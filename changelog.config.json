@@ -57,6 +57,9 @@
     "method": "semver"
   },
   "base_branches": [
-    "main"
+    "main",
+    "pre/rc",
+    "beta",
+    "alpha"
   ]
 }

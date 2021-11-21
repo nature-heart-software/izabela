@@ -3,5 +3,21 @@
   "private": true,
   "devDependencies": {
     "lerna": "^4.0.0"
+  },
+  "release": {
+    "branches": [
+      "main",
+      { "name": "pre/rc", "channel": "pre/rc", "prerelease": "rc" },
+      { "name": "beta", "channel": "beta", "prerelease": "beta" },
+      { "name": "alpha", "channel": "alpha", "prerelease": "alpha" }
+    ],
+    "plugins": [
+      [
+        "@semantic-release/npm",
+        {
+          "npmPublish": false
+        }
+      ]
+    ]
   }
 }
