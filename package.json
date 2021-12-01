@@ -1,6 +1,9 @@
 {
   "name": "root",
   "private": true,
+  "scripts": {
+    "serve": "lerna bootstrap && lerna run electron:serve --stream"
+  },
   "devDependencies": {
     "lerna": "^4.0.0"
   },

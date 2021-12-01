@@ -1,11 +1,12 @@
 // @ts-ignore
-import {ipcRenderer, ipcMain} from 'electron';
+import {ipcRenderer, ipcMain, contextBridge } from 'electron';
 const isRenderer = typeof window !== 'undefined';
 
-class IPCfy {
-    registeredClasses = {}
-    constructor(){}
-    private newClassInRenderer(Class) {
+export class Bridger {
+    constructor(){
+        this.registeredClasses = {};
+    }
+    newClassInRenderer(Class) {
         const className = Class.prototype.constructor.name
         const functionList = Object.getOwnPropertyNames(
             Class.prototype,
@@ -20,10 +21,13 @@ class IPCfy {
                 }
             }
         }
+        contextBridge.exposeInMainWorld(className, {
+            ...this.registeredClasses[className],
+        })
         return this.registeredClasses[className];
     }
 
-    private newClassInMain(Class, ...args) {
+    newClassInMain(Class, ...args) {
         const className = Class.prototype.constructor.name
         const instance = new Class(...args);
         const functionList = Object.getOwnPropertyNames(
@@ -37,12 +41,14 @@ class IPCfy {
         return instance;
     }
 
-    public new(Class) {
+    new(Class) {
         if (isRenderer) {
-            return this.newClassInRenderer(Class);
+            return () => this.newClassInRenderer(Class);
         }
-        return this.newClassInMain(Class);
+        return (...args) => this.newClassInMain(Class, ...args);
     }
 }
 
-export default new IPCfy();
+export const bridge = new Bridger();
+
+export default bridge.registeredClasses;
