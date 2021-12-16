@@ -2,6 +2,7 @@
   "name": "root",
   "private": true,
   "scripts": {
+    "install": "npm i --no-optional",
     "serve": "lerna bootstrap && lerna run electron:serve --stream"
   },
   "devDependencies": {
@@ -10,9 +11,21 @@
   "release": {
     "branches": [
       "main",
-      { "name": "pre/rc", "channel": "pre/rc", "prerelease": "rc" },
-      { "name": "beta", "channel": "beta", "prerelease": "beta" },
-      { "name": "alpha", "channel": "alpha", "prerelease": "alpha" }
+      {
+        "name": "pre/rc",
+        "channel": "pre/rc",
+        "prerelease": "rc"
+      },
+      {
+        "name": "beta",
+        "channel": "beta",
+        "prerelease": "beta"
+      },
+      {
+        "name": "alpha",
+        "channel": "alpha",
+        "prerelease": "alpha"
+      }
     ],
     "plugins": [
       [
