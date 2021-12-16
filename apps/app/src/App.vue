@@ -1,9 +1,14 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view/>
+  <div>
+    <label for="input">
+      <input
+        id="input"
+        type="text"
+        :value="$store.state.hello"
+        @input="$store.dispatch('setHello', $event.target.value)"
+      />
+    </label>
+  </div>
 </template>
 
 <style lang="scss">

@@ -1,6 +1,6 @@
 // @ts-ignore
 import {ipcRenderer, ipcMain, contextBridge } from 'electron';
-const isRenderer = typeof window !== 'undefined';
+export const isRenderer = typeof window !== 'undefined';
 
 export class Bridger {
     constructor(){
