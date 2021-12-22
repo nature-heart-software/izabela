@@ -1,22 +1,25 @@
 import fs from 'fs/promises';
 import { bridge } from '@izabela/electron-bridger';
 
-class Filesystem {
+export interface ElectronFilesystemInstance {
+  readdir: (path?: string) => Promise<string[]>;
+}
+
+declare global {
+  const ElectronFilesystem: ElectronFilesystemInstance;
+  interface Window {
+    ElectronFilesystem: ElectronFilesystemInstance;
+  }
+}
+
+class ElectronFilesystem {
   readdir(path = './') {
     return fs.readdir(path);
   }
 }
 
-export default bridge.new(Filesystem)() as iza.Filesystem;
+const createElectronFilesystemInstance = (): ElectronFilesystemInstance => {
+  return bridge.new(ElectronFilesystem)();
+};
 
-declare global {
-  namespace iza {
-    interface Filesystem {
-      readdir: (path?: string) => Promise<string[]>;
-    }
-  }
-  const Filesystem: iza.Filesystem;
-  interface Window {
-    Filesystem: iza.Filesystem;
-  }
-}
+export default createElectronFilesystemInstance();

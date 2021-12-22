@@ -9,7 +9,7 @@
 import { defineComponent } from 'vue';
 import HelloWorld from '@/components/HelloWorld.vue';
 
-const { Filesystem } = window;
+const { ElectronFilesystem } = window;
 
 export default defineComponent({
   name: 'HomeView',
@@ -17,7 +17,7 @@ export default defineComponent({
     HelloWorld,
   },
   async mounted() {
-    console.log(await Filesystem.readdir('./'));
+    console.log(await ElectronFilesystem.readdir('./'));
   },
 });
 </script>
