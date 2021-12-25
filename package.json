@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "install": "npm i --no-optional",
-    "serve": "lerna bootstrap && lerna run serve --stream"
+    "serve": "lerna bootstrap && lerna run serve --stream",
+    "storybook:serve": "lerna bootstrap && lerna run storybook:serve --stream"
   },
   "devDependencies": {
     "@parcel/packager-ts": "^2.0.1",
