@@ -9,8 +9,12 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    ignore:
+      - update-types: ['version-update:semver-major']
 
   - package-ecosystem: npm
     directory: /apps/app
     schedule:
       interval: weekly
+    ignore:
+      - update-types: ['version-update:semver-major']
