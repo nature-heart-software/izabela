@@ -1,35 +1,11 @@
 <template>
   <div>
-    <label for="input">
-      <input
-        id="input"
-        type="text"
-        :value="$store.state.hello"
-        @input="$store.dispatch('setHello', $event.target.value)"
-      />
-    </label>
+    <MyButton icon></MyButton>
   </div>
 </template>
-
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+<script lang="ts">
+import MyButton from "@/core/components/Button/Button.vue";
+export default {
+  components: {MyButton }
 }
-
-nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
-}
-</style>
+</script>

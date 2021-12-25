@@ -8,6 +8,8 @@ module.exports = defineConfig({
   configureWebpack: {
     plugins: [
       new GenerateExportsWebpackPlugin({
+        omitExtensionInExportPath: false,
+        filename: 'index.ts',
         directories: [
           './src/core/components'
         ],
