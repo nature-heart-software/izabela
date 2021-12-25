@@ -1,5 +1,5 @@
-const PrettierPlugin = require('prettier-webpack-plugin');
 const { defineConfig } = require('@vue/cli-service');
+const GenerateExportsWebpackPlugin = require('@izabela/generate-exports-webpack-plugin');
 
 module.exports = defineConfig({
   transpileDependencies: [
@@ -7,13 +7,14 @@ module.exports = defineConfig({
   ],
   configureWebpack: {
     plugins: [
-      new PrettierPlugin({
-        tabWidth: 2,
-        singleQuote: true,
-        trailingComma: 'all',
-        arrowParens: 'always',
-        endOfLine: 'auto',
-      }),
+      new GenerateExportsWebpackPlugin({
+        directories: [
+          './src/core/components'
+        ],
+        include: [
+          '**/*.vue',
+        ]
+      })
     ]
   },
   pluginOptions: {

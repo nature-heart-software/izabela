@@ -1,0 +1,25 @@
+{
+  "name": "@izabela/generate-exports-webpack-plugin",
+  "version": "1.0.0",
+  "description": "",
+  "source": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "watch": "parcel watch",
+    "build": "parcel build"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^17.0.4",
+    "parcel": "^2.0.1"
+  },
+  "dependencies": {
+    "chokidar": "^3.5.2",
+    "globby": "^11.0.4"
+  },
+  "engines": {
+    "node": ">= 12"
+  }
+}
