@@ -34,7 +34,7 @@
     "@vue/cli-service": "~5.0.0-rc.1",
     "@vue/eslint-config-airbnb": "^6.0.0",
     "@vue/eslint-config-typescript": "^9.1.0",
-    "@vue/test-utils": "^2.0.0-0",
+    "@vue/test-utils": "^2.0.0-rc.18",
     "chai": "^4.2.0",
     "cypress": "^9.0.0",
     "electron": "^13.0.0",
