@@ -1,15 +1,12 @@
 name: "Dependabot auto-merge"
 
-on: [pull_request]
+on: [pull_request_target]
 
 jobs:
   worker:
     if: github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          token: ${{ secrets.PAT }}
       - name: Auto-merge
         uses: actions/github-script@0.2.0
         with:
@@ -25,4 +22,4 @@ jobs:
               repo: context.payload.repository.name,
               pull_number: context.payload.pull_request.number
             })
-          github-token: ${{ secrets.PAT }}
+          github-token: ${{ github.token }}
