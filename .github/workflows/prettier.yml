@@ -10,6 +10,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: ${{ github.head_ref }}
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
       - name: Prettify code
         uses: creyD/prettier_action@v4.1.1
