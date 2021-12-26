@@ -14,7 +14,7 @@ protocol.registerSchemesAsPrivileged([
 
 const createWindows = async () => {
   return Promise.all([
-    ElectronWindowManager.registerInstance('messenger', await createMessengerWindow())
+    ElectronWindowManager.registerInstance('messenger', await createMessengerWindow()),
   ])
 }
 

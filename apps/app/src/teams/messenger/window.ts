@@ -23,7 +23,7 @@ const createMessengerWindow = async (): Promise<BrowserWindow> => {
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string)
-    if (!process.env.IS_TEST) win.webContents.openDevTools({mode: 'undocked'})
+    if (!process.env.IS_TEST) win.webContents.openDevTools({ mode: 'undocked' })
   } else {
     createProtocol('app')
     win.loadURL('app://./index.html')

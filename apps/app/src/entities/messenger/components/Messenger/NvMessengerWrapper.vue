@@ -89,7 +89,7 @@ export default defineComponent({
     const viewport = computed(() => ({
       width: Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0),
       height: Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0),
-    }));
+    }))
     return {
       document,
       viewport,
@@ -104,15 +104,14 @@ export default defineComponent({
         })
       },
       onScale({ target, drag }: any) {
-        target.style.transform = drag.transform;
+        target.style.transform = drag.transform
       },
-      onResize({target, width, height}: any) {
-        target.style.width = `${width}px`;
-        target.style.height = `${height}px`;
+      onResize({ target, width, height }: any) {
+        target.style.width = `${width}px`
+        target.style.height = `${height}px`
       },
     }
   },
 })
 </script>
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>
