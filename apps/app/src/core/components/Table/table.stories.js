@@ -1,14 +1,14 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { ref } from 'vue'
-import NVTable from './NVTable.vue'
-import NVTableColumn from './NVTableColumn.vue'
+import NvTable from './NvTable.vue'
+import NvTableColumn from './NvTable.vue'
 
 export default {
   title: 'Table',
 }
 
 const Template = (args) => ({
-  components: { NVTable, NVTableColumn },
+  components: { NvTable, NvTableColumn },
   setup() {
     return {
       data: ref([
@@ -39,14 +39,14 @@ const Template = (args) => ({
   template:
     args.template ||
     `
-      <NVTable
+      <NvTable
         style="width: 100%"
         :data="data"
       >
-        <NVTableColumn prop="date" label="Date" width="180" />
-        <NVTableColumn prop="name" label="Name" width="180" />
-        <NVTableColumn prop="address" label="Address" fixed="right" />
-      </NVTable>
+        <NvTableColumn prop="date" label="Date" width="180" />
+        <NvTableColumn prop="name" label="Name" width="180" />
+        <NvTableColumn prop="address" label="Address" fixed="right" />
+      </NvTable>
       `,
 })
 

@@ -4,7 +4,8 @@
   "scripts": {
     "install": "npm i --no-optional",
     "serve": "lerna bootstrap && lerna run serve --stream",
-    "storybook:serve": "lerna bootstrap && lerna run storybook:serve --stream"
+    "storybook:serve": "lerna bootstrap && lerna run storybook:serve --stream",
+    "prettify": "npx prettier --write **/*.{js,jsx,ts,tsx,vue,html,css,scss,md,json,yml} --single-quote --tab-width 2 --no-semi --trailing-comma all --arrow-parens always --end-of-line lf"
   },
   "devDependencies": {
     "@parcel/packager-ts": "^2.0.1",

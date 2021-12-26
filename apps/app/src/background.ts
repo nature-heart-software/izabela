@@ -1,9 +1,9 @@
 'use strict'
 
 import { app, protocol, BrowserWindow } from 'electron'
-import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
-import path from 'path'
+import createMessengerWindow from '@/teams/messenger/window'
+import ElectronWindowManager from '@/modules/electron-window-manager'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -12,29 +12,10 @@ protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } },
 ])
 
-async function createWindow() {
-  // Create the browser window.
-  const win = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-      // Use pluginOptions.nodeIntegration, leave this alone
-      // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
-      nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION as unknown as boolean,
-      contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
-    },
-  })
-
-  if (process.env.WEBPACK_DEV_SERVER_URL) {
-    // Load the url of the dev server if in development mode
-    await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string)
-    if (!process.env.IS_TEST) win.webContents.openDevTools()
-  } else {
-    createProtocol('app')
-    // Load the index.html when not in development
-    win.loadURL('app://./index.html')
-  }
+const createWindows = async () => {
+  return Promise.all([
+    ElectronWindowManager.registerInstance('messenger', await createMessengerWindow())
+  ])
 }
 
 // Quit when all windows are closed.
@@ -49,7 +30,7 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  if (BrowserWindow.getAllWindows().length === 0) createWindows()
 })
 
 // This method will be called when Electron has finished
@@ -64,8 +45,7 @@ app.on('ready', async () => {
       console.error('Vue Devtools failed to install:', (e as any).toString())
     }
   }
-  createWindow()
-  createWindow()
+  createWindows()
 })
 
 // Exit cleanly on request from parent process in development mode.
@@ -84,6 +64,6 @@ if (isDevelopment) {
 }
 
 // Plugins
-import '@/plugins/electron-filesystem'
+import '@/plugins/electron-messenger-window'
 import '@/modules/electron-vuex/preload'
 import '@/store'

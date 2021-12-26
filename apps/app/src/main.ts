@@ -1,3 +1,5 @@
+import '@/styles'
+import '@/teams/messenger/renderer'
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'

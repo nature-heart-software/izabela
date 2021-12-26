@@ -1,13 +1,13 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import NVButton from './NVButton.vue'
-import NVButtonGroup from './NVButtonGroup.vue'
+import NvButton from './NvButton.vue'
+import NvButtonGroup from './NvButtonGroup.vue'
 
 export default {
   title: 'Button',
 }
 
 export const Default = () => ({
-  components: { NVButton, NVButtonGroup },
+  components: { NvButton, NvButtonGroup },
   template: `
     <NVButton>
         <NVButtonGroup>loo</NVButtonGroup>
