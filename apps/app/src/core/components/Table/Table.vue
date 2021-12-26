@@ -1,6 +1,8 @@
 <template>
   <component is="wrapped-component" v-bind="$attrs" woowee>
-    <template v-for="(_, slot) of $slots" v-slot:[slot]="scope"><slot :name="slot" v-bind="scope||{}"/></template>
+    <template v-for="(_, slot) of $slots" v-slot:[slot]="scope"
+      ><slot :name="slot" v-bind="scope || {}"
+    /></template>
   </component>
 </template>
 
