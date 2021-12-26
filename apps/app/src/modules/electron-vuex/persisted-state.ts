@@ -1,18 +1,26 @@
 /* eslint-disable */
 import merge from 'deepmerge'
-import {Store} from 'vuex'
+import {Store, MutationPayload} from 'vuex'
+import type ElectronStore from 'electron-store'
 
 // const STORAGE_NAME = 'vuex';
 const STORAGE_KEY = 'state'
 const STORAGE_TEST_KEY = 'test'
+type ListOption = ((mutation: MutationPayload) => boolean) | string[] | undefined
 
+type Options = {
+  whitelist?: ListOption
+  blacklist?: ListOption
+  storage?: ElectronStore
+  storageKey?: string
+}
 class PersistedState {
-  options: any = null
-  store: any = null
-  whitelist: any = null
-  blacklist: any = null
+  options!: Options
+  store!: Store<Partial<unknown>>
+  whitelist!: ((mutation: MutationPayload) => boolean)|null
+  blacklist!: ((mutation: MutationPayload) => boolean)|null
 
-  constructor(options: any, store: any) {
+  constructor(options: Options, store: Store<Partial<unknown>>) {
     this.options = options
     this.store = store
   }
@@ -28,19 +36,19 @@ class PersistedState {
   createStorage() {
     return typeof window !== 'undefined'
       ? window.ElectronVuexStore
-      : (global as any).ElectronVuexStore
+      : (global as typeof global & {ElectronVuexStore: ElectronStore}).ElectronVuexStore
   }
 
   async getState() {
-    return this.options.storage.get(this.options.storageKey)
+    return this.options.storage!.get(this.options.storageKey!)
   }
 
-  setState(state: any) {
+  setState(state: unknown) {
     const sanitizedState = JSON.parse(JSON.stringify(state))
-    this.options.storage.set(this.options.storageKey, sanitizedState)
+    this.options.storage!.set(this.options.storageKey!, sanitizedState)
   }
 
-  loadFilter(filter: any, name: any) {
+  loadFilter(filter: ListOption, name: string) {
     if (!filter) {
       return null
     }
@@ -55,17 +63,17 @@ class PersistedState {
     )
   }
 
-  filterInArray(list: any) {
-    return (mutation: any) => list.includes(mutation.type)
+  filterInArray(list: string[]) {
+    return (mutation: MutationPayload) => list.includes(mutation.type)
   }
 
   checkStorage() {
     try {
-      this.options.storage.set(STORAGE_TEST_KEY, STORAGE_TEST_KEY)
-      this.options.storage.get(STORAGE_TEST_KEY)
-      this.options.storage.delete(STORAGE_TEST_KEY)
+      this.options.storage!.set(STORAGE_TEST_KEY, STORAGE_TEST_KEY)
+      this.options.storage!.get(STORAGE_TEST_KEY)
+      this.options.storage!.delete(STORAGE_TEST_KEY)
     } catch (error) {
-      throw new Error((error as any).message)
+      throw new Error((error as Error).message)
     }
   }
 
@@ -93,15 +101,15 @@ class PersistedState {
     const state = await this.getState()
 
     if (state) {
-      const mergedState = merge(this.store.state, state, {
+      const mergedState: unknown = merge(this.store.state, (state as Partial<unknown>), {
         arrayMerge: this.combineMerge,
       })
-      this.store.replaceState(mergedState)
+      this.store.replaceState((mergedState as Partial<unknown>))
     }
   }
 
   subscribeOnChanges() {
-    this.store.subscribe((mutation: any, state: any) => {
+    this.store.subscribe((mutation, state) => {
       if (this.blacklist && this.blacklist(mutation)) return
       if (this.whitelist && !this.whitelist(mutation)) return
 
@@ -110,8 +118,8 @@ class PersistedState {
   }
 }
 
-export default (options = {}) =>
-  async (store: Store<any>) => {
+export default (options: Options) =>
+  async (store: Store<Partial<unknown>>) => {
     store.registerModule('electronVuex', {
       namespaced: true,
       state: {
@@ -123,7 +131,7 @@ export default (options = {}) =>
         }
       },
       actions: {
-        setReady({ commit }: any, value: boolean) {
+        setReady({ commit }, value: boolean) {
           commit('setReady', value);
         },
       }
