@@ -15,4 +15,4 @@ jobs:
         uses: creyD/prettier_action@v4.1.1
         with:
           prettier_options: --write **/*.{js,jsx,ts,tsx,vue,html,css,scss,md,json,yml} --single-quote --tab-width 2 --no-semi --trailing-comma all --arrow-parens always
-          github_token: ${{ secrets.PAT }}
+          github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
