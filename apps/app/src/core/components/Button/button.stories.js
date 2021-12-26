@@ -1,16 +1,16 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import aze from './Button.vue'
-import azeaze from './ButtonGroup.vue'
+import NVButton from './NVButton.vue'
+import NVButtonGroup from './NVButtonGroup.vue'
 
 export default {
   title: 'Button',
 }
 
 export const Default = () => ({
-  components: { aze, azeaze },
+  components: { NVButton, NVButtonGroup },
   template: `
-    <azeaze>
-        <aze>loo</aze>
-    </azeaze>
+    <NVButton>
+        <NVButtonGroup>loo</NVButtonGroup>
+    </NVButton>
   `,
 })

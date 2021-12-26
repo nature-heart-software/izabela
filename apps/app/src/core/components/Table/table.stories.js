@@ -1,13 +1,17 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import Table from './Table.vue'
-import TableColumn from './TableColumn.vue'
+import {ref} from 'vue'
+import NVTable from './NVTable.vue'
+import NVTableColumn from './NVTableColumn.vue'
 
 export default {
   title: 'Table',
-  components: { Table, TableColumn },
-  data() {
+}
+
+const Template = (args) => ({
+  components: {NVTable, NVTableColumn},
+  setup() {
     return {
-      tableData: [
+      data: ref([
         {
           date: '2016-05-03',
           name: 'Tom',
@@ -28,43 +32,22 @@ export default {
           name: 'Tom',
           address: 'No. 189, Grove St, Los Angeles',
         },
-      ],
-    }
+      ]),
+      ...args,
+    };
   },
-}
-
-export const Default = () => ({
-  render() {
-    return (
-      <Table
+  template: args.template || `
+      <NVTable
         style="width: 100%"
-        data={[
-          {
-            date: '2016-05-03',
-            name: 'Tom',
-            address: 'No. 189, Grove St, Los Angeles',
-          },
-          {
-            date: '2016-05-02',
-            name: 'Tom',
-            address: 'No. 189, Grove St, Los Angeles',
-          },
-          {
-            date: '2016-05-04',
-            name: 'Tom',
-            address: 'No. 189, Grove St, Los Angeles',
-          },
-          {
-            date: '2016-05-01',
-            name: 'Tom',
-            address: 'No. 189, Grove St, Los Angeles',
-          },
-        ]}
+        :data="data"
       >
-        <TableColumn prop="date" label="Date" width="180" />
-        <TableColumn prop="name" label="Name" width="180" />
-        <TableColumn prop="address" label="Address" fixed="right" />
-      </Table>
-    )
-  },
+        <NVTableColumn prop="date" label="Date" width="180" />
+        <NVTableColumn prop="name" label="Name" width="180" />
+        <NVTableColumn prop="address" label="Address" fixed="right" />
+      </NVTable>
+      `,
 })
+
+export const Default = Template.bind({})
+Default.args = {
+}

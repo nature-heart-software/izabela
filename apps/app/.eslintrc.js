@@ -17,6 +17,7 @@ module.exports = {
     'lines-between-class-members': 'off',
     'implicit-arrow-linebreak': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
+    semi: 'off',
   },
   overrides: [
     {
