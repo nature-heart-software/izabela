@@ -6,10 +6,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import HelloWorld from '@/components/HelloWorld.vue';
+import { defineComponent } from 'vue'
+import HelloWorld from '@/components/HelloWorld.vue'
 
-const { ElectronFilesystem } = window;
+const { ElectronFilesystem } = window
 
 export default defineComponent({
   name: 'HomeView',
@@ -17,7 +17,7 @@ export default defineComponent({
     HelloWorld,
   },
   async mounted() {
-    console.log(await ElectronFilesystem.readdir('./'));
+    console.log(await ElectronFilesystem.readdir('./'))
   },
-});
+})
 </script>

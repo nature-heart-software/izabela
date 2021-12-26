@@ -1,2 +1,2 @@
-import '@/plugins/electron-filesystem';
-import '@/modules/electron-vuex/preload';
+import '@/plugins/electron-filesystem'
+import '@/modules/electron-vuex/preload'

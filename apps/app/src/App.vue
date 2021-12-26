@@ -4,8 +4,8 @@
   </div>
 </template>
 <script lang="ts">
-import MyButton from "@/core/components/Button/Button.vue";
+import MyButton from '@/core/components/Button/Button.vue'
 export default {
-  components: {MyButton }
+  components: { MyButton },
 }
 </script>
