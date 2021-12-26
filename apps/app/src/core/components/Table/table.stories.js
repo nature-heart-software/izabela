@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import {ref} from 'vue'
+import { ref } from 'vue'
 import NVTable from './NVTable.vue'
 import NVTableColumn from './NVTableColumn.vue'
 
@@ -8,7 +8,7 @@ export default {
 }
 
 const Template = (args) => ({
-  components: {NVTable, NVTableColumn},
+  components: { NVTable, NVTableColumn },
   setup() {
     return {
       data: ref([
@@ -34,9 +34,11 @@ const Template = (args) => ({
         },
       ]),
       ...args,
-    };
+    }
   },
-  template: args.template || `
+  template:
+    args.template ||
+    `
       <NVTable
         style="width: 100%"
         :data="data"
@@ -49,5 +51,4 @@ const Template = (args) => ({
 })
 
 export const Default = Template.bind({})
-Default.args = {
-}
+Default.args = {}
