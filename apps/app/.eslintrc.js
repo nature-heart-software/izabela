@@ -18,6 +18,7 @@ module.exports = {
     'implicit-arrow-linebreak': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     semi: 'off',
+    'semi-style': 'off',
     'linebreak-style': 'off',
   },
   overrides: [
