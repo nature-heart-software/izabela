@@ -9,7 +9,7 @@
         :height="$store.getters['messenger/persisted'].position.height"
         :transform="$store.getters['messenger/persisted'].position.transform"
       >
-        <nv-messenger class="w-full h-full"/>
+        <nv-messenger class="w-full h-full" />
       </nv-messenger-wrapper>
     </div>
   </template>

@@ -16,15 +16,13 @@
         left: 0,
         right: viewport.width,
         top: 0,
-        bottom: viewport.height
+        bottom: viewport.height,
       }"
-      :elementGuidelines ="[
-        document.querySelector('body'),
-      ]"
-      :verticalGuidelines="[viewport.width/2]"
+      :elementGuidelines="[document.querySelector('body')]"
+      :verticalGuidelines="[viewport.width / 2]"
       :snapDirections="{
         center: true,
-        middle: true
+        middle: true,
       }"
       :snapThreshold="50"
       @drag="onDrag"
@@ -34,9 +32,9 @@
 </template>
 <script lang="ts">
 /* eslint-disable */
-import { defineComponent, computed } from 'vue';
-import Moveable from 'vue3-moveable';
-import store from '@/store';
+import { defineComponent, computed } from 'vue'
+import Moveable from 'vue3-moveable'
+import store from '@/store'
 
 export default defineComponent({
   name: 'nv-messenger-wrapper',
@@ -69,21 +67,21 @@ export default defineComponent({
     transform: {
       type: String,
       default: null,
-    }
+    },
   },
   mounted() {
-    const moveableTargetEl = this.$refs.moveableTarget as HTMLDivElement | null ;
-    const moveable = this.$refs.moveable as any ;
+    const moveableTargetEl = this.$refs.moveableTarget as HTMLDivElement | null
+    const moveable = this.$refs.moveable as any
     if (moveableTargetEl) {
-      moveableTargetEl.style.width = this.width +'px';
-      moveableTargetEl.style.minWidth = this.minWidth +'px';
-      moveableTargetEl.style.maxWidth = this.maxWidth +'px';
-      moveableTargetEl.style.height = this.height +'px';
-      moveableTargetEl.style.minHeight = this.minHeight +'px';
-      moveableTargetEl.style.maxHeight = this.maxHeight +'px';
-      if (this.transform) moveableTargetEl.style.transform = this.transform;
+      moveableTargetEl.style.width = this.width + 'px'
+      moveableTargetEl.style.minWidth = this.minWidth + 'px'
+      moveableTargetEl.style.maxWidth = this.maxWidth + 'px'
+      moveableTargetEl.style.height = this.height + 'px'
+      moveableTargetEl.style.minHeight = this.minHeight + 'px'
+      moveableTargetEl.style.maxHeight = this.maxHeight + 'px'
+      if (this.transform) moveableTargetEl.style.transform = this.transform
     }
-    moveable.updateTarget();
+    moveable.updateTarget()
   },
   setup() {
     const viewport = computed(() => ({
@@ -93,14 +91,14 @@ export default defineComponent({
     return {
       document,
       viewport,
-      onDrag({ target, transform, width, height}: any) {
-        target.style.transform = transform;
+      onDrag({ target, transform, width, height }: any) {
+        target.style.transform = transform
         store.dispatch('messenger/setPersisted', {
           position: {
             transform,
             width,
             height,
-          }
+          },
         })
       },
       onScale({ target, drag }: any) {
