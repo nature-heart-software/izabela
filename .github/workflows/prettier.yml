@@ -1,0 +1,18 @@
+name: Prettier
+
+on: [pull_request, push]
+
+jobs:
+  prettier:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Prettify code
+        uses: creyD/prettier_action@v4.1
+        with:
+          prettier_options: --single-quote --tab-width 2 --no-semi --trailing-comma all --arrow-parens always
+          github_token: ${{ secrets.PAT }}
