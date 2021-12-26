@@ -21,7 +21,10 @@ export default createStore({
   modules: {
     messenger,
   },
-  plugins: [createPersistedState({
-    whitelist: (mutation: MutationPayload) => mutation.type.includes('setPersisted'),
-  }), createSharedMutations()],
+  plugins: [
+    createPersistedState({
+      whitelist: (mutation: MutationPayload) => mutation.type.includes('setPersisted'),
+    }),
+    createSharedMutations(),
+  ],
 })

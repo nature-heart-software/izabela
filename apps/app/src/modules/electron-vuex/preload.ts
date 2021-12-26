@@ -3,7 +3,7 @@ import Store from 'electron-store'
 import { contextBridge, ipcRenderer, ipcMain } from 'electron'
 
 class ElectronVuexStore {
-  store: Store|null = null
+  store: Store | null = null
   constructor() {
     this.store = isRenderer ? null : new Store({ name: 'vuex' })
   }
@@ -11,7 +11,7 @@ class ElectronVuexStore {
     if (!this.store) return
     return this.store.set(...args)
   }
-  ['get'](...args:  [string]) {
+  ['get'](...args: [string]) {
     if (!this.store) return
     return this.store.get(...args)
   }
