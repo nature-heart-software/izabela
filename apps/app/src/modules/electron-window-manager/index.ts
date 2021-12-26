@@ -11,11 +11,11 @@ class ElectronWindowManager {
     this.instances[name] = {
       name,
       window,
-    };
-    return this.instances[name];
+    }
+    return this.instances[name]
   }
-  getInstanceByName(name: string): Instance|undefined {
-    return this.instances[name];
+  getInstanceByName(name: string): Instance | undefined {
+    return this.instances[name]
   }
 }
 

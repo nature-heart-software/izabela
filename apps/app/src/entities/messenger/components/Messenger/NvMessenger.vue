@@ -1,12 +1,12 @@
 <template>
   <div class="messenger">
     <label for="input">
-      <input id="input" ref="input" @click="$event.target.focus()">
+      <input id="input" ref="input" @click="$event.target.focus()" />
     </label>
   </div>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'nv-messenger',
@@ -21,5 +21,4 @@ export default defineComponent({
 }
 </style>
 
-tricot Jodeki instrumental - to your excellent time
-Image
+tricot Jodeki instrumental - to your excellent time Image

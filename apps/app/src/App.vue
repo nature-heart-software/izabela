@@ -1,7 +1,7 @@
 <template>
   <div class="h-0">
     <nv-messenger-wrapper class="h-0" :min-width="768" :min-height="200">
-      <nv-messenger class="w-full h-full"/>
+      <nv-messenger class="w-full h-full" />
     </nv-messenger-wrapper>
   </div>
 </template>
@@ -18,8 +18,8 @@ body {
 }
 </style>
 <script>
-import NvMessenger from '@/entities/messenger/components/Messenger/NvMessenger.vue';
-import NvMessengerWrapper from '@/entities/messenger/components/Messenger/NvMessengerWrapper.vue';
+import NvMessenger from '@/entities/messenger/components/Messenger/NvMessenger.vue'
+import NvMessengerWrapper from '@/entities/messenger/components/Messenger/NvMessengerWrapper.vue'
 
 export default {
   name: 'app',
