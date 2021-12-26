@@ -1,4 +1,6 @@
+/* eslint-disable */
 import merge from 'deepmerge'
+import {Store} from 'vuex'
 
 // const STORAGE_NAME = 'vuex';
 const STORAGE_KEY = 'state'
@@ -109,11 +111,27 @@ class PersistedState {
 }
 
 export default (options = {}) =>
-  async (store: any) => {
+  async (store: Store<any>) => {
+    store.registerModule('electronVuex', {
+      namespaced: true,
+      state: {
+        ready: false,
+      },
+      mutations: {
+        setReady(state: {ready: boolean}, value: boolean) {
+          state.ready = value;
+        }
+      },
+      actions: {
+        setReady({ commit }: any, value: boolean) {
+          commit('setReady', value);
+        },
+      }
+    });
     const persistedState = new PersistedState(options, store)
-
     persistedState.loadOptions()
     persistedState.checkStorage()
     await persistedState.loadInitialState()
     persistedState.subscribeOnChanges()
+    store.dispatch('electronVuex/setReady', true);
   }

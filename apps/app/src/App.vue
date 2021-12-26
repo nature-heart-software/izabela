@@ -1,9 +1,18 @@
 <template>
-  <div class="h-0">
-    <nv-messenger-wrapper class="h-0" :min-width="768" :min-height="200">
-      <nv-messenger class="w-full h-full"/>
-    </nv-messenger-wrapper>
-  </div>
+  <template v-if="$store.state.electronVuex.ready">
+    <div class="h-0">
+      <nv-messenger-wrapper
+        class="h-0"
+        :min-width="768"
+        :min-height="200"
+        :width="$store.getters['messenger/persisted'].position.width"
+        :height="$store.getters['messenger/persisted'].position.height"
+        :transform="$store.getters['messenger/persisted'].position.transform"
+      >
+        <nv-messenger class="w-full h-full"/>
+      </nv-messenger-wrapper>
+    </div>
+  </template>
 </template>
 <style lang="scss">
 body {

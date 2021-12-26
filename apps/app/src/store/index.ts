@@ -1,6 +1,7 @@
 import { createStore } from 'vuex'
 
 import { createPersistedState, createSharedMutations } from '@/modules/electron-vuex'
+import messenger from '@/entities/messenger/components/store'
 
 export default createStore({
   state: {
@@ -17,6 +18,10 @@ export default createStore({
       commit('setHello', value)
     },
   },
-  modules: {},
-  plugins: [createPersistedState(), createSharedMutations()],
+  modules: {
+    messenger,
+  },
+  plugins: [createPersistedState({
+    whitelist: (mutation: any) => mutation.type.includes('setPersisted'),
+  }), createSharedMutations()],
 })

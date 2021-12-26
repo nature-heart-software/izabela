@@ -1,23 +1,32 @@
 <template>
   <div class="messengerWrapper">
-    <div id="messengerWrapper" class="inline-flex overflow-auto" :style="{
-      height: height + 'px',
-      minHeight: minHeight + 'px',
-      maxHeight: maxHeight + 'px',
-      width: width + 'px',
-      minWidth: minWidth + 'px',
-      maxWidth: maxWidth + 'px',
-    }">
+    <div ref="moveableTarget" id="messengerWrapper" class="inline-flex overflow-auto">
       <slot></slot>
     </div>
     <Moveable
+      className="opacity-0"
+      ref="moveable"
       :target="['#messengerWrapper']"
       :draggable="true"
       :scalable="false"
       :rotatable="false"
       :resizable="true"
       :snappable="true"
-      :bounds="{ left: 0, right: viewport.width, top: 0, bottom: viewport.height }"
+      :bounds="{
+        left: 0,
+        right: viewport.width,
+        top: 0,
+        bottom: viewport.height
+      }"
+      :elementGuidelines ="[
+        document.querySelector('body'),
+      ]"
+      :verticalGuidelines="[viewport.width/2]"
+      :snapDirections="{
+        center: true,
+        middle: true
+      }"
+      :snapThreshold="50"
       @drag="onDrag"
       @resize="onResize"
     />
@@ -27,6 +36,7 @@
 /* eslint-disable */
 import { defineComponent, computed } from 'vue';
 import Moveable from 'vue3-moveable';
+import store from '@/store';
 
 export default defineComponent({
   name: 'nv-messenger-wrapper',
@@ -56,6 +66,24 @@ export default defineComponent({
       type: Number,
       default: Infinity,
     },
+    transform: {
+      type: String,
+      default: null,
+    }
+  },
+  mounted() {
+    const moveableTargetEl = this.$refs.moveableTarget as HTMLDivElement | null ;
+    const moveable = this.$refs.moveable as any ;
+    if (moveableTargetEl) {
+      moveableTargetEl.style.width = this.width +'px';
+      moveableTargetEl.style.minWidth = this.minWidth +'px';
+      moveableTargetEl.style.maxWidth = this.maxWidth +'px';
+      moveableTargetEl.style.height = this.height +'px';
+      moveableTargetEl.style.minHeight = this.minHeight +'px';
+      moveableTargetEl.style.maxHeight = this.maxHeight +'px';
+      if (this.transform) moveableTargetEl.style.transform = this.transform;
+    }
+    moveable.updateTarget();
   },
   setup() {
     const viewport = computed(() => ({
@@ -63,9 +91,17 @@ export default defineComponent({
       height: Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0),
     }));
     return {
+      document,
       viewport,
-      onDrag({ target, transform }: any) {
+      onDrag({ target, transform, width, height}: any) {
         target.style.transform = transform;
+        store.dispatch('messenger/setPersisted', {
+          position: {
+            transform,
+            width,
+            height,
+          }
+        })
       },
       onScale({ target, drag }: any) {
         target.style.transform = drag.transform;
