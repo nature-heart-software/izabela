@@ -14,6 +14,7 @@ export const messengerStore: Module<typeof storeState, any> = {
   namespaced: true,
   state: storeState,
   getters: {
+    state: (state) => state,
     persisted: (state) => state.persisted,
   },
   mutations: {
