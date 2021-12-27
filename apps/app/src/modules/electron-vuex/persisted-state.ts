@@ -51,7 +51,7 @@ class PersistedState {
       return filter
     }
     throw new Error(
-      `[Vuex Electron] Filter "${ name }" should be Array or Function. Please, read the docs.`,
+      `[Vuex Electron] Filter "${name}" should be Array or Function. Please, read the docs.`,
     )
   }
 
@@ -105,7 +105,6 @@ class PersistedState {
         },
       },
     })
-
   }
 }
 
@@ -115,8 +114,7 @@ export default (options: PersistedStateOptions): Plugin<unknown> =>
     persistedState.checkStorage()
     persistedState.subscribeOnChanges()
     persistedState.createStoreModule()
-    Promise.resolve(persistedState.loadInitialState())
-      .then(() => {
-        store.dispatch('electron-vuex/setPersistedStateReady', true)
-      })
+    Promise.resolve(persistedState.loadInitialState()).then(() => {
+      store.dispatch('electron-vuex/setPersistedStateReady', true)
+    })
   }
