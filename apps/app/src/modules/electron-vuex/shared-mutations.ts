@@ -1,70 +1,63 @@
-import { MutationPayload, Store, ActionPayload } from 'vuex'
-import { IpcRendererHandler } from '@/modules/electron-vuex/types'
-import IpcMain = Electron.IpcMain
-import IpcMainEvent = Electron.IpcMainEvent
+import {
+  MutationPayload,
+  Store,
+  Plugin,
+  Dispatch,
+  DispatchOptions,
+  Commit,
+} from 'vuex'
+import {
+  AugmentedGlobal,
+  IpcRenderer,
+  ProcessType,
+  IpcMainMutationEventHandler,
+  Connections,
+  IpcRendererMutationEventHandler,
+} from '@/modules/electron-vuex/types'
+import { IPC_EVENT_CONNECT, IPC_EVENT_NOTIFY_MAIN, IPC_EVENT_NOTIFY_RENDERERS } from './consts'
 
-const IPC_EVENT_CONNECT = 'vuex-mutations-connect'
-const IPC_EVENT_NOTIFY_MAIN = 'vuex-mutations-notify-main'
-const IPC_EVENT_NOTIFY_RENDERERS = 'vuex-mutations-notify-renderers'
-type Options = {
-  type?: 'renderer' | 'main'
-  ipcMain?: Electron.IpcMain
-  ipcRenderer?: {
-    SEND_IPC_EVENT_CONNECT: () => void
-    ON_IPC_EVENT_NOTIFY_RENDERERS: (handler: IpcRendererHandler) => void
-    SEND_IPC_EVENT_NOTIFY_MAIN: (payload: MutationPayload) => void
-  }
-}
-type StoreOption = Store<unknown> & {
-  originalCommit: Store<unknown>['commit']
-  originalDispatch: Store<unknown>['dispatch']
-  dispatch: (type: string, payload: ActionPayload) => void
-}
-type Connections = { [key: string]: IpcMainEvent['sender'] }
 class SharedMutations {
-  options!: Options
-  store: StoreOption
-  constructor(store: StoreOption) {
+  type: ProcessType = typeof window !== 'undefined' ? 'renderer' : 'main'
+  ipcMain: Electron.IpcMain = (global as AugmentedGlobal).ipcMain
+  ipcRenderer: IpcRenderer | null = typeof window !== 'undefined' ? window.ElectronVuex.ipcRenderer : null
+  store: Store<unknown>
+  storeOriginalCommit!: Commit
+  storeOriginalDispatch!: Dispatch
+
+  constructor(store: Store<unknown>) {
     this.store = store
   }
 
-  loadOptions() {
-    if (!this.options.type) {
-      this.options.type = typeof window !== 'undefined' ? 'renderer' : 'main'
-    }
-    if (!this.options.ipcMain) {
-      this.options.ipcMain = (global as typeof global & { ipcMain: IpcMain }).ipcMain
-    }
-    if (!this.options.ipcRenderer) {
-      this.options.ipcRenderer =
-        typeof window !== 'undefined' ? window.ElectronVuex.ipcRenderer : null
-    }
-  }
-
   connect() {
-    this.options.ipcRenderer!.SEND_IPC_EVENT_CONNECT()
+    if (this.ipcRenderer) this.ipcRenderer.SEND_IPC_EVENT_CONNECT()
   }
 
-  onConnect(handler: (e: IpcMainEvent) => void) {
-    this.options.ipcMain!.on(IPC_EVENT_CONNECT, handler)
+  onConnect(handler: IpcMainMutationEventHandler) {
+    this.ipcMain.on(IPC_EVENT_CONNECT, handler)
   }
 
   notifyMain(payload: MutationPayload) {
-    this.options.ipcRenderer!.SEND_IPC_EVENT_NOTIFY_MAIN(payload)
+    if (this.ipcRenderer) this.ipcRenderer.SEND_IPC_EVENT_NOTIFY_MAIN(payload)
   }
 
-  onNotifyMain(handler: (e: IpcMainEvent, payload: MutationPayload) => void) {
-    this.options.ipcMain!.on(IPC_EVENT_NOTIFY_MAIN, handler)
+  onNotifyMain(handler: IpcMainMutationEventHandler) {
+    this.ipcMain.on(IPC_EVENT_NOTIFY_MAIN, handler)
   }
 
-  notifyRenderers(connections: Connections, payload: MutationPayload) {
+  notifyRenderers(
+    connections: Connections,
+    payload: MutationPayload,
+    sourceProcessId = '',
+  ) {
     Object.keys(connections).forEach((processId) => {
-      connections[processId].send(IPC_EVENT_NOTIFY_RENDERERS, payload)
+      if (processId !== sourceProcessId) {
+        connections[processId].send(IPC_EVENT_NOTIFY_RENDERERS, payload)
+      }
     })
   }
 
-  onNotifyRenderers(handler: IpcRendererHandler) {
-    this.options.ipcRenderer!.ON_IPC_EVENT_NOTIFY_RENDERERS(handler)
+  onNotifyRenderers(handler: IpcRendererMutationEventHandler) {
+    if (this.ipcRenderer) this.ipcRenderer.ON_IPC_EVENT_NOTIFY_RENDERERS(handler)
   }
 
   rendererProcessLogic() {
@@ -72,8 +65,8 @@ class SharedMutations {
     this.connect()
 
     // Save original Vuex methods
-    this.store.originalCommit = this.store.commit
-    this.store.originalDispatch = this.store.dispatch
+    this.storeOriginalCommit = this.store.commit
+    this.storeOriginalDispatch = this.store.dispatch
 
     // Don't use commit in renderer outside of actions
     this.store.commit = () => {
@@ -83,13 +76,21 @@ class SharedMutations {
     }
 
     // Forward dispatch to main process
-    ;(this.store as any).dispatch = (type: string, payload: unknown) => {
-      this.notifyMain({ type, payload })
+    this.store.dispatch = (
+      type: string,
+      payload?: any,
+    ): Promise<any> => {
+      this.notifyMain({
+        type,
+        payload,
+      })
+      // return this.storeOriginalDispatch(type, payload, options)
+      return Promise.resolve()
     }
 
     // Subscribe on changes from main process and apply them
-    this.onNotifyRenderers((event, { type, payload }) => {
-      this.store.originalCommit(type, payload)
+    this.onNotifyRenderers((event, { type, payload } = { type: '', payload: null }) => {
+      this.storeOriginalCommit(type, payload)
     })
   }
 
@@ -110,7 +111,7 @@ class SharedMutations {
     })
 
     // Subscribe on changes from renderer processes
-    this.onNotifyMain((event, { type, payload }) => {
+    this.onNotifyMain((event, { type, payload } = { type: '', payload: null }) => {
       this.store.dispatch(type, payload)
     })
 
@@ -124,7 +125,7 @@ class SharedMutations {
   }
 
   activatePlugin() {
-    switch (this.options.type) {
+    switch (this.type) {
       case 'renderer':
         this.rendererProcessLogic()
         break
@@ -137,9 +138,7 @@ class SharedMutations {
   }
 }
 
-export default () => (store: StoreOption) => {
+export default (): Plugin<unknown> => (store) => {
   const sharedMutations = new SharedMutations(store)
-
-  sharedMutations.loadOptions()
   sharedMutations.activatePlugin()
 }

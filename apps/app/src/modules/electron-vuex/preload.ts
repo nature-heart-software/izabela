@@ -1,27 +1,36 @@
 import { bridge, isRenderer } from '@izabela/electron-bridger'
-import Store from 'electron-store'
+import {
+  IPC_EVENT_CONNECT,
+  IPC_EVENT_NOTIFY_MAIN,
+  IPC_EVENT_NOTIFY_RENDERERS,
+} from '@/modules/electron-vuex/consts'
+import ElectronStore from 'electron-store'
 import { contextBridge, ipcRenderer, ipcMain } from 'electron'
-import { MutationPayload } from 'vuex'
-import { IpcRendererHandler } from '@/modules/electron-vuex/types'
 import IpcMain = Electron.IpcMain
-type ElectronVuexGlobal = {
-  ElectronVuexStore: typeof Store
-  ipcMain: IpcMain
-}
-type Global = typeof global & ElectronVuexGlobal
-class ElectronVuexStore {
-  store: Store | null = null
+import { MutationPayload } from 'vuex'
+import {
+  AugmentedGlobal,
+  IpcRenderer,
+  IpcRendererMutationEventHandler,
+} from '@/modules/electron-vuex/types'
+
+class ElectronVuexStorage {
+  store: ElectronStore | null = null
+
   constructor() {
-    this.store = isRenderer ? null : new Store({ name: 'vuex' })
+    this.store = isRenderer ? null : new ElectronStore({name: 'vuex'})
   }
+
   ['set'](...args: [string, unknown]) {
     if (!this.store) return
     return this.store.set(...args)
   }
+
   ['get'](...args: [string]) {
     if (!this.store) return
     return this.store.get(...args)
   }
+
   ['delete'](...args: [string]) {
     if (!this.store) return
     return this.store.delete(...args)
@@ -29,11 +38,8 @@ class ElectronVuexStore {
 }
 
 if (isRenderer) {
-  const IPC_EVENT_CONNECT = 'vuex-mutations-connect'
-  const IPC_EVENT_NOTIFY_MAIN = 'vuex-mutations-notify-main'
-  const IPC_EVENT_NOTIFY_RENDERERS = 'vuex-mutations-notify-renderers'
-
   contextBridge.exposeInMainWorld('ElectronVuex', {
+    winId: ipcRenderer.sendSync('electron-vuex-get-win-id'),
     ipcRenderer: {
       ['SEND_IPC_EVENT_CONNECT']() {
         ipcRenderer.send(IPC_EVENT_CONNECT)
@@ -41,28 +47,33 @@ if (isRenderer) {
       ['SEND_IPC_EVENT_NOTIFY_MAIN'](payload: MutationPayload) {
         ipcRenderer.send(IPC_EVENT_NOTIFY_MAIN, payload)
       },
-      ['ON_IPC_EVENT_NOTIFY_RENDERERS'](handler: IpcRendererHandler) {
+      ['ON_IPC_EVENT_NOTIFY_RENDERERS'](handler: IpcRendererMutationEventHandler) {
         ipcRenderer.on(IPC_EVENT_NOTIFY_RENDERERS, handler)
       },
     },
   })
+} else {
+  ipcMain.on('electron-vuex-get-win-id', (e) => {
+    e.returnValue = e.sender.id
+  })
 }
 
-const { store } = bridge.new(ElectronVuexStore)()
+const {store} = bridge.new(ElectronVuexStorage)()
 
 if (!isRenderer) {
-  Store.initRenderer()
-  ;(global as Global).ElectronVuexStore = store
-  ;(global as Global).ipcMain = ipcMain
+  ElectronStore.initRenderer()
+  ;(global as AugmentedGlobal).ElectronVuexStorage = store
+  ;(global as AugmentedGlobal).ipcMain = ipcMain
 }
 
 declare global {
   interface Window {
-    ElectronVuex: any
-    ElectronVuexStore: Global['ElectronVuexStore']
+    ElectronVuex: { ipcRenderer: IpcRenderer, winId: number }
+    ElectronVuexStorage: ElectronStore
   }
+
   interface Global {
     ipcMain: IpcMain
-    ElectronVuexStore: typeof Store
+    ElectronVuexStorage: ElectronStore
   }
 }

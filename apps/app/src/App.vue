@@ -1,5 +1,5 @@
 <template>
-  <template v-if="$store.state.electronVuex.ready">
+  <template v-if="$store.state['electron-vuex'].persistedStateReady">
     <div class="h-0">
       <nv-messenger-wrapper
         class="h-0"

@@ -3,7 +3,7 @@ import { throttle } from 'lodash'
 const { ElectronMessengerWindow } = window
 
 ;(() => {
-  let t
+  // let t
   let focused = true
   const enableMouseEvents = () => {
     if (!focused) {
