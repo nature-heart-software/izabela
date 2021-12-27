@@ -1,8 +1,8 @@
 import { bridge, isRenderer } from '@izabela/electron-bridger'
 import Store from 'electron-store'
 import { contextBridge, ipcRenderer, ipcMain } from 'electron'
-import {MutationPayload} from 'vuex'
-import {IpcRendererHandler} from '@/modules/electron-vuex/types'
+import { MutationPayload } from 'vuex'
+import { IpcRendererHandler } from '@/modules/electron-vuex/types'
 
 class ElectronVuexStore {
   store: Store | null = null
