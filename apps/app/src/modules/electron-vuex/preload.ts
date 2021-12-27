@@ -3,7 +3,12 @@ import Store from 'electron-store'
 import { contextBridge, ipcRenderer, ipcMain } from 'electron'
 import { MutationPayload } from 'vuex'
 import { IpcRendererHandler } from '@/modules/electron-vuex/types'
-
+import IpcMain = Electron.IpcMain
+type ElectronVuexGlobal = {
+  ElectronVuexStore: typeof Store
+  ipcMain: IpcMain
+}
+type Global = typeof global & ElectronVuexGlobal
 class ElectronVuexStore {
   store: Store | null = null
   constructor() {
@@ -47,17 +52,17 @@ const { store } = bridge.new(ElectronVuexStore)()
 
 if (!isRenderer) {
   Store.initRenderer()
-  ;(global as any).ElectronVuexStore = store
-  ;(global as any).ipcMain = ipcMain
+  ;(global as Global).ElectronVuexStore = store
+  ;(global as Global).ipcMain = ipcMain
 }
 
 declare global {
   interface Window {
     ElectronVuex: any
-    ElectronVuexStore: any
+    ElectronVuexStore: Global['ElectronVuexStore']
   }
   interface Global {
-    ipcMain: any
-    ElectronVuexStore: any
+    ipcMain: IpcMain
+    ElectronVuexStore: typeof Store
   }
 }
