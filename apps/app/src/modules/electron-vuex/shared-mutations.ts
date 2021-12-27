@@ -10,7 +10,7 @@ type Options = {
   type?: 'renderer' | 'main'
   ipcMain?: Electron.IpcMain
   ipcRenderer?: {
-    SEND_IPC_EVENT_CONNECT: () => void,
+    SEND_IPC_EVENT_CONNECT: () => void
     ON_IPC_EVENT_NOTIFY_RENDERERS: (handler: IpcRendererHandler) => void
     SEND_IPC_EVENT_NOTIFY_MAIN: (payload: MutationPayload) => void
   }
@@ -83,7 +83,7 @@ class SharedMutations {
     }
 
     // Forward dispatch to main process
-    (this.store as any).dispatch = (type: string, payload: unknown) => {
+    ;(this.store as any).dispatch = (type: string, payload: unknown) => {
       this.notifyMain({ type, payload })
     }
 
@@ -137,10 +137,9 @@ class SharedMutations {
   }
 }
 
-export default () =>
-  (store: StoreOption) => {
-    const sharedMutations = new SharedMutations(store)
+export default () => (store: StoreOption) => {
+  const sharedMutations = new SharedMutations(store)
 
-    sharedMutations.loadOptions()
-    sharedMutations.activatePlugin()
-  }
+  sharedMutations.loadOptions()
+  sharedMutations.activatePlugin()
+}
