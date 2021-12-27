@@ -13,8 +13,14 @@ export type AugmentedGlobal = typeof global & {
   ipcMain: Electron.IpcMain
 }
 export type ProcessType = 'main' | 'renderer'
-export type IpcMainMutationEventHandler = (event: Electron.IpcMainEvent, mutationPayload?: MutationPayload) => void
-export type IpcRendererMutationEventHandler = (event: Electron.IpcRendererEvent, mutationPayload?: MutationPayload) => void
+export type IpcMainMutationEventHandler = (
+  event: Electron.IpcMainEvent,
+  mutationPayload?: MutationPayload,
+) => void
+export type IpcRendererMutationEventHandler = (
+  event: Electron.IpcRendererEvent,
+  mutationPayload?: MutationPayload,
+) => void
 export type IpcRenderer = {
   SEND_IPC_EVENT_CONNECT: () => void
   ON_IPC_EVENT_NOTIFY_RENDERERS: (handler: IpcRendererMutationEventHandler) => void

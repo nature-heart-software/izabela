@@ -18,7 +18,7 @@ class ElectronVuexStorage {
   store: ElectronStore | null = null
 
   constructor() {
-    this.store = isRenderer ? null : new ElectronStore({name: 'vuex'})
+    this.store = isRenderer ? null : new ElectronStore({ name: 'vuex' })
   }
 
   ['set'](...args: [string, unknown]) {
@@ -58,7 +58,7 @@ if (isRenderer) {
   })
 }
 
-const {store} = bridge.new(ElectronVuexStorage)()
+const { store } = bridge.new(ElectronVuexStorage)()
 
 if (!isRenderer) {
   ElectronStore.initRenderer()
@@ -68,7 +68,7 @@ if (!isRenderer) {
 
 declare global {
   interface Window {
-    ElectronVuex: { ipcRenderer: IpcRenderer, winId: number }
+    ElectronVuex: { ipcRenderer: IpcRenderer; winId: number }
     ElectronVuexStorage: ElectronStore
   }
 
