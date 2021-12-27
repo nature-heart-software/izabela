@@ -1,4 +1,6 @@
-import { MutationPayload, Store, Plugin, Dispatch, DispatchOptions, Commit } from 'vuex'
+import {
+  MutationPayload, Store, Plugin, Dispatch, Commit,
+} from 'vuex'
 import {
   AugmentedGlobal,
   IpcRenderer,

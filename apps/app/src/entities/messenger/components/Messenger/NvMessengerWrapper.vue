@@ -93,13 +93,9 @@ export default defineComponent({
       viewport,
       onDrag({ target, transform, width, height }: any) {
         target.style.transform = transform
-        store.dispatch('messenger/setPersisted', {
-          position: {
-            transform,
-            width,
-            height,
-          },
-        })
+        store.commit('messenger/setProperty', ['position.width', width])
+        store.commit('messenger/setProperty', ['position.height', height])
+        store.commit('messenger/setProperty', ['position.transform', transform])
       },
       onScale({ target, drag }: any) {
         target.style.transform = drag.transform

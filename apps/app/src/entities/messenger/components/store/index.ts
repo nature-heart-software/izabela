@@ -1,4 +1,5 @@
 import { Module } from 'vuex'
+import { utilActions, utilMutations } from '@/utils/vuex'
 
 const storeState = {
   persisted: {
@@ -18,14 +19,10 @@ export const messengerStore: Module<typeof storeState, any> = {
     persisted: (state) => state.persisted,
   },
   mutations: {
-    setPersisted(state, value: typeof storeState['persisted']) {
-      state.persisted = value
-    },
+    ...utilMutations,
   },
   actions: {
-    setPersisted({ commit }, value: typeof storeState['persisted']) {
-      commit('setPersisted', value)
-    },
+    ...utilActions,
   },
 }
 
