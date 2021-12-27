@@ -1,6 +1,8 @@
 import { bridge, isRenderer } from '@izabela/electron-bridger'
 import Store from 'electron-store'
 import { contextBridge, ipcRenderer, ipcMain } from 'electron'
+import {MutationPayload} from 'vuex'
+import {IpcRendererHandler} from '@/modules/electron-vuex/types'
 
 class ElectronVuexStore {
   store: Store | null = null
@@ -28,13 +30,13 @@ if (isRenderer) {
 
   contextBridge.exposeInMainWorld('ElectronVuex', {
     ipcRenderer: {
-      ['SEND_IPC_EVENT_CONNECT'](payload: any) {
-        ipcRenderer.send(IPC_EVENT_CONNECT, payload)
+      ['SEND_IPC_EVENT_CONNECT']() {
+        ipcRenderer.send(IPC_EVENT_CONNECT)
       },
-      ['SEND_IPC_EVENT_NOTIFY_MAIN'](payload: any) {
+      ['SEND_IPC_EVENT_NOTIFY_MAIN'](payload: MutationPayload) {
         ipcRenderer.send(IPC_EVENT_NOTIFY_MAIN, payload)
       },
-      ['ON_IPC_EVENT_NOTIFY_RENDERERS'](handler: any) {
+      ['ON_IPC_EVENT_NOTIFY_RENDERERS'](handler: IpcRendererHandler) {
         ipcRenderer.on(IPC_EVENT_NOTIFY_RENDERERS, handler)
       },
     },
