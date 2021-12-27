@@ -1,5 +1,5 @@
-import {MutationPayload, Store, ActionPayload} from 'vuex'
-import {IpcRendererHandler} from '@/modules/electron-vuex/types'
+import { MutationPayload, Store, ActionPayload } from 'vuex'
+import { IpcRendererHandler } from '@/modules/electron-vuex/types'
 import IpcMain = Electron.IpcMain
 import IpcMainEvent = Electron.IpcMainEvent
 
@@ -33,7 +33,7 @@ class SharedMutations {
       this.options.type = typeof window !== 'undefined' ? 'renderer' : 'main'
     }
     if (!this.options.ipcMain) {
-      this.options.ipcMain = (global as typeof global & {ipcMain: IpcMain}).ipcMain
+      this.options.ipcMain = (global as typeof global & { ipcMain: IpcMain }).ipcMain
     }
     if (!this.options.ipcRenderer) {
       this.options.ipcRenderer =
