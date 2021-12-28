@@ -6,6 +6,7 @@
 **/
 export { default as NvButton } from './Button/NvButton.vue';
 export { default as NvButtonGroup } from './Button/NvButtonGroup.vue';
+export { default as NvText } from './Text/NvText.vue';
 export { default as NvTable } from './Table/NvTable.vue';
-export { default as NVTableColumn } from './Table/NVTableColumn.vue';
+export { default as NvTableColumn } from './Table/NvTableColumn.vue';
 /** End of auto-generated content **/
