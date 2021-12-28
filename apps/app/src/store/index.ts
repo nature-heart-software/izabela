@@ -8,17 +8,19 @@ export default createStore({
   getters: {
     theme() {
       return theme.extend
-    }
+    },
   },
   modules: {
     messenger,
   },
   plugins: [
-    ...(process.env.STORYBOOK ? [] : [
-      createPersistedState({
-        whitelist: (mutation: MutationPayload) => mutation.type.includes('setPersisted'),
-      }),
-      createSharedMutations(),
-    ]),
-  ]
+    ...(process.env.STORYBOOK
+      ? []
+      : [
+          createPersistedState({
+            whitelist: (mutation: MutationPayload) => mutation.type.includes('setPersisted'),
+          }),
+          createSharedMutations(),
+        ]),
+  ],
 })
