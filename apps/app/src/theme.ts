@@ -36,8 +36,8 @@ const theme = {
       30: '#B7B7C0',
       20: '#CFCFD5',
       10: '#E7E7EA',
-      0: '#ffffff'
-    }
+      0: '#ffffff',
+    },
   },
   // Follows: https://www.carbondesignsystem.com/guidelines/spacing/overview/
   space: {
@@ -73,7 +73,7 @@ const theme = {
     14: ['4.75rem', { lineHeight: '1.4', letterSpacing: '0.02rem' }],
     15: ['5.25rem', { lineHeight: '1.4', letterSpacing: '0.02rem' }],
     16: ['5.75rem', { lineHeight: '1.4', letterSpacing: '0.02rem' }],
-  }
+  },
 }
 
 module.exports = theme
