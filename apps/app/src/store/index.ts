@@ -6,9 +6,7 @@ const theme = require('@/theme')
 
 export default createStore({
   getters: {
-    theme() {
-      return theme.extend
-    }
+    theme: () => theme
   },
   modules: {
     messenger,

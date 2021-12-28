@@ -1,4 +1,6 @@
-const theme: TailwindConfig['theme'] = {
+// import { TailwindConfig } from 'tailwindcss/tailwind-config'
+
+const theme = {
   fontFamily: {
     sans: [
       'Nunito',

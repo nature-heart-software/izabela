@@ -1,12 +1,13 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import NvText from './NvText.vue'
+const theme = require('@/theme')
 
 export default {
   title: 'Text',
   argTypes: {
     size: {
-      options: Array(16).fill(null).map((_, i) => (i + 1).toString()),
-      control: { type: 'select' },
+      options: Object.keys(theme.fontSize).map(key => key),
+      control: { type: 'inline-radio' },
     },
   },
 }
