@@ -1,10 +1,10 @@
 <template>
-  <st-text :size="size"><slot/></st-text>
+  <st-text :as="as" :size="size"><slot/></st-text>
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { StText } from './text.styled'
-import { textProps } from '@/core/components/Text/consts'
+import { textProps } from './consts'
 
 export default defineComponent({
   components: {

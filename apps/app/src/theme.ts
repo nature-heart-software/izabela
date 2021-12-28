@@ -74,6 +74,15 @@ const theme = {
     15: ['5.25rem', { lineHeight: '1.4', letterSpacing: '0.02rem' }],
     16: ['5.75rem', { lineHeight: '1.4', letterSpacing: '0.02rem' }],
   },
+  borderRadius: {
+    xs: '.25rem',
+    sm: '.375rem',
+    md: '.5rem',
+    DEFAULT: '.5rem',
+  },
+  borderWidth: {
+    DEFAULT: '.063rem',
+  }
 }
 
 module.exports = theme

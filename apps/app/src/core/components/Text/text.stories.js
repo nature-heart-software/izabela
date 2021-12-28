@@ -24,6 +24,7 @@ const Template = (args) => ({
       <nv-text :size="size">{{content}}</nv-text>
     `,
 })
+
 export const Default = Template.bind({})
 Default.args = {
   content: `hello world`,
