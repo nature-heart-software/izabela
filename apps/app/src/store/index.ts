@@ -2,12 +2,12 @@ import { createStore, MutationPayload } from 'vuex'
 
 import { createPersistedState, createSharedMutations } from '@/modules/electron-vuex'
 import messenger from '@/entities/messenger/components/store'
-import tailwindConfig from '@/tailwind.config'
+const theme = require('@/theme')
 
 export default createStore({
   getters: {
     theme() {
-      return tailwindConfig.theme.extend
+      return theme.extend
     }
   },
   modules: {

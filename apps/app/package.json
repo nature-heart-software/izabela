@@ -17,6 +17,7 @@
   },
   "main": "background.js",
   "dependencies": {
+    "@types/tailwindcss": "^2.2.4",
     "deepmerge": "^4.2.2",
     "electron-store": "^8.0.1",
     "element-plus": "^1.2.0-beta.6",

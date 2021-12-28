@@ -1,4 +1,4 @@
-const extend = {
+const theme: TailwindConfig['theme'] = {
   fontFamily: {
     sans: [
       'Nunito',
@@ -73,14 +73,5 @@ const extend = {
     16: ['5.75rem', { lineHeight: '1.4', letterSpacing: '0.02rem' }],
   }
 }
-module.exports = {
-  content: [
-    './src/**/*.{vue,html,js,scss}'
-  ],
-  theme: {
-    extend: {
-      ...extend,
-    },
-  },
-  plugins: [],
-}
+
+module.exports = theme
