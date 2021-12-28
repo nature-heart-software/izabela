@@ -82,7 +82,7 @@ const theme = {
   },
   borderWidth: {
     DEFAULT: '.063rem',
-  }
+  },
 }
 
 module.exports = theme

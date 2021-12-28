@@ -5,13 +5,15 @@ import { textProps } from '@/core/components/Text/consts'
 const theme = store.getters['theme']
 
 export const StText = styled('div', textProps)`
-  color: ${ theme.colors.black };
-  font-family: ${ theme.fontFamily.sans.join(', ') };
-  font-size: ${ ({size}) => theme.fontSize[size][0] };
-  line-height: ${ ({size}) => theme.fontSize[size][1].lineHeight };
-  letter-spacing: ${ ({size}) => theme.fontSize[size][1].letterSpacing };
-  ${ ({as}) => as === 'span' ? `
+  color: ${theme.colors.black};
+  font-family: ${theme.fontFamily.sans.join(', ')};
+  font-size: ${({ size }) => theme.fontSize[size][0]};
+  line-height: ${({ size }) => theme.fontSize[size][1].lineHeight};
+  letter-spacing: ${({ size }) => theme.fontSize[size][1].letterSpacing};
+  ${({ as }) =>
+    as === 'span'
+      ? `
     display: inline-flex;
-  ` : ''
-  }
+  `
+      : ''}
 `

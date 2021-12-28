@@ -1,7 +1,7 @@
 <template>
   <st-button :size="size">
     <nv-text as="span">
-      <slot/>
+      <slot />
     </nv-text>
   </st-button>
 </template>

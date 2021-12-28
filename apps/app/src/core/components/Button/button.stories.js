@@ -19,7 +19,8 @@ const Template = (args) => ({
     }
   },
   template:
-    args.template || `
+    args.template ||
+    `
       <nv-button :size="size">{{content}}</nv-button>
     `,
 })
@@ -27,5 +28,5 @@ const Template = (args) => ({
 export const Default = Template.bind({})
 Default.args = {
   content: `hello world`,
-  size: 'md'
+  size: 'md',
 }

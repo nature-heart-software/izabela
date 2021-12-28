@@ -6,5 +6,5 @@ export const textProps = {
   as: {
     type: String,
     default: 'div',
-  }
+  },
 }

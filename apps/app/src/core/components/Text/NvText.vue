@@ -1,5 +1,5 @@
 <template>
-  <st-text :as="as" :size="size"><slot/></st-text>
+  <st-text :as="as" :size="size"><slot /></st-text>
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue'
@@ -15,6 +15,6 @@ export default defineComponent({
 </script>
 <style lang="scss">
 body {
-  @apply font-sans text-black text-2
+  @apply font-sans text-black text-2;
 }
 </style>
