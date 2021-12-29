@@ -52,18 +52,6 @@ export default defineComponent({
       type: Number,
       default: Infinity,
     },
-    height: {
-      type: Number,
-      default: 100,
-    },
-    minHeight: {
-      type: Number,
-      default: 0,
-    },
-    maxHeight: {
-      type: Number,
-      default: Infinity,
-    },
     transform: {
       type: String,
       default: null,
@@ -76,9 +64,6 @@ export default defineComponent({
       moveableTargetEl.style.width = this.width + 'px'
       moveableTargetEl.style.minWidth = this.minWidth + 'px'
       moveableTargetEl.style.maxWidth = this.maxWidth + 'px'
-      moveableTargetEl.style.height = this.height + 'px'
-      moveableTargetEl.style.minHeight = this.minHeight + 'px'
-      moveableTargetEl.style.maxHeight = this.maxHeight + 'px'
       if (this.transform) moveableTargetEl.style.transform = this.transform
     }
     moveable.updateTarget()
@@ -91,18 +76,16 @@ export default defineComponent({
     return {
       document,
       viewport,
-      onDrag({ target, transform, width, height }: any) {
+      onDrag({ target, transform }: any) {
         target.style.transform = transform
-        store.dispatch('messenger/setProperty', ['position.width', width])
-        store.dispatch('messenger/setProperty', ['position.height', height])
         store.dispatch('messenger/setProperty', ['position.transform', transform])
       },
       onScale({ target, drag }: any) {
         target.style.transform = drag.transform
       },
-      onResize({ target, width, height }: any) {
+      onResize({ target, width }: any) {
         target.style.width = `${width}px`
-        target.style.height = `${height}px`
+        store.dispatch('messenger/setProperty', ['position.width', width])
       },
     }
   },

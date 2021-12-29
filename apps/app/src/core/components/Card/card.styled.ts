@@ -12,7 +12,8 @@ const {
 
 export const StCard = styled('div', props)`
   background-color: ${colors.white};
-  padding: ${space['4']};
-  border-radius: ${borderRadius.DEFAULT}
-  box-shadow: ${boxShadow.DEFAULT}
+  padding: ${space['3']};
+  border-radius: ${borderRadius.DEFAULT};
+  box-shadow: ${boxShadow.DEFAULT};
+  font-size: 0;
 `

@@ -72,6 +72,7 @@ export const StButton = styled('button', props)`
   align-items: center;
   font-size: ${fontSize['1'][0]};
   ${fontSize['1'][1]}
+  font-weight: 600;
   border-radius: ${borderRadius.DEFAULT};
   border-width: ${borderWidth.DEFAULT};
   outline: 0;
@@ -106,7 +107,7 @@ export const StButton = styled('button', props)`
         `
                     background-color: ${colors.gray['20']};
                 `,
-      ]}
+      ].filter(Boolean)}
         `,
       type === 'plain' &&
       `
@@ -133,7 +134,7 @@ export const StButton = styled('button', props)`
                     border-color: ${colors.gray['80']};
                     background-color: ${colors.gray['80']};
                 `,
-      ]}
+      ].filter(Boolean)}
         `,
       type === 'ghost' &&
       `
@@ -156,7 +157,7 @@ export const StButton = styled('button', props)`
         `
                     background-color: ${colors.gray['20']};
                 `,
-      ]}
+      ].filter(Boolean)}
         `,
     ].filter(Boolean)}
 `

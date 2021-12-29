@@ -1,6 +1,11 @@
 import { VNode, Comment } from 'vue'
 
-export function isVNodeEmpty(vnodes: VNode | VNode[] | undefined | null): boolean {
+export function isVNodeEmpty(
+  slot: (d: object) => VNode | VNode[] | undefined | null,
+  data = {},
+): boolean {
+  if (!slot) return true
+  const vnodes: VNode | VNode[] | undefined | null = slot(data)
   return (
     !!vnodes &&
     (Array.isArray(vnodes)
