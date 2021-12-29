@@ -1,23 +1,20 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import NvText from './NvText.vue'
+import NvCard from './NvCard.vue'
+import {props} from './card.shared'
 const theme = require('@/theme')
 
 export default {
-  title: 'Text',
+  title: 'Card',
   argTypes: {
     content: {
       defaultValue: 'hello world',
       control: { type: 'text' }
     },
-    size: {
-      options: Object.keys(theme.fontSize).map((key) => key),
-      control: { type: 'inline-radio' },
-    },
   },
 }
 
 const Template = (args) => ({
-  components: { NvText },
+  components: { NvCard },
   setup() {
     return {
       args,
@@ -26,7 +23,7 @@ const Template = (args) => ({
   template:
     args.template ||
     `
-      <nv-text v-bind="args">{{args.content}}</nv-text>
+      <nv-card v-bind="args">{{args.content}}</nv-card>
     `,
 })
 

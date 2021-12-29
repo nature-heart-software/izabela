@@ -7,6 +7,7 @@ import { StIcon } from './icon.styled'
 import { props } from './icon.shared'
 
 export default defineComponent({
+  name: 'nv-icon',
   components: {
     StIcon,
   },

@@ -14,6 +14,7 @@ import { NvText, NvIcon } from '../'
 import {isVNodeEmpty} from '@/utils/vue'
 
 export default defineComponent({
+  name: 'nv-button',
   components: {
     StButton,
     NvText,

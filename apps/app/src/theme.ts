@@ -85,6 +85,9 @@ const theme = {
   borderWidth: {
     DEFAULT: '.063rem',
     lg: '.25rem',
+  },
+  boxShadow: {
+    DEFAULT: '0px 2px 1px rgba(0, 0, 0, 0.05)',
   }
 }
 

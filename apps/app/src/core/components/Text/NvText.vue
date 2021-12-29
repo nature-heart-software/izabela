@@ -7,6 +7,7 @@ import { StText } from './text.styled'
 import { props } from './text.shared'
 
 export default defineComponent({
+  name: 'nv-text',
   components: {
     StText,
   },
