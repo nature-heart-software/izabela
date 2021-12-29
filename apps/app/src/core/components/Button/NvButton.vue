@@ -19,6 +19,6 @@ export default defineComponent({
   props: buttonProps,
   mounted() {
     console.log(this.$props)
-  }
+  },
 })
 </script>
