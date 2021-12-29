@@ -3,12 +3,7 @@ import styled from 'vue3-styled-components'
 import store from '@/store'
 import { props } from './card.shared'
 
-const {
-  colors,
-  space,
-  borderRadius,
-  boxShadow,
-} = store.getters.theme
+const { colors, space, borderRadius, boxShadow } = store.getters.theme
 
 export const StCard = styled('div', props)`
   background-color: ${colors.white};

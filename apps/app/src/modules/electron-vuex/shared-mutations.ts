@@ -1,10 +1,4 @@
-import {
-  MutationPayload,
-  Store,
-  Plugin,
-  Dispatch,
-  Commit,
-} from 'vuex'
+import { MutationPayload, Store, Plugin, Dispatch, Commit } from 'vuex'
 import {
   AugmentedGlobal,
   IpcRenderer,
@@ -13,11 +7,7 @@ import {
   Connections,
   IpcRendererMutationEventHandler,
 } from '@/modules/electron-vuex/types'
-import {
-  IPC_EVENT_CONNECT,
-  IPC_EVENT_NOTIFY_MAIN,
-  IPC_EVENT_NOTIFY_RENDERERS,
-} from './consts'
+import { IPC_EVENT_CONNECT, IPC_EVENT_NOTIFY_MAIN, IPC_EVENT_NOTIFY_RENDERERS } from './consts'
 
 class SharedMutations {
   type: ProcessType = typeof window !== 'undefined' ? 'renderer' : 'main'
