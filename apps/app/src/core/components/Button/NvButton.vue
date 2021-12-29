@@ -1,5 +1,8 @@
 <template>
-  <st-button v-bind="$props" :squared="squared || isVNodeEmpty($slots.default())">
+  <st-button
+    v-bind="$props"
+    :squared="squared || isVNodeEmpty($slots.default())"
+  >
     <nv-text as="span" ref="content" v-if="!isVNodeEmpty($slots.default())">
       <slot />
     </nv-text>
@@ -7,11 +10,12 @@
   </st-button>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue'
-import { StButton } from './button.styled'
-import { props, Size } from './button.shared'
-import { NvText, NvIcon } from '../'
-import { isVNodeEmpty } from '@/utils/vue'
+import { defineComponent } from 'vue';
+import { StButton } from './button.styled';
+import { props, Size } from './button.shared';
+import NvText from '../Text/NvText.vue';
+import NvIcon from '../Icon/NvIcon.vue';
+import { isVNodeEmpty } from '@/utils/vue';
 
 export default defineComponent({
   name: 'nv-button',
@@ -24,7 +28,7 @@ export default defineComponent({
   setup() {
     return {
       isVNodeEmpty,
-    }
+    };
   },
   computed: {
     iconSize() {
@@ -33,9 +37,9 @@ export default defineComponent({
         sm: '3',
         md: '5',
         lg: '5',
-      }
-      return sizes[this.size]
+      };
+      return sizes[this.size];
     },
   },
-})
+});
 </script>

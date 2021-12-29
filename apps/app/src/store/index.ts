@@ -16,10 +16,10 @@ export default createStore({
     ...(process.env.STORYBOOK
       ? []
       : [
-          createPersistedState({
-            whitelist: (mutation: MutationPayload) => mutation.type.includes('setPersisted'),
-          }),
-          createSharedMutations(),
-        ]),
+        createPersistedState({
+          whitelist: (mutation: MutationPayload) => mutation.type.includes('setPersisted'),
+        }),
+        createSharedMutations(),
+      ]),
   ],
 })

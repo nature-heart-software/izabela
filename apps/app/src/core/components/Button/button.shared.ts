@@ -1,4 +1,5 @@
 import { PropType, ExtractPropTypes } from 'vue'
+
 export type Size = 'xs' | 'sm' | 'md' | 'lg'
 export type Type = 'default' | 'plain' | 'ghost'
 

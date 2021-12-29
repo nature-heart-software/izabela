@@ -1,4 +1,4 @@
-import { ActionContext, Dispatch, Mutation } from 'vuex'
+import { ActionContext, Mutation } from 'vuex'
 import { set } from 'lodash'
 
 export const setPropertyMutation: Mutation<any> = (state, [path, data]: [string, any]): object =>

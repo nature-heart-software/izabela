@@ -1,12 +1,18 @@
+/* eslint-disable */
 import styled from 'vue3-styled-components'
 import store from '@/store'
 import { props } from './card.shared'
 
-const theme = store.getters['theme']
+const {
+  colors,
+  space,
+  borderRadius,
+  boxShadow,
+} = store.getters.theme
 
 export const StCard = styled('div', props)`
-  background-color: ${theme.colors.white};
-  padding: ${theme.space['4']};
-  border-radius: ${theme.borderRadius.DEFAULT}
-  box-shadow: ${theme.boxShadow.DEFAULT}
+  background-color: ${colors.white};
+  padding: ${space['4']};
+  border-radius: ${borderRadius.DEFAULT}
+  box-shadow: ${boxShadow.DEFAULT}
 `

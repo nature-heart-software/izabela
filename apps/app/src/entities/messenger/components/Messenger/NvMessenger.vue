@@ -12,6 +12,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { NvCard } from '@/core/components'
+
 export default defineComponent({
   name: 'nv-messenger',
   components: {
