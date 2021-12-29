@@ -1,8 +1,5 @@
 <template>
-  <st-button
-    v-bind="$props"
-    :squared="squared || isVNodeEmpty($slots.default)"
-  >
+  <st-button v-bind="$props" :squared="squared || isVNodeEmpty($slots.default)">
     <nv-text as="span" ref="content" v-if="!isVNodeEmpty($slots.default)">
       <slot />
     </nv-text>

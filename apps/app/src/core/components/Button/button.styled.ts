@@ -101,7 +101,7 @@ export const StButton = styled('button', props)`
                 `
                     background-color: ${colors.gray['20']};
                 `,
-      ].filter(Boolean)}
+            ].filter(Boolean)}
         `,
       type === 'plain' &&
         `
@@ -128,7 +128,7 @@ export const StButton = styled('button', props)`
                     border-color: ${colors.gray['80']};
                     background-color: ${colors.gray['80']};
                 `,
-      ].filter(Boolean)}
+            ].filter(Boolean)}
         `,
       type === 'ghost' &&
         `
@@ -151,7 +151,7 @@ export const StButton = styled('button', props)`
                 `
                     background-color: ${colors.gray['20']};
                 `,
-      ].filter(Boolean)}
+            ].filter(Boolean)}
         `,
     ].filter(Boolean)}
 `
