@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import NvIcon from './NvIcon.vue'
-import {props} from './icon.shared'
+import { props } from './icon.shared'
 const theme = require('@/theme')
 
 export default {

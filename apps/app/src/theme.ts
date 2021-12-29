@@ -21,7 +21,6 @@ const theme = {
     serif: ['Georgia', 'Cambria', '"Times New Roman"', 'Times', 'serif'],
     mono: ['Menlo', 'Monaco', 'Consolas', '"Liberation Mono"', '"Courier New"', 'monospace'],
   },
-  
   colors: {
     white: '#ffffff',
     black: '#0E0E2C',
@@ -88,7 +87,7 @@ const theme = {
   },
   boxShadow: {
     DEFAULT: '0px 2px 1px rgba(0, 0, 0, 0.05)',
-  }
+  },
 }
 
 module.exports = theme

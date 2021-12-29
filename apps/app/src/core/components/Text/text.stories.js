@@ -7,7 +7,7 @@ export default {
   argTypes: {
     content: {
       defaultValue: 'hello world',
-      control: { type: 'text' }
+      control: { type: 'text' },
     },
     size: {
       options: Object.keys(theme.fontSize).map((key) => key),

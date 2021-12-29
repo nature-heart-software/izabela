@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import NvCard from './NvCard.vue'
-import {props} from './card.shared'
+import { props } from './card.shared'
 const theme = require('@/theme')
 
 export default {
@@ -8,7 +8,7 @@ export default {
   argTypes: {
     content: {
       defaultValue: 'hello world',
-      control: { type: 'text' }
+      control: { type: 'text' },
     },
   },
 }
