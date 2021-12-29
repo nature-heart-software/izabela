@@ -4,9 +4,9 @@
   </st-card>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { StCard } from './card.styled';
-import { props } from './card.shared';
+import { defineComponent } from 'vue'
+import { StCard } from './card.styled'
+import { props } from './card.shared'
 
 export default defineComponent({
   name: 'nv-card',
@@ -14,5 +14,5 @@ export default defineComponent({
     StCard,
   },
   props,
-});
+})
 </script>

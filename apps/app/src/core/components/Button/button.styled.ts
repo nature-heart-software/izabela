@@ -4,13 +4,7 @@ import store from '@/store'
 import { props, Props, Size } from './button.shared'
 import { CSSObject } from '@/types/css-in-js'
 
-const {
-  space,
-  borderWidth,
-  borderRadius,
-  fontSize,
-  colors,
-} = store.getters.theme
+const { space, borderWidth, borderRadius, fontSize, colors } = store.getters.theme
 
 const getStyleFromSize = ({ size }: Props) => {
   const styles: { [key in Size]: CSSObject } = {
@@ -87,7 +81,7 @@ export const StButton = styled('button', props)`
     ${({ type, selected }) =>
     [
       type === 'default' &&
-      `
+        `
             background-color: ${colors.white};
             border-color: ${colors.gray['20']};
             &:hover {
@@ -103,14 +97,14 @@ export const StButton = styled('button', props)`
             }
 
             ${[
-        selected &&
-        `
+              selected &&
+                `
                     background-color: ${colors.gray['20']};
                 `,
       ].filter(Boolean)}
         `,
       type === 'plain' &&
-      `
+        `
             color: ${colors.white};
             background-color: ${colors.gray['100']};
             border-color: ${colors.gray['100']};
@@ -129,15 +123,15 @@ export const StButton = styled('button', props)`
             }
 
             ${[
-        selected &&
-        `
+              selected &&
+                `
                     border-color: ${colors.gray['80']};
                     background-color: ${colors.gray['80']};
                 `,
       ].filter(Boolean)}
         `,
       type === 'ghost' &&
-      `
+        `
             background-color: transparent;
             border-color: transparent;
             &:hover {
@@ -153,8 +147,8 @@ export const StButton = styled('button', props)`
             }
 
             ${[
-        selected &&
-        `
+              selected &&
+                `
                     background-color: ${colors.gray['20']};
                 `,
       ].filter(Boolean)}

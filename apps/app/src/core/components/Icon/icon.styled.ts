@@ -3,9 +3,7 @@ import styled from 'vue3-styled-components'
 import store from '@/store'
 import { props } from './icon.shared'
 
-const {
-  fontSize,
-} = store.getters.theme
+const { fontSize } = store.getters.theme
 
 export const StIcon = styled('i', props)`
   display: inline-flex;
