@@ -4,6 +4,7 @@ import {props} from './button.shared'
 
 export default {
   title: 'Button',
+  component: NvButton,
   argTypes: {
     content: {
       defaultValue: 'hello world',

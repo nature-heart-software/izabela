@@ -13,7 +13,7 @@ export const props = {
   },
   size: {
     type: String as PropType<Size>,
-    default: '2',
+    default: 'md',
   },
   squared: {
     type: Boolean,
