@@ -61,21 +61,25 @@ const getStyleFromSquared = ({squared, size}: Props) => {
 }
 
 export const StButton = styled('button', props)`
-    display: inline-flex;
-    align-items: center;
-    font-size: ${theme.fontSize['1'][0]};
-    ${theme.fontSize['1'][1]}
-    border-radius: ${theme.borderRadius.DEFAULT};
-    border-width: ${theme.borderWidth.DEFAULT};
-    outline: 0;
-    ${(props) => getStyleFromSize(props)}
-    ${({squared}) => squared && `
+  display: inline-flex;
+  align-items: center;
+  font-size: ${theme.fontSize['1'][0]};
+  ${theme.fontSize['1'][1]}
+  border-radius: ${theme.borderRadius.DEFAULT};
+  border-width: ${theme.borderWidth.DEFAULT};
+  outline: 0;
+  ${(props) => getStyleFromSize(props)}
+  ${({ squared }) =>
+    squared &&
+    `
         padding: 0;
         justify-content: center;
     `}
     ${(props) => getStyleFromSquared(props)}
-    ${({type, selected}) => [
-        type === 'default' && `
+    ${({ type, selected }) =>
+    [
+      type === 'default' &&
+        `
             background-color: ${theme.colors.white};
             border-color: ${theme.colors.gray['20']};
             &:hover {
@@ -91,12 +95,14 @@ export const StButton = styled('button', props)`
             }
 
             ${[
-                selected && `
+              selected &&
+                `
                     background-color: ${theme.colors.gray['20']};
                 `,
             ]}
         `,
-        type === 'plain' && `
+      type === 'plain' &&
+        `
             color: ${theme.colors.white};
             background-color: ${theme.colors.gray['100']};
             border-color: ${theme.colors.gray['100']};
@@ -115,13 +121,15 @@ export const StButton = styled('button', props)`
             }
 
             ${[
-                selected && `
+              selected &&
+                `
                     border-color: ${theme.colors.gray['80']};
                     background-color: ${theme.colors.gray['80']};
                 `,
             ]}
         `,
-        type === 'ghost' && `
+      type === 'ghost' &&
+        `
             background-color: transparent;
             border-color: transparent;
             &:hover {
@@ -137,7 +145,8 @@ export const StButton = styled('button', props)`
             }
 
             ${[
-                selected && `
+              selected &&
+                `
                     background-color: ${theme.colors.gray['20']};
                 `,
             ]}

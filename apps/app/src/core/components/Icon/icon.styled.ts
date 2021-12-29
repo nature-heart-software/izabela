@@ -6,8 +6,8 @@ const theme = store.getters['theme']
 
 export const StIcon = styled('i', props)`
   display: inline-flex;
-  width: ${({size}) => theme.fontSize[size][0]};
-  height: ${({size}) => theme.fontSize[size][0]};
-  font-size: ${({size}) => theme.fontSize[size][0]};
-  line-height: ${({size}) => theme.fontSize[size][0]};
+  width: ${({ size }) => theme.fontSize[size][0]};
+  height: ${({ size }) => theme.fontSize[size][0]};
+  font-size: ${({ size }) => theme.fontSize[size][0]};
+  line-height: ${({ size }) => theme.fontSize[size][0]};
 `

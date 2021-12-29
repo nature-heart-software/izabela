@@ -1,7 +1,7 @@
 export const props = {
   name: {
     String,
-    default: 'times-square'
+    default: 'times-square',
   },
   size: {
     type: String,
