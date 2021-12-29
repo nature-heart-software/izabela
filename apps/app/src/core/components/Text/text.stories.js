@@ -29,5 +29,4 @@ const Template = (args) => ({
 export const Default = Template.bind({})
 Default.args = {
   content: `hello world`,
-  size: '2',
 }

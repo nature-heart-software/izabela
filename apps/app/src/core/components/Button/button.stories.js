@@ -1,5 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import NvButton from './NvButton.vue'
+import {props} from './button.shared'
 
 export default {
   title: 'Button',
@@ -9,18 +10,26 @@ export default {
       control: { type: 'text' }
     },
     type: {
-      defaultValue: 'default',
+      defaultValue: props.type.default,
       options: ['default', 'plain', 'ghost'],
       control: { type: 'inline-radio' },
     },
     size: {
-      defaultValue: 'md',
+      defaultValue: props.size.default,
       options: ['xs', 'sm', 'md', 'lg'],
       control: { type: 'inline-radio' },
     },
     selected: {
-      defaultValue: false,
+      defaultValue: props.selected.default,
       control: { type: 'boolean' },
+    },
+    squared: {
+      defaultValue: props.squared.default,
+      control: { type: 'boolean' },
+    },
+    iconName: {
+      defaultValue: '',
+      control: { type: 'text' }
     },
   },
 }
@@ -49,4 +58,15 @@ Plain.args = {
 export const Ghost = Template.bind({})
 Ghost.args = {
   type: 'ghost',
+}
+
+export const WithIcon = Template.bind({})
+WithIcon.args = {
+  iconName: 'github',
+}
+
+export const WithIconOnly = Template.bind({})
+WithIconOnly.args = {
+  iconName: 'github',
+  content: '',
 }

@@ -5,6 +5,6 @@ export const props = {
   },
   size: {
     type: String,
-    default: '2',
+    default: '5',
   },
 }

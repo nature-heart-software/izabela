@@ -19,6 +19,10 @@ export const props = {
     type: Boolean,
     default: false,
   },
+  iconName: {
+    type: String,
+    default: '',
+  }
 }
 
 export type Props = ExtractPropTypes<typeof props>

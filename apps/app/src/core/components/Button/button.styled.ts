@@ -11,22 +11,34 @@ const getStyleFromSize = ({size}: Props) => {
             padding: `0 ${theme.space['2']}`,
             height: theme.space['5'],
             borderRadius: theme.borderRadius.xs,
+            '> * + *': {
+                marginLeft: theme.space['2']
+            }
         },
         sm: {
             padding: `0 ${theme.space['3']}`,
             height: theme.space['6'],
             borderRadius: theme.borderRadius.sm,
+            '> * + *': {
+                marginLeft: theme.space['2']
+            }
         },
         md: {
             padding: `0 ${theme.space['5']}`,
             height: theme.space['7'],
+            '> * + *': {
+                marginLeft: theme.space['3']
+            }
         },
         lg: {
             padding: `0 ${theme.space['5']}`,
             height: theme.space['8'],
+            '> * + *': {
+                marginLeft: theme.space['3']
+            }
         },
     }
-    return styles[size] || styles['md']
+    return styles[size]
 }
 
 const getStyleFromSquared = ({squared, size}: Props) => {
@@ -44,9 +56,8 @@ const getStyleFromSquared = ({squared, size}: Props) => {
             width: squared && theme.space['8'],
         },
     }
-    console.log(styles[size], squared)
 
-    return styles[size] || styles['md']
+    return styles[size]
 }
 
 export const StButton = styled('button', props)`
@@ -60,6 +71,7 @@ export const StButton = styled('button', props)`
     ${(props) => getStyleFromSize(props)}
     ${({squared}) => squared && `
         padding: 0;
+        justify-content: center;
     `}
     ${(props) => getStyleFromSquared(props)}
     ${({type, selected}) => [
