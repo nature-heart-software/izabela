@@ -12,6 +12,6 @@ export const StText = styled('div', textProps)`
   letter-spacing: ${ ({size}) => theme.fontSize[size][1].letterSpacing };
   ${ ({as}) => as === 'span' ? `
     display: inline-flex;
-  ` : ''
-  }
+  `
+      : ''}
 `

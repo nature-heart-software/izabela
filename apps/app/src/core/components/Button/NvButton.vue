@@ -1,7 +1,7 @@
 <template>
   <st-button v-bind="$props">
     <nv-text as="span">
-      <slot/>
+      <slot />
     </nv-text>
   </st-button>
 </template>

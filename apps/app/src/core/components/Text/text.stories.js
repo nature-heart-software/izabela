@@ -6,7 +6,7 @@ export default {
   title: 'Text',
   argTypes: {
     size: {
-      options: Object.keys(theme.fontSize).map(key => key),
+      options: Object.keys(theme.fontSize).map((key) => key),
       control: { type: 'inline-radio' },
     },
   },
@@ -20,7 +20,8 @@ const Template = (args) => ({
     }
   },
   template:
-    args.template || `
+    args.template ||
+    `
       <nv-text :size="size">{{content}}</nv-text>
     `,
 })
@@ -28,5 +29,5 @@ const Template = (args) => ({
 export const Default = Template.bind({})
 Default.args = {
   content: `hello world`,
-  size: '2'
+  size: '2',
 }
