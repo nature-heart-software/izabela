@@ -21,21 +21,23 @@ const theme = {
     serif: ['Georgia', 'Cambria', '"Times New Roman"', 'Times', 'serif'],
     mono: ['Menlo', 'Monaco', 'Consolas', '"Liberation Mono"', '"Courier New"', 'monospace'],
   },
-  // Generated with: https://coolors.co/gradient-palette/ffffff-0e0e2c?number=11
+  
   colors: {
     white: '#ffffff',
     black: '#0E0E2C',
     gray: {
       100: '#0E0E2C',
-      90: '#262641',
-      80: '#3E3E56',
-      70: '#56566B',
-      60: '#6E6E80',
-      50: '#878796',
-      40: '#9F9FAB',
-      30: '#B7B7C0',
-      20: '#CFCFD5',
-      10: '#E7E7EA',
+      90: '#2B2B2C',
+      80: '#444444',
+      /* Generated with: https://coolors.co/gradient-palette/444444-DCDCDC?number=6 */
+      70: '#626262',
+      60: '#818181',
+      50: '#9F9F9F',
+      40: '#BEBEBE',
+      /* --------- */
+      30: '#DCDCDC',
+      20: '#EBEBEB',
+      10: '#F9F9FC',
       0: '#ffffff',
     },
   },
@@ -82,6 +84,7 @@ const theme = {
   },
   borderWidth: {
     DEFAULT: '.063rem',
+    lg: '.25rem',
   }
 }
 

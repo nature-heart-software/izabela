@@ -1,10 +1,10 @@
 <template>
-  <st-text :as="as" :size="size"><slot/></st-text>
+  <st-text :as="as" v-bind="$props"><slot/></st-text>
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { StText } from './text.styled'
-import { textProps } from './consts'
+import { textProps } from './text.shared'
 
 export default defineComponent({
   components: {
@@ -15,6 +15,6 @@ export default defineComponent({
 </script>
 <style lang="scss">
 body {
-  @apply font-sans text-black text-2
+  @apply font-sans text-gray-80 text-2
 }
 </style>

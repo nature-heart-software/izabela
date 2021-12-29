@@ -1,5 +1,5 @@
 <template>
-  <st-button :size="size">
+  <st-button v-bind="$props">
     <nv-text as="span">
       <slot/>
     </nv-text>
@@ -8,7 +8,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { StButton } from './button.styled'
-import { buttonProps } from './consts'
+import { buttonProps } from './button.shared'
 import { NvText } from '../'
 
 export default defineComponent({
@@ -17,5 +17,8 @@ export default defineComponent({
     NvText,
   },
   props: buttonProps,
+  mounted() {
+    console.log(this.$props)
+  }
 })
 </script>
