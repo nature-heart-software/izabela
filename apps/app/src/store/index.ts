@@ -6,6 +6,9 @@ import messenger from '@/entities/messenger/components/store'
 const theme = require('@/theme')
 
 export default createStore({
+  state: {
+    env: process.env.NODE_ENV,
+  },
   getters: {
     theme: () => theme,
   },

@@ -1,8 +1,24 @@
-import fs from 'fs/promises'
+import { app } from 'electron'
 import { bridge } from '@izabela/electron-bridger'
-import ElectronWindowManager from '@/modules/electron-window-manager'
+import ElectronWindowManager, {Instance} from '@/modules/electron-window-manager'
 class ElectronMessengerWindow {
-  focus() {
+  hide() {
+    const messenger = ElectronWindowManager.getInstanceByName('messenger')
+    if (messenger) {
+      const { window } = messenger
+      window.hide()
+    }
+    return Promise.resolve()
+  }
+  show() {
+    const messenger = ElectronWindowManager.getInstanceByName('messenger')
+    if (messenger) {
+      const { window } = messenger
+      window.show()
+    }
+    return Promise.resolve()
+  }
+  focus()  {
     const messenger = ElectronWindowManager.getInstanceByName('messenger')
     if (messenger) {
       const { window } = messenger

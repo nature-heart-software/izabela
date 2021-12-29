@@ -12,13 +12,16 @@
       <div class="flex flex-1 justify-end space-x-3">
         <nv-card class="flex-1 min-h-8">
           <div class="inline-flex space-x-2">
+            <template v-if="$store.state.env === 'development'">
+              <nv-button size="xs" type="plain" icon-name="redo" @click="reload"/>
+            </template>
           </div>
         </nv-card>
         <nv-card class="inline-flex">
           <div class="inline-flex space-x-2">
-            <nv-button size="xs" type="plain" icon-name="minus"/>
-            <nv-button size="xs" type="plain" icon-name="square-full"/>
-            <nv-button size="xs" type="plain" icon-name="times"/>
+            <!-- <nv-button size="xs" type="plain" icon-name="minus"/>
+            <nv-button size="xs" type="plain" icon-name="square-full"/> -->
+            <nv-button size="xs" type="plain" icon-name="times"  @click="hide"/>
           </div>
         </nv-card>
       </div>
@@ -52,11 +55,23 @@
 import { defineComponent } from 'vue'
 import { NvCard, NvButton } from '@/core/components'
 
+const { ElectronMessengerWindow } = window;
+
 export default defineComponent({
   name: 'nv-messenger',
   components: {
     NvCard,
     NvButton,
+  },
+  setup() {
+    return {
+      hide() {
+        ElectronMessengerWindow.hide()
+      },
+      reload() {
+        window.location.reload();
+      },
+    }
   },
 })
 </script>

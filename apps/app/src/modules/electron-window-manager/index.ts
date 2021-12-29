@@ -1,8 +1,8 @@
-type Instance = {
+export type Instance = {
   name: string
   window: Electron.BrowserWindow
 }
-type Instances = {
+export type Instances = {
   [key: string]: Instance
 }
 class ElectronWindowManager {
