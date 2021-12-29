@@ -22,7 +22,7 @@ export const props = {
   iconName: {
     type: String,
     default: '',
-  }
+  },
 }
 
 export type Props = ExtractPropTypes<typeof props>

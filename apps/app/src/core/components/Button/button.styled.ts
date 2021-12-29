@@ -5,59 +5,59 @@ import { CSSObject } from '@/types/css-in-js'
 
 const theme = store.getters['theme']
 
-const getStyleFromSize = ({size}: Props) => {
-    const styles: {[key in Size]: CSSObject} = {
-        xs: {
-            padding: `0 ${theme.space['2']}`,
-            height: theme.space['5'],
-            borderRadius: theme.borderRadius.xs,
-            '> * + *': {
-                marginLeft: theme.space['2']
-            }
-        },
-        sm: {
-            padding: `0 ${theme.space['3']}`,
-            height: theme.space['6'],
-            borderRadius: theme.borderRadius.sm,
-            '> * + *': {
-                marginLeft: theme.space['2']
-            }
-        },
-        md: {
-            padding: `0 ${theme.space['5']}`,
-            height: theme.space['7'],
-            '> * + *': {
-                marginLeft: theme.space['3']
-            }
-        },
-        lg: {
-            padding: `0 ${theme.space['5']}`,
-            height: theme.space['8'],
-            '> * + *': {
-                marginLeft: theme.space['3']
-            }
-        },
-    }
-    return styles[size]
+const getStyleFromSize = ({ size }: Props) => {
+  const styles: { [key in Size]: CSSObject } = {
+    xs: {
+      padding: `0 ${theme.space['2']}`,
+      height: theme.space['5'],
+      borderRadius: theme.borderRadius.xs,
+      '> * + *': {
+        marginLeft: theme.space['2'],
+      },
+    },
+    sm: {
+      padding: `0 ${theme.space['3']}`,
+      height: theme.space['6'],
+      borderRadius: theme.borderRadius.sm,
+      '> * + *': {
+        marginLeft: theme.space['2'],
+      },
+    },
+    md: {
+      padding: `0 ${theme.space['5']}`,
+      height: theme.space['7'],
+      '> * + *': {
+        marginLeft: theme.space['3'],
+      },
+    },
+    lg: {
+      padding: `0 ${theme.space['5']}`,
+      height: theme.space['8'],
+      '> * + *': {
+        marginLeft: theme.space['3'],
+      },
+    },
+  }
+  return styles[size]
 }
 
-const getStyleFromSquared = ({squared, size}: Props) => {
-    const styles: {[key in Size]: CSSObject} = {
-        xs: {
-            width: squared && theme.space['5'],
-        },
-        sm: {
-            width: squared && theme.space['6'],
-        },
-        md: {
-            width: squared && theme.space['7'],
-        },
-        lg: {
-            width: squared && theme.space['8'],
-        },
-    }
+const getStyleFromSquared = ({ squared, size }: Props) => {
+  const styles: { [key in Size]: CSSObject } = {
+    xs: {
+      width: squared && theme.space['5'],
+    },
+    sm: {
+      width: squared && theme.space['6'],
+    },
+    md: {
+      width: squared && theme.space['7'],
+    },
+    lg: {
+      width: squared && theme.space['8'],
+    },
+  }
 
-    return styles[size]
+  return styles[size]
 }
 
 export const StButton = styled('button', props)`
