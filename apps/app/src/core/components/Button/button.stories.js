@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import NvButton from './NvButton.vue'
-import {props} from './button.shared'
+import { props } from './button.shared'
 
 export default {
   title: 'Button',
@@ -8,7 +8,7 @@ export default {
   argTypes: {
     content: {
       defaultValue: 'hello world',
-      control: { type: 'text' }
+      control: { type: 'text' },
     },
     type: {
       defaultValue: props.type.default,
@@ -30,7 +30,7 @@ export default {
     },
     iconName: {
       defaultValue: '',
-      control: { type: 'text' }
+      control: { type: 'text' },
     },
   },
 }
@@ -43,7 +43,8 @@ const Template = (args) => ({
     }
   },
   template:
-    args.template || `
+    args.template ||
+    `
       <nv-button v-bind="args">{{args.content}}</nv-button>
     `,
 })
