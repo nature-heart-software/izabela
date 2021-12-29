@@ -1,10 +1,10 @@
 import styled from 'vue3-styled-components'
 import store from '@/store'
-import { textProps } from './text.shared'
+import { props } from './text.shared'
 
 const theme = store.getters['theme']
 
-export const StText = styled('div', textProps)`
+export const StText = styled('div', props)`
   color: inherit;
   font-family: ${theme.fontFamily.sans.join(', ')};
   font-size: ${({ size }) => theme.fontSize[size][0]};

@@ -1,4 +1,6 @@
-export const textProps = {
+import { ExtractPropTypes } from "vue"
+
+export const props = {
   size: {
     type: String,
     default: '2',
@@ -8,3 +10,5 @@ export const textProps = {
     default: 'div',
   },
 }
+
+export type Props = ExtractPropTypes<typeof props>

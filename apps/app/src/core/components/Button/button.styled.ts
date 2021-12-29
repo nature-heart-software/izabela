@@ -1,11 +1,11 @@
 import styled, { Styled } from 'vue3-styled-components'
 import store from '@/store'
-import { buttonProps, ButtonProps, Size } from './button.shared'
+import { props, Props, Size } from './button.shared'
 import { CSSObject } from '@/types/css-in-js'
 
 const theme = store.getters['theme']
 
-const getStyleFromSize = ({size}: ButtonProps) => {
+const getStyleFromSize = ({size}: Props) => {
     const styles: {[key in Size]: CSSObject} = {
         xs: {
             padding: `0 ${theme.space['2']}`,
@@ -29,7 +29,7 @@ const getStyleFromSize = ({size}: ButtonProps) => {
     return styles[size] || styles['md']
 }
 
-const getStyleFromSquared = ({squared, size}: ButtonProps) => {
+const getStyleFromSquared = ({squared, size}: Props) => {
     const styles: {[key in Size]: CSSObject} = {
         xs: {
             width: squared && theme.space['5'],
@@ -49,7 +49,7 @@ const getStyleFromSquared = ({squared, size}: ButtonProps) => {
     return styles[size] || styles['md']
 }
 
-export const StButton = styled('button', buttonProps)`
+export const StButton = styled('button', props)`
     display: inline-flex;
     align-items: center;
     font-size: ${theme.fontSize['1'][0]};
@@ -74,13 +74,15 @@ export const StButton = styled('button', buttonProps)`
                 background-color: ${theme.colors.gray['30']};
             }
 
-            ${selected && `
-                background-color: ${theme.colors.gray['20']};
-            `}
-
             &:focus {
                 box-shadow: 0 0 0 ${theme.borderWidth.lg} ${theme.colors.gray['10']};
             }
+
+            ${[
+                selected && `
+                    background-color: ${theme.colors.gray['20']};
+                `,
+            ]}
         `,
         type === 'plain' && `
             color: ${theme.colors.white};
@@ -95,15 +97,17 @@ export const StButton = styled('button', buttonProps)`
                 border-color: ${theme.colors.gray['70']};
                 background-color: ${theme.colors.gray['70']};
             }
-            
-            ${selected && `
-                border-color: ${theme.colors.gray['80']};
-                background-color: ${theme.colors.gray['80']};
-            `}
 
             &:focus {
                 box-shadow: 0 0 0 ${theme.borderWidth.lg} ${theme.colors.gray['70']};
             }
+
+            ${[
+                selected && `
+                    border-color: ${theme.colors.gray['80']};
+                    background-color: ${theme.colors.gray['80']};
+                `,
+            ]}
         `,
         type === 'ghost' && `
             background-color: transparent;
@@ -116,13 +120,15 @@ export const StButton = styled('button', buttonProps)`
                 background-color: ${theme.colors.gray['30']};
             }
 
-            ${selected && `
-                background-color: ${theme.colors.gray['20']};
-            `}
-
             &:focus {
                 box-shadow: 0 0 0 ${theme.borderWidth.lg} ${theme.colors.gray['10']};
             }
+
+            ${[
+                selected && `
+                    background-color: ${theme.colors.gray['20']};
+                `,
+            ]}
         `,
     ].filter(Boolean)}
 `

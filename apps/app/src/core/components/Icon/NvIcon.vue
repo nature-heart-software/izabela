@@ -1,14 +1,14 @@
 <template>
-  <st-text :as="as" v-bind="$props"><slot/></st-text>
+  <st-icon v-bind="$props" :class="[`uil uil-${name}`]"></st-icon>
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { StText } from './text.styled'
-import { props } from './text.shared'
+import { StIcon } from './icon.styled'
+import { props } from './icon.shared'
 
 export default defineComponent({
   components: {
-    StText,
+    StIcon,
   },
   props,
 })

@@ -17,6 +17,7 @@
   },
   "main": "background.js",
   "dependencies": {
+    "@iconscout/unicons": "^4.0.1",
     "@types/tailwindcss": "^2.2.4",
     "deepmerge": "^4.2.2",
     "electron-store": "^8.0.1",

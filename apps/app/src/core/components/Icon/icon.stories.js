@@ -1,9 +1,9 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import NvText from './NvText.vue'
+import NvIcon from './NvIcon.vue'
 const theme = require('@/theme')
 
 export default {
-  title: 'Text',
+  title: 'Icon',
   argTypes: {
     size: {
       options: Object.keys(theme.fontSize).map((key) => key),
@@ -13,7 +13,7 @@ export default {
 }
 
 const Template = (args) => ({
-  components: { NvText },
+  components: { NvIcon },
   setup() {
     return {
       args,
@@ -22,12 +22,12 @@ const Template = (args) => ({
   template:
     args.template ||
     `
-      <nv-text v-bind="args">{{args.content}}</nv-text>
+      <nv-icon v-bind="args"></nv-text>
     `,
 })
 
 export const Default = Template.bind({})
 Default.args = {
-  content: `hello world`,
+  name: 'github',
   size: '2',
 }

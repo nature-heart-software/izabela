@@ -8,7 +8,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { StButton } from './button.styled'
-import { buttonProps } from './button.shared'
+import { props } from './button.shared'
 import { NvText } from '../'
 
 export default defineComponent({
@@ -16,7 +16,7 @@ export default defineComponent({
     StButton,
     NvText,
   },
-  props: buttonProps,
+  props,
   mounted() {
     console.log(this.$props)
   },

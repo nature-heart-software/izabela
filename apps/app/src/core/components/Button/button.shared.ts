@@ -2,7 +2,7 @@ import { PropType, ExtractPropTypes } from "vue"
 export type Size = 'xs'|'sm'|'md'|'lg'
 export type Type = 'default'|'plain'|'ghost'
 
-export const buttonProps = {
+export const props = {
   selected: {
     type: Boolean,
     default: false,
@@ -21,4 +21,4 @@ export const buttonProps = {
   },
 }
 
-export type ButtonProps = ExtractPropTypes<typeof buttonProps>
+export type Props = ExtractPropTypes<typeof props>
