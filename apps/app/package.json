@@ -50,7 +50,7 @@
     "@vue/eslint-config-airbnb": "^6.0.0",
     "@vue/eslint-config-typescript": "^9.1.0",
     "@vue/test-utils": "^2.0.0-0",
-    "autoprefixer": "^10.4.0",
+    "autoprefixer": "^10.4.1",
     "chai": "^4.2.0",
     "cypress": "^9.0.0",
     "electron": "^16.0.5",
