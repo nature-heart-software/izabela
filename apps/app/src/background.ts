@@ -7,7 +7,6 @@ import ElectronWindowManager from '@/modules/electron-window-manager'
 import '@/plugins/electron-messenger-window'
 import '@/modules/electron-vuex/preload'
 import '@/store'
-
 ;(() => {
   /* Fixes the following:
    * - freeze in DevTools when unfocused
