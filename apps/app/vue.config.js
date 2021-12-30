@@ -1,10 +1,12 @@
 const { defineConfig } = require('@vue/cli-service')
 const GenerateExportsWebpackPlugin = require('@izabela/generate-exports-webpack-plugin')
+const WebpackNotifierPlugin = require('webpack-notifier')
 
 module.exports = defineConfig({
   transpileDependencies: ['@izabela'],
   configureWebpack: {
     plugins: [
+      new WebpackNotifierPlugin({ emoji: true }),
       new GenerateExportsWebpackPlugin({
         omitExtensionInExportPath: false,
         filename: 'index.ts',
