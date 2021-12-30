@@ -1,6 +1,6 @@
 <template>
   <div class="messenger bg-gray-10/90 rounded grid p-3 gap-3 grid-rows-3 grid-rows-none">
-    <div class="flex space-x-3">
+    <div class="flex space-x-4">
       <nv-button type="plain" icon-name="info"/>
       <nv-card>
           <div class="inline-flex space-x-2 -m-1">
@@ -9,7 +9,7 @@
             <nv-button size="sm" icon-name="discord"/>
           </div>
       </nv-card>
-      <div class="flex flex-1 justify-end space-x-3">
+      <div class="flex flex-1 justify-end space-x-4">
         <nv-card class="flex-1 min-h-8">
           <div class="inline-flex space-x-2">
             <template v-if="$store.state.env === 'development'">
