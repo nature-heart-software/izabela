@@ -31,4 +31,14 @@ const { ElectronMessengerWindow } = window
       }
     }, 150),
   )
+
+  if (process.env.NODE_ENV === 'development') {
+    /* This fixes focus on initial click since there's no hardware acceleration in dev
+     * Mouse events aren't fired in a transparent background due to HA being disabled :c
+     */
+    disableMouseEvents()
+    window.addEventListener('blur', () => {
+      disableMouseEvents()
+    })
+  }
 })()
