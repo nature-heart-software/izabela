@@ -1,5 +1,7 @@
 export type Options = {
-  omitExtensionInExportPath?: boolean
+  omitExtension?: boolean
+  omitSemi?: boolean
+  singleQuote?: boolean
   filename?: string
   include: string[]
   exclude?: string[]

@@ -8,7 +8,8 @@ module.exports = defineConfig({
     plugins: [
       new WebpackNotifierPlugin({ emoji: true, excludeWarnings: true }),
       new GenerateExportsWebpackPlugin({
-        omitExtensionInExportPath: false,
+        omitExtension: false,
+        omitSemi: true,
         filename: 'index.ts',
         directories: ['./src/core/components'],
         include: ['**/*.vue'],
