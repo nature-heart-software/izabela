@@ -3,42 +3,71 @@ import { throttle } from 'lodash'
 const { ElectronMessengerWindow } = window
 
 ;(() => {
-  // let t
-  let focusable = true
-  const enableMouseEvents = () => {
-    if (!focusable) {
-      focusable = true // Prevents from triggering multiple times causing perf issues
-      ElectronMessengerWindow.focus()
-    }
-  }
-  const disableMouseEvents = () => {
-    if (focusable) {
-      focusable = false // Prevents from triggering multiple times causing perf issues
-      ElectronMessengerWindow.blur()
-    }
-  }
-  window.addEventListener(
-    'mousemove',
-    throttle((event: MouseEvent) => {
-      if (event.target === document.documentElement) {
-        disableMouseEvents()
-        // if (t) clearTimeout(t)
-        // t = setTimeout(function() {
-        //     enableMouseEvents()
-        // }, 600)
-      } else {
-        enableMouseEvents()
-      }
-    }, 150),
-  )
-
-  if (process.env.NODE_ENV === 'development') {
-    /* This fixes focus on initial click since there's no hardware acceleration in dev
-     * Mouse events aren't fired in a transparent background due to HA being disabled :c
+  {
+    /* Toggles focus depending on whether the document is a mousemove target or not
+     * Note: mousemove doesn't fire on transparent elements (here document)
+     * if Hardware Acceleration is disabled (see fallback for solution)
      */
-    disableMouseEvents()
-    window.addEventListener('blur', () => {
-      disableMouseEvents()
+
+    /* This is necessary to make click-through work with Hardware Acceleration */
+    const style = document.createElement('style')
+    style.textContent = `body { pointer-events: none; } * { pointer-events: all; }`
+    document.head.appendChild(style)
+
+    /* Listen to mousemove and toggle focus */
+    let focusable = false
+    const focus = () => {
+      if (!focusable) {
+        focusable = true // Prevents from triggering multiple times causing perf issues
+        ElectronMessengerWindow.focus()
+      }
+    }
+    const blur = () => {
+      if (focusable) {
+        focusable = false // Prevents from triggering multiple times causing perf issues
+        ElectronMessengerWindow.blur()
+      }
+    }
+    /* blur once by default */
+    blur()
+    window.addEventListener(
+      'mousemove',
+      throttle((event: MouseEvent) => {
+        if (event.target === document.documentElement) {
+          blur()
+        } else {
+          focus()
+        }
+      }, 150),
+    )
+
+    if (process.env.NODE_ENV === 'development') {
+      /* Fallback in case Hardware Acceleration is disabled
+       * disableMouseEvents() will be called on window blur instead
+       * (elements that are not transparent still trigger mousemove (focus))
+       */
+      window.addEventListener('blur', () => {
+        blur()
+      })
+    }
+  }
+
+  {
+    /* Fixes focus because for some reasons it doesn't work */
+    window.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement
+      const closestFocusable = target.closest(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      ) as HTMLElement | null
+
+      const activeEl = document.activeElement as HTMLElement
+      if (activeEl) activeEl.blur()
+      if (closestFocusable) closestFocusable.focus()
+      target.focus()
+    })
+    window.addEventListener('blur', (event) => {
+      const activeEl = document.activeElement as HTMLElement
+      if (activeEl) activeEl.blur()
     })
   }
 })()

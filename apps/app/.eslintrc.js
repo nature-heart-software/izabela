@@ -13,6 +13,7 @@ module.exports = {
     'import/no-extraneous-dependencies': 'off',
     'import/prefer-default-export': 'off',
     '@typescript-eslint/no-var-requires': 'off',
+    'no-lone-blocks': 'warn',
     // '@typescript-eslint/no-explicit-any': 'off',
     // 'class-methods-use-this': 'off',
     // 'operator-linebreak': 'off',
