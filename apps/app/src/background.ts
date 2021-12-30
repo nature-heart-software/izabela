@@ -15,6 +15,8 @@ import '@/store'
    * - freeze in devTool when unfocused
    * - freeze on other hardware accelerated softwares (chrome, vs code, ...)
    * - focus on elements in devTool
+   * - focus on elements after window as been focused
+   * - just too many things just leave this thing off at all costs lol
    */
   app.disableHardwareAcceleration() // Prevents freezes with DevTool and other electron apps
 })()
