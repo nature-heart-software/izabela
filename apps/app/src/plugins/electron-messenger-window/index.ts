@@ -1,6 +1,7 @@
 import { app } from 'electron'
 import { bridge } from '@izabela/electron-bridger'
-import ElectronWindowManager, {Instance} from '@/modules/electron-window-manager'
+import ElectronWindowManager, { Instance } from '@/modules/electron-window-manager'
+
 class ElectronMessengerWindow {
   hide() {
     const messenger = ElectronWindowManager.getInstanceByName('messenger')
@@ -10,6 +11,7 @@ class ElectronMessengerWindow {
     }
     return Promise.resolve()
   }
+
   show() {
     const messenger = ElectronWindowManager.getInstanceByName('messenger')
     if (messenger) {
@@ -18,7 +20,21 @@ class ElectronMessengerWindow {
     }
     return Promise.resolve()
   }
-  focus()  {
+
+  openDevTools() {
+    const messenger = ElectronWindowManager.getInstanceByName('messenger')
+    if (messenger) {
+      const { window } = messenger
+      if (window.webContents.devToolsWebContents && window.webContents.isDevToolsOpened()) {
+        window.webContents.devToolsWebContents.focus()
+      } else {
+        window.webContents.openDevTools()
+      }
+    }
+    return Promise.resolve()
+  }
+
+  focus() {
     const messenger = ElectronWindowManager.getInstanceByName('messenger')
     if (messenger) {
       const { window } = messenger
@@ -28,6 +44,7 @@ class ElectronMessengerWindow {
     }
     return Promise.resolve()
   }
+
   blur() {
     const messenger = ElectronWindowManager.getInstanceByName('messenger')
     if (messenger) {

@@ -15,6 +15,7 @@
           <div class="inline-flex space-x-2">
             <template v-if="$store.state.env === 'development'">
               <nv-button size="sm" icon-name="redo" @click="reload" />
+              <nv-button size="sm" icon-name="brackets-curly" @click="openDevTools" />
             </template>
           </div>
         </nv-card>
@@ -76,6 +77,9 @@ export default defineComponent({
   },
   setup() {
     return {
+      openDevTools() {
+        ElectronMessengerWindow.openDevTools()
+      },
       hide() {
         ElectronMessengerWindow.hide()
       },

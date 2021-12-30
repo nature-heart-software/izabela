@@ -12,13 +12,14 @@ import '@/store'
 
 (() => {
   /* Fixes the following:
-   * - freeze in devTool when unfocused
+   * - freeze in DevTools when unfocused
    * - freeze on other hardware accelerated softwares (chrome, vs code, ...)
    * - focus on elements in devTool
    * - focus on elements after window as been focused
    * - just too many things just leave this thing off at all costs lol
+   *   - /!\ it is necessary in prod otherwise mousemove events are not detected
    */
-  app.disableHardwareAcceleration() // Prevents freezes with DevTool and other electron apps
+  if (process.env.NODE_ENV === 'development') app.disableHardwareAcceleration()
 })()
 
 const isDevelopment = process.env.NODE_ENV !== 'production'

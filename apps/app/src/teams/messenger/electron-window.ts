@@ -20,7 +20,7 @@ const createMessengerWindow = async (): Promise<BrowserWindow> => {
     win.setSize(workArea.width, workArea.height)
     win.setPosition(workArea.x, workArea.y)
 
-    //https://github.com/electron/electron/issues/10078#issuecomment-331581160
+    // https://github.com/electron/electron/issues/10078#issuecomment-331581160
     win.setAlwaysOnTop(true)
     win.setVisibleOnAllWorkspaces(true)
     win.setFullScreenable(false)
