@@ -4,7 +4,7 @@ import store from '@/store'
 import { props, Props, Size } from './button.shared'
 import { CSSObject } from '@/types/css-in-js'
 
-const { space, borderWidth, borderRadius, fontSize, colors } = store.getters.theme
+const { space, borderWidth, borderRadius, fontSize, colors, transition } = store.getters.theme
 
 const getStyleFromSize = ({ size }: Props) => {
   const styles: { [key in Size]: CSSObject } = {
@@ -70,6 +70,7 @@ export const StButton = styled('button', props)`
   border-radius: ${borderRadius.DEFAULT};
   border-width: ${borderWidth.DEFAULT};
   outline: 0;
+  transition: ${transition.DEFAULT};
   ${(parameter) => getStyleFromSize(parameter)}
   ${({ squared }) =>
     squared &&
@@ -77,8 +78,8 @@ export const StButton = styled('button', props)`
         padding: 0;
         justify-content: center;
     `}
-    ${(parameter) => getStyleFromSquared(parameter)}
-    ${({ type, selected }) =>
+  ${(parameter) => getStyleFromSquared(parameter)}
+  ${({ type, selected }) =>
     [
       type === 'default' &&
         `

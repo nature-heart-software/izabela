@@ -88,6 +88,9 @@ const theme = {
   boxShadow: {
     DEFAULT: '0px 2px 1px rgba(0, 0, 0, 0.05)',
   },
+  transition: {
+    DEFAULT: 'all .3s ease-in-out',
+  },
 }
 
 module.exports = theme
