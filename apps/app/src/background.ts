@@ -2,7 +2,7 @@
 
 import { app, protocol, BrowserWindow } from 'electron'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
-import createMessengerWindow from '@/teams/messenger/window'
+import createMessengerWindow from '@/teams/messenger/electron-window'
 import ElectronWindowManager from '@/modules/electron-window-manager'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'

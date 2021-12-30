@@ -1,4 +1,4 @@
-import { BrowserWindow } from 'electron'
+import { BrowserWindow, screen } from 'electron'
 import path from 'path'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 
@@ -15,6 +15,11 @@ const createMessengerWindow = async (): Promise<BrowserWindow> => {
   })
 
   {
+    const { workArea } = screen.getPrimaryDisplay()
+
+    win.setSize(workArea.width, workArea.height)
+    win.setPosition(workArea.x, workArea.y)
+
     //https://github.com/electron/electron/issues/10078#issuecomment-331581160
     win.setAlwaysOnTop(true)
     win.setVisibleOnAllWorkspaces(true)

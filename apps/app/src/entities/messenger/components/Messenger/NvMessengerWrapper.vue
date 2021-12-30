@@ -13,10 +13,10 @@
       :resizable="true"
       :snappable="true"
       :bounds="{
-        left: 0,
-        right: viewport.width,
-        top: 0,
-        bottom: viewport.height,
+        left: 12,
+        right: viewport.width - 12,
+        top: 12,
+        bottom: viewport.height - 12,
       }"
       :elementGuidelines="[document.querySelector('body')]"
       :verticalGuidelines="[viewport.width / 2]"
@@ -24,7 +24,7 @@
         center: true,
         middle: true,
       }"
-      :snapThreshold="50"
+      :snapThreshold="30"
       @drag="onDrag"
       @resize="onResize"
     />
