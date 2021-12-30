@@ -32,6 +32,7 @@ const getStyleFromSize = ({ size }: Props) => {
       },
     },
     lg: {
+      fontSize: fontSize['2'][0],
       padding: `0 ${space['5']}`,
       height: space['8'],
       '> * + *': {
