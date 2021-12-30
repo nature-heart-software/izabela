@@ -7,14 +7,17 @@ import ElectronWindowManager from '@/modules/electron-window-manager'
 import '@/plugins/electron-messenger-window'
 import '@/modules/electron-vuex/preload'
 import '@/store'
-;(() => {
+
+;
+
+(() => {
   /* Fixes the following:
    * - freeze in DevTools when unfocused
    * - freeze on other hardware accelerated softwares (chrome, vs code, ...)
    * - focus on elements in devTool
    * - focus on elements after window as been focused
    * - just too many things just leave this thing off at all costs lol
-   *   - /!\ it is necessary in prod otherwise mousemove events are not detected
+   *   - /!\ required in prod otherwise mousemove events are not detected on invisible elements
    */
   if (process.env.NODE_ENV === 'development') app.disableHardwareAcceleration()
 })()

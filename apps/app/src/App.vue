@@ -14,12 +14,17 @@
 </template>
 <style lang="scss">
 body {
-  pointer-events: none;
   width: 100vw;
   height: 100vh;
   margin: 0;
   overflow: hidden;
 }
+
+/* This is necessary to make click-through work with hardware acceleration */
+body {
+  pointer-events: none;
+}
+
 * {
   pointer-events: all;
 }
