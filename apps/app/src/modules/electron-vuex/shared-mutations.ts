@@ -11,11 +11,16 @@ import { IPC_EVENT_CONNECT, IPC_EVENT_NOTIFY_MAIN, IPC_EVENT_NOTIFY_RENDERERS } 
 
 class SharedMutations {
   type: ProcessType = typeof window !== 'undefined' ? 'renderer' : 'main'
+
   ipcMain: Electron.IpcMain = (global as AugmentedGlobal).ipcMain
+
   ipcRenderer: IpcRenderer | null =
     typeof window !== 'undefined' ? window.ElectronVuex.ipcRenderer : null
+
   store: Store<unknown>
+
   storeOriginalCommit!: Commit
+
   storeOriginalDispatch!: Dispatch
 
   constructor(store: Store<unknown>) {
@@ -38,7 +43,7 @@ class SharedMutations {
     this.ipcMain.on(IPC_EVENT_NOTIFY_MAIN, handler)
   }
 
-  notifyRenderers(connections: Connections, payload: MutationPayload, sourceProcessId = '') {
+  static notifyRenderers(connections: Connections, payload: MutationPayload, sourceProcessId = '') {
     Object.keys(connections).forEach((processId) => {
       if (processId !== sourceProcessId) {
         connections[processId].send(IPC_EVENT_NOTIFY_RENDERERS, payload)
@@ -107,7 +112,7 @@ class SharedMutations {
       const { type, payload } = mutation
 
       // Forward changes to renderer processes
-      this.notifyRenderers(connections, { type, payload })
+      SharedMutations.notifyRenderers(connections, { type, payload })
     })
   }
 

@@ -1,6 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import NvCard from './NvCard.vue'
 import { props } from './card.shared'
+
 const theme = require('@/theme')
 
 export default {
@@ -9,6 +10,11 @@ export default {
     content: {
       defaultValue: 'hello world',
       control: { type: 'text' },
+    },
+    size: {
+      defaultValue: props.size.default,
+      control: 'inline-radio',
+      options: ['xs', 'sm', 'md'],
     },
   },
 }

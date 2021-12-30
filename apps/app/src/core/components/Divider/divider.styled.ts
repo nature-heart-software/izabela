@@ -8,7 +8,7 @@ const { colors } = store.getters.theme
 
 export const StDivider = styled('div', props)`
   ${({ direction }) => [direction === 'vertical' ? 'border-right' : 'border-top']}: ${() =>
-    rem('1px')} solid ${colors.gray['10']};
+    rem('1px')} solid ${colors.gray['20']};
   ${({ direction }) =>
     direction === 'vertical' &&
     `

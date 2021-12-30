@@ -1,9 +1,23 @@
-'use strict'
-
 import { app, protocol, BrowserWindow } from 'electron'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import createMessengerWindow from '@/teams/messenger/electron-window'
 import ElectronWindowManager from '@/modules/electron-window-manager'
+
+// Plugins
+import '@/plugins/electron-messenger-window'
+import '@/modules/electron-vuex/preload'
+import '@/store'
+
+;
+
+(() => {
+  /* Fixes the following:
+   * - freeze in devTool when unfocused
+   * - freeze on other hardware accelerated softwares (chrome, vs code, ...)
+   * - focus on elements in devTool
+   */
+  app.disableHardwareAcceleration() // Prevents freezes with DevTool and other electron apps
+})()
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -12,11 +26,8 @@ protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } },
 ])
 
-const createWindows = async () => {
-  return Promise.all([
-    ElectronWindowManager.registerInstance('messenger', await createMessengerWindow()),
-  ])
-}
+const createWindows = async () =>
+  Promise.all([ElectronWindowManager.registerInstance('messenger', await createMessengerWindow())])
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
@@ -62,8 +73,3 @@ if (isDevelopment) {
     })
   }
 }
-
-// Plugins
-import '@/plugins/electron-messenger-window'
-import '@/modules/electron-vuex/preload'
-import '@/store'

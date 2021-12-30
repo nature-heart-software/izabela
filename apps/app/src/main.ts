@@ -1,3 +1,4 @@
+import '@/plugins/debug'
 import '@/styles'
 import '@/teams/messenger/renderer'
 import { createApp } from 'vue'
