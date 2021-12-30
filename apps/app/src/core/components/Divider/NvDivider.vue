@@ -1,5 +1,5 @@
 <template>
-  <st-divider v-bind="$props"/>
+  <st-divider v-bind="$props" />
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue'
