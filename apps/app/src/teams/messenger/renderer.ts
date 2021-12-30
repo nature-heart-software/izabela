@@ -4,16 +4,16 @@ const { ElectronMessengerWindow } = window
 
 ;(() => {
   // let t
-  let focused = true
+  let focusable = true
   const enableMouseEvents = () => {
-    if (!focused) {
-      focused = true // Prevents from triggering multiple times causing perf issues
+    if (!focusable) {
+      focusable = true // Prevents from triggering multiple times causing perf issues
       ElectronMessengerWindow.focus()
     }
   }
   const disableMouseEvents = () => {
-    if (focused) {
-      focused = false // Prevents from triggering multiple times causing perf issues
+    if (focusable) {
+      focusable = false // Prevents from triggering multiple times causing perf issues
       ElectronMessengerWindow.blur()
     }
   }

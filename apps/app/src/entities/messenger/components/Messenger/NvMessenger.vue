@@ -50,33 +50,32 @@
 
     <!-- Bottom -->
     <div>
-      <nv-card size="sm">
-        <nv-button class="w-full" size="lg"
-          >So, said the angel to the child who, divided, broke the knife..
-        </nv-button>
-        <!-- <label for="input">
-          <input id="input" ref="input" @click="$event.target.focus()" />
-        </label> -->
+      <nv-card size="sm" class="flex space-x-3">
+        <nv-input size="lg" class="w-full" v-model="inputValue" />
+        <nv-button size="lg" icon-name="message" />
       </nv-card>
     </div>
   </div>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 import { NvCard, NvButton } from '@/core/components'
 import NvDivider from '@/core/components/Divider/NvDivider.vue'
+import NvInput from '@/core/components/Input/NvInput.vue'
 
 const { ElectronMessengerWindow } = window
 
 export default defineComponent({
   name: 'nv-messenger',
   components: {
+    NvInput,
     NvDivider,
     NvCard,
     NvButton,
   },
   setup() {
     return {
+      inputValue: ref('So, said the angel to the child who, divided, broke the knife..'),
       openDevTools() {
         ElectronMessengerWindow.openDevTools()
       },

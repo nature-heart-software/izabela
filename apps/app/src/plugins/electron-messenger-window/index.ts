@@ -39,6 +39,7 @@ class ElectronMessengerWindow {
     if (messenger) {
       const { window } = messenger
       window.setFocusable(true) // Fixes alwaysOnTop going in the background sometimes for some reasons
+      window.show() // Fixes focus properly for some reasons
       window.focus() // Fixes issues with Chrome and input elements
       window.setIgnoreMouseEvents(false)
     }
