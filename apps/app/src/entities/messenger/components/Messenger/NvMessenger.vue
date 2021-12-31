@@ -19,6 +19,11 @@
             </template>
           </div>
         </nv-card>
+        <nv-card size="xs">
+          <div class="inline-flex space-x-2">
+            <nv-button size="sm" icon-name="setting" />
+          </div>
+        </nv-card>
         <nv-card size="sm" class="inline-flex">
           <div class="inline-flex space-x-2">
             <!-- <nv-button size="xs" type="plain" icon-name="minus"/>
@@ -34,9 +39,11 @@
       <nv-card size="sm" class="inline-flex items-center space-x-3">
         <nv-button size="sm" icon-name="setting" />
         <nv-divider direction="vertical" class="h-3" />
-        <nv-button size="sm">TTS API</nv-button>
-        <nv-button size="sm">API Voice</nv-button>
-        <nv-button size="sm">Output</nv-button>
+        <nv-button size="sm" icon-name="direction">TTS API</nv-button>
+        <nv-button size="sm" icon-name="direction">API Voice</nv-button>
+        <nv-divider direction="vertical" class="h-3" />
+        <nv-button size="sm" icon-name="direction">Outputs</nv-button>
+        <nv-button size="sm" icon-name="direction">Input</nv-button>
         <nv-divider direction="vertical" class="h-3" />
         <nv-button size="sm" icon-name="question-circle" />
       </nv-card>
@@ -51,8 +58,14 @@
     <!-- Bottom -->
     <div>
       <nv-card size="sm" class="flex space-x-3">
-        <nv-input size="lg" class="w-full" v-model="inputValue" />
-        <nv-button size="lg" icon-name="message" />
+        <nv-input
+          placeholder="So, said the angel to the child who, divided, broke the knife.."
+          size="lg"
+          class="w-full"
+          v-model="inputValue"
+          @keydown.enter="inputValue = ''"
+        />
+        <nv-button size="lg" icon-name="message" @click="inputValue = ''" />
       </nv-card>
     </div>
   </div>
@@ -75,7 +88,7 @@ export default defineComponent({
   },
   setup() {
     return {
-      inputValue: ref('So, said the angel to the child who, divided, broke the knife..'),
+      inputValue: ref(''),
       openDevTools() {
         ElectronMessengerWindow.openDevTools()
       },

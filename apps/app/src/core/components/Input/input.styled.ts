@@ -55,6 +55,11 @@ export const StInput = styled('div', props)`
         border-color: ${colors.gray['30']};
       }
 
+      &::placeholder {
+        color: ${colors.gray['30']};
+        font-weight: 300;
+      }
+
       ${getStyleFromSize}
     }
   }

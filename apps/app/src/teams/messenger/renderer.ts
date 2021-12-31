@@ -62,8 +62,14 @@ const { ElectronMessengerWindow } = window
 
       const activeEl = document.activeElement as HTMLElement
       if (activeEl) activeEl.blur()
-      if (closestFocusable) closestFocusable.focus()
-      target.focus()
+      if (closestFocusable) return closestFocusable.focus()
+      return target.focus()
+
+      // const selection = window.getSelection()
+      // if (selection) {
+      //   selection.removeAllRanges()
+      //   selection.addRange(document.caretRangeFromPoint(event.clientX, event.clientY) as Range)
+      // }
     })
     window.addEventListener('blur', (event) => {
       const activeEl = document.activeElement as HTMLElement
