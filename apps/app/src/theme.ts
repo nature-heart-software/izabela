@@ -41,7 +41,7 @@ const theme = {
     },
   },
   // Follows: https://www.carbondesignsystem.com/guidelines/spacing/overview/
-  space: {
+  spacing: {
     1: '.125rem',
     2: '.25rem',
     3: '.5rem',
@@ -54,7 +54,10 @@ const theme = {
     10: '4rem',
     11: '5rem',
     12: '6rem',
-    13: '10rem',
+    13: '7rem',
+    14: '8rem',
+    15: '9rem',
+    16: '10rem',
   },
   // Follows: https://www.carbondesignsystem.com/guidelines/typography/overview/
   fontSize: {
@@ -87,6 +90,7 @@ const theme = {
   },
   boxShadow: {
     DEFAULT: '0px 2px 1px rgba(0, 0, 0, 0.05)',
+    lg: '0px 2px 1px rgba(0, 0, 0, 0.05)',
   },
   transition: {
     DEFAULT: 'all .3s ease-in-out',

@@ -1,5 +1,5 @@
 <template>
-  <div class="messenger bg-gray-10/90 rounded grid p-3 gap-3 grid-rows-3 grid-rows-none">
+  <div class="messenger bg-gray-10/90 rounded grid p-4 gap-4 grid-rows-3 grid-rows-none">
     <!-- Top -->
     <div class="flex space-x-4">
       <nv-button type="plain" icon-name="info" />
@@ -39,8 +39,8 @@
       <nv-card size="sm" class="inline-flex items-center space-x-3">
         <nv-button size="sm" icon-name="setting" />
         <nv-divider direction="vertical" class="h-3" />
-        <nv-button size="sm" icon-name="direction">TTS API</nv-button>
-        <nv-button size="sm" icon-name="direction">API Voice</nv-button>
+        <nv-select class="w-12" size="sm" icon-name="direction" placeholder="TTS API"></nv-select>
+        <nv-select class="w-12" size="sm" icon-name="direction" placeholder="API Voice"></nv-select>
         <nv-divider direction="vertical" class="h-3" />
         <nv-button size="sm" icon-name="direction">Outputs</nv-button>
         <nv-button size="sm" icon-name="direction">Input</nv-button>
@@ -72,7 +72,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-import { NvCard, NvButton } from '@/core/components'
+import { NvCard, NvButton, NvSelect } from '@/core/components'
 import NvDivider from '@/core/components/Divider/NvDivider.vue'
 import NvInput from '@/core/components/Input/NvInput.vue'
 
@@ -85,6 +85,7 @@ export default defineComponent({
     NvDivider,
     NvCard,
     NvButton,
+    NvSelect,
   },
   setup() {
     return {

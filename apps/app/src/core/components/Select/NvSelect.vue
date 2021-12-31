@@ -1,0 +1,55 @@
+<template>
+  <st-select v-bind="$props">
+    <div class="nv-selectWrapper">
+      <component
+        :filterable="true"
+        :popper-append-to-body="false"
+        v-bind:is="'wrapped-component'"
+        v-bind="$attrs"
+        :model-value="modelValue"
+        @update:model-value="$emit('update:model-value', $event)"
+      >
+        <template v-for="(_, slot) of $slots" v-slot:[slot]="scope">
+          <slot :name="slot" v-bind="scope || {}" />
+        </template>
+      </component>
+      <nv-icon class="nv-select__icon" :size="iconSize" name="direction" />
+    </div>
+  </st-select>
+</template>
+<script lang="ts">
+import { defineComponent, ref } from 'vue'
+import { ElSelect as WrappedComponent } from 'element-plus'
+import 'element-plus/lib/components/select/style/css'
+import { StSelect } from './select.styled'
+import { props, Size } from './select.shared'
+import NvIcon from '../Icon/NvIcon.vue'
+
+const theme = require('@/theme')
+
+export default defineComponent({
+  name: 'nv-input',
+  components: {
+    StSelect,
+    WrappedComponent,
+    NvIcon,
+  },
+  props,
+  setup() {
+    return {
+      input: ref(''),
+      theme,
+    }
+  },
+  computed: {
+    iconSize() {
+      const sizes: { [key in Size]: string } = {
+        sm: '3',
+        md: '5',
+        lg: '5',
+      }
+      return sizes[this.size]
+    },
+  },
+})
+</script>
