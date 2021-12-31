@@ -6,9 +6,9 @@ import ElectronWindowManager from '@/modules/electron-window-manager'
 // Plugins
 import '@/plugins/electron-messenger-window'
 import '@/modules/electron-vuex/preload'
-import '@/store';
+import '@/store'
 
-(() => {
+;(() => {
   /* Disabling Hardware Acceleration does the following:
    * - fixes ui freeze in DevTools when unfocused
    * - fixes ui freeze on other hardware accelerated softwares (chrome, vs code, ...)
