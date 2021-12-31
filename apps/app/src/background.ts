@@ -6,15 +6,17 @@ import ElectronWindowManager from '@/modules/electron-window-manager'
 // Plugins
 import '@/plugins/electron-messenger-window'
 import '@/modules/electron-vuex/preload'
-import '@/store'
-;(() => {
-  /* Fixes the following:
-   * - freeze in DevTools when unfocused
-   * - freeze on other hardware accelerated softwares (chrome, vs code, ...)
-   * - focus on elements in devTool
-   * - focus on elements after window as been focused
-   * - just too many things just leave this thing off at all costs lol
-   *   - /!\ required in prod otherwise mousemove events are not detected on invisible elements
+import '@/store';
+
+(() => {
+  /* Disabling Hardware Acceleration does the following:
+   * - fixes ui freeze in DevTools when unfocused
+   * - fixes ui freeze on other hardware accelerated softwares (chrome, vs code, ...)
+   * - fixes element selection in DevTools
+   * - /!\ disables mousemove events on transparent elements (prevents blur on mouse leave)
+   * It is better to disable it in development but to keep it in production I think
+   * There are fallbacks to make both work anyway, the only difference is that there's no
+   * automatic blur on mouseleave from the messenger window when Hardware Acceleration is disabled
    */
   if (process.env.NODE_ENV === 'development') app.disableHardwareAcceleration()
 })()
