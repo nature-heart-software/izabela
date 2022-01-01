@@ -4,7 +4,13 @@ import store from '@/store'
 import { props } from './text.shared'
 
 const { fontFamily, fontSize } = store.getters.theme
-
+export const defaultTextStyle = `
+  color: inherit;
+  font-family: ${fontFamily.sans.join(', ')};
+  font-size: ${fontSize['2'][0]};
+  line-height: ${fontSize['2'][1].lineHeight};
+  letter-spacing: ${fontSize['2'][1].letterSpacing};
+`
 export const StText = styled('div', props)`
   color: inherit;
   font-family: ${fontFamily.sans.join(', ')};

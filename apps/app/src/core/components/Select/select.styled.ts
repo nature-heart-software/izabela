@@ -5,20 +5,21 @@ import { props } from './select.shared'
 import { Props, Size } from './select.shared'
 import { CSSObject } from '@/types/css-in-js'
 import { math, rem, remToPx } from 'polished'
+import { defaultTextStyle } from '../Text/text.styled'
 
 const { fontSize, spacing, boxShadow, borderRadius, borderWidth, colors, transition } =
   store.getters.theme
 const getIconStyleFromSize = ({ size }: Props) => {
-  console.log(`${ remToPx(spacing['3']) } + ${ rem('1px') }`)
+  console.log(`${remToPx(spacing['3'])} + ${rem('1px')}`)
   const styles: { [key in Size]: CSSObject } = {
     sm: {
-      right: `${ rem(math(`${ remToPx(spacing['3']) } + 1px`)) }`,
+      right: `${rem(math(`${remToPx(spacing['3'])} + 1px`))}`,
     },
     md: {
-      right: `${ rem(math(`${ remToPx(spacing['5']) } + 1px`)) }`,
+      right: `${rem(math(`${remToPx(spacing['5'])} + 1px`))}`,
     },
     lg: {
-      right: `${ rem(math(`${ remToPx(spacing['5']) } + 1px`)) }`,
+      right: `${rem(math(`${remToPx(spacing['5'])} + 1px`))}`,
     },
   }
   return styles[size]
@@ -27,16 +28,16 @@ const getIconStyleFromSize = ({ size }: Props) => {
 const getStyleFromSize = ({ size }: Props) => {
   const styles: { [key in Size]: CSSObject } = {
     sm: {
-      padding: `0 ${ spacing['3'] }`,
+      padding: `0 ${spacing['3']}`,
       borderRadius: borderRadius.sm,
       height: spacing['6'],
     },
     md: {
-      padding: `0 ${ spacing['5'] }`,
+      padding: `0 ${spacing['5']}`,
       height: spacing['7'],
     },
     lg: {
-      padding: `0 ${ spacing['5'] }`,
+      padding: `0 ${spacing['5']}`,
       height: spacing['8'],
       fontSize: fontSize['2'][0],
       ...fontSize['2'][1],
@@ -48,12 +49,15 @@ const getStyleFromSize = ({ size }: Props) => {
 const getPopperStyleFromSize = ({ size }: Props) => {
   const styles: { [key in Size]: CSSObject } = {
     sm: {
+      top: rem(math(`${remToPx(spacing['6'])} + ${remToPx(spacing['3'])}`)) + ' !important',
       borderRadius: borderRadius.sm,
     },
     md: {
+      top: rem(math(`${remToPx(spacing['7'])} + ${remToPx(spacing['3'])}`)) + ' !important',
       borderRadius: borderRadius.md,
     },
     lg: {
+      top: rem(math(`${remToPx(spacing['8'])} + ${remToPx(spacing['3'])}`)) + ' !important',
       borderRadius: borderRadius.md,
     },
   }
@@ -72,36 +76,36 @@ export const StSelect = styled('div', props)`
 
     &.is-focus {
       .el-input__inner {
-        box-shadow: 0 0 0 ${ borderWidth.lg } ${ colors.gray['10'] };
-        border-color: ${ colors.gray['30'] } !important;
+        box-shadow: 0 0 0 ${borderWidth.lg} ${colors.gray['10']};
+        border-color: ${colors.gray['30']} !important;
       }
     }
 
     .el-input__inner {
       align-items: center;
-      font-size: ${ fontSize['1'][0] };
-      ${ fontSize['1'][1] }
+      font-size: ${fontSize['1'][0]};
+      ${fontSize['1'][1]}
       font-weight: 600;
-      border-width: ${ borderWidth.DEFAULT };
+      border-width: ${borderWidth.DEFAULT};
       outline: 0;
-      border-color: ${ colors.gray['20'] };
-      transition: ${ transition.DEFAULT };
+      border-color: ${colors.gray['20']};
+      transition: ${transition.DEFAULT};
 
       &:hover {
-        border-color: ${ colors.gray['30'] };
+        border-color: ${colors.gray['30']};
       }
 
       &:focus {
-        box-shadow: 0 0 0 ${ borderWidth.lg } ${ colors.gray['10'] };
-        border-color: ${ colors.gray['30'] };
+        box-shadow: 0 0 0 ${borderWidth.lg} ${colors.gray['10']};
+        border-color: ${colors.gray['30']};
       }
 
       &::placeholder {
-        color: ${ colors.gray['40'] };
+        color: ${colors.gray['40']};
         font-weight: 300;
       }
 
-      ${ getStyleFromSize }
+      ${getStyleFromSize}
     }
 
     .el-input__suffix {
@@ -110,12 +114,19 @@ export const StSelect = styled('div', props)`
   }
 
   .el-popper {
-    box-shadow: ${ boxShadow.lg } !important;
-    border-color: ${ colors.gray['30'] } !important;
+    box-shadow: ${boxShadow.lg} !important;
+    border-color: ${colors.gray['20']} !important;
 
-    ${ getPopperStyleFromSize }
+    ${getPopperStyleFromSize}
     .el-popper__arrow {
       display: none;
+    }
+  }
+
+  .el-select {
+    .el-select-dropdown__empty {
+      padding: ${spacing['3']};
+      ${() => defaultTextStyle}
     }
   }
 
@@ -127,7 +138,7 @@ export const StSelect = styled('div', props)`
     .nv-select__icon {
       pointer-events: none;
       position: absolute;
-      ${ getIconStyleFromSize}
+      ${getIconStyleFromSize}
     }
   }
 `
