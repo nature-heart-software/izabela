@@ -2,12 +2,17 @@ import { app, protocol, BrowserWindow } from 'electron'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import createMessengerWindow from '@/teams/messenger/electron-window'
 import ElectronWindowManager from '@/modules/electron-window-manager'
-
 // Plugins
 import '@/plugins/electron-messenger-window'
 import '@/modules/electron-vuex/preload'
 import '@/store'
-;(() => {
+
+  ;
+
+(() => {
+  /* Fixes iohook. See: https://github.com/electron/electron/issues/18397 */
+  app.allowRendererProcessReuse = false
+
   /* Disabling Hardware Acceleration does the following:
    * - fixes ui freeze in DevTools when unfocused
    * - fixes ui freeze on other hardware accelerated softwares (chrome, vs code, ...)

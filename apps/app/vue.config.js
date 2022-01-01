@@ -18,6 +18,7 @@ module.exports = defineConfig({
   },
   pluginOptions: {
     electronBuilder: {
+      externals: ['iohook'],
       chainWebpackMainProcess: (config) => {
         config.module.rule('babel').before('ts').use('babel').loader('babel-loader')
       },

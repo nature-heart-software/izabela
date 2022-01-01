@@ -1,8 +1,51 @@
-import { app } from 'electron'
 import { bridge } from '@izabela/electron-bridger'
-import ElectronWindowManager, { Instance } from '@/modules/electron-window-manager'
+import ElectronWindowManager from '@/modules/electron-window-manager'
+import iohook from '@/modules/iohook'
 
 class ElectronMessengerWindow {
+  doubleKeypressDelta = 500
+
+  lastKeypressTime = 0
+
+  constructor() {
+    this.addEventListeners()
+  }
+
+  addEventListeners() {
+    // iohook.on('keypress', ({ keychar }) => console.log(`Key pressed: ${String.fromCharCode(keychar)}`))
+
+    iohook.on('keydown', (event) => {
+      if (event.keycode === 56) {
+        let keypressTime = Number(new Date())
+        if (keypressTime - this.lastKeypressTime <= this.doubleKeypressDelta) {
+          this.toggleWindow()
+          // optional - if we'd rather not detect a triple-press
+          // as a second double-press, reset the timestamp
+          keypressTime = 0
+        }
+        this.lastKeypressTime = keypressTime
+      }
+    })
+    iohook.registerShortcut([42, 56], (keys: [number, number]) => {
+      this.toggleWindow()
+      console.log('Shortcut called with keys:', keys)
+    })
+  }
+
+  toggleWindow() {
+    const messenger = ElectronWindowManager.getInstanceByName('messenger')
+    if (messenger) {
+      const { window } = messenger
+      console.log(window.isVisible())
+      if (window.isVisible()) {
+        this.hide()
+      } else {
+        this.focus()
+      }
+    }
+    return Promise.resolve()
+  }
+
   hide() {
     const messenger = ElectronWindowManager.getInstanceByName('messenger')
     if (messenger) {
