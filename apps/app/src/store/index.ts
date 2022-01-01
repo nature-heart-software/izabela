@@ -20,12 +20,11 @@ export default createStore({
       ? []
       : [
           createPersistedState({
-            whitelist: (mutation: MutationPayload) => (
-                mutation.type.includes('setPersisted') ||
-                (Array.isArray(mutation.payload) &&
-                  typeof mutation.payload[0] === 'string' &&
-                  mutation.payload[0].includes('persisted'))
-              ),
+            whitelist: (mutation: MutationPayload) =>
+              mutation.type.includes('setPersisted') ||
+              (Array.isArray(mutation.payload) &&
+                typeof mutation.payload[0] === 'string' &&
+                mutation.payload[0].includes('persisted')),
           }),
           createSharedMutations(),
         ]),
