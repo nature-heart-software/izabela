@@ -12,6 +12,10 @@ export default {
       defaultValue: 'hello world',
       control: { type: 'text' },
     },
+    placeholder: {
+      defaultValue: 'Enter some text...',
+      control: { type: 'text' },
+    },
     size: {
       defaultValue: props.size.default,
       control: 'inline-radio',

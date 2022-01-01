@@ -28,7 +28,7 @@ import NvIcon from '../Icon/NvIcon.vue'
 const theme = require('@/theme')
 
 export default defineComponent({
-  name: 'nv-input',
+  name: 'nv-select',
   components: {
     StSelect,
     WrappedComponent,

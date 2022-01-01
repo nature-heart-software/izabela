@@ -6,6 +6,8 @@ import { Props, Size } from './select.shared'
 import { CSSObject } from '@/types/css-in-js'
 import { math, rem, remToPx } from 'polished'
 import { defaultTextStyle } from '../Text/text.styled'
+import { ElOption } from 'element-plus'
+import 'element-plus/lib/components/option/style/css'
 
 const { fontSize, spacing, boxShadow, borderRadius, borderWidth, colors, transition } =
   store.getters.theme
@@ -128,6 +130,10 @@ export const StSelect = styled('div', props)`
       padding: ${spacing['3']};
       ${() => defaultTextStyle}
     }
+
+    .el-select-dropdown__item {
+      ${() => defaultTextStyle}
+    }
   }
 
   .nv-selectWrapper {
@@ -140,5 +146,36 @@ export const StSelect = styled('div', props)`
       position: absolute;
       ${getIconStyleFromSize}
     }
+  }
+`
+
+export const StOption = styled(ElOption)`
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  height: ${spacing['7']} !important;
+  padding: 0 ${spacing['5']} !important;
+
+  &:hover:not(.is-disabled),
+  &.hover:not(.is-disabled) {
+    background-color: ${colors.gray['10']} !important;
+  }
+
+  //
+  // &:active:not(.is-disabled) {
+  //   background-color: ${colors.gray['30']} !important;
+  // }
+  //
+  // &:focus:not(.is-disabled) {
+  //   box-shadow: 0 0 0 ${borderWidth.lg} ${colors.gray['10']};
+  // }
+
+  &.selected:not(.is-disabled) {
+    font-weight: 600;
+    background-color: ${colors.gray['20']} !important;
+  }
+
+  &.is-disabled {
+    color: ${colors.gray['40']} !important;
   }
 `
