@@ -5,8 +5,6 @@ const storeState = {
   persisted: {
     position: {
       transform: 'matrix(1, 0, 0, 1, 0, 0) translate(0px, 0px)',
-      width: 768,
-      height: 200,
     },
   },
 }

@@ -4,7 +4,6 @@
       <nv-messenger-wrapper
         class="h-0"
         :min-width="768"
-        :width="$store.getters['messenger/persisted'].position.width"
         :transform="$store.getters['messenger/persisted'].position.transform"
       >
         <nv-messenger class="w-full h-full" />

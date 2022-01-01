@@ -26,7 +26,6 @@
       }"
       :snapThreshold="40"
       @drag="onDrag"
-      @resize="onResize"
     />
   </div>
 </template>
@@ -35,6 +34,7 @@
 import { defineComponent, computed } from 'vue'
 import Moveable from 'vue3-moveable'
 import store from '@/store'
+import { debounce } from 'lodash'
 
 export default defineComponent({
   name: 'nv-messenger-wrapper',
@@ -42,15 +42,27 @@ export default defineComponent({
   props: {
     width: {
       type: Number,
-      default: 100,
+      default: null,
     },
     minWidth: {
       type: Number,
-      default: 0,
+      default: null,
     },
     maxWidth: {
       type: Number,
-      default: Infinity,
+      default: null,
+    },
+    height: {
+      type: Number,
+      default: null,
+    },
+    minHeight: {
+      type: Number,
+      default: null,
+    },
+    maxHeight: {
+      type: Number,
+      default: null,
     },
     transform: {
       type: String,
@@ -61,9 +73,12 @@ export default defineComponent({
     const moveableTargetEl = this.$refs.moveableTarget as HTMLDivElement | null
     const moveable = this.$refs.moveable as any
     if (moveableTargetEl) {
-      moveableTargetEl.style.width = this.width + 'px'
-      moveableTargetEl.style.minWidth = this.minWidth + 'px'
-      moveableTargetEl.style.maxWidth = this.maxWidth + 'px'
+      if (this.width) moveableTargetEl.style.width = this.width + 'px'
+      if (this.minWidth) moveableTargetEl.style.minWidth = this.minWidth + 'px'
+      if (this.maxWidth) moveableTargetEl.style.maxWidth = this.maxWidth + 'px'
+      if (this.height) moveableTargetEl.style.height = this.height + 'px'
+      if (this.minHeight) moveableTargetEl.style.minHeight = this.minHeight + 'px'
+      if (this.maxHeight) moveableTargetEl.style.maxHeight = this.maxHeight + 'px'
       if (this.transform) moveableTargetEl.style.transform = this.transform
     }
     moveable.updateTarget()
@@ -73,19 +88,15 @@ export default defineComponent({
       width: Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0),
       height: Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0),
     }))
+    const saveTransformPosition = debounce((transform) => {
+      store.dispatch('messenger/setProperty', ['persisted.position.transform', transform])
+    }, 1000)
     return {
       document,
       viewport,
       onDrag({ target, transform }: any) {
         target.style.transform = transform
-        store.dispatch('messenger/setProperty', ['persisted.position.transform', transform])
-      },
-      onScale({ target, drag }: any) {
-        target.style.transform = drag.transform
-      },
-      onResize({ target, width }: any) {
-        target.style.width = `${width}px`
-        store.dispatch('messenger/setProperty', ['persisted.position.width', width])
+        saveTransformPosition(transform)
       },
     }
   },
