@@ -71,7 +71,7 @@ const { ElectronMessengerWindow } = window
       //   selection.addRange(document.caretRangeFromPoint(event.clientX, event.clientY) as Range)
       // }
     })
-    window.addEventListener('blur', (event) => {
+    window.addEventListener('blur', () => {
       const activeEl = document.activeElement as HTMLElement
       if (activeEl) activeEl.blur()
     })

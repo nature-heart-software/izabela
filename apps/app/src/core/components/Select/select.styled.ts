@@ -12,7 +12,6 @@ import 'element-plus/lib/components/option/style/css'
 const { fontSize, spacing, boxShadow, borderRadius, borderWidth, colors, transition } =
   store.getters.theme
 const getIconStyleFromSize = ({ size }: Props) => {
-  console.log(`${remToPx(spacing['3'])} + ${rem('1px')}`)
   const styles: { [key in Size]: CSSObject } = {
     sm: {
       right: `${rem(math(`${remToPx(spacing['3'])} + 1px`))}`,
@@ -31,15 +30,18 @@ const getStyleFromSize = ({ size }: Props) => {
   const styles: { [key in Size]: CSSObject } = {
     sm: {
       padding: `0 ${spacing['3']}`,
+      paddingRight: rem(math(`${remToPx(spacing['6'])} + ${remToPx(spacing['3'])}`)),
       borderRadius: borderRadius.sm,
       height: spacing['6'],
     },
     md: {
       padding: `0 ${spacing['5']}`,
+      paddingRight: rem(math(`${remToPx(spacing['7'])} + ${remToPx(spacing['5'])}`)),
       height: spacing['7'],
     },
     lg: {
       padding: `0 ${spacing['5']}`,
+      paddingRight: rem(math(`${remToPx(spacing['8'])} + ${remToPx(spacing['5'])}`)),
       height: spacing['8'],
       fontSize: fontSize['2'][0],
       ...fontSize['2'][1],

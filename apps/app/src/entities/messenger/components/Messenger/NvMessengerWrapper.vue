@@ -1,6 +1,6 @@
 <template>
   <div class="messengerWrapper">
-    <div ref="moveableTarget" id="messengerWrapper" class="inline-flex overflow-auto">
+    <div ref="moveableTarget" id="messengerWrapper" class="inline-flex">
       <slot></slot>
     </div>
     <Moveable
@@ -10,7 +10,7 @@
       :draggable="true"
       :scalable="false"
       :rotatable="false"
-      :resizable="true"
+      :resizable="false"
       :snappable="true"
       :bounds="{
         left: 12,
@@ -24,7 +24,7 @@
         center: true,
         middle: true,
       }"
-      :snapThreshold="30"
+      :snapThreshold="40"
       @drag="onDrag"
       @resize="onResize"
     />
@@ -78,14 +78,14 @@ export default defineComponent({
       viewport,
       onDrag({ target, transform }: any) {
         target.style.transform = transform
-        store.dispatch('messenger/setProperty', ['position.transform', transform])
+        store.dispatch('messenger/setProperty', ['persisted.position.transform', transform])
       },
       onScale({ target, drag }: any) {
         target.style.transform = drag.transform
       },
       onResize({ target, width }: any) {
         target.style.width = `${width}px`
-        store.dispatch('messenger/setProperty', ['position.width', width])
+        store.dispatch('messenger/setProperty', ['persisted.position.width', width])
       },
     }
   },

@@ -82,7 +82,6 @@ class PersistedState {
     this.store.subscribe((mutation, state) => {
       if (this.blacklist && this.blacklist(mutation)) return
       if (this.whitelist && !this.whitelist(mutation)) return
-
       this.setState(state)
     })
   }

@@ -20,7 +20,9 @@
           </div>
         </nv-card>
         <nv-card size="xs">
-          <div class="inline-flex space-x-2">
+          <div class="inline-flex items-center space-x-2">
+            <nv-button size="sm" icon-name="comment-alt-lines" />
+            <nv-divider direction="vertical" class="h-3" />
             <nv-button size="sm" icon-name="setting" />
           </div>
         </nv-card>
@@ -39,8 +41,23 @@
       <nv-card size="sm" class="inline-flex items-center space-x-3">
         <nv-button size="sm" icon-name="setting" />
         <nv-divider direction="vertical" class="h-3" />
-        <nv-select class="w-12" size="sm" icon-name="direction" placeholder="TTS API"></nv-select>
-        <nv-select class="w-12" size="sm" icon-name="direction" placeholder="API Voice"></nv-select>
+        <nv-select class="w-13" v-model="api" size="sm" icon-name="direction" placeholder="TTS API">
+          <nv-option value="gctts" label="Google - Google Cloud TTS" />
+          <nv-option value="aptts" label="Polly - Amazon Polly" />
+          <nv-option value="matts" label="Azure - Microsoft azure TTS" />
+          <nv-option value="say" label="Say" />
+        </nv-select>
+        <nv-select
+          class="w-13"
+          v-model="voice"
+          size="sm"
+          icon-name="direction"
+          placeholder="API Voice"
+        >
+          <nv-option value="1" label="Voice 1" />
+          <nv-option value="2" label="Voice 2" />
+          <nv-option value="3" label="Voice 3" />
+        </nv-select>
         <nv-divider direction="vertical" class="h-3" />
         <nv-button size="sm" icon-name="direction">Outputs</nv-button>
         <nv-button size="sm" icon-name="direction">Input</nv-button>
@@ -72,7 +89,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-import { NvCard, NvButton, NvSelect } from '@/core/components'
+import { NvCard, NvButton, NvSelect, NvOption } from '@/core/components'
 import NvDivider from '@/core/components/Divider/NvDivider.vue'
 import NvInput from '@/core/components/Input/NvInput.vue'
 
@@ -86,9 +103,12 @@ export default defineComponent({
     NvCard,
     NvButton,
     NvSelect,
+    NvOption,
   },
   setup() {
     return {
+      api: ref(''),
+      voice: ref(''),
       inputValue: ref(''),
       openDevTools() {
         ElectronMessengerWindow.openDevTools()

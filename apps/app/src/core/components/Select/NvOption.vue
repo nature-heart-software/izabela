@@ -6,9 +6,9 @@
   </st-option>
 </template>
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent } from 'vue'
 import { StOption } from './select.styled'
-import { props, Size } from './select.shared'
+import { props } from './select.shared'
 
 export default defineComponent({
   name: 'nv-option',
