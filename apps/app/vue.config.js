@@ -6,7 +6,7 @@ module.exports = defineConfig({
   transpileDependencies: ['@izabela'],
   configureWebpack: {
     plugins: [
-      new WebpackNotifierPlugin({ emoji: true, excludeWarnings: true }),
+      new WebpackNotifierPlugin({ emoji: true }),
       new GenerateExportsWebpackPlugin({
         omitExtension: false,
         omitSemi: true,
