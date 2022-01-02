@@ -1,6 +1,6 @@
 <template>
   <ThemeProvider :theme="$store.getters['theme']">
-    <template v-if="$store.state['electron-vuex'].persistedStateReady">
+    <template v-if="ready">
       <div class="h-0">
         <nv-messenger-wrapper
           class="h-0"
@@ -22,6 +22,7 @@ body {
 }
 </style>
 <script>
+import { ref } from 'vue'
 import { ThemeProvider } from 'vue3-styled-components'
 import NvMessenger from '@/entities/messenger/components/Messenger/NvMessenger.vue'
 import NvMessengerWrapper from '@/entities/messenger/components/Messenger/NvMessengerWrapper.vue'
@@ -32,6 +33,16 @@ export default {
     NvMessenger,
     NvMessengerWrapper,
     ThemeProvider,
+  },
+  setup() {
+    return {
+      ready: ref(false),
+    }
+  },
+  mounted() {
+    this.$store.state['electron-vuex'].ready().then(() => {
+      this.ready = true
+    })
   },
 }
 </script>

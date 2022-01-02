@@ -9,6 +9,9 @@ import {
 import { Plugin, Store } from 'vuex'
 import type ElectronStore from 'electron-store'
 import { defaultsDeep, cloneDeep } from 'lodash'
+import mitt from 'mitt'
+
+const emitter = mitt()
 
 class PersistedState {
   options: PersistedStateOptions
@@ -87,22 +90,16 @@ class PersistedState {
   }
 
   createStoreModule() {
+    const listenToReady = new Promise((resolve) => {
+      emitter.on('electron-vuex/persisted-state/ready', () => resolve(true))
+      emitter.on('electron-vuex/persisted-state/fail', () => resolve(false))
+    })
     const storeState = {
-      persistedStateReady: false,
+      ready: () => listenToReady,
     }
     this.store.registerModule<typeof storeState>('electron-vuex', {
       namespaced: true,
       state: storeState,
-      mutations: {
-        setPersistedStateReady(state, value: boolean) {
-          state.persistedStateReady = value
-        },
-      },
-      actions: {
-        setPersistedStateReady({ commit }, value: boolean) {
-          commit('setPersistedStateReady', value)
-        },
-      },
     })
   }
 }
@@ -113,7 +110,11 @@ export default (options: PersistedStateOptions): Plugin<unknown> =>
     persistedState.checkStorage()
     persistedState.subscribeOnChanges()
     persistedState.createStoreModule()
-    Promise.resolve(persistedState.loadInitialState()).then(() => {
-      store.dispatch('electron-vuex/setPersistedStateReady', true)
-    })
+    Promise.resolve(persistedState.loadInitialState())
+      .then(() => {
+        emitter.emit('electron-vuex/persisted-state/ready')
+      })
+      .catch(() => {
+        emitter.emit('electron-vuex/persisted-state/fail')
+      })
   }

@@ -101,6 +101,7 @@ class ElectronMessengerWindow {
         })
         window.setFocusable(true) // Fixes alwaysOnTop going in the background sometimes for some reasons
         window.show() // Fixes focus properly with Hardware Acceleration for some reasons
+        window.focus() // needed for immediate focus in case the window is already shown
         window.setIgnoreMouseEvents(false)
       } else {
         reject()
