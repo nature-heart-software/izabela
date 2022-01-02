@@ -1,4 +1,5 @@
 import { throttle } from 'lodash'
+import '@/plugins/electron-log/renderer'
 
 const { ElectronMessengerWindow } = window
 

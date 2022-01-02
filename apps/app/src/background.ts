@@ -3,6 +3,7 @@ import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import createMessengerWindow from '@/teams/messenger/electron-window'
 import ElectronWindowManager from '@/modules/electron-window-manager'
 // Plugins
+import '@/plugins/electron-log'
 import '@/plugins/electron-messenger-window'
 import '@/modules/electron-vuex/preload'
 import '@/store'

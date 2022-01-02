@@ -1,15 +1,17 @@
 <template>
-  <template v-if="$store.state['electron-vuex'].persistedStateReady">
-    <div class="h-0">
-      <nv-messenger-wrapper
-        class="h-0"
-        :min-width="768"
-        :transform="$store.getters['messenger/persisted'].position.transform"
-      >
-        <nv-messenger class="w-full h-full" />
-      </nv-messenger-wrapper>
-    </div>
-  </template>
+  <ThemeProvider :theme="$store.getters['theme']">
+    <template v-if="$store.state['electron-vuex'].persistedStateReady">
+      <div class="h-0">
+        <nv-messenger-wrapper
+          class="h-0"
+          :min-width="768"
+          :transform="$store.getters['messenger/persisted'].position.transform"
+        >
+          <nv-messenger class="w-full h-full" />
+        </nv-messenger-wrapper>
+      </div>
+    </template>
+  </ThemeProvider>
 </template>
 <style lang="scss">
 body {
@@ -20,6 +22,7 @@ body {
 }
 </style>
 <script>
+import { ThemeProvider } from 'vue3-styled-components'
 import NvMessenger from '@/entities/messenger/components/Messenger/NvMessenger.vue'
 import NvMessengerWrapper from '@/entities/messenger/components/Messenger/NvMessengerWrapper.vue'
 
@@ -28,6 +31,7 @@ export default {
   components: {
     NvMessenger,
     NvMessengerWrapper,
+    ThemeProvider,
   },
 }
 </script>

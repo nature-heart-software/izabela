@@ -10,7 +10,7 @@ export { default as NvIcon } from './Icon/NvIcon.vue'
 export { default as NvInput } from './Input/NvInput.vue'
 export { default as NvOption } from './Select/NvOption.vue'
 export { default as NvSelect } from './Select/NvSelect.vue'
+export { default as NvText } from './Text/NvText.vue'
 export { default as NvTable } from './Table/NvTable.vue'
 export { default as NvTableColumn } from './Table/NvTableColumn.vue'
-export { default as NvText } from './Text/NvText.vue'
 /* End of auto-generated content. */
