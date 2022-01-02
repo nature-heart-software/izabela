@@ -76,6 +76,7 @@
     <div>
       <nv-card size="sm" class="flex space-x-3">
         <nv-input
+          ref="messenger"
           placeholder="So, said the angel to the child who, divided, broke the knife.."
           size="lg"
           class="w-full"
@@ -88,7 +89,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { ComponentPublicInstance, defineComponent, ref } from 'vue'
 import { NvCard, NvButton, NvSelect, NvOption } from '@/core/components'
 import NvDivider from '@/core/components/Divider/NvDivider.vue'
 import NvInput from '@/core/components/Input/NvInput.vue'
@@ -107,6 +108,7 @@ export default defineComponent({
   },
   setup() {
     return {
+      eventListeners: [],
       api: ref(''),
       voice: ref(''),
       inputValue: ref(''),
@@ -120,6 +122,25 @@ export default defineComponent({
         window.location.reload()
       },
     }
+  },
+  mounted() {
+    this.addEventListeners()
+  },
+  methods: {
+    onWindowFocus() {
+      const componentInstance = this.$refs.messenger as ComponentPublicInstance
+      const input = componentInstance.$el.querySelector('input')
+      if (input) input.focus()
+    },
+    addEventListeners() {
+      window.addEventListener('focus', this.onWindowFocus)
+    },
+    removeEventListeners() {
+      window.removeEventListener('focus', this.onWindowFocus)
+    },
+  },
+  beforeUnmount() {
+    this.removeEventListeners()
   },
 })
 </script>

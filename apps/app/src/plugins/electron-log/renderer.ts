@@ -1,1 +1,1 @@
-Object.assign(console, window.log)
+// Object.assign(console, window.log)
