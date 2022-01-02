@@ -19,16 +19,13 @@ class ElectronMessengerWindow {
         let keypressTime = Number(new Date())
         if (keypressTime - this.lastKeypressTime <= this.doubleKeypressDelta) {
           this.toggleWindow()
-          // optional - if we'd rather not detect a triple-press
-          // as a second double-press, reset the timestamp
           keypressTime = 0
         }
         this.lastKeypressTime = keypressTime
       }
     })
-    iohook.registerShortcut([42, 56], (keys: [number, number]) => {
+    iohook.registerShortcut([42, 56], () => {
       this.toggleWindow()
-      console.log('Shortcut called with keys:', keys)
     })
   }
 
@@ -36,7 +33,6 @@ class ElectronMessengerWindow {
     const messenger = ElectronWindowManager.getInstanceByName('messenger')
     if (messenger) {
       const { window } = messenger
-      console.log(window.isVisible())
       if (window.isVisible()) {
         this.hide()
       } else {
@@ -47,57 +43,84 @@ class ElectronMessengerWindow {
   }
 
   hide() {
-    const messenger = ElectronWindowManager.getInstanceByName('messenger')
-    if (messenger) {
-      const { window } = messenger
-      window.hide()
-    }
-    return Promise.resolve()
+    return new Promise((resolve, reject) => {
+      const messenger = ElectronWindowManager.getInstanceByName('messenger')
+      if (messenger) {
+        const { window } = messenger
+        this.blur()
+          .then(() => {
+            window.hide()
+          })
+          .catch(reject)
+      } else {
+        reject()
+      }
+    })
   }
 
   show() {
-    const messenger = ElectronWindowManager.getInstanceByName('messenger')
-    if (messenger) {
-      const { window } = messenger
-      window.show()
-    }
-    return Promise.resolve()
+    return new Promise((resolve, reject) => {
+      const messenger = ElectronWindowManager.getInstanceByName('messenger')
+      if (messenger) {
+        this.focus()
+        resolve(true)
+      } else {
+        reject()
+      }
+    })
   }
 
   openDevTools() {
-    const messenger = ElectronWindowManager.getInstanceByName('messenger')
-    if (messenger) {
-      const { window } = messenger
-      if (window.webContents.devToolsWebContents && window.webContents.isDevToolsOpened()) {
-        window.webContents.devToolsWebContents.focus()
+    return new Promise((resolve, reject) => {
+      const messenger = ElectronWindowManager.getInstanceByName('messenger')
+      if (messenger) {
+        const { window } = messenger
+        if (window.webContents.devToolsWebContents && window.webContents.isDevToolsOpened()) {
+          window.webContents.devToolsWebContents.focus()
+        } else {
+          window.webContents.openDevTools()
+        }
+        resolve(true)
       } else {
-        window.webContents.openDevTools()
+        reject()
       }
-    }
-    return Promise.resolve()
+    })
   }
 
   focus() {
-    const messenger = ElectronWindowManager.getInstanceByName('messenger')
-    if (messenger) {
-      const { window } = messenger
-      window.setFocusable(true) // Fixes alwaysOnTop going in the background sometimes for some reasons
-      window.show() // Fixes focus properly for some reasons
-      window.focus() // Fixes issues with Chrome and input elements
-      window.setIgnoreMouseEvents(false)
-    }
-    return Promise.resolve()
+    return new Promise((resolve, reject) => {
+      const messenger = ElectronWindowManager.getInstanceByName('messenger')
+      if (messenger) {
+        const { window } = messenger
+        window.once('show', () => {
+          /* The focus needs to be delayed after the show() to actually focus properly... */
+          setTimeout(() => {
+            window.focus() // Fixes issues with Chrome and input elements
+            resolve(true)
+          }, 250)
+        })
+        window.setFocusable(true) // Fixes alwaysOnTop going in the background sometimes for some reasons
+        window.show() // Fixes focus properly with Hardware Acceleration for some reasons
+        window.setIgnoreMouseEvents(false)
+      } else {
+        reject()
+      }
+    })
   }
 
   blur() {
-    const messenger = ElectronWindowManager.getInstanceByName('messenger')
-    if (messenger) {
-      const { window } = messenger
-      window.setFocusable(false) // Fixes alwaysOnTop going in the background sometimes for some reasons
-      window.blur() // Fixes issues with Chrome and input elements
-      window.setIgnoreMouseEvents(true, { forward: true })
-    }
-    return Promise.resolve()
+    return new Promise((resolve, reject) => {
+      const messenger = ElectronWindowManager.getInstanceByName('messenger')
+      if (messenger) {
+        const { window } = messenger
+        window.setFocusable(false) // Fixes alwaysOnTop going in the background sometimes for some reasons
+        window.blur() // Fixes issues with Chrome and input elements
+        window.setIgnoreMouseEvents(true, { forward: true })
+        resolve(true)
+      } else {
+        reject()
+      }
+    })
   }
 }
 
