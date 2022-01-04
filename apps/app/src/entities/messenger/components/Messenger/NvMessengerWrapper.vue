@@ -88,15 +88,22 @@ export default defineComponent({
       width: Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0),
       height: Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0),
     }))
-    const saveTransformPosition = debounce((transform) => {
-      store.dispatch('messenger/setProperty', ['persisted.position.transform', transform])
+    const savePosition = debounce((event) => {
+      const { width, height, translate, transform } = event
+      store.dispatch('messenger/setProperties', [
+        ['persisted.position.transform', transform],
+        ['persisted.position.width', width],
+        ['persisted.position.height', height],
+        ['persisted.position.translate', translate],
+      ])
     }, 1000)
     return {
       document,
       viewport,
-      onDrag({ target, transform }: any) {
+      onDrag(event: any) {
+        const { target, transform } = event
         target.style.transform = transform
-        saveTransformPosition(transform)
+        savePosition(event)
       },
     }
   },
