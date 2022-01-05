@@ -2,13 +2,11 @@
   <ThemeProvider :theme="$store.getters['theme']">
     <template v-if="ready">
       <div class="h-0">
-        <nv-messenger-wrapper
-          class="h-0"
+        <nv-messenger
+          class="w-full h-full"
           :min-width="768"
           :transform="$store.getters['messenger/persisted'].position.transform"
-        >
-          <nv-messenger class="w-full h-full" />
-        </nv-messenger-wrapper>
+        />
       </div>
     </template>
   </ThemeProvider>
@@ -25,13 +23,11 @@ body {
 import { ref } from 'vue'
 import { ThemeProvider } from 'vue3-styled-components'
 import NvMessenger from '@/entities/messenger/components/Messenger/NvMessenger.vue'
-import NvMessengerWrapper from '@/entities/messenger/components/Messenger/NvMessengerWrapper.vue'
 
 export default {
   name: 'app',
   components: {
     NvMessenger,
-    NvMessengerWrapper,
     ThemeProvider,
   },
   setup() {
