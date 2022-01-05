@@ -3,11 +3,14 @@ import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import createMessengerWindow from '@/teams/messenger/electron-window'
 import ElectronWindowManager from '@/modules/electron-window-manager'
 // Plugins
-import '@/plugins/electron-log'
-import '@/plugins/electron-messenger-window'
 import '@/modules/electron-vuex/preload'
 import '@/store'
-;(() => {
+import '@/plugins/electron-log'
+import '@/plugins/electron-messenger-window'
+
+;
+
+(() => {
   /* Fixes iohook. See: https://github.com/electron/electron/issues/18397 */
   app.allowRendererProcessReuse = false
 
@@ -15,12 +18,8 @@ import '@/store'
    * - fixes ui freeze in DevTools when unfocused
    * - fixes ui freeze on other hardware accelerated softwares (chrome, vs code, ...)
    * - fixes element selection in DevTools
-   * - /!\ disables mousemove events on transparent elements (prevents blur on mouse leave)
-   * It is better to disable it in development but to keep it in production I think
-   * There are fallbacks to make both work anyway, the only difference is that there's no
-   * automatic blur on mouseleave from the messenger window when Hardware Acceleration is disabled
    */
-  if (process.env.NODE_ENV === 'development') app.disableHardwareAcceleration()
+  app.disableHardwareAcceleration()
 })()
 
 const isDevelopment = process.env.NODE_ENV !== 'production'

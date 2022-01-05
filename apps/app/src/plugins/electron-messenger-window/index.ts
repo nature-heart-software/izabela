@@ -1,6 +1,8 @@
 import { bridge } from '@izabela/electron-bridger'
 import ElectronWindowManager from '@/modules/electron-window-manager'
-import iohook from '@/modules/iohook'
+import iohook, { IOHookEvent } from '@/modules/iohook'
+import store from '@/store'
+import { throttle } from 'lodash'
 
 class ElectronMessengerWindow {
   doubleKeypressDelta = 500
@@ -11,9 +13,34 @@ class ElectronMessengerWindow {
     this.addEventListeners()
   }
 
+  onMouseMove(event: IOHookEvent) {
+    const messenger = ElectronWindowManager.getInstanceByName('messenger')
+    if (messenger) {
+      const { window } = messenger
+      if (window.isVisible()) {
+        const { x: mouseX = 0, y: mouseY = 0 } = event
+        const [windowX, windowY] = window.getPosition()
+        const {
+          translate: [focusableX, focusableY],
+          width: focusableWidth,
+          height: focusableHeight,
+        } = store.getters['messenger/persisted'].position
+        const isWithinXBoundaries =
+          mouseX >= windowX + focusableX && mouseX <= windowX + focusableX + focusableWidth
+        const isWithinYBoundaries =
+          mouseY >= windowY + focusableY && mouseY <= windowY + focusableY + focusableHeight
+        if (isWithinXBoundaries && isWithinYBoundaries) {
+          this.focus()
+        } else {
+          this.blur()
+        }
+      }
+    }
+  }
+
   addEventListeners() {
     // iohook.on('keypress', ({ keychar }) => console.log(`Key pressed: ${String.fromCharCode(keychar)}`))
-
+    iohook.on('mousemove', throttle(this.onMouseMove.bind(this), 150))
     iohook.on('keydown', (event) => {
       if (event.keycode === 56) {
         let keypressTime = Number(new Date())
@@ -92,17 +119,19 @@ class ElectronMessengerWindow {
       const messenger = ElectronWindowManager.getInstanceByName('messenger')
       if (messenger) {
         const { window } = messenger
-        window.once('show', () => {
-          /* The focus needs to be delayed after the show() to actually focus properly... */
-          setTimeout(() => {
-            window.focus() // Fixes issues with Chrome and input elements
-            resolve(true)
-          }, 250)
-        })
-        window.setFocusable(true) // Fixes alwaysOnTop going in the background sometimes for some reasons
-        window.show() // Fixes focus properly with Hardware Acceleration for some reasons
-        window.focus() // needed for immediate focus in case the window is already shown
-        window.setIgnoreMouseEvents(false)
+        if (!window.isFocused()) {
+          window.once('show', () => {
+            /* The focus needs to be delayed after the show() to actually focus properly... */
+            setTimeout(() => {
+              window.focus() // Fixes issues with Chrome and input elements
+              resolve(true)
+            }, 250)
+          })
+          window.setFocusable(true) // Fixes alwaysOnTop going in the background sometimes for some reasons
+          window.show() // Fixes focus properly with Hardware Acceleration for some reasons
+          window.focus() // needed for immediate focus in case the window is already shown
+          window.setIgnoreMouseEvents(false)
+        }
       } else {
         reject()
       }
@@ -114,9 +143,11 @@ class ElectronMessengerWindow {
       const messenger = ElectronWindowManager.getInstanceByName('messenger')
       if (messenger) {
         const { window } = messenger
-        window.setFocusable(false) // Fixes alwaysOnTop going in the background sometimes for some reasons
-        window.blur() // Fixes issues with Chrome and input elements
-        window.setIgnoreMouseEvents(true, { forward: true })
+        if (window.isFocused()) {
+          window.setFocusable(false) // Fixes alwaysOnTop going in the background sometimes for some reasons
+          window.blur() // Fixes issues with Chrome and input elements
+          window.setIgnoreMouseEvents(true)
+        }
         resolve(true)
       } else {
         reject()

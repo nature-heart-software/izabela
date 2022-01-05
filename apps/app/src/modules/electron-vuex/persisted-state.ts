@@ -106,6 +106,8 @@ class PersistedState {
 
 export default (options: PersistedStateOptions): Plugin<unknown> =>
   (store) => {
+    const isPreload = !!(typeof window !== 'undefined' && window.ElectronVuexIsPreload)
+    if (isPreload) return emitter.emit('electron-vuex/persisted-state/ready')
     const persistedState = new PersistedState(options, store)
     persistedState.checkStorage()
     persistedState.subscribeOnChanges()

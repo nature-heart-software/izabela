@@ -6,7 +6,7 @@ import { SetPropertyPayload } from '@/utils/vuex'
 
 const theme = require('@/theme')
 
-export default createStore({
+const store = createStore({
   state: {
     env: process.env.NODE_ENV,
   },
@@ -34,3 +34,5 @@ export default createStore({
         ]),
   ],
 })
+
+export default store

@@ -8,11 +8,11 @@
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue'
+import { isVNodeEmpty } from '@/utils/vue'
 import { StButton } from './button.styled'
 import { props, Size } from './button.shared'
 import NvText from '../Text/NvText.vue'
 import NvIcon from '../Icon/NvIcon.vue'
-import { isVNodeEmpty } from '@/utils/vue'
 
 export default defineComponent({
   name: 'nv-button',

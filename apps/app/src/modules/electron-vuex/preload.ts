@@ -37,30 +37,28 @@ class ElectronVuexStorage {
   }
 }
 
+const { store } = bridge.new(ElectronVuexStorage)()
+
 if (isRenderer) {
   contextBridge.exposeInMainWorld('ElectronVuex', {
     winId: ipcRenderer.sendSync('electron-vuex-get-win-id'),
     ipcRenderer: {
-      ['SEND_IPC_EVENT_CONNECT']() {
+      'SEND_IPC_EVENT_CONNECT': function() {
         ipcRenderer.send(IPC_EVENT_CONNECT)
       },
-      ['SEND_IPC_EVENT_NOTIFY_MAIN'](payload: MutationPayload) {
+      'SEND_IPC_EVENT_NOTIFY_MAIN': function(payload: MutationPayload) {
         ipcRenderer.send(IPC_EVENT_NOTIFY_MAIN, payload)
       },
-      ['ON_IPC_EVENT_NOTIFY_RENDERERS'](handler: IpcRendererMutationEventHandler) {
+      'ON_IPC_EVENT_NOTIFY_RENDERERS': function(handler: IpcRendererMutationEventHandler) {
         ipcRenderer.on(IPC_EVENT_NOTIFY_RENDERERS, handler)
       },
     },
   })
+  window.ElectronVuexIsPreload = true
 } else {
   ipcMain.on('electron-vuex-get-win-id', (e) => {
     e.returnValue = e.sender.id
   })
-}
-
-const { store } = bridge.new(ElectronVuexStorage)()
-
-if (!isRenderer) {
   ElectronStore.initRenderer()
   ;(global as AugmentedGlobal).ElectronVuexStorage = store
   ;(global as AugmentedGlobal).ipcMain = ipcMain
@@ -70,6 +68,7 @@ declare global {
   interface Window {
     ElectronVuex: { ipcRenderer: IpcRenderer; winId: number }
     ElectronVuexStorage: ElectronStore
+    ElectronVuexIsPreload?: boolean
   }
 
   interface Global {

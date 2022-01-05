@@ -131,6 +131,8 @@ class SharedMutations {
 }
 
 export default (): Plugin<unknown> => (store) => {
+  const isPreload = !!(typeof window !== 'undefined' && window.ElectronVuexIsPreload)
+  if (isPreload) return
   const sharedMutations = new SharedMutations(store)
   sharedMutations.activatePlugin()
 }
