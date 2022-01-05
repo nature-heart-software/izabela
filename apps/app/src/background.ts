@@ -7,7 +7,6 @@ import '@/modules/electron-vuex/preload'
 import '@/store'
 import '@/plugins/electron-log'
 import '@/plugins/electron-messenger-window'
-
 ;(() => {
   /* Fixes iohook. See: https://github.com/electron/electron/issues/18397 */
   app.allowRendererProcessReuse = false
