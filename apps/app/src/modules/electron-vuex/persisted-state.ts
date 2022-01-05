@@ -8,7 +8,7 @@ import {
 } from './types'
 import { Plugin, Store } from 'vuex'
 import type ElectronStore from 'electron-store'
-import { defaultsDeep, cloneDeep } from 'lodash'
+import { defaultsDeep, cloneDeep, debounce } from 'lodash'
 import mitt from 'mitt'
 
 const emitter = mitt()
@@ -38,10 +38,10 @@ class PersistedState {
     return this.storage.get(this.options.storageName || STORAGE_KEY)
   }
 
-  setState(state: unknown) {
+  setState = debounce((state: unknown) => {
     const sanitizedState = JSON.parse(JSON.stringify(state))
     this.storage.set(this.options.storageName || STORAGE_KEY, sanitizedState)
-  }
+  }, 1000)
 
   loadFilter(filter: MutationFilterOption, name: string): MutationFilter | null {
     if (!filter) {
