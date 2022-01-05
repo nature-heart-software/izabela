@@ -43,13 +43,13 @@ if (isRenderer) {
   contextBridge.exposeInMainWorld('ElectronVuex', {
     winId: ipcRenderer.sendSync('electron-vuex-get-win-id'),
     ipcRenderer: {
-      'SEND_IPC_EVENT_CONNECT': function() {
+      SEND_IPC_EVENT_CONNECT: function () {
         ipcRenderer.send(IPC_EVENT_CONNECT)
       },
-      'SEND_IPC_EVENT_NOTIFY_MAIN': function(payload: MutationPayload) {
+      SEND_IPC_EVENT_NOTIFY_MAIN: function (payload: MutationPayload) {
         ipcRenderer.send(IPC_EVENT_NOTIFY_MAIN, payload)
       },
-      'ON_IPC_EVENT_NOTIFY_RENDERERS': function(handler: IpcRendererMutationEventHandler) {
+      ON_IPC_EVENT_NOTIFY_RENDERERS: function (handler: IpcRendererMutationEventHandler) {
         ipcRenderer.on(IPC_EVENT_NOTIFY_RENDERERS, handler)
       },
     },
