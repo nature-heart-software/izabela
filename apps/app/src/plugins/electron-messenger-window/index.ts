@@ -127,10 +127,12 @@ class ElectronMessengerWindow {
               resolve(true)
             }, 250)
           })
+
+          /* order matters */
           window.setFocusable(true) // Fixes alwaysOnTop going in the background sometimes for some reasons
+          window.setIgnoreMouseEvents(false)
           window.show() // Fixes focus properly with Hardware Acceleration for some reasons
           window.focus() // needed for immediate focus in case the window is already shown
-          window.setIgnoreMouseEvents(false)
         }
       } else {
         reject()
@@ -144,9 +146,10 @@ class ElectronMessengerWindow {
       if (messenger) {
         const { window } = messenger
         if (window.isFocused()) {
-          window.setFocusable(false) // Fixes alwaysOnTop going in the background sometimes for some reasons
+          /* order matters */
           window.blur() // Fixes issues with Chrome and input elements
           window.setIgnoreMouseEvents(true)
+          window.setFocusable(false) // Fixes alwaysOnTop going in the background sometimes for some reasons
         }
         resolve(true)
       } else {

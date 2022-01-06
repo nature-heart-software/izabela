@@ -1,6 +1,7 @@
 import { BrowserWindow, screen } from 'electron'
 import path from 'path'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
+import { ipcMain } from 'electron-postman'
 
 const createMessengerWindow = async (): Promise<BrowserWindow> => {
   const win = new BrowserWindow({
@@ -13,6 +14,8 @@ const createMessengerWindow = async (): Promise<BrowserWindow> => {
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
     },
   })
+
+  ipcMain.registerBrowserWindow('messenger-window', win)
 
   {
     const { workArea } = screen.getPrimaryDisplay()
@@ -33,6 +36,12 @@ const createMessengerWindow = async (): Promise<BrowserWindow> => {
     createProtocol('app')
     win.loadURL('app://./index.html')
   }
+
+  win.on('show', () => ipcMain.sendTo('messenger-window', 'show'))
+  win.on('hide', () => ipcMain.sendTo('messenger-window', 'hide'))
+  win.on('focus', () => ipcMain.sendTo('messenger-window', 'focus'))
+  win.on('blur', () => ipcMain.sendTo('messenger-window', 'blur'))
+
   return win
 }
 

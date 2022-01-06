@@ -231,16 +231,22 @@ export default defineComponent({
       const input = componentInstance.$el.querySelector('input')
       if (input) input.focus()
     },
+    onWindowBlur() {
+      const componentInstance = this.$refs.messenger as ComponentPublicInstance
+      const input = componentInstance.$el.querySelector('input')
+      if (input) input.blur()
+    },
     addEventListeners() {
-      window.addEventListener('focus', this.onWindowFocus)
+      const { ipc } = window
+      ipc.on('main', 'focus', this.onWindowFocus)
+      ipc.on('main', 'blur', this.onWindowBlur)
     },
-    removeEventListeners() {
-      window.removeEventListener('focus', this.onWindowFocus)
-    },
+    // removeEventListeners() {
+    // },
   },
-  beforeUnmount() {
-    this.removeEventListeners()
-  },
+  // beforeUnmount() {
+  //   this.removeEventListeners()
+  // },
 })
 </script>
 <style lang="scss" scoped>

@@ -20,6 +20,7 @@
     "@iconscout/unicons": "^4.0.1",
     "@types/tailwindcss": "^2.2.4",
     "electron-log": "^4.4.4",
+    "electron-postman": "^0.1.2",
     "electron-store": "^8.0.1",
     "element-plus": "^1.2.0-beta.6",
     "iohook": "^0.9.3",
