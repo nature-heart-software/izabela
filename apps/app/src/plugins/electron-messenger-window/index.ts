@@ -5,6 +5,12 @@ import store from '@/store'
 import { throttle } from 'lodash'
 
 class ElectronMessengerWindow {
+  /* use isFocused as source of truth instead of window.isFocused() as in some instances
+   * window.isFocused() returns true when the window is actually blurred, preventing
+   * focus again.
+   *  */
+  isFocused = false
+
   doubleKeypressDelta = 500
 
   lastKeypressTime = 0
@@ -119,10 +125,12 @@ class ElectronMessengerWindow {
       const messenger = ElectronWindowManager.getInstanceByName('messenger')
       if (messenger) {
         const { window } = messenger
-        if (!window.isFocused()) {
+        if (!this.isFocused) {
+          this.isFocused = true
           window.once('show', () => {
             /* The focus needs to be delayed after the show() to actually focus properly... */
             setTimeout(() => {
+              this.isFocused = true
               window.focus() // Fixes issues with Chrome and input elements
               resolve(true)
             }, 250)
@@ -145,7 +153,8 @@ class ElectronMessengerWindow {
       const messenger = ElectronWindowManager.getInstanceByName('messenger')
       if (messenger) {
         const { window } = messenger
-        if (window.isFocused()) {
+        if (this.isFocused) {
+          this.isFocused = false
           /* order matters */
           window.blur() // Fixes issues with Chrome and input elements
           window.setIgnoreMouseEvents(true)
