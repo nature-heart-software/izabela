@@ -224,6 +224,12 @@ export default defineComponent({
     }
     moveable.updateTarget()
     this.addEventListeners()
+
+    /* This fixes focus on focusable elements. Focus won't work unless
+     * the window has been dragged once with draggable for some reasons
+     * */
+    moveable.request('draggable', { deltaX: -1, deltaY: -1 }, true)
+    moveable.request('draggable', { deltaX: 1, deltaY: 1 }, true)
   },
   methods: {
     onWindowFocus() {
