@@ -32,3 +32,16 @@ export type StoreOption = Store<unknown> & {
   dispatch: (type: string, payload: ActionPayload) => void
 }
 export type Connections = { [key: string]: Electron.IpcMainEvent['sender'] }
+
+declare global {
+  interface Window {
+    ElectronVuex: { ipcRenderer: IpcRenderer; winId: number }
+    ElectronVuexStorage: ElectronStore
+    ElectronVuexIsPreload?: boolean
+  }
+
+  interface Global {
+    ipcMain: Electron.IpcMain
+    ElectronVuexStorage: ElectronStore
+  }
+}

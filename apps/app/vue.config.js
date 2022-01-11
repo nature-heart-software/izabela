@@ -26,14 +26,10 @@ module.exports = defineConfig({
        * https://nklayman.github.io/vue-cli-plugin-electron-builder/guide/configuration.html
        */
       mainProcessWatch: [
-        './src/**/electron-*/*',
-        './src/**/electron-*',
-        '../../libs/**/electron-*/*',
-        '../../libs/**/electron-*',
-        './src/**/node-*/*',
-        './src/**/node-*',
-        '../../libs/**/node-*/*',
-        '../../libs/**/node-*',
+        './src/**/{electron,node}*/*',
+        './src/**/{electron,node}*',
+        '../../libs/**/{electron,node}*/*',
+        '../../libs/**/{electron,node}*',
       ],
       preload: {
         preload: 'src/preload.ts',
