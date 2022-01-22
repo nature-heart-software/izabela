@@ -3,7 +3,7 @@ import '@/plugins/electron-log/preload'
 import '@/modules/electron-vuex/preload'
 
 /* Other plugins */
-import '@/plugins/electron-messenger-window'
+import '@/entities/messenger/plugins/electron-messenger-window'
 import { ipcRenderer } from 'electron-postman'
 
 ipcRenderer.exposeInMainWorld('ipc')

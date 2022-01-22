@@ -2,7 +2,7 @@
 import '@/modules/electron-vuex/main'
 import '@/store'
 import '@/plugins/electron-log'
-import '@/plugins/electron-messenger-window'
+import '@/entities/messenger/plugins/electron-messenger-window'
 import { app, protocol, BrowserWindow } from 'electron'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import createMessengerWindow from '@/teams/messenger/electron-window'

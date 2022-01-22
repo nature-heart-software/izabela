@@ -1,7 +1,10 @@
 <template>
   <div class="messengerWrapper">
     <div ref="moveableTarget" id="moveable" class="inline-flex">
-      <div class="messenger bg-gray-10/90 rounded grid p-4 gap-4 grid-rows-3 grid-rows-none">
+      <div
+        ref="messenger"
+        class="messenger bg-gray-10/90 rounded grid p-4 gap-4 grid-rows-3 grid-rows-none"
+      >
         <!-- Top -->
         <div class="flex space-x-4">
           <nv-button type="plain" icon-name="info" />
@@ -41,7 +44,9 @@
         <!-- Middle -->
         <div class="flex justify-between">
           <nv-card size="sm" class="inline-flex items-center space-x-3">
-            <nv-button size="sm" icon-name="setting" />
+            <span ref="settingsToggler">
+              <nv-button size="sm" icon-name="setting" />
+            </span>
             <nv-divider direction="vertical" class="h-3" />
             <nv-select
               class="w-13"
@@ -84,7 +89,7 @@
         <div>
           <nv-card size="sm" class="flex space-x-3">
             <nv-input
-              ref="messenger"
+              ref="messengerInput"
               placeholder="So, said the angel to the child who, divided, broke the knife.."
               size="lg"
               class="w-full"
@@ -130,6 +135,7 @@ import NvDivider from '@/core/components/Divider/NvDivider.vue'
 import NvInput from '@/core/components/Input/NvInput.vue'
 import Moveable from 'vue3-moveable'
 import store from '@/store'
+import { useSettings } from '@/entities/settings/composition'
 
 const { ElectronMessengerWindow } = window
 
@@ -175,6 +181,15 @@ export default defineComponent({
     },
   },
   setup() {
+    const messenger = ref()
+    const settingsToggler = ref()
+
+    const { popover: settingsPopover } = useSettings({
+      popoverTarget: messenger,
+      popoverOptions: {
+        triggerTarget: settingsToggler,
+      },
+    })
     const viewport = computed(() => ({
       width: Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0),
       height: Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0),
@@ -189,6 +204,9 @@ export default defineComponent({
       ])
     }
     return {
+      messenger,
+      settingsToggler,
+      settingsPopover,
       document,
       viewport,
       api: ref(''),
@@ -233,12 +251,12 @@ export default defineComponent({
   },
   methods: {
     onWindowFocus() {
-      const componentInstance = this.$refs.messenger as ComponentPublicInstance
+      const componentInstance = this.$refs.messengerInput as ComponentPublicInstance
       const input = componentInstance.$el.querySelector('input')
       if (input) input.focus()
     },
     onWindowBlur() {
-      const componentInstance = this.$refs.messenger as ComponentPublicInstance
+      const componentInstance = this.$refs.messengerInput as ComponentPublicInstance
       const input = componentInstance.$el.querySelector('input')
       if (input) input.blur()
     },

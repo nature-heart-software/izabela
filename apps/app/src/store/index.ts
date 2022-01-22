@@ -1,7 +1,7 @@
 import { createStore, MutationPayload } from 'vuex'
 
 import { createPersistedState, createSharedMutations } from '@/modules/electron-vuex'
-import messenger from '@/entities/messenger/components/store'
+import messenger from '@/entities/messenger/store'
 import { SetPropertyPayload } from '@/utils/vuex'
 
 const theme = require('@/theme')
