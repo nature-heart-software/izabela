@@ -14,6 +14,12 @@ export const useSettings = ({ popoverTarget, popoverOptions }: UseSettingsOption
       triggerTarget: popoverOptions?.triggerTarget,
       content: NvSettings,
       trigger: 'click',
+      arrow: false,
+      theme: 'settings',
+      interactive: true,
+      appendTo: () => document.body,
+      maxWidth: 'none',
+      offset: [0, 12],
     })
   }
   return {
