@@ -1,5 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import NvText from './NvText.vue'
+
 const theme = require('@/theme')
 
 export default {
@@ -11,6 +12,10 @@ export default {
     },
     size: {
       options: Object.keys(theme.fontSize).map((key) => key),
+      control: { type: 'inline-radio' },
+    },
+    type: {
+      options: ['caption', 'body-small', 'body', 'subtitle', 'title'],
       control: { type: 'inline-radio' },
     },
   },
