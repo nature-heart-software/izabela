@@ -12,7 +12,7 @@ export default {
     },
     type: {
       defaultValue: props.type.default,
-      options: ['default', 'plain', 'ghost'],
+      options: ['default', 'plain', 'ghost', 'ghost-alt'],
       control: { type: 'inline-radio' },
     },
     size: {
@@ -60,6 +60,10 @@ Plain.args = {
 export const Ghost = Template.bind({})
 Ghost.args = {
   type: 'ghost',
+}
+export const GhostAlt = Template.bind({})
+GhostAlt.args = {
+  type: 'ghost-alt',
 }
 
 export const WithIcon = Template.bind({})
