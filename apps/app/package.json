@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@storybook/addon-essentials": "^6.5.0-alpha.26",
-    "@storybook/addon-links": "^6.5.0-alpha.26",
+    "@storybook/addon-links": "^6.5.0-alpha.30",
     "@storybook/builder-webpack5": "^6.5.0-alpha.26",
     "@storybook/manager-webpack5": "^6.5.0-alpha.30",
     "@storybook/vue3": "^6.5.0-alpha.26",
