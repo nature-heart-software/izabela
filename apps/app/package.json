@@ -34,7 +34,7 @@
   "devDependencies": {
     "@storybook/addon-essentials": "^6.5.0-alpha.43",
     "@storybook/addon-links": "^6.5.0-alpha.43",
-    "@storybook/builder-webpack5": "^6.5.0-alpha.40",
+    "@storybook/builder-webpack5": "^6.5.0-alpha.46",
     "@storybook/manager-webpack5": "^6.5.0-alpha.43",
     "@storybook/vue3": "^6.5.0-alpha.43",
     "@types/chai": "^4.3.0",
