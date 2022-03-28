@@ -32,7 +32,7 @@
     "webpack-notifier": "^1.15.0"
   },
   "devDependencies": {
-    "@storybook/addon-essentials": "^6.5.0-alpha.48",
+    "@storybook/addon-essentials": "^6.5.0-alpha.51",
     "@storybook/addon-links": "^6.5.0-alpha.51",
     "@storybook/builder-webpack5": "^6.5.0-alpha.51",
     "@storybook/manager-webpack5": "^6.5.0-alpha.51",
