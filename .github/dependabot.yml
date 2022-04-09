@@ -3,20 +3,20 @@
 # Please see the documentation for all configuration options:
 # https://help.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
 
-#version: 2
-#updates:
-#  - package-ecosystem: npm
-#    directory: /
-#    schedule:
-#      interval: weekly
-#    ignore:
-#      - dependency-name: '*'
-#        update-types: ['version-update:semver-major']
-#
-#  - package-ecosystem: npm
-#    directory: /apps/app
-#    schedule:
-#      interval: weekly
-#    ignore:
-#      - dependency-name: '*'
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    ignore:
+      - dependency-name: '*'
+  #        update-types: ['version-update:semver-major']
+
+  - package-ecosystem: npm
+    directory: /apps/app
+    schedule:
+      interval: weekly
+    ignore:
+      - dependency-name: '*'
 #        update-types: ['version-update:semver-major']
