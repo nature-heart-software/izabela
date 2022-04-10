@@ -1,4 +1,5 @@
 module.exports = {
+  layout: 'fullscreen',
   core: {
     builder: 'webpack5',
   },
