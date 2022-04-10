@@ -6,6 +6,7 @@
 export { default as NvButton } from './Button/NvButton.vue'
 export { default as NvCard } from './Card/NvCard.vue'
 export { default as NvDivider } from './Divider/NvDivider.vue'
+export { default as NvGroup } from './Group/NvGroup.vue'
 export { default as NvIcon } from './Icon/NvIcon.vue'
 export { default as NvInput } from './Input/NvInput.vue'
 export { default as NvOption } from './Select/NvOption.vue'
