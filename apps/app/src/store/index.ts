@@ -3,6 +3,7 @@ import { createStore, MutationPayload } from 'vuex'
 import { createPersistedState, createSharedMutations } from '@/modules/electron-vuex'
 import messenger from '@/entities/messenger/store'
 import { SetPropertyPayload } from '@/utils/vuex'
+import domBoundariesStore from '@/modules/vue-dom-boundaries/dom-boundaries.store'
 
 const theme = require('@/theme')
 
@@ -31,6 +32,7 @@ const store = createStore({
                 )),
           }),
           createSharedMutations(),
+          domBoundariesStore(),
         ]),
   ],
 })

@@ -1,6 +1,6 @@
 <template>
   <div class="messengerWrapper">
-    <div ref="moveableTarget" id="moveable" class="inline-flex">
+    <component-boundary ref="moveableTarget" id="moveable" class="inline-flex">
       <div
         ref="messenger"
         class="messenger bg-gray-10/90 rounded grid p-4 gap-4 grid-rows-3 grid-rows-none"
@@ -100,7 +100,7 @@
           </nv-card>
         </div>
       </div>
-    </div>
+    </component-boundary>
     <Moveable
       className="opacity-0"
       ref="moveable"
@@ -130,10 +130,11 @@
 </template>
 <script lang="ts">
 import { ComponentPublicInstance, computed, defineComponent, ref } from 'vue'
+import Moveable from 'vue3-moveable'
 import { NvCard, NvButton, NvSelect, NvOption } from '@/core/components'
+import ComponentBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
 import NvDivider from '@/core/components/Divider/NvDivider.vue'
 import NvInput from '@/core/components/Input/NvInput.vue'
-import Moveable from 'vue3-moveable'
 import store from '@/store'
 import { useSettings } from '@/entities/settings/composition'
 
@@ -142,6 +143,7 @@ const { ElectronMessengerWindow } = window
 export default defineComponent({
   name: 'nv-messenger',
   components: {
+    ComponentBoundary,
     NvInput,
     NvDivider,
     NvCard,
@@ -229,7 +231,8 @@ export default defineComponent({
     }
   },
   mounted() {
-    const moveableTargetEl = this.$refs.moveableTarget as HTMLDivElement | null
+    const moveableTargetEl = (this.$refs.moveableTarget as ComponentPublicInstance)
+      .$el as HTMLDivElement | null
     const moveable = this.$refs.moveable as any
     if (moveableTargetEl) {
       if (this.width) moveableTargetEl.style.width = `${this.width}px`

@@ -1,5 +1,4 @@
 import { ExtractPropTypes, PropType } from 'vue'
-import { Properties } from 'csstype'
 
 const theme = require('@/theme')
 
