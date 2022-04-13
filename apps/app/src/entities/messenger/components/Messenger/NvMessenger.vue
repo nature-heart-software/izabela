@@ -1,41 +1,41 @@
 <template>
   <div class="messengerWrapper">
-    <component-boundary ref="moveableTarget" id="moveable" class="inline-flex">
+    <dom-boundary ref="moveableTarget" id="moveable" class="inline-flex">
       <div
         ref="messenger"
         class="messenger bg-gray-10/90 rounded grid p-4 gap-4 grid-rows-3 grid-rows-none"
       >
         <!-- Top -->
         <div class="flex space-x-4">
-          <nv-button type="plain" icon-name="info" />
+          <nv-button type="plain" icon-name="info"/>
           <nv-card size="xs">
             <div class="inline-flex space-x-2">
-              <nv-button size="sm" icon-name="github-alt" />
-              <nv-button size="sm" icon-name="twitter-alt" />
-              <nv-button size="sm" icon-name="discord" />
+              <nv-button size="sm" icon-name="github-alt"/>
+              <nv-button size="sm" icon-name="twitter-alt"/>
+              <nv-button size="sm" icon-name="discord"/>
             </div>
           </nv-card>
           <div class="flex flex-1 justify-end space-x-4 moveable-handle cursor-all-scroll">
             <nv-card size="xs" class="flex-1 min-h-8">
               <div class="inline-flex space-x-2">
                 <template v-if="$store.state.env === 'development'">
-                  <nv-button size="sm" icon-name="redo" @click="reload" />
-                  <nv-button size="sm" icon-name="brackets-curly" @click="openDevTools" />
+                  <nv-button size="sm" icon-name="redo" @click="reload"/>
+                  <nv-button size="sm" icon-name="brackets-curly" @click="openDevTools"/>
                 </template>
               </div>
             </nv-card>
             <nv-card size="xs">
               <div class="inline-flex items-center space-x-2">
-                <nv-button size="sm" icon-name="comment-alt-lines" />
-                <nv-divider direction="vertical" class="h-3" />
-                <nv-button size="sm" icon-name="setting" />
+                <nv-button size="sm" icon-name="comment-alt-lines"/>
+                <nv-divider direction="vertical" class="h-3"/>
+                <nv-button size="sm" icon-name="setting"/>
               </div>
             </nv-card>
             <nv-card size="sm" class="inline-flex">
               <div class="inline-flex space-x-2">
                 <!-- <nv-button size="xs" type="plain" icon-name="minus"/>
                 <nv-button size="xs" type="plain" icon-name="square-full"/> -->
-                <nv-button size="xs" type="plain" icon-name="times" @click="hide" />
+                <nv-button size="xs" type="plain" icon-name="times" @click="hide"/>
               </div>
             </nv-card>
           </div>
@@ -45,9 +45,9 @@
         <div class="flex justify-between">
           <nv-card size="sm" class="inline-flex items-center space-x-3">
             <span ref="settingsToggler">
-              <nv-button size="sm" icon-name="setting" />
+              <nv-button size="sm" icon-name="setting"/>
             </span>
-            <nv-divider direction="vertical" class="h-3" />
+            <nv-divider direction="vertical" class="h-3"/>
             <nv-select
               class="w-13"
               v-model="api"
@@ -55,10 +55,10 @@
               icon-name="direction"
               placeholder="TTS API"
             >
-              <nv-option value="gctts" label="Google - Google Cloud TTS" />
-              <nv-option value="aptts" label="Polly - Amazon Polly" />
-              <nv-option value="matts" label="Azure - Microsoft azure TTS" />
-              <nv-option value="say" label="Say" />
+              <nv-option value="gctts" label="Google - Google Cloud TTS"/>
+              <nv-option value="aptts" label="Polly - Amazon Polly"/>
+              <nv-option value="matts" label="Azure - Microsoft azure TTS"/>
+              <nv-option value="say" label="Say"/>
             </nv-select>
             <nv-select
               class="w-13"
@@ -67,21 +67,21 @@
               icon-name="direction"
               placeholder="API Voice"
             >
-              <nv-option value="1" label="Voice 1" />
-              <nv-option value="2" label="Voice 2" />
-              <nv-option value="3" label="Voice 3" />
+              <nv-option value="1" label="Voice 1"/>
+              <nv-option value="2" label="Voice 2"/>
+              <nv-option value="3" label="Voice 3"/>
             </nv-select>
-            <nv-divider direction="vertical" class="h-3" />
+            <nv-divider direction="vertical" class="h-3"/>
             <nv-button size="sm" icon-name="direction">Outputs</nv-button>
             <nv-button size="sm" icon-name="direction">Input</nv-button>
-            <nv-divider direction="vertical" class="h-3" />
-            <nv-button size="sm" icon-name="question-circle" />
+            <nv-divider direction="vertical" class="h-3"/>
+            <nv-button size="sm" icon-name="question-circle"/>
           </nv-card>
           <nv-card size="sm" class="inline-flex items-center space-x-3">
             <nv-button size="sm" type="plain">Sentence</nv-button>
             <nv-button size="sm">Word</nv-button>
-            <nv-divider direction="vertical" class="h-3" />
-            <nv-button size="sm" icon-name="question-circle" />
+            <nv-divider direction="vertical" class="h-3"/>
+            <nv-button size="sm" icon-name="question-circle"/>
           </nv-card>
         </div>
 
@@ -96,11 +96,11 @@
               v-model="inputValue"
               @keydown.enter="inputValue = ''"
             />
-            <nv-button size="lg" icon-name="message" @click="inputValue = ''" />
+            <nv-button size="lg" icon-name="message" @click="inputValue = ''"/>
           </nv-card>
         </div>
       </div>
-    </component-boundary>
+    </dom-boundary>
     <Moveable
       className="opacity-0"
       ref="moveable"
@@ -132,7 +132,7 @@
 import { ComponentPublicInstance, computed, defineComponent, ref } from 'vue'
 import Moveable from 'vue3-moveable'
 import { NvCard, NvButton, NvSelect, NvOption } from '@/core/components'
-import ComponentBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
+import DomBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
 import NvDivider from '@/core/components/Divider/NvDivider.vue'
 import NvInput from '@/core/components/Input/NvInput.vue'
 import store from '@/store'
@@ -143,7 +143,7 @@ const { ElectronMessengerWindow } = window
 export default defineComponent({
   name: 'nv-messenger',
   components: {
-    ComponentBoundary,
+    DomBoundary,
     NvInput,
     NvDivider,
     NvCard,
@@ -235,12 +235,12 @@ export default defineComponent({
       .$el as HTMLDivElement | null
     const moveable = this.$refs.moveable as any
     if (moveableTargetEl) {
-      if (this.width) moveableTargetEl.style.width = `${this.width}px`
-      if (this.minWidth) moveableTargetEl.style.minWidth = `${this.minWidth}px`
-      if (this.maxWidth) moveableTargetEl.style.maxWidth = `${this.maxWidth}px`
-      if (this.height) moveableTargetEl.style.height = `${this.height}px`
-      if (this.minHeight) moveableTargetEl.style.minHeight = `${this.minHeight}px`
-      if (this.maxHeight) moveableTargetEl.style.maxHeight = `${this.maxHeight}px`
+      if (this.width) moveableTargetEl.style.width = `${ this.width }px`
+      if (this.minWidth) moveableTargetEl.style.minWidth = `${ this.minWidth }px`
+      if (this.maxWidth) moveableTargetEl.style.maxWidth = `${ this.maxWidth }px`
+      if (this.height) moveableTargetEl.style.height = `${ this.height }px`
+      if (this.minHeight) moveableTargetEl.style.minHeight = `${ this.minHeight }px`
+      if (this.maxHeight) moveableTargetEl.style.maxHeight = `${ this.maxHeight }px`
       if (this.transform) moveableTargetEl.style.transform = this.transform
     }
     moveable.updateTarget()

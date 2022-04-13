@@ -3,6 +3,7 @@ import ElectronWindowManager from '@/modules/electron-window-manager'
 import iohook, { IOHookEvent } from '@/modules/iohook'
 import store from '@/store'
 import { throttle } from 'lodash'
+import { Boundary } from '@/modules/vue-dom-boundaries/types'
 
 class ElectronMessengerWindow {
   /* use isFocused as source of truth instead of window.isFocused() as in some instances
@@ -26,16 +27,15 @@ class ElectronMessengerWindow {
       if (window.isVisible()) {
         const { x: mouseX = 0, y: mouseY = 0 } = event
         const [windowX, windowY] = window.getPosition()
-        const {
-          translate: [focusableX, focusableY],
-          width: focusableWidth,
-          height: focusableHeight,
-        } = store.getters['messenger/persisted'].position
-        const isWithinXBoundaries =
-          mouseX >= windowX + focusableX && mouseX <= windowX + focusableX + focusableWidth
-        const isWithinYBoundaries =
-          mouseY >= windowY + focusableY && mouseY <= windowY + focusableY + focusableHeight
-        if (isWithinXBoundaries && isWithinYBoundaries) {
+        const domBoundaries = store.getters['dom-boundaries/boundaries']
+        const isWithinAnyBoundaries = domBoundaries.some(({ x, y, w, h }: Boundary) => {
+          const isWithinXBoundaries =
+            mouseX >= windowX+x && mouseX <= windowX+x+w
+          const isWithinYBoundaries =
+            mouseY >= windowY+y && mouseY <= windowY+y+h
+          return isWithinXBoundaries && isWithinYBoundaries
+        })
+        if (isWithinAnyBoundaries) {
           this.focus()
         } else {
           this.blur()
@@ -50,7 +50,7 @@ class ElectronMessengerWindow {
     iohook.on('keydown', (event) => {
       if (event.keycode === 56) {
         let keypressTime = Number(new Date())
-        if (keypressTime - this.lastKeypressTime <= this.doubleKeypressDelta) {
+        if (keypressTime-this.lastKeypressTime <= this.doubleKeypressDelta) {
           this.toggleWindow()
           keypressTime = 0
         }

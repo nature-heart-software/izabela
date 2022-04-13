@@ -1,11 +1,11 @@
 <template>
-  <div class="settings bg-gray-10/90 rounded p-4 flex flex-col space-y-4">
+  <dom-boundary class="settings bg-gray-10/90 rounded p-4 flex flex-col space-y-4">
     <!-- Top -->
     <div class="flex justify-between space-x-4">
       <div></div>
       <nv-card size="sm" class="inline-flex">
         <div class="inline-flex space-x-2">
-          <nv-button size="xs" type="plain" icon-name="times" />
+          <nv-button size="xs" type="plain" icon-name="times"/>
         </div>
       </nv-card>
     </div>
@@ -21,17 +21,19 @@
         </div>
       </div>
     </div>
-  </div>
+  </dom-boundary>
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { NvCard, NvButton } from '@/core/components'
+import DomBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
 
 export default defineComponent({
   name: 'nv-settings',
   components: {
     NvCard,
     NvButton,
+    DomBoundary,
   },
   methods: {
     toggleSettings() {

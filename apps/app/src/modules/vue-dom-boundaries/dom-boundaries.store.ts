@@ -1,12 +1,6 @@
 import { Plugin } from 'vuex'
-
-interface Boundary {
-  id: string
-  x: number
-  y: number
-  w: number
-  h: number
-}
+import { SESSION_ID } from '@/consts'
+import { Boundary } from './types'
 
 export default (): Plugin<any> => (store) => {
   store.registerModule<{ boundaries: Boundary[] }>('dom-boundaries', {
@@ -19,20 +13,23 @@ export default (): Plugin<any> => (store) => {
         state.boundaries = value
       },
     },
+    getters: {
+      state: state => state,
+      boundaries: (state) => state.boundaries.filter((i) => i.sessionId === SESSION_ID),
+    },
     actions: {
-      addBoundary({ commit, state }, boundary: Boundary) {
-        const newBoundaries = [...state.boundaries]
+      addBoundary({ commit, getters }, boundary: Boundary) {
+        const newBoundaries = [...getters.boundaries]
         const boundaryIndex = newBoundaries.findIndex((i) => i.id === boundary.id)
         if (boundaryIndex < 0) {
-          newBoundaries.push(boundary)
+          newBoundaries.push({ ...boundary, sessionId: SESSION_ID })
         } else {
-          newBoundaries.splice(boundaryIndex, 1, boundary)
+          newBoundaries.splice(boundaryIndex, 1, { ...boundary, sessionId: SESSION_ID })
         }
         commit('setBoundaries', newBoundaries)
-        console.log(state.boundaries)
       },
-      removeBoundary({ commit, state }, boundary: Boundary) {
-        const newBoundaries = [...state.boundaries]
+      removeBoundary({ commit, getters }, boundary: Boundary) {
+        const newBoundaries = [...getters.boundaries]
         const boundaryIndex = newBoundaries.findIndex((i) => i.id === boundary.id)
         if (boundaryIndex >= 0) {
           newBoundaries.splice(boundaryIndex, 1)

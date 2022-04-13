@@ -46,7 +46,7 @@ class SharedMutations {
   static notifyRenderers(connections: Connections, payload: MutationPayload, sourceProcessId = '') {
     Object.keys(connections).forEach((processId) => {
       if (processId !== sourceProcessId) {
-        connections[processId].send(IPC_EVENT_NOTIFY_RENDERERS, payload)
+        connections[processId].send(IPC_EVENT_NOTIFY_RENDERERS, JSON.parse(JSON.stringify(payload)))
       }
     })
   }

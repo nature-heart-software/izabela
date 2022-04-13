@@ -1,12 +1,13 @@
 <template>
   <div ref="componentRef">
-    <slot />
+    <slot/>
   </div>
 </template>
 <script lang="ts">
 import { useStore } from 'vuex'
 import { v4 as uuid } from 'uuid'
 import { defineComponent, ref, onBeforeUnmount, onMounted, watch } from 'vue'
+import { throttle } from 'lodash'
 
 export default defineComponent({
   setup() {
@@ -20,7 +21,7 @@ export default defineComponent({
       w: 0,
       h: 0,
     })
-    const updateBoundary = () => {
+    const updateBoundary = throttle(() => {
       if (componentRef.value) {
         const bounds = componentRef.value.getBoundingClientRect()
         boundaries.value.x = bounds.x
@@ -28,7 +29,7 @@ export default defineComponent({
         boundaries.value.w = bounds.width
         boundaries.value.h = bounds.height
       }
-    }
+    }, 250)
     const resizeObserver = new ResizeObserver(updateBoundary)
     const intersectionObserver = new IntersectionObserver(updateBoundary)
     const mutationObserver = new MutationObserver(updateBoundary)
@@ -45,15 +46,15 @@ export default defineComponent({
         intersectionObserver.unobserve(componentRef.value)
         mutationObserver.disconnect()
         if (store && store.hasModule('dom-boundaries')) {
-          store.dispatch('dom-boundaries/removeBoundary', boundaries)
+          store.dispatch('dom-boundaries/removeBoundary', { ...boundaries.value })
         }
       }
     })
-    watch(boundaries, () => {
+    watch(boundaries.value, () => {
       if (store && store.hasModule('dom-boundaries')) {
-        store.dispatch('dom-boundaries/addBoundary', boundaries)
+        store.dispatch('dom-boundaries/addBoundary', { ...boundaries.value })
       }
-    })
+    }, { deep: true })
     return {
       componentRef,
     }
