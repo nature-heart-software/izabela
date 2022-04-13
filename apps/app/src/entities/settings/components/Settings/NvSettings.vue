@@ -5,7 +5,7 @@
       <div></div>
       <nv-card size="sm" class="inline-flex">
         <div class="inline-flex space-x-2">
-          <nv-button size="xs" type="plain" icon-name="times"/>
+          <nv-button size="xs" type="plain" icon-name="times" />
         </div>
       </nv-card>
     </div>

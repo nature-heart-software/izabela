@@ -1,6 +1,6 @@
 <template>
   <div ref="componentRef">
-    <slot/>
+    <slot />
   </div>
 </template>
 <script lang="ts">
@@ -50,11 +50,15 @@ export default defineComponent({
         }
       }
     })
-    watch(boundaries.value, () => {
-      if (store && store.hasModule('dom-boundaries')) {
-        store.dispatch('dom-boundaries/addBoundary', { ...boundaries.value })
-      }
-    }, { deep: true })
+    watch(
+      boundaries.value,
+      () => {
+        if (store && store.hasModule('dom-boundaries')) {
+          store.dispatch('dom-boundaries/addBoundary', { ...boundaries.value })
+        }
+      },
+      { deep: true },
+    )
     return {
       componentRef,
     }

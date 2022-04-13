@@ -29,10 +29,8 @@ class ElectronMessengerWindow {
         const [windowX, windowY] = window.getPosition()
         const domBoundaries = store.getters['dom-boundaries/boundaries']
         const isWithinAnyBoundaries = domBoundaries.some(({ x, y, w, h }: Boundary) => {
-          const isWithinXBoundaries =
-            mouseX >= windowX+x && mouseX <= windowX+x+w
-          const isWithinYBoundaries =
-            mouseY >= windowY+y && mouseY <= windowY+y+h
+          const isWithinXBoundaries = mouseX >= windowX + x && mouseX <= windowX + x + w
+          const isWithinYBoundaries = mouseY >= windowY + y && mouseY <= windowY + y + h
           return isWithinXBoundaries && isWithinYBoundaries
         })
         if (isWithinAnyBoundaries) {
@@ -50,7 +48,7 @@ class ElectronMessengerWindow {
     iohook.on('keydown', (event) => {
       if (event.keycode === 56) {
         let keypressTime = Number(new Date())
-        if (keypressTime-this.lastKeypressTime <= this.doubleKeypressDelta) {
+        if (keypressTime - this.lastKeypressTime <= this.doubleKeypressDelta) {
           this.toggleWindow()
           keypressTime = 0
         }

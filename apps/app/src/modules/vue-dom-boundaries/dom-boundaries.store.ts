@@ -14,7 +14,7 @@ export default (): Plugin<any> => (store) => {
       },
     },
     getters: {
-      state: state => state,
+      state: (state) => state,
       boundaries: (state) => state.boundaries.filter((i) => i.sessionId === SESSION_ID),
     },
     actions: {
