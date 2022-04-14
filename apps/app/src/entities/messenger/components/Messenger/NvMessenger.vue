@@ -136,7 +136,7 @@ import DomBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
 import NvDivider from '@/core/components/Divider/NvDivider.vue'
 import NvInput from '@/core/components/Input/NvInput.vue'
 import store from '@/store'
-import { useSettings } from '@/entities/settings/composition'
+import { useSettingsPopover } from '@/entities/settings/hooks'
 
 const { ElectronMessengerWindow } = window
 
@@ -186,7 +186,7 @@ export default defineComponent({
     const messenger = ref()
     const settingsToggler = ref()
 
-    const { popover: settingsPopover } = useSettings({
+    const { popover: settingsPopover } = useSettingsPopover({
       popoverTarget: messenger,
       popoverOptions: {
         triggerTarget: settingsToggler,
