@@ -1,5 +1,5 @@
 export interface Boundary {
-  sessionId?: string,
+  sessionId?: string
   id: string
   x: number
   y: number
