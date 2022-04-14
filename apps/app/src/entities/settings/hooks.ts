@@ -1,5 +1,5 @@
 import { TippyOptions, useTippy } from 'vue-tippy'
-import NvSettings from '@/entities/settings/components/Settings/NvSettings.vue'
+import Settings from '@/entities/settings/components/Settings.vue'
 import { ref, Ref, h } from 'vue'
 import { TippyHookInstance, TippyTarget } from '@/types/vue-tippy'
 
@@ -13,7 +13,7 @@ export const useSettingsPopover = ({ popoverTarget, popoverOptions }: UseSetting
   if (popoverTarget) {
     popover.value = useTippy(popoverTarget, {
       triggerTarget: popoverOptions?.triggerTarget,
-      content: h(NvSettings, {
+      content: h(Settings, {
         onClose: () => popover.value?.hide(),
       }),
       trigger: 'click',

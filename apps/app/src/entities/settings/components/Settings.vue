@@ -33,8 +33,12 @@
               </template>
             </nv-stack>
           </div>
-          <div class="settings__content flex-1">
+          <div class="settings__content flex-1 pl-4">
             <!-- View -->
+            <Transition class="transition">
+              <component v-if="currentEntry.component"
+                         :is="currentEntry.component.name"></component>
+            </Transition>
           </div>
         </div>
       </div>
@@ -42,23 +46,20 @@
   </dom-boundary>
 </template>
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { computed, defineComponent, ref } from 'vue'
 import { NvCard, NvButton, NvStack, NvText } from '@/core/components'
 import DomBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
+import SettingsOverview from '@/entities/settings/components/SettingsOverview.vue'
 
 export default defineComponent({
-  name: 'nv-settings',
+  name: 'NvSettings',
   components: {
     NvCard,
     NvButton,
     NvStack,
     NvText,
     DomBoundary,
-  },
-  methods: {
-    toggleSettings() {
-      console.log('hello')
-    },
+    SettingsOverview,
   },
   setup() {
     const selectedEntry = ref('Overview')
@@ -68,6 +69,7 @@ export default defineComponent({
         children: [
           {
             name: 'Overview',
+            component: SettingsOverview,
           },
           {
             name: 'Speech',
@@ -102,9 +104,11 @@ export default defineComponent({
         ],
       },
     ]
+    const currentEntry = computed(() => navigation.flatMap((i) => i.children).find((i) => i.name === selectedEntry.value))
     return {
       navigation,
       selectedEntry,
+      currentEntry,
     }
   },
 })

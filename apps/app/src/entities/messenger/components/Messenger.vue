@@ -141,7 +141,7 @@ import { useSettingsPopover } from '@/entities/settings/hooks'
 const { ElectronMessengerWindow } = window
 
 export default defineComponent({
-  name: 'nv-messenger',
+  name: 'Messenger',
   components: {
     DomBoundary,
     NvInput,

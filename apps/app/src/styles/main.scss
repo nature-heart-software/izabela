@@ -5,5 +5,15 @@
 *,
 *::before,
 *::after {
-  user-select: none;
+    user-select: none;
+}
+
+.v-enter-active,
+.v-leave-active {
+    transition: all .3s;
+}
+
+.v-enter-from,
+.v-leave-to {
+    opacity: 0;
 }

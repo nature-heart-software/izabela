@@ -2,7 +2,7 @@
   <ThemeProvider :theme="$store.getters['theme']">
     <template v-if="ready">
       <div class="h-0">
-        <nv-messenger
+        <Messenger
           class="w-full h-full"
           :min-width="768"
           :transform="$store.getters['messenger/persisted'].position.transform"
@@ -20,14 +20,14 @@ body {
 }
 </style>
 <script>
-import { ref } from 'vue'
-import { ThemeProvider } from 'vue3-styled-components'
-import NvMessenger from '@/entities/messenger/components/Messenger/NvMessenger.vue'
+import {ref} from 'vue'
+import {ThemeProvider} from 'vue3-styled-components'
+import Messenger from '@/entities/messenger/components/Messenger.vue'
 
 export default {
   name: 'app',
   components: {
-    NvMessenger,
+    Messenger,
     ThemeProvider,
   },
   setup() {
