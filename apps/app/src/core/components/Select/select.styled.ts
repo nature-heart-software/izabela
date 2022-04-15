@@ -14,13 +14,13 @@ const { fontSize, spacing, boxShadow, borderRadius, borderWidth, colors, transit
 const getIconStyleFromSize = ({ size }: Props) => {
   const styles: { [key in Size]: CSSObject } = {
     sm: {
-      right: `${ rem(math(`${ remToPx(spacing['3']) } + 1px`)) }`,
+      right: `${rem(math(`${remToPx(spacing['3'])} + 1px`))}`,
     },
     md: {
-      right: `${ rem(math(`${ remToPx(spacing['5']) } + 1px`)) }`,
+      right: `${rem(math(`${remToPx(spacing['5'])} + 1px`))}`,
     },
     lg: {
-      right: `${ rem(math(`${ remToPx(spacing['5']) } + 1px`)) }`,
+      right: `${rem(math(`${remToPx(spacing['5'])} + 1px`))}`,
     },
   }
   return styles[size]
@@ -29,19 +29,19 @@ const getIconStyleFromSize = ({ size }: Props) => {
 const getStyleFromSize = ({ size }: Props) => {
   const styles: { [key in Size]: CSSObject } = {
     sm: {
-      padding: `0 ${ spacing['3'] }`,
-      paddingRight: rem(math(`${ remToPx(spacing['6']) } + ${ remToPx(spacing['3']) }`)),
+      padding: `0 ${spacing['3']}`,
+      paddingRight: rem(math(`${remToPx(spacing['6'])} + ${remToPx(spacing['3'])}`)),
       borderRadius: borderRadius.sm,
       height: spacing['6'],
     },
     md: {
-      padding: `0 ${ spacing['5'] }`,
-      paddingRight: rem(math(`${ remToPx(spacing['7']) } + ${ remToPx(spacing['5']) }`)),
+      padding: `0 ${spacing['5']}`,
+      paddingRight: rem(math(`${remToPx(spacing['7'])} + ${remToPx(spacing['5'])}`)),
       height: spacing['7'],
     },
     lg: {
-      padding: `0 ${ spacing['5'] }`,
-      paddingRight: rem(math(`${ remToPx(spacing['8']) } + ${ remToPx(spacing['5']) }`)),
+      padding: `0 ${spacing['5']}`,
+      paddingRight: rem(math(`${remToPx(spacing['8'])} + ${remToPx(spacing['5'])}`)),
       height: spacing['8'],
       fontSize: fontSize['2'][0],
       ...fontSize['2'][1],
@@ -80,37 +80,37 @@ export const StSelect = styled('div', props)`
 
     &.is-focus {
       .el-input__inner {
-        box-shadow: 0 0 0 ${ borderWidth.lg } ${ colors.gray['10'] };
-        border-color: ${ colors.gray['30'] } !important;
+        box-shadow: 0 0 0 ${borderWidth.lg} ${colors.gray['10']};
+        border-color: ${colors.gray['30']} !important;
       }
     }
 
     .el-input__inner {
       align-items: center;
-      font-size: ${ fontSize['1'][0] };
-      ${ fontSize['1'][1] }
+      font-size: ${fontSize['1'][0]};
+      ${fontSize['1'][1]}
       font-weight: 600;
-      border-width: ${ borderWidth.DEFAULT };
+      border-width: ${borderWidth.DEFAULT};
       outline: 0;
-      border-color: ${ colors.gray['20'] };
-      transition: ${ transition.DEFAULT };
+      border-color: ${colors.gray['20']};
+      transition: ${transition.DEFAULT};
 
-      ${ getPopperStyleFromSize }
+      ${getPopperStyleFromSize}
       &:hover {
-        border-color: ${ colors.gray['30'] };
+        border-color: ${colors.gray['30']};
       }
 
       &:focus {
-        box-shadow: 0 0 0 ${ borderWidth.lg } ${ colors.gray['10'] };
-        border-color: ${ colors.gray['30'] };
+        box-shadow: 0 0 0 ${borderWidth.lg} ${colors.gray['10']};
+        border-color: ${colors.gray['30']};
       }
 
       &::placeholder {
-        color: ${ colors.gray['40'] };
+        color: ${colors.gray['40']};
         font-weight: 300;
       }
 
-      ${ getStyleFromSize }
+      ${getStyleFromSize}
     }
 
     .el-input__suffix {
@@ -119,10 +119,10 @@ export const StSelect = styled('div', props)`
   }
 
   .el-popper {
-    box-shadow: ${ boxShadow.lg } !important;
-    border-color: ${ colors.gray['20'] } !important;
+    box-shadow: ${boxShadow.lg} !important;
+    border-color: ${colors.gray['20']} !important;
 
-    ${ getPopperStyleFromSize }
+    ${getPopperStyleFromSize}
     .el-popper__arrow {
       display: none;
     }
@@ -132,8 +132,8 @@ export const StSelect = styled('div', props)`
     width: 100%;
 
     .el-select__input {
-      margin-top: ${ spacing['2'] };
-      height: ${ spacing['6'] };
+      margin-top: ${spacing['2']};
+      height: ${spacing['6']};
     }
 
     .el-select__tags {
@@ -141,22 +141,21 @@ export const StSelect = styled('div', props)`
       transform: none;
 
       .el-tag {
-        margin: ${ spacing['2'] } 0 0 ${ spacing['2'] };
+        margin: ${spacing['2']} 0 0 ${spacing['2']};
 
         &--info {
-          background-color: ${ colors.gray['10'] };
+          background-color: ${colors.gray['10']};
         }
 
         .el-tag__close {
           &:hover {
             color: inherit !important;
-            background-color: ${ colors.gray['20'] };
+            background-color: ${colors.gray['20']};
           }
 
           &:active {
-            background-color: ${ colors.gray['30'] };
+            background-color: ${colors.gray['30']};
           }
-
         }
       }
     }
@@ -166,12 +165,12 @@ export const StSelect = styled('div', props)`
     }
 
     .el-select-dropdown__empty {
-      padding: ${ spacing['3'] };
-      ${ () => defaultTextStyle }
+      padding: ${spacing['3']};
+      ${() => defaultTextStyle}
     }
 
     .el-select-dropdown__item {
-      ${ () => defaultTextStyle }
+      ${() => defaultTextStyle}
     }
 
     &:hover {
@@ -189,7 +188,7 @@ export const StSelect = styled('div', props)`
     .nv-select__icon {
       pointer-events: none;
       position: absolute;
-      ${ getIconStyleFromSize }
+      ${getIconStyleFromSize}
     }
   }
 `
@@ -198,30 +197,30 @@ export const StOption = styled(ElOption)`
   display: inline-flex;
   align-items: center;
   width: 100%;
-  height: ${ spacing['7'] } !important;
-  padding: 0 ${ spacing['5'] } !important;
+  height: ${spacing['7']} !important;
+  padding: 0 ${spacing['5']} !important;
 
   &:hover:not(.is-disabled),
   &.hover:not(.is-disabled) {
-    background-color: ${ colors.gray['10'] } !important;
+    background-color: ${colors.gray['10']} !important;
   }
 
   //
   // &:active:not(.is-disabled) {
-    //   background-color: ${ colors.gray['30'] } !important;
+  //   background-color: ${colors.gray['30']} !important;
   // }
   //
   // &:focus:not(.is-disabled) {
-    //   box-shadow: 0 0 0 ${ borderWidth.lg } ${ colors.gray['10'] };
+  //   box-shadow: 0 0 0 ${borderWidth.lg} ${colors.gray['10']};
   // }
 
   &.selected:not(.is-disabled) {
     color: inherit !important;
     font-weight: 600;
-    background-color: ${ colors.gray['10'] } !important;
+    background-color: ${colors.gray['10']} !important;
   }
 
   &.is-disabled {
-    color: ${ colors.gray['40'] } !important;
+    color: ${colors.gray['40']} !important;
   }
 `
