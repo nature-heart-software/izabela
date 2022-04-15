@@ -23,7 +23,6 @@
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue'
 import { NvStack, NvText, NvSwitch, NvGroup, NvSelect, NvOption } from '@/core/components'
-import store from '@/store'
 import { orderBy } from 'lodash'
 
 export default defineComponent({
@@ -45,8 +44,7 @@ export default defineComponent({
       })
     window.addEventListener('devicechange', updateMediaDevices)
     updateMediaDevices()
-    const audioOutputDevices = computed(() => orderBy(mediaDevices.value.filter((m) => m.kind === 'audiooutput' && m.deviceId !== 'default' && !(store.getters['settings/persisted'].audioOutputDevices as MediaDeviceInfo['deviceId'][]).find((deviceId) => deviceId === m.deviceId)), ['label']))
-    console.log(audioOutputDevices)
+    const audioOutputDevices = computed(() => orderBy(mediaDevices.value.filter((m) => m.kind === 'audiooutput' && m.deviceId !== 'default'), ['label']))
     return {
       audioOutputDevices,
     }
