@@ -121,6 +121,10 @@ export default defineComponent({
   .settings__sidebar {
     width: 150px;
   }
+
+  .settings__content {
+    overflow-y: auto;
+  }
 }
 </style>
 <style lang="scss">

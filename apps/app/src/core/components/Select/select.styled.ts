@@ -173,6 +173,12 @@ export const StSelect = styled('div', props)`
     .el-select-dropdown__item {
       ${ () => defaultTextStyle }
     }
+
+    &:hover {
+      .el-input__inner {
+        border-color: ${ colors.gray['30'] };
+      }
+    }
   }
 
   .nv-selectWrapper {

@@ -15,6 +15,7 @@ module.exports = {
     '@typescript-eslint/no-var-requires': 'off',
     'no-lone-blocks': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
+    'vuejs-accessibility/label-has-for': 'off',
   },
   overrides: [
     {

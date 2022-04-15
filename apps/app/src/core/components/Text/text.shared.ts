@@ -1,6 +1,6 @@
 import { ExtractPropTypes, PropType } from 'vue'
 
-export type Type = 'caption' | 'body-small' | 'body' | 'subtitle' | 'title'
+export type Type = 'caption' | 'label' | 'body-small' | 'body' | 'subtitle' | 'title'
 
 export const props = {
   size: {

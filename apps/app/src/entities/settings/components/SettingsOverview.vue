@@ -5,9 +5,8 @@
       <NvStack spacing="4">
         <NvCard>
           <NvStack>
-            <NvText type="subtitle">Audio Outputs</NvText>
-            <NvText>Select audio outputs where speech should be played on</NvText>
-            <NvText type="caption">You can select up to 5 audio outputs</NvText>
+            <NvText type="label">Audio Outputs</NvText>
+            <NvText>Select audio outputs where Izabela's speech should be played on</NvText>
           </NvStack>
         </NvCard>
         <div class="pl-8">
