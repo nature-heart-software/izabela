@@ -1,0 +1,28 @@
+{
+  "name": "@izabela/app-server",
+  "version": "0.1.0",
+  "private": true,
+  "source": "src/index.ts",
+  "main": "dist/main.js",
+  "scripts": {
+    "start": "nodemon ./dist/main.js",
+    "watch": "parcel watch",
+    "build": "parcel build"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.24",
+    "parcel": "^2.4.1"
+  },
+  "dependencies": {
+    "@google-cloud/text-to-speech": "^3.4.0",
+    "axios": "^0.26.1",
+    "body-parser": "^1.20.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.3",
+    "lodash": "^4.17.21",
+    "morgan": "^1.10.0",
+    "node-cache": "^5.1.2",
+    "nodemon": "^2.0.15",
+    "uuid": "^8.3.2"
+  }
+}
