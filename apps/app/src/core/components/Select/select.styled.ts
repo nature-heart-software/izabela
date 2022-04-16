@@ -175,7 +175,7 @@ export const StSelect = styled('div', props)`
 
     &:hover {
       .el-input__inner {
-        border-color: ${ colors.gray['30'] };
+        border-color: ${colors.gray['30']};
       }
     }
   }
