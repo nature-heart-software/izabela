@@ -18,11 +18,12 @@ class IzabelaServer {
     public server = null
     private config = null
     private defaultConfig = {
-        tempPath: '',
+        tempPath: path.resolve('temp'),
+        port: 7070,
     }
 
     async startApp() {
-        this.server = app.listen(process.env.PORT || 8080, () => {
+        this.server = app.listen(this.getConfig().port, () => {
             const port = this.server.address().port
             console.log("App server now running on port", port)
         })
@@ -39,8 +40,8 @@ class IzabelaServer {
         await this.startApp()
     }
 
-    getTempPath() {
-        return this.config?.tempPath || path.resolve('temp')
+    getConfig() {
+        return this.config || this.defaultConfig
     }
 }
 

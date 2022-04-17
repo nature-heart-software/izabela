@@ -18,7 +18,7 @@ export const listVoicesHandler = async ({ body: { apiKey } }, res, next) => {
 }
 
 export const synthesizeSpeechHandler = async ({ body: { apiKey, ...rest } }, res) => {
-    const outputFile = path.join(izabelaServer.getTempPath(), uuid()+'.mp3')
+    const outputFile = path.join(izabelaServer.getConfig().tempPath, uuid()+'.mp3')
     try {
         fs.mkdirSync(path.parse(outputFile).dir, { recursive: true }, (err) => {
             if (err) throw err

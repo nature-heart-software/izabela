@@ -7,8 +7,8 @@ import { app, protocol, BrowserWindow } from 'electron'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import createMessengerWindow from '@/teams/messenger/electron-window'
 import ElectronWindowManager from '@/modules/electron-window-manager'
-
-;
+import izabelaServer from '@izabela/app-server'
+import path from 'path'
 
 (() => {
   /* Fixes iohook. See: https://github.com/electron/electron/issues/18397 */
@@ -41,6 +41,9 @@ app.on('window-all-closed', () => {
   }
 })
 
+const startAppServer = async () => izabelaServer.startServer({
+  tempPath: path.join(app.getPath('userData'), 'temp'),
+})
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
@@ -60,6 +63,7 @@ app.on('ready', async () => {
     }
   }
   createWindows()
+  startAppServer()
 })
 
 // Exit cleanly on request from parent process in development mode.

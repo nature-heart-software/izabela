@@ -1,7 +1,7 @@
 import izabelaServer from './server'
 
-export default izabelaServer
+// if (!module.parent) {
+//     izabelaServer.startServer()
+// }
 
-if (require.main !== module) {
-    izabelaServer.startServer()
-}
+module.exports = izabelaServer

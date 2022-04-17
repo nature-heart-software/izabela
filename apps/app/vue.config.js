@@ -1,4 +1,4 @@
-const { defineConfig } = require('@vue/cli-service')
+const {defineConfig} = require('@vue/cli-service')
 const GenerateExportsWebpackPlugin = require('@izabela/generate-exports-webpack-plugin')
 const WebpackNotifierPlugin = require('webpack-notifier')
 
@@ -6,7 +6,7 @@ module.exports = defineConfig({
   transpileDependencies: ['@izabela'],
   configureWebpack: {
     plugins: [
-      new WebpackNotifierPlugin({ emoji: true }),
+      new WebpackNotifierPlugin({emoji: true}),
       new GenerateExportsWebpackPlugin({
         omitExtension: false,
         omitSemi: true,
@@ -18,7 +18,7 @@ module.exports = defineConfig({
   },
   pluginOptions: {
     electronBuilder: {
-      externals: ['iohook'],
+      externals: ['iohook', '@izabela/app-server'],
       chainWebpackMainProcess: (config) => {
         config.module.rule('babel').before('ts').use('babel').loader('babel-loader')
       },
