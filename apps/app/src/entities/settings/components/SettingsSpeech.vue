@@ -11,11 +11,13 @@
             </NvStack>
             <SpeechEngineSelect
               :modelValue="$store.getters['settings/persisted'].selectedSpeechEngine"
-              @update:modelValue="(value) => {
-                selectedEngineTab = value
-                $store.dispatch('settings/setProperty', ['persisted.selectedSpeechEngine', value])
-              }
-        "/>
+              @update:modelValue="
+                (value) => {
+                  selectedEngineTab = value
+                  $store.dispatch('settings/setProperty', ['persisted.selectedSpeechEngine', value])
+                }
+              "
+            />
           </NvGroup>
         </NvCard>
         <div class="pl-8">
@@ -23,26 +25,36 @@
             <NvStack spacing="5">
               <NvGroup grow>
                 <template v-for="engine in SPEECH_ENGINES" :key="engine.id">
-                  <NvButton align="center" type="ghost" @click="selectedEngineTab = engine.id"
-                            :selected="selectedEngineTab === engine.id">{{ engine.name }}
+                  <NvButton
+                    align="center"
+                    type="ghost"
+                    @click="selectedEngineTab = engine.id"
+                    :selected="selectedEngineTab === engine.id"
+                    >{{ engine.name }}
                   </NvButton>
                 </template>
               </NvGroup>
-              <NvDivider direction="horizontal"/>
+              <NvDivider direction="horizontal" />
               <template v-if="selectedEngineTab === 'gctts'">
                 <NvStack>
                   <NvFormItem label="Engine API Key">
                     <NvInput
                       :modelValue="decrypt($store.getters['settings/persisted'].googleCloudApiKey)"
-                      @update:modelValue="(value) => $store.dispatch('settings/setProperty', ['persisted.googleCloudApiKey', encrypt(value)])"
-                      type="password" show-password/>
+                      @update:modelValue="
+                        (value) =>
+                          $store.dispatch('settings/setProperty', [
+                            'persisted.googleCloudApiKey',
+                            encrypt(value),
+                          ])
+                      "
+                      type="password"
+                      show-password
+                    />
                   </NvFormItem>
                 </NvStack>
               </template>
               <template v-else>
-                <NvText align="center">
-                  Coming Soon
-                </NvText>
+                <NvText align="center"> Coming Soon </NvText>
               </template>
             </NvStack>
           </NvCard>
@@ -83,7 +95,9 @@ export default defineComponent({
   },
   setup() {
     const store = useStore()
-    const selectedEngineTab = ref<typeof SPEECH_ENGINES[number]['id']>(store.getters['settings/persisted'].selectedSpeechEngine)
+    const selectedEngineTab = ref<typeof SPEECH_ENGINES[number]['id']>(
+      store.getters['settings/persisted'].selectedSpeechEngine,
+    )
     return {
       SPEECH_ENGINES,
       selectedEngineTab,

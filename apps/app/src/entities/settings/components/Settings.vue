@@ -5,7 +5,7 @@
       <div></div>
       <nv-card size="sm" class="inline-flex">
         <div class="inline-flex space-x-2">
-          <nv-button @click="$emit('close')" size="xs" type="plain" icon-name="times"/>
+          <nv-button @click="$emit('close')" size="xs" type="plain" icon-name="times" />
         </div>
       </nv-card>
     </div>
@@ -22,10 +22,12 @@
                   </nv-text>
                   <nv-stack spacing="2">
                     <template v-for="entry in category.children" :key="entry.name">
-                      <nv-button size="sm" type="ghost-alt" :selected="selectedEntry === entry.name"
-                                 @click="selectedEntry = entry.name">{{
-                          entry.name
-                        }}
+                      <nv-button
+                        size="sm"
+                        type="ghost-alt"
+                        :selected="selectedEntry === entry.name"
+                        @click="selectedEntry = entry.name"
+                        >{{ entry.name }}
                       </nv-button>
                     </template>
                   </nv-stack>
@@ -36,8 +38,10 @@
           <div class="settings__content flex-1 pl-4">
             <!-- View -->
             <Transition class="transition">
-              <component v-if="currentEntry.component"
-                         :is="currentEntry.component.name"></component>
+              <component
+                v-if="currentEntry.component"
+                :is="currentEntry.component.name"
+              ></component>
             </Transition>
           </div>
         </div>
@@ -110,7 +114,9 @@ export default defineComponent({
         ],
       },
     ]
-    const currentEntry = computed(() => navigation.flatMap((i) => i.children).find((i) => i.name === selectedEntry.value))
+    const currentEntry = computed(() =>
+      navigation.flatMap((i) => i.children).find((i) => i.name === selectedEntry.value),
+    )
     return {
       navigation,
       selectedEntry,

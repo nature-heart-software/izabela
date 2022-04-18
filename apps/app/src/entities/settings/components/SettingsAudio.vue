@@ -11,7 +11,7 @@
         </NvCard>
         <div class="pl-8">
           <NvCard>
-            <AudioOutputsSelect/>
+            <AudioOutputsSelect />
           </NvCard>
         </div>
       </NvStack>
