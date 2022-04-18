@@ -26,7 +26,7 @@ export default defineComponent({
     const voices = computed(() => resData.value)
     const computedApikey = computed(() => decrypt(store.getters['settings/persisted'].GCTTSApiKey))
     const fetchVoices = () => {
-      axios.post('http://localhost:7070/api/gc-tts/list-voices', {
+      axios.post('http://localhost:7070/api/tts/google-cloud/list-voices', {
         apiKey: computedApikey.value,
       })
         .then(({ data }) => {

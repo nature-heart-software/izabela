@@ -4,6 +4,6 @@ import {
 } from '../controllers/gc-tts'
 
 export const registerGCTTSRoutes = ({ app }) => {
-  app.post('/api/gc-tts/list-voices', listVoicesHandler)
-  app.post('/api/gc-tts/synthesize-speech', synthesizeSpeechHandler)
+  app.post('/api/tts/google-cloud/list-voices', listVoicesHandler)
+  app.post('/api/tts/google-cloud/synthesize-speech', synthesizeSpeechHandler)
 }
