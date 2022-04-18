@@ -7,7 +7,8 @@ const storeState = {
     playSpeechOnDefaultPlaybackDevice: true,
     audioOutputDevices: [] as MediaDeviceInfo['deviceId'][],
     selectedSpeechEngine: 'gctts' as typeof SPEECH_ENGINES[number]['id'],
-    googleCloudApiKey: '',
+    GCTTSApiKey: '',
+    GCTTSSelectedVoice: 'en-GB-Wavenet-A',
   },
 }
 

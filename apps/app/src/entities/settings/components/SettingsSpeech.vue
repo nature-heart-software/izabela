@@ -30,14 +30,21 @@
               </NvGroup>
               <NvDivider direction="horizontal"/>
               <template v-if="selectedEngineTab === 'gctts'">
-                <NvStack>
+                <NvStack spacing="5">
                   <NvFormItem label="Engine API Key">
                     <NvInput
-                      :modelValue="decrypt($store.getters['settings/persisted'].googleCloudApiKey)"
-                      @update:modelValue="(value) => $store.dispatch('settings/setProperty', ['persisted.googleCloudApiKey', encrypt(value)])"
+                      :modelValue="decrypt($store.getters['settings/persisted'].GCTTSApiKey)"
+                      @update:modelValue="(value) => $store.dispatch('settings/setProperty', ['persisted.GCTTSApiKey', encrypt(value)])"
                       type="password" show-password/>
                   </NvFormItem>
                 </NvStack>
+                <NvDivider direction="horizontal"/>
+                <NvFormItem label="Engine API Key">
+                  <GCTTSVoiceSelect
+                    :modelValue="$store.getters['settings/persisted'].GCTTSSelectedVoice"
+                    @update:modelValue="(value) => $store.dispatch('settings/setProperty', ['persisted.GCTTSSelectedVoice', value])"
+                  />
+                </NvFormItem>
               </template>
               <template v-else>
                 <NvText align="center">
@@ -65,6 +72,7 @@ import {
   NvInput,
 } from '@/core/components'
 import SpeechEngineSelect from '@/entities/speech/components/inputs/SpeechEngineSelect.vue'
+import GCTTSVoiceSelect from '@/entities/speech/components/inputs/GCTTSVoiceSelect.vue'
 import { SPEECH_ENGINES } from '@/entities/speech'
 import { useEncryption } from '@/utils/security'
 
@@ -72,6 +80,7 @@ export default defineComponent({
   name: 'SettingsSpeech',
   components: {
     SpeechEngineSelect,
+    GCTTSVoiceSelect,
     NvCard,
     NvStack,
     NvGroup,
