@@ -1,10 +1,13 @@
 import { Module } from 'vuex'
 import { utilActions, utilMutations } from '@/utils/vuex'
+import { SPEECH_ENGINES } from '@/entities/speech'
 
 const storeState = {
   persisted: {
     playSpeechOnDefaultPlaybackDevice: true,
     audioOutputDevices: [] as MediaDeviceInfo['deviceId'][],
+    selectedSpeechEngine: 'gctts' as typeof SPEECH_ENGINES[number]['id'],
+    googleCloudApiKey: '',
   },
 }
 

@@ -1,4 +1,5 @@
 import { PropType, ExtractPropTypes } from 'vue'
+import type { Properties } from 'csstype'
 
 export type Size = 'xs' | 'sm' | 'md' | 'lg'
 export type Type = 'default' | 'plain' | 'ghost' | 'ghost-alt'
@@ -22,6 +23,10 @@ export const props = {
   },
   iconName: {
     type: String,
+    default: '',
+  },
+  align: {
+    type: String as PropType<Properties['textAlign']>,
     default: '',
   },
 }

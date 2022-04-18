@@ -73,6 +73,7 @@ export const StButton = styled('button', props)`
   border-width: ${ borderWidth.DEFAULT };
   outline: 0;
   transition: ${ transition.DEFAULT };
+  ${ ({ align = '' }) => align && `justify-content: ${ align };` }
   ${ (parameter) => getStyleFromSize(parameter) }
   ${ ({ squared }) =>
     squared &&

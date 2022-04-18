@@ -1,4 +1,5 @@
 import { ExtractPropTypes, PropType } from 'vue'
+import type { Properties } from 'csstype'
 
 export type Type = 'caption' | 'label' | 'body-small' | 'body' | 'subtitle' | 'title'
 
@@ -14,6 +15,10 @@ export const props = {
   type: {
     type: String as PropType<Type>,
     default: 'body',
+  },
+  align: {
+    type: String as PropType<Properties['textAlign']>,
+    default: '',
   },
 }
 

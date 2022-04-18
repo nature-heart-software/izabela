@@ -50,6 +50,8 @@ import { computed, defineComponent, ref } from 'vue'
 import { NvCard, NvButton, NvStack, NvText } from '@/core/components'
 import DomBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
 import SettingsOverview from '@/entities/settings/components/SettingsOverview.vue'
+import SettingsAudio from '@/entities/settings/components/SettingsAudio.vue'
+import SettingsSpeech from '@/entities/settings/components/SettingsSpeech.vue'
 
 export default defineComponent({
   name: 'NvSettings',
@@ -60,6 +62,8 @@ export default defineComponent({
     NvText,
     DomBoundary,
     SettingsOverview,
+    SettingsAudio,
+    SettingsSpeech,
   },
   setup() {
     const selectedEntry = ref('Overview')
@@ -73,9 +77,11 @@ export default defineComponent({
           },
           {
             name: 'Speech',
+            component: SettingsSpeech,
           },
           {
             name: 'Audio',
+            component: SettingsAudio,
           },
           {
             name: 'Overlay',

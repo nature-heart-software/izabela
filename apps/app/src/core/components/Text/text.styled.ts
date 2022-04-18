@@ -17,6 +17,7 @@ export const StText = styled('div', props)`
   font-size: ${ ({ size }) => fontSize[size][0] };
   line-height: ${ ({ size }) => fontSize[size][1].lineHeight };
   letter-spacing: ${ ({ size }) => fontSize[size][1].letterSpacing };
+  ${ ({ align = '' }) => align && `text-align: ${ align };` }
   ${ ({ as }) =>
     as === 'span' &&
     `
