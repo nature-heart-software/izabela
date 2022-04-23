@@ -30,6 +30,7 @@
     "mitt": "^3.0.0",
     "polished": "^4.2.1",
     "uuid": "^8.3.2",
+    "vue-query": "^1.22.3",
     "vue-tippy": "^6.0.0-alpha.54",
     "vue3-moveable": "^0.3.0",
     "vue3-styled-components": "^1.2.1",

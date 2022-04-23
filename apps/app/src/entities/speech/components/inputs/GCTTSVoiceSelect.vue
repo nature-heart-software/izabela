@@ -8,11 +8,12 @@
   </NvSelect>
 </template>
 <script lang="ts">
-import { defineComponent, ref, computed, watch } from 'vue'
+import { defineComponent, computed, watch } from 'vue'
 import { useStore } from 'vuex'
-import axios from 'axios'
-import { NvOption, NvSelect } from '@/core/components'
+import { NvSelect, NvOption } from '@/core/components'
 import { decrypt } from '@/utils/security'
+import { useGCTTSListVoicesQuery } from '@/entities/speech/services'
+import { useQueryClient } from 'vue-query'
 
 export default defineComponent({
   name: 'SpeechEngineSelect',
@@ -21,22 +22,15 @@ export default defineComponent({
     NvOption,
   },
   setup() {
+    const queryClient = useQueryClient()
     const store = useStore()
-    const resData = ref([])
-    const voices = computed(() => resData.value)
     const computedApikey = computed(() => decrypt(store.getters['settings/persisted'].GCTTSApiKey))
-    const fetchVoices = () => {
-      axios.post('http://localhost:7070/api/tts/google-cloud/list-voices', {
-        apiKey: computedApikey.value,
-      })
-        .then(({ data }) => {
-          resData.value = data
-        })
+    const { data } = useGCTTSListVoicesQuery({ apiKey: computedApikey.value })
+    const voices = computed(() => data.value)
+    const refetchVoices = () => {
+      queryClient.refetchQueries('gctts-list-voices')
     }
-    if (computedApikey.value) {
-      fetchVoices()
-    }
-    watch(computedApikey, fetchVoices)
+    watch(computedApikey, refetchVoices)
     return {
       voices,
     }
