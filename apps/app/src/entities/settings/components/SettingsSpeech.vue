@@ -31,7 +31,7 @@
               <NvDivider direction="horizontal"/>
               <template v-if="selectedEngineTab === 'gctts'">
                 <NvStack spacing="5">
-                  <NvFormItem label="Engine API Key">
+                  <NvFormItem label="API Key">
                     <NvInput
                       :modelValue="decrypt($store.getters['settings/persisted'].GCTTSApiKey)"
                       @update:modelValue="(value) => $store.dispatch('settings/setProperty', ['persisted.GCTTSApiKey', encrypt(value)])"
@@ -39,7 +39,7 @@
                   </NvFormItem>
                 </NvStack>
                 <NvDivider direction="horizontal"/>
-                <NvFormItem label="Engine API Key">
+                <NvFormItem label="Voice">
                   <GCTTSVoiceSelect
                     :modelValue="$store.getters['settings/persisted'].GCTTSSelectedVoice"
                     @update:modelValue="(value) => $store.dispatch('settings/setProperty', ['persisted.GCTTSSelectedVoice', value])"
