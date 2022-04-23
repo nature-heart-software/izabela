@@ -16,6 +16,7 @@ module.exports = {
     'no-lone-blocks': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     'vuejs-accessibility/label-has-for': 'off',
+    'vue/no-unused-components': 'warn',
   },
   overrides: [
     {

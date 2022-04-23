@@ -12,7 +12,7 @@ export const props = {
   noWrap: { type: Boolean, default: false },
   grow: { type: Boolean, default: false },
   spacing: {
-    type: Number as PropType<keyof typeof theme.spacing>,
+    type: String as PropType<keyof typeof theme.spacing>,
     default: 3,
   },
   direction: {

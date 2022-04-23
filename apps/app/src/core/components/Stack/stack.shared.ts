@@ -5,7 +5,7 @@ const theme = require('@/theme')
 export type StackPosition = 'right' | 'center' | 'left' | 'apart'
 export const props = {
   spacing: {
-    type: Number as PropType<keyof typeof theme.spacing>,
+    type: String as PropType<keyof typeof theme.spacing>,
     default: 3,
   },
   align: { type: String as PropType<'stretch' | 'center' | 'start' | 'end'>, default: 'stretch' },

@@ -26,7 +26,7 @@ export default defineComponent({
     const store = useStore()
     const computedApikey = computed(() => decrypt(store.getters['settings/persisted'].GCTTSApiKey))
     const { data } = useGCTTSListVoicesQuery({ apiKey: computedApikey.value })
-    const voices = computed(() => data.value)
+    const voices = computed(() => data.value || [])
     const refetchVoices = () => {
       queryClient.refetchQueries('gctts-list-voices')
     }
