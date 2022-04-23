@@ -6,5 +6,3 @@
 import Izabela from './Izabela'
 
 export default new Izabela()
-
-
