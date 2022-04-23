@@ -11,8 +11,16 @@ module.exports = defineConfig({
         omitExtension: false,
         omitSemi: true,
         filename: 'index.ts',
-        directories: ['./src/core/components'],
         include: ['**/*.vue'],
+        directories: [
+          './src/core/components',
+          ['./src/hooks', {
+            omitExtension: true,
+            omitSemi: true,
+            filename: 'index.ts',
+            include: ['**/*.ts'],
+          }],
+        ],
       }),
     ],
   },

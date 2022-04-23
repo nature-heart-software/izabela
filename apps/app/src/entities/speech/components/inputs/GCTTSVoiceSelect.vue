@@ -16,7 +16,7 @@ import { useGCTTSListVoicesQuery } from '@/entities/speech/services'
 import { useQueryClient } from 'vue-query'
 
 export default defineComponent({
-  name: 'SpeechEngineSelect',
+  name: 'GCTTSVoiceSelect',
   components: {
     NvSelect,
     NvOption,
@@ -27,10 +27,7 @@ export default defineComponent({
     const computedApikey = computed(() => decrypt(store.getters['settings/persisted'].GCTTSApiKey))
     const { data } = useGCTTSListVoicesQuery({ apiKey: computedApikey.value })
     const voices = computed(() => data.value || [])
-    const refetchVoices = () => {
-      queryClient.refetchQueries('gctts-list-voices')
-    }
-    watch(computedApikey, refetchVoices)
+    watch(computedApikey, () => queryClient.refetchQueries('gctts-list-voices'))
     return {
       voices,
     }

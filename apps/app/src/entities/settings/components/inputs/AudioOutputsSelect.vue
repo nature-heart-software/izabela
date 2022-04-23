@@ -38,7 +38,7 @@
   </NvStack>
 </template>
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue'
+import { computed, defineComponent } from 'vue'
 import {
   NvStack,
   NvText,
@@ -49,8 +49,8 @@ import {
   NvButton,
 } from '@/core/components'
 import NvFormItem from '@/core/components/Form/NvFormItem.vue'
-import { orderBy } from 'lodash'
 import NvDivider from '@/core/components/Divider/NvDivider.vue'
+import { useMediaDevices } from '@/hooks'
 
 export default defineComponent({
   components: {
@@ -66,17 +66,9 @@ export default defineComponent({
   },
 
   setup() {
-    const mediaDevices = ref<MediaDeviceInfo[]>([])
-    const updateMediaDevices = () => navigator.mediaDevices.enumerateDevices()
-      .then((devices) => {
-        mediaDevices.value = devices
-        return devices
-      })
-    window.addEventListener('devicechange', updateMediaDevices)
-    updateMediaDevices()
-    const audioOutputDevices = computed(() => orderBy(mediaDevices.value.filter((m) => m.kind === 'audiooutput' && m.deviceId !== 'default'), ['label']))
+    const { audioOutputDevices } = useMediaDevices()
     return {
-      audioOutputDevices,
+      audioOutputDevices: computed(() => audioOutputDevices.value.filter((d) => d.deviceId !== 'default')),
     }
   },
 })
