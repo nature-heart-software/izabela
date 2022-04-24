@@ -1,10 +1,9 @@
 import { v4 as uuid } from 'uuid'
 import mitt from 'mitt'
 import { Deferred } from '@/utils/deferred'
-import { api } from '@/services'
 import store from '@/store'
-import { decrypt } from '@/utils/security'
 import { Promise } from 'bluebird'
+import speechEngineManager from '@/entities/speech/modules/speech-engine-manager'
 import { IzabelaMessageEvent, IzabelaMessagePayload } from './types'
 
 export default class {
@@ -63,14 +62,13 @@ export default class {
 
   private downloadAudio() {
     // TODO: change depending on engine
-    return api.post<Blob>(
-      '/tts/google-cloud/synthesize-speech',
-      {
-        credentials: { apiKey: decrypt(store.getters['settings/persisted'].GCTTSApiKey) },
-        payload: this.payload,
-      },
-      { responseType: 'blob' },
-    )
+    const engine = speechEngineManager.getEngineById(this.engine)
+    if (!engine)
+      return Promise.reject(new Error('Izabela Message: Selected engine was   not found'))
+    return engine.synthesizeSpeech({
+      credentials: this.credentials,
+      payload: this.payload,
+    })
   }
 
   private loadAudio(blob: Blob) {

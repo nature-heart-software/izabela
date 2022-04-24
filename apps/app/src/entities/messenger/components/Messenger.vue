@@ -141,6 +141,7 @@ import { useSettingsPopover } from '@/entities/settings/hooks'
 import SpeechEngineSelect from '@/entities/speech/components/inputs/SpeechEngineSelect.vue'
 import GCTTSVoiceSelect from '@/entities/speech/components/inputs/GCTTSVoiceSelect.vue'
 import izabela from '@/modules/izabela'
+import speechEngineManager from '@/entities/speech/modules/speech-engine-manager'
 
 const { ElectronMessengerWindow } = window
 
@@ -236,23 +237,14 @@ export default defineComponent({
 
       playMessage() {
         if (inputValue.value) {
+          const engine = speechEngineManager.getEngineById(
+            store.getters['settings/persisted'].selectedSpeechEngine,
+          )
+          if (!engine) return
           izabela.say({
-            engine: store.getters['settings/persisted'].selectedSpeechEngine,
-            credentials: { apiKey: store.getters['settings/persisted'].GCTTSApiKey },
-            payload: {
-              input: {
-                text: inputValue.value,
-              },
-              voice: {
-                languageCode: 'en-GB',
-                ssmlGender: 'FEMALE',
-                name: 'en-GB-Wavenet-A',
-              },
-              audioConfig: {
-                audioEncoding: 'MP3',
-                volumeGainDb: 0,
-              },
-            },
+            engine: engine.id,
+            credentials: engine.getCredentials(),
+            payload: engine.getPayload(inputValue.value),
           })
           inputValue.value = ''
         }

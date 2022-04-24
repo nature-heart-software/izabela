@@ -1,12 +1,12 @@
 import { Module } from 'vuex'
 import { utilActions, utilMutations } from '@/utils/vuex'
-import { SPEECH_ENGINES } from '@/entities/speech'
+import { SpeechEngine } from '@/entities/speech/modules/speech-engine-manager/types'
 
 const storeState = {
   persisted: {
     playSpeechOnDefaultPlaybackDevice: true,
     audioOutputDevices: [] as MediaDeviceInfo['deviceId'][],
-    selectedSpeechEngine: 'gctts' as typeof SPEECH_ENGINES[number]['id'],
+    selectedSpeechEngine: 'gctts' as SpeechEngine['id'],
     GCTTSApiKey: '',
     GCTTSSelectedVoice: 'en-GB-Wavenet-A',
   },

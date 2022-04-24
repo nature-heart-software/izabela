@@ -1,11 +1,13 @@
-import { SPEECH_ENGINES } from '@/entities/speech'
+import { SpeechEngine } from '@/entities/speech/modules/speech-engine-manager/types'
 
 export type IzabelaMessageEvent = 'started' | 'ended' | 'progress' | 'error'
 
 export interface IzabelaMessagePayload<O = any> {
-  engine: typeof SPEECH_ENGINES[number]['id']
+  engine: SpeechEngine['id']
   credentials: {
-    apiKey: string
+    [key: string]: any
   }
-  payload: any
+  payload: {
+    [key: string]: any
+  }
 }

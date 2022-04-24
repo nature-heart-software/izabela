@@ -11,45 +11,63 @@
             </NvStack>
             <SpeechEngineSelect
               :modelValue="$store.getters['settings/persisted'].selectedSpeechEngine"
-              @update:modelValue="(value) => {
-                selectedEngineTab = value
-                $store.dispatch('settings/setProperty', ['persisted.selectedSpeechEngine', value])
-              }
-        "/>
+              @update:modelValue="
+                (value) => {
+                  selectedEngineTab = value
+                  $store.dispatch('settings/setProperty', ['persisted.selectedSpeechEngine', value])
+                }
+              "
+            />
           </NvGroup>
         </NvCard>
         <div class="pl-8">
           <NvCard>
             <NvStack spacing="5">
               <NvGroup grow>
-                <template v-for="engine in SPEECH_ENGINES" :key="engine.id">
-                  <NvButton align="center" type="ghost" @click="selectedEngineTab = engine.id"
-                            :selected="selectedEngineTab === engine.id">{{ engine.name }}
+                <template v-for="engine in speechEngines" :key="engine.id">
+                  <NvButton
+                    :selected="selectedEngineTab === engine.id"
+                    align="center"
+                    type="ghost"
+                    @click="selectedEngineTab = engine.id"
+                    >{{ engine.name }}
                   </NvButton>
                 </template>
               </NvGroup>
-              <NvDivider direction="horizontal"/>
+              <NvDivider direction="horizontal" />
               <template v-if="selectedEngineTab === 'gctts'">
                 <NvStack spacing="5">
                   <NvFormItem label="API Key">
                     <NvInput
                       :modelValue="decrypt($store.getters['settings/persisted'].GCTTSApiKey)"
-                      @update:modelValue="(value) => $store.dispatch('settings/setProperty', ['persisted.GCTTSApiKey', encrypt(value)])"
-                      type="password" show-password/>
+                      show-password
+                      type="password"
+                      @update:modelValue="
+                        (value) =>
+                          $store.dispatch('settings/setProperty', [
+                            'persisted.GCTTSApiKey',
+                            encrypt(value),
+                          ])
+                      "
+                    />
                   </NvFormItem>
                 </NvStack>
-                <NvDivider direction="horizontal"/>
+                <NvDivider direction="horizontal" />
                 <NvFormItem label="Voice">
                   <GCTTSVoiceSelect
                     :modelValue="$store.getters['settings/persisted'].GCTTSSelectedVoice"
-                    @update:modelValue="(value) => $store.dispatch('settings/setProperty', ['persisted.GCTTSSelectedVoice', value])"
+                    @update:modelValue="
+                      (value) =>
+                        $store.dispatch('settings/setProperty', [
+                          'persisted.GCTTSSelectedVoice',
+                          value,
+                        ])
+                    "
                   />
                 </NvFormItem>
               </template>
               <template v-else>
-                <NvText align="center">
-                  Coming Soon
-                </NvText>
+                <NvText align="center">Coming Soon</NvText>
               </template>
             </NvStack>
           </NvCard>
@@ -62,19 +80,20 @@
 import { defineComponent, ref } from 'vue'
 import { useStore } from 'vuex'
 import {
-  NvStack,
-  NvText,
-  NvCard,
-  NvGroup,
   NvButton,
+  NvCard,
   NvDivider,
   NvFormItem,
+  NvGroup,
   NvInput,
+  NvStack,
+  NvText,
 } from '@/core/components'
 import SpeechEngineSelect from '@/entities/speech/components/inputs/SpeechEngineSelect.vue'
 import GCTTSVoiceSelect from '@/entities/speech/components/inputs/GCTTSVoiceSelect.vue'
-import { SPEECH_ENGINES } from '@/entities/speech'
 import { useEncryption } from '@/utils/security'
+import speechEngineManager from '@/entities/speech/modules/speech-engine-manager'
+import { SpeechEngine } from '@/entities/speech/modules/speech-engine-manager/types'
 
 export default defineComponent({
   name: 'SettingsSpeech',
@@ -92,9 +111,11 @@ export default defineComponent({
   },
   setup() {
     const store = useStore()
-    const selectedEngineTab = ref<typeof SPEECH_ENGINES[number]['id']>(store.getters['settings/persisted'].selectedSpeechEngine)
+    const selectedEngineTab = ref<SpeechEngine['id']>(
+      store.getters['settings/persisted'].selectedSpeechEngine,
+    )
     return {
-      SPEECH_ENGINES,
+      speechEngines: speechEngineManager.getEngines(),
       selectedEngineTab,
       ...useEncryption(),
     }

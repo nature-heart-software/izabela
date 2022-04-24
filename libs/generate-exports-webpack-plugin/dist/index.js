@@ -11,8 +11,7 @@ function $parcel$interopDefault(a) {
 
 
 class $fd49ddfa76b1bd76$var$GenerateExportsWebpackPlugin {
-    constructor(options1 = {
-    }){
+    constructor(options1 = []){
         this.defaultOptions = {
             omitExtension: true,
             omitSemi: false,
@@ -22,29 +21,38 @@ class $fd49ddfa76b1bd76$var$GenerateExportsWebpackPlugin {
             exclude: [],
             directories: []
         };
-        this.options = {
-            ...this.defaultOptions,
-            ...options1
-        };
+        if (!Array.isArray(options1)) this.options = [
+            {
+                ...this.defaultOptions,
+                ...options1
+            }
+        ];
+        else this.options = options1.map((option)=>({
+                ...this.defaultOptions,
+                ...option
+            })
+        );
     }
     apply() {
-        this.options.directories.forEach((directoryConfig)=>{
-            const directoryConfigIsArray = Array.isArray(directoryConfig);
-            let directory = directoryConfigIsArray ? directoryConfig[0] : directoryConfig;
-            const options = directoryConfigIsArray ? {
-                ...this.defaultOptions,
-                ...directoryConfig[1] || this.options
-            } : this.options;
-            if (!($parcel$interopDefault($lWZZX$path)).isAbsolute(directory)) directory = ($parcel$interopDefault($lWZZX$path)).resolve(directory);
-            if (process.env.NODE_ENV === 'production') return this.generateIndex(directory, options);
-            const watcher = ($parcel$interopDefault($lWZZX$chokidar)).watch(options.include, {
-                ignored: /^\./,
-                cwd: directory
+        this.options.forEach((option)=>{
+            option.directories.forEach((directoryConfig)=>{
+                const directoryConfigIsArray = Array.isArray(directoryConfig);
+                let directory = directoryConfigIsArray ? directoryConfig[0] : directoryConfig;
+                const options = directoryConfigIsArray ? {
+                    ...this.defaultOptions,
+                    ...directoryConfig[1] || this.options
+                } : this.options;
+                if (!($parcel$interopDefault($lWZZX$path)).isAbsolute(directory)) directory = ($parcel$interopDefault($lWZZX$path)).resolve(directory);
+                if (process.env.NODE_ENV === 'production') return this.generateIndex(directory, options);
+                const watcher = ($parcel$interopDefault($lWZZX$chokidar)).watch(options.include, {
+                    ignored: /^\./,
+                    cwd: directory
+                });
+                watcher.on('add', (filePath)=>this.handleFileChange(filePath, directory, options)
+                ).on('unlink', (filePath)=>this.handleFileChange(filePath, directory, options)
+                ).on('ready', ()=>this.handleFileChange('', directory, options)
+                );
             });
-            watcher.on('add', (filePath)=>this.handleFileChange(filePath, directory, options)
-            ).on('unlink', (filePath)=>this.handleFileChange(filePath, directory, options)
-            ).on('ready', ()=>this.handleFileChange('', directory, options)
-            );
         });
     }
     handleFileChange(filePath1, directory, options) {

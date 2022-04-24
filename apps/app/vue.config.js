@@ -7,24 +7,22 @@ module.exports = defineConfig({
   configureWebpack: {
     plugins: [
       new WebpackNotifierPlugin({ emoji: true }),
-      new GenerateExportsWebpackPlugin({
-        omitExtension: false,
-        omitSemi: true,
-        filename: 'index.ts',
-        include: ['**/*.vue'],
-        directories: [
-          './src/core/components',
-          [
-            './src/hooks',
-            {
-              omitExtension: true,
-              omitSemi: true,
-              filename: 'index.ts',
-              include: ['**/*.ts'],
-            },
-          ],
-        ],
-      }),
+      new GenerateExportsWebpackPlugin([
+        {
+          omitExtension: false,
+          omitSemi: true,
+          filename: 'index.ts',
+          include: ['**/*.vue'],
+          directories: ['./src/core/components'],
+        },
+        {
+          omitExtension: true,
+          omitSemi: true,
+          filename: 'index.ts',
+          include: ['**/*.ts'],
+          directories: ['./src/hooks'],
+        },
+      ]),
     ],
   },
   pluginOptions: {
