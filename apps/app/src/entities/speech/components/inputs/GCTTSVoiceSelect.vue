@@ -8,12 +8,12 @@
   </NvSelect>
 </template>
 <script lang="ts">
-import { defineComponent, computed, watch } from 'vue'
+import { computed, defineComponent, watch } from 'vue'
 import { useStore } from 'vuex'
-import { NvSelect, NvOption } from '@/core/components'
+import { useQueryClient } from 'vue-query'
+import { NvOption, NvSelect } from '@/core/components'
 import { decrypt } from '@/utils/security'
 import { useGCTTSListVoicesQuery } from '@/entities/speech/services'
-import { useQueryClient } from 'vue-query'
 
 export default defineComponent({
   name: 'GCTTSVoiceSelect',
@@ -25,7 +25,7 @@ export default defineComponent({
     const queryClient = useQueryClient()
     const store = useStore()
     const computedApikey = computed(() => decrypt(store.getters['settings/persisted'].GCTTSApiKey))
-    const { data } = useGCTTSListVoicesQuery({ apiKey: computedApikey.value })
+    const { data } = useGCTTSListVoicesQuery({ credentials: { apiKey: computedApikey.value } })
     const voices = computed(() => data.value || [])
     watch(computedApikey, () => queryClient.refetchQueries('gctts-list-voices'))
     return {

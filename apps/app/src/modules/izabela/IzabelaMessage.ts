@@ -3,13 +3,17 @@ import mitt from 'mitt'
 import { IzabelaMessageEvent, IzabelaMessagePayload } from './types'
 import { Deferred } from '@/utils/deferred'
 import { api } from '@/services'
+import store from '@/store'
+import { decrypt } from '@/utils/security'
 
 export default class {
   private id = uuid()
 
-  private text: IzabelaMessagePayload['text']
+  private engine: IzabelaMessagePayload['engine']
 
-  private options: IzabelaMessagePayload['options']
+  private payload: IzabelaMessagePayload['payload']
+
+  private credentials: IzabelaMessagePayload['credentials']
 
   private audio = new Audio()
 
@@ -19,17 +23,22 @@ export default class {
 
   private audioLoaded = new Deferred()
 
-  constructor({ text, options }: IzabelaMessagePayload) {
-    this.text = text
-    this.options = options
+  constructor({ engine, payload, credentials }: IzabelaMessagePayload) {
+    this.engine = engine
+    this.payload = payload
+    this.credentials = credentials
     this.addEventListeners()
     this.downloadAudio()
-      .then((data) => this.loadAudio(data))
+      .then(({ data }) => this.loadAudio(data))
       .catch((reason) => this.onError(reason))
   }
 
   downloadAudio() {
-    return api.post('')
+    // TODO: change depending on engine
+    return api.post<string>('/tts/google-cloud/synthesize-speech', {
+      credentials: { apikey: decrypt(store.getters['settings/persisted'].GCTTSApiKey) },
+      payload: this.payload,
+    })
   }
 
   loadAudio(data: string) {
@@ -57,7 +66,7 @@ export default class {
     this.emitter.on(event, callback)
   }
 
-  onError(e: Error) {
+  onError(e: ErrorEvent) {
     this.emitter.emit('error')
     this.audioDownloaded.reject(e)
     this.audioLoaded.reject(e)

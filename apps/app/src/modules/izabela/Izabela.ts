@@ -18,7 +18,7 @@ export default class {
   }
 
   public endMessage() {
-    // stop currently playing message if that's even possible
+    // TODO: stop currently playing message if that's even possible
     this.currentlyPlayingMessage = null
     this.playNextMessage()
   }
