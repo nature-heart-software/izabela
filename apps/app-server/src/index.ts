@@ -1,7 +1,5 @@
 import izabelaServer from './server'
 
-// if (!module.parent) {
-//     izabelaServer.startServer()
-// }
+// izabelaServer.startServer()
 
 module.exports = izabelaServer

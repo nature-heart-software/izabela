@@ -235,25 +235,27 @@ export default defineComponent({
       },
 
       playMessage() {
-        izabela.say({
-          engine: store.getters['settings/persisted'].selectedSpeechEngine,
-          credentials: { apiKey: store.getters['settings/persisted'].GCTTSApiKey },
-          payload: {
-            input: {
-              text: inputValue.value,
+        if (inputValue.value) {
+          izabela.say({
+            engine: store.getters['settings/persisted'].selectedSpeechEngine,
+            credentials: { apiKey: store.getters['settings/persisted'].GCTTSApiKey },
+            payload: {
+              input: {
+                text: inputValue.value,
+              },
+              voice: {
+                languageCode: 'en-GB',
+                ssmlGender: 'FEMALE',
+                name: 'en-GB-Wavenet-A',
+              },
+              audioConfig: {
+                audioEncoding: 'MP3',
+                volumeGainDb: 0,
+              },
             },
-            voice: {
-              languageCode: 'en-GB',
-              ssmlGender: 'FEMALE',
-              name: 'en-GB-Wavenet-A',
-            },
-            audioConfig: {
-              audioEncoding: 'MP3',
-              volumeGainDb: 0,
-            },
-          },
-        })
-        inputValue.value = ''
+          })
+          inputValue.value = ''
+        }
       },
     }
   },

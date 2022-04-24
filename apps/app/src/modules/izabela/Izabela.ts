@@ -1,4 +1,3 @@
-import mitt from 'mitt'
 import { IzabelaMessagePayload } from '@/modules/izabela/types'
 import IzabelaMessage from './IzabelaMessage'
 
@@ -6,8 +5,6 @@ export default class {
   private currentlyPlayingMessage: IzabelaMessage | null = null
 
   private messageQueue: IzabelaMessage[] = []
-
-  private emitter = mitt()
 
   public say(messagePayload: IzabelaMessagePayload): IzabelaMessage {
     const message = this.createMessage(messagePayload)
@@ -38,10 +35,13 @@ export default class {
   }
 
   private playMessage(message: IzabelaMessage) {
+    this.currentlyPlayingMessage = message
     message.on('ended', () => this.endMessage())
     message.on('error', () => this.endMessage())
-    this.currentlyPlayingMessage = message
-    this.emitter.emit('say', message)
+    message
+      .ready()
+      .then(() => message.play())
+      .catch(() => this.endMessage())
     return message
   }
 

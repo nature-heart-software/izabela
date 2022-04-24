@@ -4,6 +4,7 @@ import { Deferred } from '@/utils/deferred'
 import { api } from '@/services'
 import store from '@/store'
 import { decrypt } from '@/utils/security'
+import { Promise } from 'bluebird'
 import { IzabelaMessageEvent, IzabelaMessagePayload } from './types'
 
 export default class {
@@ -29,27 +30,59 @@ export default class {
     this.credentials = credentials
     this.addEventListeners()
     this.downloadAudio()
-      .then(({ data }) => this.loadAudio(data))
+      .then(({ data }) => {
+        this.audioDownloaded.resolve(true)
+        this.loadAudio(data)
+      })
       .catch((reason) => this.onError(reason))
   }
 
-  downloadAudio() {
-    // TODO: change depending on engine
-    return api.post<string>('/tts/google-cloud/synthesize-speech', {
-      credentials: { apikey: decrypt(store.getters['settings/persisted'].GCTTSApiKey) },
-      payload: this.payload,
+  public on(event: IzabelaMessageEvent, callback: () => void): void {
+    this.emitter.on(event, callback)
+  }
+
+  public play() {
+    Promise.map(
+      store.getters['settings/persisted'].audioOutputDevices,
+      async (deviceId: string) => {
+        // TODO: Some optimisation possible here
+        const audioElement: any = document.createElement('audio')
+        audioElement.src = this.audio.src
+        await audioElement.setSinkId(deviceId)
+        return audioElement
+      },
+    ).then((audioElements) => {
+      this.audio.play()
+      audioElements.forEach((audio) => audio.play())
     })
   }
 
-  loadAudio(data: string) {
-    console.log(data)
+  public ready() {
+    return Promise.all([this.audioDownloaded.promise, this.audioLoaded.promise])
   }
 
-  getAudioProgress() {
+  private downloadAudio() {
+    // TODO: change depending on engine
+    return api.post<Blob>(
+      '/tts/google-cloud/synthesize-speech',
+      {
+        credentials: { apiKey: decrypt(store.getters['settings/persisted'].GCTTSApiKey) },
+        payload: this.payload,
+      },
+      { responseType: 'blob' },
+    )
+  }
+
+  private loadAudio(blob: Blob) {
+    this.audio.src = URL.createObjectURL(blob)
+    this.audio.load()
+  }
+
+  private getAudioProgress() {
     return this.audio.currentTime / this.audio.duration
   }
 
-  addEventListeners() {
+  private addEventListeners() {
     this.audio.addEventListener('canplaythrough', () => {
       this.emitter.emit('canplaythrough')
       this.audioLoaded.resolve(true)
@@ -62,17 +95,9 @@ export default class {
     this.audio.addEventListener('error', (e) => this.onError(e))
   }
 
-  on(event: IzabelaMessageEvent, callback: () => void): void {
-    this.emitter.on(event, callback)
-  }
-
-  onError(e: ErrorEvent) {
+  private onError(e: ErrorEvent) {
     this.emitter.emit('error')
     this.audioDownloaded.reject(e)
     this.audioLoaded.reject(e)
-  }
-
-  ready() {
-    return Promise.all([this.audioDownloaded.promise, this.audioLoaded.promise])
   }
 }
