@@ -1,10 +1,10 @@
 import { v4 as uuid } from 'uuid'
 import mitt from 'mitt'
-import { IzabelaMessageEvent, IzabelaMessagePayload } from './types'
 import { Deferred } from '@/utils/deferred'
 import { api } from '@/services'
 import store from '@/store'
 import { decrypt } from '@/utils/security'
+import { IzabelaMessageEvent, IzabelaMessagePayload } from './types'
 
 export default class {
   private id = uuid()

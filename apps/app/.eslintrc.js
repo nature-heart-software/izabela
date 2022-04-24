@@ -17,6 +17,7 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     'vuejs-accessibility/label-has-for': 'off',
     'vue/no-unused-components': 'warn',
+    'class-methods-use-this': 'off',
   },
   overrides: [
     {

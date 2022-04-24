@@ -7,5 +7,5 @@ export interface IzabelaMessagePayload<O = any> {
   credentials: {
     apiKey: string
   }
-  payload: string
+  payload: any
 }
