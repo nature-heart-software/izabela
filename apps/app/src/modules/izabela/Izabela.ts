@@ -9,11 +9,8 @@ export default class {
 
   private emitter = mitt()
 
-  public say({ text, options }: IzabelaMessagePayload): IzabelaMessage {
-    const message = this.createMessage({
-      text,
-      options,
-    })
+  public say(messagePayload: IzabelaMessagePayload): IzabelaMessage {
+    const message = this.createMessage(messagePayload)
     if (this.currentlyPlayingMessage) {
       return this.queueMessage(message)
     }
@@ -21,7 +18,7 @@ export default class {
   }
 
   public endMessage() {
-    // stop from message if that's even possible
+    // stop currently playing message if that's even possible
     this.currentlyPlayingMessage = null
     this.playNextMessage()
   }
@@ -31,13 +28,8 @@ export default class {
     this.clearQueue()
   }
 
-  private createMessage({ text, options }: IzabelaMessagePayload) {
-    const message = new IzabelaMessage({
-      text,
-      options,
-    })
-    message.on('end', () => this.endMessage())
-    return message
+  private createMessage(messagePayload: IzabelaMessagePayload) {
+    return new IzabelaMessage(messagePayload)
   }
 
   private queueMessage(message: IzabelaMessage) {
@@ -46,6 +38,8 @@ export default class {
   }
 
   private playMessage(message: IzabelaMessage) {
+    message.on('end', () => this.endMessage())
+    message.on('error', () => this.endMessage())
     this.currentlyPlayingMessage = message
     this.emitter.emit('say', message)
     return message
@@ -53,7 +47,7 @@ export default class {
 
   private playNextMessage() {
     if (this.messageQueue.length > 0) {
-      this.emitter.emit('say', this.messageQueue[0])
+      this.playMessage(this.messageQueue[0])
       this.messageQueue.splice(0, 1)
     }
   }

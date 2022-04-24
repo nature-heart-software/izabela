@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid'
-import { IzabelaMessageEvent, IzabelaMessagePayload } from '@/modules/izabela/types'
 import mitt from 'mitt'
+import { IzabelaMessageEvent, IzabelaMessagePayload } from './types'
 
 export default class {
   id = uuid()
@@ -14,6 +14,7 @@ export default class {
   constructor({ text, options }: IzabelaMessagePayload) {
     this.text = text
     this.options = options
+    // api.post
   }
 
   on(event: IzabelaMessageEvent, callback: () => void): void {
