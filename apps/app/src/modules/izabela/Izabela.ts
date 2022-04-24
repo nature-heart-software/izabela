@@ -38,7 +38,7 @@ export default class {
   }
 
   private playMessage(message: IzabelaMessage) {
-    message.on('end', () => this.endMessage())
+    message.on('ended', () => this.endMessage())
     message.on('error', () => this.endMessage())
     this.currentlyPlayingMessage = message
     this.emitter.emit('say', message)

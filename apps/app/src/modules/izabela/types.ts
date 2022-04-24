@@ -1,4 +1,4 @@
-export type IzabelaMessageEvent = 'start' | 'end' | 'progress' | 'error'
+export type IzabelaMessageEvent = 'started' | 'ended' | 'progress' | 'error'
 
 export interface IzabelaMessagePayload<O = any> {
   text: string
