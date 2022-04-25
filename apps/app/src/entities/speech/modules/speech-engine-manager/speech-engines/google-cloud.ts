@@ -1,6 +1,7 @@
 import store from '@/store'
 import { decrypt } from '@/utils/security'
 import { api } from '@/services'
+import { pick } from 'lodash'
 import speechEngineManager from '../SpeechEngineManager'
 
 speechEngineManager.registerEngine({
@@ -12,16 +13,15 @@ speechEngineManager.registerEngine({
     }
   },
   getPayload(text) {
+    const selectedVoice = store.getters['settings/persisted'].GCTTSSelectedVoice
+    const voice: any = pick(selectedVoice, ['name', 'ssmlGender', 'languageCode'])
+    // eslint-disable-next-line prefer-destructuring
+    voice.languageCode = selectedVoice.languageCodes[0]
     return {
       input: {
         text,
       },
-      voice: {
-        // TODO: do something about the hardcoded voice
-        languageCode: 'en-GB',
-        ssmlGender: 'FEMALE',
-        name: store.getters['settings/persisted'].GCTTSSelectedVoice,
-      },
+      voice,
       audioConfig: {
         audioEncoding: 'MP3',
         volumeGainDb: 0,

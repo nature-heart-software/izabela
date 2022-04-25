@@ -8,7 +8,11 @@ const storeState = {
     audioOutputDevices: [] as MediaDeviceInfo['deviceId'][],
     selectedSpeechEngine: 'gctts' as SpeechEngine['id'],
     GCTTSApiKey: '',
-    GCTTSSelectedVoice: 'en-GB-Wavenet-A',
+    GCTTSSelectedVoice: {
+      languageCodes: ['en-GB'],
+      ssmlGender: 'FEMALE',
+      name: 'en-GB-Wavenet-A',
+    },
   },
 }
 
