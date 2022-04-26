@@ -8,6 +8,7 @@ import {
   IpcRendererMutationEventHandler,
 } from '@/modules/electron-vuex/types'
 import { IPC_EVENT_CONNECT, IPC_EVENT_NOTIFY_MAIN, IPC_EVENT_NOTIFY_RENDERERS } from './consts'
+import { purify } from '@/utils/object'
 
 class SharedMutations {
   type: ProcessType = typeof window !== 'undefined' ? 'renderer' : 'main'
@@ -46,7 +47,7 @@ class SharedMutations {
   static notifyRenderers(connections: Connections, payload: MutationPayload, sourceProcessId = '') {
     Object.keys(connections).forEach((processId) => {
       if (processId !== sourceProcessId) {
-        connections[processId].send(IPC_EVENT_NOTIFY_RENDERERS, JSON.parse(JSON.stringify(payload)))
+        connections[processId].send(IPC_EVENT_NOTIFY_RENDERERS, purify(payload))
       }
     })
   }
