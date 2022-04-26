@@ -10,6 +10,7 @@ import { Plugin, Store } from 'vuex'
 import type ElectronStore from 'electron-store'
 import { defaultsDeep, cloneDeep, debounce } from 'lodash'
 import mitt from 'mitt'
+import { purify } from '@/utils/object'
 
 const emitter = mitt()
 
@@ -39,7 +40,7 @@ class PersistedState {
   }
 
   setState = debounce((state: unknown) => {
-    const sanitizedState = JSON.parse(JSON.stringify(state))
+    const sanitizedState = purify(state)
     this.storage.set(this.options.storageName || STORAGE_KEY, sanitizedState)
   }, 1000)
 
