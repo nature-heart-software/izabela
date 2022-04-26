@@ -3,7 +3,7 @@
     <template v-for="voice in voices" :key="voice.name">
       <NvOption
         :label="`${voice.name} - ${voice.ssmlGender}`"
-        :value="JSON.parse(JSON.stringify(voice))"
+        :value="purify(voice)"
       >
         {{ `${voice.name} - ${voice.ssmlGender}` }}
       </NvOption>
@@ -17,6 +17,7 @@ import { useQueryClient } from 'vue-query'
 import { NvOption, NvSelect } from '@/core/components'
 import { decrypt } from '@/utils/security'
 import { useGCTTSListVoicesQuery } from '@/entities/speech/services'
+import { purify } from '@/utils/object'
 
 export default defineComponent({
   name: 'GCTTSVoiceSelect',
@@ -33,6 +34,7 @@ export default defineComponent({
     watch(computedApikey, () => queryClient.refetchQueries('gctts-list-voices'))
     return {
       voices,
+      purify,
     }
   },
 })
