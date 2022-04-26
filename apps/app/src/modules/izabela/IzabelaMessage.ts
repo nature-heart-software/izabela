@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid'
 import mitt from 'mitt'
-import { Deferred } from '@/utils/deferred'
+import { Deferred } from '@/utils/promise'
 import store from '@/store'
 import { Promise } from 'bluebird'
 import speechEngineManager from '@/entities/speech/modules/speech-engine-manager'
