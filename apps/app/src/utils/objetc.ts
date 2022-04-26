@@ -1,3 +1,6 @@
-export const purify = (o: object | []) => {
-  return JSON.parse(JSON.stringify(o))
+export const purify = (o?: object | [] | null) => {
+  if (typeof o === 'object') {
+    return JSON.parse(JSON.stringify(o))
+  }
+  return o
 }
