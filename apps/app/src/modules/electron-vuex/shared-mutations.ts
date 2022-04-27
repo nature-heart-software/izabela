@@ -1,14 +1,14 @@
-import { MutationPayload, Store, Plugin, Dispatch, Commit } from 'vuex'
+import { Commit, Dispatch, MutationPayload, Plugin, Store } from 'vuex'
 import {
   AugmentedGlobal,
-  IpcRenderer,
-  ProcessType,
-  IpcMainMutationEventHandler,
   Connections,
+  IpcMainMutationEventHandler,
+  IpcRenderer,
   IpcRendererMutationEventHandler,
+  ProcessType,
 } from '@/modules/electron-vuex/types'
-import { IPC_EVENT_CONNECT, IPC_EVENT_NOTIFY_MAIN, IPC_EVENT_NOTIFY_RENDERERS } from './consts'
 import { purify } from '@/utils/object'
+import { IPC_EVENT_CONNECT, IPC_EVENT_NOTIFY_MAIN, IPC_EVENT_NOTIFY_RENDERERS } from './consts'
 
 class SharedMutations {
   type: ProcessType = typeof window !== 'undefined' ? 'renderer' : 'main'
@@ -28,6 +28,14 @@ class SharedMutations {
     this.store = store
   }
 
+  static notifyRenderers(connections: Connections, payload: MutationPayload, sourceProcessId = '') {
+    Object.keys(connections).forEach((processId) => {
+      if (processId !== sourceProcessId) {
+        connections[processId].send(IPC_EVENT_NOTIFY_RENDERERS, purify(payload))
+      }
+    })
+  }
+
   connect() {
     if (this.ipcRenderer) this.ipcRenderer.SEND_IPC_EVENT_CONNECT()
   }
@@ -42,14 +50,6 @@ class SharedMutations {
 
   onNotifyMain(handler: IpcMainMutationEventHandler) {
     this.ipcMain.on(IPC_EVENT_NOTIFY_MAIN, handler)
-  }
-
-  static notifyRenderers(connections: Connections, payload: MutationPayload, sourceProcessId = '') {
-    Object.keys(connections).forEach((processId) => {
-      if (processId !== sourceProcessId) {
-        connections[processId].send(IPC_EVENT_NOTIFY_RENDERERS, purify(payload))
-      }
-    })
   }
 
   onNotifyRenderers(handler: IpcRendererMutationEventHandler) {

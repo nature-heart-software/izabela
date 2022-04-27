@@ -18,6 +18,8 @@ module.exports = {
     'vuejs-accessibility/label-has-for': 'off',
     'vue/no-unused-components': 'warn',
     'class-methods-use-this': 'off',
+    'import/extensions': 'off',
+    'import/no-unresolved': 'off',
   },
   overrides: [
     {

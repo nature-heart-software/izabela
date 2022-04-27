@@ -1,15 +1,16 @@
 /* eslint-disable */
 import { STORAGE_KEY, STORAGE_TEST_KEY } from './consts'
 import {
-  PersistedStateOptions,
+  AugmentedGlobal,
   MutationFilter,
   MutationFilterOption,
-  AugmentedGlobal,
+  PersistedStateOptions,
 } from './types'
 import { Plugin, Store } from 'vuex'
 import type ElectronStore from 'electron-store'
-import { defaultsDeep, cloneDeep, debounce } from 'lodash'
+import { cloneDeep, debounce, defaultsDeep } from 'lodash'
 import mitt from 'mitt'
+// @ts-ignore
 import { purify } from '@/utils/object'
 
 const emitter = mitt()
@@ -20,6 +21,10 @@ class PersistedState {
   storage!: ElectronStore
   whitelist!: MutationFilter | null
   blacklist!: MutationFilter | null
+  setState = debounce((state: any) => {
+    const sanitizedState = purify(state)
+    this.storage.set(this.options.storageName || STORAGE_KEY, sanitizedState)
+  }, 1000)
 
   constructor(options: PersistedStateOptions, store: Store<unknown>) {
     this.options = options
@@ -38,11 +43,6 @@ class PersistedState {
   async getState() {
     return this.storage.get(this.options.storageName || STORAGE_KEY)
   }
-
-  setState = debounce((state: unknown) => {
-    const sanitizedState = purify(state)
-    this.storage.set(this.options.storageName || STORAGE_KEY, sanitizedState)
-  }, 1000)
 
   loadFilter(filter: MutationFilterOption, name: string): MutationFilter | null {
     if (!filter) {
