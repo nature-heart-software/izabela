@@ -28,9 +28,9 @@ export default (): Plugin<any> => (store) => {
         }
         commit('setBoundaries', newBoundaries)
       },
-      removeBoundary({ commit, getters }, boundary: Boundary) {
+      removeBoundary({ commit, getters }, id: Boundary['id']) {
         const newBoundaries = [...getters.boundaries]
-        const boundaryIndex = newBoundaries.findIndex((i) => i.id === boundary.id)
+        const boundaryIndex = newBoundaries.findIndex((i) => i.id === id)
         if (boundaryIndex >= 0) {
           newBoundaries.splice(boundaryIndex, 1)
         }

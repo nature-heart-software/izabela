@@ -18,6 +18,7 @@
   "main": "background.js",
   "dependencies": {
     "@iconscout/unicons": "^4.0.1",
+    "@ryanmorr/ready": "^1.4.0",
     "@types/crypto-js": "^4.1.1",
     "@types/tailwindcss": "^2.2.4",
     "bluebird": "^3.7.2",

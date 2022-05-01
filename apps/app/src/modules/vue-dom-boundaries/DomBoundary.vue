@@ -6,7 +6,7 @@
 <script lang="ts">
 import { useStore } from 'vuex'
 import { v4 as uuid } from 'uuid'
-import { defineComponent, ref, onBeforeUnmount, onMounted, watch } from 'vue'
+import { defineComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { throttle } from 'lodash'
 
 export default defineComponent({
@@ -46,7 +46,7 @@ export default defineComponent({
         intersectionObserver.unobserve(componentRef.value)
         mutationObserver.disconnect()
         if (store && store.hasModule('dom-boundaries')) {
-          store.dispatch('dom-boundaries/removeBoundary', { ...boundaries.value })
+          store.dispatch('dom-boundaries/removeBoundary', boundaries.value.id)
         }
       }
     })
