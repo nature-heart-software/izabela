@@ -12,7 +12,7 @@ import ElectronWindowManager from '@/modules/electron-window-manager'
 import server from '@izabela/app-server'
 import path from 'path'
 
-(() => {
+;(() => {
   /* Fixes iohook. See: https://github.com/electron/electron/issues/18397 */
   app.allowRendererProcessReuse = false
 

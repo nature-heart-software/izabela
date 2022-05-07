@@ -4,6 +4,7 @@ const { ElectronFilesystem } = window
 
 export const getGoogleCloudSpeechCredentialsPathQueryKey = 'getGoogleCloudSpeechCredentialsPath'
 
-export const useGetGoogleCloudSpeechCredentialsPath = () => useQuery(getGoogleCloudSpeechCredentialsPathQueryKey, () =>
+export const useGetGoogleCloudSpeechCredentialsPath = () =>
+  useQuery(getGoogleCloudSpeechCredentialsPathQueryKey, () =>
     ElectronFilesystem.getGoogleCloudSpeechCredentialsPath(),
   )
