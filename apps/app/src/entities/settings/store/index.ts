@@ -6,6 +6,7 @@ const storeState = {
   persisted: {
     playSpeechOnDefaultPlaybackDevice: true,
     audioOutputDevices: [] as MediaDeviceInfo['deviceId'][],
+    audioInputDevice: 'default' as MediaDeviceInfo['deviceId'],
     selectedSpeechEngine: 'gctts' as SpeechEngine['id'],
     GCTTSApiKey: '',
     GCTTSSelectedVoice: {

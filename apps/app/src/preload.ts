@@ -1,6 +1,8 @@
 /* High priority plugins */
 import '@/plugins/electron-log/preload'
 import '@/modules/electron-vuex/preload'
+import '@/modules/electron-dialog'
+import '@/modules/electron-filesystem'
 
 /* Other plugins */
 import '@/entities/messenger/plugins/electron-messenger-window'

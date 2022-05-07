@@ -3,11 +3,13 @@ import '@/modules/electron-vuex/main'
 import '@/store'
 import '@/plugins/electron-log'
 import '@/entities/messenger/plugins/electron-messenger-window'
-import { app, protocol, BrowserWindow } from 'electron'
+import '@/modules/electron-dialog'
+import '@/modules/electron-filesystem'
+import { app, BrowserWindow, protocol } from 'electron'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import createMessengerWindow from '@/teams/messenger/electron-window'
 import ElectronWindowManager from '@/modules/electron-window-manager'
-import izabelaServer from '@izabela/app-server'
+import server from '@izabela/app-server'
 import path from 'path'
 
 (() => {
@@ -41,9 +43,10 @@ app.on('window-all-closed', () => {
   }
 })
 
-const startAppServer = async () => izabelaServer.startServer({
-  tempPath: path.join(app.getPath('userData'), 'temp'),
-})
+const startAppServer = async () =>
+  server.startServer({
+    tempPath: path.join(app.getPath('userData'), 'temp'),
+  })
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.

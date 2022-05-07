@@ -3,9 +3,9 @@
     <!-- Top -->
     <div class="flex justify-between space-x-4">
       <div></div>
-      <nv-card size="sm" class="inline-flex">
+      <nv-card class="inline-flex" size="sm">
         <div class="inline-flex space-x-2">
-          <nv-button @click="$emit('close')" size="xs" type="plain" icon-name="times" />
+          <nv-button icon-name="times" size="xs" type="plain" @click="$emit('close')" />
         </div>
       </nv-card>
     </div>
@@ -17,15 +17,15 @@
             <nv-stack spacing="6">
               <template v-for="category in navigation" :key="category.name">
                 <nv-stack>
-                  <nv-text type="subtitle" class="mx-3">
+                  <nv-text class="mx-3" type="subtitle">
                     {{ category.name }}
                   </nv-text>
                   <nv-stack spacing="2">
                     <template v-for="entry in category.children" :key="entry.name">
                       <nv-button
+                        :selected="selectedEntry === entry.name"
                         size="sm"
                         type="ghost-alt"
-                        :selected="selectedEntry === entry.name"
                         @click="selectedEntry = entry.name"
                         >{{ entry.name }}
                       </nv-button>
@@ -39,8 +39,8 @@
             <!-- View -->
             <Transition class="transition">
               <component
-                v-if="currentEntry.component"
                 :is="currentEntry.component.name"
+                v-if="currentEntry.component"
               ></component>
             </Transition>
           </div>
@@ -51,7 +51,7 @@
 </template>
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue'
-import { NvCard, NvButton, NvStack, NvText } from '@/core/components'
+import { NvButton, NvCard, NvStack, NvText } from '@/core/components'
 import DomBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
 import SettingsOverview from '@/entities/settings/components/SettingsOverview.vue'
 import SettingsAudio from '@/entities/settings/components/SettingsAudio.vue'
@@ -70,7 +70,6 @@ export default defineComponent({
     SettingsSpeech,
   },
   setup() {
-    const selectedEntry = ref('Overview')
     const navigation = [
       {
         name: 'Application',
@@ -114,6 +113,7 @@ export default defineComponent({
         ],
       },
     ]
+    const selectedEntry = ref('Overview')
     const currentEntry = computed(() =>
       navigation.flatMap((i) => i.children).find((i) => i.name === selectedEntry.value),
     )

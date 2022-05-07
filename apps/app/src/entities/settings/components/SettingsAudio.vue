@@ -15,13 +15,27 @@
           </NvCard>
         </div>
       </NvStack>
+      <NvStack spacing="4">
+        <NvCard>
+          <NvStack>
+            <NvText type="label">Audio Input</NvText>
+            <NvText>Select an audio input to generate Izabela's speech from</NvText>
+          </NvStack>
+        </NvCard>
+        <div class="pl-8">
+          <NvCard>
+            <AudioInputSelect />
+          </NvCard>
+        </div>
+      </NvStack>
     </NvStack>
   </NvStack>
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { NvStack, NvText, NvCard } from '@/core/components'
+import { NvCard, NvStack, NvText } from '@/core/components'
 import AudioOutputsSelect from '@/entities/settings/components/inputs/AudioOutputsSelect.vue'
+import AudioInputSelect from '@/entities/settings/components/inputs/AudioInputSelect.vue'
 
 export default defineComponent({
   name: 'SettingsAudio',
@@ -30,6 +44,7 @@ export default defineComponent({
     NvStack,
     NvText,
     AudioOutputsSelect,
+    AudioInputSelect,
   },
 })
 </script>
