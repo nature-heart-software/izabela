@@ -55,9 +55,9 @@ class ElectronMessengerWindow {
         this.lastKeypressTime = keypressTime
       }
     })
-    iohook.registerShortcut([42, 56], () => {
-      this.toggleWindow()
-    })
+    // iohook.registerShortcut([42, 56], () => {
+    //   this.toggleWindow()
+    // })
   }
 
   toggleWindow() {

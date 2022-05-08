@@ -3,11 +3,12 @@
     <template v-if="ready">
       <div class="h-0">
         <Messenger
-          class="w-full h-full"
           :min-width="768"
           :transform="$store.getters['messenger/persisted'].position.transform"
+          class="w-full h-full"
         />
       </div>
+      <SpeechListener :key="$store.getters['settings/persisted'].audioInputDevice" />
     </template>
   </ThemeProvider>
 </template>
@@ -20,15 +21,17 @@ body {
 }
 </style>
 <script>
-import {ref} from 'vue'
-import {ThemeProvider} from 'vue3-styled-components'
+import { ref } from 'vue'
+import { ThemeProvider } from 'vue3-styled-components'
 import Messenger from '@/entities/messenger/components/Messenger.vue'
+import SpeechListener from '@/entities/speech/components/SpeechListener.vue'
 
 export default {
   name: 'app',
   components: {
     Messenger,
     ThemeProvider,
+    SpeechListener,
   },
   setup() {
     return {

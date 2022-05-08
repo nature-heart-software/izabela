@@ -2,6 +2,7 @@
 import '@/modules/electron-vuex/main'
 import '@/store'
 import '@/plugins/electron-log'
+import '@/plugins/electron-speech'
 import '@/entities/messenger/plugins/electron-messenger-window'
 import '@/modules/electron-dialog'
 import '@/modules/electron-filesystem'

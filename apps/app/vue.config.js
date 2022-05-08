@@ -27,7 +27,7 @@ module.exports = defineConfig({
   },
   pluginOptions: {
     electronBuilder: {
-      externals: ['iohook', '@izabela/app-server'],
+      externals: ['iohook', '@izabela/app-server', '@google-cloud/speech'],
       chainWebpackMainProcess: (config) => {
         config.module.rule('babel').before('ts').use('babel').loader('babel-loader')
       },
