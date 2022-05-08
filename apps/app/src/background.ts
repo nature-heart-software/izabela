@@ -12,8 +12,7 @@ import createMessengerWindow from '@/teams/messenger/electron-window'
 import ElectronWindowManager from '@/modules/electron-window-manager'
 import server from '@izabela/app-server'
 import path from 'path'
-
-(() => {
+;(() => {
   app.commandLine.appendSwitch('disable-renderer-backgrounding')
 
   /* Fixes iohook. See: https://github.com/electron/electron/issues/18397 */
