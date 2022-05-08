@@ -1,9 +1,9 @@
 import { useQuery } from 'vue-query'
 import { api } from '@/services'
 
-export const useGCTTSListVoicesQuery = (params: { credentials: { apiKey: string } }) =>
+export const useGCTTSListVoicesQuery = (getParams: () => { credentials: { apiKey: string } }) =>
   useQuery('gctts-list-voices', () =>
-    api.post('/tts/google-cloud/list-voices', params).then(({ data }) => data),
+    api.post('/tts/google-cloud/list-voices', getParams()).then(({ data }) => data),
   )
 
 export const useGCTTSSynthesizeSpeechQuery = (params: {
