@@ -13,4 +13,4 @@ declare global {
   }
 }
 
-export default ((): ElectronDialog => bridge.new(ElectronDialog)())()
+export default ((): ElectronDialog => bridge.new('ElectronDialog', ElectronDialog)())()

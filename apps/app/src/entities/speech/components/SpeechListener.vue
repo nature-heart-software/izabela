@@ -18,7 +18,7 @@ const stream = navigator.mediaDevices.getUserMedia({
 })
 const audioContext = new window.AudioContext({ sampleRate })
 const source: MediaStreamAudioSourceNode = audioContext.createMediaStreamSource(await stream)
-await audioContext.audioWorklet.addModule('/pcm-worker.js')
+await audioContext.audioWorklet.addModule('./pcm-worker.js')
 const pcmWorker = new AudioWorkletNode(audioContext, 'pcm-worker', {
   outputChannelCount: [1],
 })

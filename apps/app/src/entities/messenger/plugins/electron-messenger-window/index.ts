@@ -172,4 +172,5 @@ declare global {
   }
 }
 
-export default ((): ElectronMessengerWindow => bridge.new(ElectronMessengerWindow)())()
+export default ((): ElectronMessengerWindow =>
+  bridge.new('ElectronMessengerWindow', ElectronMessengerWindow)())()

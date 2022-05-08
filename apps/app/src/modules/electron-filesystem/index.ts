@@ -34,4 +34,4 @@ declare global {
   }
 }
 
-export default ((): ElectronFilesystem => bridge.new(ElectronFilesystem)())()
+export default ((): ElectronFilesystem => bridge.new('ElectronFilesystem', ElectronFilesystem)())()

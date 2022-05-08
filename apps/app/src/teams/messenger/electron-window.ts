@@ -36,11 +36,13 @@ const createMessengerWindow = async (): Promise<BrowserWindow> => {
     createProtocol('app')
     win.loadURL('app://./index.html')
   }
-
-  win.on('show', () => ipcMain.sendTo('messenger-window', 'show'))
-  win.on('hide', () => ipcMain.sendTo('messenger-window', 'hide'))
-  win.on('focus', () => ipcMain.sendTo('messenger-window', 'focus'))
-  win.on('blur', () => ipcMain.sendTo('messenger-window', 'blur'))
+  win.on('ready-to-show', () => {
+    win.on('show', () => ipcMain.sendTo('messenger-window', 'show'))
+    win.on('hide', () => ipcMain.sendTo('messenger-window', 'hide'))
+    win.on('focus', () => ipcMain.sendTo('messenger-window', 'focus'))
+    win.on('blur', () => ipcMain.sendTo('messenger-window', 'blur'))
+    // win.webContents.openDevTools({ mode: 'undocked' })
+  })
 
   return win
 }

@@ -10,6 +10,6 @@ export const useGCTTSSynthesizeSpeechQuery = (params: {
   credentials: { apiKey: string }
   payload: any
 }) =>
-  useQuery('gctts-list-voices', () =>
+  useQuery('gctts-synthesize-speech', () =>
     api.post('/tts/google-cloud/synthesize-speech', params).then(({ data }) => data),
   )

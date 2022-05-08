@@ -24,4 +24,4 @@ class ElectronVuexStorage {
   }
 }
 
-export default bridge.new(ElectronVuexStorage)()
+export default bridge.new('ElectronVuexStorage', ElectronVuexStorage)()
