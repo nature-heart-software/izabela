@@ -45,7 +45,7 @@ class ElectronMessengerWindow {
   addEventListeners() {
     // iohook.on('keypress', ({ keychar }) => console.log(`Key pressed: ${String.fromCharCode(keychar)}`))
     iohook.on('mousemove', throttle(this.onMouseMove.bind(this), 150))
-    iohook.on('keydown', (event) => {
+    iohook.on('keypress', (event) => {
       if (event.keycode === 56) {
         let keypressTime = Number(new Date())
         if (keypressTime - this.lastKeypressTime <= this.doubleKeypressDelta) {
