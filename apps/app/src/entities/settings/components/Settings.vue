@@ -1,5 +1,5 @@
 <template>
-  <dom-boundary class="settings bg-gray-10/90 rounded p-4 flex flex-col space-y-4">
+  <dom-boundary class="settings bg-gray-10/95 rounded p-4 flex flex-col space-y-4">
     <!-- Top -->
     <div class="flex justify-between space-x-4">
       <div></div>

@@ -51,6 +51,9 @@ export default class {
         return audioElement
       },
     ).then((audioElements) => {
+      if (!store.getters['settings/persisted'].playSpeechOnDefaultPlaybackDevice) {
+        this.audio.volume = 0
+      }
       this.audio.play()
       audioElements.forEach((audio) => audio.play())
     })

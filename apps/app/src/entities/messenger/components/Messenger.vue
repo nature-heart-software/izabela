@@ -3,7 +3,7 @@
     <dom-boundary id="moveable" ref="moveableTarget" class="inline-flex">
       <div
         ref="messenger"
-        class="messenger bg-gray-10/90 rounded grid p-4 gap-4 grid-rows-3 grid-rows-none"
+        class="messenger bg-gray-10/95 rounded grid p-4 gap-4 grid-rows-3 grid-rows-none"
       >
         <!-- Top -->
         <div class="flex space-x-4">
