@@ -26,11 +26,12 @@ export default defineComponent({
     const queryClient = useQueryClient()
     const store = useStore()
     const computedApikey = computed(() => decrypt(store.getters['settings/persisted'].GCTTSApiKey))
-    const { data } = useGCTTSListVoicesQuery(() => ({
+    const computedParams = computed(() => ({
       credentials: {
         apiKey: computedApikey.value,
       },
     }))
+    const { data } = useGCTTSListVoicesQuery(computedParams)
     const voices = computed(() => data.value || [])
     watch(computedApikey, () => queryClient.refetchQueries('gctts-list-voices'))
     return {
