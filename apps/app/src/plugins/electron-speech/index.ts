@@ -5,6 +5,8 @@ import path from 'path'
 import iohook from 'iohook'
 import { app } from 'electron'
 import { v4 as uuid } from 'uuid'
+import { Deferred } from '@/utils/promise'
+import store from '@/store'
 
 let wsStream: any = null
 const encoding = 'LINEAR16' as const
@@ -20,14 +22,14 @@ app.whenReady().then(() => {
   process.env.GOOGLE_APPLICATION_CREDENTIALS = googleCloudSpeechCredentialsFilePath
 })
 
-const request = {
+const getRequest = () => ({
   config: {
     encoding,
     sampleRateHertz,
-    languageCode,
+    languageCode: store.getters['settings/persisted'].GCTTSSelectedVoice.languageCodes[0],
   },
   interimResults: false, // If you want interim results, set this to true
-}
+})
 
 let ws: WebSocket | null = null
 const wss: Websocket.Server = (Websocket.createServer as any)(
@@ -51,7 +53,7 @@ wss.on('connection', (WebSocket) => {
 })
 const recognizeStream = () =>
   new speech.SpeechClient()
-    .streamingRecognize(request)
+    .streamingRecognize(getRequest())
     .on('error', console.error)
     .on('data', (data: any) => {
       const transcription =
@@ -66,38 +68,34 @@ const recognizeStream = () =>
       if (ws) ws.send(transcription)
     })
 
-let listening = false
+let deferredRecording: Deferred<boolean> | null = null
 
-class Recorder {
+class Recording {
   id = uuid()
 
-  gcStream
-
-  onKeyUpBinded: any
-
-  constructor(gcStream: any) {
+  constructor(stream: any, deferred: Deferred<boolean>) {
     console.log('Starting recording - ', this.id)
-    this.gcStream = gcStream
-    wsStream.pipe((this as any).gcStream)
-    this.onKeyUpBinded = this.onKeyUp.bind(this)
-    iohook.on('keyup', this.onKeyUpBinded)
-  }
-
-  onKeyUp(event: any) {
-    if (event.keycode === 54) {
+    wsStream.pipe(stream)
+    deferred.promise.then(() => {
       console.log('Stopping recording - ', this.id)
-      this.gcStream.end()
-      wsStream.unpipe((this as any).gcStream)
-      iohook.off('keyup', this.onKeyUpBinded)
-      listening = false
-    }
+      stream.end()
+      wsStream.unpipe(stream)
+    })
   }
 }
 
+iohook.on('keyup', (event) => {
+  if (event.keycode === 54 && deferredRecording) {
+    deferredRecording.resolve(true)
+    deferredRecording = null
+  }
+})
+
 iohook.on('keydown', (event) => {
-  if (event.keycode === 54 && wsStream && !listening) {
-    listening = true
+  if (event.keycode === 54 && wsStream && !deferredRecording) {
+    const deferred = new Deferred<boolean>()
+    deferredRecording = deferred
     // eslint-disable-next-line no-new
-    new Recorder(recognizeStream())
+    new Recording(recognizeStream(), deferred)
   }
 })
