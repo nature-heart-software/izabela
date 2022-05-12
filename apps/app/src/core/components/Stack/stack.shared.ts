@@ -1,6 +1,6 @@
 import { ExtractPropTypes, PropType } from 'vue'
 
-const theme = require('@/theme')
+import theme from '@/styles/tokens'
 
 export type StackPosition = 'right' | 'center' | 'left' | 'apart'
 export const props = {

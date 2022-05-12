@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
+import theme from '@/styles/tokens'
 import NvIcon from './NvIcon.vue'
-import { props } from './icon.shared'
-const theme = require('@/theme')
+import {props} from './icon.shared'
 
 export default {
   title: 'Icon',

@@ -1,6 +1,4 @@
-// import { TailwindConfig } from 'tailwindcss/tailwind-config'
-
-const theme = {
+const tokens = {
   fontFamily: {
     sans: [
       'Nunito',
@@ -95,6 +93,6 @@ const theme = {
   transition: {
     DEFAULT: 'all .3s',
   },
-}
+} as const
 
-module.exports = theme
+export default tokens

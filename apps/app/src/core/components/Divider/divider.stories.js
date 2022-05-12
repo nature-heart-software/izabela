@@ -1,8 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import NvDivider from './NvDivider.vue'
-import { props } from './divider.shared'
-
-const theme = require('@/theme')
 
 export default {
   title: 'Divider',

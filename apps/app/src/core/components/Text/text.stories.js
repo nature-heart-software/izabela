@@ -1,28 +1,28 @@
 /* eslint-disable import/no-extraneous-dependencies */
+import theme from '@/styles/tokens'
 import NvText from './NvText.vue'
 
-const theme = require('@/theme')
 
 export default {
   title: 'Text',
   argTypes: {
     content: {
       defaultValue: 'hello world',
-      control: { type: 'text' },
+      control: {type: 'text'},
     },
     size: {
       options: Object.keys(theme.fontSize).map((key) => key),
-      control: { type: 'inline-radio' },
+      control: {type: 'inline-radio'},
     },
     type: {
       options: ['caption', 'body-small', 'body', 'subtitle', 'title'],
-      control: { type: 'inline-radio' },
+      control: {type: 'inline-radio'},
     },
   },
 }
 
 const Template = (args) => ({
-  components: { NvText },
+  components: {NvText},
   setup() {
     return {
       args,

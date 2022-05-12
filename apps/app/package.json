@@ -22,6 +22,7 @@
     "@ryanmorr/ready": "^1.4.0",
     "@types/crypto-js": "^4.1.1",
     "@types/tailwindcss": "^2.2.4",
+    "@wurielle/generate-modules-webpack-plugin": "^0.1.0",
     "bluebird": "^3.7.2",
     "crypto-js": "^4.1.1",
     "csstype": "^3.0.11",

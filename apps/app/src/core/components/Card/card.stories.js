@@ -1,8 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import NvCard from './NvCard.vue'
-import { props } from './card.shared'
-
-const theme = require('@/theme')
+import {props} from './card.shared'
 
 export default {
   title: 'Card',

@@ -1,4 +1,4 @@
-const theme = require('./src/theme.ts')
+const theme = require('./src/styles/tokens.common').default
 
 module.exports = {
   content: ['./src/**/*.{vue,html,js,scss}'],

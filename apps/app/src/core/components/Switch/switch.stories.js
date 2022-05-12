@@ -1,8 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { ref } from 'vue'
+import {ref} from 'vue'
 import NvSwitch from './NvSwitch.vue'
-
-const theme = require('@/theme')
 
 export default {
   title: 'Switch',

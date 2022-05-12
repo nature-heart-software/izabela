@@ -22,11 +22,11 @@ import { defineComponent, ref } from 'vue'
 import { ElSelect as WrappedComponent } from 'element-plus'
 import 'element-plus/lib/components/select/style/css'
 import { watchBoundary } from '@/modules/vue-dom-boundaries'
+import theme from '@/styles/tokens'
 import { StSelect } from './select.styled'
 import { props, Size } from './select.shared'
 import NvIcon from '../Icon/NvIcon.vue'
 
-const theme = require('@/theme')
 
 watchBoundary('.el-select-dropdown')
 

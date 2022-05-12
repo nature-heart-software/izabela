@@ -1,9 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { ref } from 'vue'
+import {ref} from 'vue'
 import NvInput from './NvInput.vue'
-import { props } from './input.shared'
-
-const theme = require('@/theme')
+import {props} from './input.shared'
 
 export default {
   title: 'Input',

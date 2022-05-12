@@ -1,7 +1,7 @@
 import { ExtractPropTypes, PropType } from 'vue'
 import type { Properties } from 'csstype'
 
-const theme = require('@/theme')
+import theme from '@/styles/tokens'
 
 export type GroupPosition = 'right' | 'center' | 'left' | 'apart'
 export const props = {
