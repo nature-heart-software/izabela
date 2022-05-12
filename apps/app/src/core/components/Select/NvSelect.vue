@@ -27,7 +27,6 @@ import { StSelect } from './select.styled'
 import { props, Size } from './select.shared'
 import NvIcon from '../Icon/NvIcon.vue'
 
-
 watchBoundary('.el-select-dropdown')
 
 export default defineComponent({
