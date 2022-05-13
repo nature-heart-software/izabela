@@ -1,18 +1,14 @@
 <template>
-  <st-text :as="as" v-bind="$props"><slot /></st-text>
+  <StText :as="as" v-bind="$props">
+    <slot />
+  </StText>
 </template>
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script lang="ts" setup>
+import { defineProps } from 'vue'
 import { StText } from './text.styled'
 import { props } from './text.shared'
 
-export default defineComponent({
-  name: 'nv-text',
-  components: {
-    StText,
-  },
-  props,
-})
+defineProps(props)
 </script>
 <style lang="scss">
 body {

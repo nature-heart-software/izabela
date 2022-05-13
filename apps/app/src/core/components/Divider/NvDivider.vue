@@ -1,16 +1,10 @@
 <template>
-  <st-divider v-bind="$props" />
+  <StDivider v-bind="$props" />
 </template>
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script lang="ts" setup>
+import { defineProps } from 'vue'
 import { StDivider } from './divider.styled'
 import { props } from './divider.shared'
 
-export default defineComponent({
-  name: 'nv-divider',
-  components: {
-    StDivider,
-  },
-  props,
-})
+defineProps(props)
 </script>

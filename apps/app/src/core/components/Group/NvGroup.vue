@@ -1,18 +1,12 @@
 <template>
-  <st-group :as="as" v-bind="$props">
+  <StGroup :as="as" v-bind="$props">
     <slot />
-  </st-group>
+  </StGroup>
 </template>
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script lang="ts" setup>
+import { defineProps } from 'vue'
 import { StGroup } from './group.styled'
 import { props } from './group.shared'
 
-export default defineComponent({
-  name: 'nv-group',
-  components: {
-    StGroup,
-  },
-  props,
-})
+defineProps(props)
 </script>

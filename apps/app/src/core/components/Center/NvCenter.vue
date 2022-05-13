@@ -1,18 +1,12 @@
 <template>
-  <st-center :as="as" v-bind="$props">
+  <StCenter :as="as" v-bind="$props">
     <slot />
-  </st-center>
+  </StCenter>
 </template>
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script lang="ts" setup>
+import { defineProps } from 'vue'
 import { StCenter } from './center.styled'
 import { props } from './center.shared'
 
-export default defineComponent({
-  name: 'nv-center',
-  components: {
-    StCenter,
-  },
-  props,
-})
+defineProps(props)
 </script>

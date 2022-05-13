@@ -1,18 +1,12 @@
 <template>
-  <st-icon v-bind="$props" :class="[`uil uil-${name}`]"></st-icon>
+  <StIcon :class="[`uil uil-${name}`]" v-bind="$props" />
 </template>
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script lang="ts" setup>
+import { defineProps } from 'vue'
 import { StIcon } from './icon.styled'
 import { props } from './icon.shared'
 
-export default defineComponent({
-  name: 'nv-icon',
-  components: {
-    StIcon,
-  },
-  props,
-})
+defineProps(props)
 </script>
 <style lang="scss">
 body {

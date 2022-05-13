@@ -1,18 +1,12 @@
 <template>
-  <st-card v-bind="$props">
+  <StCard v-bind="$props">
     <slot />
-  </st-card>
+  </StCard>
 </template>
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script lang="ts" setup>
+import { defineProps } from 'vue'
 import { StCard } from './card.styled'
 import { props } from './card.shared'
 
-export default defineComponent({
-  name: 'nv-card',
-  components: {
-    StCard,
-  },
-  props,
-})
+defineProps(props)
 </script>

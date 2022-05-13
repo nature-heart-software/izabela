@@ -1,18 +1,12 @@
 <template>
-  <st-stack :as="as" v-bind="$props">
+  <StStack :as="as" v-bind="$props">
     <slot />
-  </st-stack>
+  </StStack>
 </template>
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script lang="ts" setup>
+import { defineProps } from 'vue'
 import { StStack } from './stack.styled'
 import { props } from './stack.shared'
 
-export default defineComponent({
-  name: 'nv-stack',
-  components: {
-    StStack,
-  },
-  props,
-})
+defineProps(props)
 </script>

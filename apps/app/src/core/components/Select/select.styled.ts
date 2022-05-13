@@ -1,13 +1,15 @@
 /* eslint-disable */
 import styled from 'vue3-styled-components'
 import store from '@/store'
-import { props } from './select.shared'
-import { Props, Size } from './select.shared'
+import { props, Props, Size } from './select.shared'
 import { CSSObject } from '@/types/css-in-js'
 import { math, rem, remToPx } from 'polished'
 import { defaultTextStyle } from '../Text/text.styled'
 import { ElOption } from 'element-plus'
 import 'element-plus/lib/components/option/style/css'
+import { watchBoundary } from '@/modules/vue-dom-boundaries'
+
+watchBoundary('.el-select-dropdown')
 
 const { fontSize, spacing, boxShadow, borderRadius, borderWidth, colors, transition } =
   store.getters.theme

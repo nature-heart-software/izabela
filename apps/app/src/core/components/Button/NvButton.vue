@@ -1,42 +1,27 @@
 <template>
-  <st-button v-bind="$props" :squared="squared || isVNodeEmpty($slots.default)">
-    <nv-text as="span" size="1" ref="content" v-if="!isVNodeEmpty($slots.default)">
+  <StButton :squared="squared || isVNodeEmpty($slots.default)" v-bind="$props">
+    <NvText v-if="!isVNodeEmpty($slots.default)" ref="content" as="span" size="1">
       <slot />
-    </nv-text>
-    <nv-icon v-if="iconName" :name="iconName" :size="iconSize" />
-  </st-button>
+    </NvText>
+    <NvIcon v-if="iconName" :name="iconName" :size="iconSize" />
+  </StButton>
 </template>
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script lang="ts" setup>
+import { computed, defineProps } from 'vue'
 import { isVNodeEmpty } from '@/utils/vue'
 import { StButton } from './button.styled'
 import { props, Size } from './button.shared'
 import NvText from '../Text/NvText.vue'
 import NvIcon from '../Icon/NvIcon.vue'
 
-export default defineComponent({
-  name: 'nv-button',
-  components: {
-    StButton,
-    NvText,
-    NvIcon,
-  },
-  props,
-  setup() {
-    return {
-      isVNodeEmpty,
-    }
-  },
-  computed: {
-    iconSize() {
-      const sizes: { [key in Size]: string } = {
-        xs: '1',
-        sm: '3',
-        md: '5',
-        lg: '5',
-      }
-      return sizes[this.size]
-    },
-  },
+const compopentProps = defineProps(props)
+const iconSize = computed(() => {
+  const sizes: { [key in Size]: string } = {
+    xs: '1',
+    sm: '3',
+    md: '5',
+    lg: '5',
+  }
+  return sizes[compopentProps.size]
 })
 </script>
