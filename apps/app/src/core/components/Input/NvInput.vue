@@ -1,7 +1,7 @@
 <template>
   <StInput v-bind="$props">
     <component
-      v-bind:is="WrappedComponent"
+      :is="WrappedComponent"
       :model-value="$props.modelValue"
       v-bind="$attrs"
       @update:model-value="$emit('update:model-value', $event)"

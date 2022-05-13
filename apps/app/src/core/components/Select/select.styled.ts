@@ -7,9 +7,6 @@ import { math, rem, remToPx } from 'polished'
 import { defaultTextStyle } from '../Text/text.styled'
 import { ElOption } from 'element-plus'
 import 'element-plus/lib/components/option/style/css'
-import { watchBoundary } from '@/modules/vue-dom-boundaries'
-
-watchBoundary('.el-select-dropdown')
 
 const { fontSize, spacing, boxShadow, borderRadius, borderWidth, colors, transition } =
   store.getters.theme

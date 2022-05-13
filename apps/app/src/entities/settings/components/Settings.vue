@@ -1,129 +1,107 @@
 <template>
-  <dom-boundary class="settings bg-gray-10/95 rounded p-4 flex flex-col space-y-4">
+  <DomBoundary class="settings bg-gray-10/95 rounded p-4 flex flex-col space-y-4">
     <!-- Top -->
     <div class="flex justify-between space-x-4">
       <div></div>
-      <nv-card class="inline-flex" size="sm">
+      <NvCard class="inline-flex" size="sm">
         <div class="inline-flex space-x-2">
-          <nv-button icon-name="times" size="xs" type="plain" @click="$emit('close')" />
+          <NvButton icon-name="times" size="xs" type="plain" @click="$emit('close')" />
         </div>
-      </nv-card>
+      </NvCard>
     </div>
     <div class="flex-1 relative">
       <div class="absolute inset-0">
         <div class="flex h-full">
           <div class="settings__sidebar">
             <!-- Side Nav -->
-            <nv-stack spacing="6">
+            <NvStack spacing="6">
               <template v-for="category in navigation" :key="category.name">
-                <nv-stack>
-                  <nv-text class="mx-3" type="subtitle">
+                <NvStack>
+                  <NvText class="mx-3" type="subtitle">
                     {{ category.name }}
-                  </nv-text>
-                  <nv-stack spacing="2">
+                  </NvText>
+                  <NvStack spacing="2">
                     <template v-for="entry in category.children" :key="entry.name">
-                      <nv-button
+                      <NvButton
                         :selected="selectedEntry === entry.name"
                         size="sm"
                         type="ghost-alt"
                         @click="selectedEntry = entry.name"
                         >{{ entry.name }}
-                      </nv-button>
+                      </NvButton>
                     </template>
-                  </nv-stack>
-                </nv-stack>
+                  </NvStack>
+                </NvStack>
               </template>
-            </nv-stack>
+            </NvStack>
           </div>
           <div class="settings__content flex-1 pl-4">
             <!-- View -->
             <Transition class="transition">
-              <component
-                :is="currentEntry.component.name"
-                v-if="currentEntry.component"
-              ></component>
+              <component :is="currentEntry.component" v-if="currentEntry.component"></component>
             </Transition>
           </div>
         </div>
       </div>
     </div>
-  </dom-boundary>
+  </DomBoundary>
 </template>
-<script lang="ts">
-import { computed, defineComponent, ref } from 'vue'
+<script lang="ts" setup>
+import { computed, ref } from 'vue'
 import { NvButton, NvCard, NvStack, NvText } from '@/core/components'
 import DomBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
 import SettingsOverview from '@/entities/settings/components/SettingsOverview.vue'
 import SettingsAudio from '@/entities/settings/components/SettingsAudio.vue'
 import SettingsSpeech from '@/entities/settings/components/SettingsSpeech.vue'
 
-export default defineComponent({
-  name: 'NvSettings',
-  components: {
-    NvCard,
-    NvButton,
-    NvStack,
-    NvText,
-    DomBoundary,
-    SettingsOverview,
-    SettingsAudio,
-    SettingsSpeech,
-  },
-  setup() {
-    const navigation = [
+const navigation = [
+  {
+    name: 'Application',
+    children: [
       {
-        name: 'Application',
-        children: [
-          {
-            name: 'Overview',
-            component: SettingsOverview,
-          },
-          {
-            name: 'Speech',
-            component: SettingsSpeech,
-          },
-          {
-            name: 'Audio',
-            component: SettingsAudio,
-          },
-          {
-            name: 'Overlay',
-          },
-          {
-            name: 'Dictionary',
-          },
-          {
-            name: 'Keybinds',
-          },
-          {
-            name: 'Startup',
-          },
-          {
-            name: 'Performance',
-          },
-        ],
+        name: 'Overview',
+        component: SettingsOverview,
       },
       {
-        name: 'Other',
-        children: [
-          {
-            name: 'About',
-          },
-          { name: 'Support' },
-        ],
+        name: 'Speech',
+        component: SettingsSpeech,
       },
-    ]
-    const selectedEntry = ref('Overview')
-    const currentEntry = computed(() =>
-      navigation.flatMap((i) => i.children).find((i) => i.name === selectedEntry.value),
-    )
-    return {
-      navigation,
-      selectedEntry,
-      currentEntry,
-    }
+      {
+        name: 'Audio',
+        component: SettingsAudio,
+      },
+      {
+        name: 'Overlay',
+      },
+      {
+        name: 'Dictionary',
+      },
+      {
+        name: 'Keybinds',
+      },
+      {
+        name: 'Startup',
+      },
+      {
+        name: 'Performance',
+      },
+    ],
   },
-})
+  {
+    name: 'Other',
+    children: [
+      {
+        name: 'About',
+      },
+      { name: 'Support' },
+    ],
+  },
+]
+const selectedEntry = ref('Overview')
+const currentEntry = computed(() =>
+  navigation.flatMap((i) => i.children).find((i) => i.name === selectedEntry.value),
+)
+console.log(currentEntry)
 </script>
 <style lang="scss" scoped>
 .settings {

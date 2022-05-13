@@ -76,8 +76,8 @@
     </NvStack>
   </NvStack>
 </template>
-<script lang="ts">
-import { defineComponent, ref } from 'vue'
+<script lang="ts" setup>
+import { ref } from 'vue'
 import { useStore } from 'vuex'
 import {
   NvButton,
@@ -95,30 +95,10 @@ import { useEncryption } from '@/utils/security'
 import speechEngineManager from '@/entities/speech/modules/speech-engine-manager'
 import { SpeechEngine } from '@/entities/speech/modules/speech-engine-manager/types'
 
-export default defineComponent({
-  name: 'SettingsSpeech',
-  components: {
-    SpeechEngineSelect,
-    GCTTSVoiceSelect,
-    NvCard,
-    NvStack,
-    NvGroup,
-    NvText,
-    NvButton,
-    NvDivider,
-    NvFormItem,
-    NvInput,
-  },
-  setup() {
-    const store = useStore()
-    const selectedEngineTab = ref<SpeechEngine['id']>(
-      store.getters['settings/persisted'].selectedSpeechEngine,
-    )
-    return {
-      speechEngines: speechEngineManager.getEngines(),
-      selectedEngineTab,
-      ...useEncryption(),
-    }
-  },
-})
+const store = useStore()
+const selectedEngineTab = ref<SpeechEngine['id']>(
+  store.getters['settings/persisted'].selectedSpeechEngine,
+)
+const speechEngines = speechEngineManager.getEngines()
+const { encrypt, decrypt } = useEncryption()
 </script>

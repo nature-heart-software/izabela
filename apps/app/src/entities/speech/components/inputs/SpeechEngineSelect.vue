@@ -5,21 +5,9 @@
     </template>
   </NvSelect>
 </template>
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script lang="ts" setup>
 import { NvOption, NvSelect } from '@/core/components'
 import speechEngineManager from '@/entities/speech/modules/speech-engine-manager'
 
-export default defineComponent({
-  name: 'SpeechEngineSelect',
-  components: {
-    NvSelect,
-    NvOption,
-  },
-  setup() {
-    return {
-      speechEngines: speechEngineManager.getEngines(),
-    }
-  },
-})
+const speechEngines = speechEngineManager.getEngines()
 </script>

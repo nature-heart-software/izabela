@@ -33,20 +33,8 @@
     </NvStack>
   </NvStack>
 </template>
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script lang="ts" setup>
 import { NvCard, NvStack, NvText } from '@/core/components'
 import AudioOutputsSelect from '@/entities/settings/components/inputs/AudioOutputsSelect.vue'
 import AudioInputSelect from '@/entities/settings/components/inputs/AudioInputSelect.vue'
-
-export default defineComponent({
-  name: 'SettingsAudio',
-  components: {
-    NvCard,
-    NvStack,
-    NvText,
-    AudioOutputsSelect,
-    AudioInputSelect,
-  },
-})
 </script>

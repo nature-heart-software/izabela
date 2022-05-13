@@ -2,7 +2,7 @@
   <StSelect v-bind="$props">
     <div class="nv-selectWrapper">
       <component
-        v-bind:is="WrappedComponent"
+        :is="WrappedComponent"
         :filterable="true"
         :model-value="compopentProps.modelValue"
         :popper-append-to-body="false"
@@ -35,4 +35,11 @@ const iconSize = computed(() => {
   }
   return sizes[compopentProps.size]
 })
+</script>
+<script lang="ts">
+// eslint-disable-next-line
+import { watchBoundary } from '@/modules/vue-dom-boundaries'
+
+watchBoundary('.el-select-dropdown')
+export default {}
 </script>

@@ -62,7 +62,7 @@ import { useMediaDevices } from '@/hooks'
 import {
   getGoogleCloudSpeechCredentialsPathQueryKey,
   useGetGoogleCloudSpeechCredentialsPath,
-} from '@/entities/settings/components/hooks'
+} from '@/entities/settings/hooks'
 import { useQueryClient } from 'vue-query'
 
 const { ElectronDialog, ElectronFilesystem } = window

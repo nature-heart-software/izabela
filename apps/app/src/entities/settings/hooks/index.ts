@@ -1,7 +1,17 @@
-import { TippyOptions, useTippy } from 'vue-tippy'
-import Settings from '@/entities/settings/components/Settings.vue'
-import { ref, Ref, h } from 'vue'
+import { useQuery } from 'vue-query'
 import { TippyHookInstance, TippyTarget } from '@/types/vue-tippy'
+import { TippyOptions, useTippy } from 'vue-tippy'
+import { h, ref, Ref } from 'vue'
+import Settings from '@/entities/settings/components/Settings.vue'
+
+const { ElectronFilesystem } = window
+
+export const getGoogleCloudSpeechCredentialsPathQueryKey = 'getGoogleCloudSpeechCredentialsPath'
+
+export const useGetGoogleCloudSpeechCredentialsPath = () =>
+  useQuery(getGoogleCloudSpeechCredentialsPathQueryKey, () =>
+    ElectronFilesystem.getGoogleCloudSpeechCredentialsPath(),
+  )
 
 export type UseSettingsOptions = {
   popoverTarget?: TippyTarget
