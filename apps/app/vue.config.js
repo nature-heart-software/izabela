@@ -8,6 +8,8 @@ const setConfigAliases = (config) => {
   config.resolve.alias.set('@package', path.resolve(__dirname, './package.json'))
 }
 
+const pkg = require('./package.json')
+
 module.exports = defineConfig({
   transpileDependencies: ['@izabela'],
   configureWebpack: {
@@ -42,6 +44,9 @@ module.exports = defineConfig({
   },
   pluginOptions: {
     electronBuilder: {
+      generateUpdatesFilesForAllChannels: true,
+      // eslint-disable-next-line no-template-curly-in-string
+      artifactName: '${name}-setup-${version}-${channel}-${os}.${ext}',
       builderOptions: {
         beforeBuild: './scripts/electron-builder-before-build.js',
       },
@@ -61,6 +66,10 @@ module.exports = defineConfig({
       ],
       preload: {
         preload: 'src/preload.ts',
+      },
+      publish: {
+        provider: 'github',
+        url: pkg.repository,
       },
     },
   },

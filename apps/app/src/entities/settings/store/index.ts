@@ -8,6 +8,8 @@ const storeState = {
     audioOutputDevices: [] as MediaDeviceInfo['deviceId'][],
     audioInputDevice: 'default' as MediaDeviceInfo['deviceId'],
     selectedSpeechEngine: 'gctts' as SpeechEngine['id'],
+    autoUpdateChannel: 'latest',
+    launchOnStartup: true,
     GCTTSApiKey: '',
     GCTTSSelectedVoice: {
       languageCodes: ['en-GB'],

@@ -1,6 +1,7 @@
 {
   "name": "izabela-next",
   "productName": "Izabela Next",
+  "repository": "https://github.com/nature-heart-software/izabela",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -31,6 +32,7 @@
     "electron-log": "^4.4.6",
     "electron-postman": "^0.1.2",
     "electron-store": "^8.0.1",
+    "electron-updater": "^5.0.1",
     "element-plus": "^1.2.0-beta.6",
     "iohook": "^0.9.3",
     "mitt": "^3.0.0",

@@ -5,6 +5,7 @@ import { ipcMain } from 'electron-postman'
 
 const createMessengerWindow = async (): Promise<BrowserWindow> => {
   const win = new BrowserWindow({
+    show: false,
     fullscreen: true,
     transparent: true,
     frame: false,

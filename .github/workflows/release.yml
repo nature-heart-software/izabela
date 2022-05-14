@@ -26,3 +26,58 @@ jobs:
           body: ${{ steps.github_release.outputs.changelog }}
           token: ${{ secrets.GITHUB_TOKEN }}
           prerelease: ${{ contains(github.ref, 'rc') || contains(github.ref, 'beta') || contains(github.ref, 'alpha')}}
+
+  deploy:
+    needs: [release]
+    strategy:
+      matrix:
+        os: [windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 'lts/*'
+
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - name: Set env variables
+        shell: bash
+        run: |
+          echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - name: Set package.json version
+        uses: wurielle/package-version-action@v1
+        with:
+          version: ${{ env.RELEASE_VERSION }}
+          targets: |
+            ./package.json
+      - name: Build electron
+        working-directory: apps/app
+        run: |
+          npx lerna bootstrap
+          npm i
+          npm run electron:build -- -p never
+      - name: Cleanup electron dist
+        shell: bash
+        working-directory: apps/app/dist_electron
+        run: |
+          rm -rf win-unpacked linux-unpacked mac builder-debug.yml bundled
+          ls -l ./
+      - name: Upload artifacts to Release
+        uses: alexellis/upload-assets@0.3.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          asset_paths: '["./apps/app/dist_electron/*"]'
