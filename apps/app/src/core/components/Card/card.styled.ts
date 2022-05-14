@@ -9,22 +9,22 @@ const { colors, spacing, borderRadius, boxShadow } = store.getters.theme
 const getStyleFromSize = ({ size }: Props) => {
   const styles: { [key in Size]: CSSObject } = {
     xs: {
-      padding: `${ spacing['2'] }`,
+      padding: `${spacing['2']}`,
     },
     sm: {
-      padding: `${ spacing['3'] }`,
+      padding: `${spacing['3']}`,
     },
     md: {
-      padding: `${ spacing['5'] }`,
+      padding: `${spacing['5']}`,
     },
   }
   return styles[size]
 }
 export const StCard = styled('div', props)`
-  background-color: ${ colors.white };
-  padding: ${ spacing['3'] };
-  border-radius: ${ borderRadius.DEFAULT };
-  box-shadow: ${ boxShadow.DEFAULT };
+  background-color: ${colors.white};
+  padding: ${spacing['3']};
+  border-radius: ${borderRadius.DEFAULT};
+  box-shadow: ${boxShadow.DEFAULT};
   font-size: 0;
-  ${ getStyleFromSize}
+  ${getStyleFromSize}
 `
