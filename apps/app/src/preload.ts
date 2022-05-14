@@ -5,7 +5,7 @@ import '@/modules/electron-dialog'
 import '@/modules/electron-filesystem'
 
 /* Other plugins */
-import '@/entities/messenger/plugins/electron-messenger-window'
+import '@/entities/messenger/modules/electron-messenger-window'
 import { ipcRenderer } from 'electron-postman'
 
 ipcRenderer.exposeInMainWorld('ipc')

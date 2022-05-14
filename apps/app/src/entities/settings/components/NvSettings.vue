@@ -50,9 +50,9 @@
 import { computed, ref } from 'vue'
 import { NvButton, NvCard, NvStack, NvText } from '@/core/components'
 import DomBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
-import SettingsOverview from '@/entities/settings/components/SettingsOverview.vue'
-import SettingsAudio from '@/entities/settings/components/SettingsAudio.vue'
-import SettingsSpeech from '@/entities/settings/components/SettingsSpeech.vue'
+import SettingsOverview from '@/entities/settings/components/NvSettingsOverview.vue'
+import SettingsAudio from '@/entities/settings/components/NvSettingsAudio.vue'
+import SettingsSpeech from '@/entities/settings/components/NvSettingsSpeech.vue'
 
 const navigation = [
   {

@@ -3,16 +3,18 @@ import '@/modules/electron-vuex/main'
 import '@/store'
 import '@/plugins/electron-log'
 import '@/plugins/electron-speech'
-import '@/entities/messenger/plugins/electron-messenger-window'
+import '@/entities/messenger/modules/electron-messenger-window'
 import '@/modules/electron-dialog'
 import '@/modules/electron-filesystem'
 import { app, BrowserWindow, protocol } from 'electron'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import createMessengerWindow from '@/teams/messenger/electron-window'
+import createTray from '@/teams/tray/electron-tray'
 import ElectronWindowManager from '@/modules/electron-window-manager'
 import server from '@izabela/app-server'
 import path from 'path'
-;(() => {
+
+(() => {
   app.commandLine.appendSwitch('disable-renderer-backgrounding')
 
   /* Fixes iohook. See: https://github.com/electron/electron/issues/18397 */
@@ -67,6 +69,7 @@ app.on('ready', async () => {
       console.error('Vue Devtools failed to install:', (e as Error).toString())
     }
   }
+  createTray()
   createWindows()
   startAppServer()
 })

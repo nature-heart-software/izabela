@@ -2,7 +2,7 @@
   <ThemeProvider :theme="$store.getters['theme']">
     <template v-if="ready">
       <div class="h-0">
-        <Messenger
+        <NvMessenger
           :min-width="768"
           :transform="$store.getters['messenger/persisted'].position.transform"
           class="w-full h-full"
@@ -20,28 +20,16 @@ body {
   overflow: hidden;
 }
 </style>
-<script>
+<script lang="ts" setup>
 import { ref } from 'vue'
 import { ThemeProvider } from 'vue3-styled-components'
-import Messenger from '@/entities/messenger/components/Messenger.vue'
+import NvMessenger from '@/entities/messenger/components/NvMessenger.vue'
 import SpeechListener from '@/entities/speech/components/SpeechListener.vue'
+import { useStore } from 'vuex'
 
-export default {
-  name: 'app',
-  components: {
-    Messenger,
-    ThemeProvider,
-    SpeechListener,
-  },
-  setup() {
-    return {
-      ready: ref(false),
-    }
-  },
-  mounted() {
-    this.$store.state['electron-vuex'].ready().then(() => {
-      this.ready = true
-    })
-  },
-}
+const store = useStore()
+const ready = ref(false)
+store.state['electron-vuex'].ready().then(() => {
+  ready.value = true
+})
 </script>

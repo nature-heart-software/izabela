@@ -2,7 +2,7 @@ import { useQuery } from 'vue-query'
 import { TippyHookInstance, TippyTarget } from '@/types/vue-tippy'
 import { TippyOptions, useTippy } from 'vue-tippy'
 import { h, ref, Ref } from 'vue'
-import Settings from '@/entities/settings/components/Settings.vue'
+import NvSettings from '@/entities/settings/components/NvSettings.vue'
 
 const { ElectronFilesystem } = window
 
@@ -23,7 +23,7 @@ export const useSettingsPopover = ({ popoverTarget, popoverOptions }: UseSetting
   if (popoverTarget) {
     popover.value = useTippy(popoverTarget, {
       triggerTarget: popoverOptions?.triggerTarget,
-      content: h(Settings, {
+      content: h(NvSettings, {
         onClose: () => popover.value?.hide(),
       }),
       trigger: 'click',

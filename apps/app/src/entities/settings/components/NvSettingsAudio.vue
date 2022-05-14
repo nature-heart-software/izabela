@@ -35,6 +35,6 @@
 </template>
 <script lang="ts" setup>
 import { NvCard, NvStack, NvText } from '@/core/components'
-import AudioOutputsSelect from '@/entities/settings/components/inputs/AudioOutputsSelect.vue'
-import AudioInputSelect from '@/entities/settings/components/inputs/AudioInputSelect.vue'
+import AudioOutputsSelect from '@/entities/settings/components/inputs/NvAudioOutputsSelect.vue'
+import AudioInputSelect from '@/entities/settings/components/inputs/NvAudioInputSelect.vue'
 </script>
