@@ -15,7 +15,6 @@ import createTray from '@/teams/tray/electron-tray'
 import ElectronWindowManager from '@/modules/electron-window-manager'
 import server from '@izabela/app-server'
 import path from 'path'
-
 ;(() => {
   app.commandLine.appendSwitch('disable-renderer-backgrounding')
 
