@@ -1,6 +1,14 @@
 name: Prettier
 
-on: [pull_request, push]
+on:
+  pull_request:
+  push:
+    branches:
+      - '**'
+      - '!main'
+      - '!pre/rc'
+      - '!beta'
+      - '!alpha'
 
 jobs:
   prettier:
