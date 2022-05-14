@@ -62,12 +62,12 @@ jobs:
         with:
           version: ${{ env.RELEASE_VERSION }}
           targets: |
-            ./package.json
+            ./apps/app/package.json
       - name: Build electron
         working-directory: apps/app
         run: |
-          npx lerna bootstrap
           npm i
+          npx lerna bootstrap
           npm run electron:build -- -p never
       - name: Cleanup electron dist
         shell: bash
