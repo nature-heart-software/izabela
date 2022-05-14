@@ -1,15 +1,33 @@
 {
   "name": "root",
   "private": true,
+  "scripts": {
+    "serve": "lerna bootstrap && lerna run serve --stream"
+  },
   "devDependencies": {
-    "lerna": "^4.0.0"
+    "@parcel/packager-ts": "^2.0.1",
+    "@parcel/transformer-typescript-types": "^2.0.1",
+    "lerna": "^4.0.0",
+    "typescript": "^4.5.4"
   },
   "release": {
     "branches": [
       "main",
-      { "name": "pre/rc", "channel": "pre/rc", "prerelease": "rc" },
-      { "name": "beta", "channel": "beta", "prerelease": "beta" },
-      { "name": "alpha", "channel": "alpha", "prerelease": "alpha" }
+      {
+        "name": "pre/rc",
+        "channel": "pre/rc",
+        "prerelease": "rc"
+      },
+      {
+        "name": "beta",
+        "channel": "beta",
+        "prerelease": "beta"
+      },
+      {
+        "name": "alpha",
+        "channel": "alpha",
+        "prerelease": "alpha"
+      }
     ],
     "plugins": [
       [
@@ -19,5 +37,13 @@
         }
       ]
     ]
+  },
+  "prettier": {
+    "singleQuote": true,
+    "tabWidth": 2,
+    "semi": false,
+    "trailingComma": "all",
+    "arrowParens": "always",
+    "endOfLine": "lf"
   }
 }

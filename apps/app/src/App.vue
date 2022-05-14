@@ -1,30 +1,35 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view/>
+  <ThemeProvider :theme="$store.getters['theme']">
+    <template v-if="ready">
+      <div class="h-0">
+        <NvMessenger
+          :min-width="768"
+          :transform="$store.getters['messenger/persisted'].position.transform"
+          class="w-full h-full"
+        />
+      </div>
+      <SpeechListener :key="$store.getters['settings/persisted'].audioInputDevice" />
+    </template>
+  </ThemeProvider>
 </template>
-
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+body {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  overflow: hidden;
 }
 </style>
+<script lang="ts" setup>
+import { ref } from 'vue'
+import { ThemeProvider } from 'vue3-styled-components'
+import NvMessenger from '@/entities/messenger/components/NvMessenger.vue'
+import SpeechListener from '@/entities/speech/components/SpeechListener.vue'
+import { useStore } from 'vuex'
+
+const store = useStore()
+const ready = ref(false)
+store.state['electron-vuex'].ready().then(() => {
+  ready.value = true
+})
+</script>
