@@ -11,6 +11,9 @@ var $1hSWc$fs = require("fs");
 var $1hSWc$microsoftcognitiveservicesspeechsdk = require("microsoft-cognitiveservices-speech-sdk");
 var $1hSWc$ibmwatsontexttospeechv1 = require("ibm-watson/text-to-speech/v1");
 var $1hSWc$ibmwatsonauth = require("ibm-watson/auth");
+var $1hSWc$awssdkclientpolly = require("@aws-sdk/client-polly");
+var $1hSWc$awssdkclientcognitoidentity = require("@aws-sdk/client-cognito-identity");
+var $1hSWc$awssdkcredentialprovidercognitoidentity = require("@aws-sdk/credential-provider-cognito-identity");
 
 function $parcel$interopDefault(a) {
   return a && a.__esModule ? a.default : a;
@@ -154,9 +157,6 @@ const $2e5d6a656809d93c$export$a93cd00e7c1effd6 = ({ app: app  })=>{
 
 
 
-
-
-
 const $88555a0b04d81c4f$export$2272521fb3bd5353 = async ({ body: { credentials: { apiKey: apiKey , url: url  } ,  } ,  }, res)=>{
     try {
         const textToSpeech = new ($parcel$interopDefault($1hSWc$ibmwatsontexttospeechv1))({
@@ -172,7 +172,6 @@ const $88555a0b04d81c4f$export$2272521fb3bd5353 = async ({ body: { credentials: 
     }
 };
 const $88555a0b04d81c4f$export$720e715da265c262 = async ({ body: { credentials: { apiKey: apiKey , url: url  } , payload: { text: text , voice: voice  } ,  } ,  }, res)=>{
-    const outputFile = $1hSWc$path.join($a3bdc0234368055c$export$2e2bcd8739ae039.getConfig().tempPath, $1hSWc$uuid.v4() + '.mp3');
     try {
         const textToSpeech = new ($parcel$interopDefault($1hSWc$ibmwatsontexttospeechv1))({
             authenticator: new $1hSWc$ibmwatsonauth.IamAuthenticator({
@@ -195,6 +194,58 @@ const $88555a0b04d81c4f$export$720e715da265c262 = async ({ body: { credentials: 
 const $78af54c5aebbe2f9$export$ce6d120b07604ec0 = ({ app: app  })=>{
     app.post('/api/tts/ibm-watson/list-voices', $88555a0b04d81c4f$export$2272521fb3bd5353);
     app.post('/api/tts/ibm-watson/synthesize-speech', $88555a0b04d81c4f$export$720e715da265c262);
+};
+
+
+
+
+
+
+const $bbf043d171ccefaa$export$2272521fb3bd5353 = async ({ body: { credentials: { identityPoolId: identityPoolId , region: region  } ,  } ,  }, res)=>{
+    try {
+        const client = new $1hSWc$awssdkclientpolly.Polly({
+            region: region,
+            credentials: $1hSWc$awssdkcredentialprovidercognitoidentity.fromCognitoIdentityPool({
+                client: new $1hSWc$awssdkclientcognitoidentity.CognitoIdentityClient({
+                    region: region
+                }),
+                identityPoolId: identityPoolId
+            })
+        });
+        const command = new $1hSWc$awssdkclientpolly.DescribeVoicesCommand({});
+        const { Voices: voices  } = await client.send(command);
+        res.status(200).json(voices);
+    } catch (e) {
+        $9ea4c5e7d90b028e$export$d3da1ecaf1206c58(res, 'Internal server error', e.message, 500);
+    }
+};
+const $bbf043d171ccefaa$export$720e715da265c262 = async ({ body: { credentials: { identityPoolId: identityPoolId , region: region  } , payload: { text: text , voice: voice  } ,  } ,  }, res)=>{
+    try {
+        const client = new $1hSWc$awssdkclientpolly.Polly({
+            region: region,
+            credentials: $1hSWc$awssdkcredentialprovidercognitoidentity.fromCognitoIdentityPool({
+                client: new $1hSWc$awssdkclientcognitoidentity.CognitoIdentityClient({
+                    region: region
+                }),
+                identityPoolId: identityPoolId
+            })
+        });
+        const command = new $1hSWc$awssdkclientpolly.SynthesizeSpeechCommand({
+            OutputFormat: 'mp3',
+            Text: text,
+            VoiceId: voice.Id
+        });
+        const { AudioStream: AudioStream  } = await client.send(command);
+        AudioStream.pipe(res);
+    } catch (e) {
+        $9ea4c5e7d90b028e$export$d3da1ecaf1206c58(res, 'Internal server error', e.message, 500);
+    }
+};
+
+
+const $100e082905130c51$export$2257b94d0c1621dc = ({ app: app  })=>{
+    app.post('/api/tts/amazon-polly/list-voices', $bbf043d171ccefaa$export$2272521fb3bd5353);
+    app.post('/api/tts/amazon-polly/synthesize-speech', $bbf043d171ccefaa$export$720e715da265c262);
 };
 
 
@@ -223,6 +274,7 @@ class $a3bdc0234368055c$var$IzabelaServer {
             app: $a3bdc0234368055c$var$app,
             server: this.server
         };
+        $100e082905130c51$export$2257b94d0c1621dc(context);
         $78af54c5aebbe2f9$export$ce6d120b07604ec0(context);
         $5e8fcb11fef7f285$export$776ed06f580210d5(context);
         $2e5d6a656809d93c$export$a93cd00e7c1effd6(context);

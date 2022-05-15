@@ -2,11 +2,6 @@ import TextToSpeechV1 from 'ibm-watson/text-to-speech/v1'
 import { IamAuthenticator } from 'ibm-watson/auth'
 import { handleError } from '../utils/requests'
 
-import { v4 as uuid } from 'uuid'
-import izabelaServer from '../server'
-
-const path = require('path')
-
 export const listVoicesHandler = async (
   {
     body: {
@@ -40,10 +35,6 @@ export const synthesizeSpeechHandler = async (
   },
   res,
 ) => {
-  const outputFile = path.join(
-    izabelaServer.getConfig().tempPath,
-    uuid() + '.mp3',
-  )
   try {
     const textToSpeech = new TextToSpeechV1({
       authenticator: new IamAuthenticator({

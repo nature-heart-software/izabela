@@ -7,6 +7,7 @@ import { defaultsDeep } from 'lodash'
 import { registerGCTTSRoutes } from './routes/gc-tts'
 import { registerMATTSRoutes } from './routes/ma-tts'
 import { registerIWTTSRoutes } from './routes/iw-tts'
+import { registerAPTTSRoutes } from './routes/ap-tts'
 
 const app = express()
 app.use(cors())
@@ -33,6 +34,7 @@ class IzabelaServer {
 
   async startRouter() {
     const context = { app, server: this.server }
+    registerAPTTSRoutes(context)
     registerIWTTSRoutes(context)
     registerGCTTSRoutes(context)
     registerMATTSRoutes(context)
