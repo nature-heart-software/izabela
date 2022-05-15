@@ -7,6 +7,13 @@ export const useGCTTSListVoicesQuery = (params: Ref<{ credentials: { apiKey: str
     api.post('/tts/google-cloud/list-voices', params.value).then(({ data }) => data),
   )
 
+export const useIWTTSListVoicesQuery = (
+  params: Ref<{ credentials: { apiKey: string; url: string } }>,
+) =>
+  useQuery('iwtts-list-voices', () =>
+    api.post('/tts/ibm-watson/list-voices', params.value).then(({ data }) => data),
+  )
+
 export const useGCTTSSynthesizeSpeechQuery = (params: {
   credentials: { apiKey: string }
   payload: any

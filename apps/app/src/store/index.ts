@@ -9,9 +9,6 @@ import domBoundariesStore from '@/modules/vue-dom-boundaries/dom-boundaries.stor
 import theme from '@/styles/tokens'
 
 const store = createStore({
-  state: {
-    env: process.env.NODE_ENV,
-  },
   getters: {
     theme: () => theme,
   },

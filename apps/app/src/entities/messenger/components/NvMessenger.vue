@@ -18,7 +18,7 @@
           <div class="flex flex-1 justify-end space-x-4 moveable-handle cursor-all-scroll">
             <NvCard class="flex-1 min-h-8" size="xs">
               <div class="inline-flex space-x-2">
-                <template v-if="$store.state.env === 'development'">
+                <template v-if="NODE_ENV === 'development'">
                   <NvButton icon-name="redo" size="sm" @click="reload" />
                   <NvButton icon-name="brackets-curly" size="sm" @click="openDevTools" />
                 </template>
@@ -63,12 +63,23 @@
               <GCTTSVoiceSelect
                 :modelValue="$store.getters['settings/persisted'].GCTTSSelectedVoice"
                 class="w-13"
-                icon-name="direction"
                 placeholder="Speech Voice"
                 size="sm"
                 @update:modelValue="
                   (value) =>
                     $store.dispatch('settings/setProperty', ['persisted.GCTTSSelectedVoice', value])
+                "
+              />
+            </template>
+            <template v-if="$store.getters['settings/persisted'].selectedSpeechEngine === 'iwtts'">
+              <IWTTSVoiceSelect
+                :modelValue="$store.getters['settings/persisted'].IWTTSSelectedVoice"
+                class="w-13"
+                placeholder="Speech Voice"
+                size="sm"
+                @update:modelValue="
+                  (value) =>
+                    $store.dispatch('settings/setProperty', ['persisted.IWTTSSelectedVoice', value])
                 "
               />
             </template>
@@ -140,11 +151,12 @@ import store from '@/store'
 import { useSettingsPopover } from '@/entities/settings/hooks'
 import SpeechEngineSelect from '@/entities/speech/components/inputs/SpeechEngineSelect.vue'
 import GCTTSVoiceSelect from '@/entities/speech/components/inputs/GCTTSVoiceSelect.vue'
+import IWTTSVoiceSelect from '@/entities/speech/components/inputs/IWTTSVoiceSelect.vue'
 import izabela from '@/modules/izabela'
 import speechEngineManager from '@/entities/speech/modules/speech-engine-manager'
 
 const { ElectronMessengerWindow } = window
-
+const {NODE_ENV} = process.env
 const componentProps = defineProps({
   width: {
     type: Number,

@@ -66,6 +66,49 @@
                   />
                 </NvFormItem>
               </template>
+              <template v-if="selectedEngineTab === 'iwtts'">
+                <NvStack spacing="5">
+                  <NvFormItem label="API Key">
+                    <NvInput
+                      :modelValue="decrypt($store.getters['settings/persisted'].IWTTSApiKey)"
+                      show-password
+                      type="password"
+                      @update:modelValue="
+                        (value) =>
+                          $store.dispatch('settings/setProperty', [
+                            'persisted.IWTTSApiKey',
+                            encrypt(value),
+                          ])
+                      "
+                    />
+                  </NvFormItem>
+                </NvStack>
+                <NvDivider direction="horizontal" />
+                <NvStack spacing="5">
+                  <NvFormItem label="Url">
+                    <NvInput
+                      :modelValue="$store.getters['settings/persisted'].IWTTSUrl"
+                      @update:modelValue="
+                        (value) =>
+                          $store.dispatch('settings/setProperty', ['persisted.IWTTSUrl', value])
+                      "
+                    />
+                  </NvFormItem>
+                </NvStack>
+                <NvDivider direction="horizontal" />
+                <NvFormItem label="Voice">
+                  <IWTTSVoiceSelect
+                    :modelValue="$store.getters['settings/persisted'].IWTTSSelectedVoice"
+                    @update:modelValue="
+                      (value) =>
+                        $store.dispatch('settings/setProperty', [
+                          'persisted.IWTTSSelectedVoice',
+                          value,
+                        ])
+                    "
+                  />
+                </NvFormItem>
+              </template>
               <template v-else>
                 <NvText align="center">Coming Soon</NvText>
               </template>
@@ -91,6 +134,7 @@ import {
 } from '@/core/components'
 import SpeechEngineSelect from '@/entities/speech/components/inputs/SpeechEngineSelect.vue'
 import GCTTSVoiceSelect from '@/entities/speech/components/inputs/GCTTSVoiceSelect.vue'
+import IWTTSVoiceSelect from '@/entities/speech/components/inputs/IWTTSVoiceSelect.vue'
 import { useEncryption } from '@/utils/security'
 import speechEngineManager from '@/entities/speech/modules/speech-engine-manager'
 import { SpeechEngine } from '@/entities/speech/modules/speech-engine-manager/types'
