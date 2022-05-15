@@ -152,6 +152,51 @@
                   />
                 </NvFormItem>
               </template>
+              <template v-if="selectedEngineTab === 'aptts'">
+                <NvStack spacing="5">
+                  <NvFormItem label="API Key">
+                    <NvInput
+                      :modelValue="
+                        decrypt($store.getters['settings/persisted'].APTTSIdentityPoolId)
+                      "
+                      show-password
+                      type="password"
+                      @update:modelValue="
+                        (value) =>
+                          $store.dispatch('settings/setProperty', [
+                            'persisted.APTTSIdentityPoolId',
+                            encrypt(value),
+                          ])
+                      "
+                    />
+                  </NvFormItem>
+                </NvStack>
+                <NvDivider direction="horizontal" />
+                <NvStack spacing="5">
+                  <NvFormItem label="Region">
+                    <NvInput
+                      :modelValue="$store.getters['settings/persisted'].APTTSRegion"
+                      @update:modelValue="
+                        (value) =>
+                          $store.dispatch('settings/setProperty', ['persisted.APTTSRegion', value])
+                      "
+                    />
+                  </NvFormItem>
+                </NvStack>
+                <NvDivider direction="horizontal" />
+                <NvFormItem label="Voice">
+                  <APTTSVoiceSelect
+                    :modelValue="$store.getters['settings/persisted'].APTTSSelectedVoice"
+                    @update:modelValue="
+                      (value) =>
+                        $store.dispatch('settings/setProperty', [
+                          'persisted.APTTSSelectedVoice',
+                          value,
+                        ])
+                    "
+                  />
+                </NvFormItem>
+              </template>
             </NvStack>
           </NvCard>
         </div>
@@ -173,6 +218,7 @@ import {
   NvText,
 } from '@/core/components'
 import SpeechEngineSelect from '@/entities/speech/components/inputs/SpeechEngineSelect.vue'
+import APTTSVoiceSelect from '@/entities/speech/components/inputs/APTTSVoiceSelect.vue'
 import GCTTSVoiceSelect from '@/entities/speech/components/inputs/GCTTSVoiceSelect.vue'
 import IWTTSVoiceSelect from '@/entities/speech/components/inputs/IWTTSVoiceSelect.vue'
 import MATTSVoiceSelect from '@/entities/speech/components/inputs/MATTSVoiceSelect.vue'

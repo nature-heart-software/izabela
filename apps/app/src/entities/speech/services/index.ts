@@ -20,3 +20,10 @@ export const useMATTSListVoicesQuery = (
   useQuery('matts-list-voices', () =>
     api.post('/tts/microsoft-azure/list-voices', params.value).then(({ data }) => data),
   )
+
+export const useAPTTSListVoicesQuery = (
+  params: Ref<{ credentials: { identityPoolId: string; region: string } }>,
+) =>
+  useQuery('aptts-list-voices', () =>
+    api.post('/tts/amazon-polly/list-voices', params.value).then(({ data }) => data),
+  )

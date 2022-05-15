@@ -7,35 +7,35 @@
       >
         <!-- Top -->
         <div class="flex space-x-4">
-          <NvButton icon-name="info" type="plain" />
+          <NvButton icon-name="info" type="plain"/>
           <NvCard size="xs">
             <div class="inline-flex space-x-2">
-              <NvButton icon-name="github-alt" size="sm" />
-              <NvButton icon-name="twitter-alt" size="sm" />
-              <NvButton icon-name="discord" size="sm" />
+              <NvButton icon-name="github-alt" size="sm"/>
+              <NvButton icon-name="twitter-alt" size="sm"/>
+              <NvButton icon-name="discord" size="sm"/>
             </div>
           </NvCard>
           <div class="flex flex-1 justify-end space-x-4 moveable-handle cursor-all-scroll">
             <NvCard class="flex-1 min-h-8" size="xs">
               <div class="inline-flex space-x-2">
                 <template v-if="NODE_ENV === 'development'">
-                  <NvButton icon-name="redo" size="sm" @click="reload" />
-                  <NvButton icon-name="brackets-curly" size="sm" @click="openDevTools" />
+                  <NvButton icon-name="redo" size="sm" @click="reload"/>
+                  <NvButton icon-name="brackets-curly" size="sm" @click="openDevTools"/>
                 </template>
               </div>
             </NvCard>
             <NvCard size="xs">
               <div class="inline-flex items-center space-x-2">
-                <NvButton icon-name="comment-alt-lines" size="sm" />
-                <NvDivider class="h-3" direction="vertical" />
-                <NvButton icon-name="setting" size="sm" />
+                <NvButton icon-name="comment-alt-lines" size="sm"/>
+                <NvDivider class="h-3" direction="vertical"/>
+                <NvButton icon-name="setting" size="sm"/>
               </div>
             </NvCard>
             <NvCard class="inline-flex" size="sm">
               <div class="inline-flex space-x-2">
                 <!-- <NvButton size="xs" type="plain" icon-name="minus"/>
                 <NvButton size="xs" type="plain" icon-name="square-full"/> -->
-                <NvButton icon-name="times" size="xs" type="plain" @click="hide" />
+                <NvButton icon-name="times" size="xs" type="plain" @click="hide"/>
               </div>
             </NvCard>
           </div>
@@ -45,9 +45,9 @@
         <div class="flex justify-between">
           <NvCard class="inline-flex items-center space-x-3" size="sm">
             <span ref="settingsToggler">
-              <NvButton icon-name="setting" size="sm" />
+              <NvButton icon-name="setting" size="sm"/>
             </span>
-            <NvDivider class="h-3" direction="vertical" />
+            <NvDivider class="h-3" direction="vertical"/>
             <SpeechEngineSelect
               :modelValue="$store.getters['settings/persisted'].selectedSpeechEngine"
               class="w-13"
@@ -95,17 +95,32 @@
                 "
               />
             </template>
-            <NvDivider class="h-3" direction="vertical" />
+            <template v-if="$store.getters['settings/persisted'].selectedSpeechEngine === 'aptts'">
+              <APTTSVoiceSelect
+                :modelValue="$store.getters['settings/persisted'].APTTSSelectedVoice"
+                class="w-13"
+                placeholder="Speech Voice"
+                size="sm"
+                @update:modelValue="
+                      (value) =>
+                        $store.dispatch('settings/setProperty', [
+                          'persisted.APTTSSelectedVoice',
+                          value,
+                        ])
+                    "
+              />
+            </template>
+            <NvDivider class="h-3" direction="vertical"/>
             <NvButton icon-name="direction" size="sm">Outputs</NvButton>
             <NvButton icon-name="direction" size="sm">Input</NvButton>
-            <NvDivider class="h-3" direction="vertical" />
-            <NvButton icon-name="question-circle" size="sm" />
+            <NvDivider class="h-3" direction="vertical"/>
+            <NvButton icon-name="question-circle" size="sm"/>
           </NvCard>
           <NvCard class="inline-flex items-center space-x-3" size="sm">
             <NvButton size="sm" type="plain">Sentence</NvButton>
             <NvButton size="sm">Word</NvButton>
-            <NvDivider class="h-3" direction="vertical" />
-            <NvButton icon-name="question-circle" size="sm" />
+            <NvDivider class="h-3" direction="vertical"/>
+            <NvButton icon-name="question-circle" size="sm"/>
           </NvCard>
         </div>
 
@@ -120,7 +135,7 @@
               size="lg"
               @keydown.enter="playMessage()"
             />
-            <NvButton icon-name="message" size="lg" @click="playMessage()" />
+            <NvButton icon-name="message" size="lg" @click="playMessage()"/>
           </NvCard>
         </div>
       </div>
@@ -162,6 +177,7 @@ import NvInput from '@/core/components/Input/NvInput.vue'
 import store from '@/store'
 import { useSettingsPopover } from '@/entities/settings/hooks'
 import SpeechEngineSelect from '@/entities/speech/components/inputs/SpeechEngineSelect.vue'
+import APTTSVoiceSelect from '@/entities/speech/components/inputs/APTTSVoiceSelect.vue'
 import IWTTSVoiceSelect from '@/entities/speech/components/inputs/IWTTSVoiceSelect.vue'
 import GCTTSVoiceSelect from '@/entities/speech/components/inputs/GCTTSVoiceSelect.vue'
 import MATTSVoiceSelect from '@/entities/speech/components/inputs/MATTSVoiceSelect.vue'
@@ -288,12 +304,12 @@ onMounted(() => {
   const moveableTargetEl = (moveableTarget.value as ComponentPublicInstance)
     .$el as HTMLDivElement | null
   if (moveableTargetEl) {
-    if (componentProps.width) moveableTargetEl.style.width = `${componentProps.width}px`
-    if (componentProps.minWidth) moveableTargetEl.style.minWidth = `${componentProps.minWidth}px`
-    if (componentProps.maxWidth) moveableTargetEl.style.maxWidth = `${componentProps.maxWidth}px`
-    if (componentProps.height) moveableTargetEl.style.height = `${componentProps.height}px`
-    if (componentProps.minHeight) moveableTargetEl.style.minHeight = `${componentProps.minHeight}px`
-    if (componentProps.maxHeight) moveableTargetEl.style.maxHeight = `${componentProps.maxHeight}px`
+    if (componentProps.width) moveableTargetEl.style.width = `${ componentProps.width }px`
+    if (componentProps.minWidth) moveableTargetEl.style.minWidth = `${ componentProps.minWidth }px`
+    if (componentProps.maxWidth) moveableTargetEl.style.maxWidth = `${ componentProps.maxWidth }px`
+    if (componentProps.height) moveableTargetEl.style.height = `${ componentProps.height }px`
+    if (componentProps.minHeight) moveableTargetEl.style.minHeight = `${ componentProps.minHeight }px`
+    if (componentProps.maxHeight) moveableTargetEl.style.maxHeight = `${ componentProps.maxHeight }px`
     if (componentProps.transform) moveableTargetEl.style.transform = componentProps.transform
   }
   moveable.value.updateTarget()

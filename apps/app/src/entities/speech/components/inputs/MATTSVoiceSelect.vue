@@ -32,6 +32,6 @@ const computedParams = computed(() => ({
   },
 }))
 const { data } = useMATTSListVoicesQuery(computedParams)
-const voices = computed(() => orderBy(data.value || [], 'name'))
+const voices = computed(() => orderBy(data.value || [], ['Locale', 'DisplayName']))
 watch([computedApikey, computedRegion], () => queryClient.refetchQueries('matts-list-voices'))
 </script>
