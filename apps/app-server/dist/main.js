@@ -9,6 +9,8 @@ var $1hSWc$uuid = require("uuid");
 var $1hSWc$util = require("util");
 var $1hSWc$fs = require("fs");
 var $1hSWc$microsoftcognitiveservicesspeechsdk = require("microsoft-cognitiveservices-speech-sdk");
+var $1hSWc$ibmwatsontexttospeechv1 = require("ibm-watson/text-to-speech/v1");
+var $1hSWc$ibmwatsonauth = require("ibm-watson/auth");
 
 function $parcel$interopDefault(a) {
   return a && a.__esModule ? a.default : a;
@@ -149,6 +151,53 @@ const $2e5d6a656809d93c$export$a93cd00e7c1effd6 = ({ app: app  })=>{
 };
 
 
+
+
+
+
+
+
+const $88555a0b04d81c4f$export$2272521fb3bd5353 = async ({ body: { credentials: { apiKey: apiKey , url: url  } ,  } ,  }, res)=>{
+    try {
+        const textToSpeech = new ($parcel$interopDefault($1hSWc$ibmwatsontexttospeechv1))({
+            authenticator: new $1hSWc$ibmwatsonauth.IamAuthenticator({
+                apikey: apiKey
+            }),
+            serviceUrl: url
+        });
+        const { result: { voices: voices  } ,  } = await textToSpeech.listVoices();
+        res.status(200).json(voices);
+    } catch (e) {
+        $9ea4c5e7d90b028e$export$d3da1ecaf1206c58(res, 'Internal server error', e.message, 500);
+    }
+};
+const $88555a0b04d81c4f$export$720e715da265c262 = async ({ body: { credentials: { apiKey: apiKey , url: url  } , payload: { text: text , voice: voice  } ,  } ,  }, res)=>{
+    const outputFile = $1hSWc$path.join($a3bdc0234368055c$export$2e2bcd8739ae039.getConfig().tempPath, $1hSWc$uuid.v4() + '.mp3');
+    try {
+        const textToSpeech = new ($parcel$interopDefault($1hSWc$ibmwatsontexttospeechv1))({
+            authenticator: new $1hSWc$ibmwatsonauth.IamAuthenticator({
+                apikey: apiKey
+            }),
+            serviceUrl: url
+        });
+        const { result: result  } = await textToSpeech.synthesize({
+            text: text,
+            accept: 'audio/mp3',
+            voice: voice.name
+        });
+        result.pipe(res);
+    } catch (e) {
+        $9ea4c5e7d90b028e$export$d3da1ecaf1206c58(res, 'Internal server error', e.message, 500);
+    }
+};
+
+
+const $78af54c5aebbe2f9$export$ce6d120b07604ec0 = ({ app: app  })=>{
+    app.post('/api/tts/ibm-watson/list-voices', $88555a0b04d81c4f$export$2272521fb3bd5353);
+    app.post('/api/tts/ibm-watson/synthesize-speech', $88555a0b04d81c4f$export$720e715da265c262);
+};
+
+
 const $a3bdc0234368055c$var$app = ($parcel$interopDefault($1hSWc$express))();
 $a3bdc0234368055c$var$app.use(($parcel$interopDefault($1hSWc$cors))());
 $a3bdc0234368055c$var$app.use(($parcel$interopDefault($1hSWc$bodyparser)).json());
@@ -174,6 +223,7 @@ class $a3bdc0234368055c$var$IzabelaServer {
             app: $a3bdc0234368055c$var$app,
             server: this.server
         };
+        $78af54c5aebbe2f9$export$ce6d120b07604ec0(context);
         $5e8fcb11fef7f285$export$776ed06f580210d5(context);
         $2e5d6a656809d93c$export$a93cd00e7c1effd6(context);
     }
