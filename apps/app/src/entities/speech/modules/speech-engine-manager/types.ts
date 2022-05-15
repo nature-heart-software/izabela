@@ -7,6 +7,7 @@ export interface SpeechEngine {
   id: string
   name: string
   getCredentials: () => Credentials
+  getLanguageCode: () => string
   getPayload: (text: string) => Payload
   synthesizeSpeech: (context: {
     credentials: Credentials

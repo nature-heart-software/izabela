@@ -7,11 +7,11 @@ import { app } from 'electron'
 import { v4 as uuid } from 'uuid'
 import { Deferred } from '@/utils/promise'
 import store from '@/store'
+import speechEngineManager from '@/entities/speech/modules/speech-engine-manager'
 
 let wsStream: any = null
 const encoding = 'LINEAR16' as const
 const sampleRateHertz = 16000
-const languageCode = 'en-US'
 
 app.whenReady().then(() => {
   const credentialsDirPath = path.join(app.getPath('userData'), 'credentials')
@@ -22,14 +22,19 @@ app.whenReady().then(() => {
   process.env.GOOGLE_APPLICATION_CREDENTIALS = googleCloudSpeechCredentialsFilePath
 })
 
-const getRequest = () => ({
-  config: {
-    encoding,
-    sampleRateHertz,
-    languageCode: store.getters['settings/persisted'].GCTTSSelectedVoice.languageCodes[0],
-  },
-  interimResults: false, // If you want interim results, set this to true
-})
+const getRequest = () => {
+  const engine = speechEngineManager.getEngineById(
+    store.getters['settings/persisted'].selectedSpeechEngine,
+  )
+  return {
+    config: {
+      encoding,
+      sampleRateHertz,
+      languageCode: engine?.getLanguageCode() || 'en-US',
+    },
+    interimResults: false, // If you want interim results, set this to true
+  }
+}
 
 let ws: WebSocket | null = null
 const wss: Websocket.Server = (Websocket.createServer as any)(
@@ -85,14 +90,14 @@ class Recording {
 }
 
 iohook.on('keyup', (event) => {
-  if (event.keycode === 54 && deferredRecording) {
+  if ([29, 54].includes(event.keycode) && deferredRecording) {
     deferredRecording.resolve(true)
     deferredRecording = null
   }
 })
 
 iohook.on('keydown', (event) => {
-  if (event.keycode === 54 && wsStream && !deferredRecording) {
+  if ([29, 54].includes(event.keycode) && wsStream && !deferredRecording) {
     const deferred = new Deferred<boolean>()
     deferredRecording = deferred
     // eslint-disable-next-line no-new

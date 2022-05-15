@@ -18,6 +18,9 @@ speechEngineManager.registerEngine({
       voice: store.getters['settings/persisted'].IWTTSSelectedVoice,
     }
   },
+  getLanguageCode() {
+    return store.getters['settings/persisted'].IWTTSSelectedVoice.language
+  },
   synthesizeSpeech({ credentials, payload }) {
     return api.post<Blob>(
       '/tts/ibm-watson/synthesize-speech',

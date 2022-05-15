@@ -18,6 +18,9 @@ speechEngineManager.registerEngine({
       voice: store.getters['settings/persisted'].MATTSSelectedVoice,
     }
   },
+  getLanguageCode() {
+    return store.getters['settings/persisted'].MATTSSelectedVoice.Locale
+  },
   synthesizeSpeech({ credentials, payload }) {
     return api.post<Blob>(
       '/tts/microsoft-azure/synthesize-speech',
