@@ -10,7 +10,7 @@ const createTray = (): Promise<Tray> =>
     const pkg = JSON.parse(readFileSync(path.join(rootPath, 'package.json'), 'utf8'))
     tray = new Tray(path.join(__static, 'icons/256x256.png'))
     const contextMenu = Menu.buildFromTemplate([{ label: 'Exit', type: 'normal', role: 'quit' }])
-    tray.setToolTip(pkg.productName)
+    tray.setToolTip(`${pkg.productName} - v${pkg.version}`)
     tray.setContextMenu(contextMenu)
     tray.on('click', () => {
       ElectronMessengerWindow.show()

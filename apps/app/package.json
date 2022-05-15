@@ -1,5 +1,7 @@
 {
   "name": "izabela-next",
+  "description": "Your speech assistant.",
+  "author": "Nature Heart Software",
   "productName": "Izabela Next",
   "repository": "https://github.com/nature-heart-software/izabela",
   "version": "0.1.0",

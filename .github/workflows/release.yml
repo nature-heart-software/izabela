@@ -63,13 +63,13 @@ jobs:
         with:
           version: ${{ env.RELEASE_VERSION }}
           targets: |
+            ./package.json
             ./apps/app/package.json
       - name: Build electron
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         working-directory: apps/app
         run: |
-          npm i
           npx lerna bootstrap
           npm run electron:build -- -p never
       - name: Cleanup electron dist
