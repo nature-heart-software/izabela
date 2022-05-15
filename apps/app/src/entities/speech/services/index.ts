@@ -14,10 +14,9 @@ export const useIWTTSListVoicesQuery = (
     api.post('/tts/ibm-watson/list-voices', params.value).then(({ data }) => data),
   )
 
-export const useGCTTSSynthesizeSpeechQuery = (params: {
-  credentials: { apiKey: string }
-  payload: any
-}) =>
-  useQuery('gctts-synthesize-speech', () =>
-    api.post('/tts/google-cloud/synthesize-speech', params).then(({ data }) => data),
+export const useMATTSListVoicesQuery = (
+  params: Ref<{ credentials: { apiKey: string; region: string } }>,
+) =>
+  useQuery('matts-list-voices', () =>
+    api.post('/tts/microsoft-azure/list-voices', params.value).then(({ data }) => data),
   )

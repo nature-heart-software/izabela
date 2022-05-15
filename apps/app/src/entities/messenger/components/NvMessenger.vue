@@ -83,6 +83,18 @@
                 "
               />
             </template>
+            <template v-if="$store.getters['settings/persisted'].selectedSpeechEngine === 'matts'">
+              <MATTSVoiceSelect
+                :modelValue="$store.getters['settings/persisted'].MATTSSelectedVoice"
+                class="w-13"
+                placeholder="Speech Voice"
+                size="sm"
+                @update:modelValue="
+                  (value) =>
+                    $store.dispatch('settings/setProperty', ['persisted.MATTSSelectedVoice', value])
+                "
+              />
+            </template>
             <NvDivider class="h-3" direction="vertical" />
             <NvButton icon-name="direction" size="sm">Outputs</NvButton>
             <NvButton icon-name="direction" size="sm">Input</NvButton>
@@ -150,13 +162,14 @@ import NvInput from '@/core/components/Input/NvInput.vue'
 import store from '@/store'
 import { useSettingsPopover } from '@/entities/settings/hooks'
 import SpeechEngineSelect from '@/entities/speech/components/inputs/SpeechEngineSelect.vue'
-import GCTTSVoiceSelect from '@/entities/speech/components/inputs/GCTTSVoiceSelect.vue'
 import IWTTSVoiceSelect from '@/entities/speech/components/inputs/IWTTSVoiceSelect.vue'
+import GCTTSVoiceSelect from '@/entities/speech/components/inputs/GCTTSVoiceSelect.vue'
+import MATTSVoiceSelect from '@/entities/speech/components/inputs/MATTSVoiceSelect.vue'
 import izabela from '@/modules/izabela'
 import speechEngineManager from '@/entities/speech/modules/speech-engine-manager'
 
 const { ElectronMessengerWindow } = window
-const {NODE_ENV} = process.env
+const { NODE_ENV } = process.env
 const componentProps = defineProps({
   width: {
     type: Number,
