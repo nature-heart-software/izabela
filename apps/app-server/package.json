@@ -5,7 +5,7 @@
   "source": "src/index.ts",
   "main": "dist/main.js",
   "scripts": {
-    "start": "nodemon ./dist/main.js",
+    "start": "nodemon ./dist/main.js --start-server",
     "watch": "parcel watch",
     "build": "parcel build"
   },
@@ -20,6 +20,7 @@
     "cors": "^2.8.5",
     "express": "^4.17.3",
     "lodash": "^4.17.21",
+    "microsoft-cognitiveservices-speech-sdk": "^1.21.0",
     "morgan": "^1.10.0",
     "node-cache": "^5.1.2",
     "nodemon": "^2.0.15",

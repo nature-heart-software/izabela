@@ -15,7 +15,6 @@ export const listVoicesHandler = async (
     },
   },
   res,
-  next,
 ) => {
   try {
     const {
