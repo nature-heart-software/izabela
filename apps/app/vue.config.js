@@ -63,7 +63,7 @@ module.exports = defineConfig({
         beforeBuild: './scripts/electron-builder-before-build.js',
         generateUpdatesFilesForAllChannels: true,
         // eslint-disable-next-line no-template-curly-in-string
-        artifactName: '${name}-setup-${version}-${channel}-${os}.${ext}',
+        artifactName: '${name}-setup-${version}-${os}.${ext}',
         publish: ['github'],
       },
     },
