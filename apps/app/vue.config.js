@@ -64,6 +64,7 @@ module.exports = defineConfig({
         preload: 'src/preload.ts',
       },
       builderOptions: {
+        appId: 'com.nhs.izabela',
         beforeBuild: './scripts/electron-builder-before-build.js',
         generateUpdatesFilesForAllChannels: true,
         // eslint-disable-next-line no-template-curly-in-string
