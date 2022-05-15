@@ -5,7 +5,7 @@
       <div></div>
       <NvCard class="inline-flex" size="sm">
         <div class="inline-flex space-x-2">
-          <NvButton icon-name="times" size="xs" type="plain" @click="$emit('close')" />
+          <NvButton icon-name="times" size="xs" type="plain" @click="$emit('close')"/>
         </div>
       </NvCard>
     </div>
@@ -27,7 +27,7 @@
                         size="sm"
                         type="ghost-alt"
                         @click="selectedEntry = entry.name"
-                        >{{ entry.name }}
+                      >{{ entry.name }}
                       </NvButton>
                     </template>
                   </NvStack>
@@ -101,7 +101,6 @@ const selectedEntry = ref('Overview')
 const currentEntry = computed(() =>
   navigation.flatMap((i) => i.children).find((i) => i.name === selectedEntry.value),
 )
-console.log(currentEntry)
 </script>
 <style lang="scss" scoped>
 .settings {

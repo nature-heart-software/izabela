@@ -8,7 +8,6 @@
           class="w-full h-full"
         />
       </div>
-      <SpeechListener :key="$store.getters['settings/persisted'].audioInputDevice" />
     </template>
   </ThemeProvider>
 </template>
@@ -24,7 +23,6 @@ body {
 import { ref } from 'vue'
 import { ThemeProvider } from 'vue3-styled-components'
 import NvMessenger from '@/entities/messenger/components/NvMessenger.vue'
-import SpeechListener from '@/entities/speech/components/SpeechListener.vue'
 import { useStore } from 'vuex'
 
 const store = useStore()

@@ -14,6 +14,9 @@ speechEngineManager.registerEngine({
       voice: store.getters['settings/persisted'].SaySelectedVoice,
     }
   },
+  getLanguageCode() {
+    return navigator.language
+  },
   synthesizeSpeech({ credentials, payload }) {
     return api.post<Blob>(
       '/tts/say/synthesize-speech',

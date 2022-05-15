@@ -28,6 +28,9 @@ speechEngineManager.registerEngine({
       },
     }
   },
+  getLanguageCode() {
+    return store.getters['settings/persisted'].GCTTSSelectedVoice.languageCodes[0]
+  },
   synthesizeSpeech({ credentials, payload }) {
     return api.post<Blob>(
       '/tts/google-cloud/synthesize-speech',

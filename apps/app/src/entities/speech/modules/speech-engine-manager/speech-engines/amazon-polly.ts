@@ -18,6 +18,9 @@ speechEngineManager.registerEngine({
       voice: store.getters['settings/persisted'].APTTSSelectedVoice,
     }
   },
+  getLanguageCode() {
+    return store.getters['settings/persisted'].APTTSSelectedVoice.LanguageCode
+  },
   synthesizeSpeech({ credentials, payload }) {
     return api.post<Blob>(
       '/tts/amazon-polly/synthesize-speech',
