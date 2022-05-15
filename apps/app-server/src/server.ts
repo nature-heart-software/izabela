@@ -8,6 +8,7 @@ import { registerGCTTSRoutes } from './routes/gc-tts'
 import { registerMATTSRoutes } from './routes/ma-tts'
 import { registerIWTTSRoutes } from './routes/iw-tts'
 import { registerAPTTSRoutes } from './routes/ap-tts'
+import { registerSayTTSRoutes } from './routes/say-tts'
 
 const app = express()
 app.use(cors())
@@ -38,6 +39,7 @@ class IzabelaServer {
     registerIWTTSRoutes(context)
     registerGCTTSRoutes(context)
     registerMATTSRoutes(context)
+    registerSayTTSRoutes(context)
   }
 
   async startServer(config = {}) {

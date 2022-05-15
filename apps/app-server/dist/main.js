@@ -14,6 +14,7 @@ var $1hSWc$ibmwatsonauth = require("ibm-watson/auth");
 var $1hSWc$awssdkclientpolly = require("@aws-sdk/client-polly");
 var $1hSWc$awssdkclientcognitoidentity = require("@aws-sdk/client-cognito-identity");
 var $1hSWc$awssdkcredentialprovidercognitoidentity = require("@aws-sdk/credential-provider-cognito-identity");
+var $1hSWc$say = require("say");
 
 function $parcel$interopDefault(a) {
   return a && a.__esModule ? a.default : a;
@@ -249,6 +250,64 @@ const $100e082905130c51$export$2257b94d0c1621dc = ({ app: app  })=>{
 };
 
 
+
+
+
+
+
+
+const $c5694c718096713d$export$2272521fb3bd5353 = async (_, res)=>{
+    try {
+        const voices = await new Promise((resolve, reject)=>{
+            ($parcel$interopDefault($1hSWc$say)).getInstalledVoices((err, apiVoices)=>{
+                if (err) return reject(err);
+                return resolve(apiVoices);
+            });
+        });
+        res.status(200).json(voices);
+    } catch (e) {
+        $9ea4c5e7d90b028e$export$d3da1ecaf1206c58(res, 'Internal server error', e.message, 500);
+    }
+};
+const $c5694c718096713d$export$720e715da265c262 = async ({ body: { payload: { text: text , voice: voice , speed: speed = 1  } ,  } ,  }, res)=>{
+    const outputFile = $1hSWc$path.join($a3bdc0234368055c$export$2e2bcd8739ae039.getConfig().tempPath, $1hSWc$uuid.v4() + '.mp3');
+    try {
+        $1hSWc$fs.mkdirSync($1hSWc$path.parse(outputFile).dir, {
+            recursive: true
+        }, (err)=>{
+            if (err) throw err;
+        });
+        $1hSWc$fs.writeFileSync(outputFile, '');
+        await new Promise((resolve, reject)=>{
+            ($parcel$interopDefault($1hSWc$say)).export(text, voice, speed, outputFile, (err)=>{
+                if (err) reject(err);
+                resolve(true);
+            });
+        });
+        const stat = $1hSWc$fs.statSync(outputFile);
+        const total = stat.size;
+        res.writeHead(200, {
+            'Content-Length': total,
+            'Content-Type': 'audio/mp3'
+        });
+        const stream = $1hSWc$fs.createReadStream(outputFile).pipe(res);
+        stream.on('finish', ()=>{
+            $1hSWc$fs.unlinkSync(outputFile);
+        });
+    } catch (e) {
+        if ($1hSWc$fs.existsSync(outputFile)) $1hSWc$fs.unlinkSync(outputFile);
+        $9ea4c5e7d90b028e$export$d3da1ecaf1206c58(res, 'Internal server error', e.message, 500);
+    }
+};
+
+
+const $f2d0c6b74bd4293d$export$68ecd95bc867712b = ({ app: app  })=>{
+    app.get('/api/tts/say/list-voices', $c5694c718096713d$export$2272521fb3bd5353);
+    app.post('/api/tts/say/list-voices', $c5694c718096713d$export$2272521fb3bd5353);
+    app.post('/api/tts/say/synthesize-speech', $c5694c718096713d$export$720e715da265c262);
+};
+
+
 const $a3bdc0234368055c$var$app = ($parcel$interopDefault($1hSWc$express))();
 $a3bdc0234368055c$var$app.use(($parcel$interopDefault($1hSWc$cors))());
 $a3bdc0234368055c$var$app.use(($parcel$interopDefault($1hSWc$bodyparser)).json());
@@ -278,6 +337,7 @@ class $a3bdc0234368055c$var$IzabelaServer {
         $78af54c5aebbe2f9$export$ce6d120b07604ec0(context);
         $5e8fcb11fef7f285$export$776ed06f580210d5(context);
         $2e5d6a656809d93c$export$a93cd00e7c1effd6(context);
+        $f2d0c6b74bd4293d$export$68ecd95bc867712b(context);
     }
     async startServer(config = {}) {
         this.config = $1hSWc$lodash.defaultsDeep(config, this.defaultConfig);
