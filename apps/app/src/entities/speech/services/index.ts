@@ -27,3 +27,6 @@ export const useAPTTSListVoicesQuery = (
   useQuery('aptts-list-voices', () =>
     api.post('/tts/amazon-polly/list-voices', params.value).then(({ data }) => data),
   )
+
+export const useSayTTSListVoicesQuery = () =>
+  useQuery('saytts-list-voices', () => api.post('/tts/say/list-voices').then(({ data }) => data))

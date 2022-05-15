@@ -154,7 +154,7 @@
               </template>
               <template v-if="selectedEngineTab === 'aptts'">
                 <NvStack spacing="5">
-                  <NvFormItem label="API Key">
+                  <NvFormItem label="Identity pool ID">
                     <NvInput
                       :modelValue="
                         decrypt($store.getters['settings/persisted'].APTTSIdentityPoolId)
@@ -197,6 +197,20 @@
                   />
                 </NvFormItem>
               </template>
+              <template v-if="selectedEngineTab === 'saytts'">
+                <NvFormItem label="Voice">
+                  <SayTTSVoiceSelect
+                    :modelValue="$store.getters['settings/persisted'].SayTTSSelectedVoice"
+                    @update:modelValue="
+                      (value) =>
+                        $store.dispatch('settings/setProperty', [
+                          'persisted.SayTTSSelectedVoice',
+                          value,
+                        ])
+                    "
+                  />
+                </NvFormItem>
+              </template>
             </NvStack>
           </NvCard>
         </div>
@@ -222,6 +236,7 @@ import APTTSVoiceSelect from '@/entities/speech/components/inputs/APTTSVoiceSele
 import GCTTSVoiceSelect from '@/entities/speech/components/inputs/GCTTSVoiceSelect.vue'
 import IWTTSVoiceSelect from '@/entities/speech/components/inputs/IWTTSVoiceSelect.vue'
 import MATTSVoiceSelect from '@/entities/speech/components/inputs/MATTSVoiceSelect.vue'
+import SayTTSVoiceSelect from '@/entities/speech/components/inputs/SayTTSVoiceSelect.vue'
 import { useEncryption } from '@/utils/security'
 import speechEngineManager from '@/entities/speech/modules/speech-engine-manager'
 import { SpeechEngine } from '@/entities/speech/modules/speech-engine-manager/types'

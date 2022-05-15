@@ -7,7 +7,7 @@ const storeState = {
     playSpeechOnDefaultPlaybackDevice: true,
     audioOutputDevices: [] as MediaDeviceInfo['deviceId'][],
     audioInputDevice: 'default' as MediaDeviceInfo['deviceId'],
-    selectedSpeechEngine: 'gctts' as SpeechEngine['id'],
+    selectedSpeechEngine: 'saytts' as SpeechEngine['id'],
     autoUpdateChannel: 'latest',
     launchOnStartup: true,
     APTTSIdentityPoolId: '',
@@ -52,7 +52,7 @@ const storeState = {
       VoiceType: 'Neural',
       Status: 'GA',
     },
-    SaySelectedVoice: null,
+    SayTTSSelectedVoice: null,
   },
 }
 
