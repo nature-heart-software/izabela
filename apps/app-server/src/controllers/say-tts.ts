@@ -1,27 +1,22 @@
+import say from 'say'
 import { handleError } from '../utils/requests'
-import axios from 'axios'
 
 import { v4 as uuid } from 'uuid'
 import izabelaServer from '../server'
 
 const path = require('path')
-const util = require('util')
 const fs = require('fs')
 
-export const listVoicesHandler = async (
-  {
-    body: {
-      credentials: { apiKey },
-    },
-  },
-  res,
-) => {
+export const listVoicesHandler = async (_, res) => {
   try {
-    const {
-      data: { voices },
-    } = await axios.get(
-      `https://texttospeech.googleapis.com/v1beta1/voices?key=${apiKey}`,
-    )
+    const voices = await new Promise((resolve, reject) => {
+      ;(say as any).getInstalledVoices((err: any, apiVoices: any) => {
+        if (err) {
+          return reject(err)
+        }
+        return resolve(apiVoices)
+      })
+    })
     res.status(200).json(voices)
   } catch (e) {
     handleError(res, 'Internal server error', e.message, 500)
@@ -31,8 +26,7 @@ export const listVoicesHandler = async (
 export const synthesizeSpeechHandler = async (
   {
     body: {
-      credentials: { apiKey },
-      payload,
+      payload: { text, voice, speed = 1 },
     },
   },
   res,
@@ -46,15 +40,16 @@ export const synthesizeSpeechHandler = async (
       if (err) throw err
     })
     fs.writeFileSync(outputFile, '')
-    const {
-      data: { audioContent },
-    } = await axios.post(
-      `https://texttospeech.googleapis.com/v1beta1/text:synthesize?key=${apiKey}`,
-      payload,
-    )
-    const writeFile = util.promisify(fs.writeFile)
 
-    await writeFile(outputFile, Buffer.from(audioContent, 'base64'), 'binary')
+    await new Promise((resolve, reject) => {
+      say.export(text, voice, speed, outputFile, (err) => {
+        if (err) {
+          reject(err)
+        }
+        resolve(true)
+      })
+    })
+
     const stat = fs.statSync(outputFile)
     const total = stat.size
 

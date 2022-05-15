@@ -5,7 +5,7 @@
   "source": "src/index.ts",
   "main": "dist/main.js",
   "scripts": {
-    "start": "nodemon ./dist/main.js",
+    "start": "nodemon ./dist/main.js --start-server",
     "watch": "parcel watch",
     "build": "parcel build"
   },
@@ -14,15 +14,21 @@
     "parcel": "^2.4.1"
   },
   "dependencies": {
+    "@aws-sdk/client-cognito-identity": "^3.87.0",
+    "@aws-sdk/client-polly": "^3.87.0",
+    "@aws-sdk/credential-provider-cognito-identity": "^3.87.0",
     "@google-cloud/text-to-speech": "^3.4.0",
     "axios": "^0.26.1",
     "body-parser": "^1.20.0",
     "cors": "^2.8.5",
     "express": "^4.17.3",
+    "ibm-watson": "^7.0.0",
     "lodash": "^4.17.21",
+    "microsoft-cognitiveservices-speech-sdk": "^1.21.0",
     "morgan": "^1.10.0",
     "node-cache": "^5.1.2",
     "nodemon": "^2.0.15",
+    "say": "^0.16.0",
     "uuid": "^8.3.2"
   },
   "engines": {

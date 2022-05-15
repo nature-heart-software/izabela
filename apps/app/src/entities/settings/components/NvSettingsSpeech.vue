@@ -66,8 +66,150 @@
                   />
                 </NvFormItem>
               </template>
-              <template v-else>
-                <NvText align="center">Coming Soon</NvText>
+              <template v-if="selectedEngineTab === 'iwtts'">
+                <NvStack spacing="5">
+                  <NvFormItem label="API Key">
+                    <NvInput
+                      :modelValue="decrypt($store.getters['settings/persisted'].IWTTSApiKey)"
+                      show-password
+                      type="password"
+                      @update:modelValue="
+                        (value) =>
+                          $store.dispatch('settings/setProperty', [
+                            'persisted.IWTTSApiKey',
+                            encrypt(value),
+                          ])
+                      "
+                    />
+                  </NvFormItem>
+                </NvStack>
+                <NvDivider direction="horizontal" />
+                <NvStack spacing="5">
+                  <NvFormItem label="Url">
+                    <NvInput
+                      :modelValue="$store.getters['settings/persisted'].IWTTSUrl"
+                      @update:modelValue="
+                        (value) =>
+                          $store.dispatch('settings/setProperty', ['persisted.IWTTSUrl', value])
+                      "
+                    />
+                  </NvFormItem>
+                </NvStack>
+                <NvDivider direction="horizontal" />
+                <NvFormItem label="Voice">
+                  <IWTTSVoiceSelect
+                    :modelValue="$store.getters['settings/persisted'].IWTTSSelectedVoice"
+                    @update:modelValue="
+                      (value) =>
+                        $store.dispatch('settings/setProperty', [
+                          'persisted.IWTTSSelectedVoice',
+                          value,
+                        ])
+                    "
+                  />
+                </NvFormItem>
+              </template>
+              <template v-if="selectedEngineTab === 'matts'">
+                <NvStack spacing="5">
+                  <NvFormItem label="API Key">
+                    <NvInput
+                      :modelValue="decrypt($store.getters['settings/persisted'].MATTSApiKey)"
+                      show-password
+                      type="password"
+                      @update:modelValue="
+                        (value) =>
+                          $store.dispatch('settings/setProperty', [
+                            'persisted.MATTSApiKey',
+                            encrypt(value),
+                          ])
+                      "
+                    />
+                  </NvFormItem>
+                </NvStack>
+                <NvDivider direction="horizontal" />
+                <NvStack spacing="5">
+                  <NvFormItem label="Region">
+                    <NvInput
+                      :modelValue="$store.getters['settings/persisted'].MATTSRegion"
+                      @update:modelValue="
+                        (value) =>
+                          $store.dispatch('settings/setProperty', ['persisted.MATTSRegion', value])
+                      "
+                    />
+                  </NvFormItem>
+                </NvStack>
+                <NvDivider direction="horizontal" />
+                <NvFormItem label="Voice">
+                  <MATTSVoiceSelect
+                    :modelValue="$store.getters['settings/persisted'].MATTSSelectedVoice"
+                    @update:modelValue="
+                      (value) =>
+                        $store.dispatch('settings/setProperty', [
+                          'persisted.MATTSSelectedVoice',
+                          value,
+                        ])
+                    "
+                  />
+                </NvFormItem>
+              </template>
+              <template v-if="selectedEngineTab === 'aptts'">
+                <NvStack spacing="5">
+                  <NvFormItem label="Identity pool ID">
+                    <NvInput
+                      :modelValue="
+                        decrypt($store.getters['settings/persisted'].APTTSIdentityPoolId)
+                      "
+                      show-password
+                      type="password"
+                      @update:modelValue="
+                        (value) =>
+                          $store.dispatch('settings/setProperty', [
+                            'persisted.APTTSIdentityPoolId',
+                            encrypt(value),
+                          ])
+                      "
+                    />
+                  </NvFormItem>
+                </NvStack>
+                <NvDivider direction="horizontal" />
+                <NvStack spacing="5">
+                  <NvFormItem label="Region">
+                    <NvInput
+                      :modelValue="$store.getters['settings/persisted'].APTTSRegion"
+                      @update:modelValue="
+                        (value) =>
+                          $store.dispatch('settings/setProperty', ['persisted.APTTSRegion', value])
+                      "
+                    />
+                  </NvFormItem>
+                </NvStack>
+                <NvDivider direction="horizontal" />
+                <NvFormItem label="Voice">
+                  <APTTSVoiceSelect
+                    :modelValue="$store.getters['settings/persisted'].APTTSSelectedVoice"
+                    @update:modelValue="
+                      (value) =>
+                        $store.dispatch('settings/setProperty', [
+                          'persisted.APTTSSelectedVoice',
+                          value,
+                        ])
+                    "
+                  />
+                </NvFormItem>
+              </template>
+              <template v-if="selectedEngineTab === 'saytts'">
+                <NvFormItem label="Voice">
+                  <SayTTSVoiceSelect
+                    :modelValue="$store.getters['settings/persisted'].SayTTSSelectedVoice"
+                    @update:modelValue="
+                      (value) =>
+                        $store.dispatch('settings/setProperty', [
+                          'persisted.SayTTSSelectedVoice',
+                          value,
+                        ])
+                    "
+                  />
+                </NvFormItem>
               </template>
             </NvStack>
           </NvCard>
@@ -90,7 +232,11 @@ import {
   NvText,
 } from '@/core/components'
 import SpeechEngineSelect from '@/entities/speech/components/inputs/SpeechEngineSelect.vue'
+import APTTSVoiceSelect from '@/entities/speech/components/inputs/APTTSVoiceSelect.vue'
 import GCTTSVoiceSelect from '@/entities/speech/components/inputs/GCTTSVoiceSelect.vue'
+import IWTTSVoiceSelect from '@/entities/speech/components/inputs/IWTTSVoiceSelect.vue'
+import MATTSVoiceSelect from '@/entities/speech/components/inputs/MATTSVoiceSelect.vue'
+import SayTTSVoiceSelect from '@/entities/speech/components/inputs/SayTTSVoiceSelect.vue'
 import { useEncryption } from '@/utils/security'
 import speechEngineManager from '@/entities/speech/modules/speech-engine-manager'
 import { SpeechEngine } from '@/entities/speech/modules/speech-engine-manager/types'
