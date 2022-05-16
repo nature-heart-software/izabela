@@ -1,5 +1,6 @@
 import store from '@/store'
 import { api } from '@/services'
+import { DEFAULT_LANGUAGE_CODE } from '@/consts'
 import speechEngineManager from '../SpeechEngineManager'
 
 speechEngineManager.registerEngine({
@@ -15,7 +16,7 @@ speechEngineManager.registerEngine({
     }
   },
   getLanguageCode() {
-    return navigator.language
+    return DEFAULT_LANGUAGE_CODE
   },
   synthesizeSpeech({ credentials, payload }) {
     return api.post<Blob>(

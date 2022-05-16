@@ -1,55 +1,51 @@
 <script lang="ts" setup>
-import { useStore } from 'vuex'
+import store from '@/store'
+import { getTime } from '@/utils/time'
+import { blobToBase64 } from '@/utils/blob'
 import { onBeforeUnmount } from 'vue'
-import izabela from '@/modules/izabela'
-import speechEngineManager from '@/entities/speech/modules/speech-engine-manager'
-// import WebSocket from 'ws'
 
-const store = useStore()
-const sampleRate = 16000
-const stream = navigator.mediaDevices.getUserMedia({
+let audioChunks: Blob[] = []
+const { ipc } = window
+const stream = await navigator.mediaDevices.getUserMedia({
   audio: {
     deviceId: store.getters['settings/persisted'].audioInputDevice,
-    sampleRate,
+    sampleRate: 16000,
     sampleSize: 16,
     channelCount: 1,
   },
   video: false,
 })
-const audioContext = new window.AudioContext({ sampleRate })
-const source: MediaStreamAudioSourceNode = audioContext.createMediaStreamSource(await stream)
-await audioContext.audioWorklet.addModule('./pcm-worker.js')
-const pcmWorker = new AudioWorkletNode(audioContext, 'pcm-worker', {
-  outputChannelCount: [1],
+const mediaRecorder = new MediaRecorder(stream)
+
+mediaRecorder.addEventListener('dataavailable', (event) => {
+  audioChunks.push(event.data)
 })
-source.connect(pcmWorker)
 
-const conn = new WebSocket('ws://127.0.0.1:1243')
-pcmWorker.port.onmessage = (event) => {
-  if (conn.readyState === conn.OPEN) {
-    conn.send(event.data)
-  }
-}
+mediaRecorder.addEventListener('stop', () => {
+  const audioBlob = new Blob(audioChunks)
+  audioChunks = []
+  blobToBase64(audioBlob).then((base64) => {
+    ipc.sendTo('main', 'transcribe-audio', base64)
+  })
 
-conn.onmessage = ({ data: message }) => {
-  if (message) {
-    const engine = speechEngineManager.getEngineById(
-      store.getters['settings/persisted'].selectedSpeechEngine,
-    )
-    if (!engine) return
-    izabela.say({
-      engine: engine.id,
-      credentials: engine.getCredentials(),
-      payload: engine.getPayload(message),
-    })
-  }
-}
+  const audioUrl = URL.createObjectURL(audioBlob)
+  const audio = new Audio(audioUrl)
+  audio.play()
+})
 
-pcmWorker.port.start()
+ipc.on('main', 'speech-record-start', () => {
+  console.log(`[${getTime()}] Starting web recording`)
+  mediaRecorder.start()
+})
+
+ipc.on('main', 'speech-record-stop', () => {
+  console.log(`[${getTime()}] Stopping web recording`)
+  mediaRecorder.stop()
+})
+
 onBeforeUnmount(() => {
-  pcmWorker.port.close()
-  conn.close()
-  source.disconnect()
-  audioContext.close()
+  if (mediaRecorder.state !== 'inactive') {
+    mediaRecorder.stop()
+  }
 })
 </script>
