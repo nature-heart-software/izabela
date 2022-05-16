@@ -49,7 +49,14 @@ module.exports = defineConfig({
       externals: ['iohook', '@izabela/app-server', '@google-cloud/speech'],
       chainWebpackMainProcess: (config) => {
         setConfigAliases(config)
-        config.module.rule('babel').before('ts').use('babel').loader('babel-loader').end()
+        config.module
+          .rule('babel')
+          .before('ts')
+          .use('babel')
+          .loader('babel-loader')
+          .options({
+            plugins: [['inline-json-import', {}]],
+          })
       },
       /* Documentation:
        * https://nklayman.github.io/vue-cli-plugin-electron-builder/guide/configuration.html
@@ -64,6 +71,7 @@ module.exports = defineConfig({
         preload: 'src/preload.ts',
       },
       builderOptions: {
+        appId: 'com.nhs.izabela',
         beforeBuild: './scripts/electron-builder-before-build.js',
         generateUpdatesFilesForAllChannels: true,
         // eslint-disable-next-line no-template-curly-in-string
