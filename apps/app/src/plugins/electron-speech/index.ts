@@ -9,9 +9,6 @@ import speechEngineManager from '@/entities/speech/modules/speech-engine-manager
 import { ipcMain } from 'electron-postman'
 import { DEFAULT_LANGUAGE_CODE } from '@/consts'
 
-const encoding = 'LINEAR16' as const
-const sampleRateHertz = 16000
-
 app.whenReady().then(() => {
   const credentialsDirPath = path.join(app.getPath('userData'), 'credentials')
   const googleCloudSpeechCredentialsFilePath = path.join(
@@ -20,19 +17,6 @@ app.whenReady().then(() => {
   )
   process.env.GOOGLE_APPLICATION_CREDENTIALS = googleCloudSpeechCredentialsFilePath
 })
-
-const getRequest = () => {
-  const engine = speechEngineManager.getEngineById(
-    store.getters['settings/persisted'].selectedSpeechEngine,
-  )
-  return {
-    config: {
-      encoding,
-      sampleRateHertz,
-      languageCode: engine?.getLanguageCode() || DEFAULT_LANGUAGE_CODE,
-    },
-  }
-}
 
 let deferredRecording: Deferred<boolean> | null = null
 
@@ -52,21 +36,39 @@ iohook.on('keyup', (event) => {
   }
 })
 
-ipcMain.on('audio-worker-window', 'transcribe-audio', async (content: string) => {
-  const client = new speech.SpeechClient()
-  const audio = {
+ipcMain.on(
+  'audio-worker-window',
+  'transcribe-audio',
+  async ({
     content,
-  }
+    sampleRate,
+    encoding,
+  }: {
+    content: string
+    sampleRate: number
+    encoding: any
+  }) => {
+    const client = new speech.SpeechClient()
+    const engine = speechEngineManager.getEngineById(
+      store.getters['settings/persisted'].selectedSpeechEngine,
+    )
 
-  const request = {
-    ...getRequest(),
-    audio,
-  }
+    const request = {
+      config: {
+        encoding,
+        sampleRateHertz: sampleRate,
+        languageCode: engine?.getLanguageCode() || DEFAULT_LANGUAGE_CODE,
+      },
+      audio: {
+        content,
+      },
+    }
 
-  const [operation] = await client.longRunningRecognize(request)
-  const [response]: any = await operation.promise()
-  const transcription = response.results
-    .map((result: any) => result.alternatives[0].transcript)
-    .join('\n')
-  console.log(`Transcription: ${transcription}`)
-})
+    const [operation] = await client.longRunningRecognize(request)
+    const [response]: any = await operation.promise()
+    const transcription = response.results
+      .map((result: any) => result.alternatives[0].transcript)
+      .join('\n')
+    console.log(`Transcription: ${transcription}`)
+  },
+)

@@ -6,10 +6,11 @@ import { onBeforeUnmount } from 'vue'
 
 let audioChunks: Blob[] = []
 const { ipc } = window
+const sampleRate = 48000
 const stream = await navigator.mediaDevices.getUserMedia({
   audio: {
     deviceId: store.getters['settings/persisted'].audioInputDevice,
-    sampleRate: 16000,
+    sampleRate,
     sampleSize: 16,
     channelCount: 1,
   },
@@ -22,15 +23,20 @@ mediaRecorder.addEventListener('dataavailable', (event) => {
 })
 
 mediaRecorder.addEventListener('stop', () => {
-  const audioBlob = new Blob(audioChunks)
+  const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType })
   audioChunks = []
   blobToBase64(audioBlob).then((base64) => {
-    ipc.sendTo('main', 'transcribe-audio', base64)
+    ipc.sendTo('main', 'transcribe-audio', {
+      content: (base64 as string).split(',').pop(),
+      sampleRate,
+      encoding: 'WEBM_OPUS',
+    })
   })
 
-  const audioUrl = URL.createObjectURL(audioBlob)
-  const audio = new Audio(audioUrl)
-  audio.play()
+  // debug
+  // const audioUrl = URL.createObjectURL(audioBlob)
+  // const audio = new Audio(audioUrl)
+  // audio.play()
 })
 
 ipc.on('main', 'speech-record-start', () => {
