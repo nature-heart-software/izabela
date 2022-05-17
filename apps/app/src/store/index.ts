@@ -1,7 +1,7 @@
 import { createStore, MutationPayload } from 'vuex'
 
 import { createPersistedState, createSharedMutations } from '@/modules/electron-vuex'
-import messenger from '@/entities/messenger/store'
+import messenger from '@/teams/messenger/store'
 import settings from '@/entities/settings/store'
 import { SetPropertyPayload } from '@/utils/vuex'
 import domBoundariesStore from '@/modules/vue-dom-boundaries/dom-boundaries.store'

@@ -2,23 +2,20 @@
 import '@/modules/electron-vuex/main'
 import '@/store'
 import '@/plugins/electron-log'
-import '@/plugins/electron-speech'
+import '@/teams/speech-worker/plugins/electron-speech'
 import '@/plugins/electron-startup'
 import '@/plugins/electron-updater'
-import '@/entities/messenger/modules/electron-messenger-window'
 import '@/modules/electron-dialog'
 import '@/modules/electron-filesystem'
 import { app, BrowserWindow, protocol } from 'electron'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
-import createMessengerWindow from '@/teams/messenger/electron-window'
 import createTray from '@/teams/tray/electron-tray'
-import ElectronWindowManager from '@/modules/electron-window-manager'
 import server from '@izabela/app-server'
 import path from 'path'
-
-import createAudioWorkerWindow from '@/teams/audio-worker/electron-window'
-
-(() => {
+import ElectronWindowManager from '@/modules/electron-window-manager'
+import { createMessengerWindow } from '@/teams/messenger/background'
+import { createSpeechWorkerWindow } from '@/teams/speech-worker/background'
+;(() => {
   app.commandLine.appendSwitch('disable-renderer-backgrounding')
 
   /* Fixes iohook. See: https://github.com/electron/electron/issues/18397 */
@@ -41,8 +38,8 @@ protocol.registerSchemesAsPrivileged([
 
 const createWindows = async () =>
   Promise.all([
-    ElectronWindowManager.registerInstance('messenger', await createMessengerWindow()),
-    ElectronWindowManager.registerInstance('audio-worker', await createAudioWorkerWindow()),
+    await ElectronWindowManager.registerInstance('messenger', createMessengerWindow),
+    await ElectronWindowManager.registerInstance('speech-worker', createSpeechWorkerWindow),
   ])
 
 // Quit when all windows are closed.
@@ -57,6 +54,7 @@ app.on('window-all-closed', () => {
 const startAppServer = async () =>
   server.startServer({
     tempPath: path.join(app.getPath('userData'), 'temp'),
+    port: process.env.VUE_APP_SERVER_PORT,
   })
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the

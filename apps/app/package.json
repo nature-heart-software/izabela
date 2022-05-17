@@ -36,6 +36,7 @@
     "electron-store": "^8.0.1",
     "electron-updater": "^5.0.1",
     "element-plus": "^1.2.0-beta.6",
+    "hark": "^1.2.3",
     "iohook": "^0.9.3",
     "mitt": "^3.0.0",
     "polished": "^4.2.1",

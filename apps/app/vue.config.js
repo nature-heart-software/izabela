@@ -11,7 +11,7 @@ const setConfigAliases = (config) => {
 module.exports = defineConfig({
   pages: {
     index: './src/teams/messenger/main.ts',
-    'audio-worker': './src/teams/audio-worker/main.ts',
+    'speech-worker': './src/teams/speech-worker/main.ts',
   },
   transpileDependencies: ['@izabela'],
   configureWebpack: {

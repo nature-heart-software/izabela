@@ -1,5 +1,5 @@
 import { createApp } from 'vue'
-import App from '@/teams/audio-worker/App.vue'
 import store from '@/store'
+import App from '@/teams/speech-worker/App.vue'
 
 createApp(App).use(store).mount('#app')

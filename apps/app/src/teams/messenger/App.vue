@@ -22,7 +22,7 @@ body {
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { ThemeProvider } from 'vue3-styled-components'
-import NvMessenger from '@/entities/messenger/components/NvMessenger.vue'
+import NvMessenger from '@/teams/messenger/components/NvMessenger.vue'
 import { useStore } from 'vuex'
 
 const store = useStore()

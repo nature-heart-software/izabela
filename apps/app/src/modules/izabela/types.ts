@@ -2,7 +2,7 @@ import { SpeechEngine } from '@/entities/speech/modules/speech-engine-manager/ty
 
 export type IzabelaMessageEvent = 'started' | 'ended' | 'progress' | 'error'
 
-export interface IzabelaMessagePayload<O = any> {
+export interface IzabelaMessagePayload {
   engine: SpeechEngine['id']
   credentials: {
     [key: string]: any

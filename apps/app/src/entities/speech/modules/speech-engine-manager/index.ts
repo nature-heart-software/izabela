@@ -1,4 +1,4 @@
-import speechEngineManage from './SpeechEngineManager'
+import speechEngineManager from './SpeechEngineManager'
 
 function requireAll(r: any) {
   r.keys().forEach(r)
@@ -6,4 +6,4 @@ function requireAll(r: any) {
 
 requireAll(require.context('./speech-engines/', true, /\.ts$/))
 
-export default speechEngineManage
+export default speechEngineManager
