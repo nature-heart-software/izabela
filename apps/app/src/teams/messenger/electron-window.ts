@@ -3,7 +3,7 @@ import path from 'path'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import { ipcMain } from 'electron-postman'
 
-const createMessengerWindow = async (): Promise<BrowserWindow> => {
+const createWindow = async (name: string): Promise<BrowserWindow> => {
   const win = new BrowserWindow({
     show: false,
     fullscreen: true,
@@ -16,7 +16,7 @@ const createMessengerWindow = async (): Promise<BrowserWindow> => {
     },
   })
 
-  ipcMain.registerBrowserWindow('messenger-window', win)
+  ipcMain.registerBrowserWindow(name, win)
 
   {
     const { workArea } = screen.getPrimaryDisplay()
@@ -30,22 +30,22 @@ const createMessengerWindow = async (): Promise<BrowserWindow> => {
     win.setFullScreenable(false)
   }
 
+  win.on('ready-to-show', () => {
+    win.on('show', () => ipcMain.sendTo(name, 'show'))
+    win.on('hide', () => ipcMain.sendTo(name, 'hide'))
+    win.on('focus', () => ipcMain.sendTo(name, 'focus'))
+    win.on('blur', () => ipcMain.sendTo(name, 'blur'))
+  })
+
   if (process.env.WEBPACK_DEV_SERVER_URL) {
-    await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string)
+    await win.loadURL(path.join(process.env.WEBPACK_DEV_SERVER_URL as string, name))
     if (!process.env.IS_TEST) win.webContents.openDevTools({ mode: 'undocked' })
   } else {
     createProtocol('app')
-    win.loadURL('app://./index.html')
+    win.loadURL(`app://./${name}.html`)
   }
-  win.on('ready-to-show', () => {
-    win.on('show', () => ipcMain.sendTo('messenger-window', 'show'))
-    win.on('hide', () => ipcMain.sendTo('messenger-window', 'hide'))
-    win.on('focus', () => ipcMain.sendTo('messenger-window', 'focus'))
-    win.on('blur', () => ipcMain.sendTo('messenger-window', 'blur'))
-    // win.webContents.openDevTools({ mode: 'undocked' })
-  })
 
   return win
 }
 
-export default createMessengerWindow
+export default createWindow

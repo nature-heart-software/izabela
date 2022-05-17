@@ -1,5 +1,6 @@
 <template>
   <div>
+    <SpeechSynthesizer />
     <SpeechListener :key="$store.getters['settings/persisted'].audioInputDevice" />
   </div>
 </template>
@@ -12,5 +13,6 @@ body {
 }
 </style>
 <script lang="ts" setup>
-import SpeechListener from '@/entities/speech/components/SpeechListener.vue'
+import SpeechListener from '@/teams/speech-worker/components/SpeechListener.vue'
+import SpeechSynthesizer from '@/teams/speech-worker/components/SpeechSynthesizer.vue'
 </script>

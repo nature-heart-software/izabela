@@ -1,9 +1,9 @@
 import { BrowserWindow } from 'electron'
+import { ipcMain } from 'electron-postman'
 import path from 'path'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
-import { ipcMain } from 'electron-postman'
 
-const createAudioWorkerWindow = async (): Promise<BrowserWindow> => {
+const createWindow = async (name: string): Promise<BrowserWindow> => {
   const win = new BrowserWindow({
     show: true,
     transparent: true,
@@ -16,7 +16,7 @@ const createAudioWorkerWindow = async (): Promise<BrowserWindow> => {
     },
   })
 
-  ipcMain.registerBrowserWindow('audio-worker-window', win)
+  ipcMain.registerBrowserWindow(name, win)
 
   {
     win.setSize(0, 0)
@@ -29,14 +29,14 @@ const createAudioWorkerWindow = async (): Promise<BrowserWindow> => {
   }
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
-    await win.loadURL(path.join(process.env.WEBPACK_DEV_SERVER_URL as string, 'audio-worker'))
+    await win.loadURL(path.join(process.env.WEBPACK_DEV_SERVER_URL as string, name))
     if (!process.env.IS_TEST) win.webContents.openDevTools({ mode: 'undocked' })
   } else {
     createProtocol('app')
-    win.loadURL('app://./audio-worker.html')
+    win.loadURL(`app://./${name}.html`)
   }
 
   return win
 }
 
-export default createAudioWorkerWindow
+export default createWindow
