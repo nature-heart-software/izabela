@@ -15,7 +15,6 @@ import path from 'path'
 import ElectronWindowManager from '@/modules/electron-window-manager'
 import { createMessengerWindow } from '@/teams/messenger/background'
 import { createSpeechWorkerWindow } from '@/teams/speech-worker/background'
-
 ;(() => {
   app.commandLine.appendSwitch('disable-renderer-backgrounding')
 
