@@ -39,12 +39,12 @@ mediaRecorder.addEventListener('stop', () => {
   // audio.play()
 })
 
-ipc.on('main', 'speech-record-start', () => {
+ipc.on('main', 'start-speech-transcription', () => {
   console.log(`[${getTime()}] Starting web recording`)
   mediaRecorder.start()
 })
 
-ipc.on('main', 'speech-record-stop', () => {
+ipc.on('main', 'stop-speech-transcription', () => {
   console.log(`[${getTime()}] Stopping web recording`)
   mediaRecorder.stop()
 })

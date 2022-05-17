@@ -194,10 +194,8 @@ import IWTTSVoiceSelect from '@/entities/speech/components/inputs/IWTTSVoiceSele
 import GCTTSVoiceSelect from '@/entities/speech/components/inputs/GCTTSVoiceSelect.vue'
 import MATTSVoiceSelect from '@/entities/speech/components/inputs/MATTSVoiceSelect.vue'
 import SayTTSVoiceSelect from '@/entities/speech/components/inputs/SayTTSVoiceSelect.vue'
-import izabela from '@/modules/izabela'
-import speechEngineManager from '@/entities/speech/modules/speech-engine-manager'
 
-const { ElectronMessengerWindow } = window
+const { ElectronMessengerWindow, ipc } = window
 const { NODE_ENV } = process.env
 const componentProps = defineProps({
   width: {
@@ -282,15 +280,7 @@ const onDrag = (event: any) => {
 
 const playMessage = () => {
   if (inputValue.value) {
-    const engine = speechEngineManager.getEngineById(
-      store.getters['settings/persisted'].selectedSpeechEngine,
-    )
-    if (!engine) return
-    izabela.say({
-      engine: engine.id,
-      credentials: engine.getCredentials(),
-      payload: engine.getPayload(inputValue.value),
-    })
+    ipc.sendTo('speech-worker', 'say', inputValue.value)
     inputValue.value = ''
   }
 }
@@ -308,7 +298,6 @@ const onWindowBlur = () => {
 }
 
 const addEventListeners = () => {
-  const { ipc } = window
   ipc.on('main', 'focus', onWindowFocus)
   ipc.on('main', 'blur', onWindowBlur)
 }

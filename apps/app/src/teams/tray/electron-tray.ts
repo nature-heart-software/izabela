@@ -1,7 +1,7 @@
 import { app, Menu, Tray } from 'electron'
 import path from 'path'
 import { readFileSync } from 'fs'
-import ElectronMessengerWindow from '@/entities/messenger/modules/electron-messenger-window'
+import ElectronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
 
 let tray = null
 const createTray = (): Promise<Tray> =>

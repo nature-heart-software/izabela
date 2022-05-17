@@ -24,7 +24,7 @@ iohook.on('keydown', (event) => {
   if ([3640, 54].includes(event.keycode) && !deferredRecording) {
     const deferred = new Deferred<boolean>()
     deferredRecording = deferred
-    ipcMain.sendTo('audio-worker-window', 'speech-record-start')
+    ipcMain.sendTo('speech-worker', 'start-speech-transcription')
   }
 })
 
@@ -32,12 +32,12 @@ iohook.on('keyup', (event) => {
   if ([3640, 54].includes(event.keycode) && deferredRecording) {
     deferredRecording.resolve(true)
     deferredRecording = null
-    ipcMain.sendTo('audio-worker-window', 'speech-record-stop')
+    ipcMain.sendTo('speech-worker', 'stop-speech-transcription')
   }
 })
 
 ipcMain.on(
-  'audio-worker-window',
+  'speech-worker',
   'transcribe-audio',
   async ({
     content,
@@ -70,5 +70,8 @@ ipcMain.on(
       .map((result: any) => result.alternatives[0].transcript)
       .join('\n')
     console.log(`Transcription: ${transcription}`)
+    if (transcription) {
+      ipcMain.sendTo('speech-worker', 'say', transcription)
+    }
   },
 )
