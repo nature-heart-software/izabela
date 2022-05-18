@@ -17,6 +17,7 @@ import { createMessengerWindow } from '@/teams/messenger/background'
 import { createSpeechWorkerWindow } from '@/teams/speech-worker/background'
 
 (() => {
+  if (process.platform === 'win32') app.setAppUserModelId(app.name)
   app.commandLine.appendSwitch('disable-renderer-backgrounding')
 
   /* Fixes iohook. See: https://github.com/electron/electron/issues/18397 */
