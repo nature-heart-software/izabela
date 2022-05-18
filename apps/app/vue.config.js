@@ -10,7 +10,7 @@ const setConfigAliases = (config) => {
 
 module.exports = defineConfig({
   pages: {
-    index: './src/teams/messenger/main.ts',
+    messenger: './src/teams/messenger/main.ts',
     'speech-worker': './src/teams/speech-worker/main.ts',
   },
   transpileDependencies: ['@izabela'],
