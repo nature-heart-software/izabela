@@ -1,5 +1,5 @@
 const path = require('path')
-const { defineConfig } = require('@vue/cli-service')
+const {defineConfig} = require('@vue/cli-service')
 const GenerateExportsPlugin = require('@izabela/generate-exports-webpack-plugin')
 const GenerateModulesPlugin = require('@wurielle/generate-modules-webpack-plugin')
 const WebpackNotifierPlugin = require('webpack-notifier')
@@ -10,13 +10,13 @@ const setConfigAliases = (config) => {
 
 module.exports = defineConfig({
   pages: {
-    index: './src/teams/messenger/main.ts',
+    messenger: './src/teams/messenger/main.ts',
     'speech-worker': './src/teams/speech-worker/main.ts',
   },
   transpileDependencies: ['@izabela'],
   configureWebpack: {
     plugins: [
-      new WebpackNotifierPlugin({ emoji: true }),
+      new WebpackNotifierPlugin({emoji: true}),
       new GenerateExportsPlugin([
         {
           omitExtension: false,
