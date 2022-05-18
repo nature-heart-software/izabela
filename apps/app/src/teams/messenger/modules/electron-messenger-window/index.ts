@@ -24,7 +24,7 @@ class ElectronMessengerWindow {
     const messenger = ElectronWindowManager.getInstanceByName('messenger')
     if (messenger) {
       const { window } = messenger
-      if (window.isVisible()) {
+      if (!window.isDestroyed() && window.isVisible()) {
         const { x: mouseX = 0, y: mouseY = 0 } = event
         const [windowX, windowY] = window.getPosition()
         const domBoundaries = store.getters['dom-boundaries/boundaries']
