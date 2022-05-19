@@ -1,16 +1,16 @@
 import { Module } from 'vuex'
 import { utilActions, utilMutations } from '@/utils/vuex'
 import { SpeechEngine } from '@/entities/speech/modules/speech-engine-manager/types'
-import pkg from '@package'
 
-const { version } = pkg
+const { version } = require('../../../../package.json')
+
 // eslint-disable-next-line no-nested-ternary
-const channel = version.contains('alpha')
+const channel = version.includes('alpha')
   ? 'alpha'
   : // eslint-disable-next-line no-nested-ternary
-  version.contains('beta')
+  version.includes('beta')
   ? 'beta'
-  : version.contains('rc')
+  : version.includes('rc')
   ? 'rc'
   : 'latest'
 const storeState = {
