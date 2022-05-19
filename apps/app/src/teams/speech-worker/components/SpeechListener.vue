@@ -16,14 +16,14 @@ const stream = await navigator.mediaDevices.getUserMedia({
   },
   video: false,
 })
-const mediaRecorder = new MediaRecorder(stream)
+let mediaRecorder: MediaRecorder | null = new MediaRecorder(stream)
 
-mediaRecorder.addEventListener('dataavailable', (event) => {
+const onDataAvailable = (event: any) => {
   audioChunks.push(event.data)
-})
+}
 
-mediaRecorder.addEventListener('stop', () => {
-  const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType })
+const onStop = () => {
+  const audioBlob = new Blob(audioChunks, { type: mediaRecorder?.mimeType })
   audioChunks = []
   blobToBase64(audioBlob).then((base64) => {
     ipc.sendTo('main', 'transcribe-audio', {
@@ -37,21 +37,31 @@ mediaRecorder.addEventListener('stop', () => {
   // const audioUrl = URL.createObjectURL(audioBlob)
   // const audio = new Audio(audioUrl)
   // audio.play()
-})
+}
+
+mediaRecorder.addEventListener('dataavailable', onDataAvailable)
+mediaRecorder.addEventListener('stop', onStop)
 
 ipc.on('main', 'start-speech-transcription', () => {
-  console.log(`[${getTime()}] Starting web recording`)
-  mediaRecorder.start()
+  if (mediaRecorder) {
+    console.log(`[${getTime()}] Starting web recording`)
+    mediaRecorder.start()
+  }
 })
 
 ipc.on('main', 'stop-speech-transcription', () => {
-  console.log(`[${getTime()}] Stopping web recording`)
-  mediaRecorder.stop()
+  if (mediaRecorder) {
+    console.log(`[${getTime()}] Stopping web recording`)
+    mediaRecorder.stop()
+  }
 })
 
 onBeforeUnmount(() => {
-  if (mediaRecorder.state !== 'inactive') {
-    mediaRecorder.stop()
+  if (mediaRecorder?.state !== 'inactive') {
+    mediaRecorder?.stop()
   }
+  mediaRecorder?.removeEventListener('dataavailable', onDataAvailable)
+  mediaRecorder?.removeEventListener('stop', onDataAvailable)
+  mediaRecorder = null
 })
 </script>
