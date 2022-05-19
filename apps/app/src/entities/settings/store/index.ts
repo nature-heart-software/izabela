@@ -2,13 +2,24 @@ import { Module } from 'vuex'
 import { utilActions, utilMutations } from '@/utils/vuex'
 import { SpeechEngine } from '@/entities/speech/modules/speech-engine-manager/types'
 
+const { version } = require('../../../../package.json')
+
+// eslint-disable-next-line no-nested-ternary
+const channel = version.includes('alpha')
+  ? 'alpha'
+  : // eslint-disable-next-line no-nested-ternary
+  version.includes('beta')
+  ? 'beta'
+  : version.includes('rc')
+  ? 'rc'
+  : 'latest'
 const storeState = {
   persisted: {
     playSpeechOnDefaultPlaybackDevice: true,
     audioOutputDevices: [] as MediaDeviceInfo['deviceId'][],
     audioInputDevice: 'default' as MediaDeviceInfo['deviceId'],
     selectedSpeechEngine: 'saytts' as SpeechEngine['id'],
-    autoUpdateChannel: 'latest',
+    autoUpdateChannel: channel,
     launchOnStartup: true,
     APTTSIdentityPoolId: '',
     APTTSRegion: '',
