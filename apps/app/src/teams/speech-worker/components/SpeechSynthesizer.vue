@@ -3,9 +3,9 @@ import izabela from '@/modules/izabela'
 import type { IzabelaMessagePayload } from '@/modules/izabela/types'
 import speechEngineManager from '@/entities/speech/modules/speech-engine-manager'
 import store from '@/store'
+import { processes } from '@/types/electron'
 
 const { ipc } = window
-const processes = ['main', 'messenger'] as const
 
 processes.forEach((processName) => {
   ipc.on(processName, 'say', (payload: string | IzabelaMessagePayload) => {

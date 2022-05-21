@@ -102,19 +102,17 @@ class ElectronMessengerWindow {
   }
 
   openDevTools() {
-    return new Promise((resolve, reject) => {
-      const messenger = ElectronWindowManager.getInstanceByName('messenger')
-      if (messenger) {
-        const { window } = messenger
+    return new Promise((resolve) => {
+      const instances = ElectronWindowManager.getInstances()
+      instances.forEach((instance) => {
+        const { window } = instance
         if (window.webContents.devToolsWebContents && window.webContents.isDevToolsOpened()) {
           window.webContents.devToolsWebContents.focus()
         } else {
           window.webContents.openDevTools()
         }
-        resolve(true)
-      } else {
-        reject()
-      }
+      })
+      resolve(true)
     })
   }
 

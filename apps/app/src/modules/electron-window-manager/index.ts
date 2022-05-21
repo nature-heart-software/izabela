@@ -24,6 +24,10 @@ class ElectronWindowManager {
   getInstanceByName(name: string): Instance | undefined {
     return this.instances[name]
   }
+
+  getInstances(): Instance[] {
+    return Object.values(this.instances)
+  }
 }
 
 export default new ElectronWindowManager()

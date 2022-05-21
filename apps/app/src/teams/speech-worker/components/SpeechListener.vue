@@ -23,6 +23,7 @@ const onDataAvailable = (event: any) => {
 }
 
 const onStop = () => {
+  console.log(audioChunks)
   const audioBlob = new Blob(audioChunks, { type: mediaRecorder?.mimeType })
   audioChunks = []
   blobToBase64(audioBlob).then((base64) => {
@@ -62,6 +63,11 @@ onBeforeUnmount(() => {
   }
   mediaRecorder?.removeEventListener('dataavailable', onDataAvailable)
   mediaRecorder?.removeEventListener('stop', onDataAvailable)
+  stream.getTracks().forEach((track) => {
+    if (track.readyState === 'live') {
+      track.stop()
+    }
+  })
   mediaRecorder = null
 })
 </script>
