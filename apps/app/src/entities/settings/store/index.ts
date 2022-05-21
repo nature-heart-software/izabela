@@ -16,8 +16,8 @@ const channel = version.includes('alpha')
 const storeState = {
   persisted: {
     playSpeechOnDefaultPlaybackDevice: true,
-    audioOutputDevices: [] as MediaDeviceInfo['deviceId'][],
-    audioInputDevice: 'default' as MediaDeviceInfo['deviceId'],
+    audioOutputDevices: [] as MediaDeviceInfo['label'][],
+    audioInputDevice: 'default' as MediaDeviceInfo['label'],
     selectedSpeechEngine: 'saytts' as SpeechEngine['id'],
     autoUpdateChannel: channel,
     launchOnStartup: true,

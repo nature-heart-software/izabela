@@ -4,6 +4,7 @@ import { Deferred } from '@/utils/promise'
 import store from '@/store'
 import { Promise } from 'bluebird'
 import speechEngineManager from '@/entities/speech/modules/speech-engine-manager'
+import { getMediaDeviceByLabel } from '@/utils/media-devices'
 import { IzabelaMessageEvent, IzabelaMessagePayload } from './types'
 
 export default class {
@@ -43,19 +44,23 @@ export default class {
   public play() {
     Promise.map(
       store.getters['settings/persisted'].audioOutputDevices,
-      async (deviceId: string) => {
+      async (deviceLabel: string) => {
         // TODO: Some optimisation possible here
-        const audioElement: any = document.createElement('audio')
-        audioElement.src = this.audio.src
-        await audioElement.setSinkId(deviceId)
-        return audioElement
+        const mediaDevice = await getMediaDeviceByLabel(deviceLabel)
+        if (mediaDevice) {
+          const audioElement: any = document.createElement('audio')
+          audioElement.src = this.audio.src
+          await audioElement.setSinkId(mediaDevice.deviceId)
+          return audioElement
+        }
+        return null
       },
-    ).then((audioElements) => {
+    ).then((audioElements: (HTMLAudioElement | null)[]) => {
       if (!store.getters['settings/persisted'].playSpeechOnDefaultPlaybackDevice) {
         this.audio.volume = 0
       }
       this.audio.play()
-      audioElements.forEach((audio) => audio.play())
+      audioElements.forEach((audio) => audio && audio.play())
     })
   }
 

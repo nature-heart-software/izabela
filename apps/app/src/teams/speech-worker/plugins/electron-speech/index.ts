@@ -8,6 +8,7 @@ import store from '@/store'
 import speechEngineManager from '@/entities/speech/modules/speech-engine-manager'
 import { ipcMain } from 'electron-postman'
 import { DEFAULT_LANGUAGE_CODE } from '@/consts'
+import { createNotification } from '@/utils/electron-notification'
 
 app.whenReady().then(() => {
   const credentialsDirPath = path.join(app.getPath('userData'), 'credentials')
@@ -36,6 +37,13 @@ iohook.on('keyup', (event) => {
   }
 })
 
+const onListeningError = () => {
+  createNotification({
+    body: "Sorry, I didn't catch that..\nCould you please repeat that?",
+    silent: true,
+  }).show()
+}
+
 ipcMain.on(
   'speech-worker',
   'transcribe-audio',
@@ -48,30 +56,35 @@ ipcMain.on(
     sampleRate: number
     encoding: any
   }) => {
-    const client = new speech.SpeechClient()
-    const engine = speechEngineManager.getEngineById(
-      store.getters['settings/persisted'].selectedSpeechEngine,
-    )
+    try {
+      const client = new speech.SpeechClient()
+      const engine = speechEngineManager.getEngineById(
+        store.getters['settings/persisted'].selectedSpeechEngine,
+      )
 
-    const request = {
-      config: {
-        encoding,
-        sampleRateHertz: sampleRate,
-        languageCode: engine?.getLanguageCode() || DEFAULT_LANGUAGE_CODE,
-      },
-      audio: {
-        content,
-      },
-    }
+      const request = {
+        config: {
+          encoding,
+          sampleRateHertz: sampleRate,
+          languageCode: engine?.getLanguageCode() || DEFAULT_LANGUAGE_CODE,
+        },
+        audio: {
+          content,
+        },
+      }
 
-    const [operation] = await client.longRunningRecognize(request)
-    const [response]: any = await operation.promise()
-    const transcription = response.results
-      .map((result: any) => result.alternatives[0].transcript)
-      .join('\n')
-    console.log(`Transcription: ${transcription}`)
-    if (transcription) {
-      ipcMain.sendTo('speech-worker', 'say', transcription)
+      const [operation] = await client.longRunningRecognize(request)
+      const [response]: any = await operation.promise()
+      const transcription = response.results
+        .map((result: any) => result.alternatives[0].transcript)
+        .join('\n')
+      if (transcription) {
+        ipcMain.sendTo('speech-worker', 'say', transcription)
+      } else {
+        onListeningError()
+      }
+    } catch (e: unknown) {
+      onListeningError()
     }
   },
 )

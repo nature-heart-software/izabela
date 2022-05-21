@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="storeReady">
     <SpeechSynthesizer />
     <SpeechListener :key="$store.getters['settings/persisted'].audioInputDevice" />
   </div>
@@ -15,4 +15,7 @@ body {
 <script lang="ts" setup>
 import SpeechListener from '@/teams/speech-worker/components/SpeechListener.vue'
 import SpeechSynthesizer from '@/teams/speech-worker/components/SpeechSynthesizer.vue'
+import { useStoreReady } from '@/hooks'
+
+const { data: storeReady } = useStoreReady()
 </script>
