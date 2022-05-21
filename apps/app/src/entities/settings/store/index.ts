@@ -21,6 +21,7 @@ const storeState = {
     selectedSpeechEngine: 'saytts' as SpeechEngine['id'],
     autoUpdateChannel: channel,
     launchOnStartup: true,
+    debugMode: process.env.NODE_ENV === 'development',
     APTTSIdentityPoolId: '',
     APTTSRegion: '',
     APTTSSelectedVoice: {

@@ -18,7 +18,7 @@
           <div class="flex flex-1 justify-end space-x-4 moveable-handle cursor-all-scroll">
             <NvCard class="flex-1 min-h-8" size="xs">
               <div class="inline-flex space-x-2">
-                <template v-if="NODE_ENV === 'development'">
+                <template v-if="$store.getters['settings/persisted'].debugMode">
                   <NvButton icon-name="redo" size="sm" @click="reload" />
                   <NvButton icon-name="brackets-curly" size="sm" @click="openDevTools" />
                 </template>

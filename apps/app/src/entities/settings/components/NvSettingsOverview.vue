@@ -42,10 +42,29 @@
         </NvStack>
       </NvStack>
     </NvStack>
+    <NvStack>
+      <NvText type="subtitle">Development</NvText>
+      <NvStack spacing="4">
+        <NvStack spacing="4">
+          <NvCard>
+            <NvGroup no-wrap position="apart" spacing="5">
+              <NvStack>
+                <NvText type="label">Debug mode</NvText>
+              </NvStack>
+              <NvSwitch
+                :modelValue="$store.getters['settings/persisted'].debugMode"
+                @update:modelValue="
+                  (value) => $store.dispatch('settings/setProperty', ['persisted.debugMode', value])
+                "
+              />
+            </NvGroup>
+          </NvCard>
+        </NvStack>
+      </NvStack>
+    </NvStack>
   </NvStack>
 </template>
 <script lang="ts" setup>
-import { NvCard, NvGroup, NvStack, NvText } from '@/core/components'
+import { NvCard, NvGroup, NvStack, NvSwitch, NvText } from '@/core/components'
 import NvAutoUpdateChannelSelect from '@/entities/settings/components/inputs/NvAutoUpdateChannelSelect.vue'
-import NvSwitch from '@/core/components/Switch/NvSwitch.vue'
 </script>
