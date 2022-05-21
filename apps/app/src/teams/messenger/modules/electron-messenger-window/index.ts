@@ -109,7 +109,7 @@ class ElectronMessengerWindow {
         if (window.webContents.devToolsWebContents && window.webContents.isDevToolsOpened()) {
           window.webContents.devToolsWebContents.focus()
         } else {
-          window.webContents.openDevTools()
+          window.webContents.openDevTools({ mode: 'undocked' })
         }
       })
       resolve(true)
