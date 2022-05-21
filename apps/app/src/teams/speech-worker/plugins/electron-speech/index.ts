@@ -39,7 +39,7 @@ iohook.on('keyup', (event) => {
 
 const onListeningError = () => {
   createNotification({
-    body: "Sorry, I didn't catch that..\nCould you please repeat that?",
+    body: "Sorry, I didn't catch that..\nCould you say that again please?",
     silent: true,
   }).show()
 }
