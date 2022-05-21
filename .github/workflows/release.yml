@@ -84,3 +84,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           asset_paths: '["./apps/app/dist_electron/*"]'
+      - name: Rollback Release
+        if: failure()
+        uses: author/action-rollback@stable
+        with:
+          tag: ${{ env.RELEASE_VERSION }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
