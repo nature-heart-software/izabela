@@ -1,15 +1,22 @@
+<template>
+  <div></div>
+</template>
 <script lang="ts" setup>
 import store from '@/store'
 import { getTime } from '@/utils/time'
 import { blobToBase64 } from '@/utils/blob'
 import { onBeforeUnmount } from 'vue'
+import { getMediaDeviceByLabel } from '@/utils/media-devices'
 
+const mediaDevice = await getMediaDeviceByLabel(
+  store.getters['settings/persisted'].audioInputDevice,
+)
 let audioChunks: Blob[] = []
 const { ipc } = window
 const sampleRate = 48000
 const stream = await navigator.mediaDevices.getUserMedia({
   audio: {
-    deviceId: store.getters['settings/persisted'].audioInputDevice,
+    deviceId: mediaDevice?.deviceId,
     sampleRate,
     sampleSize: 16,
     channelCount: 1,
@@ -23,7 +30,6 @@ const onDataAvailable = (event: any) => {
 }
 
 const onStop = () => {
-  console.log(audioChunks)
   const audioBlob = new Blob(audioChunks, { type: mediaRecorder?.mimeType })
   audioChunks = []
   blobToBase64(audioBlob).then((base64) => {
@@ -58,6 +64,7 @@ ipc.on('main', 'stop-speech-transcription', () => {
 })
 
 onBeforeUnmount(() => {
+  console.log('is this being called')
   if (mediaRecorder?.state !== 'inactive') {
     mediaRecorder?.stop()
   }

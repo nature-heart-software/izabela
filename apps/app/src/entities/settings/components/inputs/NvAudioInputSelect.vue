@@ -37,7 +37,7 @@
           "
         >
           <template v-for="audioInputDevice in audioInputDevices" :key="audioInputDevice.deviceId">
-            <NvOption :label="audioInputDevice.label" :value="audioInputDevice.deviceId">
+            <NvOption :label="audioInputDevice.label" :value="audioInputDevice.label">
               {{ audioInputDevice.label }}
             </NvOption>
           </template>

@@ -16,15 +16,15 @@
     <NvDivider direction="horizontal" />
     <NvFormItem label="Audio Outputs">
       <NvSelect
-        multiple
         :modelValue="$store.getters['settings/persisted'].audioOutputDevices"
+        multiple
         @update:modelValue="
           (value) =>
             $store.dispatch('settings/setProperty', ['persisted.audioOutputDevices', value])
         "
       >
         <template v-for="audioOutputDevice in audioOutputDevices" :key="audioOutputDevice.deviceId">
-          <NvOption :label="audioOutputDevice.label" :value="audioOutputDevice.deviceId">
+          <NvOption :label="audioOutputDevice.label" :value="audioOutputDevice.label">
             {{ audioOutputDevice.label }}
           </NvOption>
         </template>
@@ -32,7 +32,7 @@
     </NvFormItem>
     <NvDivider direction="horizontal" />
 
-    <NvGroup position="apart" no-wrap align="start">
+    <NvGroup align="start" no-wrap position="apart">
       <NvStack>
         <NvText type="label">Install VB-Audio Virtual Cable</NvText>
         <NvText
@@ -49,7 +49,7 @@
 </template>
 <script lang="ts">
 import { computed, defineComponent } from 'vue'
-import { NvStack, NvText, NvSwitch, NvGroup, NvSelect, NvOption, NvButton } from '@/core/components'
+import { NvButton, NvGroup, NvOption, NvSelect, NvStack, NvSwitch, NvText } from '@/core/components'
 import NvFormItem from '@/core/components/Form/NvFormItem.vue'
 import NvDivider from '@/core/components/Divider/NvDivider.vue'
 import { useMediaDevices } from '@/hooks'

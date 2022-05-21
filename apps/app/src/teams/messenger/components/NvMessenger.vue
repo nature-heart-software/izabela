@@ -196,7 +196,6 @@ import MATTSVoiceSelect from '@/entities/speech/components/inputs/MATTSVoiceSele
 import SayTTSVoiceSelect from '@/entities/speech/components/inputs/SayTTSVoiceSelect.vue'
 
 const { ElectronMessengerWindow, ipc } = window
-const { NODE_ENV } = process.env
 const componentProps = defineProps({
   width: {
     type: Number,
@@ -286,9 +285,9 @@ const playMessage = () => {
 }
 
 const onWindowFocus = () => {
-  const componentInstance = messengerInput.value as ComponentPublicInstance
-  const input = componentInstance.$el.querySelector('input')
-  if (input) input.focus()
+  // const componentInstance = messengerInput.value as ComponentPublicInstance
+  // const input = componentInstance.$el.querySelector('input')
+  // if (input) input.focus()
 }
 
 const onWindowBlur = () => {
