@@ -5,9 +5,7 @@ import { createNotification } from '@/utils/electron-notification'
 import process from 'process'
 import store from '@/store'
 
-;
-
-(() => {
+;(() => {
   // if (process.env.NODE_ENV === 'development') {
   ;(store.state as any)['electron-vuex']
     .ready()
