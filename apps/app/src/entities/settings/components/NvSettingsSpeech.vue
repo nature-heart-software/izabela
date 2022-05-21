@@ -4,7 +4,7 @@
       <NvText type="subtitle">Speech</NvText>
       <NvStack spacing="4">
         <NvCard>
-          <NvGroup spacing="5">
+          <NvGroup no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Speech Engine</NvText>
               <NvText>Select the speech engine used for Izabela's speech</NvText>
