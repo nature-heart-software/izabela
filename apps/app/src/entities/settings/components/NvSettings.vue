@@ -36,10 +36,18 @@
             </NvStack>
           </div>
           <div class="settings__content flex-1 pl-4">
-            <!-- View -->
-            <Transition class="transition">
-              <component :is="currentEntry.component" v-if="currentEntry.component"></component>
-            </Transition>
+            <div class="h-full relative">
+              <!-- View -->
+              <Transition class="transition">
+                <div
+                  v-if="currentEntry.component"
+                  :key="currentEntry.component"
+                  class="absolute inset-0 overflow-y-auto"
+                >
+                  <component :is="currentEntry.component" />
+                </div>
+              </Transition>
+            </div>
           </div>
         </div>
       </div>
