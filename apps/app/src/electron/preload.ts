@@ -4,7 +4,7 @@ import '@/modules/electron-vuex/preload'
 
 /* Other plugins */
 import { ipcRenderer } from 'electron-postman'
-import { loadBridgedModules } from '@/electron-loaders'
+import { loadBridgedModules } from '@/electron/loaders'
 
 ipcRenderer.exposeInMainWorld('ipc')
 loadBridgedModules()

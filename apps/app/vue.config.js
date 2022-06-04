@@ -61,6 +61,7 @@ module.exports = defineConfig({
       /* Documentation:
        * https://nklayman.github.io/vue-cli-plugin-electron-builder/guide/configuration.html
        */
+      mainProcessFile: 'src/electron/background.ts',
       mainProcessWatch: [
         './src/**/{electron,node}*/*',
         './src/**/{electron,node}*',
@@ -68,7 +69,7 @@ module.exports = defineConfig({
         '../../libs/**/{electron,node}*',
       ],
       preload: {
-        preload: 'src/preload.ts',
+        preload: 'src/electron/preload.ts',
       },
       builderOptions: {
         appId: 'com.nhs.izabela',
