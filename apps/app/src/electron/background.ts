@@ -12,8 +12,8 @@ import createTray from '@/teams/tray/electron-tray'
 import server from '@izabela/app-server'
 import path from 'path'
 import ElectronWindowManager from '@/modules/electron-window-manager'
-import { createMessengerWindow } from '@/teams/messenger/background'
-import { createSpeechWorkerWindow } from '@/teams/speech-worker/background'
+import { createMessengerWindow } from '@/teams/messenger/electron/background'
+import { createSpeechWorkerWindow } from '@/teams/speech-worker/electron/background'
 import { loadBridgedModules } from '@/electron/loaders'
 
 loadBridgedModules()
