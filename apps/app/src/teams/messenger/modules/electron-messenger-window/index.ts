@@ -4,7 +4,7 @@ import store from '@/store'
 import { throttle } from 'lodash'
 import { Boundary } from '@/modules/vue-dom-boundaries/types'
 
-export const createElectronMessengerWindow = () => {
+export const ElectronMessengerWindow = () => {
   /* use isFocused as source of truth instead of window.isFocused() as in some instances
    * window.isFocused() returns true when the window is actually blurred, preventing
    * focus again.
@@ -166,4 +166,4 @@ export const createElectronMessengerWindow = () => {
   }
 }
 
-export default createElectronMessengerWindow()
+export default ElectronMessengerWindow()

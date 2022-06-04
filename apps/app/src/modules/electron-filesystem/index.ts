@@ -2,7 +2,7 @@ import { copyFile, mkdir, stat } from 'fs/promises'
 import path from 'path'
 import { app } from 'electron'
 
-export const createElectronFilesystem = () => ({
+export const ElectronFilesystem = () => ({
   importGoogleCloudSpeechCredentials(credentialsPath: string): Promise<string> {
     const credentialsDirPath = path.join(app.getPath('userData'), 'credentials')
     const googleCloudSpeechCredentialsFilePath = path.join(
@@ -26,4 +26,4 @@ export const createElectronFilesystem = () => ({
   },
 })
 
-export default createElectronFilesystem()
+export default ElectronFilesystem()

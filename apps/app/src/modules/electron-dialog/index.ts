@@ -1,9 +1,9 @@
 import { dialog } from 'electron'
 
-export const createElectronDialog = () => ({
+export const ElectronDialog = () => ({
   showOpenDialog(options: Electron.OpenDialogOptions): ReturnType<typeof dialog.showOpenDialog> {
     return dialog.showOpenDialog(options)
   },
 })
 
-export default createElectronDialog()
+export default ElectronDialog()

@@ -1,7 +1,7 @@
 import ElectronStore from 'electron-store'
 import { bridge, isRenderer } from '@izabela/electron-bridger'
 
-const createElectronVuexStorage = () => {
+const ElectronVuexStorage = () => {
   const store: ElectronStore | null = isRenderer ? null : new ElectronStore({ name: 'vuex' })
 
   return {
@@ -25,7 +25,7 @@ const createElectronVuexStorage = () => {
     },
   }
 }
-const electronVuexStorage = createElectronVuexStorage()
+const electronVuexStorage = ElectronVuexStorage()
 
 bridge.register([['ElectronVuexStorage', () => electronVuexStorage]])
 
