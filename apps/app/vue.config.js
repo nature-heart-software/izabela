@@ -65,6 +65,7 @@ module.exports = defineConfig({
       mainProcessWatch: [
         './src/**/{electron,node}*/*',
         './src/**/{electron,node}*',
+        './src/**/store/*',
         '../../libs/**/{electron,node}*/*',
         '../../libs/**/{electron,node}*',
       ],
