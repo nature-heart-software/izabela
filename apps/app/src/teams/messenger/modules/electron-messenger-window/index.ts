@@ -1,5 +1,5 @@
 import ElectronWindowManager from '@/modules/electron-window-manager'
-import iohook, { IOHookEvent } from '@/modules/iohook'
+import iohook, { IOHookEvent } from '@/modules/node-iohook'
 import store from '@/store'
 import { throttle } from 'lodash'
 import { Boundary } from '@/modules/vue-dom-boundaries/types'
