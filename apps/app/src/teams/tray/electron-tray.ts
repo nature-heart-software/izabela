@@ -1,6 +1,6 @@
 import { app, Menu, Tray } from 'electron'
 import path from 'path'
-import ElectronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
+import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
 
 let tray = null
 const createTray = (): Promise<Tray> =>
@@ -10,7 +10,7 @@ const createTray = (): Promise<Tray> =>
     tray.setToolTip(`${app.name} - v${app.getVersion()}`)
     tray.setContextMenu(contextMenu)
     tray.on('click', () => {
-      ElectronMessengerWindow.show()
+      electronMessengerWindow.show()
     })
     return tray
   })
