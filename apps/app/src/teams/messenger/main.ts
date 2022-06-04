@@ -1,4 +1,4 @@
-import '@/plugins/electron-debug/renderer'
+import '@/modules/electron-debug/renderer'
 import '@/styles'
 import '@/teams/messenger/renderer'
 import { createApp } from 'vue'

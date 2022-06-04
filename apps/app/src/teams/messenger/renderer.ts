@@ -1,1 +1,1 @@
-import '@/plugins/electron-log/renderer'
+import '@/modules/electron-log/renderer'

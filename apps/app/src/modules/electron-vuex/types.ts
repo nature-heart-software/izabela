@@ -9,7 +9,7 @@ export type PersistedStateOptions = {
   blacklist?: MutationFilterOption
 }
 export type AugmentedGlobal = typeof global & {
-  ElectronVuexStorage: ElectronStore
+  ElectronVuexStorage: ElectronStore | null
   ipcMain: Electron.IpcMain
 }
 export type ProcessType = 'main' | 'renderer'

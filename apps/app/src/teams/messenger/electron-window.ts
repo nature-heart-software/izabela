@@ -2,6 +2,7 @@ import { BrowserWindow, screen } from 'electron'
 import path from 'path'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import { ipcMain } from 'electron-postman'
+import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
 
 const createWindow = async (name: string): Promise<BrowserWindow> => {
   const win = new BrowserWindow({
@@ -35,6 +36,7 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     win.on('hide', () => ipcMain.sendTo(name, 'hide'))
     win.on('focus', () => ipcMain.sendTo(name, 'focus'))
     win.on('blur', () => ipcMain.sendTo(name, 'blur'))
+    electronMessengerWindow.start()
   })
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {

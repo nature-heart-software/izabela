@@ -3,52 +3,60 @@ import { contextBridge, ipcMain, ipcRenderer } from 'electron'
 
 export const isRenderer = typeof window !== 'undefined'
 
-export class Bridger {
-  constructor() {
-    this.registeredClasses = {}
-  }
+export const createBridge = () => {
+  const registeredInstances = {}
 
-  newClassInRenderer(className, Class) {
-    const functionList = Object.getOwnPropertyNames(Class.prototype).filter(
-      (v) => v !== 'constructor',
+  const newInstancInRenderer = (name, pluginCallback) => {
+    const instance = pluginCallback()
+    const functionList = Object.entries(instance).filter(
+      ([_, value]) => typeof value === 'function',
     )
-    if (!this.registeredClasses[className]) {
-      this.registeredClasses[className] = {}
+    if (!registeredInstances[name]) {
+      registeredInstances[name] = {}
     }
-    for (const functionName of functionList) {
-      if (!this.registeredClasses[className][functionName]) {
-        this.registeredClasses[className][functionName] = (...args) => {
-          return ipcRenderer.invoke(`${className}-${functionName}`, ...args)
+    for (const [functionName] of functionList) {
+      if (!registeredInstances[name][functionName]) {
+        registeredInstances[name][functionName] = (...args) => {
+          return ipcRenderer.invoke(`${name}-${functionName}`, ...args)
         }
       }
     }
-    contextBridge.exposeInMainWorld(className, {
-      ...this.registeredClasses[className],
+    contextBridge.exposeInMainWorld(name, {
+      ...registeredInstances[name],
     })
-    return this.registeredClasses[className]
+    return registeredInstances[name]
   }
 
-  newClassInMain(className, Class, ...args) {
-    const instance = new Class(...args)
-    const functionList = Object.getOwnPropertyNames(Class.prototype).filter(
-      (v) => v !== 'constructor',
+  const newInstancInMain = (name, pluginCallback) => {
+    const instance = pluginCallback()
+    const functionList = Object.entries(instance).filter(
+      ([_, value]) => typeof value === 'function',
     )
-    for (const functionName of functionList) {
-      ipcMain.handle(`${className}-${functionName}`, async (_, ...args) => {
+    for (const [functionName] of functionList) {
+      ipcMain.handle(`${name}-${functionName}`, async (_, ...args) => {
         return await instance[functionName](...args)
       })
     }
     return instance
   }
 
-  new(className, Class) {
+  const registerPlugin = (name, pluginCallback) => {
     if (isRenderer) {
-      return () => this.newClassInRenderer(className, Class)
+      return newInstancInRenderer(name, pluginCallback)
     }
-    return (...args) => this.newClassInMain(className, Class, ...args)
+    return newInstancInMain(name, pluginCallback)
+  }
+  const register = (plugins) => {
+    plugins.forEach(([name, pluginCallback]) => {
+      registerPlugin(name, pluginCallback)
+    })
+  }
+  return {
+    registeredInstances,
+    register,
   }
 }
 
-export const bridge = new Bridger()
+export const bridge = createBridge()
 
-export default bridge.registeredClasses
+export default bridge.registeredInstances

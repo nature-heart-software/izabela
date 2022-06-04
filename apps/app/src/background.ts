@@ -1,13 +1,11 @@
 /* import plugins first, starting with the store and vuex-electron */
 import '@/modules/electron-vuex/main'
 import '@/store'
-import '@/plugins/electron-log'
+import '@/modules/electron-log'
 import '@/teams/speech-worker/plugins/electron-speech'
-import '@/plugins/electron-startup'
-import '@/plugins/electron-updater'
-import '@/plugins/electron-debug/background'
-import '@/modules/electron-dialog'
-import '@/modules/electron-filesystem'
+import '@/modules/electron-startup'
+import '@/modules/electron-updater'
+import '@/modules/electron-debug/background'
 import { app, BrowserWindow, protocol } from 'electron'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import createTray from '@/teams/tray/electron-tray'
@@ -16,6 +14,9 @@ import path from 'path'
 import ElectronWindowManager from '@/modules/electron-window-manager'
 import { createMessengerWindow } from '@/teams/messenger/background'
 import { createSpeechWorkerWindow } from '@/teams/speech-worker/background'
+import { loadBridgedModules } from '@/electron-loaders'
+
+loadBridgedModules()
 ;(() => {
   if (process.platform === 'win32') app.setAppUserModelId(app.name)
   app.commandLine.appendSwitch('disable-renderer-backgrounding')

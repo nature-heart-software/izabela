@@ -37,7 +37,7 @@ class PersistedState {
   createStorage(): ElectronStore {
     return typeof window !== 'undefined'
       ? window.ElectronVuexStorage
-      : (global as AugmentedGlobal).ElectronVuexStorage
+      : ((global as AugmentedGlobal).ElectronVuexStorage as ElectronStore)
   }
 
   async getState() {

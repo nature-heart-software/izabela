@@ -1,14 +1,13 @@
 /* High priority plugins */
-import '@/plugins/electron-log/preload'
+import '@/modules/electron-log/preload'
 import '@/modules/electron-vuex/preload'
-import '@/modules/electron-dialog'
-import '@/modules/electron-filesystem'
 
 /* Other plugins */
-import '@/teams/messenger/modules/electron-messenger-window'
 import { ipcRenderer } from 'electron-postman'
+import { loadBridgedModules } from '@/electron-loaders'
 
 ipcRenderer.exposeInMainWorld('ipc')
+loadBridgedModules()
 
 declare global {
   interface Window {
