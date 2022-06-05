@@ -59,8 +59,8 @@ export const StSwitch = styled('span', props)`
     modelValue &&
     `
     &::before {
-      background-color: ${() => colors.gray['100']};
-      left: ${() => spacing['5']};
+      background-color: ${colors.gray['100']};
+      left: ${spacing['5']};
     }
   `}
 `

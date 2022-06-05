@@ -1,5 +1,4 @@
 import { ExtractPropTypes, PropType } from 'vue'
-import type { Properties } from 'csstype'
 
 import tokens from '@/styles/tokens'
 
