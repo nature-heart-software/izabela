@@ -1,18 +1,20 @@
 /* eslint-disable import/no-extraneous-dependencies */
+import { directionValues, Direction } from '@/core/components/Divider/divider.shared'
+import { Story } from '@storybook/vue3'
 import NvDivider from './NvDivider.vue'
 
 export default {
   title: 'Divider',
   argTypes: {
     direction: {
-      defaultValue: 'horizontal',
-      options: ['horizontal', 'vertical'],
-      control: { type: 'inline-radio' },
+      defaultValue: 'horizontal' as Direction,
+      options: directionValues,
+      control: 'inline-radio',
     },
   },
 }
 
-const Template = (args) => ({
+const Template: Story = (args) => ({
   components: { NvDivider },
   setup() {
     return {

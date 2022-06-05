@@ -1,16 +1,22 @@
 import { ExtractPropTypes, PropType } from 'vue'
-
 import tokens from '@/styles/tokens'
 
-export type StackPosition = 'right' | 'center' | 'left' | 'apart'
+export const justifyValues = ['left', 'center', 'right', 'apart']
+export type Justify = typeof justifyValues[number]
+export const alignValues = ['stretch', 'center', 'start', 'end']
+export type Align = typeof alignValues[number]
+
 export const props = {
   spacing: {
     type: Number as PropType<keyof typeof tokens.spacing>,
     default: 3,
   },
-  align: { type: String as PropType<'stretch' | 'center' | 'start' | 'end'>, default: 'stretch' },
+  align: {
+    type: String as PropType<Align>,
+    default: 'stretch',
+  },
   justify: {
-    type: String as PropType<'start' | 'center' | 'end' | 'between' | 'around'>,
+    type: String as PropType<Justify>,
     default: 'center',
   },
   as: {

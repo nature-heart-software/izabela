@@ -1,8 +1,9 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { ref } from 'vue'
+import { Story } from '@storybook/vue3'
 import NvSelect from './NvSelect.vue'
 import NvOption from './NvOption.vue'
-import { props } from './select.shared'
+import { props, sizeValues } from './select.shared'
 
 export default {
   title: 'Select',
@@ -11,16 +12,16 @@ export default {
     size: {
       defaultValue: props.size.default,
       control: 'inline-radio',
-      options: ['sm', 'md', 'lg'],
+      options: sizeValues,
     },
     placeholder: {
       defaultValue: 'Select some options...',
-      control: { type: 'text' },
+      control: 'text',
     },
   },
 }
 
-const Template = (args) => ({
+const Template: Story = (args) => ({
   components: { NvSelect, NvOption },
   setup() {
     return {

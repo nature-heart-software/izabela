@@ -1,4 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
+import { Story } from '@storybook/vue3'
 import NvGroup from './NvGroup.vue'
 import NvButton from '../Button/NvButton.vue'
 
@@ -7,7 +8,7 @@ export default {
   component: NvGroup,
 }
 
-const Template = (args) => ({
+const Template: Story = (args) => ({
   components: { NvGroup, NvButton },
   setup() {
     return {

@@ -1,23 +1,24 @@
 /* eslint-disable import/no-extraneous-dependencies */
+import { Story } from '@storybook/vue3'
 import NvCard from './NvCard.vue'
-import { props } from './card.shared'
+import { props, sizeValues } from './card.shared'
 
 export default {
   title: 'Card',
   argTypes: {
     content: {
       defaultValue: 'hello world',
-      control: { type: 'text' },
+      control: 'text',
     },
     size: {
       defaultValue: props.size.default,
       control: 'inline-radio',
-      options: ['xs', 'sm', 'md'],
+      options: sizeValues,
     },
   },
 }
 
-const Template = (args) => ({
+const Template: Story = (args) => ({
   components: { NvCard },
   setup() {
     return {

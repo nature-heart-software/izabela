@@ -1,7 +1,9 @@
 import { ExtractPropTypes, PropType } from 'vue'
-import type { Properties } from 'csstype'
 
-export type Type = 'caption' | 'label' | 'body-small' | 'body' | 'subtitle' | 'title'
+export const typeValues = ['caption', 'label', 'body-small', 'body', 'subtitle', 'title']
+export type Type = typeof typeValues[number]
+export const alignValues = ['stretch', 'center', 'start', 'end']
+export type Align = typeof alignValues[number]
 
 export const props = {
   size: {
@@ -17,7 +19,7 @@ export const props = {
     default: 'body',
   },
   align: {
-    type: String as PropType<Properties['textAlign']>,
+    type: String as PropType<Align>,
     default: '',
   },
 }

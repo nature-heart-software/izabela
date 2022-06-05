@@ -1,6 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
+import { Story } from '@storybook/vue3'
 import NvButton from './NvButton.vue'
-import { props } from './button.shared'
+import { props, sizeValues, typeValues } from './button.shared'
 
 export default {
   title: 'Button',
@@ -8,34 +9,34 @@ export default {
   argTypes: {
     content: {
       defaultValue: 'hello world',
-      control: { type: 'text' },
+      control: 'text',
     },
     type: {
       defaultValue: props.type.default,
-      options: ['default', 'plain', 'ghost', 'ghost-alt'],
-      control: { type: 'inline-radio' },
+      options: typeValues,
+      control: 'inline-radio',
     },
     size: {
       defaultValue: props.size.default,
-      options: ['xs', 'sm', 'md', 'lg'],
-      control: { type: 'inline-radio' },
+      options: sizeValues,
+      control: 'inline-radio',
     },
     selected: {
       defaultValue: props.selected.default,
-      control: { type: 'boolean' },
+      control: 'boolean',
     },
     squared: {
       defaultValue: props.squared.default,
-      control: { type: 'boolean' },
+      control: 'boolean',
     },
     iconName: {
       defaultValue: '',
-      control: { type: 'text' },
+      control: 'text',
     },
   },
 }
 
-const Template = (args) => ({
+const Template: Story = (args) => ({
   components: { NvButton },
   setup() {
     return {

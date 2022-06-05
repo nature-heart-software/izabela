@@ -3,10 +3,12 @@ import type { Properties } from 'csstype'
 
 import tokens from '@/styles/tokens'
 
-export type GroupPosition = 'right' | 'center' | 'left' | 'apart'
+export const positionValues = ['left', 'center', 'right', 'apart'] as const
+export type Position = typeof positionValues[number]
+
 export const props = {
   position: {
-    type: String as PropType<GroupPosition>,
+    type: String as PropType<Position>,
     default: 'left',
   },
   noWrap: { type: Boolean, default: false },

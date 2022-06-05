@@ -1,5 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import tokens from '@/styles/tokens'
+import { Story } from '@storybook/vue3'
 import NvIcon from './NvIcon.vue'
 import { props } from './icon.shared'
 
@@ -9,12 +10,12 @@ export default {
     size: {
       defaultValue: props.size.default,
       options: Object.keys(tokens.fontSize).map((key) => key),
-      control: { type: 'inline-radio' },
+      control: 'inline-radio',
     },
   },
 }
 
-const Template = (args) => ({
+const Template: Story = (args) => ({
   components: { NvIcon },
   setup() {
     return {

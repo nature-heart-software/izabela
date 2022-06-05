@@ -1,5 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { ref } from 'vue'
+import { Story } from '@storybook/vue3'
 import NvSwitch from './NvSwitch.vue'
 
 export default {
@@ -9,7 +10,7 @@ export default {
   },
 }
 
-const Template = (args) => ({
+const Template: Story = (args) => ({
   components: { NvSwitch },
   setup() {
     return {

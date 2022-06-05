@@ -1,28 +1,29 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { ref } from 'vue'
+import { Story } from '@storybook/vue3'
 import NvInput from './NvInput.vue'
-import { props } from './input.shared'
+import { props, sizeValues } from './input.shared'
 
 export default {
   title: 'Input',
   argTypes: {
     content: {
       defaultValue: 'hello world',
-      control: { type: 'text' },
+      control: 'text',
     },
     placeholder: {
       defaultValue: 'Enter some text...',
-      control: { type: 'text' },
+      control: 'text',
     },
     size: {
       defaultValue: props.size.default,
       control: 'inline-radio',
-      options: ['sm', 'md', 'lg'],
+      options: sizeValues,
     },
   },
 }
 
-const Template = (args) => ({
+const Template: Story = (args) => ({
   components: { NvInput },
   setup() {
     return {
