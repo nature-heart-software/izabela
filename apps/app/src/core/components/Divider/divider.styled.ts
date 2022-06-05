@@ -8,7 +8,7 @@ const { colors } = tokens
 
 export const StDivider = styled('div', props)`
   ${({ direction }) => [direction === 'vertical' ? 'border-right' : 'border-top']}: ${() =>
-    rem('1px')} solid ${() => colors.gray['20']};
+    rem(1)} solid ${() => colors.gray['20']};
   ${({ direction }) =>
     direction === 'vertical' &&
     `

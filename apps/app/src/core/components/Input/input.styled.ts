@@ -5,24 +5,25 @@ import { props } from './input.shared'
 import { Props, Size } from './input.shared'
 import { CSSObject } from '@/types/css-in-js'
 import { fontSizeStyle } from '@/utils/css-in-js'
+import { rem } from 'polished'
 
 const { fontSize, spacing, borderRadius, borderWidth, colors, transition } = tokens
 const getStyleFromSize = ({ size }: Props) => {
   const styles: Record<Size, CSSObject> = {
     sm: {
       ...fontSizeStyle(fontSize['1']),
-      padding: `0 ${spacing['3']}`,
-      height: spacing['6'],
+      padding: `0 ${rem(spacing['3'])}`,
+      height: rem(spacing['6']),
     },
     md: {
       ...fontSizeStyle(fontSize['1']),
-      padding: `0 ${spacing['5']}`,
-      height: spacing['7'],
+      padding: `0 ${rem(spacing['5'])}`,
+      height: rem(spacing['7']),
     },
     lg: {
       ...fontSizeStyle(fontSize['2']),
-      padding: `0 ${spacing['5']}`,
-      height: spacing['8'],
+      padding: `0 ${rem(spacing['5'])}`,
+      height: rem(spacing['8']),
     },
   }
   return styles[size]
@@ -40,8 +41,8 @@ export const StInput = styled('div', props)`
     .el-input__inner {
       align-items: center;
       font-weight: 600;
-      border-radius: ${() => borderRadius.DEFAULT};
-      border-width: ${() => borderWidth.DEFAULT};
+      border-radius: ${() => rem(borderRadius.DEFAULT)};
+      border-width: ${() => rem(borderWidth.DEFAULT)};
       outline: 0;
       border-color: ${() => colors.gray['20']};
       transition: ${() => transition.DEFAULT};
@@ -51,7 +52,7 @@ export const StInput = styled('div', props)`
       }
 
       &:focus {
-        box-shadow: 0 0 0 ${() => borderWidth.lg} ${() => colors.gray['10']};
+        box-shadow: 0 0 0 ${() => rem(borderWidth.lg)} ${() => colors.gray['10']};
         border-color: ${() => colors.gray['30']};
       }
 

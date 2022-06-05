@@ -2,6 +2,7 @@
 import styled from 'vue3-styled-components'
 import tokens from '@/styles/tokens'
 import { props } from './group.shared'
+import { rem } from 'polished'
 
 const { spacing } = tokens
 const POSITIONS = {
@@ -28,7 +29,7 @@ export const StGroup = styled('div', props)`
         ? POSITIONS['left']
         : POSITIONS[justify]
       : align};
-  gap: ${({ spacing: spacingKey }) => spacing[spacingKey]};
+  gap: ${({ spacing: spacingKey }) => rem(spacing[spacingKey])};
 
   & > * {
     flex-grow: ${({ grow }) => (grow ? 1 : 0)};

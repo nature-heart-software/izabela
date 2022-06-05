@@ -13,13 +13,13 @@ const { fontSize, spacing, boxShadow, borderRadius, borderWidth, colors, transit
 const getIconStyleFromSize = ({ size }: Props) => {
   const styles: Record<Size, CSSObject> = {
     sm: {
-      right: `${rem(math(`${remToPx(spacing['3'])} + 1px`))}`,
+      right: `${rem(spacing['3'] + 1)}`,
     },
     md: {
-      right: `${rem(math(`${remToPx(spacing['5'])} + 1px`))}`,
+      right: `${rem(spacing['5'] + 1)}`,
     },
     lg: {
-      right: `${rem(math(`${remToPx(spacing['5'])} + 1px`))}`,
+      right: `${rem(spacing['5'] + 1)}`,
     },
   }
   return styles[size]
@@ -28,22 +28,21 @@ const getIconStyleFromSize = ({ size }: Props) => {
 const getStyleFromSize = ({ size }: Props) => {
   const styles: Record<Size, CSSObject> = {
     sm: {
-      padding: `0 ${() => spacing['3']}`,
-      paddingRight: rem(math(`${remToPx(spacing['6'])} + ${remToPx(spacing['3'])}`)),
-      borderRadius: borderRadius.sm,
-      height: spacing['6'],
+      padding: `0 ${() => rem(spacing['3'])}`,
+      paddingRight: rem(spacing['6'] + spacing['3']),
+      borderRadius: rem(borderRadius.sm),
+      height: rem(spacing['6']),
     },
     md: {
-      padding: `0 ${() => spacing['5']}`,
-      paddingRight: rem(math(`${remToPx(spacing['7'])} + ${remToPx(spacing['5'])}`)),
-      height: spacing['7'],
+      padding: `0 ${() => rem(spacing['5'])}`,
+      paddingRight: rem(spacing['7'] + spacing['5']),
+      height: rem(spacing['7']),
     },
     lg: {
-      padding: `0 ${() => spacing['5']}`,
-      paddingRight: rem(math(`${remToPx(spacing['8'])} + ${remToPx(spacing['5'])}`)),
-      height: spacing['8'],
-      fontSize: fontSize['2'][0],
-      ...fontSize['2'][1],
+      padding: `0 ${() => rem(spacing['5'])}`,
+      paddingRight: rem(spacing['8'] + spacing['5']),
+      height: rem(spacing['8']),
+      ...fontSizeStyle(fontSize['2']),
     },
   }
   return styles[size]
@@ -53,15 +52,15 @@ const getPopperStyleFromSize = ({ size }: Props) => {
   const styles: Record<Size, CSSObject> = {
     sm: {
       // top: rem(math(`${ remToPx(spacing['6']) } + ${ remToPx(spacing['3']) }`))+' !important',
-      borderRadius: borderRadius.sm,
+      borderRadius: rem(borderRadius.sm),
     },
     md: {
       // top: rem(math(`${ remToPx(spacing['7']) } + ${ remToPx(spacing['3']) }`))+' !important',
-      borderRadius: borderRadius.DEFAULT,
+      borderRadius: rem(borderRadius.DEFAULT),
     },
     lg: {
       // top: rem(math(`${ remToPx(spacing['8']) } + ${ remToPx(spacing['3']) }`))+' !important',
-      borderRadius: borderRadius.DEFAULT,
+      borderRadius: rem(borderRadius.DEFAULT),
     },
   }
   return styles[size]
@@ -79,7 +78,7 @@ export const StSelect = styled('div', props)`
 
     &.is-focus {
       .el-input__inner {
-        box-shadow: 0 0 0 ${() => borderWidth.lg} ${() => colors.gray['10']};
+        box-shadow: 0 0 0 ${() => rem(borderWidth.lg)} ${() => colors.gray['10']};
         border-color: ${() => colors.gray['30']} !important;
       }
     }
@@ -88,7 +87,7 @@ export const StSelect = styled('div', props)`
       align-items: center;
       ${() => fontSizeStyle(fontSize['1'])}
       font-weight: 600;
-      border-width: ${() => borderWidth.DEFAULT};
+      border-width: ${() => rem(borderWidth.DEFAULT)};
       outline: 0;
       border-color: ${() => colors.gray['20']};
       transition: ${() => transition.DEFAULT};
@@ -99,7 +98,7 @@ export const StSelect = styled('div', props)`
       }
 
       &:focus {
-        box-shadow: 0 0 0 ${() => borderWidth.lg} ${() => colors.gray['10']};
+        box-shadow: 0 0 0 ${() => rem(borderWidth.lg)} ${() => colors.gray['10']};
         border-color: ${() => colors.gray['30']};
       }
 
@@ -130,8 +129,8 @@ export const StSelect = styled('div', props)`
     width: 100%;
 
     .el-select__input {
-      margin-top: ${() => spacing['2']};
-      height: ${() => spacing['6']};
+      margin-top: ${() => rem(spacing['2'])};
+      height: ${() => rem(spacing['6'])};
     }
 
     .el-select__tags {
@@ -139,7 +138,7 @@ export const StSelect = styled('div', props)`
       transform: none;
 
       .el-tag {
-        margin: ${() => spacing['2']} 0 0 ${() => spacing['2']};
+        margin: ${() => rem(spacing['2'])} 0 0 ${() => rem(spacing['2'])};
 
         &--info {
           background-color: ${() => colors.gray['10']};
@@ -163,7 +162,7 @@ export const StSelect = styled('div', props)`
     }
 
     .el-select-dropdown__empty {
-      padding: ${() => spacing['3']};
+      padding: ${() => rem(spacing['3'])};
       ${() => defaultTextStyle()}
     }
 
@@ -195,8 +194,8 @@ export const StOption = styled(ElOption)`
   display: inline-flex;
   align-items: center;
   width: 100%;
-  height: ${() => spacing['7']} !important;
-  padding: 0 ${() => spacing['5']} !important;
+  height: ${() => rem(spacing['7'])} !important;
+  padding: 0 ${() => rem(spacing['5'])} !important;
 
   &:hover:not(.is-disabled),
   &.hover:not(.is-disabled) {
@@ -209,7 +208,7 @@ export const StOption = styled(ElOption)`
   // }
   //
   // &:focus:not(.is-disabled) {
-  //   box-shadow: 0 0 0 ${() => borderWidth.lg} ${() => colors.gray['10']};
+  //   box-shadow: 0 0 0 ${() => rem(borderWidth.lg)} ${() => colors.gray['10']};
   // }
 
   &.selected:not(.is-disabled) {

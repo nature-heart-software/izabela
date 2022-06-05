@@ -2,6 +2,7 @@
 import styled from 'vue3-styled-components'
 import tokens from '@/styles/tokens'
 import { props } from './stack.shared'
+import { rem } from 'polished'
 
 const { spacing } = tokens
 const POSITIONS = {
@@ -21,5 +22,5 @@ export const StStack = styled('div', props)`
   flex-direction: column;
   justify-content: ${({ justify }) => POSITIONS[justify]};
   align-items: ${({ align }) => POSITIONS[align]};
-  gap: ${({ spacing: spacingKey }) => spacing[spacingKey]};
+  gap: ${({ spacing: spacingKey }) => rem(spacing[spacingKey])};
 `

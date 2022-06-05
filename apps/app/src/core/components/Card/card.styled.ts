@@ -4,26 +4,27 @@ import tokens from '@/styles/tokens'
 import { props } from './card.shared'
 import { Props, Size } from './card.shared'
 import { CSSObject } from '@/types/css-in-js'
+import { rem } from 'polished'
 
 const { colors, spacing, borderRadius, boxShadow } = tokens
 const getStyleFromSize = ({ size }: Props) => {
   const styles: Record<Size, CSSObject> = {
     xs: {
-      padding: `${spacing['2']}`,
+      padding: `${rem(spacing['2'])}`,
     },
     sm: {
-      padding: `${spacing['3']}`,
+      padding: `${rem(spacing['3'])}`,
     },
     md: {
-      padding: `${spacing['5']}`,
+      padding: `${rem(spacing['5'])}`,
     },
   }
   return styles[size]
 }
 export const StCard = styled('div', props)`
   background-color: ${() => colors.white};
-  padding: ${() => spacing['3']};
-  border-radius: ${() => borderRadius.DEFAULT};
+  padding: ${() => rem(spacing['3'])};
+  border-radius: ${() => rem(borderRadius.DEFAULT)};
   box-shadow: ${() => boxShadow.DEFAULT};
   font-size: 0;
   ${getStyleFromSize}

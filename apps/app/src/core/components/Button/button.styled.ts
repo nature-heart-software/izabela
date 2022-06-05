@@ -4,6 +4,7 @@ import tokens from '@/styles/tokens'
 import { props, Props, Size } from './button.shared'
 import { CSSObject } from '@/types/css-in-js'
 import { fontSizeStyle } from '@/utils/css-in-js'
+import { rem } from 'polished'
 
 const { spacing, borderWidth, borderRadius, fontSize, colors, transition, boxShadow } = tokens
 
@@ -11,36 +12,36 @@ const getStyleFromSize = ({ size }: Props) => {
   const styles: Record<Size, CSSObject> = {
     xs: {
       ...fontSizeStyle(fontSize['1']),
-      padding: `0 ${spacing['2']}`,
-      height: spacing['5'],
-      borderRadius: borderRadius.xs,
+      padding: `0 ${rem(spacing['2'])}`,
+      height: rem(spacing['5']),
+      borderRadius: rem(borderRadius.xs),
       '> * + *': {
-        marginLeft: spacing['2'],
+        marginLeft: rem(spacing['2']),
       },
     },
     sm: {
       ...fontSizeStyle(fontSize['1']),
-      padding: `0 ${spacing['3']}`,
-      height: spacing['6'],
-      borderRadius: borderRadius.sm,
+      padding: `0 ${rem(spacing['3'])}`,
+      height: rem(spacing['6']),
+      borderRadius: rem(borderRadius.sm),
       '> * + *': {
-        marginLeft: spacing['2'],
+        marginLeft: rem(spacing['2']),
       },
     },
     md: {
       ...fontSizeStyle(fontSize['1']),
-      padding: `0 ${spacing['5']}`,
-      height: spacing['7'],
+      padding: `0 ${rem(spacing['5'])}`,
+      height: rem(spacing['7']),
       '> * + *': {
-        marginLeft: spacing['3'],
+        marginLeft: rem(spacing['3']),
       },
     },
     lg: {
       ...fontSizeStyle(fontSize['2']),
-      padding: `0 ${spacing['5']}`,
-      height: spacing['8'],
+      padding: `0 ${rem(spacing['5'])}`,
+      height: rem(spacing['8']),
       '> * + *': {
-        marginLeft: spacing['3'],
+        marginLeft: rem(spacing['3']),
       },
     },
   }
@@ -50,16 +51,16 @@ const getStyleFromSize = ({ size }: Props) => {
 const getStyleFromSquared = ({ squared, size }: Props) => {
   const styles: Record<Size, CSSObject> = {
     xs: {
-      width: (squared && spacing['5']) || '',
+      width: (squared && rem(spacing['5'])) || '',
     },
     sm: {
-      width: (squared && spacing['6']) || '',
+      width: (squared && rem(spacing['6'])) || '',
     },
     md: {
-      width: (squared && spacing['7']) || '',
+      width: (squared && rem(spacing['7'])) || '',
     },
     lg: {
-      width: (squared && spacing['8']) || '',
+      width: (squared && rem(spacing['8'])) || '',
     },
   }
 
@@ -70,8 +71,8 @@ export const StButton = styled('button', props)`
   display: inline-flex;
   align-items: center;
   font-weight: 600;
-  border-radius: ${() => borderRadius.DEFAULT};
-  border-width: ${() => borderWidth.DEFAULT};
+  border-radius: ${() => rem(borderRadius.DEFAULT)};
+  border-width: ${() => rem(borderWidth.DEFAULT)};
   outline: 0;
   transition: ${() => transition.DEFAULT};
   ${({ align = '' }) => align && `justify-content: ${align};`}
@@ -124,7 +125,7 @@ export const StButton = styled('button', props)`
             }
 
             &:focus {
-                box-shadow: 0 0 0 ${borderWidth.lg} ${colors.gray['70']};
+                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${colors.gray['70']};
             }
 
             ${[
@@ -148,7 +149,7 @@ export const StButton = styled('button', props)`
             }
 
             &:focus {
-                box-shadow: 0 0 0 ${borderWidth.lg} ${colors.gray['10']};
+                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${colors.gray['10']};
             }
 
             ${[
@@ -171,7 +172,7 @@ export const StButton = styled('button', props)`
             }
 
             &:focus {
-                box-shadow: 0 0 0 ${borderWidth.lg} ${colors.gray['10']};
+                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${colors.gray['10']};
             }
 
             ${[
