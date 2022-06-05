@@ -11,7 +11,6 @@ import { computed, defineProps } from 'vue'
 import { isVNodeEmpty } from '@/utils/vue'
 import { StButton } from './button.styled'
 import { props, Size } from './button.shared'
-import NvText from '../Text/NvText.vue'
 import NvIcon from '../Icon/NvIcon.vue'
 
 const componentProps = defineProps(props)
