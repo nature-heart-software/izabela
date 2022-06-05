@@ -1,7 +1,7 @@
 import { ExtractPropTypes, PropType } from 'vue'
 import type { Properties } from 'csstype'
 
-import theme from '@/styles/tokens'
+import tokens from '@/styles/tokens'
 
 export type GroupPosition = 'right' | 'center' | 'left' | 'apart'
 export const props = {
@@ -12,7 +12,7 @@ export const props = {
   noWrap: { type: Boolean, default: false },
   grow: { type: Boolean, default: false },
   spacing: {
-    type: Number as PropType<keyof typeof theme.spacing>,
+    type: Number as PropType<keyof typeof tokens.spacing>,
     default: 3,
   },
   direction: {

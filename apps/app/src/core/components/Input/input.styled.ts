@@ -1,26 +1,28 @@
 /* eslint-disable */
 import styled from 'vue3-styled-components'
-import store from '@/store'
+import tokens from '@/styles/tokens'
 import { props } from './input.shared'
 import { Props, Size } from './input.shared'
 import { CSSObject } from '@/types/css-in-js'
+import { fontSizeStyle } from '@/utils/css-in-js'
 
-const { fontSize, spacing, borderRadius, borderWidth, colors, transition } = store.getters.theme
+const { fontSize, spacing, borderRadius, borderWidth, colors, transition } = tokens
 const getStyleFromSize = ({ size }: Props) => {
   const styles: { [key in Size]: CSSObject } = {
     sm: {
+      ...fontSizeStyle(fontSize['1']),
       padding: `0 ${spacing['3']}`,
       height: spacing['6'],
     },
     md: {
+      ...fontSizeStyle(fontSize['1']),
       padding: `0 ${spacing['5']}`,
       height: spacing['7'],
     },
     lg: {
+      ...fontSizeStyle(fontSize['2']),
       padding: `0 ${spacing['5']}`,
       height: spacing['8'],
-      fontSize: fontSize['2'][0],
-      ...fontSize['2'][1],
     },
   }
   return styles[size]
@@ -37,26 +39,24 @@ export const StInput = styled('div', props)`
 
     .el-input__inner {
       align-items: center;
-      font-size: ${fontSize['1'][0]};
-      ${fontSize['1'][1]}
       font-weight: 600;
-      border-radius: ${borderRadius.DEFAULT};
-      border-width: ${borderWidth.DEFAULT};
+      border-radius: ${() => borderRadius.DEFAULT};
+      border-width: ${() => borderWidth.DEFAULT};
       outline: 0;
-      border-color: ${colors.gray['20']};
-      transition: ${transition.DEFAULT};
+      border-color: ${() => colors.gray['20']};
+      transition: ${() => transition.DEFAULT};
 
       &:hover {
-        border-color: ${colors.gray['30']};
+        border-color: ${() => colors.gray['30']};
       }
 
       &:focus {
-        box-shadow: 0 0 0 ${borderWidth.lg} ${colors.gray['10']};
-        border-color: ${colors.gray['30']};
+        box-shadow: 0 0 0 ${() => borderWidth.lg} ${() => colors.gray['10']};
+        border-color: ${() => colors.gray['30']};
       }
 
       &::placeholder {
-        color: ${colors.gray['40']};
+        color: ${() => colors.gray['40']};
         font-weight: 300;
       }
 

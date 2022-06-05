@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import theme from '@/styles/tokens'
+import tokens from '@/styles/tokens'
 import NvIcon from './NvIcon.vue'
 import { props } from './icon.shared'
 
@@ -8,7 +8,7 @@ export default {
   argTypes: {
     size: {
       defaultValue: props.size.default,
-      options: Object.keys(theme.fontSize).map((key) => key),
+      options: Object.keys(tokens.fontSize).map((key) => key),
       control: { type: 'inline-radio' },
     },
   },

@@ -1,8 +1,8 @@
 <template>
   <StButton v-bind="{ ...$props, squared: componentProps.squared || isVNodeEmpty($slots.default) }">
-    <NvText v-if="!isVNodeEmpty($slots.default)" ref="content" as="span" size="1">
+    <span v-if="!isVNodeEmpty($slots.default)" ref="content">
       <slot />
-    </NvText>
+    </span>
     <NvIcon v-if="componentProps.iconName" :name="componentProps.iconName" :size="iconSize" />
   </StButton>
 </template>

@@ -1,9 +1,9 @@
 /* eslint-disable */
 import styled from 'vue3-styled-components'
-import store from '@/store'
+import tokens from '@/styles/tokens'
 import { props } from './stack.shared'
 
-const { spacing } = store.getters.theme
+const { spacing } = tokens
 const POSITIONS = {
   start: 'flex-start',
   center: 'center',

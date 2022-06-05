@@ -1,15 +1,16 @@
 /* eslint-disable */
 import styled, { Styled } from 'vue3-styled-components'
-import store from '@/store'
+import tokens from '@/styles/tokens'
 import { props, Props, Size } from './button.shared'
 import { CSSObject } from '@/types/css-in-js'
+import { fontSizeStyle } from '@/utils/css-in-js'
 
-const { spacing, borderWidth, borderRadius, fontSize, colors, transition, boxShadow } =
-  store.getters.theme
+const { spacing, borderWidth, borderRadius, fontSize, colors, transition, boxShadow } = tokens
 
 const getStyleFromSize = ({ size }: Props) => {
   const styles: { [key in Size]: CSSObject } = {
     xs: {
+      ...fontSizeStyle(fontSize['1']),
       padding: `0 ${spacing['2']}`,
       height: spacing['5'],
       borderRadius: borderRadius.xs,
@@ -18,6 +19,7 @@ const getStyleFromSize = ({ size }: Props) => {
       },
     },
     sm: {
+      ...fontSizeStyle(fontSize['1']),
       padding: `0 ${spacing['3']}`,
       height: spacing['6'],
       borderRadius: borderRadius.sm,
@@ -26,6 +28,7 @@ const getStyleFromSize = ({ size }: Props) => {
       },
     },
     md: {
+      ...fontSizeStyle(fontSize['1']),
       padding: `0 ${spacing['5']}`,
       height: spacing['7'],
       '> * + *': {
@@ -33,7 +36,7 @@ const getStyleFromSize = ({ size }: Props) => {
       },
     },
     lg: {
-      fontSize: fontSize['2'][0],
+      ...fontSizeStyle(fontSize['2']),
       padding: `0 ${spacing['5']}`,
       height: spacing['8'],
       '> * + *': {
@@ -47,16 +50,16 @@ const getStyleFromSize = ({ size }: Props) => {
 const getStyleFromSquared = ({ squared, size }: Props) => {
   const styles: { [key in Size]: CSSObject } = {
     xs: {
-      width: squared && spacing['5'],
+      width: (squared && spacing['5']) || '',
     },
     sm: {
-      width: squared && spacing['6'],
+      width: (squared && spacing['6']) || '',
     },
     md: {
-      width: squared && spacing['7'],
+      width: (squared && spacing['7']) || '',
     },
     lg: {
-      width: squared && spacing['8'],
+      width: (squared && spacing['8']) || '',
     },
   }
 
@@ -66,15 +69,13 @@ const getStyleFromSquared = ({ squared, size }: Props) => {
 export const StButton = styled('button', props)`
   display: inline-flex;
   align-items: center;
-  font-size: ${fontSize['1'][0]};
-  ${fontSize['1'][1]}
   font-weight: 600;
-  border-radius: ${borderRadius.DEFAULT};
-  border-width: ${borderWidth.DEFAULT};
+  border-radius: ${() => borderRadius.DEFAULT};
+  border-width: ${() => borderWidth.DEFAULT};
   outline: 0;
-  transition: ${transition.DEFAULT};
+  transition: ${() => transition.DEFAULT};
   ${({ align = '' }) => align && `justify-content: ${align};`}
-  ${(parameter) => getStyleFromSize(parameter)}
+  ${(props) => getStyleFromSize(props)}
   ${({ squared }) =>
     squared &&
     `

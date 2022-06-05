@@ -6,11 +6,8 @@ import settings from '@/entities/settings/store'
 import { SetPropertyPayload } from '@/utils/vuex'
 import domBoundariesStore from '@/modules/vue-dom-boundaries/dom-boundaries.store'
 
-import theme from '@/styles/tokens'
-
 const store = createStore({
   getters: {
-    theme: () => theme,
     isReady: (state: any) => () => Promise.all([state['electron-vuex'].isReady()]),
   },
   modules: {

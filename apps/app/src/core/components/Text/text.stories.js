@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import theme from '@/styles/tokens'
+import tokens from '@/styles/tokens'
 import NvText from './NvText.vue'
 
 export default {
@@ -10,7 +10,7 @@ export default {
       control: { type: 'text' },
     },
     size: {
-      options: Object.keys(theme.fontSize).map((key) => key),
+      options: Object.keys(tokens.fontSize).map((key) => key),
       control: { type: 'inline-radio' },
     },
     type: {
