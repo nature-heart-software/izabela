@@ -11,10 +11,7 @@ import theme from '@/styles/tokens'
 const store = createStore({
   getters: {
     theme: () => theme,
-    isReady:
-      ({ state }: any) =>
-      () =>
-        Promise.all([state['electron-vuex/isReady']()]),
+    isReady: (state: any) => () => Promise.all([state['electron-vuex'].isReady()]),
   },
   modules: {
     messenger,
