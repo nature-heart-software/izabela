@@ -13,8 +13,8 @@ body {
 }
 </style>
 <script lang="ts" setup>
-import SpeechListener from '@/teams/speech-worker/components/SpeechListener.vue'
-import SpeechSynthesizer from '@/teams/speech-worker/components/SpeechSynthesizer.vue'
+import SpeechListener from '@/teams/speech-worker/components/NvSpeechListener.vue'
+import SpeechSynthesizer from '@/teams/speech-worker/components/NvSpeechSynthesizer.vue'
 import { useStoreReady } from '@/hooks'
 
 const { data: storeReady } = useStoreReady()

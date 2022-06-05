@@ -188,12 +188,12 @@ import NvDivider from '@/core/components/Divider/NvDivider.vue'
 import NvInput from '@/core/components/Input/NvInput.vue'
 import store from '@/store'
 import { useSettingsPopover } from '@/entities/settings/hooks'
-import SpeechEngineSelect from '@/entities/speech/components/inputs/SpeechEngineSelect.vue'
-import APTTSVoiceSelect from '@/entities/speech/components/inputs/APTTSVoiceSelect.vue'
-import IWTTSVoiceSelect from '@/entities/speech/components/inputs/IWTTSVoiceSelect.vue'
-import GCTTSVoiceSelect from '@/entities/speech/components/inputs/GCTTSVoiceSelect.vue'
-import MATTSVoiceSelect from '@/entities/speech/components/inputs/MATTSVoiceSelect.vue'
-import SayTTSVoiceSelect from '@/entities/speech/components/inputs/SayTTSVoiceSelect.vue'
+import SpeechEngineSelect from '@/entities/speech/components/inputs/NvSpeechEngineSelect.vue'
+import APTTSVoiceSelect from '@/entities/speech/components/inputs/NvAPTTSVoiceSelect.vue'
+import IWTTSVoiceSelect from '@/entities/speech/components/inputs/NvIWTTSVoiceSelect.vue'
+import GCTTSVoiceSelect from '@/entities/speech/components/inputs/NvGCTTSVoiceSelect.vue'
+import MATTSVoiceSelect from '@/entities/speech/components/inputs/NvMATTSVoiceSelect.vue'
+import SayTTSVoiceSelect from '@/entities/speech/components/inputs/NvSayTTSVoiceSelect.vue'
 
 const { ElectronMessengerWindow, ipc } = window
 const componentProps = defineProps({
