@@ -41,7 +41,7 @@ export default ({ engine: engineName, payload, credentials }: IzabelaMessagePayl
     })
   }
 
-  function ready() {
+  function isReady() {
     return Promise.all([audioDownloaded.promise, audioLoaded.promise])
   }
 
@@ -92,7 +92,7 @@ export default ({ engine: engineName, payload, credentials }: IzabelaMessagePayl
 
   return {
     id,
-    ready,
+    isReady,
     play,
     on,
   }

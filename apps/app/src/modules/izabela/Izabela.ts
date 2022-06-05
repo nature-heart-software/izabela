@@ -28,7 +28,7 @@ export default () => {
     message.on('ended', () => endMessage())
     message.on('error', () => endMessage())
     message
-      .ready()
+      .isReady()
       .then(() => message.play())
       .catch(() => endMessage())
     return message

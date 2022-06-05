@@ -2,8 +2,9 @@ import { autoUpdater } from 'electron-updater'
 import store from '@/store'
 import { createNotification } from '@/utils/electron-notification'
 import { app } from 'electron'
-;(store.state as any)['electron-vuex']
-  .ready()
+
+store.getters
+  .isReady()
   .then(app.whenReady)
   .then(() => {
     const channel = store.getters['settings/persisted'].autoUpdateChannel

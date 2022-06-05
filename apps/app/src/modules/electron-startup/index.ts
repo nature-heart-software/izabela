@@ -1,6 +1,7 @@
 import store from '@/store'
 import { app } from 'electron'
-;(store.state as any)['electron-vuex'].ready().then(() => {
+
+store.getters.isReady().then(() => {
   const { launchOnStartup } = store.getters['settings/persisted']
   console.log('[electron-startup] Launch on startup:', launchOnStartup)
   app.setLoginItemSettings({

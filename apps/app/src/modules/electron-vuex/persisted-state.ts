@@ -9,12 +9,10 @@ import {
 import { Plugin, Store } from 'vuex'
 import type ElectronStore from 'electron-store'
 import { cloneDeep, debounce, defaultsDeep } from 'lodash'
-import mitt from 'mitt'
 // @ts-ignore
 import { purify } from '@/utils/object'
 import { Deferred } from '@/utils/promise'
 
-const emitter = mitt()
 const isReady = Deferred()
 
 const PersistedState = (options: PersistedStateOptions, store: Store<unknown>) => {
@@ -83,12 +81,8 @@ const PersistedState = (options: PersistedStateOptions, store: Store<unknown>) =
   }
 
   function createStoreModule() {
-    const listenToReady = new Promise((resolve) => {
-      emitter.on('electron-vuex/persisted-state/ready', () => resolve(true))
-      emitter.on('electron-vuex/persisted-state/fail', () => resolve(false))
-    })
     const storeState = {
-      ready: () => isReady.promise,
+      isReady: () => isReady.promise,
     }
     store.registerModule<typeof storeState>('electron-vuex', {
       namespaced: true,
