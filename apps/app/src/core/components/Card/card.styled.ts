@@ -7,7 +7,7 @@ import { CSSObject } from '@/types/css-in-js'
 
 const { colors, spacing, borderRadius, boxShadow } = tokens
 const getStyleFromSize = ({ size }: Props) => {
-  const styles: { [key in Size]: CSSObject } = {
+  const styles: Record<Size, CSSObject> = {
     xs: {
       padding: `${spacing['2']}`,
     },

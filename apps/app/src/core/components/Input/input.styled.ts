@@ -8,7 +8,7 @@ import { fontSizeStyle } from '@/utils/css-in-js'
 
 const { fontSize, spacing, borderRadius, borderWidth, colors, transition } = tokens
 const getStyleFromSize = ({ size }: Props) => {
-  const styles: { [key in Size]: CSSObject } = {
+  const styles: Record<Size, CSSObject> = {
     sm: {
       ...fontSizeStyle(fontSize['1']),
       padding: `0 ${spacing['3']}`,

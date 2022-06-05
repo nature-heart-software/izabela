@@ -8,7 +8,7 @@ import { fontSizeStyle } from '@/utils/css-in-js'
 const { spacing, borderWidth, borderRadius, fontSize, colors, transition, boxShadow } = tokens
 
 const getStyleFromSize = ({ size }: Props) => {
-  const styles: { [key in Size]: CSSObject } = {
+  const styles: Record<Size, CSSObject> = {
     xs: {
       ...fontSizeStyle(fontSize['1']),
       padding: `0 ${spacing['2']}`,
@@ -48,7 +48,7 @@ const getStyleFromSize = ({ size }: Props) => {
 }
 
 const getStyleFromSquared = ({ squared, size }: Props) => {
-  const styles: { [key in Size]: CSSObject } = {
+  const styles: Record<Size, CSSObject> = {
     xs: {
       width: (squared && spacing['5']) || '',
     },

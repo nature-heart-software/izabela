@@ -11,7 +11,7 @@ import { fontSizeStyle } from '@/utils/css-in-js'
 
 const { fontSize, spacing, boxShadow, borderRadius, borderWidth, colors, transition } = tokens
 const getIconStyleFromSize = ({ size }: Props) => {
-  const styles: { [key in Size]: CSSObject } = {
+  const styles: Record<Size, CSSObject> = {
     sm: {
       right: `${rem(math(`${remToPx(spacing['3'])} + 1px`))}`,
     },
@@ -26,7 +26,7 @@ const getIconStyleFromSize = ({ size }: Props) => {
 }
 
 const getStyleFromSize = ({ size }: Props) => {
-  const styles: { [key in Size]: CSSObject } = {
+  const styles: Record<Size, CSSObject> = {
     sm: {
       padding: `0 ${() => spacing['3']}`,
       paddingRight: rem(math(`${remToPx(spacing['6'])} + ${remToPx(spacing['3'])}`)),
@@ -50,7 +50,7 @@ const getStyleFromSize = ({ size }: Props) => {
 }
 
 const getPopperStyleFromSize = ({ size }: Props) => {
-  const styles: { [key in Size]: CSSObject } = {
+  const styles: Record<Size, CSSObject> = {
     sm: {
       // top: rem(math(`${ remToPx(spacing['6']) } + ${ remToPx(spacing['3']) }`))+' !important',
       borderRadius: borderRadius.sm,

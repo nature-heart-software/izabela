@@ -15,11 +15,11 @@ import NvIcon from '../Icon/NvIcon.vue'
 
 const componentProps = defineProps(props)
 const iconSize = computed(() => {
-  const sizes: { [key in Size]: string } = {
-    xs: '1',
-    sm: '3',
-    md: '5',
-    lg: '5',
+  const sizes: Record<Size, number> = {
+    xs: 1,
+    sm: 3,
+    md: 5,
+    lg: 5,
   }
   return sizes[componentProps.size]
 })
