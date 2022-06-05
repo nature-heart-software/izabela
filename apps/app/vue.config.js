@@ -5,7 +5,7 @@ const GenerateModulesPlugin = require('@wurielle/generate-modules-webpack-plugin
 const WebpackNotifierPlugin = require('webpack-notifier')
 
 const setConfigAliases = (config) => {
-  config.resolve.alias.set('@package', path.resolve(__dirname, './package.json'))
+  config.resolve.alias.set('@root', path.resolve(__dirname, './'))
 }
 
 module.exports = defineConfig({
@@ -49,14 +49,6 @@ module.exports = defineConfig({
       externals: ['iohook', '@izabela/app-server', '@google-cloud/speech'],
       chainWebpackMainProcess: (config) => {
         setConfigAliases(config)
-        config.module
-          .rule('babel')
-          .before('ts')
-          .use('babel')
-          .loader('babel-loader')
-          .options({
-            plugins: [['inline-json-import', {}]],
-          })
       },
       /* Documentation:
        * https://nklayman.github.io/vue-cli-plugin-electron-builder/guide/configuration.html

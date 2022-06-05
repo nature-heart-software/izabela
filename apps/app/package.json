@@ -46,9 +46,7 @@
     "vue-tippy": "^6.0.0-alpha.54",
     "vue3-moveable": "^0.3.0",
     "vue3-styled-components": "^1.2.1",
-    "webpack-notifier": "^1.15.0",
-    "websocket-stream": "^5.5.2",
-    "ws": "^8.6.0"
+    "webpack-notifier": "^1.15.0"
   },
   "devDependencies": {
     "@storybook/addon-essentials": "^6.5.0-alpha.55",
@@ -76,7 +74,6 @@
     "@vue/eslint-config-typescript": "^9.1.0",
     "@vue/test-utils": "^2.0.0-0",
     "autoprefixer": "^10.4.4",
-    "babel-plugin-inline-json-import": "^0.3.2",
     "chai": "^4.2.0",
     "cypress": "^9.5.3",
     "electron": "^12.2.3",
