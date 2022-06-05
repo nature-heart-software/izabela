@@ -2,7 +2,6 @@
 import '@/modules/electron-vuex/main'
 import '@/store'
 import '@/modules/electron-log'
-import '@/teams/speech-worker/plugins/electron-speech'
 import '@/modules/electron-startup'
 import '@/modules/electron-updater'
 import '@/modules/electron-debug/background'
