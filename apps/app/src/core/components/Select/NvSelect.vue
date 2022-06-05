@@ -21,6 +21,7 @@
 import { computed, defineProps } from 'vue'
 import { ElSelect as WrappedComponent } from 'element-plus'
 import 'element-plus/lib/components/select/style/css'
+import tokens from '@/styles/tokens'
 import { StSelect } from './select.styled'
 import { props, Size } from './select.shared'
 import NvIcon from '../Icon/NvIcon.vue'
@@ -28,7 +29,7 @@ import NvIcon from '../Icon/NvIcon.vue'
 const compopentProps = defineProps(props)
 
 const iconSize = computed(() => {
-  const sizes: Record<Size, number> = {
+  const sizes: Record<Size, keyof typeof tokens.spacing> = {
     sm: 3,
     md: 5,
     lg: 5,

@@ -9,13 +9,14 @@
 <script lang="ts" setup>
 import { computed, defineProps } from 'vue'
 import { isVNodeEmpty } from '@/utils/vue'
+import tokens from '@/styles/tokens'
 import { StButton } from './button.styled'
 import { props, Size } from './button.shared'
 import NvIcon from '../Icon/NvIcon.vue'
 
 const componentProps = defineProps(props)
 const iconSize = computed(() => {
-  const sizes: Record<Size, number> = {
+  const sizes: Record<Size, keyof typeof tokens.spacing> = {
     xs: 1,
     sm: 3,
     md: 5,
