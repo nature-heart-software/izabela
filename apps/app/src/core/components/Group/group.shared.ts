@@ -3,12 +3,14 @@ import type { Properties } from 'csstype'
 
 import tokens from '@/styles/tokens'
 
-export const positionValues = ['left', 'center', 'right', 'apart'] as const
-export type Position = typeof positionValues[number]
+export const justifyValues = ['left', 'center', 'right', 'apart'] as const
+export type Justify = typeof justifyValues[number]
+export const alignValues = ['stretch', 'center', 'start', 'end'] as const
+export type Align = typeof alignValues[number]
 
 export const props = {
-  position: {
-    type: String as PropType<Position>,
+  justify: {
+    type: String as PropType<Justify>,
     default: 'left',
   },
   noWrap: { type: Boolean, default: false },
@@ -21,7 +23,7 @@ export const props = {
     type: String as PropType<'row' | 'column'>,
     default: 'row',
   },
-  align: { type: String as PropType<Properties['alignItems']>, default: 'center' },
+  align: { type: String as PropType<Align>, default: 'center' },
   as: {
     type: String,
     default: 'div',

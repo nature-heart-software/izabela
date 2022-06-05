@@ -1,6 +1,6 @@
 <template>
   <NvStack spacing="5">
-    <NvGroup position="apart">
+    <NvGroup justify="apart">
       <NvText type="label">Play Izabela's speech on default playback device</NvText>
       <NvSwitch
         :modelValue="$store.getters['settings/persisted'].playSpeechOnDefaultPlaybackDevice"
@@ -32,7 +32,7 @@
     </NvFormItem>
     <NvDivider direction="horizontal" />
 
-    <NvGroup align="start" no-wrap position="apart">
+    <NvGroup align="start" no-wrap justify="apart">
       <NvStack>
         <NvText type="label">Install VB-Audio Virtual Cable</NvText>
         <NvText

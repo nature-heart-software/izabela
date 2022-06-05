@@ -6,11 +6,14 @@ import { props } from './stack.shared'
 const { spacing } = tokens
 const POSITIONS = {
   start: 'flex-start',
+  left: 'flex-start',
   center: 'center',
   end: 'flex-end',
+  right: 'flex-end',
   between: 'space-between',
   around: 'space-around',
   stretch: 'stretch',
+  apart: 'space-between',
 }
 
 export const StStack = styled('div', props)`

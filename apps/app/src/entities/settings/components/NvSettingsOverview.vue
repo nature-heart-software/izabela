@@ -5,7 +5,7 @@
       <NvStack spacing="4">
         <NvStack spacing="4">
           <NvCard>
-            <NvGroup no-wrap position="apart" spacing="5">
+            <NvGroup no-wrap justify="apart" spacing="5">
               <NvStack>
                 <NvText type="label">Auto Update Channel</NvText>
               </NvStack>
@@ -26,7 +26,7 @@
       <NvStack spacing="4">
         <NvStack spacing="4">
           <NvCard>
-            <NvGroup no-wrap position="apart" spacing="5">
+            <NvGroup no-wrap justify="apart" spacing="5">
               <NvStack>
                 <NvText type="label">Launch on startup</NvText>
               </NvStack>
@@ -47,7 +47,7 @@
       <NvStack spacing="4">
         <NvStack spacing="4">
           <NvCard>
-            <NvGroup no-wrap position="apart" spacing="5">
+            <NvGroup no-wrap justify="apart" spacing="5">
               <NvStack>
                 <NvText type="label">Debug mode</NvText>
               </NvStack>

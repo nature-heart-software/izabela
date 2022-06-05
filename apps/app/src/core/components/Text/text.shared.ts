@@ -1,8 +1,8 @@
 import { ExtractPropTypes, PropType } from 'vue'
 
-export const typeValues = ['caption', 'label', 'body-small', 'body', 'subtitle', 'title']
+export const typeValues = ['caption', 'label', 'body-small', 'body', 'subtitle', 'title'] as const
 export type Type = typeof typeValues[number]
-export const alignValues = ['stretch', 'center', 'start', 'end']
+export const alignValues = ['stretch', 'center', 'start', 'end'] as const
 export type Align = typeof alignValues[number]
 
 export const props = {
