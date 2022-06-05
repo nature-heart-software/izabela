@@ -62,7 +62,6 @@ module.exports = defineConfig({
        * https://nklayman.github.io/vue-cli-plugin-electron-builder/guide/configuration.html
        */
       mainProcessFile: 'src/electron/background.ts',
-      rendererProcessFile: 'src/electron/renderer.ts',
       mainProcessWatch: [
         './src/**/{electron,node}*/*',
         './src/**/{electron,node}*',

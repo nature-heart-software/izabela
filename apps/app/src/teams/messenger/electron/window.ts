@@ -31,7 +31,7 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     win.setFullScreenable(false)
   }
 
-  win.on('ready-to-show', () => {
+  win.once('ready-to-show', () => {
     win.on('show', () => ipcMain.sendTo(name, 'show'))
     win.on('hide', () => ipcMain.sendTo(name, 'hide'))
     win.on('focus', () => ipcMain.sendTo(name, 'focus'))

@@ -19,11 +19,11 @@ app.whenReady().then(() => {
   process.env.GOOGLE_APPLICATION_CREDENTIALS = googleCloudSpeechCredentialsFilePath
 })
 
-let deferredRecording: Deferred<boolean> | null = null
+let deferredRecording: ReturnType<typeof Deferred> | null = null
 
 iohook.on('keydown', (event) => {
   if ([3640, 54].includes(event.keycode) && !deferredRecording) {
-    const deferred = new Deferred<boolean>()
+    const deferred = Deferred()
     deferredRecording = deferred
     ipcMain.sendTo('speech-worker', 'start-speech-transcription')
   }

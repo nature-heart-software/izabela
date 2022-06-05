@@ -1,3 +1,4 @@
+import '@/electron/renderer'
 import '@/modules/electron-debug/renderer'
 import { createApp } from 'vue'
 import store from '@/store'

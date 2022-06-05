@@ -12,44 +12,36 @@ import { cloneDeep, debounce, defaultsDeep } from 'lodash'
 import mitt from 'mitt'
 // @ts-ignore
 import { purify } from '@/utils/object'
+import { Deferred } from '@/utils/promise'
 
 const emitter = mitt()
+const isReady = Deferred()
 
-class PersistedState {
-  options: PersistedStateOptions
-  store!: Store<unknown>
-  storage!: ElectronStore
-  whitelist!: MutationFilter | null
-  blacklist!: MutationFilter | null
-  setState = debounce((state: any) => {
+const PersistedState = (options: PersistedStateOptions, store: Store<unknown>) => {
+  const storage = createStorage()
+  const whitelist = loadFilter(options.whitelist, 'whitelist')
+  const blacklist = loadFilter(options.blacklist, 'blacklist')
+  const setState = debounce((state: any) => {
     const sanitizedState = purify(state)
-    this.storage.set(this.options.storageName || STORAGE_KEY, sanitizedState)
+    storage.set(options.storageName || STORAGE_KEY, sanitizedState)
   }, 1000)
 
-  constructor(options: PersistedStateOptions, store: Store<unknown>) {
-    this.options = options
-    this.store = store
-    this.storage = this.createStorage()
-    this.whitelist = this.loadFilter(this.options.whitelist, 'whitelist')
-    this.blacklist = this.loadFilter(this.options.blacklist, 'blacklist')
-  }
-
-  createStorage(): ElectronStore {
+  function createStorage(): ElectronStore {
     return typeof window !== 'undefined'
       ? window.ElectronVuexStorage
       : ((global as AugmentedGlobal).ElectronVuexStorage as ElectronStore)
   }
 
-  async getState() {
-    return this.storage.get(this.options.storageName || STORAGE_KEY)
+  async function getState() {
+    return storage.get(options.storageName || STORAGE_KEY)
   }
 
-  loadFilter(filter: MutationFilterOption, name: string): MutationFilter | null {
+  function loadFilter(filter: MutationFilterOption, name: string): MutationFilter | null {
     if (!filter) {
       return null
     }
     if (filter instanceof Array) {
-      return this.filterInArray(filter)
+      return filterInArray(filter)
     }
     if (typeof filter === 'function') {
       return filter
@@ -59,65 +51,72 @@ class PersistedState {
     )
   }
 
-  filterInArray(list: string[]): MutationFilter {
+  function filterInArray(list: string[]): MutationFilter {
     return (mutation) => list.includes(mutation.type)
   }
 
-  checkStorage() {
+  function checkStorage() {
     try {
-      this.storage.set(STORAGE_TEST_KEY, STORAGE_TEST_KEY)
-      this.storage.get(STORAGE_TEST_KEY)
-      this.storage.delete(STORAGE_TEST_KEY)
+      storage.set(STORAGE_TEST_KEY, STORAGE_TEST_KEY)
+      storage.get(STORAGE_TEST_KEY)
+      storage.delete(STORAGE_TEST_KEY)
     } catch (error) {
       throw new Error((error as Error).message)
     }
   }
 
-  async loadInitialState() {
-    const state = await this.getState()
+  async function loadInitialState() {
+    const state = await getState()
 
     if (state) {
-      const mergedState = defaultsDeep(cloneDeep(state), cloneDeep(this.store.state))
-      this.store.replaceState(mergedState)
+      const mergedState = defaultsDeep(cloneDeep(state), cloneDeep(store.state))
+      store.replaceState(mergedState)
     }
   }
 
-  subscribeOnChanges() {
-    this.store.subscribe((mutation, state) => {
-      if (this.blacklist && this.blacklist(mutation)) return
-      if (this.whitelist && !this.whitelist(mutation)) return
-      this.setState(state)
+  function subscribeOnChanges() {
+    store.subscribe((mutation, state) => {
+      if (blacklist && blacklist(mutation)) return
+      if (whitelist && !whitelist(mutation)) return
+      setState(state)
     })
   }
 
-  createStoreModule() {
+  function createStoreModule() {
     const listenToReady = new Promise((resolve) => {
       emitter.on('electron-vuex/persisted-state/ready', () => resolve(true))
       emitter.on('electron-vuex/persisted-state/fail', () => resolve(false))
     })
     const storeState = {
-      ready: () => listenToReady,
+      ready: () => isReady.promise,
     }
-    this.store.registerModule<typeof storeState>('electron-vuex', {
+    store.registerModule<typeof storeState>('electron-vuex', {
       namespaced: true,
       state: storeState,
     })
+  }
+  return {
+    checkStorage,
+    subscribeOnChanges,
+    createStoreModule,
+    loadInitialState,
   }
 }
 
 export default (options: PersistedStateOptions): Plugin<unknown> =>
   (store) => {
     const isPreload = !!(typeof window !== 'undefined' && window.ElectronVuexIsPreload)
-    if (isPreload) return emitter.emit('electron-vuex/persisted-state/ready')
-    const persistedState = new PersistedState(options, store)
+    if (isPreload) return isReady.resolve(true)
+    const persistedState = PersistedState(options, store)
     persistedState.checkStorage()
     persistedState.subscribeOnChanges()
     persistedState.createStoreModule()
+
     Promise.resolve(persistedState.loadInitialState())
       .then(() => {
-        emitter.emit('electron-vuex/persisted-state/ready')
+        isReady.resolve(true)
       })
       .catch(() => {
-        emitter.emit('electron-vuex/persisted-state/fail')
+        isReady.reject()
       })
   }

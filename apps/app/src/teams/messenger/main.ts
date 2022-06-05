@@ -1,3 +1,4 @@
+import '@/electron/renderer'
 import '@/modules/electron-debug/renderer'
 import '@/styles'
 import { createApp } from 'vue'

@@ -7,41 +7,18 @@ import speechEngineManager from '@/entities/speech/modules/speech-engine-manager
 import { getMediaDeviceByLabel } from '@/utils/media-devices'
 import { IzabelaMessageEvent, IzabelaMessagePayload } from './types'
 
-export default class {
-  private id = uuid()
+export default ({ engine: engineName, payload, credentials }: IzabelaMessagePayload) => {
+  const id = uuid()
+  const audio = new Audio()
+  const emitter = mitt()
+  const audioDownloaded = Deferred()
+  const audioLoaded = Deferred()
 
-  private engine: IzabelaMessagePayload['engine']
-
-  private payload: IzabelaMessagePayload['payload']
-
-  private credentials: IzabelaMessagePayload['credentials']
-
-  private audio = new Audio()
-
-  private emitter = mitt()
-
-  private audioDownloaded = new Deferred()
-
-  private audioLoaded = new Deferred()
-
-  constructor({ engine, payload, credentials }: IzabelaMessagePayload) {
-    this.engine = engine
-    this.payload = payload
-    this.credentials = credentials
-    this.addEventListeners()
-    this.downloadAudio()
-      .then(({ data }) => {
-        this.audioDownloaded.resolve(true)
-        this.loadAudio(data)
-      })
-      .catch((reason) => this.onError(reason))
+  function on(event: IzabelaMessageEvent, callback: () => void): void {
+    emitter.on(event, callback)
   }
 
-  public on(event: IzabelaMessageEvent, callback: () => void): void {
-    this.emitter.on(event, callback)
-  }
-
-  public play() {
+  function play() {
     Promise.map(
       store.getters['settings/persisted'].audioOutputDevices,
       async (deviceLabel: string) => {
@@ -49,7 +26,7 @@ export default class {
         const mediaDevice = await getMediaDeviceByLabel(deviceLabel)
         if (mediaDevice) {
           const audioElement: any = document.createElement('audio')
-          audioElement.src = this.audio.src
+          audioElement.src = audio.src
           await audioElement.setSinkId(mediaDevice.deviceId)
           return audioElement
         }
@@ -57,53 +34,66 @@ export default class {
       },
     ).then((audioElements: (HTMLAudioElement | null)[]) => {
       if (!store.getters['settings/persisted'].playSpeechOnDefaultPlaybackDevice) {
-        this.audio.volume = 0
+        audio.volume = 0
       }
-      this.audio.play()
-      audioElements.forEach((audio) => audio && audio.play())
+      audio.play()
+      audioElements.forEach((audioEl) => audioEl && audioEl.play())
     })
   }
 
-  public ready() {
-    return Promise.all([this.audioDownloaded.promise, this.audioLoaded.promise])
+  function ready() {
+    return Promise.all([audioDownloaded.promise, audioLoaded.promise])
   }
 
-  private downloadAudio() {
+  function downloadAudio() {
     // TODO: change depending on engine
-    const engine = speechEngineManager.getEngineById(this.engine)
+    const engine = speechEngineManager.getEngineById(engineName)
     if (!engine)
       return Promise.reject(new Error('Izabela Message: Selected engine was   not found'))
     return engine.synthesizeSpeech({
-      credentials: this.credentials,
-      payload: this.payload,
+      credentials,
+      payload,
     })
   }
 
-  private loadAudio(blob: Blob) {
-    this.audio.src = URL.createObjectURL(blob)
-    this.audio.load()
+  function loadAudio(blob: Blob) {
+    audio.src = URL.createObjectURL(blob)
+    audio.load()
   }
 
-  private getAudioProgress() {
-    return this.audio.currentTime / this.audio.duration
+  function getAudioProgress() {
+    return audio.currentTime / audio.duration
   }
 
-  private addEventListeners() {
-    this.audio.addEventListener('canplaythrough', () => {
-      this.emitter.emit('canplaythrough')
-      this.audioLoaded.resolve(true)
+  function addEventListeners() {
+    audio.addEventListener('canplaythrough', () => {
+      emitter.emit('canplaythrough')
+      audioLoaded.resolve(true)
     })
-    this.audio.addEventListener('started', () => this.emitter.emit('started'))
-    this.audio.addEventListener('ended', () => this.emitter.emit('ended'))
-    this.audio.addEventListener('progress', () =>
-      this.emitter.emit('progress', this.getAudioProgress()),
-    )
-    this.audio.addEventListener('error', (e) => this.onError(e))
+    audio.addEventListener('started', () => emitter.emit('started'))
+    audio.addEventListener('ended', () => emitter.emit('ended'))
+    audio.addEventListener('progress', () => emitter.emit('progress', getAudioProgress()))
+    audio.addEventListener('error', (e) => onError(e))
   }
 
-  private onError(e: ErrorEvent) {
-    this.emitter.emit('error')
-    this.audioDownloaded.reject(e)
-    this.audioLoaded.reject(e)
+  function onError(e: ErrorEvent) {
+    emitter.emit('error')
+    audioDownloaded.reject(e)
+    audioLoaded.reject(e)
+  }
+
+  addEventListeners()
+  downloadAudio()
+    .then(({ data }) => {
+      audioDownloaded.resolve(true)
+      loadAudio(data)
+    })
+    .catch((reason) => onError(reason))
+
+  return {
+    id,
+    ready,
+    play,
+    on,
   }
 }

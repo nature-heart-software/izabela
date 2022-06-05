@@ -1,60 +1,66 @@
 import { IzabelaMessagePayload } from '@/modules/izabela/types'
 import IzabelaMessage from './IzabelaMessage'
 
-export default class {
-  private currentlyPlayingMessage: IzabelaMessage | null = null
+export default () => {
+  let currentlyPlayingMessage: ReturnType<typeof IzabelaMessage> | null = null
 
-  private messageQueue: IzabelaMessage[] = []
+  let messageQueue: ReturnType<typeof IzabelaMessage>[] = []
 
-  public say(messagePayload: IzabelaMessagePayload): IzabelaMessage {
-    const message = this.createMessage(messagePayload)
-    if (this.currentlyPlayingMessage) {
-      return this.queueMessage(message)
+  function clearQueue() {
+    if (messageQueue.length > 0) {
+      messageQueue = []
     }
-    return this.playMessage(message)
   }
 
-  public endMessage() {
+  function endMessage() {
     // TODO: stop currently playing message if that's even possible
-    this.currentlyPlayingMessage = null
-    this.playNextMessage()
+    currentlyPlayingMessage = null
+    playNextMessage()
   }
 
-  public endAllMessages() {
-    this.currentlyPlayingMessage = null
-    this.clearQueue()
+  function endAllMessages() {
+    currentlyPlayingMessage = null
+    clearQueue()
   }
 
-  private createMessage(messagePayload: IzabelaMessagePayload) {
-    return new IzabelaMessage(messagePayload)
-  }
-
-  private queueMessage(message: IzabelaMessage) {
-    this.messageQueue.push(message)
-    return message
-  }
-
-  private playMessage(message: IzabelaMessage) {
-    this.currentlyPlayingMessage = message
-    message.on('ended', () => this.endMessage())
-    message.on('error', () => this.endMessage())
+  function playMessage(message: ReturnType<typeof IzabelaMessage>) {
+    currentlyPlayingMessage = message
+    message.on('ended', () => endMessage())
+    message.on('error', () => endMessage())
     message
       .ready()
       .then(() => message.play())
-      .catch(() => this.endMessage())
+      .catch(() => endMessage())
     return message
   }
 
-  private playNextMessage() {
-    if (this.messageQueue.length > 0) {
-      this.playMessage(this.messageQueue[0])
-      this.messageQueue.splice(0, 1)
+  function playNextMessage() {
+    if (messageQueue.length > 0) {
+      playMessage(messageQueue[0])
+      messageQueue.splice(0, 1)
     }
   }
 
-  private clearQueue() {
-    if (this.messageQueue.length > 0) {
-      this.messageQueue = []
+  function createMessage(messagePayload: IzabelaMessagePayload) {
+    return IzabelaMessage(messagePayload)
+  }
+
+  function queueMessage(message: ReturnType<typeof IzabelaMessage>) {
+    messageQueue.push(message)
+    return message
+  }
+
+  function say(messagePayload: IzabelaMessagePayload): ReturnType<typeof IzabelaMessage> {
+    const message = createMessage(messagePayload)
+    if (currentlyPlayingMessage) {
+      return queueMessage(message)
     }
+    return playMessage(message)
+  }
+
+  return {
+    say,
+    endMessage,
+    endAllMessages,
   }
 }

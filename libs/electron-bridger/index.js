@@ -3,7 +3,7 @@ import { contextBridge, ipcMain, ipcRenderer } from 'electron'
 
 export const isRenderer = typeof window !== 'undefined'
 
-export const createBridge = () => {
+export const Bridge = () => {
   const registeredInstances = {}
 
   const newInstancInRenderer = (name, pluginCallback) => {
@@ -57,6 +57,6 @@ export const createBridge = () => {
   }
 }
 
-export const bridge = createBridge()
+export const bridge = Bridge()
 
 export default bridge.registeredInstances
