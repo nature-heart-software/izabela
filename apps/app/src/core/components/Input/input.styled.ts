@@ -4,28 +4,34 @@ import tokens from '@/styles/tokens'
 import { props } from './input.shared'
 import { Props, Size } from './input.shared'
 import { CSSObject } from '@/types/css-in-js'
-import { borderRadiusBySizeStyle, fontSizeStyle } from '@/utils/css-in-js'
+import {
+  borderRadiusBySizeStyle,
+  fontSizeStyle,
+  horizontalPaddingBySizeStyle,
+} from '@/utils/css-in-js'
 import { rem } from 'polished'
 
 const { fontSize, spacing, borderRadius, borderWidth, colors, transition } = tokens
 const getStyleFromSize = ({ size }: Props) => {
+  const borderRadius = borderRadiusBySizeStyle(size)
+  const horizontalPadding = horizontalPaddingBySizeStyle(size)
   const styles: Record<Size, CSSObject> = {
     sm: {
       ...fontSizeStyle(fontSize['1']),
-      ...borderRadiusBySizeStyle(size),
-      padding: `0 ${rem(spacing['3'])}`,
+      ...borderRadius,
+      ...horizontalPadding,
       height: rem(spacing['6']),
     },
     md: {
       ...fontSizeStyle(fontSize['1']),
-      ...borderRadiusBySizeStyle(size),
-      padding: `0 ${rem(spacing['5'])}`,
+      ...borderRadius,
+      ...horizontalPadding,
       height: rem(spacing['7']),
     },
     lg: {
       ...fontSizeStyle(fontSize['2']),
-      ...borderRadiusBySizeStyle(size),
-      padding: `0 ${rem(spacing['5'])}`,
+      ...borderRadius,
+      ...horizontalPadding,
       height: rem(spacing['8']),
     },
   }

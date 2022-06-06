@@ -3,7 +3,7 @@
     <span v-if="!isVNodeEmpty($slots.default)" ref="content">
       <slot />
     </span>
-    <NvIcon v-if="componentProps.iconName" :name="componentProps.iconName" :size="iconSize" />
+    <NvIcon class="nv-button__icon" v-if="componentProps.iconName" :name="componentProps.iconName" :size="iconSize" />
   </StButton>
 </template>
 <script lang="ts" setup>

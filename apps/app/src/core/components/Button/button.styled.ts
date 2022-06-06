@@ -3,48 +3,46 @@ import styled, { Styled } from 'vue3-styled-components'
 import tokens from '@/styles/tokens'
 import { props, Props, Size } from './button.shared'
 import { CSSObject } from '@/types/css-in-js'
-import { borderRadiusBySizeStyle, fontSizeStyle } from '@/utils/css-in-js'
+import {
+  borderRadiusBySizeStyle,
+  fontSizeStyle,
+  horizontalPaddingBySizeStyle,
+  horizontalPaddingWithIconBySizeStyle,
+  iconPositionBySizeStyle,
+} from '@/utils/css-in-js'
 import { rem } from 'polished'
 
 const { spacing, borderWidth, borderRadius, fontSize, colors, transition, boxShadow } = tokens
 
-const getStyleFromSize = ({ size }: Props) => {
+const getStyleFromSize = ({ size, iconName }: Props) => {
+  const horizontalPadding = (
+    iconName ? horizontalPaddingWithIconBySizeStyle : horizontalPaddingBySizeStyle
+  )(size)
+  const borderRadius = borderRadiusBySizeStyle(size)
   const styles: Record<Size, CSSObject> = {
     xs: {
       ...fontSizeStyle(fontSize['1']),
-      ...borderRadiusBySizeStyle(size),
-      padding: `0 ${rem(spacing['2'])}`,
+      ...borderRadius,
+      ...horizontalPadding,
       height: rem(spacing['5']),
-      '> * + *': {
-        marginLeft: rem(spacing['2']),
-      },
     },
     sm: {
       ...fontSizeStyle(fontSize['1']),
-      ...borderRadiusBySizeStyle(size),
-      padding: `0 ${rem(spacing['3'])}`,
+      ...borderRadius,
+      ...horizontalPadding,
       height: rem(spacing['6']),
-      '> * + *': {
-        marginLeft: rem(spacing['2']),
-      },
     },
     md: {
       ...fontSizeStyle(fontSize['1']),
-      ...borderRadiusBySizeStyle(size),
-      padding: `0 ${rem(spacing['5'])}`,
+      ...borderRadius,
+      ...horizontalPadding,
       height: rem(spacing['7']),
-      '> * + *': {
-        marginLeft: rem(spacing['3']),
-      },
     },
     lg: {
       ...fontSizeStyle(fontSize['2']),
-      ...borderRadiusBySizeStyle(size),
-      padding: `0 ${rem(spacing['5'])}`,
+      ...borderRadius,
+      ...horizontalPadding,
       height: rem(spacing['8']),
-      '> * + *': {
-        marginLeft: rem(spacing['3']),
-      },
     },
   }
   return styles[size]
@@ -70,6 +68,7 @@ const getStyleFromSquared = ({ squared, size }: Props) => {
 }
 
 export const StButton = styled('button', props)`
+  position: relative;
   display: inline-flex;
   align-items: center;
   font-weight: 600;
@@ -185,4 +184,10 @@ export const StButton = styled('button', props)`
             ].filter(Boolean)}
         `,
     ].filter(Boolean)}
+
+  .nv-button__icon {
+    pointer-events: none;
+    ${({ squared }) => !squared && 'position: absolute;'}
+    ${({ size, squared }) => !squared && iconPositionBySizeStyle(size)}
+  }
 `

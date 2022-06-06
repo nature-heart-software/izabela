@@ -3,44 +3,55 @@ import styled from 'vue3-styled-components'
 import tokens from '@/styles/tokens'
 import { props, Props, Size } from './select.shared'
 import { CSSObject } from '@/types/css-in-js'
-import { math, rem, remToPx } from 'polished'
+import { math, rem } from 'polished'
 import { defaultTextStyle } from '../Text/text.styled'
 import { ElOption } from 'element-plus'
 import 'element-plus/lib/components/option/style/css'
-import { fontSizeStyle } from '@/utils/css-in-js'
+import {
+  borderRadiusBySizeStyle,
+  fontSizeStyle,
+  horizontalPaddingWithIconBySizeStyle,
+  iconPositionBySizeStyle,
+} from '@/utils/css-in-js'
 
-const { fontSize, spacing, boxShadow, borderRadius, borderWidth, colors, transition } = tokens
+const { fontSize, spacing, boxShadow, borderWidth, colors, transition } = tokens
 const getIconStyleFromSize = ({ size }: Props) => {
+  const position = Object.fromEntries(
+    Object.entries(iconPositionBySizeStyle(size)).map(([key, value]) =>
+      key === 'right' ? [key, math(`${value} + ${rem(1)}`)] : [key, value],
+    ),
+  )
   const styles: Record<Size, CSSObject> = {
     sm: {
-      right: `${rem(spacing['3'] + 1)}`,
+      ...position,
     },
     md: {
-      right: `${rem(spacing['5'] + 1)}`,
+      ...position,
     },
     lg: {
-      right: `${rem(spacing['5'] + 1)}`,
+      ...position,
     },
   }
   return styles[size]
 }
 
 const getStyleFromSize = ({ size }: Props) => {
+  const borderRadius = borderRadiusBySizeStyle(size)
+  const horizontalPadding = horizontalPaddingWithIconBySizeStyle(size)
   const styles: Record<Size, CSSObject> = {
     sm: {
-      padding: `0 ${() => rem(spacing['3'])}`,
-      paddingRight: rem(spacing['6'] + spacing['3']),
-      borderRadius: rem(borderRadius.sm),
+      ...borderRadius,
+      ...horizontalPadding,
       height: rem(spacing['6']),
     },
     md: {
-      padding: `0 ${() => rem(spacing['5'])}`,
-      paddingRight: rem(spacing['7'] + spacing['5']),
+      ...borderRadius,
+      ...horizontalPadding,
       height: rem(spacing['7']),
     },
     lg: {
-      padding: `0 ${() => rem(spacing['5'])}`,
-      paddingRight: rem(spacing['8'] + spacing['5']),
+      ...borderRadius,
+      ...horizontalPadding,
       height: rem(spacing['8']),
       ...fontSizeStyle(fontSize['2']),
     },
@@ -49,18 +60,16 @@ const getStyleFromSize = ({ size }: Props) => {
 }
 
 const getPopperStyleFromSize = ({ size }: Props) => {
+  const borderRadius = borderRadiusBySizeStyle(size)
   const styles: Record<Size, CSSObject> = {
     sm: {
-      // top: rem(math(`${ remToPx(spacing['6']) } + ${ remToPx(spacing['3']) }`))+' !important',
-      borderRadius: rem(borderRadius.sm),
+      ...borderRadius,
     },
     md: {
-      // top: rem(math(`${ remToPx(spacing['7']) } + ${ remToPx(spacing['3']) }`))+' !important',
-      borderRadius: rem(borderRadius.DEFAULT),
+      ...borderRadius,
     },
     lg: {
-      // top: rem(math(`${ remToPx(spacing['8']) } + ${ remToPx(spacing['3']) }`))+' !important',
-      borderRadius: rem(borderRadius.DEFAULT),
+      ...borderRadius,
     },
   }
   return styles[size]
