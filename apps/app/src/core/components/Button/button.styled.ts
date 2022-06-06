@@ -3,7 +3,7 @@ import styled, { Styled } from 'vue3-styled-components'
 import tokens from '@/styles/tokens'
 import { props, Props, Size } from './button.shared'
 import { CSSObject } from '@/types/css-in-js'
-import { fontSizeStyle } from '@/utils/css-in-js'
+import { borderRadiusBySizeStyle, fontSizeStyle } from '@/utils/css-in-js'
 import { rem } from 'polished'
 
 const { spacing, borderWidth, borderRadius, fontSize, colors, transition, boxShadow } = tokens
@@ -12,24 +12,25 @@ const getStyleFromSize = ({ size }: Props) => {
   const styles: Record<Size, CSSObject> = {
     xs: {
       ...fontSizeStyle(fontSize['1']),
+      ...borderRadiusBySizeStyle(size),
       padding: `0 ${rem(spacing['2'])}`,
       height: rem(spacing['5']),
-      borderRadius: rem(borderRadius.xs),
       '> * + *': {
         marginLeft: rem(spacing['2']),
       },
     },
     sm: {
       ...fontSizeStyle(fontSize['1']),
+      ...borderRadiusBySizeStyle(size),
       padding: `0 ${rem(spacing['3'])}`,
       height: rem(spacing['6']),
-      borderRadius: rem(borderRadius.sm),
       '> * + *': {
         marginLeft: rem(spacing['2']),
       },
     },
     md: {
       ...fontSizeStyle(fontSize['1']),
+      ...borderRadiusBySizeStyle(size),
       padding: `0 ${rem(spacing['5'])}`,
       height: rem(spacing['7']),
       '> * + *': {
@@ -38,6 +39,7 @@ const getStyleFromSize = ({ size }: Props) => {
     },
     lg: {
       ...fontSizeStyle(fontSize['2']),
+      ...borderRadiusBySizeStyle(size),
       padding: `0 ${rem(spacing['5'])}`,
       height: rem(spacing['8']),
       '> * + *': {
@@ -71,7 +73,6 @@ export const StButton = styled('button', props)`
   display: inline-flex;
   align-items: center;
   font-weight: 600;
-  border-radius: ${() => rem(borderRadius.DEFAULT)};
   border-width: ${() => rem(borderWidth.DEFAULT)};
   outline: 0;
   transition: ${() => transition.DEFAULT};
@@ -83,7 +84,7 @@ export const StButton = styled('button', props)`
         padding: 0;
         justify-content: center;
     `}
-  ${(parameter) => getStyleFromSquared(parameter)}
+  ${(props) => getStyleFromSquared(props)}
   ${({ type, selected }) =>
     [
       type === 'default' &&

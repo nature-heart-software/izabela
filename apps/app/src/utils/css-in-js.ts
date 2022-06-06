@@ -1,4 +1,7 @@
 import { rem } from 'polished'
+import tokens from '@/styles/tokens'
+
+const { borderRadius } = tokens
 
 type Value = number | string
 type FontSizeProperty = 'lineHeight' | 'letterSpacing'
@@ -29,4 +32,8 @@ export const fontSizeStyle = (tailwindFontSize: TailwindFontSize) => ({
   fontSize: fontSize(tailwindFontSize),
   lineHeight: lineHeight(tailwindFontSize),
   letterSpacing: letterSpacing(tailwindFontSize),
+})
+
+export const borderRadiusBySizeStyle = (size: string) => ({
+  borderRadius: rem(borderRadius[size as keyof typeof borderRadius] || borderRadius.DEFAULT),
 })

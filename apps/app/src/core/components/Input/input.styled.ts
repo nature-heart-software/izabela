@@ -4,7 +4,7 @@ import tokens from '@/styles/tokens'
 import { props } from './input.shared'
 import { Props, Size } from './input.shared'
 import { CSSObject } from '@/types/css-in-js'
-import { fontSizeStyle } from '@/utils/css-in-js'
+import { borderRadiusBySizeStyle, fontSizeStyle } from '@/utils/css-in-js'
 import { rem } from 'polished'
 
 const { fontSize, spacing, borderRadius, borderWidth, colors, transition } = tokens
@@ -12,16 +12,19 @@ const getStyleFromSize = ({ size }: Props) => {
   const styles: Record<Size, CSSObject> = {
     sm: {
       ...fontSizeStyle(fontSize['1']),
+      ...borderRadiusBySizeStyle(size),
       padding: `0 ${rem(spacing['3'])}`,
       height: rem(spacing['6']),
     },
     md: {
       ...fontSizeStyle(fontSize['1']),
+      ...borderRadiusBySizeStyle(size),
       padding: `0 ${rem(spacing['5'])}`,
       height: rem(spacing['7']),
     },
     lg: {
       ...fontSizeStyle(fontSize['2']),
+      ...borderRadiusBySizeStyle(size),
       padding: `0 ${rem(spacing['5'])}`,
       height: rem(spacing['8']),
     },
@@ -41,7 +44,6 @@ export const StInput = styled('div', props)`
     .el-input__inner {
       align-items: center;
       font-weight: 600;
-      border-radius: ${() => rem(borderRadius.DEFAULT)};
       border-width: ${() => rem(borderWidth.DEFAULT)};
       outline: 0;
       border-color: ${() => colors.gray['20']};
