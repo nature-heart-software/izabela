@@ -5,16 +5,16 @@ import { props } from './input.shared'
 import { Props, Size } from './input.shared'
 import { CSSObject } from '@/types/css-in-js'
 import {
-  borderRadiusBySizeStyle,
+  borderRadiusStyleBySize,
   fontSizeStyle,
-  horizontalPaddingBySizeStyle,
+  horizontalPaddingStyleBySize,
 } from '@/utils/css-in-js'
 import { rem } from 'polished'
 
 const { fontSize, spacing, borderRadius, borderWidth, colors, transition } = tokens
-const getStyleFromSize = ({ size }: Props) => {
-  const borderRadius = borderRadiusBySizeStyle(size)
-  const horizontalPadding = horizontalPaddingBySizeStyle(size)
+const styleBySize = ({ size }: Props) => {
+  const borderRadius = borderRadiusStyleBySize(size)
+  const horizontalPadding = horizontalPaddingStyleBySize(size)
   const styles: Record<Size, CSSObject> = {
     sm: {
       ...fontSizeStyle(fontSize['1']),
@@ -69,7 +69,7 @@ export const StInput = styled('div', props)`
         font-weight: 300;
       }
 
-      ${getStyleFromSize}
+      ${styleBySize}
     }
   }
 `

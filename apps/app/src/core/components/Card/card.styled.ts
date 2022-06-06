@@ -7,7 +7,7 @@ import { CSSObject } from '@/types/css-in-js'
 import { rem } from 'polished'
 
 const { colors, spacing, borderRadius, boxShadow } = tokens
-const getStyleFromSize = ({ size }: Props) => {
+const styleBySize = ({ size }: Props) => {
   const styles: Record<Size, CSSObject> = {
     xs: {
       padding: `${rem(spacing['2'])}`,
@@ -27,5 +27,5 @@ export const StCard = styled('div', props)`
   border-radius: ${() => rem(borderRadius.DEFAULT)};
   box-shadow: ${() => boxShadow.DEFAULT};
   font-size: 0;
-  ${getStyleFromSize}
+  ${styleBySize}
 `

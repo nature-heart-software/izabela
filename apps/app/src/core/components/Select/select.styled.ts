@@ -8,16 +8,16 @@ import { defaultTextStyle } from '../Text/text.styled'
 import { ElOption } from 'element-plus'
 import 'element-plus/lib/components/option/style/css'
 import {
-  borderRadiusBySizeStyle,
+  borderRadiusStyleBySize,
   fontSizeStyle,
-  horizontalPaddingWithIconBySizeStyle,
-  iconPositionBySizeStyle,
+  horizontalPaddingWithIconStyleBySize,
+  iconStyleBySize,
 } from '@/utils/css-in-js'
 
 const { fontSize, spacing, boxShadow, borderWidth, colors, transition } = tokens
-const getIconStyleFromSize = ({ size }: Props) => {
+const iconStyle = ({ size }: Props) => {
   const position = Object.fromEntries(
-    Object.entries(iconPositionBySizeStyle(size)).map(([key, value]) =>
+    Object.entries(iconStyleBySize(size)).map(([key, value]) =>
       key === 'right' ? [key, math(`${value} + ${rem(1)}`)] : [key, value],
     ),
   )
@@ -35,9 +35,9 @@ const getIconStyleFromSize = ({ size }: Props) => {
   return styles[size]
 }
 
-const getStyleFromSize = ({ size }: Props) => {
-  const borderRadius = borderRadiusBySizeStyle(size)
-  const horizontalPadding = horizontalPaddingWithIconBySizeStyle(size)
+const styleBySize = ({ size }: Props) => {
+  const borderRadius = borderRadiusStyleBySize(size)
+  const horizontalPadding = horizontalPaddingWithIconStyleBySize(size)
   const styles: Record<Size, CSSObject> = {
     sm: {
       ...borderRadius,
@@ -59,8 +59,8 @@ const getStyleFromSize = ({ size }: Props) => {
   return styles[size]
 }
 
-const getPopperStyleFromSize = ({ size }: Props) => {
-  const borderRadius = borderRadiusBySizeStyle(size)
+const popperStyleBySize = ({ size }: Props) => {
+  const borderRadius = borderRadiusStyleBySize(size)
   const styles: Record<Size, CSSObject> = {
     sm: {
       ...borderRadius,
@@ -101,7 +101,7 @@ export const StSelect = styled('div', props)`
       border-color: ${() => colors.gray['20']};
       transition: ${() => transition.DEFAULT};
 
-      ${getPopperStyleFromSize}
+      ${popperStyleBySize}
       &:hover {
         border-color: ${() => colors.gray['30']};
       }
@@ -116,7 +116,7 @@ export const StSelect = styled('div', props)`
         font-weight: 300;
       }
 
-      ${getStyleFromSize}
+      ${styleBySize}
     }
 
     .el-input__suffix {
@@ -128,7 +128,7 @@ export const StSelect = styled('div', props)`
     box-shadow: ${() => boxShadow.lg} !important;
     border-color: ${() => colors.gray['20']} !important;
 
-    ${getPopperStyleFromSize}
+    ${popperStyleBySize}
     .el-popper__arrow {
       display: none;
     }
@@ -194,7 +194,7 @@ export const StSelect = styled('div', props)`
     .nv-select__icon {
       pointer-events: none;
       position: absolute;
-      ${getIconStyleFromSize}
+      ${iconStyle}
     }
   }
 `

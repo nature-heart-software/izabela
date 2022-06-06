@@ -4,21 +4,21 @@ import tokens from '@/styles/tokens'
 import { props, Props, Size } from './button.shared'
 import { CSSObject } from '@/types/css-in-js'
 import {
-  borderRadiusBySizeStyle,
+  borderRadiusStyleBySize,
   fontSizeStyle,
-  horizontalPaddingBySizeStyle,
-  horizontalPaddingWithIconBySizeStyle,
-  iconPositionBySizeStyle,
+  horizontalPaddingStyleBySize,
+  horizontalPaddingWithIconStyleBySize,
+  iconStyleBySize,
 } from '@/utils/css-in-js'
 import { rem } from 'polished'
 
 const { spacing, borderWidth, borderRadius, fontSize, colors, transition, boxShadow } = tokens
 
-const getStyleFromSize = ({ size, iconName }: Props) => {
+const styleBySize = ({ size, iconName }: Props) => {
   const horizontalPadding = (
-    iconName ? horizontalPaddingWithIconBySizeStyle : horizontalPaddingBySizeStyle
+    iconName ? horizontalPaddingWithIconStyleBySize : horizontalPaddingStyleBySize
   )(size)
-  const borderRadius = borderRadiusBySizeStyle(size)
+  const borderRadius = borderRadiusStyleBySize(size)
   const styles: Record<Size, CSSObject> = {
     xs: {
       ...fontSizeStyle(fontSize['1']),
@@ -48,7 +48,7 @@ const getStyleFromSize = ({ size, iconName }: Props) => {
   return styles[size]
 }
 
-const getStyleFromSquared = ({ squared, size }: Props) => {
+const styleBySquared = ({ squared, size }: Props) => {
   const styles: Record<Size, CSSObject> = {
     xs: {
       width: (squared && rem(spacing['5'])) || '',
@@ -76,14 +76,14 @@ export const StButton = styled('button', props)`
   outline: 0;
   transition: ${() => transition.DEFAULT};
   ${({ align = '' }) => align && `justify-content: ${align};`}
-  ${(props) => getStyleFromSize(props)}
+  ${(props) => styleBySize(props)}
   ${({ squared }) =>
     squared &&
     `
         padding: 0;
         justify-content: center;
     `}
-  ${(props) => getStyleFromSquared(props)}
+  ${(props) => styleBySquared(props)}
   ${({ type, selected }) =>
     [
       type === 'default' &&
@@ -188,6 +188,6 @@ export const StButton = styled('button', props)`
   .nv-button__icon {
     pointer-events: none;
     ${({ squared }) => !squared && 'position: absolute;'}
-    ${({ size, squared }) => !squared && iconPositionBySizeStyle(size)}
+    ${({ size, squared }) => !squared && iconStyleBySize(size)}
   }
 `
