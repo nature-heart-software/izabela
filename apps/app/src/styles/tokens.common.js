@@ -8,7 +8,10 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.tailwindTheme = exports.default = void 0;
+
+var _polished = require("polished");
+
 const tokens = {
   fontFamily: {
     sans: ['Nunito', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', '"Noto Sans"', 'sans-serif', '"Apple Color Emoji"', '"Segoe UI Emoji"', '"Segoe UI Symbol"', '"Noto Color Emoji"'],
@@ -140,6 +143,19 @@ const tokens = {
     DEFAULT: 'all .3s'
   }
 };
+const tailwindTheme = { ...tokens,
+  spacing: Object.fromEntries(Object.entries(tokens.spacing).map(([key, value]) => [key, (0, _polished.rem)(value)])),
+  borderRadius: Object.fromEntries(Object.entries(tokens.borderRadius).map(([key, value]) => [key, (0, _polished.rem)(value)])),
+  borderWidth: Object.fromEntries(Object.entries(tokens.borderWidth).map(([key, value]) => [key, (0, _polished.rem)(value)])),
+  fontSize: Object.fromEntries(Object.entries(tokens.fontSize).map(([key, [fontSize, {
+    lineHeight,
+    letterSpacing
+  }]]) => [key, [(0, _polished.rem)(fontSize), {
+    lineHeight: (0, _polished.rem)(lineHeight),
+    letterSpacing: (0, _polished.rem)(letterSpacing)
+  }]]))
+};
+exports.tailwindTheme = tailwindTheme;
 var _default = tokens;
 exports.default = _default;
 /* End of auto-generated content. */

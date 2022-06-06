@@ -1,18 +1,27 @@
 import { rem } from 'polished'
 
+type Value = number | string
+type FontSizeProperty = 'lineHeight' | 'letterSpacing'
 type TailwindFontSize =
-  | number
-  | [number, Record<'lineHeight' | 'letterSpacing', number>]
-  | readonly [number, Record<'lineHeight' | 'letterSpacing', number>]
+  | Value
+  | [Value, Record<FontSizeProperty, Value>]
+  | readonly [Value, Record<FontSizeProperty, Value>]
 
 export const fontSize = (tailwindFontSize: TailwindFontSize) =>
-  typeof tailwindFontSize === 'number' ? rem(tailwindFontSize) : rem(tailwindFontSize[0])
+  typeof tailwindFontSize === 'number' || typeof tailwindFontSize === 'string'
+    ? rem(tailwindFontSize)
+    : rem(tailwindFontSize[0])
 
 export const lineHeight = (tailwindFontSize: TailwindFontSize) =>
-  typeof tailwindFontSize === 'number' ? 1 : rem(tailwindFontSize[1]?.lineHeight) || 1
+  // eslint-disable-next-line no-nested-ternary
+  typeof tailwindFontSize === 'number' || typeof tailwindFontSize === 'string'
+    ? 1
+    : typeof tailwindFontSize[1]?.lineHeight === 'string'
+    ? rem(tailwindFontSize[1]?.lineHeight)
+    : tailwindFontSize[1]?.lineHeight || 1
 
 export const letterSpacing = (tailwindFontSize: TailwindFontSize) =>
-  typeof tailwindFontSize === 'number'
+  typeof tailwindFontSize === 'number' || typeof tailwindFontSize === 'string'
     ? 'normal'
     : rem(tailwindFontSize[1]?.letterSpacing) || 'normal'
 

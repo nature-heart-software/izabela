@@ -1,3 +1,5 @@
+import { rem } from 'polished'
+
 const tokens = {
   fontFamily: {
     sans: [
@@ -94,5 +96,24 @@ const tokens = {
     DEFAULT: 'all .3s',
   },
 } as const
+
+export const tailwindTheme = {
+  ...tokens,
+  spacing: Object.fromEntries(
+    Object.entries(tokens.spacing).map(([key, value]) => [key, rem(value)]),
+  ),
+  borderRadius: Object.fromEntries(
+    Object.entries(tokens.borderRadius).map(([key, value]) => [key, rem(value)]),
+  ),
+  borderWidth: Object.fromEntries(
+    Object.entries(tokens.borderWidth).map(([key, value]) => [key, rem(value)]),
+  ),
+  fontSize: Object.fromEntries(
+    Object.entries(tokens.fontSize).map(([key, [fontSize, { lineHeight, letterSpacing }]]) => [
+      key,
+      [rem(fontSize), { lineHeight: rem(lineHeight), letterSpacing: rem(letterSpacing) }],
+    ]),
+  ),
+}
 
 export default tokens
