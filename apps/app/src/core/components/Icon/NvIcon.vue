@@ -1,12 +1,15 @@
 <template>
-  <StIcon :class="[`uil uil-${name}`]" v-bind="$props" />
+  <component :is="component" :width="sizeValue" :height="sizeValue" fill="currentColor"/>
 </template>
 <script lang="ts" setup>
-import { defineProps } from 'vue'
-import { StIcon } from './icon.styled'
-import { props } from './icon.shared'
+import { computed, defineProps } from 'vue'
+import tokens from '@/styles/tokens'
+import { props as propsDefinition } from './icon.shared'
+import * as Icons from '../Icons'
 
-defineProps(props)
+const props = defineProps(propsDefinition)
+const sizeValue = computed(() => tokens.fontSize[props.size][0])
+const component = computed(() => Object.values((Icons as any)).find((i: any) => [props.name, `nv-${props.name}`].includes(i.name)))
 </script>
 <style lang="scss">
 body {

@@ -23,7 +23,16 @@ module.exports = defineConfig({
           omitSemi: true,
           filename: 'index.ts',
           include: ['**/*.vue'],
+          exclude: ['**/Icons/*'],
           directories: ['./src/core/components'],
+        },
+        {
+          omitExtension: false,
+          omitSemi: true,
+          filename: 'index.ts',
+          include: ['**/*.vue'],
+          exclude: ['**/*Story.vue'],
+          directories: ['./src/core/components/Icons'],
         },
         {
           omitExtension: true,
