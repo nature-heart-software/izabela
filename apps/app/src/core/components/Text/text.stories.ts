@@ -1,6 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import tokens from '@/styles/tokens'
 import { Story } from '@storybook/vue3'
+import { typeValues, props } from '@/core/components/Text/text.shared'
 import NvText from './NvText.vue'
 
 export default {
@@ -11,12 +12,18 @@ export default {
       control: 'text',
     },
     size: {
-      options: Object.keys(tokens.fontSize).map((key) => key),
+      options: Object.keys(tokens.fontSize).map((key) => Number(key)),
       control: 'inline-radio',
+      defaultValue: props.size.default,
     },
     type: {
-      options: ['caption', 'body-small', 'body', 'subtitle', 'title'],
+      options: typeValues,
       control: 'inline-radio',
+      defaultValue: props.type.default,
+    },
+    align: {
+      control: 'text',
+      defaultValue: '',
     },
   },
 }
@@ -28,10 +35,8 @@ const Template: Story = (args) => ({
       args,
     }
   },
-  template:
-    args.template ||
-    `
-      <nv-text v-bind="args">{{args.content}}</nv-text>
+  template: `
+      <NvText v-bind="args">{{args.content}}</NvText>
     `,
 })
 

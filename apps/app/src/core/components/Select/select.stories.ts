@@ -54,19 +54,17 @@ const Template: Story = (args) => ({
       ),
     }
   },
-  template:
-    args.template ||
-    `
-      <nv-select v-model="inputValue" v-bind="args">
-        <nv-option
+  template: `
+      <NvSelect v-model="inputValue" v-bind="args">
+        <NvOption
           v-for="item in options"
           :key="item.value"
           :label="item.label"
           :value="item.value"
           :disabled="item.disabled"
         >
-        </nv-option>
-      </nv-select>
+        </NvOption>
+      </NvSelect>
     `,
 })
 

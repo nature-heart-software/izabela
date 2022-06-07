@@ -20,12 +20,6 @@ const styleBySize = ({ size, iconName }: Props) => {
   )(size)
   const borderRadius = borderRadiusStyleBySize(size)
   const styles: Record<Size, CSSObject> = {
-    xs: {
-      ...fontSizeStyle(fontSize['1']),
-      ...borderRadius,
-      ...horizontalPadding,
-      height: rem(spacing['5']),
-    },
     sm: {
       ...fontSizeStyle(fontSize['1']),
       ...borderRadius,
@@ -50,9 +44,6 @@ const styleBySize = ({ size, iconName }: Props) => {
 
 const styleBySquared = ({ squared, size }: Props) => {
   const styles: Record<Size, CSSObject> = {
-    xs: {
-      width: (squared && rem(spacing['5'])) || '',
-    },
     sm: {
       width: (squared && rem(spacing['6'])) || '',
     },

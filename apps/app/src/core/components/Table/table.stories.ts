@@ -37,9 +37,7 @@ const Template: Story = (args) => ({
       ...args,
     }
   },
-  template:
-    args.template ||
-    `
+  template: `
       <NvTable
         style="width: 100%"
         :data="data"

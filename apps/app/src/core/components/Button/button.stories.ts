@@ -43,10 +43,8 @@ const Template: Story = (args) => ({
       args,
     }
   },
-  template:
-    args.template ||
-    `
-      <nv-button v-bind="args">{{args.content}}</nv-button>
+  template: `
+      <NvButton v-bind="args">{{args.content}}</NvButton>
     `,
 })
 

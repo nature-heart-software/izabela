@@ -1,9 +1,11 @@
 import { PropType, ExtractPropTypes } from 'vue'
 import type { Properties } from 'csstype'
+import { sizeValues, Size } from '@/utils/css-in-js'
 
-export const sizeValues = ['xs', 'sm', 'md', 'lg'] as const
+export { sizeValues } from '@/utils/css-in-js'
+export type { Size } from '@/utils/css-in-js'
+
 export const typeValues = ['default', 'plain', 'ghost', 'ghost-alt'] as const
-export type Size = typeof sizeValues[number]
 export type Type = typeof typeValues[number]
 
 export const props = {

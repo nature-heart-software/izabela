@@ -3,14 +3,20 @@ import tokens from '@/styles/tokens'
 import { Story } from '@storybook/vue3'
 import NvIcon from './NvIcon.vue'
 import { props } from './icon.shared'
+import * as Icons from '../Icons'
 
 export default {
   title: 'Icon',
   argTypes: {
     size: {
       defaultValue: props.size.default,
-      options: Object.keys(tokens.fontSize).map((key) => key),
+      options: Object.keys(tokens.fontSize).map((key) => Number(key)),
       control: 'inline-radio',
+    },
+    name: {
+      defaultValue: 'github',
+      options: Object.values(Icons).map(({ name }) => name.replace('nv-', '')),
+      control: 'select',
     },
   },
 }
@@ -22,14 +28,10 @@ const Template: Story = (args) => ({
       args,
     }
   },
-  template:
-    args.template ||
-    `
-      <nv-icon v-bind="args"></nv-text>
+  template: `
+      <NvIcon v-bind="args"></nv-text>
     `,
 })
 
 export const Default = Template.bind({})
-Default.args = {
-  name: 'github',
-}
+Default.args = {}

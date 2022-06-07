@@ -3,8 +3,8 @@ import tokens from '@/styles/tokens'
 import { CSSObject } from '@/types/css-in-js'
 
 const { borderRadius, spacing } = tokens
-const sizeValues = ['xs', 'sm', 'md', 'lg'] as const
-type Size = typeof sizeValues[number]
+export const sizeValues = ['sm', 'md', 'lg'] as const
+export type Size = typeof sizeValues[number]
 
 type Value = number | string
 type FontSizeProperty = 'lineHeight' | 'letterSpacing'
@@ -43,10 +43,6 @@ export const borderRadiusStyleBySize = (size: string) => ({
 
 export const horizontalPaddingStyleBySize = (size: Size) => {
   const styles: Record<Size, CSSObject> = {
-    xs: {
-      paddingLeft: rem(spacing['2']),
-      paddingRight: rem(spacing['2']),
-    },
     sm: {
       paddingLeft: rem(spacing['3']),
       paddingRight: rem(spacing['3']),
@@ -65,10 +61,6 @@ export const horizontalPaddingStyleBySize = (size: Size) => {
 
 export const horizontalPaddingWithIconStyleBySize = (size: Size) => {
   const styles: Record<Size, CSSObject> = {
-    xs: {
-      paddingLeft: rem(spacing['2']),
-      paddingRight: rem(spacing['2'] + spacing['4']),
-    },
     sm: {
       paddingLeft: rem(spacing['3']),
       paddingRight: rem(spacing['3'] + spacing['5']),
@@ -87,9 +79,6 @@ export const horizontalPaddingWithIconStyleBySize = (size: Size) => {
 
 export const iconStyleBySize = (size: Size) => {
   const styles: Record<Size, CSSObject> = {
-    xs: {
-      right: `${rem(spacing['1'])}`,
-    },
     sm: {
       right: `${rem(spacing['2'])}`,
     },

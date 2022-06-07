@@ -21,10 +21,8 @@ const Template: Story = (args) => ({
       args,
     }
   },
-  template:
-    args.template ||
-    `
-      <nv-divider v-bind="args" />
+  template: `
+      <NvDivider v-bind="args" />
     `,
 })
 

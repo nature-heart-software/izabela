@@ -31,10 +31,8 @@ const Template: Story = (args) => ({
       inputValue: ref(args.content),
     }
   },
-  template:
-    args.template ||
-    `
-      <nv-input v-model="inputValue" v-bind="args" />
+  template: `
+      <NvInput v-model="inputValue" v-bind="args" />
     `,
 })
 

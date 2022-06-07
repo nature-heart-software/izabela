@@ -1,11 +1,44 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { Story } from '@storybook/vue3'
+import tokens from '@/styles/tokens'
 import NvGroup from './NvGroup.vue'
 import NvButton from '../Button/NvButton.vue'
+import { props, justifyValues, alignValues, directionValues } from './group.shared'
 
 export default {
   title: 'Group',
   component: NvGroup,
+
+  argTypes: {
+    spacing: {
+      options: Object.keys(tokens.spacing).map(Number),
+      control: 'inline-radio',
+      defaultValue: props.spacing.default,
+    },
+    justify: {
+      options: justifyValues,
+      control: 'inline-radio',
+      defaultValue: props.justify.default,
+    },
+    align: {
+      options: alignValues,
+      control: 'inline-radio',
+      defaultValue: props.align.default,
+    },
+    direction: {
+      options: directionValues,
+      control: 'inline-radio',
+      defaultValue: props.direction.default,
+    },
+    grow: {
+      control: 'boolean',
+      defaultValue: props.grow.default,
+    },
+    noWrap: {
+      control: 'boolean',
+      defaultValue: props.noWrap.default,
+    },
+  },
 }
 
 const Template: Story = (args) => ({
@@ -15,14 +48,12 @@ const Template: Story = (args) => ({
       args,
     }
   },
-  template:
-    args.template ||
-    `
-      <nv-group v-bind="args">
-        <nv-button squared>1</nv-button>
-        <nv-button squared>2</nv-button>
-        <nv-button squared>3</nv-button>
-      </nv-group>`,
+  template: `
+      <NvGroup v-bind="args" :style="{height: '300px'}">
+        <NvButton>1</NvButton>
+        <NvButton>2</NvButton>
+        <NvButton>3</NvButton>
+      </NvGroup>`,
 })
 
 export const Default = Template.bind({})

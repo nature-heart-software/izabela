@@ -25,10 +25,8 @@ const Template: Story = (args) => ({
       args,
     }
   },
-  template:
-    args.template ||
-    `
-      <nv-card v-bind="args">{{args.content}}</nv-card>
+  template: `
+      <NvCard v-bind="args">{{args.content}}</NvCard>
     `,
 })
 

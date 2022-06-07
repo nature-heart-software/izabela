@@ -1,14 +1,14 @@
 import { ExtractPropTypes, PropType } from 'vue'
+import { Properties } from 'csstype'
+import tokens from '@/styles/tokens'
 
 export const typeValues = ['caption', 'label', 'body-small', 'body', 'subtitle', 'title'] as const
 export type Type = typeof typeValues[number]
-export const alignValues = ['stretch', 'center', 'start', 'end'] as const
-export type Align = typeof alignValues[number]
 
 export const props = {
   size: {
-    type: String,
-    default: '2',
+    type: Number as PropType<keyof typeof tokens.fontSize>,
+    default: 2,
   },
   as: {
     type: String,
@@ -19,7 +19,7 @@ export const props = {
     default: 'body',
   },
   align: {
-    type: String as PropType<Align>,
+    type: String as unknown as Properties['textAlign'],
     default: '',
   },
 }

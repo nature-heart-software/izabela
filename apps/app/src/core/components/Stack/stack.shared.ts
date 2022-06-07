@@ -1,9 +1,9 @@
 import { ExtractPropTypes, PropType } from 'vue'
 import tokens from '@/styles/tokens'
 
-export const justifyValues = ['left', 'center', 'right', 'apart'] as const
+export const justifyValues = ['left', 'center', 'right', 'apart', 'around'] as const
 export type Justify = typeof justifyValues[number]
-export const alignValues = ['stretch', 'center', 'start', 'end'] as const
+export const alignValues = ['start', 'center', 'end', 'stretch'] as const
 export type Align = typeof alignValues[number]
 
 export const props = {

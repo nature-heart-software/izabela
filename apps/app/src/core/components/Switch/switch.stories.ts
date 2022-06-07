@@ -18,10 +18,8 @@ const Template: Story = (args) => ({
       value: ref(args.value),
     }
   },
-  template:
-    args.template ||
-    `
-      <nv-switch v-bind="args" v-model="value"/>
+  template: `
+      <NvSwitch v-bind="args" v-model="value"/>
     `,
 })
 
