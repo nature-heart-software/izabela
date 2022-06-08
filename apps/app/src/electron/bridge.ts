@@ -3,7 +3,7 @@ import electronDialog from '@/modules/electron-dialog'
 import electronFilesystem from '@/modules/electron-filesystem'
 import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
 
-export const loadBridgedModules = () =>
+export const bridgeModules = () =>
   bridge.register([
     ['ElectronDialog', () => electronDialog],
     ['ElectronFilesystem', () => electronFilesystem],

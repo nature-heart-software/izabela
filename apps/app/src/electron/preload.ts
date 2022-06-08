@@ -3,10 +3,10 @@ import '@/modules/electron-log/preload'
 import '@/modules/electron-vuex/preload'
 /* Other plugins */
 import { ipcRenderer } from 'electron-postman'
-import { loadBridgedModules } from '@/electron/loaders'
+import { bridgeModules } from '@/electron/bridge'
 
 ipcRenderer.exposeInMainWorld('ipc')
-loadBridgedModules()
+bridgeModules()
 
 declare global {
   interface Window {
