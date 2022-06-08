@@ -24,7 +24,10 @@ export const props = {
     type: String as PropType<Direction>,
     default: 'row',
   },
-  align: { type: String as PropType<Align>, default: 'center' },
+  align: {
+    type: String as PropType<Align>,
+    default: 'start',
+  },
   as: {
     type: String,
     default: 'div',

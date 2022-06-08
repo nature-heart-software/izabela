@@ -36,9 +36,9 @@ const Template: Story = (args) => ({
   },
   template: `
       <NvStack v-bind="args" :style="{height: '300px'}">
-        <NvButton>1</NvButton>
-        <NvButton>2</NvButton>
-        <NvButton>3</NvButton>
+        <NvButton class="!h-auto">1</NvButton>
+        <NvButton class="!h-auto">2</NvButton>
+        <NvButton class="!h-auto">3</NvButton>
       </NvStack>`,
 })
 

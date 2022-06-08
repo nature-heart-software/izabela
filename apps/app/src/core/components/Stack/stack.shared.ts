@@ -17,7 +17,7 @@ export const props = {
   },
   justify: {
     type: String as PropType<Justify>,
-    default: 'center',
+    default: 'left',
   },
   as: {
     type: String,

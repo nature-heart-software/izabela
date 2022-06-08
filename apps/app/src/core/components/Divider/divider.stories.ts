@@ -32,4 +32,5 @@ Default.args = {}
 export const Vertical = Template.bind({})
 Vertical.args = {
   direction: 'vertical',
+  class: 'h-64',
 }
