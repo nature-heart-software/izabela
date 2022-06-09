@@ -1,18 +1,18 @@
 /* eslint global-require: 0 */
 import { autoUpdater } from 'electron-updater'
 
-const fallback = () => {
+const fallback = async () => {
   autoUpdater.on('update-downloaded', () => {
     autoUpdater.quitAndInstall()
   })
-  autoUpdater.checkForUpdates()
+  return autoUpdater.checkForUpdates()
 }
 
-;(() => {
+;(async () => {
   try {
     require('./plugins')
     require('./app').default.start().catch(fallback)
   } catch (e) {
-    fallback()
+    await fallback()
   }
 })()
