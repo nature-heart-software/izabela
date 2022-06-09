@@ -7,20 +7,29 @@ import { createSpeechWorkerWindow } from '@/teams/speech-worker/electron/backgro
 import server from '@izabela/app-server'
 import path from 'path'
 import { bridgeModules } from '@/electron/bridge'
+import registerElectronStartup from '@/modules/electron-startup/register'
+import registerElectronUpdater from '@/modules/electron-updater/register'
+import registerElectronDebug from '@/modules/electron-debug/register'
 
 const App = () => {
   const isDevelopment = process.env.NODE_ENV !== 'production'
-  const createWindows = async () =>
-    Promise.all([
-      await ElectronWindowManager.registerInstance('messenger', createMessengerWindow),
-      await ElectronWindowManager.registerInstance('speech-worker', createSpeechWorkerWindow),
-    ])
+  const createWindows = () =>
+    app
+      .whenReady()
+      .then(async () =>
+        Promise.all([
+          await ElectronWindowManager.registerInstance('messenger', createMessengerWindow),
+          await ElectronWindowManager.registerInstance('speech-worker', createSpeechWorkerWindow),
+        ]),
+      )
 
   const startAppServer = async () =>
-    server.startServer({
-      tempPath: path.join(app.getPath('userData'), 'temp'),
-      port: process.env.VUE_APP_SERVER_PORT,
-    })
+    app.whenReady().then(async () =>
+      server.startServer({
+        tempPath: path.join(app.getPath('userData'), 'temp'),
+        port: process.env.VUE_APP_SERVER_PORT,
+      }),
+    )
 
   const configureAppDefaults = () => {
     if (process.platform === 'win32') app.setAppUserModelId(app.name)
@@ -56,9 +65,6 @@ const App = () => {
           console.error('Vue Devtools failed to install:', (e as Error).toString())
         }
       }
-      createTray()
-      createWindows()
-      startAppServer()
     })
 
     app.on('activate', () => {
@@ -90,7 +96,13 @@ const App = () => {
     return Promise.all([
       exec('Register app listeners', () => addEventListeners()),
       exec('Configure app defaults', () => configureAppDefaults()),
+      exec('Register updater', () => registerElectronUpdater()),
+      exec('Register startup', () => registerElectronStartup()),
+      exec('Register debug', () => registerElectronDebug()),
       exec('Bridge modules', () => bridgeModules()),
+      exec('Create tray', () => createTray()),
+      exec('Create windows', () => createWindows()),
+      exec('Start server', () => startAppServer()),
     ])
   }
 
