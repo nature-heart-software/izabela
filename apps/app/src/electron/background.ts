@@ -11,7 +11,7 @@ const fallback = async () => {
     autoUpdater.quitAndInstall()
   })
   console.log(
-    `[system] A critical error occured. Proceeding to update the application on the "${channel}" channel.`,
+    `[system] A critical error occurred. Proceeding to update the application on the "${channel}" channel.`,
   )
   return autoUpdater.checkForUpdates()
 }
