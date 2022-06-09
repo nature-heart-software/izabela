@@ -1,3 +1,4 @@
+/* eslint global-require: 0 */
 import { autoUpdater } from 'electron-updater'
 
 const fallback = () => {
@@ -7,14 +8,11 @@ const fallback = () => {
   autoUpdater.checkForUpdates()
 }
 
-try {
-  // eslint-disable-next-line global-require
-  require('./plugins')
-} catch (e) {
-  fallback()
-}
-
 ;(() => {
-  // eslint-disable-next-line global-require
-  require('./app').default.start().catch(fallback)
+  try {
+    require('./plugins')
+    require('./app').default.start().catch(fallback)
+  } catch (e) {
+    fallback()
+  }
 })()

@@ -26,7 +26,7 @@ export const props = {
   },
   align: {
     type: String as PropType<Align>,
-    default: 'start',
+    default: 'center',
   },
   as: {
     type: String,

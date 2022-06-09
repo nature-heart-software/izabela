@@ -3,7 +3,7 @@ import tokens from '@/styles/tokens'
 import { CSSObject } from '@/types/css-in-js'
 
 const { borderRadius, spacing } = tokens
-export const sizeValues = ['sm', 'md', 'lg'] as const
+export const sizeValues = ['xs', 'sm', 'md', 'lg'] as const
 export type Size = typeof sizeValues[number]
 
 type Value = number | string
@@ -37,12 +37,30 @@ export const fontSizeStyle = (tailwindFontSize: TailwindFontSize) => ({
   letterSpacing: letterSpacing(tailwindFontSize),
 })
 
-export const borderRadiusStyleBySize = (size: string) => ({
-  borderRadius: rem(borderRadius[size as keyof typeof borderRadius] || borderRadius.DEFAULT),
-})
-
-export const horizontalPaddingStyleBySize = (size: Size) => {
+export function borderRadiusStyleBySize(size: Size) {
   const styles: Record<Size, CSSObject> = {
+    xs: {
+      borderRadius: rem(borderRadius.xs),
+    },
+    sm: {
+      borderRadius: rem(borderRadius.sm),
+    },
+    md: {
+      borderRadius: rem(borderRadius.md),
+    },
+    lg: {
+      borderRadius: rem(borderRadius.DEFAULT),
+    },
+  }
+  return styles[size]
+}
+
+export function horizontalPaddingStyleBySize(size: Size) {
+  const styles: Record<Size, CSSObject> = {
+    xs: {
+      paddingLeft: rem(spacing['2']),
+      paddingRight: rem(spacing['2']),
+    },
     sm: {
       paddingLeft: rem(spacing['3']),
       paddingRight: rem(spacing['3']),
@@ -59,8 +77,12 @@ export const horizontalPaddingStyleBySize = (size: Size) => {
   return styles[size]
 }
 
-export const horizontalPaddingWithIconStyleBySize = (size: Size) => {
+export function horizontalPaddingWithIconStyleBySize(size: Size) {
   const styles: Record<Size, CSSObject> = {
+    xs: {
+      paddingLeft: rem(spacing['2']),
+      paddingRight: rem(spacing['2'] + spacing['4']),
+    },
     sm: {
       paddingLeft: rem(spacing['3']),
       paddingRight: rem(spacing['3'] + spacing['5']),
@@ -77,8 +99,11 @@ export const horizontalPaddingWithIconStyleBySize = (size: Size) => {
   return styles[size]
 }
 
-export const iconStyleBySize = (size: Size) => {
+export function iconStyleBySize(size: Size) {
   const styles: Record<Size, CSSObject> = {
+    xs: {
+      right: `${rem(spacing['1'])}`,
+    },
     sm: {
       right: `${rem(spacing['2'])}`,
     },
