@@ -1,5 +1,5 @@
 <template>
-  <component :is="component" :width="sizeValue" :height="sizeValue" fill="currentColor"/>
+  <component :is="component" :width="sizeValue" :height="sizeValue" fill="currentColor" />
 </template>
 <script lang="ts" setup>
 import { computed, defineProps } from 'vue'
@@ -9,7 +9,9 @@ import * as Icons from '../Icons'
 
 const props = defineProps(propsDefinition)
 const sizeValue = computed(() => tokens.fontSize[props.size][0])
-const component = computed(() => Object.values((Icons as any)).find((i: any) => [props.name, `nv-${props.name}`].includes(i.name)))
+const component = computed(() =>
+  Object.values(Icons as any).find((i: any) => [props.name, `nv-${props.name}`].includes(i.name)),
+)
 </script>
 <style lang="scss">
 body {
