@@ -1,22 +1,18 @@
 /* eslint-disable */
 import styled from 'vue3-styled-components'
-import store from '@/store'
+import tokens from '@/styles/tokens'
 import { props } from './text.shared'
+import { fontSizeStyle } from '@/utils/css-in-js'
 
-const { fontFamily, fontSize, colors } = store.getters.theme
-export const defaultTextStyle = `
-  color: inherit;
-  font-family: ${fontFamily.sans.join(', ')};
-  font-size: ${fontSize['2'][0]};
-  line-height: ${fontSize['2'][1].lineHeight};
-  letter-spacing: ${fontSize['2'][1].letterSpacing};
-`
+const { fontFamily, fontSize, colors } = tokens
+export const defaultTextStyle = () => ({
+  color: 'inherit',
+  fontFamily: fontFamily.sans.join(', '),
+  ...fontSizeStyle(fontSize['2']),
+})
+
 export const StText = styled('div', props)`
-  color: inherit;
-  font-family: ${fontFamily.sans.join(', ')};
-  font-size: ${({ size }) => fontSize[size][0]};
-  line-height: ${({ size }) => fontSize[size][1].lineHeight};
-  letter-spacing: ${({ size }) => fontSize[size][1].letterSpacing};
+  ${() => defaultTextStyle()}
   ${({ align = '' }) => align && `text-align: ${align};`}
   ${({ as }) =>
     as === 'span' &&
@@ -25,42 +21,23 @@ export const StText = styled('div', props)`
   `}
   ${({ type }) =>
     [
-      type === 'caption' &&
-        `
-      color: ${colors.gray['60']};
-      font-size: ${fontSize['1'][0]};
-      line-height: ${fontSize['1'][1].lineHeight};
-      letter-spacing: ${fontSize['1'][1].letterSpacing};
-    `,
-      type === 'label' &&
-        `
-      font-weight: 700;
-    `,
-      type === 'body-small' &&
-        `
-      font-size: ${fontSize['1'][0]};
-      line-height: ${fontSize['1'][1].lineHeight};
-      letter-spacing: ${fontSize['1'][1].letterSpacing};
-    `,
-      type === 'body-small' &&
-        `
-      font-size: ${fontSize['1'][0]};
-      line-height: ${fontSize['1'][1].lineHeight};
-      letter-spacing: ${fontSize['1'][1].letterSpacing};
-    `,
-      type === 'subtitle' &&
-        `
-      font-size: ${fontSize['2'][0]};
-      line-height: ${fontSize['2'][1].lineHeight};
-      letter-spacing: ${fontSize['2'][1].letterSpacing};
-      font-weight: 700;
-    `,
-      type === 'title' &&
-        `
-      font-size: ${fontSize['4'][0]};
-      line-height: ${fontSize['4'][1].lineHeight};
-      letter-spacing: ${fontSize['4'][1].letterSpacing};
-      font-weight: 700;
-    `,
+      type === 'caption' && {
+        color: colors.gray['60'],
+        ...fontSizeStyle(fontSize['1']),
+      },
+      type === 'label' && {
+        fontWeight: 700,
+      },
+      type === 'body-small' && {
+        ...fontSizeStyle(fontSize['1']),
+      },
+      type === 'subtitle' && {
+        ...fontSizeStyle(fontSize['2']),
+        fontWeight: 700,
+      },
+      type === 'title' && {
+        ...fontSizeStyle(fontSize['4']),
+        fontWeight: 700,
+      },
     ].filter(Boolean)}
 `

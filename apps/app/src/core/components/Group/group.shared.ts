@@ -1,25 +1,33 @@
 import { ExtractPropTypes, PropType } from 'vue'
-import type { Properties } from 'csstype'
 
-import theme from '@/styles/tokens'
+import tokens from '@/styles/tokens'
 
-export type GroupPosition = 'right' | 'center' | 'left' | 'apart'
+export const justifyValues = ['left', 'center', 'right', 'apart', 'around'] as const
+export type Justify = typeof justifyValues[number]
+export const alignValues = ['stretch', 'center', 'start', 'end'] as const
+export type Align = typeof alignValues[number]
+export const directionValues = ['row', 'column'] as const
+export type Direction = typeof directionValues[number]
+
 export const props = {
-  position: {
-    type: String as PropType<GroupPosition>,
+  justify: {
+    type: String as PropType<Justify>,
     default: 'left',
   },
   noWrap: { type: Boolean, default: false },
   grow: { type: Boolean, default: false },
   spacing: {
-    type: Number as PropType<keyof typeof theme.spacing>,
+    type: Number as PropType<keyof typeof tokens.spacing>,
     default: 3,
   },
   direction: {
-    type: String as PropType<'row' | 'column'>,
+    type: String as PropType<Direction>,
     default: 'row',
   },
-  align: { type: String as PropType<Properties['alignItems']>, default: 'center' },
+  align: {
+    type: String as PropType<Align>,
+    default: 'center',
+  },
   as: {
     type: String,
     default: 'div',

@@ -1,6 +1,6 @@
 <template>
-  <ThemeProvider :theme="$store.getters['theme']">
-    <template v-if="ready">
+  <ThemeProvider :theme="tokens">
+    <template v-if="isReady">
       <div class="h-0">
         <NvMessenger
           :min-width="768"
@@ -20,14 +20,10 @@ body {
 }
 </style>
 <script lang="ts" setup>
-import { ref } from 'vue'
 import { ThemeProvider } from 'vue3-styled-components'
 import NvMessenger from '@/teams/messenger/components/NvMessenger.vue'
-import { useStore } from 'vuex'
+import tokens from '@/styles/tokens'
+import useStoreReady from '../../hooks/useStoreReady'
 
-const store = useStore()
-const ready = ref(false)
-store.state['electron-vuex'].ready().then(() => {
-  ready.value = true
-})
+const { data: isReady } = useStoreReady()
 </script>

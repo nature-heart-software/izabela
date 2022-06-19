@@ -1,6 +1,6 @@
-import '@/plugins/electron-debug/renderer'
+import '@/electron/renderer'
+import '@/modules/electron-debug/renderer'
 import '@/styles'
-import '@/teams/messenger/renderer'
 import { createApp } from 'vue'
 import { VueQueryPlugin, VueQueryPluginOptions } from 'vue-query'
 

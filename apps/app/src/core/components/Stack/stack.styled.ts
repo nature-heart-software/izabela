@@ -1,16 +1,20 @@
 /* eslint-disable */
 import styled from 'vue3-styled-components'
-import store from '@/store'
+import tokens from '@/styles/tokens'
 import { props } from './stack.shared'
+import { rem } from 'polished'
 
-const { spacing } = store.getters.theme
+const { spacing } = tokens
 const POSITIONS = {
   start: 'flex-start',
+  left: 'flex-start',
   center: 'center',
   end: 'flex-end',
+  right: 'flex-end',
   between: 'space-between',
   around: 'space-around',
   stretch: 'stretch',
+  apart: 'space-between',
 }
 
 export const StStack = styled('div', props)`
@@ -18,5 +22,5 @@ export const StStack = styled('div', props)`
   flex-direction: column;
   justify-content: ${({ justify }) => POSITIONS[justify]};
   align-items: ${({ align }) => POSITIONS[align]};
-  gap: ${({ spacing: spacingKey }) => spacing[spacingKey]};
+  gap: ${({ spacing: spacingKey }) => rem(spacing[spacingKey])};
 `

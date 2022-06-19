@@ -5,7 +5,7 @@ const GenerateModulesPlugin = require('@wurielle/generate-modules-webpack-plugin
 const WebpackNotifierPlugin = require('webpack-notifier')
 
 const setConfigAliases = (config) => {
-  config.resolve.alias.set('@package', path.resolve(__dirname, './package.json'))
+  config.resolve.alias.set('@root', path.resolve(__dirname, './'))
 }
 
 module.exports = defineConfig({
@@ -23,7 +23,16 @@ module.exports = defineConfig({
           omitSemi: true,
           filename: 'index.ts',
           include: ['**/*.vue'],
+          exclude: ['**/Icons/*'],
           directories: ['./src/core/components'],
+        },
+        {
+          omitExtension: false,
+          omitSemi: true,
+          filename: 'index.ts',
+          include: ['**/*.vue'],
+          exclude: ['**/*Story.vue'],
+          directories: ['./src/core/components/Icons'],
         },
         {
           omitExtension: true,
@@ -49,26 +58,20 @@ module.exports = defineConfig({
       externals: ['iohook', '@izabela/app-server', '@google-cloud/speech'],
       chainWebpackMainProcess: (config) => {
         setConfigAliases(config)
-        config.module
-          .rule('babel')
-          .before('ts')
-          .use('babel')
-          .loader('babel-loader')
-          .options({
-            plugins: [['inline-json-import', {}]],
-          })
       },
       /* Documentation:
        * https://nklayman.github.io/vue-cli-plugin-electron-builder/guide/configuration.html
        */
+      mainProcessFile: 'src/electron/background.ts',
       mainProcessWatch: [
         './src/**/{electron,node}*/*',
         './src/**/{electron,node}*',
+        './src/**/store/*',
         '../../libs/**/{electron,node}*/*',
         '../../libs/**/{electron,node}*',
       ],
       preload: {
-        preload: 'src/preload.ts',
+        preload: 'src/electron/preload.ts',
       },
       builderOptions: {
         appId: 'com.nhs.izabela',

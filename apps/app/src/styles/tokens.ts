@@ -1,3 +1,5 @@
+import { rem } from 'polished'
+
 const tokens = {
   fontFamily: {
     sans: [
@@ -40,59 +42,78 @@ const tokens = {
   },
   // Follows: https://www.carbondesignsystem.com/guidelines/spacing/overview/
   spacing: {
-    1: '.125rem',
-    2: '.25rem',
-    3: '.5rem',
-    4: '.75rem',
-    5: '1rem',
-    6: '1.5rem',
-    7: '2rem',
-    8: '2.5rem',
-    9: '3rem',
-    10: '4rem',
-    11: '5rem',
-    12: '6rem',
-    13: '7rem',
-    14: '8rem',
-    15: '9rem',
-    16: '10rem',
+    1: 2,
+    2: 4,
+    3: 8,
+    4: 12,
+    5: 16,
+    6: 24,
+    7: 32,
+    8: 40,
+    9: 48,
+    10: 64,
+    11: 80,
+    12: 96,
+    13: 112,
+    14: 128,
+    15: 144,
+    16: 160,
   },
   // Follows: https://www.carbondesignsystem.com/guidelines/typography/overview/
   fontSize: {
-    1: ['0.75rem', { lineHeight: '1.4', letterSpacing: '0.02rem' }],
-    2: ['0.875rem', { lineHeight: '1.4', letterSpacing: '0.02rem' }],
-    3: ['1rem', { lineHeight: '1.4', letterSpacing: '0.02rem' }],
-    4: ['1.125rem', { lineHeight: '1.4', letterSpacing: '0.02rem' }],
-    5: ['1.5rem', { lineHeight: '1.4', letterSpacing: '0.02rem' }],
-    6: ['1.75rem', { lineHeight: '1.4', letterSpacing: '0.02rem' }],
-    7: ['2rem', { lineHeight: '1.4', letterSpacing: '0.02rem' }],
-    8: ['2.25rem', { lineHeight: '1.4', letterSpacing: '0.02rem' }],
-    9: ['2.625rem', { lineHeight: '1.4', letterSpacing: '0.02rem' }],
-    10: ['3rem', { lineHeight: '1.4', letterSpacing: '0.02rem' }],
-    11: ['3.375rem', { lineHeight: '1.4', letterSpacing: '0.02rem' }],
-    12: ['3.75rem', { lineHeight: '1.4', letterSpacing: '0.02rem' }],
-    13: ['4.25rem', { lineHeight: '1.4', letterSpacing: '0.02rem' }],
-    14: ['4.75rem', { lineHeight: '1.4', letterSpacing: '0.02rem' }],
-    15: ['5.25rem', { lineHeight: '1.4', letterSpacing: '0.02rem' }],
-    16: ['5.75rem', { lineHeight: '1.4', letterSpacing: '0.02rem' }],
+    1: [12, { lineHeight: 1.4, letterSpacing: 0.32 }],
+    2: [14, { lineHeight: 1.4, letterSpacing: 0.32 }],
+    3: [16, { lineHeight: 1.4, letterSpacing: 0.32 }],
+    4: [18, { lineHeight: 1.4, letterSpacing: 0.32 }],
+    5: [24, { lineHeight: 1.4, letterSpacing: 0.32 }],
+    6: [28, { lineHeight: 1.4, letterSpacing: 0.32 }],
+    7: [32, { lineHeight: 1.4, letterSpacing: 0.32 }],
+    8: [36, { lineHeight: 1.4, letterSpacing: 0.32 }],
+    9: [42, { lineHeight: 1.4, letterSpacing: 0.32 }],
+    10: [48, { lineHeight: 1.4, letterSpacing: 0.32 }],
+    11: [54, { lineHeight: 1.4, letterSpacing: 0.32 }],
+    12: [60, { lineHeight: 1.4, letterSpacing: 0.32 }],
+    13: [68, { lineHeight: 1.4, letterSpacing: 0.32 }],
+    14: [76, { lineHeight: 1.4, letterSpacing: 0.32 }],
+    15: [84, { lineHeight: 1.4, letterSpacing: 0.32 }],
+    16: [92, { lineHeight: 1.4, letterSpacing: 0.32 }],
   },
   borderRadius: {
-    xs: '.25rem',
-    sm: '.375rem',
-    md: '.5rem',
-    DEFAULT: '.5rem',
+    xs: 4,
+    sm: 6,
+    md: 8,
+    DEFAULT: 8,
   },
   borderWidth: {
-    DEFAULT: '.063rem',
-    lg: '.25rem',
+    DEFAULT: 1,
+    lg: 4,
   },
   boxShadow: {
-    DEFAULT: '0px 2px 1px rgba(0, 0, 0, 0.05)',
-    lg: '0px 2px 1px rgba(0, 0, 0, 0.05)',
+    DEFAULT: '0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)',
+    lg: '0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)',
   },
   transition: {
     DEFAULT: 'all .3s',
   },
 } as const
+
+export const tailwindTheme = {
+  ...tokens,
+  spacing: Object.fromEntries(
+    Object.entries(tokens.spacing).map(([key, value]) => [key, rem(value)]),
+  ),
+  borderRadius: Object.fromEntries(
+    Object.entries(tokens.borderRadius).map(([key, value]) => [key, rem(value)]),
+  ),
+  borderWidth: Object.fromEntries(
+    Object.entries(tokens.borderWidth).map(([key, value]) => [key, rem(value)]),
+  ),
+  fontSize: Object.fromEntries(
+    Object.entries(tokens.fontSize).map(([key, [fontSize, { lineHeight, letterSpacing }]]) => [
+      key,
+      [rem(fontSize), { lineHeight: rem(lineHeight), letterSpacing: rem(letterSpacing) }],
+    ]),
+  ),
+}
 
 export default tokens

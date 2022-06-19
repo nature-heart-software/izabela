@@ -1,6 +1,7 @@
 import { ExtractPropTypes, PropType } from 'vue'
 
-export type Size = 'sm' | 'md' | 'lg'
+export const sizeValues = ['sm', 'md', 'lg'] as const
+export type Size = typeof sizeValues[number]
 
 export const props = {
   modelValue: {},

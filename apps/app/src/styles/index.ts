@@ -7,6 +7,7 @@ import 'tippy.js/dist/tippy.css'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { injectGlobal } from 'vue3-styled-components'
+import { rem } from 'polished'
 import tokens from './tokens'
 
 const { spacing, colors } = tokens
@@ -14,11 +15,11 @@ const { spacing, colors } = tokens
 injectGlobal`
   * {
     &::-webkit-scrollbar {
-      width: ${spacing['5']};
+      width: ${rem(spacing['5'])};
     }
 
     &::-webkit-scrollbar-thumb {
-      border-left: ${spacing['3']} solid rgba(0, 0, 0, 0);
+      border-left: ${rem(spacing['3'])} solid rgba(0, 0, 0, 0);
       background-clip: padding-box;
       background-color: ${colors.gray['100']};
 

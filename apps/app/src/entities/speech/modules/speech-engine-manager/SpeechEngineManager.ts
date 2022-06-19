@@ -1,19 +1,25 @@
 import { SpeechEngine } from '@/entities/speech/modules/speech-engine-manager/types'
 
-class SpeechEngineManager {
-  private speechEngines: SpeechEngine[] = []
+const SpeechEngineManager = () => {
+  const speechEngines: SpeechEngine[] = []
 
-  public registerEngine(speechEngine: SpeechEngine) {
-    this.speechEngines.push(speechEngine)
+  function registerEngine(speechEngine: SpeechEngine) {
+    speechEngines.push(speechEngine)
   }
 
-  public getEngineById(id: SpeechEngine['id']) {
-    return this.speechEngines.find((speechEngine) => speechEngine.id === id)
+  function getEngineById(id: SpeechEngine['id']) {
+    return speechEngines.find((speechEngine) => speechEngine.id === id)
   }
 
-  public getEngines() {
-    return this.speechEngines
+  function getEngines() {
+    return speechEngines
+  }
+
+  return {
+    registerEngine,
+    getEngineById,
+    getEngines,
   }
 }
 
-export default new SpeechEngineManager()
+export default SpeechEngineManager()

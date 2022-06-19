@@ -1,6 +1,8 @@
 import { PropType } from 'vue'
 
-type Direction = 'vertical' | 'horizontal'
+export const directionValues = ['vertical', 'horizontal'] as const
+export type Direction = typeof directionValues[number]
+
 export const props = {
   direction: {
     type: String as PropType<Direction>,

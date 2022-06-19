@@ -1,62 +1,66 @@
 /* eslint-disable */
 import styled, { Styled } from 'vue3-styled-components'
-import store from '@/store'
+import tokens from '@/styles/tokens'
 import { props, Props, Size } from './button.shared'
 import { CSSObject } from '@/types/css-in-js'
+import {
+  borderRadiusStyleBySize,
+  fontSizeStyle,
+  horizontalPaddingStyleBySize,
+  horizontalPaddingWithIconStyleBySize,
+  iconStyleBySize,
+} from '@/utils/css-in-js'
+import { rem } from 'polished'
 
-const { spacing, borderWidth, borderRadius, fontSize, colors, transition, boxShadow } =
-  store.getters.theme
+const { spacing, borderWidth, borderRadius, fontSize, colors, transition, boxShadow } = tokens
 
-const getStyleFromSize = ({ size }: Props) => {
-  const styles: { [key in Size]: CSSObject } = {
+const styleBySize = ({ size, iconName }: Props) => {
+  const horizontalPadding = (
+    iconName ? horizontalPaddingWithIconStyleBySize : horizontalPaddingStyleBySize
+  )(size)
+  const borderRadius = borderRadiusStyleBySize(size)
+  const styles: Record<Size, CSSObject> = {
     xs: {
-      padding: `0 ${spacing['2']}`,
-      height: spacing['5'],
-      borderRadius: borderRadius.xs,
-      '> * + *': {
-        marginLeft: spacing['2'],
-      },
+      ...fontSizeStyle(fontSize['1']),
+      ...borderRadius,
+      ...horizontalPadding,
+      height: rem(spacing['5']),
     },
     sm: {
-      padding: `0 ${spacing['3']}`,
-      height: spacing['6'],
-      borderRadius: borderRadius.sm,
-      '> * + *': {
-        marginLeft: spacing['2'],
-      },
+      ...fontSizeStyle(fontSize['1']),
+      ...borderRadius,
+      ...horizontalPadding,
+      height: rem(spacing['6']),
     },
     md: {
-      padding: `0 ${spacing['5']}`,
-      height: spacing['7'],
-      '> * + *': {
-        marginLeft: spacing['3'],
-      },
+      ...fontSizeStyle(fontSize['1']),
+      ...borderRadius,
+      ...horizontalPadding,
+      height: rem(spacing['7']),
     },
     lg: {
-      fontSize: fontSize['2'][0],
-      padding: `0 ${spacing['5']}`,
-      height: spacing['8'],
-      '> * + *': {
-        marginLeft: spacing['3'],
-      },
+      ...fontSizeStyle(fontSize['2']),
+      ...borderRadius,
+      ...horizontalPadding,
+      height: rem(spacing['8']),
     },
   }
   return styles[size]
 }
 
-const getStyleFromSquared = ({ squared, size }: Props) => {
-  const styles: { [key in Size]: CSSObject } = {
+const styleBySquared = ({ squared, size }: Props) => {
+  const styles: Record<Size, CSSObject> = {
     xs: {
-      width: squared && spacing['5'],
+      width: (squared && rem(spacing['5'])) || '',
     },
     sm: {
-      width: squared && spacing['6'],
+      width: (squared && rem(spacing['6'])) || '',
     },
     md: {
-      width: squared && spacing['7'],
+      width: (squared && rem(spacing['7'])) || '',
     },
     lg: {
-      width: squared && spacing['8'],
+      width: (squared && rem(spacing['8'])) || '',
     },
   }
 
@@ -64,24 +68,22 @@ const getStyleFromSquared = ({ squared, size }: Props) => {
 }
 
 export const StButton = styled('button', props)`
+  position: relative;
   display: inline-flex;
   align-items: center;
-  font-size: ${fontSize['1'][0]};
-  ${fontSize['1'][1]}
   font-weight: 600;
-  border-radius: ${borderRadius.DEFAULT};
-  border-width: ${borderWidth.DEFAULT};
+  border-width: ${() => rem(borderWidth.DEFAULT)};
   outline: 0;
-  transition: ${transition.DEFAULT};
+  transition: ${() => transition.DEFAULT};
   ${({ align = '' }) => align && `justify-content: ${align};`}
-  ${(parameter) => getStyleFromSize(parameter)}
+  ${(props) => styleBySize(props)}
   ${({ squared }) =>
     squared &&
     `
         padding: 0;
         justify-content: center;
     `}
-  ${(parameter) => getStyleFromSquared(parameter)}
+  ${(props) => styleBySquared(props)}
   ${({ type, selected }) =>
     [
       type === 'default' &&
@@ -123,7 +125,7 @@ export const StButton = styled('button', props)`
             }
 
             &:focus {
-                box-shadow: 0 0 0 ${borderWidth.lg} ${colors.gray['70']};
+                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${colors.gray['70']};
             }
 
             ${[
@@ -147,7 +149,7 @@ export const StButton = styled('button', props)`
             }
 
             &:focus {
-                box-shadow: 0 0 0 ${borderWidth.lg} ${colors.gray['10']};
+                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${colors.gray['10']};
             }
 
             ${[
@@ -170,7 +172,7 @@ export const StButton = styled('button', props)`
             }
 
             &:focus {
-                box-shadow: 0 0 0 ${borderWidth.lg} ${colors.gray['10']};
+                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${colors.gray['10']};
             }
 
             ${[
@@ -182,4 +184,10 @@ export const StButton = styled('button', props)`
             ].filter(Boolean)}
         `,
     ].filter(Boolean)}
+
+  .nv-button__icon {
+    pointer-events: none;
+    ${({ squared }) => !squared && 'position: absolute;'}
+    ${({ size, squared }) => !squared && iconStyleBySize(size)}
+  }
 `

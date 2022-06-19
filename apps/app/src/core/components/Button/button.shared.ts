@@ -1,8 +1,11 @@
 import { PropType, ExtractPropTypes } from 'vue'
 import type { Properties } from 'csstype'
+import { sizeValues as defaultSizeValues } from '@/utils/css-in-js'
 
-export type Size = 'xs' | 'sm' | 'md' | 'lg'
-export type Type = 'default' | 'plain' | 'ghost' | 'ghost-alt'
+export const sizeValues = ['xs', ...defaultSizeValues] as const
+export type Size = typeof sizeValues[number]
+export const typeValues = ['default', 'plain', 'ghost', 'ghost-alt'] as const
+export type Type = typeof typeValues[number]
 
 export const props = {
   selected: {

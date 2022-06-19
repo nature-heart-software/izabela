@@ -1,6 +1,6 @@
 <template>
   <NvStack spacing="5">
-    <NvGroup align="start" no-wrap position="apart">
+    <NvGroup align="start" no-wrap justify="apart">
       <NvStack>
         <NvText type="label">Import Google Cloud Speech Credentials</NvText>
         <NvText
