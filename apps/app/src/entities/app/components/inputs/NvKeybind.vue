@@ -10,7 +10,7 @@
 import { NvButton } from '@/core/components'
 import { ref } from 'vue'
 
-const {ElectronKeybind} = window
+const { ElectronKeybind } = window
 const listeningToKeys = ref(false)
 
 const getRecordingKeybind = () => {
