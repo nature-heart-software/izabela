@@ -43,6 +43,21 @@
       </NvStack>
     </NvStack>
     <NvStack>
+      <NvText type="subtitle">Keybinds</NvText>
+      <NvStack spacing="4">
+        <NvStack spacing="4">
+          <NvCard>
+            <NvGroup no-wrap justify="apart" spacing="5">
+              <NvStack>
+                <NvText type="label">Record</NvText>
+              </NvStack>
+              <NvRecordingKeybind />
+            </NvGroup>
+          </NvCard>
+        </NvStack>
+      </NvStack>
+    </NvStack>
+    <NvStack>
       <NvText type="subtitle">Development</NvText>
       <NvStack spacing="4">
         <NvStack spacing="4">
@@ -66,5 +81,6 @@
 </template>
 <script lang="ts" setup>
 import { NvCard, NvGroup, NvStack, NvSwitch, NvText } from '@/core/components'
+import NvRecordingKeybind from '@/entities/speech/components/inputs/NvRecordingKeybind.vue'
 import NvAutoUpdateChannelSelect from '@/entities/settings/components/inputs/NvAutoUpdateChannelSelect.vue'
 </script>
