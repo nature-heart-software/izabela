@@ -51,7 +51,7 @@
               <NvStack>
                 <NvText type="label">Record</NvText>
               </NvStack>
-              <NvRecordingKeybind />
+              <NvKeybind />
             </NvGroup>
           </NvCard>
         </NvStack>
@@ -81,6 +81,6 @@
 </template>
 <script lang="ts" setup>
 import { NvCard, NvGroup, NvStack, NvSwitch, NvText } from '@/core/components'
-import NvRecordingKeybind from '@/entities/speech/components/inputs/NvRecordingKeybind.vue'
+import NvKeybind from '@/entities/app/components/inputs/NvKeybind.vue'
 import NvAutoUpdateChannelSelect from '@/entities/settings/components/inputs/NvAutoUpdateChannelSelect.vue'
 </script>
