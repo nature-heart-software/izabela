@@ -58,7 +58,7 @@ export const ElectronKeybind = () => ({
   setAudioRecordKeybind(keybind: Keybind) {
     console.log(keybind)
     return Promise.resolve(true)
-  }
+  },
 })
 
 export default ElectronKeybind()

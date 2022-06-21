@@ -15,9 +15,10 @@ const listeningToKeys = ref(false)
 
 const getRecordingKeybind = () => {
   listeningToKeys.value = true
-  ElectronKeybind.getKeybind().then((keybind) => {
-    return ElectronKeybind.setAudioRecordKeybind(keybind)
-  })
+  ElectronKeybind.getKeybind()
+    .then((keybind) => {
+      return ElectronKeybind.setAudioRecordKeybind(keybind)
+    })
     .finally(() => {
       listeningToKeys.value = false
     })
