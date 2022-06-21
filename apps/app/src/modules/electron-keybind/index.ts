@@ -1,18 +1,15 @@
-import iohook, { modifiersEvents, IOHookKeyboardEvent } from '@/modules/node-iohook'
+import iohook, { modifierEvents, IOHookKeyboardEvent } from '@/modules/node-iohook'
 import { Deferred } from '@/utils/promise'
+import { Keybind } from '@/types/node'
 
-type KeybindingResult = {
-  modifiers: typeof modifiersEvents[keyof typeof modifiersEvents]['name'][]
-  keys: string[]
-  combination: number[]
-}
+type ModifierEvents = typeof modifierEvents
 
 export const ElectronKeybind = () => ({
-  getKeybinding() {
-    const { promise, resolve, reject } = Deferred()
-    const modifiers: { [key: string]: typeof modifiersEvents[keyof typeof modifiersEvents] } = {}
+  getKeybind() {
+    const { promise, resolve, reject } = Deferred<Keybind>()
+    const modifiers: { [key: string]: ModifierEvents[keyof ModifierEvents] } = {}
     const events: Record<string, IOHookKeyboardEvent> = {}
-    const getResult = (): KeybindingResult => ({
+    const getResult = (): Keybind => ({
       keys: Object.values(events).map((v) => (v.keychar && String.fromCharCode(v.keychar)) || ''),
       modifiers: Object.values(modifiers).map((v) => v.name),
       combination: [...Object.values(modifiers), ...Object.values(events)].map((v) => v.rawcode),
@@ -35,13 +32,13 @@ export const ElectronKeybind = () => ({
         return
       }
       ;(
-        Object.entries(modifiersEvents) as [
-          keyof typeof modifiersEvents,
-          typeof modifiersEvents[keyof typeof modifiersEvents],
+        Object.entries(modifierEvents) as [
+          keyof ModifierEvents,
+          ModifierEvents[keyof ModifierEvents],
         ][]
       ).forEach(([modifier, { rawcode }]) => {
         if (event[modifier]) {
-          modifiers[rawcode] = modifiersEvents[modifier]
+          modifiers[rawcode] = modifierEvents[modifier]
         }
       })
       events[event.rawcode] = event
@@ -58,6 +55,10 @@ export const ElectronKeybind = () => ({
     iohook.on('keyup', onKeyUp)
     return promise
   },
+  setAudioRecordKeybind(keybind: Keybind) {
+    console.log(keybind)
+    return Promise.resolve(true)
+  }
 })
 
 export default ElectronKeybind()

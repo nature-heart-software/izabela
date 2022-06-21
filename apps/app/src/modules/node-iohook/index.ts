@@ -34,7 +34,7 @@ export type IOHookMouseEvent = {
   y: number
 }
 
-export const modifiersEvents = {
+export const modifierEvents = {
   shiftKey: { name: 'shift', rawcode: 16 },
   altKey: { name: 'alt', rawcode: 18 },
   ctrlKey: { name: 'ctrl', rawcode: 17 },
