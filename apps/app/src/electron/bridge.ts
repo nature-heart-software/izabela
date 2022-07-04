@@ -2,14 +2,14 @@ import { bridge } from '@izabela/electron-bridger'
 import electronDialog from '@/modules/electron-dialog'
 import electronFilesystem from '@/modules/electron-filesystem'
 import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
-import electronKeybind from '@/modules/electron-keybind'
+import electronKeybinding from '@/modules/electron-keybinding'
 
 export const bridgeModules = () =>
   bridge.register([
     ['ElectronDialog', () => electronDialog],
     ['ElectronFilesystem', () => electronFilesystem],
     ['ElectronMessengerWindow', () => electronMessengerWindow],
-    ['ElectronKeybind', () => electronKeybind],
+    ['ElectronKeybinding', () => electronKeybinding],
   ])
 
 declare global {
@@ -17,6 +17,6 @@ declare global {
     ElectronDialog: typeof electronDialog
     ElectronFilesystem: typeof electronFilesystem
     ElectronMessengerWindow: typeof electronMessengerWindow
-    ElectronKeybind: typeof electronKeybind
+    ElectronKeybinding: typeof electronKeybinding
   }
 }

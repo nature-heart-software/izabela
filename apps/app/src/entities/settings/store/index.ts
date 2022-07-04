@@ -2,6 +2,7 @@ import { Module } from 'vuex'
 import { utilActions, utilMutations } from '@/utils/vuex'
 import { SpeechEngine } from '@/entities/speech/modules/speech-engine-manager/types'
 import pkg from '@root/package.json'
+import { KeybindingResult } from '@/types/keybinds'
 
 const { version } = pkg
 // eslint-disable-next-line no-nested-ternary
@@ -22,6 +23,11 @@ const storeState = {
     autoUpdateChannel: channel,
     launchOnStartup: true,
     debugMode: process.env.NODE_ENV === 'development',
+    recordAudioKeybinding: {
+      keys: ['161'],
+      modifiers: [],
+      combination: [161],
+    } as KeybindingResult,
     APTTSIdentityPoolId: '',
     APTTSRegion: '',
     APTTSSelectedVoice: {

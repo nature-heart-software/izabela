@@ -35,10 +35,10 @@ export type IOHookMouseEvent = {
 }
 
 export const modifiersEvents = {
-  shiftKey: { name: 'shift', rawcode: 16 },
-  altKey: { name: 'alt', rawcode: 18 },
-  ctrlKey: { name: 'ctrl', rawcode: 17 },
-  metaKey: { name: 'meta', rawcode: 91 },
+  shiftKey: { name: 'shift', keycode: 42 },
+  altKey: { name: 'alt', keycode: 56 },
+  ctrlKey: { name: 'ctrl', keycode: 29 },
+  metaKey: { name: 'meta', keycode: 3675 },
 } as const
 
 export default iohook

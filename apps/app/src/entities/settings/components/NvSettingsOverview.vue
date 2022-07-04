@@ -43,7 +43,7 @@
       </NvStack>
     </NvStack>
     <NvStack>
-      <NvText type="subtitle">Keybinds</NvText>
+      <NvText type="subtitle">Keybindings</NvText>
       <NvStack spacing="4">
         <NvStack spacing="4">
           <NvCard>
@@ -51,7 +51,12 @@
               <NvStack>
                 <NvText type="label">Record</NvText>
               </NvStack>
-              <NvKeybind />
+              <NvKeybinding
+                :modelValue="$store.getters['settings/persisted'].recordAudioKeybinding"
+                @update:modelValue="
+                  (value) => setRecordAudioKeybinding(value)
+                "
+              />
             </NvGroup>
           </NvCard>
         </NvStack>
@@ -81,6 +86,13 @@
 </template>
 <script lang="ts" setup>
 import { NvCard, NvGroup, NvStack, NvSwitch, NvText } from '@/core/components'
-import NvKeybind from '@/entities/app/components/inputs/NvKeybind.vue'
 import NvAutoUpdateChannelSelect from '@/entities/settings/components/inputs/NvAutoUpdateChannelSelect.vue'
+import NvKeybinding from '@/entities/app/components/inputs/NvKeybinding.vue'
+import { useStore } from 'vuex'
+import { KeybindingResult } from '@/types/keybinds'
+
+const store = useStore()
+const setRecordAudioKeybinding = (value: KeybindingResult) => {
+  store.dispatch('settings/setProperty', ['persisted.recordAudioKeybinding', value])
+}
 </script>
