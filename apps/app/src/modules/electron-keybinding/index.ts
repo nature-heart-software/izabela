@@ -76,7 +76,6 @@ export const ElectronKeybinding = () => ({
       removeListeners()
     }
     function onKeyDown(event: IOHookKeyboardEvent) {
-      console.log(event)
       if (event.keycode === 27) {
         rejectPromise()
         return
