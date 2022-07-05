@@ -10,9 +10,9 @@
           <NvAutoUpdateChannelSelect
             :modelValue="$store.getters['settings/persisted'].autoUpdateChannel"
             @update:modelValue="
-                  (value) =>
-                    $store.dispatch('settings/setProperty', ['persisted.autoUpdateChannel', value])
-                "
+              (value) =>
+                $store.dispatch('settings/setProperty', ['persisted.autoUpdateChannel', value])
+            "
           />
         </NvGroup>
       </NvCard>
@@ -27,9 +27,9 @@
           <NvSwitch
             :modelValue="$store.getters['settings/persisted'].launchOnStartup"
             @update:modelValue="
-                  (value) =>
-                    $store.dispatch('settings/setProperty', ['persisted.launchOnStartup', value])
-                "
+              (value) =>
+                $store.dispatch('settings/setProperty', ['persisted.launchOnStartup', value])
+            "
           />
         </NvGroup>
       </NvCard>
@@ -44,8 +44,8 @@
           <NvSwitch
             :modelValue="$store.getters['settings/persisted'].debugMode"
             @update:modelValue="
-                  (value) => $store.dispatch('settings/setProperty', ['persisted.debugMode', value])
-                "
+              (value) => $store.dispatch('settings/setProperty', ['persisted.debugMode', value])
+            "
           />
         </NvGroup>
       </NvCard>
@@ -54,6 +54,5 @@
 </template>
 <script lang="ts" setup>
 import { NvCard, NvGroup, NvStack, NvSwitch, NvText } from '@/core/components'
-import NvAutoUpdateChannelSelect
-  from '@/entities/settings/components/inputs/NvAutoUpdateChannelSelect.vue'
+import NvAutoUpdateChannelSelect from '@/entities/settings/components/inputs/NvAutoUpdateChannelSelect.vue'
 </script>
