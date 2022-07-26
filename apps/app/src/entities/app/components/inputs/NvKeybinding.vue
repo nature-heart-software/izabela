@@ -3,7 +3,7 @@
     <NvButton class="pointer-events-none">Listening - press Esc to cancel</NvButton>
   </template>
   <template v-else>
-    <NvButton @click.prevent="getKeybinding">{{readableKeybinding}}</NvButton>
+    <NvButton @click.prevent="getKeybinding">{{ readableKeybinding }}</NvButton>
   </template>
 </template>
 <script lang="ts" setup>
@@ -25,7 +25,9 @@ const emit = defineEmits(['update:modelValue'])
 const { ElectronKeybinding } = window
 const listeningToKeys = ref(false)
 const currentKeybinding = computed(() => props.modelValue)
-const readableKeybinding = computed(() => [...currentKeybinding.value.modifiers, ...currentKeybinding.value.keys].join('+'))
+const readableKeybinding = computed(() =>
+  [...currentKeybinding.value.modifiers, ...currentKeybinding.value.keys].join('+'),
+)
 const getKeybinding = () => {
   listeningToKeys.value = true
   ElectronKeybinding[props.multiple ? 'getKeys' : 'getKey']().then((keybinding) => {
