@@ -85,7 +85,7 @@ const navigation = [
         name: 'Dictionary',
       },
       {
-        name: 'Keybinds',
+        name: 'Keybindings',
       },
       {
         name: 'Startup',

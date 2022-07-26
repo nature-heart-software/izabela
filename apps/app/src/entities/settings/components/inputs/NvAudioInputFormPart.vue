@@ -43,6 +43,19 @@
           </template>
         </NvSelect>
       </NvFormItem>
+      <NvDivider direction="horizontal" />
+      <NvGroup no-wrap justify="apart" spacing="5">
+        <NvStack>
+          <NvText type="label">Push-to-record Key</NvText>
+        </NvStack>
+        <NvKeybinding
+          :modelValue="$store.getters['settings/persisted'].recordAudioKeybinding"
+          @update:modelValue="
+            (value) =>
+              $store.dispatch('settings/setProperty', ['persisted.recordAudioKeybinding', value])
+          "
+        />
+      </NvGroup>
     </template>
   </NvStack>
 </template>
@@ -58,6 +71,7 @@ import {
   NvStack,
   NvText,
 } from '@/core/components'
+import NvKeybinding from '@/entities/app/components/inputs/NvKeybinding.vue'
 import { useMediaDevices } from '@/hooks'
 import {
   getGoogleCloudSpeechCredentialsPathQueryKey,

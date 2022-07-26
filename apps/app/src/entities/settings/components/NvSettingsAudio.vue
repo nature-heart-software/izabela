@@ -12,7 +12,7 @@
           </NvCard>
           <div class="pl-8">
             <NvCard>
-              <AudioOutputsSelect />
+              <NvAudioOutputsSelect />
             </NvCard>
           </div>
         </NvStack>
@@ -25,7 +25,7 @@
           </NvCard>
           <div class="pl-8">
             <NvCard>
-              <AudioInputSelect />
+              <NvAudioInputFormPart />
             </NvCard>
           </div>
         </NvStack>
@@ -35,6 +35,6 @@
 </template>
 <script lang="ts" setup>
 import { NvCard, NvStack, NvText } from '@/core/components'
-import AudioOutputsSelect from '@/entities/settings/components/inputs/NvAudioOutputsSelect.vue'
-import AudioInputSelect from '@/entities/settings/components/inputs/NvAudioInputSelect.vue'
+import NvAudioOutputsSelect from '@/entities/settings/components/inputs/NvAudioOutputsSelect.vue'
+import NvAudioInputFormPart from '@/entities/settings/components/inputs/NvAudioInputFormPart.vue'
 </script>
