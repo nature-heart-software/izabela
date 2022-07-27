@@ -10,10 +10,10 @@
         @update:model-value="$emit('update:model-value', $event)"
       >
         <template v-for="(_, slot) of $slots" v-slot:[slot]="scope">
-          <slot :name="slot" v-bind="scope || {}"/>
+          <slot :name="slot" v-bind="scope || {}" />
         </template>
       </component>
-      <NvIcon :size="iconSize" class="nv-select__icon" name="direction"/>
+      <NvIcon :size="iconSize" class="nv-select__icon" name="direction" />
     </div>
   </StSelect>
 </template>

@@ -1,7 +1,7 @@
 <template>
   <div v-if="storeReady">
-    <SpeechSynthesizer/>
-    <SpeechListener :key="store.getters['settings/persisted'].audioInputDevice"/>
+    <SpeechSynthesizer />
+    <SpeechListener :key="store.getters['settings/persisted'].audioInputDevice" />
   </div>
 </template>
 <style lang="scss">
