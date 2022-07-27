@@ -1,5 +1,5 @@
 <template>
-  <NvSelect v-bind="$attrs" valueKey="Id">
+  <NvSelect v-loading="isFetching" v-bind="$attrs" valueKey="Id">
     <template v-for="voice in voices" :key="voice.Id">
       <NvOption
         :label="`${voice.LanguageCode} ${voice.Name} - ${voice.Gender}`"
@@ -33,9 +33,12 @@ const computedParams = computed(() => ({
     region: computedRegion.value,
   },
 }))
-const { data } = useAPTTSListVoicesQuery(computedParams)
+const canFetch = computed(() => Object.values(computedParams.value.credentials).every(Boolean))
+const { data, isFetching } = useAPTTSListVoicesQuery(computedParams, {
+  enabled: canFetch,
+})
 const voices = computed(() => orderBy(data.value || [], ['LanguageCode', 'Name']))
 watch([computedIdentityPoolId, computedRegion], () =>
-  queryClient.refetchQueries('aptts-list-voices'),
+  canFetch.value && queryClient.refetchQueries('aptts-list-voices'),
 )
 </script>

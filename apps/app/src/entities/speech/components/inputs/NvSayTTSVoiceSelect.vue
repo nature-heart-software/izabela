@@ -1,5 +1,5 @@
 <template>
-  <NvSelect v-bind="$attrs">
+  <NvSelect v-loading="isFetching" v-bind="$attrs">
     <NvOption :value="null" label="Default">Default</NvOption>
     <template v-for="voice in voices" :key="voice">
       <NvOption :label="voice" :value="voice">
@@ -14,6 +14,6 @@ import { NvOption, NvSelect } from '@/core/components'
 import { useSayTTSListVoicesQuery } from '@/entities/speech/services'
 import { sortBy } from 'lodash'
 
-const { data } = useSayTTSListVoicesQuery()
+const { data, isFetching } = useSayTTSListVoicesQuery()
 const voices = computed(() => sortBy(data.value || []))
 </script>

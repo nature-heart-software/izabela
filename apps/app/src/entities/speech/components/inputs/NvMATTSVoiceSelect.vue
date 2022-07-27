@@ -1,5 +1,5 @@
 <template>
-  <NvSelect v-bind="$attrs" valueKey="Name">
+  <NvSelect v-loading="isFetching" v-bind="$attrs" valueKey="Name">
     <template v-for="voice in voices" :key="voice.Name">
       <NvOption
         :label="`${voice.Locale} ${voice.DisplayName} - ${voice.Gender}`"
@@ -31,7 +31,10 @@ const computedParams = computed(() => ({
     region: computedRegion.value,
   },
 }))
-const { data } = useMATTSListVoicesQuery(computedParams)
+const canFetch = computed(() => Object.values(computedParams.value.credentials).every(Boolean))
+const { data, isFetching } = useMATTSListVoicesQuery(computedParams, {
+  enabled: canFetch,
+})
 const voices = computed(() => orderBy(data.value || [], ['Locale', 'DisplayName']))
-watch([computedApikey, computedRegion], () => queryClient.refetchQueries('matts-list-voices'))
+watch([computedApikey, computedRegion], () => canFetch.value && queryClient.refetchQueries('matts-list-voices'))
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <NvSelect v-bind="$attrs" valueKey="name">
+  <NvSelect v-loading="isFetching" v-bind="$attrs" valueKey="name">
     <template v-for="voice in voices" :key="voice.name">
       <NvOption :label="`${voice.name} - ${voice.gender}`" :value="purify(voice)">
         {{ `${voice.name} - ${voice.gender}` }}
@@ -28,7 +28,10 @@ const computedParams = computed(() => ({
     url: computedUrl.value,
   },
 }))
-const { data } = useIWTTSListVoicesQuery(computedParams)
+const canFetch = computed(() => Object.values(computedParams.value.credentials).every(Boolean))
+const { data, isFetching } = useIWTTSListVoicesQuery(computedParams, {
+  enabled: canFetch,
+})
 const voices = computed(() => orderBy(data.value || [], 'name'))
-watch([computedApikey, computedUrl], () => queryClient.refetchQueries('iwtts-list-voices'))
+watch([computedApikey, computedUrl], () => canFetch.value && queryClient.refetchQueries('iwtts-list-voices'))
 </script>

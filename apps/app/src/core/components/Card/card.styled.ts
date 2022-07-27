@@ -1,8 +1,7 @@
 /* eslint-disable */
 import styled from 'vue3-styled-components'
 import tokens from '@/styles/tokens'
-import { props } from './card.shared'
-import { Props, Size } from './card.shared'
+import { props, Props, Size } from './card.shared'
 import { CSSObject } from '@/types/css-in-js'
 import { rem } from 'polished'
 
@@ -27,5 +26,6 @@ export const StCard = styled('div', props)`
   border-radius: ${() => rem(borderRadius.DEFAULT)};
   box-shadow: ${() => boxShadow.DEFAULT};
   font-size: 0;
+  //overflow: hidden;
   ${styleBySize}
 `

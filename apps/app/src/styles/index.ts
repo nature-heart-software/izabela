@@ -4,6 +4,8 @@ import './main.scss'
 import './defaults.scss'
 import '@iconscout/unicons/css/line.css'
 import 'tippy.js/dist/tippy.css'
+import 'element-plus/lib/components/loading/style/css'
+
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { injectGlobal } from 'vue3-styled-components'
@@ -29,6 +31,18 @@ injectGlobal`
 
       &:active {
         background-color: ${colors.gray['70']};
+      }
+    }
+  }
+
+  .el-loading-mask {
+    .el-loading-spinner {
+      .circular {
+        .path {
+          r: ${rem(spacing['3'])}
+          stroke: ${colors.black}
+          stroke-width: ${rem(spacing['1'])}
+        }
       }
     }
   }

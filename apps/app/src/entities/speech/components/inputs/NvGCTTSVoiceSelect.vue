@@ -1,5 +1,5 @@
 <template>
-  <NvSelect v-bind="$attrs" valueKey="name">
+  <NvSelect v-loading="isFetching" v-bind="$attrs" valueKey="name">
     <template v-for="voice in voices" :key="voice.name">
       <NvOption :label="`${voice.name} - ${voice.ssmlGender}`" :value="purify(voice)">
         {{ `${voice.name} - ${voice.ssmlGender}` }}
@@ -24,7 +24,10 @@ const computedParams = computed(() => ({
     apiKey: computedApikey.value,
   },
 }))
-const { data } = useGCTTSListVoicesQuery(computedParams)
+const canFetch = computed(() => Object.values(computedParams.value.credentials).every(Boolean))
+const { data, isFetching } = useGCTTSListVoicesQuery(computedParams, {
+  enabled: canFetch,
+})
 const voices = computed(() => data.value || [])
-watch(computedApikey, () => queryClient.refetchQueries('gctts-list-voices'))
+watch(computedApikey, () => canFetch.value && queryClient.refetchQueries('gctts-list-voices'))
 </script>

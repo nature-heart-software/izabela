@@ -1,7 +1,7 @@
 <template>
   <ThemeProvider :theme="tokens">
     <template v-if="isReady">
-      <NvBackground />
+      <NvBackground/>
       <div class="h-0">
         <NvMessenger
           :min-width="768"

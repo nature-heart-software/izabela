@@ -1,31 +1,45 @@
-import { useQuery } from 'vue-query'
+import { useQuery, UseQueryOptions } from 'vue-query'
 import { api } from '@/services'
 import { Ref } from 'vue'
 
-export const useGCTTSListVoicesQuery = (params: Ref<{ credentials: { apiKey: string } }>) =>
-  useQuery('gctts-list-voices', () =>
-    api.post('/tts/google-cloud/list-voices', params.value).then(({ data }) => data),
+export const useGCTTSListVoicesQuery = (
+  params: Ref<{ credentials: { apiKey: string } }>,
+  options?: UseQueryOptions,
+) =>
+  useQuery<any>(
+    'gctts-list-voices',
+    () => api.post('/tts/google-cloud/list-voices', params.value).then(({ data }) => data),
+    options,
   )
 
 export const useIWTTSListVoicesQuery = (
   params: Ref<{ credentials: { apiKey: string; url: string } }>,
+  options?: UseQueryOptions,
 ) =>
-  useQuery('iwtts-list-voices', () =>
-    api.post('/tts/ibm-watson/list-voices', params.value).then(({ data }) => data),
+  useQuery<any>(
+    'iwtts-list-voices',
+    () => api.post('/tts/ibm-watson/list-voices', params.value).then(({ data }) => data),
+    options,
   )
 
 export const useMATTSListVoicesQuery = (
   params: Ref<{ credentials: { apiKey: string; region: string } }>,
+  options?: UseQueryOptions,
 ) =>
-  useQuery('matts-list-voices', () =>
-    api.post('/tts/microsoft-azure/list-voices', params.value).then(({ data }) => data),
+  useQuery<any>(
+    'matts-list-voices',
+    () => api.post('/tts/microsoft-azure/list-voices', params.value).then(({ data }) => data),
+    options,
   )
 
 export const useAPTTSListVoicesQuery = (
   params: Ref<{ credentials: { identityPoolId: string; region: string } }>,
+  options?: UseQueryOptions,
 ) =>
-  useQuery('aptts-list-voices', () =>
-    api.post('/tts/amazon-polly/list-voices', params.value).then(({ data }) => data),
+  useQuery<any>(
+    'aptts-list-voices',
+    () => api.post('/tts/amazon-polly/list-voices', params.value).then(({ data }) => data),
+    options,
   )
 
 export const useSayTTSListVoicesQuery = () =>
