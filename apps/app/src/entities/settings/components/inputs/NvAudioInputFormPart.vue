@@ -4,13 +4,13 @@
       <NvStack>
         <NvText type="label">Import Google Cloud Speech Credentials</NvText>
         <NvText
-        >Izabela uses Google Cloud Speech for speech recognition which requires credentials to be
+          >Izabela uses Google Cloud Speech for speech recognition which requires credentials to be
           imported
         </NvText>
         <template v-if="googleCloudSpeechCredentialsPath">
           <NvText type="caption">
             <NvGroup>
-              <NvIcon name="check-circle" size="3"/>
+              <NvIcon name="check-circle" size="3" />
               <span>Credentials found</span>
             </NvGroup>
           </NvText>
@@ -18,7 +18,7 @@
         <template v-else>
           <NvText type="caption">
             <NvGroup>
-              <NvIcon name="exclamation-triangle" size="3"/>
+              <NvIcon name="exclamation-triangle" size="3" />
               <span>Credentials not found</span>
             </NvGroup>
           </NvText>
@@ -27,13 +27,12 @@
       <NvButton @click="importGoogleCloudSpeechCredentials">Import</NvButton>
     </NvGroup>
     <template v-if="googleCloudSpeechCredentialsPath">
-      <NvDivider direction="horizontal"/>
+      <NvDivider direction="horizontal" />
       <NvFormItem label="Audio Input">
         <NvSelect
           :modelValue="store.getters['settings/persisted'].audioInputDevice"
           @update:modelValue="
-            (value) =>
-              store.dispatch('settings/setProperty', ['persisted.audioInputDevice', value])
+            (value) => store.dispatch('settings/setProperty', ['persisted.audioInputDevice', value])
           "
         >
           <template v-for="audioInputDevice in audioInputDevices" :key="audioInputDevice.deviceId">
@@ -43,7 +42,7 @@
           </template>
         </NvSelect>
       </NvFormItem>
-      <NvDivider direction="horizontal"/>
+      <NvDivider direction="horizontal" />
       <NvGroup justify="apart" no-wrap spacing="5">
         <NvStack>
           <NvText type="label">Push-to-record Key</NvText>

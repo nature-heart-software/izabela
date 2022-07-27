@@ -1,14 +1,9 @@
 <template>
   <StButton v-bind="{ ...props, squared: props.squared || isVNodeEmpty($slots.default) }">
     <span v-if="!isVNodeEmpty($slots.default)" ref="content">
-      <slot/>
+      <slot />
     </span>
-    <NvIcon
-      v-if="props.iconName"
-      :name="props.iconName"
-      :size="iconSize"
-      class="nv-button__icon"
-    />
+    <NvIcon v-if="props.iconName" :name="props.iconName" :size="iconSize" class="nv-button__icon" />
   </StButton>
 </template>
 <script lang="ts" setup>

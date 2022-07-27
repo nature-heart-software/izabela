@@ -1,5 +1,5 @@
 <template>
-  <StDivider v-bind="props"/>
+  <StDivider v-bind="props" />
 </template>
 <script lang="ts" setup>
 import { defineProps } from 'vue'
