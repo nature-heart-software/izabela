@@ -7,35 +7,35 @@
       >
         <!-- Top -->
         <div class="flex space-x-4">
-          <NvButton icon-name="info" type="plain" />
+          <NvButton icon-name="info" type="plain"/>
           <NvCard size="xs">
             <div class="inline-flex space-x-2">
-              <NvButton icon-name="github-alt" size="sm" />
-              <NvButton icon-name="twitter-alt" size="sm" />
-              <NvButton icon-name="discord" size="sm" />
+              <NvButton icon-name="github-alt" size="sm"/>
+              <NvButton icon-name="twitter-alt" size="sm"/>
+              <NvButton icon-name="discord" size="sm"/>
             </div>
           </NvCard>
           <div class="flex flex-1 justify-end space-x-4 moveable-handle cursor-all-scroll">
             <NvCard class="flex-1 min-h-8" size="xs">
               <div class="inline-flex space-x-2">
-                <template v-if="$store.getters['settings/persisted'].debugMode">
-                  <NvButton icon-name="redo" size="sm" @click="reload" />
-                  <NvButton icon-name="brackets-curly" size="sm" @click="openDevTools" />
+                <template v-if="store.getters['settings/persisted'].debugMode">
+                  <NvButton icon-name="redo" size="sm" @click="reload"/>
+                  <NvButton icon-name="brackets-curly" size="sm" @click="openDevTools"/>
                 </template>
               </div>
             </NvCard>
             <NvCard size="xs">
               <div class="inline-flex items-center space-x-2">
-                <NvButton icon-name="comment-alt-lines" size="sm" />
-                <NvDivider class="h-3" direction="vertical" />
-                <NvButton icon-name="setting" size="sm" />
+                <NvButton icon-name="comment-alt-lines" size="sm"/>
+                <NvDivider class="h-3" direction="vertical"/>
+                <NvButton icon-name="setting" size="sm"/>
               </div>
             </NvCard>
             <NvCard class="inline-flex" size="sm">
               <div class="inline-flex space-x-2">
                 <!-- <NvButton size="xs" type="plain" icon-name="minus"/>
                 <NvButton size="xs" type="plain" icon-name="square-full"/> -->
-                <NvButton icon-name="times" size="xs" type="plain" @click="hide" />
+                <NvButton icon-name="times" size="xs" type="plain" @click="hide"/>
               </div>
             </NvCard>
           </div>
@@ -45,94 +45,94 @@
         <div class="flex justify-between">
           <NvCard class="inline-flex items-center space-x-3" size="sm">
             <span ref="settingsToggler">
-              <NvButton icon-name="setting" size="sm" />
+              <NvButton icon-name="setting" size="sm"/>
             </span>
-            <NvDivider class="h-3" direction="vertical" />
+            <NvDivider class="h-3" direction="vertical"/>
             <SpeechEngineSelect
-              :modelValue="$store.getters['settings/persisted'].selectedSpeechEngine"
+              :modelValue="store.getters['settings/persisted'].selectedSpeechEngine"
               class="w-13"
               icon-name="direction"
               placeholder="Speech Engine"
               size="sm"
               @update:modelValue="
                 (value) =>
-                  $store.dispatch('settings/setProperty', ['persisted.selectedSpeechEngine', value])
+                  store.dispatch('settings/setProperty', ['persisted.selectedSpeechEngine', value])
               "
             />
-            <template v-if="$store.getters['settings/persisted'].selectedSpeechEngine === 'gctts'">
+            <template v-if="store.getters['settings/persisted'].selectedSpeechEngine === 'gctts'">
               <GCTTSVoiceSelect
-                :modelValue="$store.getters['settings/persisted'].GCTTSSelectedVoice"
+                :modelValue="store.getters['settings/persisted'].GCTTSSelectedVoice"
                 class="w-13"
                 placeholder="Speech Voice"
                 size="sm"
                 @update:modelValue="
                   (value) =>
-                    $store.dispatch('settings/setProperty', ['persisted.GCTTSSelectedVoice', value])
+                    store.dispatch('settings/setProperty', ['persisted.GCTTSSelectedVoice', value])
                 "
               />
             </template>
-            <template v-if="$store.getters['settings/persisted'].selectedSpeechEngine === 'iwtts'">
+            <template v-if="store.getters['settings/persisted'].selectedSpeechEngine === 'iwtts'">
               <IWTTSVoiceSelect
-                :modelValue="$store.getters['settings/persisted'].IWTTSSelectedVoice"
+                :modelValue="store.getters['settings/persisted'].IWTTSSelectedVoice"
                 class="w-13"
                 placeholder="Speech Voice"
                 size="sm"
                 @update:modelValue="
                   (value) =>
-                    $store.dispatch('settings/setProperty', ['persisted.IWTTSSelectedVoice', value])
+                    store.dispatch('settings/setProperty', ['persisted.IWTTSSelectedVoice', value])
                 "
               />
             </template>
-            <template v-if="$store.getters['settings/persisted'].selectedSpeechEngine === 'matts'">
+            <template v-if="store.getters['settings/persisted'].selectedSpeechEngine === 'matts'">
               <MATTSVoiceSelect
-                :modelValue="$store.getters['settings/persisted'].MATTSSelectedVoice"
+                :modelValue="store.getters['settings/persisted'].MATTSSelectedVoice"
                 class="w-13"
                 placeholder="Speech Voice"
                 size="sm"
                 @update:modelValue="
                   (value) =>
-                    $store.dispatch('settings/setProperty', ['persisted.MATTSSelectedVoice', value])
+                    store.dispatch('settings/setProperty', ['persisted.MATTSSelectedVoice', value])
                 "
               />
             </template>
-            <template v-if="$store.getters['settings/persisted'].selectedSpeechEngine === 'aptts'">
+            <template v-if="store.getters['settings/persisted'].selectedSpeechEngine === 'aptts'">
               <APTTSVoiceSelect
-                :modelValue="$store.getters['settings/persisted'].APTTSSelectedVoice"
+                :modelValue="store.getters['settings/persisted'].APTTSSelectedVoice"
                 class="w-13"
                 placeholder="Speech Voice"
                 size="sm"
                 @update:modelValue="
                   (value) =>
-                    $store.dispatch('settings/setProperty', ['persisted.APTTSSelectedVoice', value])
+                    store.dispatch('settings/setProperty', ['persisted.APTTSSelectedVoice', value])
                 "
               />
             </template>
-            <template v-if="$store.getters['settings/persisted'].selectedSpeechEngine === 'saytts'">
+            <template v-if="store.getters['settings/persisted'].selectedSpeechEngine === 'saytts'">
               <SayTTSVoiceSelect
-                :modelValue="$store.getters['settings/persisted'].SayTTSSelectedVoice"
+                :modelValue="store.getters['settings/persisted'].SayTTSSelectedVoice"
                 class="w-13"
                 placeholder="Speech Voice"
                 size="sm"
                 @update:modelValue="
                   (value) =>
-                    $store.dispatch('settings/setProperty', [
+                    store.dispatch('settings/setProperty', [
                       'persisted.SayTTSSelectedVoice',
                       value,
                     ])
                 "
               />
             </template>
-            <NvDivider class="h-3" direction="vertical" />
+            <NvDivider class="h-3" direction="vertical"/>
             <NvButton icon-name="direction" size="sm">Outputs</NvButton>
             <NvButton icon-name="direction" size="sm">Input</NvButton>
-            <NvDivider class="h-3" direction="vertical" />
-            <NvButton icon-name="question-circle" size="sm" />
+            <NvDivider class="h-3" direction="vertical"/>
+            <NvButton icon-name="question-circle" size="sm"/>
           </NvCard>
           <NvCard class="inline-flex items-center space-x-3" size="sm">
             <NvButton size="sm" type="plain">Sentence</NvButton>
             <NvButton size="sm">Word</NvButton>
-            <NvDivider class="h-3" direction="vertical" />
-            <NvButton icon-name="question-circle" size="sm" />
+            <NvDivider class="h-3" direction="vertical"/>
+            <NvButton icon-name="question-circle" size="sm"/>
           </NvCard>
         </div>
 
@@ -149,7 +149,7 @@
               @focus="store.dispatch('messenger/setProperty', ['isInputFocused', true])"
               @keydown.enter="playMessage()"
             />
-            <NvButton icon-name="message" size="lg" @click="playMessage()" />
+            <NvButton icon-name="message" size="lg" @click="playMessage()"/>
           </NvCard>
         </div>
       </div>
@@ -199,7 +199,7 @@ import { useStore } from 'vuex'
 
 const store = useStore()
 const { ElectronMessengerWindow, ipc } = window
-const componentProps = defineProps({
+const props = defineProps({
   width: {
     type: Number,
     default: null,
@@ -314,13 +314,13 @@ onMounted(() => {
   const moveableTargetEl = (moveableTarget.value as ComponentPublicInstance)
     .$el as HTMLDivElement | null
   if (moveableTargetEl) {
-    if (componentProps.width) moveableTargetEl.style.width = `${componentProps.width}px`
-    if (componentProps.minWidth) moveableTargetEl.style.minWidth = `${componentProps.minWidth}px`
-    if (componentProps.maxWidth) moveableTargetEl.style.maxWidth = `${componentProps.maxWidth}px`
-    if (componentProps.height) moveableTargetEl.style.height = `${componentProps.height}px`
-    if (componentProps.minHeight) moveableTargetEl.style.minHeight = `${componentProps.minHeight}px`
-    if (componentProps.maxHeight) moveableTargetEl.style.maxHeight = `${componentProps.maxHeight}px`
-    if (componentProps.transform) moveableTargetEl.style.transform = componentProps.transform
+    if (props.width) moveableTargetEl.style.width = `${ props.width }px`
+    if (props.minWidth) moveableTargetEl.style.minWidth = `${ props.minWidth }px`
+    if (props.maxWidth) moveableTargetEl.style.maxWidth = `${ props.maxWidth }px`
+    if (props.height) moveableTargetEl.style.height = `${ props.height }px`
+    if (props.minHeight) moveableTargetEl.style.minHeight = `${ props.minHeight }px`
+    if (props.maxHeight) moveableTargetEl.style.maxHeight = `${ props.maxHeight }px`
+    if (props.transform) moveableTargetEl.style.transform = props.transform
   }
   moveable.value.updateTarget()
 

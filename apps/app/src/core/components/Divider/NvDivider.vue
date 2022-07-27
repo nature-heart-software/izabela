@@ -1,10 +1,10 @@
 <template>
-  <StDivider v-bind="$props" />
+  <StDivider v-bind="props"/>
 </template>
 <script lang="ts" setup>
 import { defineProps } from 'vue'
 import { StDivider } from './divider.styled'
-import { props } from './divider.shared'
+import { props as propsDefinition } from './divider.shared'
 
-defineProps(props)
+const props = defineProps(propsDefinition)
 </script>

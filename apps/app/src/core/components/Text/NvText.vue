@@ -1,14 +1,14 @@
 <template>
-  <StText :as="as" v-bind="$props">
-    <slot />
+  <StText :as="as" v-bind="props">
+    <slot/>
   </StText>
 </template>
 <script lang="ts" setup>
 import { defineProps } from 'vue'
 import { StText } from './text.styled'
-import { props } from './text.shared'
+import { props as propsDefinition } from './text.shared'
 
-defineProps(props)
+const props = defineProps(propsDefinition)
 </script>
 <style lang="scss">
 body {

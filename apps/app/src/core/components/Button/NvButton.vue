@@ -1,13 +1,13 @@
 <template>
-  <StButton v-bind="{ ...$props, squared: componentProps.squared || isVNodeEmpty($slots.default) }">
+  <StButton v-bind="{ ...props, squared: props.squared || isVNodeEmpty($slots.default) }">
     <span v-if="!isVNodeEmpty($slots.default)" ref="content">
-      <slot />
+      <slot/>
     </span>
     <NvIcon
-      class="nv-button__icon"
-      v-if="componentProps.iconName"
-      :name="componentProps.iconName"
+      v-if="props.iconName"
+      :name="props.iconName"
       :size="iconSize"
+      class="nv-button__icon"
     />
   </StButton>
 </template>
@@ -16,10 +16,10 @@ import { computed, defineProps } from 'vue'
 import { isVNodeEmpty } from '@/utils/vue'
 import tokens from '@/styles/tokens'
 import { StButton } from './button.styled'
-import { props, Size } from './button.shared'
+import { props as propsDefinition, Size } from './button.shared'
 import NvIcon from '../Icon/NvIcon.vue'
 
-const componentProps = defineProps(props)
+const props = defineProps(propsDefinition)
 const iconSize = computed(() => {
   const sizes: Record<Size, keyof typeof tokens.spacing> = {
     xs: 1,
@@ -27,6 +27,6 @@ const iconSize = computed(() => {
     md: 5,
     lg: 5,
   }
-  return sizes[componentProps.size]
+  return sizes[props.size]
 })
 </script>

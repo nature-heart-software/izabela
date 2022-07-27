@@ -10,11 +10,11 @@
               <NvText>Select the speech engine used for Izabela's speech</NvText>
             </NvStack>
             <SpeechEngineSelect
-              :modelValue="$store.getters['settings/persisted'].selectedSpeechEngine"
+              :modelValue="store.getters['settings/persisted'].selectedSpeechEngine"
               @update:modelValue="
                 (value) => {
                   selectedEngineTab = value
-                  $store.dispatch('settings/setProperty', ['persisted.selectedSpeechEngine', value])
+                  store.dispatch('settings/setProperty', ['persisted.selectedSpeechEngine', value])
                 }
               "
             />
@@ -30,21 +30,21 @@
                     align="center"
                     type="ghost"
                     @click="selectedEngineTab = engine.id"
-                    >{{ engine.name }}
+                  >{{ engine.name }}
                   </NvButton>
                 </template>
               </NvGroup>
-              <NvDivider direction="horizontal" />
+              <NvDivider direction="horizontal"/>
               <template v-if="selectedEngineTab === 'gctts'">
                 <NvStack spacing="5">
                   <NvFormItem label="API Key">
                     <NvInput
-                      :modelValue="decrypt($store.getters['settings/persisted'].GCTTSApiKey)"
+                      :modelValue="decrypt(store.getters['settings/persisted'].GCTTSApiKey)"
                       show-password
                       type="password"
                       @update:modelValue="
                         (value) =>
-                          $store.dispatch('settings/setProperty', [
+                          store.dispatch('settings/setProperty', [
                             'persisted.GCTTSApiKey',
                             encrypt(value),
                           ])
@@ -52,13 +52,13 @@
                     />
                   </NvFormItem>
                 </NvStack>
-                <NvDivider direction="horizontal" />
+                <NvDivider direction="horizontal"/>
                 <NvFormItem label="Voice">
                   <GCTTSVoiceSelect
-                    :modelValue="$store.getters['settings/persisted'].GCTTSSelectedVoice"
+                    :modelValue="store.getters['settings/persisted'].GCTTSSelectedVoice"
                     @update:modelValue="
                       (value) =>
-                        $store.dispatch('settings/setProperty', [
+                        store.dispatch('settings/setProperty', [
                           'persisted.GCTTSSelectedVoice',
                           value,
                         ])
@@ -70,12 +70,12 @@
                 <NvStack spacing="5">
                   <NvFormItem label="API Key">
                     <NvInput
-                      :modelValue="decrypt($store.getters['settings/persisted'].IWTTSApiKey)"
+                      :modelValue="decrypt(store.getters['settings/persisted'].IWTTSApiKey)"
                       show-password
                       type="password"
                       @update:modelValue="
                         (value) =>
-                          $store.dispatch('settings/setProperty', [
+                          store.dispatch('settings/setProperty', [
                             'persisted.IWTTSApiKey',
                             encrypt(value),
                           ])
@@ -83,25 +83,25 @@
                     />
                   </NvFormItem>
                 </NvStack>
-                <NvDivider direction="horizontal" />
+                <NvDivider direction="horizontal"/>
                 <NvStack spacing="5">
                   <NvFormItem label="Url">
                     <NvInput
-                      :modelValue="$store.getters['settings/persisted'].IWTTSUrl"
+                      :modelValue="store.getters['settings/persisted'].IWTTSUrl"
                       @update:modelValue="
                         (value) =>
-                          $store.dispatch('settings/setProperty', ['persisted.IWTTSUrl', value])
+                          store.dispatch('settings/setProperty', ['persisted.IWTTSUrl', value])
                       "
                     />
                   </NvFormItem>
                 </NvStack>
-                <NvDivider direction="horizontal" />
+                <NvDivider direction="horizontal"/>
                 <NvFormItem label="Voice">
                   <IWTTSVoiceSelect
-                    :modelValue="$store.getters['settings/persisted'].IWTTSSelectedVoice"
+                    :modelValue="store.getters['settings/persisted'].IWTTSSelectedVoice"
                     @update:modelValue="
                       (value) =>
-                        $store.dispatch('settings/setProperty', [
+                        store.dispatch('settings/setProperty', [
                           'persisted.IWTTSSelectedVoice',
                           value,
                         ])
@@ -113,12 +113,12 @@
                 <NvStack spacing="5">
                   <NvFormItem label="API Key">
                     <NvInput
-                      :modelValue="decrypt($store.getters['settings/persisted'].MATTSApiKey)"
+                      :modelValue="decrypt(store.getters['settings/persisted'].MATTSApiKey)"
                       show-password
                       type="password"
                       @update:modelValue="
                         (value) =>
-                          $store.dispatch('settings/setProperty', [
+                          store.dispatch('settings/setProperty', [
                             'persisted.MATTSApiKey',
                             encrypt(value),
                           ])
@@ -126,25 +126,25 @@
                     />
                   </NvFormItem>
                 </NvStack>
-                <NvDivider direction="horizontal" />
+                <NvDivider direction="horizontal"/>
                 <NvStack spacing="5">
                   <NvFormItem label="Region">
                     <NvInput
-                      :modelValue="$store.getters['settings/persisted'].MATTSRegion"
+                      :modelValue="store.getters['settings/persisted'].MATTSRegion"
                       @update:modelValue="
                         (value) =>
-                          $store.dispatch('settings/setProperty', ['persisted.MATTSRegion', value])
+                          store.dispatch('settings/setProperty', ['persisted.MATTSRegion', value])
                       "
                     />
                   </NvFormItem>
                 </NvStack>
-                <NvDivider direction="horizontal" />
+                <NvDivider direction="horizontal"/>
                 <NvFormItem label="Voice">
                   <MATTSVoiceSelect
-                    :modelValue="$store.getters['settings/persisted'].MATTSSelectedVoice"
+                    :modelValue="store.getters['settings/persisted'].MATTSSelectedVoice"
                     @update:modelValue="
                       (value) =>
-                        $store.dispatch('settings/setProperty', [
+                        store.dispatch('settings/setProperty', [
                           'persisted.MATTSSelectedVoice',
                           value,
                         ])
@@ -157,13 +157,13 @@
                   <NvFormItem label="Identity pool ID">
                     <NvInput
                       :modelValue="
-                        decrypt($store.getters['settings/persisted'].APTTSIdentityPoolId)
+                        decrypt(store.getters['settings/persisted'].APTTSIdentityPoolId)
                       "
                       show-password
                       type="password"
                       @update:modelValue="
                         (value) =>
-                          $store.dispatch('settings/setProperty', [
+                          store.dispatch('settings/setProperty', [
                             'persisted.APTTSIdentityPoolId',
                             encrypt(value),
                           ])
@@ -171,25 +171,25 @@
                     />
                   </NvFormItem>
                 </NvStack>
-                <NvDivider direction="horizontal" />
+                <NvDivider direction="horizontal"/>
                 <NvStack spacing="5">
                   <NvFormItem label="Region">
                     <NvInput
-                      :modelValue="$store.getters['settings/persisted'].APTTSRegion"
+                      :modelValue="store.getters['settings/persisted'].APTTSRegion"
                       @update:modelValue="
                         (value) =>
-                          $store.dispatch('settings/setProperty', ['persisted.APTTSRegion', value])
+                          store.dispatch('settings/setProperty', ['persisted.APTTSRegion', value])
                       "
                     />
                   </NvFormItem>
                 </NvStack>
-                <NvDivider direction="horizontal" />
+                <NvDivider direction="horizontal"/>
                 <NvFormItem label="Voice">
                   <APTTSVoiceSelect
-                    :modelValue="$store.getters['settings/persisted'].APTTSSelectedVoice"
+                    :modelValue="store.getters['settings/persisted'].APTTSSelectedVoice"
                     @update:modelValue="
                       (value) =>
-                        $store.dispatch('settings/setProperty', [
+                        store.dispatch('settings/setProperty', [
                           'persisted.APTTSSelectedVoice',
                           value,
                         ])
@@ -200,10 +200,10 @@
               <template v-if="selectedEngineTab === 'saytts'">
                 <NvFormItem label="Voice">
                   <SayTTSVoiceSelect
-                    :modelValue="$store.getters['settings/persisted'].SayTTSSelectedVoice"
+                    :modelValue="store.getters['settings/persisted'].SayTTSSelectedVoice"
                     @update:modelValue="
                       (value) =>
-                        $store.dispatch('settings/setProperty', [
+                        store.dispatch('settings/setProperty', [
                           'persisted.SayTTSSelectedVoice',
                           value,
                         ])

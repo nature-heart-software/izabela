@@ -1,19 +1,19 @@
 <template>
-  <StSelect v-bind="$props">
+  <StSelect v-bind="props">
     <div class="nv-selectWrapper">
       <component
         :is="WrappedComponent"
         :filterable="true"
-        :model-value="compopentProps.modelValue"
+        :model-value="props.modelValue"
         :popper-append-to-body="false"
         v-bind="$attrs"
         @update:model-value="$emit('update:model-value', $event)"
       >
         <template v-for="(_, slot) of $slots" v-slot:[slot]="scope">
-          <slot :name="slot" v-bind="scope || {}" />
+          <slot :name="slot" v-bind="scope || {}"/>
         </template>
       </component>
-      <NvIcon :size="iconSize" class="nv-select__icon" name="direction" />
+      <NvIcon :size="iconSize" class="nv-select__icon" name="direction"/>
     </div>
   </StSelect>
 </template>
@@ -23,10 +23,10 @@ import { ElSelect as WrappedComponent } from 'element-plus'
 import 'element-plus/lib/components/select/style/css'
 import tokens from '@/styles/tokens'
 import { StSelect } from './select.styled'
-import { props, Size } from './select.shared'
+import { props as propsDefinition, Size } from './select.shared'
 import NvIcon from '../Icon/NvIcon.vue'
 
-const compopentProps = defineProps(props)
+const props = defineProps(propsDefinition)
 
 const iconSize = computed(() => {
   const sizes: Record<Size, keyof typeof tokens.spacing> = {
@@ -34,7 +34,7 @@ const iconSize = computed(() => {
     md: 5,
     lg: 5,
   }
-  return sizes[compopentProps.size]
+  return sizes[props.size]
 })
 </script>
 <script lang="ts">

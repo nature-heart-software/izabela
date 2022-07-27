@@ -1,12 +1,12 @@
 <template>
-  <StCenter :as="as" v-bind="$props">
-    <slot />
+  <StCenter :as="as" v-bind="props">
+    <slot/>
   </StCenter>
 </template>
 <script lang="ts" setup>
 import { defineProps } from 'vue'
 import { StCenter } from './center.styled'
-import { props } from './center.shared'
+import { props as propsDefinition } from './center.shared'
 
-defineProps(props)
+const props = defineProps(propsDefinition)
 </script>
