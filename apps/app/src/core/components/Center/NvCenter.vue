@@ -1,6 +1,6 @@
 <template>
   <StCenter v-bind="props">
-    <slot/>
+    <slot />
   </StCenter>
 </template>
 <script lang="ts" setup>

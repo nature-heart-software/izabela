@@ -1,6 +1,6 @@
 <template>
   <StGroup v-bind="props">
-    <slot/>
+    <slot />
   </StGroup>
 </template>
 <script lang="ts" setup>
