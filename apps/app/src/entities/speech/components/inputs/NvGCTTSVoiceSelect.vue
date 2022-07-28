@@ -1,5 +1,5 @@
 <template>
-  <NvSelect v-loading="true" v-bind="$attrs" valueKey="name">
+  <NvSelect v-loading="isFetching" v-bind="$attrs" valueKey="name">
     <template v-for="voice in voices" :key="voice.name">
       <NvOption :label="`${voice.name} - ${voice.ssmlGender}`" :value="purify(voice)">
         {{ `${voice.name} - ${voice.ssmlGender}` }}
