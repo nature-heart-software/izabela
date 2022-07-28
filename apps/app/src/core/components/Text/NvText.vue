@@ -1,6 +1,6 @@
 <template>
   <StText v-bind="props">
-    <slot/>
+    <slot />
   </StText>
 </template>
 <script lang="ts" setup>
