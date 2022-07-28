@@ -1,4 +1,4 @@
-import { rem } from 'polished'
+import { rem, rgba } from 'polished'
 import tokens from '@/styles/tokens'
 import { CSSObject } from '@/types/css-in-js'
 
@@ -115,4 +115,10 @@ export function iconStyleBySize(size: Size) {
     },
   }
   return styles[size]
+}
+
+export function disabledItemBackgroundStyle() {
+  return `
+    background-color: ${rgba('#fff', 0.9)};
+  `
 }

@@ -1,6 +1,6 @@
 <template>
-  <StStack :as="as" v-bind="props">
-    <slot />
+  <StStack v-bind="props">
+    <slot/>
   </StStack>
 </template>
 <script lang="ts" setup>

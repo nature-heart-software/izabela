@@ -1,5 +1,5 @@
 <template>
-  <StSwitch :as="as" tabindex="0" v-bind="props" @click="toggleValue">
+  <StSwitch tabindex="0" v-bind="props" @click="toggleValue">
     <label :for="id">
       <input
         :id="id"
