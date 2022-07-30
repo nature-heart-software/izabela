@@ -30,11 +30,11 @@
                     align="center"
                     type="ghost"
                     @click="selectedEngineTab = engine.id"
-                  >{{ engine.name }}
+                    >{{ engine.name }}
                   </NvButton>
                 </template>
               </NvGroup>
-              <NvDivider direction="horizontal"/>
+              <NvDivider direction="horizontal" />
               <template v-if="selectedEngineTab === 'gctts'">
                 <NvStack spacing="5">
                   <NvFormItem label="API Key">
@@ -52,7 +52,7 @@
                     />
                   </NvFormItem>
                 </NvStack>
-                <NvDivider direction="horizontal"/>
+                <NvDivider direction="horizontal" />
                 <NvAccessBlocker
                   :allowed="!!decrypt(store.getters['settings/persisted'].GCTTSApiKey)"
                   reason="Credentials required"
@@ -61,12 +61,12 @@
                     <GCTTSVoiceSelect
                       :modelValue="store.getters['settings/persisted'].GCTTSSelectedVoice"
                       @update:modelValue="
-                      (value) =>
-                        store.dispatch('settings/setProperty', [
-                          'persisted.GCTTSSelectedVoice',
-                          value,
-                        ])
-                    "
+                        (value) =>
+                          store.dispatch('settings/setProperty', [
+                            'persisted.GCTTSSelectedVoice',
+                            value,
+                          ])
+                      "
                     />
                   </NvFormItem>
                 </NvAccessBlocker>
@@ -88,7 +88,7 @@
                     />
                   </NvFormItem>
                 </NvStack>
-                <NvDivider direction="horizontal"/>
+                <NvDivider direction="horizontal" />
                 <NvStack spacing="5">
                   <NvFormItem label="Url">
                     <NvInput
@@ -100,9 +100,14 @@
                     />
                   </NvFormItem>
                 </NvStack>
-                <NvDivider direction="horizontal"/>
+                <NvDivider direction="horizontal" />
                 <NvAccessBlocker
-                  :allowed="[decrypt(store.getters['settings/persisted'].IWTTSApiKey), store.getters['settings/persisted'].IWTTSUrl].every(Boolean)"
+                  :allowed="
+                    [
+                      decrypt(store.getters['settings/persisted'].IWTTSApiKey),
+                      store.getters['settings/persisted'].IWTTSUrl,
+                    ].every(Boolean)
+                  "
                   reason="Credentials required"
                 >
                   <NvFormItem label="Voice">
@@ -136,7 +141,7 @@
                     />
                   </NvFormItem>
                 </NvStack>
-                <NvDivider direction="horizontal"/>
+                <NvDivider direction="horizontal" />
                 <NvStack spacing="5">
                   <NvFormItem label="Region">
                     <NvInput
@@ -148,21 +153,26 @@
                     />
                   </NvFormItem>
                 </NvStack>
-                <NvDivider direction="horizontal"/>
+                <NvDivider direction="horizontal" />
                 <NvAccessBlocker
-                  :allowed="[decrypt(store.getters['settings/persisted'].MATTSApiKey), store.getters['settings/persisted'].MATTSRegion].every(Boolean)"
+                  :allowed="
+                    [
+                      decrypt(store.getters['settings/persisted'].MATTSApiKey),
+                      store.getters['settings/persisted'].MATTSRegion,
+                    ].every(Boolean)
+                  "
                   reason="Credentials required"
                 >
                   <NvFormItem label="Voice">
                     <MATTSVoiceSelect
                       :modelValue="store.getters['settings/persisted'].MATTSSelectedVoice"
                       @update:modelValue="
-                      (value) =>
-                        store.dispatch('settings/setProperty', [
-                          'persisted.MATTSSelectedVoice',
-                          value,
-                        ])
-                    "
+                        (value) =>
+                          store.dispatch('settings/setProperty', [
+                            'persisted.MATTSSelectedVoice',
+                            value,
+                          ])
+                      "
                     />
                   </NvFormItem>
                 </NvAccessBlocker>
@@ -184,7 +194,7 @@
                     />
                   </NvFormItem>
                 </NvStack>
-                <NvDivider direction="horizontal"/>
+                <NvDivider direction="horizontal" />
                 <NvStack spacing="5">
                   <NvFormItem label="Region">
                     <NvInput
@@ -196,9 +206,14 @@
                     />
                   </NvFormItem>
                 </NvStack>
-                <NvDivider direction="horizontal"/>
+                <NvDivider direction="horizontal" />
                 <NvAccessBlocker
-                  :allowed="[decrypt(store.getters['settings/persisted'].APTTSIdentityPoolId), store.getters['settings/persisted'].APTTSRegion].every(Boolean)"
+                  :allowed="
+                    [
+                      decrypt(store.getters['settings/persisted'].APTTSIdentityPoolId),
+                      store.getters['settings/persisted'].APTTSRegion,
+                    ].every(Boolean)
+                  "
                   reason="Credentials required"
                 >
                   <NvFormItem label="Voice">
@@ -261,9 +276,7 @@ import speechEngineManager from '@/entities/speech/modules/speech-engine-manager
 import { SpeechEngine } from '@/entities/speech/modules/speech-engine-manager/types'
 
 const store = useStore()
-const selectedEngineTab = ref<SpeechEngine['id']>(
-  store.getters['settings/selectedSpeechEngine'],
-)
+const selectedEngineTab = ref<SpeechEngine['id']>(store.getters['settings/selectedSpeechEngine'])
 const speechEngines = speechEngineManager.getEngines()
 const { encrypt, decrypt } = useEncryption()
 </script>
