@@ -1,11 +1,11 @@
 <template>
   <StAccessBlocker v-bind="props">
-    <slot />
+    <slot/>
     <Transition class="transition">
       <StAccessBlockerReason v-if="!props.allowed">
         <NkCenter class="w-full h-full">
           <slot name="reason">
-            <NvAlert>
+            <NvAlert size="sm">
               {{ props.reason }}
             </NvAlert>
           </slot>

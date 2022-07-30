@@ -55,6 +55,36 @@ export function borderRadiusStyleBySize(size: Size) {
   return styles[size]
 }
 
+export function paddingStyleBySize(size: Size) {
+  const styles: Record<Size, CSSObject> = {
+    xs: {
+      paddingTop: rem(spacing['2']),
+      paddingLeft: rem(spacing['2']),
+      paddingRight: rem(spacing['2']),
+      paddingBottom: rem(spacing['2']),
+    },
+    sm: {
+      paddingTop: rem(spacing['3']),
+      paddingLeft: rem(spacing['3']),
+      paddingRight: rem(spacing['3']),
+      paddingBottom: rem(spacing['3']),
+    },
+    md: {
+      paddingTop: rem(spacing['5']),
+      paddingLeft: rem(spacing['5']),
+      paddingRight: rem(spacing['5']),
+      paddingBottom: rem(spacing['5']),
+    },
+    lg: {
+      paddingTop: rem(spacing['5']),
+      paddingLeft: rem(spacing['5']),
+      paddingRight: rem(spacing['5']),
+      paddingBottom: rem(spacing['5']),
+    },
+  }
+  return styles[size]
+}
+
 export function horizontalPaddingStyleBySize(size: Size) {
   const styles: Record<Size, CSSObject> = {
     xs: {

@@ -1,4 +1,5 @@
 import { ExtractPropTypes, PropType } from 'vue'
+import { Size } from '@/utils/css-in-js'
 
 export const typeValues = ['success', 'warning', 'info', 'error'] as const
 export type Type = typeof typeValues[number]
@@ -13,8 +14,8 @@ export const props = {
     default: 'div',
   },
   size: {
-    type: String,
-    default: 'sm',
+    type: String as PropType<Size>,
+    default: 'md',
   },
 }
 
