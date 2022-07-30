@@ -4,9 +4,9 @@ import { api } from '@/services'
 import speechEngineManager from '../SpeechEngineManager'
 
 const getCredentials = () => ({
-    identityPoolId: decrypt(store.getters['settings/persisted'].APTTSIdentityPoolId),
-    region: store.getters['settings/persisted'].APTTSRegion,
-  })
+  identityPoolId: decrypt(store.getters['settings/persisted'].APTTSIdentityPoolId),
+  region: store.getters['settings/persisted'].APTTSRegion,
+})
 
 speechEngineManager.registerEngine({
   id: 'aptts',

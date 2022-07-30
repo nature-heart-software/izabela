@@ -5,8 +5,8 @@ import { pick } from 'lodash'
 import speechEngineManager from '../SpeechEngineManager'
 
 const getCredentials = () => ({
-    apiKey: decrypt(store.getters['settings/persisted'].GCTTSApiKey),
-  })
+  apiKey: decrypt(store.getters['settings/persisted'].GCTTSApiKey),
+})
 speechEngineManager.registerEngine({
   id: 'gctts',
   name: 'Google Cloud',

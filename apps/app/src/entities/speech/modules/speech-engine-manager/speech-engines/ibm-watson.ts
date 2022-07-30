@@ -4,9 +4,9 @@ import { api } from '@/services'
 import speechEngineManager from '../SpeechEngineManager'
 
 const getCredentials = () => ({
-    apiKey: decrypt(store.getters['settings/persisted'].IWTTSApiKey),
-    url: store.getters['settings/persisted'].IWTTSUrl,
-  })
+  apiKey: decrypt(store.getters['settings/persisted'].IWTTSApiKey),
+  url: store.getters['settings/persisted'].IWTTSUrl,
+})
 
 speechEngineManager.registerEngine({
   id: 'iwtts',
