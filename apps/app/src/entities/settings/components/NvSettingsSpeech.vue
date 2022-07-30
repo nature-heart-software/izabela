@@ -30,11 +30,11 @@
                     align="center"
                     type="ghost"
                     @click="selectedEngineTab = engine.id"
-                    >{{ engine.name }}
+                  >{{ engine.name }}
                   </NvButton>
                 </template>
               </NvGroup>
-              <NvDivider direction="horizontal" />
+              <NvDivider direction="horizontal"/>
               <template v-if="selectedEngineTab === 'gctts'">
                 <NvStack spacing="5">
                   <NvFormItem label="API Key">
@@ -52,19 +52,24 @@
                     />
                   </NvFormItem>
                 </NvStack>
-                <NvDivider direction="horizontal" />
-                <NvFormItem label="Voice">
-                  <GCTTSVoiceSelect
-                    :modelValue="store.getters['settings/persisted'].GCTTSSelectedVoice"
-                    @update:modelValue="
+                <NvDivider direction="horizontal"/>
+                <NvAccessBlocker
+                  :allowed="!!decrypt(store.getters['settings/persisted'].GCTTSApiKey)"
+                  reason="Credentials required"
+                >
+                  <NvFormItem label="Voice">
+                    <GCTTSVoiceSelect
+                      :modelValue="store.getters['settings/persisted'].GCTTSSelectedVoice"
+                      @update:modelValue="
                       (value) =>
                         store.dispatch('settings/setProperty', [
                           'persisted.GCTTSSelectedVoice',
                           value,
                         ])
                     "
-                  />
-                </NvFormItem>
+                    />
+                  </NvFormItem>
+                </NvAccessBlocker>
               </template>
               <template v-if="selectedEngineTab === 'iwtts'">
                 <NvStack spacing="5">
@@ -83,7 +88,7 @@
                     />
                   </NvFormItem>
                 </NvStack>
-                <NvDivider direction="horizontal" />
+                <NvDivider direction="horizontal"/>
                 <NvStack spacing="5">
                   <NvFormItem label="Url">
                     <NvInput
@@ -95,19 +100,24 @@
                     />
                   </NvFormItem>
                 </NvStack>
-                <NvDivider direction="horizontal" />
-                <NvFormItem label="Voice">
-                  <IWTTSVoiceSelect
-                    :modelValue="store.getters['settings/persisted'].IWTTSSelectedVoice"
-                    @update:modelValue="
-                      (value) =>
-                        store.dispatch('settings/setProperty', [
-                          'persisted.IWTTSSelectedVoice',
-                          value,
-                        ])
-                    "
-                  />
-                </NvFormItem>
+                <NvDivider direction="horizontal"/>
+                <NvAccessBlocker
+                  :allowed="[decrypt(store.getters['settings/persisted'].IWTTSApiKey), store.getters['settings/persisted'].IWTTSUrl].every(Boolean)"
+                  reason="Credentials required"
+                >
+                  <NvFormItem label="Voice">
+                    <IWTTSVoiceSelect
+                      :modelValue="store.getters['settings/persisted'].IWTTSSelectedVoice"
+                      @update:modelValue="
+                        (value) =>
+                          store.dispatch('settings/setProperty', [
+                            'persisted.IWTTSSelectedVoice',
+                            value,
+                          ])
+                      "
+                    />
+                  </NvFormItem>
+                </NvAccessBlocker>
               </template>
               <template v-if="selectedEngineTab === 'matts'">
                 <NvStack spacing="5">
@@ -126,7 +136,7 @@
                     />
                   </NvFormItem>
                 </NvStack>
-                <NvDivider direction="horizontal" />
+                <NvDivider direction="horizontal"/>
                 <NvStack spacing="5">
                   <NvFormItem label="Region">
                     <NvInput
@@ -138,19 +148,24 @@
                     />
                   </NvFormItem>
                 </NvStack>
-                <NvDivider direction="horizontal" />
-                <NvFormItem label="Voice">
-                  <MATTSVoiceSelect
-                    :modelValue="store.getters['settings/persisted'].MATTSSelectedVoice"
-                    @update:modelValue="
+                <NvDivider direction="horizontal"/>
+                <NvAccessBlocker
+                  :allowed="[decrypt(store.getters['settings/persisted'].MATTSApiKey), store.getters['settings/persisted'].MATTSRegion].every(Boolean)"
+                  reason="Credentials required"
+                >
+                  <NvFormItem label="Voice">
+                    <MATTSVoiceSelect
+                      :modelValue="store.getters['settings/persisted'].MATTSSelectedVoice"
+                      @update:modelValue="
                       (value) =>
                         store.dispatch('settings/setProperty', [
                           'persisted.MATTSSelectedVoice',
                           value,
                         ])
                     "
-                  />
-                </NvFormItem>
+                    />
+                  </NvFormItem>
+                </NvAccessBlocker>
               </template>
               <template v-if="selectedEngineTab === 'aptts'">
                 <NvStack spacing="5">
@@ -169,7 +184,7 @@
                     />
                   </NvFormItem>
                 </NvStack>
-                <NvDivider direction="horizontal" />
+                <NvDivider direction="horizontal"/>
                 <NvStack spacing="5">
                   <NvFormItem label="Region">
                     <NvInput
@@ -181,19 +196,24 @@
                     />
                   </NvFormItem>
                 </NvStack>
-                <NvDivider direction="horizontal" />
-                <NvFormItem label="Voice">
-                  <APTTSVoiceSelect
-                    :modelValue="store.getters['settings/persisted'].APTTSSelectedVoice"
-                    @update:modelValue="
-                      (value) =>
-                        store.dispatch('settings/setProperty', [
-                          'persisted.APTTSSelectedVoice',
-                          value,
-                        ])
-                    "
-                  />
-                </NvFormItem>
+                <NvDivider direction="horizontal"/>
+                <NvAccessBlocker
+                  :allowed="[decrypt(store.getters['settings/persisted'].APTTSIdentityPoolId), store.getters['settings/persisted'].APTTSRegion].every(Boolean)"
+                  reason="Credentials required"
+                >
+                  <NvFormItem label="Voice">
+                    <APTTSVoiceSelect
+                      :modelValue="store.getters['settings/persisted'].APTTSSelectedVoice"
+                      @update:modelValue="
+                        (value) =>
+                          store.dispatch('settings/setProperty', [
+                            'persisted.APTTSSelectedVoice',
+                            value,
+                          ])
+                      "
+                    />
+                  </NvFormItem>
+                </NvAccessBlocker>
               </template>
               <template v-if="selectedEngineTab === 'saytts'">
                 <NvFormItem label="Voice">
@@ -220,6 +240,7 @@
 import { ref } from 'vue'
 import { useStore } from 'vuex'
 import {
+  NvAccessBlocker,
   NvButton,
   NvCard,
   NvDivider,
