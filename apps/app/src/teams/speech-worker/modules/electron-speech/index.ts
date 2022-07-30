@@ -61,7 +61,7 @@ ipcMain.on(
     try {
       const client = new speech.SpeechClient()
       const engine = speechEngineManager.getEngineById(
-        store.getters['settings/persisted'].selectedSpeechEngine,
+        store.getters['settings/selectedSpeechEngine'],
       )
 
       const request = {

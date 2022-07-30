@@ -1,7 +1,15 @@
 <template>
   <NvSelect v-bind="$attrs">
     <template v-for="engine in speechEngines" :key="engine.id">
-      <NvOption :label="engine.name" :value="engine.id">{{ engine.name }}</NvOption>
+      <NvOption
+        :disabled="engine.hasCredentials ? !engine.hasCredentials() : false"
+        :label="engine.name"
+        :title="engine.hasCredentials && !engine.hasCredentials() ? 'Requires credentials' : ''"
+        :value="engine.id"
+      >{{
+          engine.name
+        }}
+      </NvOption>
     </template>
   </NvSelect>
 </template>

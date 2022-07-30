@@ -3,14 +3,17 @@ import { decrypt } from '@/utils/security'
 import { api } from '@/services'
 import speechEngineManager from '../SpeechEngineManager'
 
+const getCredentials = () => ({
+    identityPoolId: decrypt(store.getters['settings/persisted'].APTTSIdentityPoolId),
+    region: store.getters['settings/persisted'].APTTSRegion,
+  })
+
 speechEngineManager.registerEngine({
   id: 'aptts',
   name: 'Amazon Polly',
-  getCredentials() {
-    return {
-      identityPoolId: decrypt(store.getters['settings/persisted'].APTTSIdentityPoolId),
-      region: store.getters['settings/persisted'].APTTSRegion,
-    }
+  getCredentials,
+  hasCredentials() {
+    return Object.values(getCredentials()).every(Boolean)
   },
   getPayload(text) {
     return {

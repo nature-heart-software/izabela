@@ -3,14 +3,17 @@ import { decrypt } from '@/utils/security'
 import { api } from '@/services'
 import speechEngineManager from '../SpeechEngineManager'
 
+const getCredentials = () => ({
+  apiKey: decrypt(store.getters['settings/persisted'].MATTSApiKey),
+  region: store.getters['settings/persisted'].MATTSRegion,
+})
+
 speechEngineManager.registerEngine({
   id: 'matts',
   name: 'Microsoft Azure',
-  getCredentials() {
-    return {
-      apiKey: decrypt(store.getters['settings/persisted'].MATTSApiKey),
-      region: store.getters['settings/persisted'].MATTSRegion,
-    }
+  getCredentials,
+  hasCredentials() {
+    return Object.values(getCredentials()).every(Boolean)
   },
   getPayload(text) {
     return {

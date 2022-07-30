@@ -3,14 +3,17 @@ import { decrypt } from '@/utils/security'
 import { api } from '@/services'
 import speechEngineManager from '../SpeechEngineManager'
 
+const getCredentials = () => ({
+    apiKey: decrypt(store.getters['settings/persisted'].IWTTSApiKey),
+    url: store.getters['settings/persisted'].IWTTSUrl,
+  })
+
 speechEngineManager.registerEngine({
   id: 'iwtts',
   name: 'IBM Watson',
-  getCredentials() {
-    return {
-      apiKey: decrypt(store.getters['settings/persisted'].IWTTSApiKey),
-      url: store.getters['settings/persisted'].IWTTSUrl,
-    }
+  getCredentials,
+  hasCredentials() {
+    return Object.values(getCredentials()).every(Boolean)
   },
   getPayload(text) {
     return {

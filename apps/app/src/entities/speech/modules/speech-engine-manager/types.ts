@@ -13,4 +13,5 @@ export interface SpeechEngine {
     credentials: Credentials
     payload: Payload
   }) => Promise<AxiosResponse<Blob>>
+  hasCredentials?: () => boolean
 }

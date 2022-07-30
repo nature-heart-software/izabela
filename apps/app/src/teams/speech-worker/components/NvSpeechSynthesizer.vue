@@ -13,7 +13,7 @@ allProcesses.forEach((processName) => {
     let message = null
     if (typeof payload === 'string') {
       const engine = speechEngineManager.getEngineById(
-        store.getters['settings/persisted'].selectedSpeechEngine,
+        store.getters['settings/selectedSpeechEngine'],
       )
       if (!engine) return
       message = {

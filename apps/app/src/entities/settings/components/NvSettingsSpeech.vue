@@ -10,7 +10,7 @@
               <NvText>Select the speech engine used for Izabela's speech</NvText>
             </NvStack>
             <SpeechEngineSelect
-              :modelValue="store.getters['settings/persisted'].selectedSpeechEngine"
+              :modelValue="store.getters['settings/selectedSpeechEngine']"
               @update:modelValue="
                 (value) => {
                   selectedEngineTab = value
@@ -262,7 +262,7 @@ import { SpeechEngine } from '@/entities/speech/modules/speech-engine-manager/ty
 
 const store = useStore()
 const selectedEngineTab = ref<SpeechEngine['id']>(
-  store.getters['settings/persisted'].selectedSpeechEngine,
+  store.getters['settings/selectedSpeechEngine'],
 )
 const speechEngines = speechEngineManager.getEngines()
 const { encrypt, decrypt } = useEncryption()

@@ -3,6 +3,7 @@ import { utilActions, utilMutations } from '@/utils/vuex'
 import { SpeechEngine } from '@/entities/speech/modules/speech-engine-manager/types'
 import pkg from '@root/package.json'
 import { KeybindingResult } from '@/types/keybinds'
+import speechEngineManager from '@/entities/speech/modules/speech-engine-manager'
 
 const { version } = pkg
 // eslint-disable-next-line no-nested-ternary
@@ -80,6 +81,13 @@ export const settingsStore: Module<typeof storeState, any> = {
   getters: {
     state: (state) => state,
     persisted: (state) => state.persisted,
+    selectedSpeechEngine: (state, getters) => {
+      const engine = speechEngineManager.getEngineById(getters.persisted.selectedSpeechEngine)
+      if (engine && engine.hasCredentials && engine.hasCredentials()) {
+        return getters.persisted.selectedSpeechEngine
+      }
+      return 'saytts'
+    },
   },
   mutations: {
     ...utilMutations,
