@@ -7,6 +7,11 @@ import { getTime } from '@/utils/time'
 import { blobToBase64 } from '@/utils/blob'
 import { onBeforeUnmount } from 'vue'
 import { getMediaDeviceByLabel } from '@/utils/media-devices'
+import {
+  emitIPCTranscribeAudio,
+  onIPCStartSpeechTranscription,
+  onIPCStopSpeechTranscription,
+} from '@/electron/events/renderer'
 
 const mediaDevice = await getMediaDeviceByLabel(
   store.getters['settings/persisted'].audioInputDevice,
@@ -33,8 +38,8 @@ const onStop = () => {
   const audioBlob = new Blob(audioChunks, { type: mediaRecorder?.mimeType })
   audioChunks = []
   blobToBase64(audioBlob).then((base64) => {
-    ipc.sendTo('main', 'transcribe-audio', {
-      content: (base64 as string).split(',').pop(),
+    emitIPCTranscribeAudio({
+      content: (base64 as string).split(',').pop() || '',
       sampleRate,
       encoding: 'WEBM_OPUS',
     })
@@ -49,16 +54,16 @@ const onStop = () => {
 mediaRecorder.addEventListener('dataavailable', onDataAvailable)
 mediaRecorder.addEventListener('stop', onStop)
 
-ipc.on('main', 'start-speech-transcription', () => {
+onIPCStartSpeechTranscription(() => {
   if (mediaRecorder) {
-    console.log(`[${getTime()}] Starting web recording`)
+    console.log(`[${ getTime() }] Starting web recording`)
     mediaRecorder.start()
   }
 })
 
-ipc.on('main', 'stop-speech-transcription', () => {
+onIPCStopSpeechTranscription(() => {
   if (mediaRecorder) {
-    console.log(`[${getTime()}] Stopping web recording`)
+    console.log(`[${ getTime() }] Stopping web recording`)
     mediaRecorder.stop()
   }
 })
