@@ -1,7 +1,9 @@
 import { AxiosResponse } from 'axios'
+import { Component } from 'vue'
 
 export type Credentials = { [key: string]: any }
 export type Payload = { [key: string]: any }
+type Lazy<T> = () => Promise<T>
 
 export interface SpeechEngine {
   id: string
@@ -14,4 +16,6 @@ export interface SpeechEngine {
     payload: Payload
   }) => Promise<AxiosResponse<Blob>>
   hasCredentials?: () => boolean
+  voiceSelectComponent: Component
+  settingsComponent: Component
 }

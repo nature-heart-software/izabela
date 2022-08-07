@@ -3,6 +3,7 @@ import { createStore, MutationPayload } from 'vuex'
 import { createPersistedState, createSharedMutations } from '@/modules/electron-vuex'
 import messenger from '@/teams/messenger/store'
 import settings from '@/entities/settings/store'
+import speech from '@/entities/speech/store'
 import { SetPropertyPayload } from '@/utils/vuex'
 import domBoundariesStore from '@/modules/vue-dom-boundaries/dom-boundaries.store'
 
@@ -13,6 +14,7 @@ const store = createStore({
   modules: {
     messenger,
     settings,
+    speech,
   },
   plugins: [
     ...(process.env.STORYBOOK

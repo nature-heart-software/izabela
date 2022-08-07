@@ -1,14 +1,16 @@
 import store from '@/store'
 import { decrypt } from '@/utils/security'
 import { api } from '@/services'
-import speechEngineManager from '../SpeechEngineManager'
+import { registerEngine } from '@/entities/speech/modules/speech-engine-manager'
+import NvVoiceSelect from './NvVoiceSelect.vue'
+import NvSettings from './NvSettings.vue'
 
 const getCredentials = () => ({
   identityPoolId: decrypt(store.getters['settings/persisted'].APTTSIdentityPoolId),
   region: store.getters['settings/persisted'].APTTSRegion,
 })
 
-speechEngineManager.registerEngine({
+registerEngine({
   id: 'aptts',
   name: 'Amazon Polly',
   getCredentials,
@@ -34,4 +36,6 @@ speechEngineManager.registerEngine({
       { responseType: 'blob' },
     )
   },
+  voiceSelectComponent: NvVoiceSelect,
+  settingsComponent: NvSettings,
 })

@@ -1,5 +1,14 @@
 <template>
-  <NvSelect v-loading="isFetching" v-bind="$attrs" valueKey="Id">
+  <NvSelect
+    v-loading="isFetching"
+    :modelValue="store.getters['settings/persisted'].APTTSSelectedVoice"
+    v-bind="$attrs"
+    valueKey="Id"
+    @update:modelValue="
+      (value) =>
+        store.dispatch('settings/setProperty', ['persisted.APTTSSelectedVoice', value])
+    "
+  >
     <template v-for="voice in voices" :key="voice.Id">
       <NvOption
         :label="`${voice.LanguageCode} ${voice.Name} - ${voice.Gender}`"

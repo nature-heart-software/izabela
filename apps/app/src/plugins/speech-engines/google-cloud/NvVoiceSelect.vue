@@ -1,5 +1,14 @@
 <template>
-  <NvSelect v-loading="isFetching" v-bind="$attrs" valueKey="name">
+  <NvSelect
+    v-loading="isFetching"
+    :modelValue="store.getters['settings/persisted'].GCTTSSelectedVoice"
+    v-bind="$attrs"
+    valueKey="name"
+    @update:modelValue="
+      (value) =>
+        store.dispatch('settings/setProperty', ['persisted.GCTTSSelectedVoice', value])
+    "
+  >
     <template v-for="voice in voices" :key="voice.name">
       <NvOption :label="`${voice.name} - ${voice.ssmlGender}`" :value="purify(voice)">
         {{ `${voice.name} - ${voice.ssmlGender}` }}

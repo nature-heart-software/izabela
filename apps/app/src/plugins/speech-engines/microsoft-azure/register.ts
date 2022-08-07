@@ -1,14 +1,16 @@
 import store from '@/store'
 import { decrypt } from '@/utils/security'
 import { api } from '@/services'
-import speechEngineManager from '../SpeechEngineManager'
+import { registerEngine } from '@/entities/speech/modules/speech-engine-manager'
+import NvVoiceSelect from './NvVoiceSelect.vue'
+import NvSettings from './NvSettings.vue'
 
 const getCredentials = () => ({
   apiKey: decrypt(store.getters['settings/persisted'].MATTSApiKey),
   region: store.getters['settings/persisted'].MATTSRegion,
 })
 
-speechEngineManager.registerEngine({
+registerEngine({
   id: 'matts',
   name: 'Microsoft Azure',
   getCredentials,
@@ -34,4 +36,6 @@ speechEngineManager.registerEngine({
       { responseType: 'blob' },
     )
   },
+  voiceSelectComponent: NvVoiceSelect,
+  settingsComponent: NvSettings,
 })

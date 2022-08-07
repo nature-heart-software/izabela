@@ -2,12 +2,14 @@ import store from '@/store'
 import { decrypt } from '@/utils/security'
 import { api } from '@/services'
 import { pick } from 'lodash'
-import speechEngineManager from '../SpeechEngineManager'
+import { registerEngine } from '@/entities/speech/modules/speech-engine-manager'
+import NvVoiceSelect from './NvVoiceSelect.vue'
+import NvSettings from './NvSettings.vue'
 
 const getCredentials = () => ({
   apiKey: decrypt(store.getters['settings/persisted'].GCTTSApiKey),
 })
-speechEngineManager.registerEngine({
+registerEngine({
   id: 'gctts',
   name: 'Google Cloud',
   getCredentials,
@@ -43,4 +45,6 @@ speechEngineManager.registerEngine({
       { responseType: 'blob' },
     )
   },
+  voiceSelectComponent: NvVoiceSelect,
+  settingsComponent: NvSettings,
 })

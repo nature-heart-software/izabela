@@ -1,9 +1,11 @@
 import store from '@/store'
 import { api } from '@/services'
 import { DEFAULT_LANGUAGE_CODE } from '@/consts'
-import speechEngineManager from '../SpeechEngineManager'
+import { registerEngine } from '@/entities/speech/modules/speech-engine-manager'
+import NvVoiceSelect from './NvVoiceSelect.vue'
+import NvSettings from './NvSettings.vue'
 
-speechEngineManager.registerEngine({
+registerEngine({
   id: 'saytts',
   name: 'Say',
   getCredentials() {
@@ -28,4 +30,6 @@ speechEngineManager.registerEngine({
       { responseType: 'blob' },
     )
   },
+  voiceSelectComponent: NvVoiceSelect,
+  settingsComponent: NvSettings,
 })

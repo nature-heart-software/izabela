@@ -8,6 +8,7 @@ import App from '@/teams/messenger/App.vue'
 import router from '@/router'
 import store from '@/store'
 import ElLoading from 'element-plus/lib/components/loading'
+import '@/plugins'
 
 const vueQueryPluginOptions: VueQueryPluginOptions = {
   queryClientConfig: {

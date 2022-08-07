@@ -59,64 +59,13 @@
                   store.dispatch('settings/setProperty', ['persisted.selectedSpeechEngine', value])
               "
             />
-            <template v-if="store.getters['settings/selectedSpeechEngine'] === 'gctts'">
-              <GCTTSVoiceSelect
-                :modelValue="store.getters['settings/persisted'].GCTTSSelectedVoice"
+            <template v-if="store.getters['speech/currentSpeechEngine']">
+              <component
+                :is="store.getters['speech/currentSpeechEngine'].voiceSelectComponent"
+                v-if="store.getters['speech/currentSpeechEngine'].voiceSelectComponent"
                 class="w-13"
                 placeholder="Speech Voice"
                 size="sm"
-                @update:modelValue="
-                  (value) =>
-                    store.dispatch('settings/setProperty', ['persisted.GCTTSSelectedVoice', value])
-                "
-              />
-            </template>
-            <template v-if="store.getters['settings/selectedSpeechEngine'] === 'iwtts'">
-              <IWTTSVoiceSelect
-                :modelValue="store.getters['settings/persisted'].IWTTSSelectedVoice"
-                class="w-13"
-                placeholder="Speech Voice"
-                size="sm"
-                @update:modelValue="
-                  (value) =>
-                    store.dispatch('settings/setProperty', ['persisted.IWTTSSelectedVoice', value])
-                "
-              />
-            </template>
-            <template v-if="store.getters['settings/selectedSpeechEngine'] === 'matts'">
-              <MATTSVoiceSelect
-                :modelValue="store.getters['settings/persisted'].MATTSSelectedVoice"
-                class="w-13"
-                placeholder="Speech Voice"
-                size="sm"
-                @update:modelValue="
-                  (value) =>
-                    store.dispatch('settings/setProperty', ['persisted.MATTSSelectedVoice', value])
-                "
-              />
-            </template>
-            <template v-if="store.getters['settings/selectedSpeechEngine'] === 'aptts'">
-              <APTTSVoiceSelect
-                :modelValue="store.getters['settings/persisted'].APTTSSelectedVoice"
-                class="w-13"
-                placeholder="Speech Voice"
-                size="sm"
-                @update:modelValue="
-                  (value) =>
-                    store.dispatch('settings/setProperty', ['persisted.APTTSSelectedVoice', value])
-                "
-              />
-            </template>
-            <template v-if="store.getters['settings/selectedSpeechEngine'] === 'saytts'">
-              <SayTTSVoiceSelect
-                :modelValue="store.getters['settings/persisted'].SayTTSSelectedVoice"
-                class="w-13"
-                placeholder="Speech Voice"
-                size="sm"
-                @update:modelValue="
-                  (value) =>
-                    store.dispatch('settings/setProperty', ['persisted.SayTTSSelectedVoice', value])
-                "
               />
             </template>
             <NvDivider class="h-3" direction="vertical"/>
@@ -187,11 +136,6 @@ import NvDivider from '@/core/components/Divider/NvDivider.vue'
 import NvInput from '@/core/components/Input/NvInput.vue'
 import { useSettingsPopover } from '@/entities/settings/hooks'
 import SpeechEngineSelect from '@/entities/speech/components/inputs/NvSpeechEngineSelect.vue'
-import APTTSVoiceSelect from '@/entities/speech/components/inputs/NvAPTTSVoiceSelect.vue'
-import IWTTSVoiceSelect from '@/entities/speech/components/inputs/NvIWTTSVoiceSelect.vue'
-import GCTTSVoiceSelect from '@/entities/speech/components/inputs/NvGCTTSVoiceSelect.vue'
-import MATTSVoiceSelect from '@/entities/speech/components/inputs/NvMATTSVoiceSelect.vue'
-import SayTTSVoiceSelect from '@/entities/speech/components/inputs/NvSayTTSVoiceSelect.vue'
 import { useStore } from 'vuex'
 import { emitIPCSay } from '@/electron/events/renderer'
 
