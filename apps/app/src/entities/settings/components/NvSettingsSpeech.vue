@@ -50,8 +50,8 @@ import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
 import { NvButton, NvCard, NvDivider, NvGroup, NvStack, NvText } from '@/core/components'
 import SpeechEngineSelect from '@/entities/speech/components/inputs/NvSpeechEngineSelect.vue'
-import { useSpeechEngineManager } from '@/entities/speech/modules/speech-engine-manager'
-import { SpeechEngine } from '@/entities/speech/modules/speech-engine-manager/types'
+import { useSpeechEngineManager } from '@/modules/speech-engine-manager'
+import { SpeechEngine } from '@/modules/speech-engine-manager/types'
 
 const store = useStore()
 const selectedEngineTab = ref<SpeechEngine['id']>(store.getters['speech/selectedSpeechEngine'])

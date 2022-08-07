@@ -24,7 +24,8 @@ import { NvOption, NvSelect } from '@/core/components'
 import { decrypt } from '@/utils/security'
 import { purify } from '@/utils/object'
 import { orderBy } from 'lodash'
-import { listVoicesQueryKey, useListVoicesQuery } from './hooks'
+import { useListVoicesQuery } from './hooks'
+import { LIST_VOICES_QUERY_KEY } from './consts'
 
 const queryClient = useQueryClient()
 const store = useStore()
@@ -42,5 +43,5 @@ const { data, isFetching } = useListVoicesQuery(computedParams, {
   enabled: canFetch,
 })
 const voices = computed(() => orderBy(data.value || [], 'name'))
-watch([computedApikey, computedUrl], () => canFetch.value && queryClient.refetchQueries(listVoicesQueryKey))
+watch([computedApikey, computedUrl], () => canFetch.value && queryClient.refetchQueries(LIST_VOICES_QUERY_KEY))
 </script>

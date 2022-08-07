@@ -13,7 +13,7 @@
 </template>
 <script lang="ts" setup>
 import { NvOption, NvSelect } from '@/core/components'
-import { useSpeechEngineManager } from '@/entities/speech/modules/speech-engine-manager'
+import { useSpeechEngineManager } from '@/modules/speech-engine-manager'
 
 const { engines } = useSpeechEngineManager()
 </script>

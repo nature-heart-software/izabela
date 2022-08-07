@@ -1,4 +1,4 @@
-import { SpeechEngine } from '@/entities/speech/modules/speech-engine-manager/types'
+import { SpeechEngine } from '@/modules/speech-engine-manager/types'
 import { ref } from 'vue'
 
 const SpeechEngineManager = () => {
@@ -17,10 +17,10 @@ const SpeechEngineManager = () => {
   }
 
   const useSpeechEngineManager = () => ({
-      getEngineById,
-      getEngines,
-      engines,
-    })
+    getEngineById,
+    getEngines,
+    engines,
+  })
   return {
     registerEngine,
     getEngineById,

@@ -23,7 +23,8 @@ import { useQueryClient } from 'vue-query'
 import { NvOption, NvSelect } from '@/core/components'
 import { decrypt } from '@/utils/security'
 import { purify } from '@/utils/object'
-import { listVoicesQueryKey, useListVoicesQuery } from './hooks'
+import { useListVoicesQuery } from './hooks'
+import { LIST_VOICES_QUERY_KEY } from './consts'
 
 const queryClient = useQueryClient()
 const store = useStore()
@@ -38,5 +39,5 @@ const { data, isFetching } = useListVoicesQuery(computedParams, {
   enabled: canFetch,
 })
 const voices = computed(() => data.value || [])
-watch(computedApikey, () => canFetch.value && queryClient.refetchQueries(listVoicesQueryKey))
+watch(computedApikey, () => canFetch.value && queryClient.refetchQueries(LIST_VOICES_QUERY_KEY))
 </script>

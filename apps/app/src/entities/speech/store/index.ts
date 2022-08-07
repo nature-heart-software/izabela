@@ -1,6 +1,6 @@
 import { Module } from 'vuex'
 import { utilActions, utilMutations } from '@/utils/vuex'
-import { getEngineById } from '@/entities/speech/modules/speech-engine-manager'
+import { getEngineById } from '@/modules/speech-engine-manager'
 
 const storeState = {
   persisted: {},

@@ -1,6 +1,6 @@
 import { Module } from 'vuex'
 import { utilActions, utilMutations } from '@/utils/vuex'
-import { SpeechEngine } from '@/entities/speech/modules/speech-engine-manager/types'
+import { SpeechEngine } from '@/modules/speech-engine-manager/types'
 import pkg from '@root/package.json'
 import { KeybindingResult } from '@/types/keybinds'
 
