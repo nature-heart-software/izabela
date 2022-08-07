@@ -12,7 +12,15 @@ const store: Module<typeof storeState, any> = {
   getters: {
     state: (state) => state,
     persisted: (state) => state.persisted,
-    currentSpeechEngine: (state, getters, rootState, rootGetters) => getEngineById(rootGetters['settings/selectedSpeechEngine']),
+    currentSpeechEngine: (state, getters, rootState, rootGetters) =>
+      getEngineById(rootGetters['speech/selectedSpeechEngine']),
+    selectedSpeechEngine: (state, getters, rootState, rootGetters) => {
+      const engine = getEngineById(rootGetters['settings/persisted'].selectedSpeechEngine)
+      if (engine && engine.hasCredentials && engine.hasCredentials()) {
+        return rootGetters['settings/persisted'].selectedSpeechEngine
+      }
+      return 'saytts'
+    },
   },
   mutations: {
     ...utilMutations,

@@ -10,7 +10,7 @@
               <NvText>Select the speech engine used for Izabela's speech</NvText>
             </NvStack>
             <SpeechEngineSelect
-              :modelValue="store.getters['settings/selectedSpeechEngine']"
+              :modelValue="store.getters['speech/selectedSpeechEngine']"
               @update:modelValue="
                 (value) => {
                   selectedEngineTab = value
@@ -54,7 +54,7 @@ import { useSpeechEngineManager } from '@/entities/speech/modules/speech-engine-
 import { SpeechEngine } from '@/entities/speech/modules/speech-engine-manager/types'
 
 const store = useStore()
-const selectedEngineTab = ref<SpeechEngine['id']>(store.getters['settings/selectedSpeechEngine'])
+const selectedEngineTab = ref<SpeechEngine['id']>(store.getters['speech/selectedSpeechEngine'])
 const { engines } = useSpeechEngineManager()
 const currentEngineSettingsComponent = computed(() => engines.value.find(e => e.id === selectedEngineTab.value)?.settingsComponent)
 </script>

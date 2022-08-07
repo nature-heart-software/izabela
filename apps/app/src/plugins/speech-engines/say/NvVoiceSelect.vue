@@ -19,11 +19,11 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { NvOption, NvSelect } from '@/core/components'
-import { useSayTTSListVoicesQuery } from '@/entities/speech/services'
 import { sortBy } from 'lodash'
 import { useStore } from 'vuex'
+import { useListVoicesQuery } from './hooks'
 
-const { data, isFetching } = useSayTTSListVoicesQuery()
+const { data, isFetching } = useListVoicesQuery()
 const voices = computed(() => sortBy(data.value || []))
 const store = useStore()
 </script>

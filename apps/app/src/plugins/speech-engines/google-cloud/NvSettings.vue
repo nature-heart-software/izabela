@@ -21,18 +21,15 @@
     reason="Credentials required"
   >
     <NvFormItem label="Voice">
-      <template v-if="engine">
-        <component :is="engine.voiceSelectComponent"/>
-      </template>
+      <NvVoiceSelect/>
     </NvFormItem>
   </NvAccessBlocker>
 </template>
 <script lang="ts" setup>
 import { NvAccessBlocker, NvDivider, NvFormItem, NvInput, NvStack } from '@/core/components'
-import { getEngineById } from '@/entities/speech/modules/speech-engine-manager'
 import { useStore } from 'vuex'
 import { decrypt, encrypt } from '@/utils/security'
+import NvVoiceSelect from './NvVoiceSelect'
 
 const store = useStore()
-const engine = getEngineById('gctts')
 </script>

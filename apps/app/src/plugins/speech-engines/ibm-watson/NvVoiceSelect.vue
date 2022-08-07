@@ -22,9 +22,9 @@ import { useStore } from 'vuex'
 import { useQueryClient } from 'vue-query'
 import { NvOption, NvSelect } from '@/core/components'
 import { decrypt } from '@/utils/security'
-import { useIWTTSListVoicesQuery } from '@/entities/speech/services'
 import { purify } from '@/utils/object'
 import { orderBy } from 'lodash'
+import { listVoicesQueryKey, useListVoicesQuery } from './hooks'
 
 const queryClient = useQueryClient()
 const store = useStore()
@@ -38,9 +38,9 @@ const computedParams = computed(() => ({
   },
 }))
 const canFetch = computed(() => Object.values(computedParams.value.credentials).every(Boolean))
-const { data, isFetching } = useIWTTSListVoicesQuery(computedParams, {
+const { data, isFetching } = useListVoicesQuery(computedParams, {
   enabled: canFetch,
 })
 const voices = computed(() => orderBy(data.value || [], 'name'))
-watch([computedApikey, computedUrl], () => canFetch.value && queryClient.refetchQueries('iwtts-list-voices'))
+watch([computedApikey, computedUrl], () => canFetch.value && queryClient.refetchQueries(listVoicesQueryKey))
 </script>

@@ -9,7 +9,7 @@ onIPCSay((payload: string | IzabelaMessagePayload) => {
   console.log('saying something...')
   let message = null
   if (typeof payload === 'string') {
-    const engine = speechEngineManager.getEngineById(store.getters['settings/selectedSpeechEngine'])
+    const engine = speechEngineManager.getEngineById(store.getters['speech/selectedSpeechEngine'])
     if (!engine) return
     message = {
       engine: engine.id,

@@ -22,8 +22,8 @@ import { useStore } from 'vuex'
 import { useQueryClient } from 'vue-query'
 import { NvOption, NvSelect } from '@/core/components'
 import { decrypt } from '@/utils/security'
-import { useGCTTSListVoicesQuery } from '@/entities/speech/services'
 import { purify } from '@/utils/object'
+import { listVoicesQueryKey, useListVoicesQuery } from './hooks'
 
 const queryClient = useQueryClient()
 const store = useStore()
@@ -34,9 +34,9 @@ const computedParams = computed(() => ({
   },
 }))
 const canFetch = computed(() => Object.values(computedParams.value.credentials).every(Boolean))
-const { data, isFetching } = useGCTTSListVoicesQuery(computedParams, {
+const { data, isFetching } = useListVoicesQuery(computedParams, {
   enabled: canFetch,
 })
 const voices = computed(() => data.value || [])
-watch(computedApikey, () => canFetch.value && queryClient.refetchQueries('gctts-list-voices'))
+watch(computedApikey, () => canFetch.value && queryClient.refetchQueries(listVoicesQueryKey))
 </script>

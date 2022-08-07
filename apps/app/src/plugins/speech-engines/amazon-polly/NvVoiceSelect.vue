@@ -25,9 +25,9 @@ import { useStore } from 'vuex'
 import { useQueryClient } from 'vue-query'
 import { NvOption, NvSelect } from '@/core/components'
 import { decrypt } from '@/utils/security'
-import { useAPTTSListVoicesQuery } from '@/entities/speech/services'
 import { purify } from '@/utils/object'
 import { orderBy } from 'lodash'
+import { listVoicesQueryKey, useListVoicesQuery } from './hooks'
 
 const queryClient = useQueryClient()
 const store = useStore()
@@ -43,11 +43,11 @@ const computedParams = computed(() => ({
   },
 }))
 const canFetch = computed(() => Object.values(computedParams.value.credentials).every(Boolean))
-const { data, isFetching } = useAPTTSListVoicesQuery(computedParams, {
+const { data, isFetching } = useListVoicesQuery(computedParams, {
   enabled: canFetch,
 })
 const voices = computed(() => orderBy(data.value || [], ['LanguageCode', 'Name']))
 watch([computedIdentityPoolId, computedRegion], () =>
-  canFetch.value && queryClient.refetchQueries('aptts-list-voices'),
+  canFetch.value && queryClient.refetchQueries(listVoicesQueryKey),
 )
 </script>

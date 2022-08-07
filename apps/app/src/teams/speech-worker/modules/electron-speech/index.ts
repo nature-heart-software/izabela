@@ -60,9 +60,7 @@ ipcMain.on(
   }) => {
     try {
       const client = new speech.SpeechClient()
-      const engine = speechEngineManager.getEngineById(
-        store.getters['settings/selectedSpeechEngine'],
-      )
+      const engine = speechEngineManager.getEngineById(store.getters['speech/selectedSpeechEngine'])
 
       const request = {
         config: {
