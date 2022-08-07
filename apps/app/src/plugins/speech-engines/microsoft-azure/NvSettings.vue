@@ -7,27 +7,23 @@
         type="password"
         @update:modelValue="
           (value) =>
-            store.dispatch('settings/setProperty', [
-              'persisted.MATTSApiKey',
-              encrypt(value),
-            ])
+            store.dispatch('settings/setProperty', ['persisted.MATTSApiKey', encrypt(value)])
         "
       />
     </NvFormItem>
   </NvStack>
-  <NvDivider direction="horizontal"/>
+  <NvDivider direction="horizontal" />
   <NvStack spacing="5">
     <NvFormItem label="Region">
       <NvInput
         :modelValue="store.getters['settings/persisted'].MATTSRegion"
         @update:modelValue="
-          (value) =>
-            store.dispatch('settings/setProperty', ['persisted.MATTSRegion', value])
+          (value) => store.dispatch('settings/setProperty', ['persisted.MATTSRegion', value])
         "
       />
     </NvFormItem>
   </NvStack>
-  <NvDivider direction="horizontal"/>
+  <NvDivider direction="horizontal" />
   <NvAccessBlocker
     :allowed="
       [
@@ -38,7 +34,7 @@
     reason="Credentials required"
   >
     <NvFormItem label="Voice">
-      <NvVoiceSelect/>
+      <NvVoiceSelect />
     </NvFormItem>
   </NvAccessBlocker>
 </template>

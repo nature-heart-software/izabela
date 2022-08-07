@@ -15,19 +15,18 @@
       />
     </NvFormItem>
   </NvStack>
-  <NvDivider direction="horizontal"/>
+  <NvDivider direction="horizontal" />
   <NvStack spacing="5">
     <NvFormItem label="Region">
       <NvInput
         :modelValue="store.getters['settings/persisted'].APTTSRegion"
         @update:modelValue="
-          (value) =>
-            store.dispatch('settings/setProperty', ['persisted.APTTSRegion', value])
+          (value) => store.dispatch('settings/setProperty', ['persisted.APTTSRegion', value])
         "
       />
     </NvFormItem>
   </NvStack>
-  <NvDivider direction="horizontal"/>
+  <NvDivider direction="horizontal" />
   <NvAccessBlocker
     :allowed="
       [
@@ -38,7 +37,7 @@
     reason="Credentials required"
   >
     <NvFormItem label="Voice">
-      <NvVoiceSelect/>
+      <NvVoiceSelect />
     </NvFormItem>
   </NvAccessBlocker>
 </template>
