@@ -4,8 +4,7 @@
     :modelValue="store.getters['settings/persisted'].SayTTSSelectedVoice"
     v-bind="$attrs"
     @update:modelValue="
-      (value) =>
-        store.dispatch('settings/setProperty', ['persisted.SayTTSSelectedVoice', value])
+      (value) => store.dispatch('settings/setProperty', ['persisted.SayTTSSelectedVoice', value])
     "
   >
     <NvOption :value="null" label="Default">Default</NvOption>

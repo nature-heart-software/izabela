@@ -5,8 +5,7 @@
     v-bind="$attrs"
     valueKey="name"
     @update:modelValue="
-      (value) =>
-        store.dispatch('settings/setProperty', ['persisted.IWTTSSelectedVoice', value])
+      (value) => store.dispatch('settings/setProperty', ['persisted.IWTTSSelectedVoice', value])
     "
   >
     <template v-for="voice in voices" :key="voice.name">
@@ -42,5 +41,8 @@ const { data, isFetching } = useListVoicesQuery(computedParams, {
   enabled: canFetch,
 })
 const voices = computed(() => orderBy(data.value || [], 'name'))
-watch([computedApikey, computedUrl], () => canFetch.value && queryClient.refetchQueries(listVoicesQueryKey))
+watch(
+  [computedApikey, computedUrl],
+  () => canFetch.value && queryClient.refetchQueries(listVoicesQueryKey),
+)
 </script>

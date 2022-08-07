@@ -5,8 +5,7 @@
     v-bind="$attrs"
     valueKey="name"
     @update:modelValue="
-      (value) =>
-        store.dispatch('settings/setProperty', ['persisted.GCTTSSelectedVoice', value])
+      (value) => store.dispatch('settings/setProperty', ['persisted.GCTTSSelectedVoice', value])
     "
   >
     <template v-for="voice in voices" :key="voice.name">

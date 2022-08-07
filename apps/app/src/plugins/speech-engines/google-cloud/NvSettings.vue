@@ -7,21 +7,18 @@
         type="password"
         @update:modelValue="
           (value) =>
-            store.dispatch('settings/setProperty', [
-              'persisted.GCTTSApiKey',
-              encrypt(value),
-            ])
+            store.dispatch('settings/setProperty', ['persisted.GCTTSApiKey', encrypt(value)])
         "
       />
     </NvFormItem>
   </NvStack>
-  <NvDivider direction="horizontal"/>
+  <NvDivider direction="horizontal" />
   <NvAccessBlocker
     :allowed="!!decrypt(store.getters['settings/persisted'].GCTTSApiKey)"
     reason="Credentials required"
   >
     <NvFormItem label="Voice">
-      <NvVoiceSelect/>
+      <NvVoiceSelect />
     </NvFormItem>
   </NvAccessBlocker>
 </template>

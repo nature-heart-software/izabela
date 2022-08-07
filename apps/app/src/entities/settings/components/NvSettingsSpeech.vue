@@ -30,13 +30,13 @@
                     align="center"
                     type="ghost"
                     @click="selectedEngineTab = engine.id"
-                  >{{ engine.name }}
+                    >{{ engine.name }}
                   </NvButton>
                 </template>
               </NvGroup>
-              <NvDivider direction="horizontal"/>
+              <NvDivider direction="horizontal" />
               <template v-if="currentEngineSettingsComponent">
-                <component :is="currentEngineSettingsComponent"/>
+                <component :is="currentEngineSettingsComponent" />
               </template>
             </NvStack>
           </NvCard>
@@ -56,5 +56,7 @@ import { SpeechEngine } from '@/entities/speech/modules/speech-engine-manager/ty
 const store = useStore()
 const selectedEngineTab = ref<SpeechEngine['id']>(store.getters['speech/selectedSpeechEngine'])
 const { engines } = useSpeechEngineManager()
-const currentEngineSettingsComponent = computed(() => engines.value.find(e => e.id === selectedEngineTab.value)?.settingsComponent)
+const currentEngineSettingsComponent = computed(
+  () => engines.value.find((e) => e.id === selectedEngineTab.value)?.settingsComponent,
+)
 </script>

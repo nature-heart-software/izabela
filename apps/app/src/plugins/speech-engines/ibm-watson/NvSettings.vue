@@ -7,27 +7,23 @@
         type="password"
         @update:modelValue="
           (value) =>
-            store.dispatch('settings/setProperty', [
-              'persisted.IWTTSApiKey',
-              encrypt(value),
-            ])
+            store.dispatch('settings/setProperty', ['persisted.IWTTSApiKey', encrypt(value)])
         "
       />
     </NvFormItem>
   </NvStack>
-  <NvDivider direction="horizontal"/>
+  <NvDivider direction="horizontal" />
   <NvStack spacing="5">
     <NvFormItem label="Url">
       <NvInput
         :modelValue="store.getters['settings/persisted'].IWTTSUrl"
         @update:modelValue="
-          (value) =>
-            store.dispatch('settings/setProperty', ['persisted.IWTTSUrl', value])
+          (value) => store.dispatch('settings/setProperty', ['persisted.IWTTSUrl', value])
         "
       />
     </NvFormItem>
   </NvStack>
-  <NvDivider direction="horizontal"/>
+  <NvDivider direction="horizontal" />
   <NvAccessBlocker
     :allowed="
       [
@@ -38,7 +34,7 @@
     reason="Credentials required"
   >
     <NvFormItem label="Voice">
-      <NvVoiceSelect/>
+      <NvVoiceSelect />
     </NvFormItem>
   </NvAccessBlocker>
 </template>
