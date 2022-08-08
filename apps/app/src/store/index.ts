@@ -52,7 +52,7 @@ const store = createStore({
 })
 
 export const registerPluginStore = <S extends Record<any, any>>(id: string, state: S) => {
-  const pluginPath = ['persisted.plugins', id].join('.')
+  const pluginPath = ['settings.persisted.plugins', id].join('.')
   const currentPluginState = get(store.state, pluginPath, {})
   const mergedState = defaultsDeep(currentPluginState, state)
   set(store.state, pluginPath, mergedState)
