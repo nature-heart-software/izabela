@@ -1,6 +1,7 @@
 import { Module } from 'vuex'
 import { utilActions, utilMutations } from '@/utils/vuex'
 import { getEngineById } from '@/modules/speech-engine-manager'
+import { ENGINE_ID } from '@/plugins/speech-engines/say/consts'
 
 const storeState = {
   persisted: {},
@@ -19,7 +20,7 @@ const store: Module<typeof storeState, any> = {
       if (engine && engine.hasCredentials && engine.hasCredentials()) {
         return rootGetters['settings/persisted'].selectedSpeechEngine
       }
-      return 'saytts'
+      return ENGINE_ID
     },
   },
   mutations: {

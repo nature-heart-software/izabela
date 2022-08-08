@@ -3,6 +3,7 @@ import { utilActions, utilMutations } from '@/utils/vuex'
 import { SpeechEngine } from '@/modules/speech-engine-manager/types'
 import pkg from '@root/package.json'
 import { KeybindingResult } from '@/types/keybinds'
+import { ENGINE_ID } from '@/plugins/speech-engines/say/consts'
 
 const { version } = pkg
 // eslint-disable-next-line no-nested-ternary
@@ -19,7 +20,7 @@ const storeState = {
     playSpeechOnDefaultPlaybackDevice: true,
     audioOutputDevices: [] as MediaDeviceInfo['label'][],
     audioInputDevice: 'default' as MediaDeviceInfo['label'],
-    selectedSpeechEngine: 'saytts' as SpeechEngine['id'],
+    selectedSpeechEngine: ENGINE_ID as SpeechEngine['id'],
     autoUpdateChannel: channel,
     launchOnStartup: true,
     debugMode: process.env.NODE_ENV === 'development',
