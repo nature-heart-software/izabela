@@ -2,50 +2,40 @@
   <NvStack spacing="5">
     <NvFormItem label="Identity pool ID">
       <NvInput
-        :modelValue="decrypt(store.getters['settings/persisted'].APTTSIdentityPoolId)"
+        :modelValue="getProperty('identityPoolId', true)"
         show-password
         type="password"
-        @update:modelValue="
-          (value) =>
-            store.dispatch('settings/setProperty', [
-              'persisted.APTTSIdentityPoolId',
-              encrypt(value),
-            ])
-        "
+        @update:modelValue="(value) => setProperty('identityPoolId', value, true)"
       />
     </NvFormItem>
   </NvStack>
-  <NvDivider direction="horizontal" />
+  <NvDivider direction="horizontal"/>
   <NvStack spacing="5">
     <NvFormItem label="Region">
       <NvInput
-        :modelValue="store.getters['settings/persisted'].APTTSRegion"
+        :modelValue="getProperty('region')"
         @update:modelValue="
-          (value) => store.dispatch('settings/setProperty', ['persisted.APTTSRegion', value])
+          (value) => setProperty('region', value)
         "
       />
     </NvFormItem>
   </NvStack>
-  <NvDivider direction="horizontal" />
+  <NvDivider direction="horizontal"/>
   <NvAccessBlocker
     :allowed="
       [
-        decrypt(store.getters['settings/persisted'].APTTSIdentityPoolId),
-        store.getters['settings/persisted'].APTTSRegion,
+        getProperty('identityPoolId', true),
+        getProperty('region'),
       ].every(Boolean)
     "
     reason="Credentials required"
   >
     <NvFormItem label="Voice">
-      <NvVoiceSelect />
+      <NvVoiceSelect/>
     </NvFormItem>
   </NvAccessBlocker>
 </template>
 <script lang="ts" setup>
 import { NvAccessBlocker, NvDivider, NvFormItem, NvInput, NvStack } from '@/core/components'
-import { useStore } from 'vuex'
-import { decrypt, encrypt } from '@/utils/security'
 import NvVoiceSelect from './NvVoiceSelect'
-
-const store = useStore()
-</script>
+import { getProperty, setProperty } from './store'</script>

@@ -1,13 +1,10 @@
 <template>
   <NvSelect
     v-loading="isFetching"
-    :modelValue="store.getters['settings/persisted'].APTTSSelectedVoice"
+    :modelValue="getProperty('selectedVoice')"
     v-bind="$attrs"
     valueKey="Id"
-    @update:modelValue="
-      (value) =>
-        store.dispatch('settings/setProperty', ['persisted.APTTSSelectedVoice', value])
-    "
+    @update:modelValue="(value) => setProperty('selectedVoice', value)"
   >
     <template v-for="voice in voices" :key="voice.Id">
       <NvOption
@@ -21,26 +18,20 @@
 </template>
 <script lang="ts" setup>
 import { computed, watch } from 'vue'
-import { useStore } from 'vuex'
 import { useQueryClient } from 'vue-query'
 import { NvOption, NvSelect } from '@/core/components'
-import { decrypt } from '@/utils/security'
 import { purify } from '@/utils/object'
 import { orderBy } from 'lodash'
 import { useListVoicesQuery } from './hooks'
 import { LIST_VOICES_QUERY_KEY } from './consts'
+import { getProperty, setProperty } from './store'
 
 const queryClient = useQueryClient()
-const store = useStore()
-const computedIdentityPoolId = computed(() =>
-  decrypt(store.getters['settings/persisted'].APTTSIdentityPoolId),
-)
-const computedRegion = computed(() => store.getters['settings/persisted'].APTTSRegion)
 
 const computedParams = computed(() => ({
   credentials: {
-    identityPoolId: computedIdentityPoolId.value,
-    region: computedRegion.value,
+    identityPoolId: getProperty('identityPoolId', true),
+    region: getProperty('region'),
   },
 }))
 const canFetch = computed(() => Object.values(computedParams.value.credentials).every(Boolean))
@@ -48,7 +39,6 @@ const { data, isFetching } = useListVoicesQuery(computedParams, {
   enabled: canFetch,
 })
 const voices = computed(() => orderBy(data.value || [], ['LanguageCode', 'Name']))
-watch([computedIdentityPoolId, computedRegion], () =>
-  canFetch.value && queryClient.refetchQueries(LIST_VOICES_QUERY_KEY),
+watch(() => [getProperty('identityPoolId', true), getProperty('region')], () => canFetch.value && queryClient.refetchQueries(LIST_VOICES_QUERY_KEY),
 )
 </script>
