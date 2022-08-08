@@ -17,6 +17,9 @@
   "module": "./dist/generate-exports.module.js",
   "unpkg": "./dist/generate-exports.umd.js",
   "types": "./dist/main.d.ts",
+  "files": [
+    "/dist"
+  ],
   "dependencies": {
     "chokidar": "^3.5.3",
     "globby": "^11.1.0"
