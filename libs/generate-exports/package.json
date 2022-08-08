@@ -1,0 +1,33 @@
+{
+  "name": "generate-exports",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "microbundle --target=node --alias fsevents=fsevents-mock",
+    "dev": "microbundle --target=node watch --alias fsevents=fsevents-mock"
+  },
+  "source": "src/main.ts",
+  "exports": {
+    "import": "./dist/generate-exports.module.js",
+    "require": "./dist/generate-exports.cjs",
+    "default": "./dist/generate-exports.modern.js"
+  },
+  "main": "./dist/generate-exports.cjs",
+  "module": "./dist/generate-exports.module.js",
+  "unpkg": "./dist/generate-exports.umd.js",
+  "types": "./dist/main.d.ts",
+  "dependencies": {
+    "chokidar": "^3.5.3",
+    "globby": "^11.1.0",
+    "fsevents-mock": "file:./mocks/fsevents"
+  },
+  "devDependencies": {
+    "microbundle": "^0.15.0",
+    "typescript": "^4.6.4",
+    "vite": "^3.0.0"
+  },
+  "optionalDependencies": {
+    "fsevents": "~2.3.2"
+  }
+}

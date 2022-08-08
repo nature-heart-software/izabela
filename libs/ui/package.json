@@ -1,0 +1,36 @@
+{
+  "name": "@izabela/ui",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/ui.umd.js",
+  "module": "./dist/ui.mjs.js",
+  "exports": {
+    ".": {
+      "import": "./dist/ui.mjs.js",
+      "require": "./dist/ui.umd.js"
+    }
+  },
+  "types": "./dist/main.d.ts",
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vite-plugin-dts": "^1.4.1",
+    "vue": "^3.2.37"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^3.0.0",
+    "typescript": "^4.6.4",
+    "vite": "^3.0.0",
+    "vue-tsc": "^0.38.4"
+  },
+  "optionalDependencies": {
+    "generate-exports": "*"
+  }
+}
