@@ -2,47 +2,38 @@
   <NvStack spacing="5">
     <NvFormItem label="API Key">
       <NvInput
-        :modelValue="decrypt(store.getters['settings/persisted'].IWTTSApiKey)"
+        :modelValue="getProperty('apiKey', true)"
         show-password
         type="password"
-        @update:modelValue="
-          (value) =>
-            store.dispatch('settings/setProperty', ['persisted.IWTTSApiKey', encrypt(value)])
-        "
+        @update:modelValue="(value) => setProperty('apiKey', value, true)"
       />
     </NvFormItem>
   </NvStack>
-  <NvDivider direction="horizontal" />
+  <NvDivider direction="horizontal"/>
   <NvStack spacing="5">
     <NvFormItem label="Url">
       <NvInput
-        :modelValue="store.getters['settings/persisted'].IWTTSUrl"
-        @update:modelValue="
-          (value) => store.dispatch('settings/setProperty', ['persisted.IWTTSUrl', value])
-        "
+        :modelValue="getProperty('url')"
+        @update:modelValue="(value) => setProperty('url', value)"
       />
     </NvFormItem>
   </NvStack>
-  <NvDivider direction="horizontal" />
+  <NvDivider direction="horizontal"/>
   <NvAccessBlocker
     :allowed="
       [
-        decrypt(store.getters['settings/persisted'].IWTTSApiKey),
-        store.getters['settings/persisted'].IWTTSUrl,
+        getProperty('apiKey', true),
+        getProperty('url'),
       ].every(Boolean)
     "
     reason="Credentials required"
   >
     <NvFormItem label="Voice">
-      <NvVoiceSelect />
+      <NvVoiceSelect/>
     </NvFormItem>
   </NvAccessBlocker>
 </template>
 <script lang="ts" setup>
 import { NvAccessBlocker, NvDivider, NvFormItem, NvInput, NvStack } from '@/core/components'
-import { useStore } from 'vuex'
-import { decrypt, encrypt } from '@/utils/security'
 import NvVoiceSelect from './NvVoiceSelect'
-
-const store = useStore()
-</script>
+import { getProperty, setProperty } from './store'</script>

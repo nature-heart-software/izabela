@@ -1,11 +1,9 @@
 <template>
   <NvSelect
     v-loading="isFetching"
-    :modelValue="store.getters['settings/persisted'].SayTTSSelectedVoice"
+    :modelValue="getProperty('selectedVoice')"
     v-bind="$attrs"
-    @update:modelValue="
-      (value) => store.dispatch('settings/setProperty', ['persisted.SayTTSSelectedVoice', value])
-    "
+    @update:modelValue="(value) => setProperty('selectedVoice', value)"
   >
     <NvOption :value="null" label="Default">Default</NvOption>
     <template v-for="voice in voices" :key="voice">
@@ -19,10 +17,9 @@
 import { computed } from 'vue'
 import { NvOption, NvSelect } from '@/core/components'
 import { sortBy } from 'lodash'
-import { useStore } from 'vuex'
 import { useListVoicesQuery } from './hooks'
+import { getProperty, setProperty } from './store'
 
 const { data, isFetching } = useListVoicesQuery()
 const voices = computed(() => sortBy(data.value || []))
-const store = useStore()
 </script>

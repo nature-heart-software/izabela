@@ -1,15 +1,15 @@
-import store from '@/store'
-import { decrypt } from '@/utils/security'
 import { api } from '@/services'
 import { pick } from 'lodash'
 import { registerEngine } from '@/modules/speech-engine-manager'
 import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME } from './consts'
+import { getProperty } from './store'
 
 const getCredentials = () => ({
-  apiKey: decrypt(store.getters['settings/persisted'].GCTTSApiKey),
+  apiKey: getProperty('apiKey', true),
 })
+
 registerEngine({
   id: ENGINE_ID,
   name: ENGINE_NAME,
@@ -18,7 +18,7 @@ registerEngine({
     return Object.values(getCredentials()).every(Boolean)
   },
   getPayload(text) {
-    const selectedVoice = store.getters['settings/persisted'].GCTTSSelectedVoice
+    const selectedVoice = getProperty('selectedVoice')
     const voice: any = pick(selectedVoice, ['name', 'ssmlGender', 'languageCode'])
     // eslint-disable-next-line prefer-destructuring
     voice.languageCode = selectedVoice.languageCodes[0]
@@ -34,7 +34,7 @@ registerEngine({
     }
   },
   getLanguageCode() {
-    return store.getters['settings/persisted'].GCTTSSelectedVoice.languageCodes[0]
+    return getProperty('selectedVoice').languageCodes[0]
   },
   synthesizeSpeech({ credentials, payload }) {
     return api.post<Blob>(

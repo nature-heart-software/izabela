@@ -1,14 +1,13 @@
-import store from '@/store'
-import { decrypt } from '@/utils/security'
 import { api } from '@/services'
 import { registerEngine } from '@/modules/speech-engine-manager'
 import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME } from './consts'
+import { getProperty } from './store'
 
 const getCredentials = () => ({
-  apiKey: decrypt(store.getters['settings/persisted'].IWTTSApiKey),
-  url: store.getters['settings/persisted'].IWTTSUrl,
+  apiKey: getProperty('apiKey', true),
+  url: getProperty('url'),
 })
 
 registerEngine({
@@ -21,11 +20,11 @@ registerEngine({
   getPayload(text) {
     return {
       text,
-      voice: store.getters['settings/persisted'].IWTTSSelectedVoice,
+      voice: getProperty('selectedVoice'),
     }
   },
   getLanguageCode() {
-    return store.getters['settings/persisted'].IWTTSSelectedVoice.language
+    return getProperty('selectedVoice').language
   },
   synthesizeSpeech({ credentials, payload }) {
     return api.post<Blob>(

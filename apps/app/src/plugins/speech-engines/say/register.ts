@@ -1,10 +1,10 @@
-import store from '@/store'
 import { api } from '@/services'
 import { DEFAULT_LANGUAGE_CODE } from '@/consts'
 import { registerEngine } from '@/modules/speech-engine-manager'
 import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME } from './consts'
+import { getProperty } from './store'
 
 registerEngine({
   id: ENGINE_ID,
@@ -15,7 +15,7 @@ registerEngine({
   getPayload(text) {
     return {
       text,
-      voice: store.getters['settings/persisted'].SaySelectedVoice,
+      voice: getProperty('selectedVoice'),
     }
   },
   getLanguageCode() {
