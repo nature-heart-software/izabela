@@ -19,7 +19,14 @@ const tokens = {
       '"Noto Color Emoji"',
     ],
     serif: ['Georgia', 'Cambria', '"Times New Roman"', 'Times', 'serif'],
-    mono: ['Menlo', 'Monaco', 'Consolas', '"Liberation Mono"', '"Courier New"', 'monospace'],
+    mono: [
+      'Menlo',
+      'Monaco',
+      'Consolas',
+      '"Liberation Mono"',
+      '"Courier New"',
+      'monospace',
+    ],
   },
   colors: {
     white: '#ffffff',
@@ -103,16 +110,24 @@ export const tailwindTheme = {
     Object.entries(tokens.spacing).map(([key, value]) => [key, rem(value)]),
   ),
   borderRadius: Object.fromEntries(
-    Object.entries(tokens.borderRadius).map(([key, value]) => [key, rem(value)]),
+    Object.entries(tokens.borderRadius).map(([key, value]) => [
+      key,
+      rem(value),
+    ]),
   ),
   borderWidth: Object.fromEntries(
     Object.entries(tokens.borderWidth).map(([key, value]) => [key, rem(value)]),
   ),
   fontSize: Object.fromEntries(
-    Object.entries(tokens.fontSize).map(([key, [fontSize, { lineHeight, letterSpacing }]]) => [
-      key,
-      [rem(fontSize), { lineHeight: rem(lineHeight), letterSpacing: rem(letterSpacing) }],
-    ]),
+    Object.entries(tokens.fontSize).map(
+      ([key, [fontSize, { lineHeight, letterSpacing }]]) => [
+        key,
+        [
+          rem(fontSize),
+          { lineHeight: rem(lineHeight), letterSpacing: rem(letterSpacing) },
+        ],
+      ],
+    ),
   ),
 }
 
