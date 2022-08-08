@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "microbundle --target=node --alias fsevents=fsevents-mock",
-    "dev": "microbundle --target=node watch --alias fsevents=fsevents-mock"
+    "build": "microbundle --target=node",
+    "dev": "microbundle --target=node watch"
   },
   "source": "src/main.ts",
   "exports": {
@@ -19,15 +19,11 @@
   "types": "./dist/main.d.ts",
   "dependencies": {
     "chokidar": "^3.5.3",
-    "globby": "^11.1.0",
-    "fsevents-mock": "file:./mocks/fsevents"
+    "globby": "^11.1.0"
   },
   "devDependencies": {
     "microbundle": "^0.15.0",
     "typescript": "^4.6.4",
     "vite": "^3.0.0"
-  },
-  "optionalDependencies": {
-    "fsevents": "~2.3.2"
   }
 }
