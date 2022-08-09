@@ -3,7 +3,7 @@ import tokens from '@/styles/tokens'
 import { Story } from '@storybook/vue3'
 import NvIcon from './NvIcon.vue'
 import { props } from './icon.shared'
-import * as Icons from '../Icons'
+import * as Icons from '@izabela/icons'
 
 export default {
   title: 'Icon',
