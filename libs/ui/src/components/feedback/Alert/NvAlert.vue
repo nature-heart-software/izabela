@@ -1,7 +1,7 @@
 <template>
   <StAlert v-bind="props">
     <NvText>
-      <slot/>
+      <slot />
     </NvText>
   </StAlert>
 </template>

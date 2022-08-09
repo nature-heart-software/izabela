@@ -11,7 +11,8 @@ import {
 } from '@/utils/css-in-js'
 import { rem } from 'polished'
 
-const { fontSize, spacing, borderRadius, borderWidth, colors, transition } = tokens
+const { fontSize, spacing, borderRadius, borderWidth, colors, transition } =
+  tokens
 const styleBySize = ({ size }: Props) => {
   const borderRadius = borderRadiusStyleBySize(size)
   const horizontalPadding = horizontalPaddingStyleBySize(size)
@@ -60,7 +61,8 @@ export const StInput = styled('div', props)`
       }
 
       &:focus {
-        box-shadow: 0 0 0 ${() => rem(borderWidth.lg)} ${() => colors.gray['10']};
+        box-shadow: 0 0 0 ${() => rem(borderWidth.lg)}
+          ${() => colors.gray['10']};
         border-color: ${() => colors.gray['30']};
       }
 

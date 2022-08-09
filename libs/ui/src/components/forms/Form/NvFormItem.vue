@@ -1,7 +1,7 @@
 <template>
   <NvStack spacing="3">
     <NvText v-if="label" type="label"
-    ><label :for="name">{{ label }}</label></NvText
+      ><label :for="name">{{ label }}</label></NvText
     >
     <NvStack>
       <slot></slot>

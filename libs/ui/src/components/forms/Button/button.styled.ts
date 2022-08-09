@@ -12,11 +12,21 @@ import {
 } from '@/utils/css-in-js'
 import { rem } from 'polished'
 
-const { spacing, borderWidth, borderRadius, fontSize, colors, transition, boxShadow } = tokens
+const {
+  spacing,
+  borderWidth,
+  borderRadius,
+  fontSize,
+  colors,
+  transition,
+  boxShadow,
+} = tokens
 
 const styleBySize = ({ size, iconName }: Props) => {
   const horizontalPadding = (
-    iconName ? horizontalPaddingWithIconStyleBySize : horizontalPaddingStyleBySize
+    iconName
+      ? horizontalPaddingWithIconStyleBySize
+      : horizontalPaddingStyleBySize
   )(size)
   const borderRadius = borderRadiusStyleBySize(size)
   const styles: Record<Size, CSSObject> = {

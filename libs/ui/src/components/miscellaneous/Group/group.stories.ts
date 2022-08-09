@@ -3,7 +3,12 @@ import { Story } from '@storybook/vue3'
 import tokens from '@/styles/tokens'
 import NvGroup from './NvGroup.vue'
 import NvButton from '../Button/NvButton.vue'
-import { props, justifyValues, alignValues, directionValues } from './group.shared'
+import {
+  props,
+  justifyValues,
+  alignValues,
+  directionValues,
+} from './group.shared'
 
 export default {
   title: 'Group',
