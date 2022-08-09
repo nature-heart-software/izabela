@@ -46,7 +46,7 @@
   },
   "optionalDependencies": {
     "@izabela/icons": "*",
-    "generate-exports": "*",
-    "generate-modules": "*"
+    "vite-plugin-generate-exports": "*",
+    "vite-plugin-generate-modules": "*"
   }
 }

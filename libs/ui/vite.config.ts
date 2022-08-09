@@ -2,27 +2,8 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import dts from 'vite-plugin-dts'
 import { resolve } from 'path'
-import generateExports from 'generate-exports'
-import generateModules from 'generate-modules'
-
-const generateExportsPlugin = (...arg: Parameters<typeof generateExports>) => {
-  const instance = generateExports(...arg)
-  return {
-    name: 'vite-plugin-generate-exports',
-    buildStart() {
-      instance.start()
-    },
-  }
-}
-const generateModulesPlugin = (...arg: Parameters<typeof generateModules>) => {
-  generateModules(...arg)
-  return {
-    name: 'vite-plugin-generate-exports',
-    buildStart() {
-      // instance.start()
-    },
-  }
-}
+import generateExportsPlugin from 'vite-plugin-generate-exports'
+import generateModulesPlugin from 'vite-plugin-generate-modules'
 
 const name = 'ui'
 // https://vitejs.dev/config/
