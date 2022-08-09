@@ -33,5 +33,8 @@ const { data, isFetching } = useListVoicesQuery(computedParams, {
   enabled: canFetch,
 })
 const voices = computed(() => data.value || [])
-watch(() => getProperty('apiKey', true), () => canFetch.value && queryClient.refetchQueries(LIST_VOICES_QUERY_KEY))
+watch(
+  () => getProperty('apiKey', true),
+  () => canFetch.value && queryClient.refetchQueries(LIST_VOICES_QUERY_KEY),
+)
 </script>

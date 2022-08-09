@@ -12,7 +12,7 @@
           </NvCard>
           <div class="pl-8">
             <NvCard>
-              <NvAudioOutputsSelect/>
+              <NvAudioOutputsSelect />
             </NvCard>
           </div>
         </NvStack>
@@ -25,7 +25,7 @@
           </NvCard>
           <div class="pl-8">
             <NvCard>
-              <NvAudioInputFormPart/>
+              <NvAudioInputFormPart />
             </NvCard>
           </div>
         </NvStack>

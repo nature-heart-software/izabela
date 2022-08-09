@@ -9,7 +9,7 @@
       />
     </NvFormItem>
   </NvStack>
-  <NvDivider direction="horizontal"/>
+  <NvDivider direction="horizontal" />
   <NvStack spacing="5">
     <NvFormItem label="Url">
       <NvInput
@@ -18,22 +18,18 @@
       />
     </NvFormItem>
   </NvStack>
-  <NvDivider direction="horizontal"/>
+  <NvDivider direction="horizontal" />
   <NvAccessBlocker
-    :allowed="
-      [
-        getProperty('apiKey', true),
-        getProperty('url'),
-      ].every(Boolean)
-    "
+    :allowed="[getProperty('apiKey', true), getProperty('url')].every(Boolean)"
     reason="Credentials required"
   >
     <NvFormItem label="Voice">
-      <NvVoiceSelect/>
+      <NvVoiceSelect />
     </NvFormItem>
   </NvAccessBlocker>
 </template>
 <script lang="ts" setup>
 import { NvAccessBlocker, NvDivider, NvFormItem, NvInput, NvStack } from '@izabela/ui'
 import NvVoiceSelect from './NvVoiceSelect'
-import { getProperty, setProperty } from './store'</script>
+import { getProperty, setProperty } from './store'
+</script>

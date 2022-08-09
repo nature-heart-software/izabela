@@ -5,24 +5,19 @@
         :modelValue="getProperty('apiKey', true)"
         show-password
         type="password"
-        @update:modelValue="
-          (value) =>
-           setProperty('apiKey', value,  true)
-        "
+        @update:modelValue="(value) => setProperty('apiKey', value, true)"
       />
     </NvFormItem>
   </NvStack>
-  <NvDivider direction="horizontal"/>
-  <NvAccessBlocker
-    :allowed="!!getProperty('apiKey', true)"
-    reason="Credentials required"
-  >
+  <NvDivider direction="horizontal" />
+  <NvAccessBlocker :allowed="!!getProperty('apiKey', true)" reason="Credentials required">
     <NvFormItem label="Voice">
-      <NvVoiceSelect/>
+      <NvVoiceSelect />
     </NvFormItem>
   </NvAccessBlocker>
 </template>
 <script lang="ts" setup>
 import { NvAccessBlocker, NvDivider, NvFormItem, NvInput, NvStack } from '@izabela/ui'
 import NvVoiceSelect from './NvVoiceSelect'
-import { getProperty, setProperty } from './store'</script>
+import { getProperty, setProperty } from './store'
+</script>
