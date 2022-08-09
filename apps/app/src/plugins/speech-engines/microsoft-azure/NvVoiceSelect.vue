@@ -19,7 +19,7 @@
 <script lang="ts" setup>
 import { computed, watch } from 'vue'
 import { useQueryClient } from 'vue-query'
-import { NvOption, NvSelect } from '@/core/components'
+import { NvOption, NvSelect } from '@izabela/ui'
 import { purify } from '@/utils/object'
 import { orderBy } from 'lodash'
 import { useListVoicesQuery } from './hooks'

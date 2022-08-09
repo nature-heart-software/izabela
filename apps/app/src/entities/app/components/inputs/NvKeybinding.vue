@@ -7,7 +7,7 @@
   </template>
 </template>
 <script lang="ts" setup>
-import { NvButton } from '@/core/components'
+import { NvButton } from '@izabela/ui'
 import { computed, ref, defineProps, defineEmits, PropType } from 'vue'
 import { KeybindingResult } from '@/types/keybinds'
 

@@ -73,7 +73,7 @@ import {
   NvSelect,
   NvStack,
   NvText,
-} from '@/core/components'
+} from '@izabela/ui'
 import NvKeybinding from '@/entities/app/components/inputs/NvKeybinding.vue'
 import { useMediaDevices } from '@/hooks'
 import {

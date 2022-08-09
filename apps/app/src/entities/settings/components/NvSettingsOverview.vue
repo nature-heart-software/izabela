@@ -53,8 +53,9 @@
   </NvStack>
 </template>
 <script lang="ts" setup>
-import { NvCard, NvGroup, NvStack, NvSwitch, NvText } from '@/core/components'
-import NvAutoUpdateChannelSelect from '@/entities/settings/components/inputs/NvAutoUpdateChannelSelect.vue'
+import { NvCard, NvGroup, NvStack, NvSwitch, NvText } from '@izabela/ui'
+import NvAutoUpdateChannelSelect
+  from '@/entities/settings/components/inputs/NvAutoUpdateChannelSelect.vue'
 import { useStore } from 'vuex'
 
 const store = useStore()

@@ -64,7 +64,14 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, 'src/main.ts'),
       name: name,
-      fileName: (format) => `${name}.${format}.js`,
+      formats: ['cjs', 'es'],
+      fileName: (format) =>
+        `${name}.${
+          {
+            cjs: 'cjs',
+            es: 'es.js',
+          }[format]
+        }`,
     },
     rollupOptions: {
       external: ['vue'],

@@ -6,14 +6,8 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/ui.umd.js",
-  "module": "./dist/ui.mjs.js",
-  "exports": {
-    ".": {
-      "import": "./dist/ui.mjs.js",
-      "require": "./dist/ui.umd.js"
-    }
-  },
+  "main": "./dist/ui.cjs",
+  "module": "./dist/ui.es.js",
   "types": "./dist/main.d.ts",
   "scripts": {
     "dev": "vite build --watch",
@@ -23,7 +17,7 @@
     "build-storybook": "build-storybook"
   },
   "dependencies": {
-    "element-plus": "^2.2.12",
+    "element-plus": "^1.2.0-beta.6",
     "polished": "^4.2.2",
     "uuid": "^8.3.2",
     "vite-plugin-dts": "^1.4.1",

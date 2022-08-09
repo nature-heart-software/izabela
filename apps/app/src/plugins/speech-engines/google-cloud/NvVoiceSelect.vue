@@ -16,7 +16,7 @@
 <script lang="ts" setup>
 import { computed, watch } from 'vue'
 import { useQueryClient } from 'vue-query'
-import { NvOption, NvSelect } from '@/core/components'
+import { NvOption, NvSelect } from '@izabela/ui'
 import { purify } from '@/utils/object'
 import { useListVoicesQuery } from './hooks'
 import { LIST_VOICES_QUERY_KEY } from './consts'

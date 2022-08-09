@@ -34,6 +34,6 @@
   </NvAccessBlocker>
 </template>
 <script lang="ts" setup>
-import { NvAccessBlocker, NvDivider, NvFormItem, NvInput, NvStack } from '@/core/components'
+import { NvAccessBlocker, NvDivider, NvFormItem, NvInput, NvStack } from '@izabela/ui'
 import NvVoiceSelect from './NvVoiceSelect'
 import { getProperty, setProperty } from './store'</script>

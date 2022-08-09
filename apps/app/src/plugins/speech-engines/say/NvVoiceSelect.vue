@@ -15,7 +15,7 @@
 </template>
 <script lang="ts" setup>
 import { computed } from 'vue'
-import { NvOption, NvSelect } from '@/core/components'
+import { NvOption, NvSelect } from '@izabela/ui'
 import { sortBy } from 'lodash'
 import { useListVoicesQuery } from './hooks'
 import { getProperty, setProperty } from './store'

@@ -19,22 +19,6 @@ module.exports = defineConfig({
       new WebpackNotifierPlugin({ emoji: true }),
       new GenerateExportsPlugin([
         {
-          omitExtension: false,
-          omitSemi: true,
-          filename: 'index.ts',
-          include: ['**/*.vue'],
-          exclude: ['**/Icons/*'],
-          directories: ['./src/core/components'],
-        },
-        {
-          omitExtension: false,
-          omitSemi: true,
-          filename: 'index.ts',
-          include: ['**/*.vue'],
-          exclude: ['**/*Story.vue'],
-          directories: ['./src/core/components/Icons'],
-        },
-        {
           omitExtension: true,
           omitSemi: true,
           filename: 'index.ts',
@@ -52,6 +36,10 @@ module.exports = defineConfig({
   },
   chainWebpack: (config) => {
     setConfigAliases(config)
+
+    // https://github.com/vuejs/core/issues/4344#issuecomment-912627569
+    config.resolve.symlinks(false)
+    config.resolve.alias.set('vue', path.resolve('./node_modules/vue'))
   },
   pluginOptions: {
     electronBuilder: {

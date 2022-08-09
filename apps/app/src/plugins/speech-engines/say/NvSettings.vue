@@ -1,9 +1,9 @@
 <template>
   <NvFormItem label="Voice">
-    <NvVoiceSelect />
+    <NvVoiceSelect/>
   </NvFormItem>
 </template>
 <script lang="ts" setup>
-import { NvFormItem } from '@/core/components'
+import { NvFormItem } from '@izabela/ui'
 import NvVoiceSelect from './NvVoiceSelect'
 </script>

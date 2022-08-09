@@ -30,13 +30,13 @@
                     align="center"
                     type="ghost"
                     @click="selectedEngineTab = engine.id"
-                    >{{ engine.name }}
+                  >{{ engine.name }}
                   </NvButton>
                 </template>
               </NvGroup>
-              <NvDivider direction="horizontal" />
+              <NvDivider direction="horizontal"/>
               <template v-if="currentEngineSettingsComponent">
-                <component :is="currentEngineSettingsComponent" />
+                <component :is="currentEngineSettingsComponent"/>
               </template>
             </NvStack>
           </NvCard>
@@ -48,7 +48,7 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
-import { NvButton, NvCard, NvDivider, NvGroup, NvStack, NvText } from '@/core/components'
+import { NvButton, NvCard, NvDivider, NvGroup, NvStack, NvText } from '@izabela/ui'
 import SpeechEngineSelect from '@/entities/speech/components/inputs/NvSpeechEngineSelect.vue'
 import { useSpeechEngineManager } from '@/modules/speech-engine-manager'
 import { SpeechEngine } from '@/modules/speech-engine-manager/types'

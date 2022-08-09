@@ -17,7 +17,6 @@ const mediaDevice = await getMediaDeviceByLabel(
   store.getters['settings/persisted'].audioInputDevice,
 )
 let audioChunks: Blob[] = []
-const { ipc } = window
 const sampleRate = 48000
 const stream = await navigator.mediaDevices.getUserMedia({
   audio: {
@@ -56,14 +55,14 @@ mediaRecorder.addEventListener('stop', onStop)
 
 onIPCStartSpeechTranscription(() => {
   if (mediaRecorder) {
-    console.log(`[${getTime()}] Starting web recording`)
+    console.log(`[${ getTime() }] Starting web recording`)
     mediaRecorder.start()
   }
 })
 
 onIPCStopSpeechTranscription(() => {
   if (mediaRecorder) {
-    console.log(`[${getTime()}] Stopping web recording`)
+    console.log(`[${ getTime() }] Stopping web recording`)
     mediaRecorder.stop()
   }
 })

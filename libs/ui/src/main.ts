@@ -1,4 +1,5 @@
 export * from './components'
 export * as icons from './components/typography/Icons'
-export { default as tokens } from './styles/tokens'
+export { default as tokens, tailwindTheme } from './styles/tokens'
+export { default as NvLoading } from 'element-plus'
 import './styles'
