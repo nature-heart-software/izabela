@@ -1,12 +1,9 @@
 import generateModules from 'generate-modules'
 
-const generateModulesPlugin = (...arg: Parameters<typeof generateModules>) => {
-  generateModules(...arg)
+const generateModulesPlugin = (...args: Parameters<typeof generateModules>) => {
+  generateModules(...args)
   return {
-    name: 'vite-plugin-generate-exports',
-    buildStart() {
-      // instance.start()
-    },
+    name: 'generate-exports',
   }
 }
 

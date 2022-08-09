@@ -13,6 +13,7 @@ import { BabelPluginsParams, ModuleType, PluginOptions } from './types'
 export * from './types'
 
 export const generateModules = (opts: PluginOptions | PluginOptions[]) => {
+  const { cwd } = process
   const options: PluginOptions[] = Array.isArray(opts) ? opts : [opts]
 
   const babelPluginsParams: BabelPluginsParams = {
@@ -38,9 +39,9 @@ export const generateModules = (opts: PluginOptions | PluginOptions[]) => {
     },
   }
 
-  // const btfs = (path: string): string => {
-  //   return path.replace(/\\/g, '/')
-  // }
+  const btfs = (path: string): string => {
+    return path.replace(/\\/g, '/')
+  }
 
   const transformFiles = (files: string[]) => {
     files.forEach((file) => {
@@ -80,26 +81,21 @@ export const generateModules = (opts: PluginOptions | PluginOptions[]) => {
     }
   }
 
-  // const start = () => {
-  //   const { cwd } = process
-  //   compiler.hooks.watchRun.tap('WatchRun', (comp) => {
-  //     if (comp.modifiedFiles) {
-  //       const modifiedFiles: string[] = Array.from(comp.modifiedFiles)
-  //       modifiedFiles.forEach((modifiedFile) => {
-  //         const patternOptions = options.find(({ pattern }) => {
-  //           const target = btfs(path.normalize(modifiedFile))
-  //           const resolvedPattern = btfs(path.resolve(cwd(), pattern))
-  //           return minimatch(target, resolvedPattern)
-  //         })
-  //         if (patternOptions) {
-  //           this.transformModules(modifiedFile, patternOptions)
-  //         }
-  //       })
-  //     }
-  //   })
-  // }
+  const transformFile = (filePath: string) => {
+    const patternOptions = options.find(({ pattern }) => {
+      const target = btfs(path.normalize(filePath))
+      const resolvedPattern = btfs(path.resolve(cwd(), pattern))
+      return minimatch(target, resolvedPattern)
+    })
+    if (patternOptions) {
+      transformModules(filePath, patternOptions)
+    }
+  }
+
   transformFiles(globby.sync(options.map(({ pattern }) => pattern)))
-  // return {start}
+  return {
+    transformFile,
+  }
 }
 
 export default generateModules

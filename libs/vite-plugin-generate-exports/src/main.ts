@@ -1,9 +1,9 @@
 import generateExports from 'generate-exports'
 
-const generateExportsPlugin = (...arg: Parameters<typeof generateExports>) => {
-  const instance = generateExports(...arg)
+const generateExportsPlugin = (...args: Parameters<typeof generateExports>) => {
+  const instance = generateExports(...args)
   return {
-    name: 'vite-plugin-generate-exports',
+    name: 'generate-exports',
     buildStart() {
       instance.start()
     },
