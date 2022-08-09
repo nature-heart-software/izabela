@@ -3,10 +3,10 @@
     <NvGroup justify="apart">
       <NvText type="label">Play Izabela's speech on default playback device</NvText>
       <NvSwitch
-        :modelValue="$store.getters['settings/persisted'].playSpeechOnDefaultPlaybackDevice"
+        :modelValue="store.getters['settings/persisted'].playSpeechOnDefaultPlaybackDevice"
         @update:modelValue="
           (value) =>
-            $store.dispatch('settings/setProperty', [
+            store.dispatch('settings/setProperty', [
               'persisted.playSpeechOnDefaultPlaybackDevice',
               value,
             ])
@@ -16,14 +16,16 @@
     <NvDivider direction="horizontal" />
     <NvFormItem label="Audio Outputs">
       <NvSelect
-        :modelValue="$store.getters['settings/persisted'].audioOutputDevices"
+        :modelValue="store.getters['settings/persisted'].audioOutputDevices"
         multiple
         @update:modelValue="
-          (value) =>
-            $store.dispatch('settings/setProperty', ['persisted.audioOutputDevices', value])
+          (value) => store.dispatch('settings/setProperty', ['persisted.audioOutputDevices', value])
         "
       >
-        <template v-for="audioOutputDevice in audioOutputDevices" :key="audioOutputDevice.deviceId">
+        <template
+          v-for="audioOutputDevice in filteredAudioOutputDevices"
+          :key="audioOutputDevice.deviceId"
+        >
           <NvOption :label="audioOutputDevice.label" :value="audioOutputDevice.label">
             {{ audioOutputDevice.label }}
           </NvOption>
@@ -32,7 +34,7 @@
     </NvFormItem>
     <NvDivider direction="horizontal" />
 
-    <NvGroup align="start" no-wrap justify="apart">
+    <NvGroup align="start" justify="apart" no-wrap>
       <NvStack>
         <NvText type="label">Install VB-Audio Virtual Cable</NvText>
         <NvText
@@ -47,33 +49,26 @@
     </NvGroup>
   </NvStack>
 </template>
-<script lang="ts">
-import { computed, defineComponent } from 'vue'
-import { NvButton, NvGroup, NvOption, NvSelect, NvStack, NvSwitch, NvText } from '@/core/components'
-import NvFormItem from '@/core/components/Form/NvFormItem.vue'
-import NvDivider from '@/core/components/Divider/NvDivider.vue'
+<script lang="ts" setup>
+import { computed } from 'vue'
+import {
+  NvButton,
+  NvDivider,
+  NvFormItem,
+  NvGroup,
+  NvOption,
+  NvSelect,
+  NvStack,
+  NvSwitch,
+  NvText,
+} from '@izabela/ui'
 import { useMediaDevices } from '@/hooks'
+import { useStore } from 'vuex'
 
-export default defineComponent({
-  components: {
-    NvDivider,
-    NvText,
-    NvStack,
-    NvSwitch,
-    NvGroup,
-    NvSelect,
-    NvOption,
-    NvFormItem,
-    NvButton,
-  },
+const store = useStore()
+const { audioOutputDevices } = useMediaDevices()
 
-  setup() {
-    const { audioOutputDevices } = useMediaDevices()
-    return {
-      audioOutputDevices: computed(() =>
-        audioOutputDevices.value.filter((d) => d.deviceId !== 'default'),
-      ),
-    }
-  },
-})
+const filteredAudioOutputDevices = computed(() =>
+  audioOutputDevices.value.filter((d) => d.deviceId !== 'default'),
+)
 </script>

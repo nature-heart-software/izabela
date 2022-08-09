@@ -3,7 +3,7 @@ import mitt from 'mitt'
 import { Deferred } from '@/utils/promise'
 import store from '@/store'
 import { Promise } from 'bluebird'
-import speechEngineManager from '@/entities/speech/modules/speech-engine-manager'
+import { getEngineById } from '@/modules/speech-engine-manager'
 import { getMediaDeviceByLabel } from '@/utils/media-devices'
 import { IzabelaMessageEvent, IzabelaMessagePayload } from './types'
 
@@ -47,7 +47,7 @@ export default ({ engine: engineName, payload, credentials }: IzabelaMessagePayl
 
   function downloadAudio() {
     // TODO: change depending on engine
-    const engine = speechEngineManager.getEngineById(engineName)
+    const engine = getEngineById(engineName)
     if (!engine)
       return Promise.reject(new Error('Izabela Message: Selected engine was   not found'))
     return engine.synthesizeSpeech({

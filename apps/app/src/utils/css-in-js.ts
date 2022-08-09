@@ -1,5 +1,5 @@
-import { rem } from 'polished'
-import tokens from '@/styles/tokens'
+import { rem, rgba } from 'polished'
+import { tokens } from '@izabela/ui'
 import { CSSObject } from '@/types/css-in-js'
 
 const { borderRadius, spacing } = tokens
@@ -50,6 +50,36 @@ export function borderRadiusStyleBySize(size: Size) {
     },
     lg: {
       borderRadius: rem(borderRadius.DEFAULT),
+    },
+  }
+  return styles[size]
+}
+
+export function paddingStyleBySize(size: Size) {
+  const styles: Record<Size, CSSObject> = {
+    xs: {
+      paddingTop: rem(spacing['2']),
+      paddingLeft: rem(spacing['2']),
+      paddingRight: rem(spacing['2']),
+      paddingBottom: rem(spacing['2']),
+    },
+    sm: {
+      paddingTop: rem(spacing['3']),
+      paddingLeft: rem(spacing['3']),
+      paddingRight: rem(spacing['3']),
+      paddingBottom: rem(spacing['3']),
+    },
+    md: {
+      paddingTop: rem(spacing['5']),
+      paddingLeft: rem(spacing['5']),
+      paddingRight: rem(spacing['5']),
+      paddingBottom: rem(spacing['5']),
+    },
+    lg: {
+      paddingTop: rem(spacing['5']),
+      paddingLeft: rem(spacing['5']),
+      paddingRight: rem(spacing['5']),
+      paddingBottom: rem(spacing['5']),
     },
   }
   return styles[size]
@@ -115,4 +145,10 @@ export function iconStyleBySize(size: Size) {
     },
   }
   return styles[size]
+}
+
+export function disabledItemBackgroundStyle() {
+  return `
+    background-color: ${rgba('#fff', 0.9)};
+  `
 }

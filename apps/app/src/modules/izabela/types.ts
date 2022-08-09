@@ -1,4 +1,4 @@
-import { SpeechEngine } from '@/entities/speech/modules/speech-engine-manager/types'
+import { SpeechEngine } from '@/modules/speech-engine-manager/types'
 
 export type IzabelaMessageEvent = 'started' | 'ended' | 'progress' | 'error'
 

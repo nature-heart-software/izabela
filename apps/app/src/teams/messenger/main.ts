@@ -7,6 +7,8 @@ import { VueQueryPlugin, VueQueryPluginOptions } from 'vue-query'
 import App from '@/teams/messenger/App.vue'
 import router from '@/router'
 import store from '@/store'
+import '@/plugins'
+import { NvLoading } from '@izabela/ui'
 
 const vueQueryPluginOptions: VueQueryPluginOptions = {
   queryClientConfig: {
@@ -18,4 +20,9 @@ const vueQueryPluginOptions: VueQueryPluginOptions = {
   },
 }
 
-createApp(App).use(store).use(router).use(VueQueryPlugin, vueQueryPluginOptions).mount('#app')
+const app = createApp(App)
+  .use(store)
+  .use(router)
+  .use(VueQueryPlugin, vueQueryPluginOptions)
+  .use(NvLoading)
+app.mount('#app')

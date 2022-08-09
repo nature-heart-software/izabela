@@ -1,0 +1,37 @@
+{
+  "name": "generate-modules",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "microbundle --target=node",
+    "dev": "microbundle --target=node watch"
+  },
+  "source": "src/main.ts",
+  "exports": {
+    "import": "./dist/generate-modules.module.js",
+    "require": "./dist/generate-modules.cjs",
+    "default": "./dist/generate-modules.modern.js"
+  },
+  "main": "./dist/generate-modules.cjs",
+  "module": "./dist/generate-modules.module.js",
+  "unpkg": "./dist/generate-modules.umd.js",
+  "types": "./dist/main.d.ts",
+  "files": [
+    "/dist"
+  ],
+  "dependencies": {
+    "@babel/core": "^7.17.10",
+    "@babel/plugin-transform-modules-amd": "^7.16.7",
+    "@babel/plugin-transform-modules-commonjs": "^7.17.9",
+    "@babel/plugin-transform-modules-systemjs": "^7.17.8",
+    "@babel/plugin-transform-modules-umd": "^7.16.7",
+    "@babel/preset-typescript": "^7.16.7",
+    "globby": "^11.0.4",
+    "minimatch": "^5.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^4.6.4",
+    "vite": "^3.0.0"
+  }
+}

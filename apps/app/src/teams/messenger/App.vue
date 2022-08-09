@@ -1,10 +1,11 @@
 <template>
   <ThemeProvider :theme="tokens">
     <template v-if="isReady">
+      <NvBackground />
       <div class="h-0">
         <NvMessenger
           :min-width="768"
-          :transform="$store.getters['messenger/persisted'].position.transform"
+          :transform="store.getters['messenger/persisted'].position.transform"
           class="w-full h-full"
         />
       </div>
@@ -22,8 +23,11 @@ body {
 <script lang="ts" setup>
 import { ThemeProvider } from 'vue3-styled-components'
 import NvMessenger from '@/teams/messenger/components/NvMessenger.vue'
-import tokens from '@/styles/tokens'
-import useStoreReady from '../../hooks/useStoreReady'
+import { tokens } from '@izabela/ui'
+import useStoreReady from '@/hooks/useStoreReady'
+import NvBackground from '@/teams/messenger/components/NvBackground.vue'
+import { useStore } from 'vuex'
 
 const { data: isReady } = useStoreReady()
+const store = useStore()
 </script>

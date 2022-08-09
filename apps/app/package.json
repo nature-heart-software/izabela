@@ -23,12 +23,10 @@
   "main": "background.js",
   "dependencies": {
     "@google-cloud/speech": "^4.10.2",
-    "@iconscout/unicons": "^4.0.1",
     "@ryanmorr/ready": "^1.4.0",
     "@types/crypto-js": "^4.1.1",
-    "@types/tailwindcss": "^2.2.4",
     "@wurielle/generate-modules-webpack-plugin": "^0.1.0",
-    "@wurielle/svg-to-vue": "^0.1.0",
+    "axios": "^0.27.2",
     "bluebird": "^3.7.2",
     "crypto-js": "^4.1.1",
     "csstype": "^3.0.11",
@@ -36,7 +34,6 @@
     "electron-postman": "^0.1.2",
     "electron-store": "^8.0.1",
     "electron-updater": "^5.0.1",
-    "element-plus": "^1.2.0-beta.6",
     "hark": "^1.2.3",
     "iohook": "^0.9.3",
     "mitt": "^3.0.0",
@@ -50,11 +47,6 @@
     "webpack-notifier": "^1.15.0"
   },
   "devDependencies": {
-    "@storybook/addon-essentials": "^6.5.0-alpha.55",
-    "@storybook/addon-links": "^6.5.0-alpha.55",
-    "@storybook/builder-webpack5": "^6.5.0-alpha.55",
-    "@storybook/manager-webpack5": "^6.5.0-alpha.51",
-    "@storybook/vue3": "^6.5.0-alpha.55",
     "@types/bluebird": "^3.5.36",
     "@types/chai": "^4.3.0",
     "@types/electron-devtools-installer": "^2.2.1",
@@ -102,7 +94,8 @@
   "optionalDependencies": {
     "@izabela/app-server": "*",
     "@izabela/electron-bridger": "*",
-    "@izabela/generate-exports-webpack-plugin": "*"
+    "@izabela/generate-exports-webpack-plugin": "*",
+    "@izabela/ui": "*"
   },
   "iohook": {
     "targets": [

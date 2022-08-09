@@ -1,9 +1,8 @@
-import { ipcMain } from 'electron-postman'
 import { app } from 'electron'
-import { processes } from '@/types/electron'
 import { createNotification } from '@/utils/electron-notification'
 import process from 'process'
 import store from '@/store'
+import { onIPCProcessError } from '@/electron/events/main'
 
 export default () =>
   app.whenReady().then(() =>
@@ -21,8 +20,6 @@ export default () =>
           }
         }
         process.on('uncaughtException', errorHandler)
-        processes.forEach((windowProcess) => {
-          ipcMain.on(windowProcess, 'error', (error: Error) => errorHandler(error, windowProcess))
-        })
+        onIPCProcessError((error: Error, processName) => errorHandler(error, processName))
       }),
   )

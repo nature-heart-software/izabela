@@ -2,6 +2,9 @@ import { Module } from 'vuex'
 import { utilActions, utilMutations } from '@/utils/vuex'
 
 const storeState = {
+  isShown: false,
+  isFocused: false,
+  isInputFocused: false,
   persisted: {
     position: {
       transform: 'matrix(1, 0, 0, 1, 0, 0) translate(0px, 0px)',

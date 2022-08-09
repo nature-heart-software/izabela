@@ -3,15 +3,15 @@
     <NvStack>
       <NvText type="subtitle">Auto Update</NvText>
       <NvCard>
-        <NvGroup no-wrap justify="apart" spacing="5">
+        <NvGroup justify="apart" no-wrap spacing="5">
           <NvStack>
             <NvText type="label">Auto Update Channel</NvText>
           </NvStack>
           <NvAutoUpdateChannelSelect
-            :modelValue="$store.getters['settings/persisted'].autoUpdateChannel"
+            :modelValue="store.getters['settings/persisted'].autoUpdateChannel"
             @update:modelValue="
               (value) =>
-                $store.dispatch('settings/setProperty', ['persisted.autoUpdateChannel', value])
+                store.dispatch('settings/setProperty', ['persisted.autoUpdateChannel', value])
             "
           />
         </NvGroup>
@@ -20,15 +20,15 @@
     <NvStack>
       <NvText type="subtitle">Startup</NvText>
       <NvCard>
-        <NvGroup no-wrap justify="apart" spacing="5">
+        <NvGroup justify="apart" no-wrap spacing="5">
           <NvStack>
             <NvText type="label">Launch on startup</NvText>
           </NvStack>
           <NvSwitch
-            :modelValue="$store.getters['settings/persisted'].launchOnStartup"
+            :modelValue="store.getters['settings/persisted'].launchOnStartup"
             @update:modelValue="
               (value) =>
-                $store.dispatch('settings/setProperty', ['persisted.launchOnStartup', value])
+                store.dispatch('settings/setProperty', ['persisted.launchOnStartup', value])
             "
           />
         </NvGroup>
@@ -37,14 +37,14 @@
     <NvStack>
       <NvText type="subtitle">Development</NvText>
       <NvCard>
-        <NvGroup no-wrap justify="apart" spacing="5">
+        <NvGroup justify="apart" no-wrap spacing="5">
           <NvStack>
             <NvText type="label">Debug mode</NvText>
           </NvStack>
           <NvSwitch
-            :modelValue="$store.getters['settings/persisted'].debugMode"
+            :modelValue="store.getters['settings/persisted'].debugMode"
             @update:modelValue="
-              (value) => $store.dispatch('settings/setProperty', ['persisted.debugMode', value])
+              (value) => store.dispatch('settings/setProperty', ['persisted.debugMode', value])
             "
           />
         </NvGroup>
@@ -53,6 +53,9 @@
   </NvStack>
 </template>
 <script lang="ts" setup>
-import { NvCard, NvGroup, NvStack, NvSwitch, NvText } from '@/core/components'
+import { NvCard, NvGroup, NvStack, NvSwitch, NvText } from '@izabela/ui'
 import NvAutoUpdateChannelSelect from '@/entities/settings/components/inputs/NvAutoUpdateChannelSelect.vue'
+import { useStore } from 'vuex'
+
+const store = useStore()
 </script>

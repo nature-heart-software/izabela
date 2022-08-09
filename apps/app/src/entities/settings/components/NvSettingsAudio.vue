@@ -34,7 +34,7 @@
   </NvStack>
 </template>
 <script lang="ts" setup>
-import { NvCard, NvStack, NvText } from '@/core/components'
+import { NvCard, NvStack, NvText } from '@izabela/ui'
 import NvAudioOutputsSelect from '@/entities/settings/components/inputs/NvAudioOutputsSelect.vue'
 import NvAudioInputFormPart from '@/entities/settings/components/inputs/NvAudioInputFormPart.vue'
 </script>

@@ -7,5 +7,5 @@
   </NvSelect>
 </template>
 <script lang="ts" setup>
-import { NvOption, NvSelect } from '@/core/components'
+import { NvOption, NvSelect } from '@izabela/ui'
 </script>

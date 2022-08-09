@@ -5,7 +5,6 @@ import iohook from 'iohook'
 import { app } from 'electron'
 import { Deferred } from '@/utils/promise'
 import store from '@/store'
-import speechEngineManager from '@/entities/speech/modules/speech-engine-manager'
 import { ipcMain } from 'electron-postman'
 import { DEFAULT_LANGUAGE_CODE } from '@/consts'
 import { createNotification } from '@/utils/electron-notification'
@@ -60,9 +59,7 @@ ipcMain.on(
   }) => {
     try {
       const client = new speech.SpeechClient()
-      const engine = speechEngineManager.getEngineById(
-        store.getters['settings/persisted'].selectedSpeechEngine,
-      )
+      const engine = store.getters['speech/currentSpeechEngine']
 
       const request = {
         config: {
