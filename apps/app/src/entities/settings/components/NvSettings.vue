@@ -5,7 +5,7 @@
       <div></div>
       <NvCard class="inline-flex" size="sm">
         <div class="inline-flex space-x-2">
-          <NvButton icon-name="times" size="xs" type="plain" @click="$emit('close')"/>
+          <NvButton icon-name="times" size="xs" type="plain" @click="$emit('close')" />
         </div>
       </NvCard>
     </div>
@@ -27,7 +27,7 @@
                         size="sm"
                         type="ghost-alt"
                         @click="selectedEntry = entry.name"
-                      >{{ entry.name }}
+                        >{{ entry.name }}
                       </NvButton>
                     </template>
                   </NvStack>
@@ -44,7 +44,7 @@
                   :key="currentEntry.component"
                   class="absolute inset-0 overflow-y-auto"
                 >
-                  <component :is="currentEntry.component"/>
+                  <component :is="currentEntry.component" />
                 </div>
               </Transition>
             </div>

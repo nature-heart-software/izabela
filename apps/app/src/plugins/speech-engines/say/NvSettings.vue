@@ -1,6 +1,6 @@
 <template>
   <NvFormItem label="Voice">
-    <NvVoiceSelect/>
+    <NvVoiceSelect />
   </NvFormItem>
 </template>
 <script lang="ts" setup>
