@@ -11,8 +11,10 @@ import { defineComponent } from 'vue'
 import { ElTableColumn as WrappedComponent } from 'element-plus'
 import 'element-plus/lib/components/table-column/style/css'
 
-export default defineComponent<InstanceType<typeof WrappedComponent>['$props']>({
-  name: 'nv-table-column',
-  components: { WrappedComponent },
-})
+export default defineComponent<InstanceType<typeof WrappedComponent>['$props']>(
+  {
+    name: 'nv-table-column',
+    components: { WrappedComponent },
+  },
+)
 </script>

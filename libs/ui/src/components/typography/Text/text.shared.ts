@@ -2,7 +2,14 @@ import { ExtractPropTypes, PropType } from 'vue'
 import { Properties } from 'csstype'
 import tokens from '@/styles/tokens'
 
-export const typeValues = ['caption', 'label', 'body-small', 'body', 'subtitle', 'title'] as const
+export const typeValues = [
+  'caption',
+  'label',
+  'body-small',
+  'body',
+  'subtitle',
+  'title',
+] as const
 export type Type = typeof typeValues[number]
 
 export const props = {

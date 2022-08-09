@@ -19,8 +19,10 @@ const POSITIONS = {
 
 export const StGroup = styled('div', props)`
   display: flex;
-  flex-flow: ${({ direction }) => direction} ${({ noWrap }) => (noWrap ? 'nowrap' : 'wrap')};
-  ${({ justify, direction }) => direction === 'row' && `justify-content: ${POSITIONS[justify]}`};
+  flex-flow: ${({ direction }) => direction}
+    ${({ noWrap }) => (noWrap ? 'nowrap' : 'wrap')};
+  ${({ justify, direction }) =>
+    direction === 'row' && `justify-content: ${POSITIONS[justify]}`};
   align-items: ${({ align = props.align.default, direction, grow, justify }) =>
     direction === 'column' && grow
       ? 'stretch'

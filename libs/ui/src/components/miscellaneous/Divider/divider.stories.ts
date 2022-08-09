@@ -1,5 +1,8 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { directionValues, Direction } from '@/core/components/Divider/divider.shared'
+import {
+  directionValues,
+  Direction,
+} from '@/core/components/Divider/divider.shared'
 import { Story } from '@storybook/vue3'
 import NvDivider from './NvDivider.vue'
 
