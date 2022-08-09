@@ -1,6 +1,8 @@
 import { emitIPCProcessError } from '@/electron/events/renderer'
+
+const { addEventListener } = window
 ;(() => {
-  window.addEventListener('error', (error: any) => {
+  addEventListener('error', (error: any) => {
     emitIPCProcessError({ name: error.name, message: error.message })
   })
 })()
