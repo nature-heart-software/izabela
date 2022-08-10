@@ -1,6 +1,6 @@
 const path = require('path')
 const { defineConfig } = require('@vue/cli-service')
-const GenerateExportsPlugin = require('@izabela/generate-exports-webpack-plugin')
+const GenerateExportsPlugin = require('generate-exports-webpack-plugin')
 const GenerateModulesPlugin = require('@wurielle/generate-modules-webpack-plugin')
 const WebpackNotifierPlugin = require('webpack-notifier')
 
@@ -17,15 +17,18 @@ module.exports = defineConfig({
   configureWebpack: {
     plugins: [
       new WebpackNotifierPlugin({ emoji: true }),
-      new GenerateExportsPlugin([
-        {
-          omitExtension: true,
-          omitSemi: true,
-          filename: 'index.ts',
-          include: ['**/*.ts'],
-          directories: ['./src/hooks'],
-        },
-      ]),
+      new GenerateExportsPlugin({
+        watch: process.env.NODE_ENV === 'development',
+        entries: [
+          {
+            omitExtension: true,
+            omitSemi: true,
+            filename: 'index.ts',
+            include: ['**/*.ts'],
+            directories: ['./src/hooks'],
+          },
+        ],
+      }),
       new GenerateModulesPlugin([
         {
           pattern: './src/styles/tokens.ts',

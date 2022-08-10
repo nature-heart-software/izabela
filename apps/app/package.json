@@ -93,8 +93,8 @@
   },
   "optionalDependencies": {
     "@izabela/app-server": "*",
-    "@izabela/electron-bridger": "*",
-    "@izabela/generate-exports-webpack-plugin": "*",
+    "electron-bridger": "*",
+    "generate-exports-webpack-plugin": "*",
     "@izabela/ui": "*"
   },
   "iohook": {
