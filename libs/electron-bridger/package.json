@@ -1,11 +1,31 @@
 {
   "name": "@izabela/electron-bridger",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "microbundle --target=node",
+    "dev": "microbundle --target=node watch"
   },
-  "author": "",
-  "license": "ISC"
+  "source": "src/main.ts",
+  "exports": {
+    "import": "./dist/electron-bridger.module.js",
+    "require": "./dist/electron-bridger.cjs",
+    "default": "./dist/electron-bridger.modern.js"
+  },
+  "main": "./dist/electron-bridger.cjs",
+  "module": "./dist/electron-bridger.module.js",
+  "unpkg": "./dist/electron-bridger.umd.js",
+  "types": "./dist/main.d.ts",
+  "files": [
+    "/dist"
+  ],
+  "devDependencies": {
+    "microbundle": "^0.15.0",
+    "typescript": "^4.6.4",
+    "vite": "^3.0.0"
+  },
+  "dependencies": {
+    "electron": "^12.2.3"
+  }
 }
