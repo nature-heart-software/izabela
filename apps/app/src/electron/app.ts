@@ -25,7 +25,7 @@ const App = () => {
 
   const startAppServer = async () =>
     app.whenReady().then(async () =>
-      server.startServer({
+      server.start({
         tempPath: path.join(app.getPath('userData'), 'temp'),
         port: process.env.VUE_APP_SERVER_PORT,
       }),
