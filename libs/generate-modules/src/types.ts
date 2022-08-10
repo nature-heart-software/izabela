@@ -1,6 +1,6 @@
 export type ModuleType = 'commonjs' | 'umd' | 'amd' | 'systemjs' | 'module'
 
-export interface PluginOptions {
+export interface Entry {
   into: ModuleType | ModuleType[]
   pattern: string
 }

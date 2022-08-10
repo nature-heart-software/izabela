@@ -5,36 +5,48 @@ import { resolve } from 'path'
 import generateExportsPlugin from 'vite-plugin-generate-exports'
 import generateModulesPlugin from 'vite-plugin-generate-modules'
 
+const mode = (() => {
+  const args = process.argv
+  const index = args.indexOf('--mode')
+  return index < 0 ? 'production' : args[index + 1]
+})()
+
 const name = 'ui'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
     dts(),
-    generateExportsPlugin([
-      {
-        omitExtension: false,
-        omitSemi: true,
-        filename: 'index.ts',
-        include: ['**/*.vue'],
-        exclude: ['**/Icons/*'],
-        directories: ['./src/components'],
-      },
-      {
-        omitExtension: false,
-        omitSemi: true,
-        filename: 'index.ts',
-        include: ['**/*.vue'],
-        exclude: ['**/*Story.vue'],
-        directories: ['./src/components/typography/Icons'],
-      },
-    ]),
-    generateModulesPlugin([
-      {
-        pattern: './src/styles/tokens.ts',
-        into: ['commonjs'],
-      },
-    ]),
+    generateExportsPlugin({
+      watch: mode === 'development',
+      entries: [
+        {
+          omitExtension: false,
+          omitSemi: true,
+          filename: 'index.ts',
+          include: ['**/*.vue'],
+          exclude: ['**/Icons/*'],
+          directories: ['./src/components'],
+        },
+        {
+          omitExtension: false,
+          omitSemi: true,
+          filename: 'index.ts',
+          include: ['**/*.vue'],
+          exclude: ['**/*Story.vue'],
+          directories: ['./src/components/typography/Icons'],
+        },
+      ],
+    }),
+    generateModulesPlugin({
+      watch: mode === 'development',
+      entries: [
+        {
+          pattern: './src/styles/tokens.ts',
+          into: ['commonjs'],
+        },
+      ],
+    }),
   ],
   resolve: {
     alias: {

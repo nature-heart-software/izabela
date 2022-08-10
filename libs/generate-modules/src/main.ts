@@ -8,13 +8,17 @@ import babelPluginTransformModulesAMD from '@babel/plugin-transform-modules-amd'
 import babelPluginTransformModulesSystemjs from '@babel/plugin-transform-modules-systemjs'
 import minimatch from 'minimatch'
 import globby from 'globby'
-import { BabelPluginsParams, ModuleType, PluginOptions } from './types'
+import { BabelPluginsParams, Entry, ModuleType } from './types'
+import chokidar from 'chokidar'
 
 export * from './types'
 
-export const generateModules = (opts: PluginOptions | PluginOptions[]) => {
+export const generateModules = (config: {
+  watch?: boolean
+  entries: Entry[]
+}) => {
   const { cwd } = process
-  const options: PluginOptions[] = Array.isArray(opts) ? opts : [opts]
+  const entries = config.entries
 
   const babelPluginsParams: BabelPluginsParams = {
     module: {
@@ -43,18 +47,7 @@ export const generateModules = (opts: PluginOptions | PluginOptions[]) => {
     return path.replace(/\\/g, '/')
   }
 
-  const transformFiles = (files: string[]) => {
-    files.forEach((file) => {
-      const patternOptions = options.find(({ pattern }) =>
-        minimatch(file, pattern),
-      )
-      if (patternOptions) {
-        transformModules(file, patternOptions)
-      }
-    })
-  }
-
-  const transformModules = (filepath: string, { into }: PluginOptions) => {
+  const transformModules = (filepath: string, { into }: Entry) => {
     try {
       const moduleTypes = typeof into === 'string' ? [into] : into
       const { dir, name, base } = path.parse(filepath)
@@ -82,8 +75,8 @@ export const generateModules = (opts: PluginOptions | PluginOptions[]) => {
   }
 
   const transformFile = (filePath: string) => {
-    const patternOptions = options.find(({ pattern }) => {
-      const target = btfs(path.normalize(filePath))
+    const patternOptions = entries.find(({ pattern }) => {
+      const target = btfs(path.resolve(cwd(), filePath))
       const resolvedPattern = btfs(path.resolve(cwd(), pattern))
       return minimatch(target, resolvedPattern)
     })
@@ -91,10 +84,25 @@ export const generateModules = (opts: PluginOptions | PluginOptions[]) => {
       transformModules(filePath, patternOptions)
     }
   }
+  const initialTransform = () =>
+    transformFiles(globby.sync(entries.map(({ pattern }) => pattern)))
+  const transformFiles = (files: string[]) =>
+    files.forEach((file) => transformFile(file))
 
-  transformFiles(globby.sync(options.map(({ pattern }) => pattern)))
-  return {
-    transformFile,
+  if (config.watch) {
+    const watcher = chokidar.watch(
+      entries.map(({ pattern }) => pattern),
+      {
+        ignored: /^\./,
+        cwd: cwd(),
+      },
+    )
+    watcher
+      .on('add', (filePath) => transformFile(filePath))
+      .on('change', (filePath) => transformFile(filePath))
+      .on('ready', () => initialTransform())
+  } else {
+    initialTransform()
   }
 }
 

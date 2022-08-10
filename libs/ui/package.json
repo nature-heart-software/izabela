@@ -10,7 +10,7 @@
   "module": "./dist/ui.es.js",
   "types": "./dist/main.d.ts",
   "scripts": {
-    "dev": "vite build --watch",
+    "dev": "vite build --watch --mode development",
     "build": "vite build",
     "preview": "vite preview",
     "storybook": "start-storybook -p 6006",

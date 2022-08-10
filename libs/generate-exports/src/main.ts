@@ -1,16 +1,17 @@
 import path from 'path'
-import type { Options, PluginOptions } from './types'
+import type { Entry, Options } from './types'
 import fs from 'fs/promises'
 import globby from 'globby'
 import chokidar from 'chokidar'
 
 export * from './types'
 
-export const generateExports = (
-  pluginOptions: Partial<PluginOptions> | Partial<PluginOptions>[] = [],
-) => {
+export const generateExports = (config: {
+  watch?: boolean
+  entries: Partial<Entry>[]
+}) => {
   const eol = '\n'
-  const defaultOptions: PluginOptions = {
+  const defaultOptions: Entry = {
     exportAll: false,
     exportAllAsAlias: true,
     omitExtension: true,
@@ -22,16 +23,10 @@ export const generateExports = (
     directories: [],
   }
 
-  const globalOptions: PluginOptions[] = (() => {
-    if (!Array.isArray(pluginOptions)) {
-      return [{ ...defaultOptions, ...pluginOptions }]
-    } else {
-      return pluginOptions.map((option) => ({
-        ...defaultOptions,
-        ...option,
-      }))
-    }
-  })()
+  const globalOptions: Entry[] = config.entries.map((option) => ({
+    ...defaultOptions,
+    ...option,
+  }))
 
   const handleFileChange = (
     filePath: string,
@@ -53,7 +48,7 @@ export const generateExports = (
 
   const getTemplate = (
     directory: string,
-    options: PluginOptions | Options,
+    options: Entry | Options,
     files: string[],
   ) => {
     const {
@@ -92,7 +87,7 @@ export const generateExports = (
 
   const generateIndex = (
     directory: string,
-    options: Required<PluginOptions | Options>,
+    options: Required<Entry | Options>,
   ) => {
     if (!path.isAbsolute(directory)) directory = path.resolve(directory)
     const { filename, include, exclude } = options
@@ -130,9 +125,9 @@ export const generateExports = (
             directoryConfigIsArray
               ? { ...globalOptions[optionIndex], ...(directoryConfig[1] || {}) }
               : globalOptions[optionIndex]
-          ) as Required<PluginOptions | Options>
+          ) as Required<Entry | Options>
           if (!path.isAbsolute(directory)) directory = path.resolve(directory)
-          if (process.env.NODE_ENV === 'production') {
+          if (!config.watch) {
             return generateIndex(directory, options)
           }
           const watcher = chokidar.watch(options.include, {
