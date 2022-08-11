@@ -1,4 +1,4 @@
-import { BrowserWindow, screen } from 'electron'
+import { BrowserWindow, screen, shell } from 'electron'
 import path from 'path'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import { ipcMain } from 'electron-postman'
@@ -44,6 +44,10 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     })
     win.on('blur', () => {
       store.dispatch('messenger/setProperty', ['isFocused', false])
+    })
+    win.webContents.setWindowOpenHandler(({ url }) => {
+      shell.openExternal(url)
+      return { action: 'deny' }
     })
     electronMessengerWindow.start()
   })
