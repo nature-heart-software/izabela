@@ -87,8 +87,18 @@
             <NvButton icon-name="question-circle" size="sm"/>
           </NvCard>
           <NvCard class="inline-flex items-center space-x-3" size="sm">
-            <NvButton size="sm" type="plain">Sentence</NvButton>
-            <NvButton size="sm">Word</NvButton>
+            <NvButton
+              :type="store.getters['settings/persisted'].messageMode === 'sentence' && 'plain'"
+              size="sm"
+              @click="store.dispatch('settings/setProperty', ['persisted.messageMode', 'sentence'])"
+            >Sentence
+            </NvButton>
+            <NvButton
+              :type="store.getters['settings/persisted'].messageMode === 'word' && 'plain'"
+              size="sm"
+              @click="store.dispatch('settings/setProperty', ['persisted.messageMode', 'word'])"
+            >Word
+            </NvButton>
             <NvDivider class="h-3" direction="vertical"/>
             <NvButton icon-name="question-circle" size="sm"/>
           </NvCard>
@@ -106,6 +116,7 @@
               @blur="store.dispatch('messenger/setProperty', ['isInputFocused', false])"
               @focus="store.dispatch('messenger/setProperty', ['isInputFocused', true])"
               @keydown.enter="playMessage()"
+              @keydown.space="store.getters['settings/persisted'].messageMode === 'word' && playMessage()"
             />
             <NvButton icon-name="message" size="lg" @click="playMessage()"/>
           </NvCard>

@@ -24,6 +24,7 @@ const storeState = {
     autoUpdateChannel: channel,
     launchOnStartup: true,
     debugMode: process.env.NODE_ENV === 'development',
+    messageMode: 'sentence' as 'sentence' | 'word',
     recordAudioKeybinding: {
       keys: ['161'],
       modifiers: [],
