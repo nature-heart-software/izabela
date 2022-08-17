@@ -124,7 +124,7 @@ export const tailwindTheme = {
         key,
         [
           rem(fontSize),
-          { lineHeight: rem(lineHeight), letterSpacing: rem(letterSpacing) },
+          { lineHeight, letterSpacing: rem(letterSpacing) },
         ],
       ],
     ),
