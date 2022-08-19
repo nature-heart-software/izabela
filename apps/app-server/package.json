@@ -11,6 +11,7 @@
   "source": "src/main.ts",
   "main": "./dist/app-server.cjs",
   "module": "./dist/app-server.es.js",
+  "unpkg": "./dist/app-server.umd.js",
   "types": "./dist/main.d.ts",
   "files": [
     "/dist"

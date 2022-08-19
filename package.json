@@ -5,8 +5,8 @@
     "install": "npm run bootstrap && npm run build:packages",
     "bootstrap": "npx lerna bootstrap",
     "dev": "npx lerna run serve --scope izabela-next --stream",
-    "build": "npx lerna run build --stream",
-    "build:packages": "npx lerna run build --scope @packages/* --stream",
+    "build": "npm run build:app",
+    "build:deps": "npx lerna run build --scope  '{@packages/*,@apps/app-server}' --stream",
     "build:app": "npx lerna run build --scope '{@packages/*,izabela-next}' --stream"
   },
   "devDependencies": {

@@ -150,8 +150,8 @@ const tailwindTheme = { ...tokens,
   fontSize: Object.fromEntries(Object.entries(tokens.fontSize).map(([key, [fontSize, {
     lineHeight,
     letterSpacing
-  }]]) => [key, [(0, _polished.rem)(fontSize), {
-    lineHeight: (0, _polished.rem)(lineHeight),
+  }]]) => [key, [fontSize, {
+    lineHeight,
     letterSpacing: (0, _polished.rem)(letterSpacing)
   }]]))
 };

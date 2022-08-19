@@ -148,5 +148,3 @@ export const generateExports = (config: {
     },
   }
 }
-
-export default generateExports

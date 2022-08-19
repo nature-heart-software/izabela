@@ -10,6 +10,7 @@
   "source": "src/main.ts",
   "main": "./dist/generate-modules.cjs",
   "module": "./dist/generate-modules.es.js",
+  "unpkg": "./dist/generate-modules.umd.js",
   "types": "./dist/main.d.ts",
   "files": [
     "/dist"

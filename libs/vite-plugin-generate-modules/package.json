@@ -10,6 +10,7 @@
   "source": "src/main.ts",
   "main": "./dist/vite-plugin-generate-modules.cjs",
   "module": "./dist/vite-plugin-generate-modules.es.js",
+  "unpkg": "./dist/vite-plugin-generate-modules.umd.js",
   "types": "./dist/main.d.ts",
   "files": [
     "/dist"

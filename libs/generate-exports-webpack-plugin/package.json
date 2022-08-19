@@ -10,6 +10,7 @@
   },
   "main": "./dist/generate-exports-webpack-plugin.cjs",
   "module": "./dist/generate-exports-webpack-plugin.es.js",
+  "unpkg": "./dist/generate-exports-webpack-plugin.umd.js",
   "types": "./dist/main.d.ts",
   "files": [
     "/dist"

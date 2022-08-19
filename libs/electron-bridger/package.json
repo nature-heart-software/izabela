@@ -10,6 +10,7 @@
   "source": "src/main.ts",
   "main": "./dist/electron-bridger.cjs",
   "module": "./dist/electron-bridger.es.js",
+  "unpkg": "./dist/electron-bridger.umd.js",
   "types": "./dist/main.d.ts",
   "files": [
     "/dist"
