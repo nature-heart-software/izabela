@@ -9,21 +9,21 @@
         <div class="flex space-x-4">
           <a href="https://github.com/nature-heart-software/izabela" target="_blank">
             <span class="hidden">GitHub</span>
-            <NvButton icon-name="info" type="plain"/>
+            <NvButton icon-name="info" type="plain" />
           </a>
           <NvCard size="xs">
             <div class="inline-flex space-x-2">
               <a href="https://github.com/nature-heart-software/izabela" target="_blank">
                 <span class="hidden">GitHub</span>
-                <NvButton icon-name="github-alt" size="sm"/>
+                <NvButton icon-name="github-alt" size="sm" />
               </a>
               <a href="https://twitter.com/wurielle" target="_blank">
                 <span class="hidden">Twitter</span>
-                <NvButton icon-name="twitter-alt" size="sm"/>
+                <NvButton icon-name="twitter-alt" size="sm" />
               </a>
               <a href="https://discord.gg/BmWtmYmaeQ" target="_blank">
                 <span class="hidden">Discord</span>
-                <NvButton icon-name="discord" size="sm"/>
+                <NvButton icon-name="discord" size="sm" />
               </a>
             </div>
           </NvCard>
@@ -31,17 +31,17 @@
             <NvCard class="flex-1 min-h-8" size="xs">
               <div class="inline-flex space-x-2">
                 <template v-if="store.getters['settings/persisted'].debugMode">
-                  <NvButton icon-name="redo" size="sm" @click="reload"/>
-                  <NvButton icon-name="brackets-curly" size="sm" @click="openDevTools"/>
+                  <NvButton icon-name="redo" size="sm" @click="reload" />
+                  <NvButton icon-name="brackets-curly" size="sm" @click="openDevTools" />
                 </template>
               </div>
             </NvCard>
             <NvCard size="xs">
               <div class="inline-flex items-center space-x-2">
-                <NvButton icon-name="comment-alt-lines" size="sm"/>
-                <NvDivider class="h-3" direction="vertical"/>
+                <NvButton icon-name="comment-alt-lines" size="sm" />
+                <NvDivider class="h-3" direction="vertical" />
                 <span ref="settingsToggler">
-                  <NvButton icon-name="setting" size="sm"/>
+                  <NvButton icon-name="setting" size="sm" />
                 </span>
               </div>
             </NvCard>
@@ -49,7 +49,7 @@
               <div class="inline-flex space-x-2">
                 <!-- <NvButton size="xs" type="plain" icon-name="minus"/>
                 <NvButton size="xs" type="plain" icon-name="square-full"/> -->
-                <NvButton icon-name="times" size="xs" type="plain" @click="hide"/>
+                <NvButton icon-name="times" size="xs" type="plain" @click="hide" />
               </div>
             </NvCard>
           </div>
@@ -58,8 +58,8 @@
         <!-- Middle -->
         <div class="flex justify-between">
           <NvCard class="inline-flex items-center space-x-3" size="sm">
-            <NvButton icon-name="setting" size="sm"/>
-            <NvDivider class="h-3" direction="vertical"/>
+            <NvButton icon-name="setting" size="sm" />
+            <NvDivider class="h-3" direction="vertical" />
             <SpeechEngineSelect
               :modelValue="store.getters['speech/selectedSpeechEngine']"
               class="w-13"
@@ -80,27 +80,27 @@
                 size="sm"
               />
             </template>
-            <NvDivider class="h-3" direction="vertical"/>
+            <NvDivider class="h-3" direction="vertical" />
             <NvButton icon-name="direction" size="sm">Outputs</NvButton>
             <NvButton icon-name="direction" size="sm">Input</NvButton>
-            <NvDivider class="h-3" direction="vertical"/>
-            <NvButton icon-name="question-circle" size="sm"/>
+            <NvDivider class="h-3" direction="vertical" />
+            <NvButton icon-name="question-circle" size="sm" />
           </NvCard>
           <NvCard class="inline-flex items-center space-x-3" size="sm">
             <NvButton
               :type="store.getters['settings/persisted'].messageMode === 'sentence' && 'plain'"
               size="sm"
               @click="store.dispatch('settings/setProperty', ['persisted.messageMode', 'sentence'])"
-            >Sentence
+              >Sentence
             </NvButton>
             <NvButton
               :type="store.getters['settings/persisted'].messageMode === 'word' && 'plain'"
               size="sm"
               @click="store.dispatch('settings/setProperty', ['persisted.messageMode', 'word'])"
-            >Word
+              >Word
             </NvButton>
-            <NvDivider class="h-3" direction="vertical"/>
-            <NvButton icon-name="question-circle" size="sm"/>
+            <NvDivider class="h-3" direction="vertical" />
+            <NvButton icon-name="question-circle" size="sm" />
           </NvCard>
         </div>
 
@@ -116,9 +116,11 @@
               @blur="store.dispatch('messenger/setProperty', ['isInputFocused', false])"
               @focus="store.dispatch('messenger/setProperty', ['isInputFocused', true])"
               @keydown.enter="playMessage()"
-              @keydown.space="store.getters['settings/persisted'].messageMode === 'word' && playMessage()"
+              @keydown.space="
+                store.getters['settings/persisted'].messageMode === 'word' && playMessage()
+              "
             />
-            <NvButton icon-name="message" size="lg" @click="playMessage()"/>
+            <NvButton icon-name="message" size="lg" @click="playMessage()" />
           </NvCard>
         </div>
       </div>
@@ -277,12 +279,12 @@ onMounted(() => {
   const moveableTargetEl = (moveableTarget.value as ComponentPublicInstance)
     .$el as HTMLDivElement | null
   if (moveableTargetEl) {
-    if (props.width) moveableTargetEl.style.width = `${ props.width }px`
-    if (props.minWidth) moveableTargetEl.style.minWidth = `${ props.minWidth }px`
-    if (props.maxWidth) moveableTargetEl.style.maxWidth = `${ props.maxWidth }px`
-    if (props.height) moveableTargetEl.style.height = `${ props.height }px`
-    if (props.minHeight) moveableTargetEl.style.minHeight = `${ props.minHeight }px`
-    if (props.maxHeight) moveableTargetEl.style.maxHeight = `${ props.maxHeight }px`
+    if (props.width) moveableTargetEl.style.width = `${props.width}px`
+    if (props.minWidth) moveableTargetEl.style.minWidth = `${props.minWidth}px`
+    if (props.maxWidth) moveableTargetEl.style.maxWidth = `${props.maxWidth}px`
+    if (props.height) moveableTargetEl.style.height = `${props.height}px`
+    if (props.minHeight) moveableTargetEl.style.minHeight = `${props.minHeight}px`
+    if (props.maxHeight) moveableTargetEl.style.maxHeight = `${props.maxHeight}px`
     if (props.transform) moveableTargetEl.style.transform = props.transform
   }
   moveable.value.updateTarget()
