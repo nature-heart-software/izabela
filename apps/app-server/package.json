@@ -1,5 +1,5 @@
 {
-  "name": "@izabela/app-server",
+  "name": "@apps/app-server",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,14 +9,8 @@
     "dev": "node bin/generate-exports && microbundle --target=node watch"
   },
   "source": "src/main.ts",
-  "exports": {
-    "import": "./dist/app-server.module.js",
-    "require": "./dist/app-server.cjs",
-    "default": "./dist/app-server.modern.js"
-  },
   "main": "./dist/app-server.cjs",
-  "module": "./dist/app-server.module.js",
-  "unpkg": "./dist/app-server.umd.js",
+  "module": "./dist/app-server.es.js",
   "types": "./dist/main.d.ts",
   "files": [
     "/dist"
@@ -51,6 +45,6 @@
     "uuid": "^8.3.2"
   },
   "optionalDependencies": {
-    "generate-exports": "*"
+    "@packages/generate-exports": "*"
   }
 }

@@ -61,7 +61,7 @@ import {
   NvStack,
   NvSwitch,
   NvText,
-} from '@izabela/ui'
+} from '@packages/ui'
 import { useMediaDevices } from '@/hooks'
 import { useStore } from 'vuex'
 

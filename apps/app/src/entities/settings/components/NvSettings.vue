@@ -56,7 +56,7 @@
 </template>
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
-import { NvButton, NvCard, NvStack, NvText } from '@izabela/ui'
+import { NvButton, NvCard, NvStack, NvText } from '@packages/ui'
 import DomBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
 import SettingsOverview from '@/entities/settings/components/NvSettingsOverview.vue'
 import SettingsAudio from '@/entities/settings/components/NvSettingsAudio.vue'

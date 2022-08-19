@@ -1,4 +1,4 @@
-import generateExports from 'generate-exports'
+import { generateExports } from '@packages/generate-exports'
 
 class GenerateExportsWebpackPlugin {
   instance: ReturnType<typeof generateExports>

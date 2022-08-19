@@ -153,7 +153,7 @@
 <script lang="ts" setup>
 import { ComponentPublicInstance, computed, defineProps, onMounted, ref, watch } from 'vue'
 import Moveable from 'vue3-moveable'
-import { NvButton, NvCard, NvDivider, NvInput } from '@izabela/ui'
+import { NvButton, NvCard, NvDivider, NvInput } from '@packages/ui'
 import DomBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
 import { useSettingsPopover } from '@/entities/settings/hooks'
 import SpeechEngineSelect from '@/entities/speech/components/inputs/NvSpeechEngineSelect.vue'

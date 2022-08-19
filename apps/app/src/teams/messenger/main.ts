@@ -8,7 +8,7 @@ import App from '@/teams/messenger/App.vue'
 import router from '@/router'
 import store from '@/store'
 import '@/plugins'
-import { NvLoading } from '@izabela/ui'
+import { NvLoading } from '@packages/ui'
 
 const vueQueryPluginOptions: VueQueryPluginOptions = {
   queryClientConfig: {

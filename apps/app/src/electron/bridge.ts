@@ -1,4 +1,4 @@
-import { bridge } from 'electron-bridger'
+import { bridge } from '@packages/electron-bridger'
 import electronDialog from '@/modules/electron-dialog'
 import electronFilesystem from '@/modules/electron-filesystem'
 import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'

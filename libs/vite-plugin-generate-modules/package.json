@@ -1,5 +1,5 @@
 {
-  "name": "vite-plugin-generate-modules",
+  "name": "@packages/vite-plugin-generate-modules",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -8,22 +8,17 @@
     "dev": "microbundle --target=node watch"
   },
   "source": "src/main.ts",
-  "exports": {
-    "import": "./dist/vite-plugin-generate-modules.module.js",
-    "require": "./dist/vite-plugin-generate-modules.cjs",
-    "default": "./dist/vite-plugin-generate-modules.modern.js"
-  },
   "main": "./dist/vite-plugin-generate-modules.cjs",
-  "module": "./dist/vite-plugin-generate-modules.module.js",
-  "unpkg": "./dist/vite-plugin-generate-modules.umd.js",
+  "module": "./dist/vite-plugin-generate-modules.es.js",
   "types": "./dist/main.d.ts",
   "files": [
     "/dist"
   ],
   "dependencies": {
-    "generate-modules": "*"
+    "@packages/generate-modules": "*"
   },
   "devDependencies": {
+    "microbundle": "^0.15.1",
     "typescript": "^4.6.4",
     "vite": "^3.0.0",
     "vite-plugin-dts": "^1.4.1"
