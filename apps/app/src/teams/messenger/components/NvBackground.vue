@@ -1,5 +1,5 @@
 <template>
-  <Transition class="transition">
+  <Transition>
     <DomBoundary v-if="isBackgroundShown" class="absolute inset-0" @click="isWindowShowing = false">
       <div class="w-full h-full bg-black bg-opacity-50"></div>
     </DomBoundary>
