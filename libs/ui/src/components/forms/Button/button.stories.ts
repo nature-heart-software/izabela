@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { Story } from '@storybook/vue3'
-import NvButton from './NvButton.vue'
 import { props, sizeValues, typeValues } from './button.shared'
+import { NvButton } from '@/components'
 
 export default {
   title: 'Button',

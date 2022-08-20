@@ -1,6 +1,10 @@
+const path = require('path');
+const { mergeConfig } = require('vite');
+const viteConfig = require('../vite.config.cjs').default;
+
 module.exports = {
     "stories": [
-        "../../src/**/*.stories.@(js|jsx|ts|tsx|mdx)",
+        "../src/**/*.stories.@(js|jsx|ts|tsx|mdx)",
     ],
     "addons": [
         "@storybook/addon-links",
@@ -13,5 +17,8 @@ module.exports = {
     },
     "features": {
         "storyStoreV7": true,
+    },
+    async viteFinal(config) {
+        return mergeConfig(config, viteConfig);
     },
 }

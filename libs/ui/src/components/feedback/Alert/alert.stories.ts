@@ -1,8 +1,8 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { Story } from '@storybook/vue3'
-import { props, typeValues } from '@/core/components/Alert/alert.shared'
+import { props, typeValues } from '@/components/feedback/Alert/alert.shared'
 import { sizeValues } from '@/utils/css-in-js'
-import NvAlert from './NvAlert.vue'
+import { NvAlert } from '@/components'
 
 export default {
   title: 'Alert',

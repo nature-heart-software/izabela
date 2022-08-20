@@ -45,6 +45,10 @@ export default defineConfig({
           pattern: './src/styles/tokens.ts',
           into: ['commonjs'],
         },
+        {
+          pattern: './vite.config.ts',
+          into: ['commonjs'],
+        },
       ],
     }),
   ],

@@ -1,9 +1,8 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { Story } from '@storybook/vue3'
 import tokens from '@/styles/tokens'
-import NvStack from './NvStack.vue'
-import NvButton from '../Button/NvButton.vue'
 import { props, alignValues, justifyValues } from './stack.shared'
+import { NvStack, NvButton } from '@/components'
 
 export default {
   title: 'Stack',

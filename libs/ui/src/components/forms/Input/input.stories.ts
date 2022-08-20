@@ -1,8 +1,8 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { ref } from 'vue'
 import { Story } from '@storybook/vue3'
-import NvInput from './NvInput.vue'
 import { props, sizeValues } from './input.shared'
+import { NvInput } from '@/components'
 
 export default {
   title: 'Input',

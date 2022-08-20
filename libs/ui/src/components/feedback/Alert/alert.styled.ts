@@ -4,7 +4,7 @@ import tokens from '@/styles/tokens'
 import { props, Props, Type } from './alert.shared'
 import { rem } from 'polished'
 import { borderRadiusStyleBySize, paddingStyleBySize } from '@/utils/css-in-js'
-import { Size } from '@/core/components/Button/button.shared'
+import { Size } from '@/components/forms/Button/button.shared'
 import { CSSObject } from '@/types/css-in-js'
 
 const { spacing, colors } = tokens

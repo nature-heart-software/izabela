@@ -1,8 +1,8 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import tokens from '@/styles/tokens'
 import { Story } from '@storybook/vue3'
-import { typeValues, props } from '@/core/components/Text/text.shared'
-import NvText from './NvText.vue'
+import { typeValues, props } from '@/components/typography/Text/text.shared'
+import { NvText } from '@/components'
 
 export default {
   title: 'Text',
