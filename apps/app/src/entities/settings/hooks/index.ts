@@ -2,8 +2,8 @@ import { useQuery } from 'vue-query'
 import { TippyHookInstance, TippyTarget } from '@/types/vue-tippy'
 import { TippyOptions, useTippy } from 'vue-tippy'
 import { h, ref, Ref } from 'vue'
-import NvSettings from '@/entities/settings/components/NvSettings.vue'
 import { tokens } from '@packages/ui/'
+import { RouterView } from 'vue-router'
 
 const { ElectronFilesystem } = window
 
@@ -24,7 +24,7 @@ export const useSettingsPopover = ({ popoverTarget, popoverOptions }: UseSetting
   if (popoverTarget) {
     popover.value = useTippy(popoverTarget, {
       triggerTarget: popoverOptions?.triggerTarget,
-      content: h(NvSettings, {
+      content: h(RouterView, {
         onClose: () => popover.value?.hide(),
       }),
       trigger: 'click',

@@ -22,13 +22,15 @@
                   </NvText>
                   <NvStack spacing="2">
                     <template v-for="entry in category.children" :key="entry.name">
-                      <NvButton
-                        :selected="selectedEntry === entry.name"
-                        size="sm"
-                        type="ghost-alt"
-                        @click="selectedEntry = entry.name"
+                      <router-link :to="entry.to || { name: 'settings' }" class="w-full">
+                        <NvButton
+                          :selected="currentRoute.name === entry.to?.name"
+                          size="sm"
+                          type="ghost-alt"
+                          class="w-full"
                         >{{ entry.name }}
-                      </NvButton>
+                        </NvButton>
+                      </router-link>
                     </template>
                   </NvStack>
                 </NvStack>
@@ -38,15 +40,16 @@
           <div class="settings__content flex-1 pl-4">
             <div class="h-full relative">
               <!-- View -->
-              <Transition class="transition">
-                <div
-                  v-if="currentEntry.component"
-                  :key="currentEntry.component"
-                  class="absolute inset-0 overflow-y-auto"
-                >
-                  <component :is="currentEntry.component" />
-                </div>
-              </Transition>
+              <router-view  v-slot="{ Component }">
+                <Transition class="transition">
+                  <div
+                    :key="Component"
+                    class="absolute inset-0 overflow-y-auto"
+                  >
+                    <component :is="Component" />
+                  </div>
+                </Transition>
+              </router-view>
             </div>
           </div>
         </div>
@@ -55,12 +58,9 @@
   </DomBoundary>
 </template>
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
 import { NvButton, NvCard, NvStack, NvText } from '@packages/ui'
 import DomBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
-import SettingsOverview from '@/entities/settings/components/NvSettingsOverview.vue'
-import SettingsAudio from '@/entities/settings/components/NvSettingsAudio.vue'
-import SettingsSpeech from '@/entities/settings/components/NvSettingsSpeech.vue'
+import { useRoute } from 'vue-router'
 
 const navigation = [
   {
@@ -68,15 +68,15 @@ const navigation = [
     children: [
       {
         name: 'Overview',
-        component: SettingsOverview,
+        to: { name: 'settings-overview' },
       },
       {
         name: 'Speech',
-        component: SettingsSpeech,
+        to: { name: 'settings-speech' },
       },
       {
         name: 'Audio',
-        component: SettingsAudio,
+        to: { name: 'settings-audio' },
       },
       {
         name: 'Overlay',
@@ -105,10 +105,7 @@ const navigation = [
     ],
   },
 ]
-const selectedEntry = ref('Overview')
-const currentEntry = computed(() =>
-  navigation.flatMap((i) => i.children).find((i) => i.name === selectedEntry.value),
-)
+const currentRoute = useRoute()
 </script>
 <style lang="scss" scoped>
 .settings {

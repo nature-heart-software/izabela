@@ -40,9 +40,9 @@
               <div class="inline-flex items-center space-x-2">
                 <NvButton icon-name="comment-alt-lines" size="sm" />
                 <NvDivider class="h-3" direction="vertical" />
-                <span ref="settingsToggler">
+                <router-link :to="{ name: 'settings-overview' }">
                   <NvButton icon-name="setting" size="sm" />
-                </span>
+                </router-link>
               </div>
             </NvCard>
             <NvCard class="inline-flex" size="sm">
@@ -58,7 +58,9 @@
         <!-- Middle -->
         <div class="flex justify-between">
           <NvCard class="inline-flex items-center space-x-3" size="sm">
-            <NvButton icon-name="setting" size="sm" />
+            <router-link :to="{name: 'settings-speech'}">
+              <NvButton icon-name="setting" size="sm" />
+            </router-link>
             <NvDivider class="h-3" direction="vertical" />
             <SpeechEngineSelect
               :modelValue="store.getters['speech/selectedSpeechEngine']"
@@ -83,7 +85,7 @@
             <NvDivider class="h-3" direction="vertical" />
             <NvPopover size="sm" :tippy-options="{ placement: 'top-start' }">
               <div class="w-screen max-w-full">
-                <NvStack spacing="3">
+                <NvStack spacing="4">
                   <NvGroup justify="apart">
                     <NvText type="label">Play on default playback device</NvText>
                     <NvSwitch
@@ -111,7 +113,7 @@
             </NvPopover>
             <NvPopover size="sm" :tippy-options="{ placement: 'top-start' }">
               <div class="w-screen max-w-full">
-                <NvStack spacing="3">
+                <NvStack spacing="4">
                   <NvFormItem label="Audio Input">
                     <NvAudioInputsSelect class="w-full" />
                   </NvFormItem>
@@ -212,6 +214,7 @@ import { useStore } from 'vuex'
 import { emitIPCSay } from '@/electron/events/renderer'
 import NvAudioOutputsSelect from '@/entities/settings/components/inputs/NvAudioOutputsSelect.vue'
 import NvAudioInputsSelect from '@/entities/settings/components/inputs/NvAudioInputSelect.vue'
+import { onBeforeRouteLeave } from 'vue-router'
 
 const store = useStore()
 const { ElectronMessengerWindow } = window
@@ -248,19 +251,18 @@ const props = defineProps({
 
 const messenger = ref()
 
-const settingsToggler = ref()
-
 const moveable = ref()
 const moveableTarget = ref()
 const messengerInput = ref()
 
 const inputValue = ref('')
 const doc = document
-useSettingsPopover({
+const settingsPopover = useSettingsPopover({
   popoverTarget: messenger,
-  popoverOptions: {
-    triggerTarget: settingsToggler,
-  },
+})
+
+onBeforeRouteLeave(() => {
+  settingsPopover.popover.value?.show()
 })
 
 const viewport = computed(() => ({
