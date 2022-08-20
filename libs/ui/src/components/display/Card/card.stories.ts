@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { Story } from '@storybook/vue3'
-import {NvCard} from '@/components'
+import { NvCard } from '@/components'
 import { props, sizeValues } from './card.shared'
 
 export default {
