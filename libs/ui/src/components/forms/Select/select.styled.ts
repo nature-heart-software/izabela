@@ -129,7 +129,7 @@ export const StSelect = styled('div', props)`
   .el-popper {
     box-shadow: ${() => boxShadow.lg} !important;
     border-color: ${() => colors.gray['20']} !important;
-
+    overflow: hidden;
     ${popperStyleBySize}
     .el-popper__arrow {
       display: none;
