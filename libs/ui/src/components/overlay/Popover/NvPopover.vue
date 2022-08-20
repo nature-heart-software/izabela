@@ -19,10 +19,11 @@ const props = defineProps(propsDefinition)
 const tippyProps: typeof props['tippyOptions'] = {
   trigger: 'click',
   interactive: true,
-  placement: 'auto-start',
+  placement: 'bottom-start',
   offset: [0, tokens.spacing['4']],
   appendTo: () => document.body,
   theme: `popover-${props.size}`,
+  maxWidth: 300,
   ...props.tippyOptions
 }
 </script>

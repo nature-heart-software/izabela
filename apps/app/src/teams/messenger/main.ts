@@ -10,6 +10,10 @@ import store from '@/store'
 import '@/plugins'
 import { NvLoading } from '@packages/ui'
 
+import { watchBoundary } from '@/modules/vue-dom-boundaries'
+
+watchBoundary('.el-select-dropdown')
+
 const vueQueryPluginOptions: VueQueryPluginOptions = {
   queryClientConfig: {
     defaultOptions: {

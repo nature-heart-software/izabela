@@ -26,42 +26,23 @@
       </NvStack>
       <NvButton @click="importGoogleCloudSpeechCredentials">Import</NvButton>
     </NvGroup>
-    <NvAccessBlocker :allowed="googleCloudSpeechCredentialsPath" reason="Credentials required">
-      <NvStack spacing="5">
-        <NvDivider direction="horizontal" />
-        <NvFormItem label="Audio Input">
-          <NvSelect
-            :modelValue="store.getters['settings/persisted'].audioInputDevice"
-            @update:modelValue="
-              (value) =>
-                store.dispatch('settings/setProperty', ['persisted.audioInputDevice', value])
-            "
-          >
-            <template
-              v-for="audioInputDevice in audioInputDevices"
-              :key="audioInputDevice.deviceId"
-            >
-              <NvOption :label="audioInputDevice.label" :value="audioInputDevice.label">
-                {{ audioInputDevice.label }}
-              </NvOption>
-            </template>
-          </NvSelect>
-        </NvFormItem>
-        <NvDivider direction="horizontal" />
-        <NvGroup justify="apart" no-wrap spacing="5">
-          <NvStack>
-            <NvText type="label">Push-to-record Key</NvText>
-          </NvStack>
-          <NvKeybinding
-            :modelValue="store.getters['settings/persisted'].recordAudioKeybinding"
-            @update:modelValue="
-              (value) =>
-                store.dispatch('settings/setProperty', ['persisted.recordAudioKeybinding', value])
-            "
-          />
-        </NvGroup>
+    <NvDivider direction="horizontal" />
+    <NvFormItem label="Audio Input">
+      <NvAudioInputSelect />
+    </NvFormItem>
+    <NvDivider direction="horizontal" />
+    <NvGroup justify="apart" no-wrap spacing="5">
+      <NvStack>
+        <NvText type="label">Push-to-record Key</NvText>
       </NvStack>
-    </NvAccessBlocker>
+      <NvKeybinding
+        :modelValue="store.getters['settings/persisted'].recordAudioKeybinding"
+        @update:modelValue="
+             (value) =>
+               store.dispatch('settings/setProperty', ['persisted.recordAudioKeybinding', value])
+           "
+      />
+    </NvGroup>
   </NvStack>
 </template>
 <script lang="ts" setup>
@@ -72,23 +53,20 @@ import {
   NvFormItem,
   NvGroup,
   NvIcon,
-  NvOption,
-  NvSelect,
   NvStack,
   NvText,
 } from '@packages/ui'
 import NvKeybinding from '@/entities/app/components/inputs/NvKeybinding.vue'
-import { useMediaDevices } from '@/hooks'
 import {
   getGoogleCloudSpeechCredentialsPathQueryKey,
   useGetGoogleCloudSpeechCredentialsPath,
 } from '@/entities/settings/hooks'
 import { useQueryClient } from 'vue-query'
 import { useStore } from 'vuex'
+import NvAudioInputSelect from '@/entities/settings/components/inputs/NvAudioInputSelect.vue'
 
 const store = useStore()
 const { ElectronDialog, ElectronFilesystem } = window
-const { audioInputDevices } = useMediaDevices()
 
 const queryClient = useQueryClient()
 

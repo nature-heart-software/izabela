@@ -12,7 +12,40 @@
           </NvCard>
           <div class="pl-8">
             <NvCard>
-              <NvAudioOutputsSelect />
+              <NvStack spacing="5">
+                <NvGroup justify="apart">
+                  <NvText type="label">Play Izabela's speech on default playback device</NvText>
+                  <NvSwitch
+                    :modelValue="store.getters['settings/persisted'].playSpeechOnDefaultPlaybackDevice"
+                    @update:modelValue="
+          (value) =>
+            store.dispatch('settings/setProperty', [
+              'persisted.playSpeechOnDefaultPlaybackDevice',
+              value,
+            ])
+        "
+                  />
+                </NvGroup>
+                <NvDivider direction="horizontal" />
+                <NvFormItem label="Audio Outputs">
+                  <NvAudioOutputsSelect />
+                </NvFormItem>
+                <NvDivider direction="horizontal" />
+
+                <NvGroup align="start" justify="apart" no-wrap>
+                  <NvStack>
+                    <NvText type="label">Install VB-Audio Virtual Cable</NvText>
+                    <NvText
+                    >VB-Audio Virtual Cable creates a virtual audio cable that can be used as a recording
+                      device for Izabela's speech in other applications
+                    </NvText>
+                    <NvText type="caption"
+                    >VB-Audio Virtual Cable must also be present in Audio Outputs
+                    </NvText>
+                  </NvStack>
+                  <NvButton>Install</NvButton>
+                </NvGroup>
+              </NvStack>
             </NvCard>
           </div>
         </NvStack>
@@ -34,7 +67,10 @@
   </NvStack>
 </template>
 <script lang="ts" setup>
-import { NvCard, NvStack, NvText } from '@packages/ui'
+import { NvCard, NvStack, NvText, NvButton, NvGroup, NvDivider, NvFormItem, NvSwitch } from '@packages/ui'
 import NvAudioOutputsSelect from '@/entities/settings/components/inputs/NvAudioOutputsSelect.vue'
 import NvAudioInputFormPart from '@/entities/settings/components/inputs/NvAudioInputFormPart.vue'
+import { useStore } from 'vuex'
+
+const store = useStore()
 </script>

@@ -30,7 +30,6 @@ ${(props) => injectGlobal`
   [data-theme="popover-${props.size}"] {
     box-shadow: ${boxShadow.lg} !important;
     border-color: ${colors.gray['20']} !important;
-    overflow: hidden;
     border-width: ${rem(borderWidth.DEFAULT)};
     background-color: white;
     ${paddingStyleBySize(props.size)}
