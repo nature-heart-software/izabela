@@ -40,7 +40,11 @@
               <div class="inline-flex items-center space-x-2">
                 <NvButton icon-name="comment-alt-lines" size="sm" />
                 <NvDivider class="h-3" direction="vertical" />
-                  <NvButton @click="navigateTo({ name: 'settings-overview' })" icon-name="setting" size="sm" />
+                <NvButton
+                  @click="navigateTo({ name: 'settings-overview' })"
+                  icon-name="setting"
+                  size="sm"
+                />
               </div>
             </NvCard>
             <NvCard class="inline-flex" size="sm">
@@ -56,7 +60,11 @@
         <!-- Middle -->
         <div class="flex justify-between">
           <NvCard class="inline-flex items-center space-x-3" size="sm">
-              <NvButton @click="navigateTo({ name: 'settings-speech' })" icon-name="setting" size="sm" />
+            <NvButton
+              @click="navigateTo({ name: 'settings-speech' })"
+              icon-name="setting"
+              size="sm"
+            />
             <NvDivider class="h-3" direction="vertical" />
             <SpeechEngineSelect
               :modelValue="store.getters['speech/selectedSpeechEngine']"
@@ -257,7 +265,7 @@ const settingsPopover = useSettingsPopover({
   popoverTarget: messenger,
   popoverOptions: {
     trigger: 'manual',
-  }
+  },
 })
 
 const router = useRouter()
