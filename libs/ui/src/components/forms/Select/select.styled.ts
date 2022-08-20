@@ -101,7 +101,7 @@ export const StSelect = styled('div', props)`
       outline: 0;
       border-color: ${() => colors.gray['20']};
       transition: ${() => transition.DEFAULT};
-      
+
       ${popperStyleBySize}
       &:hover {
         border-color: ${() => colors.gray['30']};
@@ -144,7 +144,7 @@ export const StSelect = styled('div', props)`
     .el-select__input {
       margin-top: ${() => rem(spacing['2'])};
       height: ${() => rem(spacing['6'])};
-      width: 100%!important;
+      width: 100% !important;
     }
 
     .el-select__tags {
