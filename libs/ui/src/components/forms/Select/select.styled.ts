@@ -101,12 +101,14 @@ export const StSelect = styled('div', props)`
       outline: 0;
       border-color: ${() => colors.gray['20']};
       transition: ${() => transition.DEFAULT};
-
+      
       ${popperStyleBySize}
       &:hover {
         border-color: ${() => colors.gray['30']};
       }
-
+      &:placeholder-shown {
+        height: ${(props) => styleBySize(props).height || ''}!important;
+      }
       &:focus {
         box-shadow: 0 0 0 ${() => rem(borderWidth.lg)}
           ${() => colors.gray['10']};
@@ -142,6 +144,7 @@ export const StSelect = styled('div', props)`
     .el-select__input {
       margin-top: ${() => rem(spacing['2'])};
       height: ${() => rem(spacing['6'])};
+      width: 100%!important;
     }
 
     .el-select__tags {
