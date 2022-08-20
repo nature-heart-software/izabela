@@ -13,6 +13,7 @@ import { NvLoading } from '@packages/ui'
 import { watchBoundary } from '@/modules/vue-dom-boundaries'
 
 watchBoundary('.el-select-dropdown')
+watchBoundary('.tippy-box')
 
 const vueQueryPluginOptions: VueQueryPluginOptions = {
   queryClientConfig: {
