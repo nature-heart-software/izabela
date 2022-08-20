@@ -3,6 +3,7 @@ import { Story } from '@storybook/vue3'
 import {NvCard} from '@/components'
 import { props, sizeValues } from './card.shared'
 
+console.log(NvCard)
 export default {
   title: 'Card',
   argTypes: {

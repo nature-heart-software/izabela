@@ -1,6 +1,5 @@
-const path = require('path');
 const { mergeConfig } = require('vite');
-const viteConfig = require('../vite.config.cjs').default;
+const {plugins, resolve} = require('../vite.config.cjs').default;
 
 module.exports = {
     "stories": [
@@ -18,7 +17,10 @@ module.exports = {
     "features": {
         "storyStoreV7": true,
     },
-    async viteFinal(config) {
-        return mergeConfig(config, viteConfig);
+    viteFinal(config) {
+        return mergeConfig(config, {
+            resolve,
+            plugins: plugins.filter((p) => !p.name.includes('vite')),
+        });
     },
 }
