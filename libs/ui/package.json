@@ -21,6 +21,7 @@
     "polished": "^4.2.2",
     "uuid": "^8.3.2",
     "vue": "^3.2.37",
+    "vue-tippy": "^6.0.0-alpha.63",
     "vue3-styled-components": "^1.2.1"
   },
   "devDependencies": {

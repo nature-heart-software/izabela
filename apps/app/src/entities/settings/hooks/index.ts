@@ -3,6 +3,7 @@ import { TippyHookInstance, TippyTarget } from '@/types/vue-tippy'
 import { TippyOptions, useTippy } from 'vue-tippy'
 import { h, ref, Ref } from 'vue'
 import NvSettings from '@/entities/settings/components/NvSettings.vue'
+import { tokens } from '@packages/ui/'
 
 const { ElectronFilesystem } = window
 
@@ -27,12 +28,11 @@ export const useSettingsPopover = ({ popoverTarget, popoverOptions }: UseSetting
         onClose: () => popover.value?.hide(),
       }),
       trigger: 'click',
-      arrow: false,
       theme: 'settings',
       interactive: true,
       appendTo: () => document.body,
       maxWidth: 'none',
-      offset: [0, 12],
+      offset: [0, tokens.spacing['4']],
     })
   }
   return {

@@ -9,7 +9,7 @@ import { rem } from 'polished'
 import { disabledItemBackgroundStyle } from '@/utils/css-in-js'
 import tokens from './tokens'
 
-const { spacing, colors } = tokens
+const { spacing, colors, transition } = tokens
 // eslint-disable-next-line no-unused-expressions
 injectGlobal`
   * {
@@ -42,6 +42,20 @@ injectGlobal`
           stroke-width: ${rem(spacing['1'])}
         }
       }
+    }
+  }
+  
+  // tippy
+  [data-v-tippy] {
+    display: inline-flex;
+  }
+  [data-animation] {
+    transition: ${transition.DEFAULT}!important;
+    &[data-state='hidden'] {
+      opacity: 0;
+    }
+    &[data-state='visible'] {
+      opacity: 1;
     }
   }
 `

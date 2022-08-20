@@ -1,10 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { Story } from '@storybook/vue3'
-import {NvCard} from '@/components'
-import { props, sizeValues } from './card.shared'
+import { NvPopover, NvButton, NvText, NvCenter } from '@/components'
+import { props, sizeValues } from './popover.shared'
 
 export default {
-  title: 'Card',
+  title: 'Popover',
   argTypes: {
     content: {
       defaultValue: 'hello world',
@@ -19,14 +19,23 @@ export default {
 }
 
 const Template: Story = (args) => ({
-  components: { NvCard },
+  components: { NvPopover, NvButton, NvText, NvCenter },
   setup() {
     return {
       args,
     }
   },
   template: `
-      <NvCard v-bind="args">{{args.content}}</NvCard>
+    <NvCenter>
+    <NvPopover v-bind="args">
+      <NvText>
+        Some content
+      </NvText>
+      <template #reference>
+        <NvButton>Check this out</NvButton>
+      </template>
+    </NvPopover>
+    </NvCenter>
     `,
 })
 

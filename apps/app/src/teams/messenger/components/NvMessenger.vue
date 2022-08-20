@@ -81,7 +81,14 @@
               />
             </template>
             <NvDivider class="h-3" direction="vertical" />
-            <NvButton icon-name="direction" size="sm">Outputs</NvButton>
+            <NvPopover size="sm">
+              <NvText>
+                outputs here
+              </NvText>
+              <template #reference>
+                <NvButton icon-name="direction" size="sm">Outputs</NvButton>
+              </template>
+            </NvPopover>
             <NvButton icon-name="direction" size="sm">Input</NvButton>
             <NvDivider class="h-3" direction="vertical" />
             <NvButton icon-name="question-circle" size="sm" />
@@ -155,7 +162,7 @@
 <script lang="ts" setup>
 import { ComponentPublicInstance, computed, defineProps, onMounted, ref, watch } from 'vue'
 import Moveable from 'vue3-moveable'
-import { NvButton, NvCard, NvDivider, NvInput } from '@packages/ui'
+import { NvButton, NvCard, NvDivider, NvInput, NvPopover, NvText } from '@packages/ui'
 import DomBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
 import { useSettingsPopover } from '@/entities/settings/hooks'
 import SpeechEngineSelect from '@/entities/speech/components/inputs/NvSpeechEngineSelect.vue'
