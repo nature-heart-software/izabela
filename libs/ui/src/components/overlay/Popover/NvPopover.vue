@@ -1,9 +1,9 @@
 <template>
   <StPopover v-bind="props">
     <tippy v-bind="tippyProps">
-      <slot name="reference"/>
+      <slot name="reference" />
       <template #content>
-          <slot />
+        <slot />
       </template>
     </tippy>
   </StPopover>
@@ -24,6 +24,6 @@ const tippyProps: typeof props['tippyOptions'] = {
   appendTo: () => document.body,
   theme: `popover-${props.size}`,
   maxWidth: 300,
-  ...props.tippyOptions
+  ...props.tippyOptions,
 }
 </script>
