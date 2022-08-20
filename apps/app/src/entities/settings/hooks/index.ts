@@ -23,7 +23,6 @@ export const useSettingsPopover = ({ popoverTarget, popoverOptions }: UseSetting
   const popover: Ref<TippyHookInstance | undefined> = ref()
   if (popoverTarget) {
     popover.value = useTippy(popoverTarget, {
-      triggerTarget: popoverOptions?.triggerTarget,
       content: h(RouterView, {
         onClose: () => popover.value?.hide(),
       }),
@@ -33,6 +32,7 @@ export const useSettingsPopover = ({ popoverTarget, popoverOptions }: UseSetting
       appendTo: () => document.body,
       maxWidth: 'none',
       offset: [0, tokens.spacing['4']],
+      ...popoverOptions,
     })
   }
   return {

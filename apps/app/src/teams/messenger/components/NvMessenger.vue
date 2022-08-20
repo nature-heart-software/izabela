@@ -40,9 +40,7 @@
               <div class="inline-flex items-center space-x-2">
                 <NvButton icon-name="comment-alt-lines" size="sm" />
                 <NvDivider class="h-3" direction="vertical" />
-                <router-link :to="{ name: 'settings-overview' }">
-                  <NvButton icon-name="setting" size="sm" />
-                </router-link>
+                  <NvButton @click="navigateTo({ name: 'settings-overview' })" icon-name="setting" size="sm" />
               </div>
             </NvCard>
             <NvCard class="inline-flex" size="sm">
@@ -58,9 +56,7 @@
         <!-- Middle -->
         <div class="flex justify-between">
           <NvCard class="inline-flex items-center space-x-3" size="sm">
-            <router-link :to="{name: 'settings-speech'}">
-              <NvButton icon-name="setting" size="sm" />
-            </router-link>
+              <NvButton @click="navigateTo({ name: 'settings-speech' })" icon-name="setting" size="sm" />
             <NvDivider class="h-3" direction="vertical" />
             <SpeechEngineSelect
               :modelValue="store.getters['speech/selectedSpeechEngine']"
@@ -214,7 +210,7 @@ import { useStore } from 'vuex'
 import { emitIPCSay } from '@/electron/events/renderer'
 import NvAudioOutputsSelect from '@/entities/settings/components/inputs/NvAudioOutputsSelect.vue'
 import NvAudioInputsSelect from '@/entities/settings/components/inputs/NvAudioInputSelect.vue'
-import { onBeforeRouteLeave } from 'vue-router'
+import { onBeforeRouteLeave, RouteLocationRaw, useRouter } from 'vue-router'
 
 const store = useStore()
 const { ElectronMessengerWindow } = window
@@ -259,11 +255,16 @@ const inputValue = ref('')
 const doc = document
 const settingsPopover = useSettingsPopover({
   popoverTarget: messenger,
+  popoverOptions: {
+    trigger: 'manual',
+  }
 })
 
-onBeforeRouteLeave(() => {
+const router = useRouter()
+const navigateTo = (location: RouteLocationRaw) => {
+  router.push(location)
   settingsPopover.popover.value?.show()
-})
+}
 
 const viewport = computed(() => ({
   width: Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0),
