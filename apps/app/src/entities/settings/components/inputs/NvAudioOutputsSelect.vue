@@ -3,8 +3,8 @@
     :modelValue="store.getters['settings/persisted'].audioOutputDevices"
     multiple
     @update:modelValue="
-          (value) => store.dispatch('settings/setProperty', ['persisted.audioOutputDevices', value])
-        "
+      (value) => store.dispatch('settings/setProperty', ['persisted.audioOutputDevices', value])
+    "
   >
     <template
       v-for="audioOutputDevice in filteredAudioOutputDevices"
@@ -18,10 +18,7 @@
 </template>
 <script lang="ts" setup>
 import { computed } from 'vue'
-import {
-  NvOption,
-  NvSelect,
-} from '@packages/ui'
+import { NvOption, NvSelect } from '@packages/ui'
 import { useMediaDevices } from '@/hooks'
 import { useStore } from 'vuex'
 

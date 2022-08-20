@@ -81,13 +81,15 @@
               />
             </template>
             <NvDivider class="h-3" direction="vertical" />
-            <NvPopover size="sm" :tippy-options="{placement: 'top-start'}">
+            <NvPopover size="sm" :tippy-options="{ placement: 'top-start' }">
               <div class="w-screen max-w-full">
                 <NvStack spacing="3">
                   <NvGroup justify="apart">
                     <NvText type="label">Play on default playback device</NvText>
                     <NvSwitch
-                      :modelValue="store.getters['settings/persisted'].playSpeechOnDefaultPlaybackDevice"
+                      :modelValue="
+                        store.getters['settings/persisted'].playSpeechOnDefaultPlaybackDevice
+                      "
                       @update:modelValue="
                         (value) =>
                           store.dispatch('settings/setProperty', [
@@ -107,7 +109,7 @@
                 <NvButton icon-name="direction" size="sm">Outputs</NvButton>
               </template>
             </NvPopover>
-            <NvPopover size="sm" :tippy-options="{placement: 'top-start'}">
+            <NvPopover size="sm" :tippy-options="{ placement: 'top-start' }">
               <div class="w-screen max-w-full">
                 <NvStack spacing="3">
                   <NvFormItem label="Audio Input">
@@ -191,7 +193,18 @@
 <script lang="ts" setup>
 import { ComponentPublicInstance, computed, defineProps, onMounted, ref, watch } from 'vue'
 import Moveable from 'vue3-moveable'
-import { NvButton, NvCard, NvDivider, NvInput, NvPopover, NvFormItem, NvStack, NvGroup, NvSwitch, NvText } from '@packages/ui'
+import {
+  NvButton,
+  NvCard,
+  NvDivider,
+  NvInput,
+  NvPopover,
+  NvFormItem,
+  NvStack,
+  NvGroup,
+  NvSwitch,
+  NvText,
+} from '@packages/ui'
 import DomBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
 import { useSettingsPopover } from '@/entities/settings/hooks'
 import SpeechEngineSelect from '@/entities/speech/components/inputs/NvSpeechEngineSelect.vue'

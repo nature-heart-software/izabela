@@ -38,9 +38,9 @@
       <NvKeybinding
         :modelValue="store.getters['settings/persisted'].recordAudioKeybinding"
         @update:modelValue="
-             (value) =>
-               store.dispatch('settings/setProperty', ['persisted.recordAudioKeybinding', value])
-           "
+          (value) =>
+            store.dispatch('settings/setProperty', ['persisted.recordAudioKeybinding', value])
+        "
       />
     </NvGroup>
   </NvStack>
