@@ -22,6 +22,6 @@ export interface SpeechEngine {
     name: string
     value: string
     description?: string
-  }[],
+  }[]
   store: ReturnType<typeof registerPluginStore>
 }

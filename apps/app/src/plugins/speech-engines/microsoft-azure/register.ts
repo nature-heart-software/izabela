@@ -11,9 +11,8 @@ const getCredentials = () => ({
   region: getProperty('region'),
 })
 
-const commands: SpeechEngine['commands'] = (voice) => (voice.StyleList || []).map((style: string) => (
-  { name: style, value: style}
-))
+const commands: SpeechEngine['commands'] = (voice) =>
+  (voice.StyleList || []).map((style: string) => ({ name: style, value: style }))
 
 registerEngine({
   id: ENGINE_ID,
@@ -25,7 +24,7 @@ registerEngine({
   getPayload(text) {
     const voice = getProperty('selectedVoice')
     let newText = text
-    let expression;
+    let expression
     const commandString = newText.split(' ')[0] || ''
     if (commandString.startsWith('/')) {
       const command = commands(voice).find(({ name }) => commandString.startsWith(`/${name}`))
@@ -59,5 +58,5 @@ registerEngine({
   store: {
     setProperty,
     getProperty,
-  }
+  },
 })

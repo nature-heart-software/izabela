@@ -30,7 +30,7 @@ const store: Module<typeof storeState, any> = {
         return engine.commands(voice)
       }
       return []
-    }
+    },
   },
   mutations: {
     ...utilMutations,
