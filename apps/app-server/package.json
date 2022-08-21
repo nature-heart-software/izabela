@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "start": "node bin/generate-exports && nodemon ./dist/main.js --start-server",
-    "build": "node bin/generate-exports && npx microbundle --target=node",
-    "dev": "node bin/generate-exports && npx microbundle --target=node watch"
+    "build": "node bin/generate-exports && microbundle --target=node",
+    "dev": "node bin/generate-exports && microbundle --target=node watch"
   },
   "source": "src/main.ts",
   "main": "./dist/app-server.cjs",
