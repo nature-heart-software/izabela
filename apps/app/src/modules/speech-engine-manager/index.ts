@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-cycle
 import { SpeechEngine } from '@/modules/speech-engine-manager/types'
 import { ref } from 'vue'
 // eslint-disable-next-line import/no-cycle
