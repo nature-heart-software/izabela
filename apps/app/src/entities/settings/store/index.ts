@@ -1,5 +1,6 @@
 import { Module } from 'vuex'
 import { utilActions, utilMutations } from '@/utils/vuex'
+// eslint-disable-next-line import/no-cycle
 import { SpeechEngine } from '@/modules/speech-engine-manager/types'
 import pkg from '@root/package.json'
 import { KeybindingResult } from '@/types/keybinds'
