@@ -8,26 +8,26 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service electron:serve",
-    "build": "vue-cli-service electron:build",
+    "build": "vue-cli-service electron:build -p never",
     "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
     "lint": "vue-cli-service lint",
-    "electron:build": "vue-cli-service electron:build",
+    "electron:build": "vue-cli-service electron:build -p never",
     "electron:serve": "vue-cli-service electron:serve",
-    "postinstall": "electron-builder install-app-deps",
-    "postuninstall": "electron-builder install-app-deps",
+    "postinstall": "node bin/rebuild.js",
+    "postuninstall": "node bin/rebuild.js",
     "storybook:build": "vue-cli-service storybook:build -c config/storybook",
     "storybook:serve": "vue-cli-service storybook:serve -p 6006 -c config/storybook",
-    "generate:app-icon": "npx electron-icon-builder --input=./assets/app-icon.png --output=./build --flatten && npx electron-icon-builder --input=./assets/app-icon.png --output=./public --flatten"
+    "generate:app-icon": "npx electron-icon-builder --input=./assets/app-icon.png --output=./build --flatten && npx electron-icon-builder --input=./assets/app-icon.png --output=./public --flatten",
+    "rebuild": "electron-builder install-app-deps && npx patch-package"
   },
   "main": "background.js",
   "dependencies": {
     "@google-cloud/speech": "^4.10.2",
-    "@iconscout/unicons": "^4.0.1",
     "@ryanmorr/ready": "^1.4.0",
     "@types/crypto-js": "^4.1.1",
-    "@types/tailwindcss": "^2.2.4",
     "@wurielle/generate-modules-webpack-plugin": "^0.1.0",
+    "axios": "^0.27.2",
     "bluebird": "^3.7.2",
     "crypto-js": "^4.1.1",
     "csstype": "^3.0.11",
@@ -35,7 +35,6 @@
     "electron-postman": "^0.1.2",
     "electron-store": "^8.0.1",
     "electron-updater": "^5.0.1",
-    "element-plus": "^1.2.0-beta.6",
     "hark": "^1.2.3",
     "iohook": "^0.9.3",
     "mitt": "^3.0.0",
@@ -46,16 +45,9 @@
     "vue-tippy": "^6.0.0-alpha.54",
     "vue3-moveable": "^0.3.0",
     "vue3-styled-components": "^1.2.1",
-    "webpack-notifier": "^1.15.0",
-    "websocket-stream": "^5.5.2",
-    "ws": "^8.6.0"
+    "webpack-notifier": "^1.15.0"
   },
   "devDependencies": {
-    "@storybook/addon-essentials": "^6.5.0-alpha.55",
-    "@storybook/addon-links": "^6.5.0-alpha.55",
-    "@storybook/builder-webpack5": "^6.5.0-alpha.55",
-    "@storybook/manager-webpack5": "^6.5.0-alpha.51",
-    "@storybook/vue3": "^6.5.0-alpha.55",
     "@types/bluebird": "^3.5.36",
     "@types/chai": "^4.3.0",
     "@types/electron-devtools-installer": "^2.2.1",
@@ -76,7 +68,6 @@
     "@vue/eslint-config-typescript": "^9.1.0",
     "@vue/test-utils": "^2.0.0-0",
     "autoprefixer": "^10.4.4",
-    "babel-plugin-inline-json-import": "^0.3.2",
     "chai": "^4.2.0",
     "cypress": "^9.5.3",
     "electron": "^12.2.3",
@@ -97,14 +88,14 @@
     "typescript": "~4.6.3",
     "vue": "^3.2.31",
     "vue-cli-plugin-electron-builder": "~2.1.1",
-    "vue-cli-plugin-storybook": "~3.0.0-rc.0",
     "vue-router": "^4.0.14",
     "vuex": "^4.0.0"
   },
   "optionalDependencies": {
-    "@izabela/app-server": "*",
-    "@izabela/electron-bridger": "*",
-    "@izabela/generate-exports-webpack-plugin": "*"
+    "@apps/app-server": "*",
+    "@packages/electron-bridger": "*",
+    "@packages/generate-exports-webpack-plugin": "*",
+    "@packages/ui": "*"
   },
   "iohook": {
     "targets": [

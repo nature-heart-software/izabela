@@ -2,19 +2,38 @@ import { createStore, MutationPayload } from 'vuex'
 
 import { createPersistedState, createSharedMutations } from '@/modules/electron-vuex'
 import messenger from '@/teams/messenger/store'
+// eslint-disable-next-line import/no-cycle
 import settings from '@/entities/settings/store'
-import { SetPropertyPayload } from '@/utils/vuex'
+// eslint-disable-next-line import/no-cycle
+import speech from '@/entities/speech/store'
+import dictionary from '@/entities/dictionary/store'
+import { SetPropertyPayload, utilActions, utilMutations } from '@/utils/vuex'
 import domBoundariesStore from '@/modules/vue-dom-boundaries/dom-boundaries.store'
-
-import theme from '@/styles/tokens'
+import { defaultsDeep, get, set } from 'lodash'
+import { decrypt, encrypt } from '@/utils/security'
 
 const store = createStore({
+  state: {
+    persisted: {
+      plugins: {},
+    },
+  },
   getters: {
-    theme: () => theme,
+    state: (state) => state,
+    persisted: (state) => state.persisted,
+    isReady: (state: any) => () => Promise.all([state['electron-vuex'].isReady()]),
+  },
+  mutations: {
+    ...utilMutations,
+  },
+  actions: {
+    ...utilActions,
   },
   modules: {
     messenger,
     settings,
+    speech,
+    dictionary,
   },
   plugins: [
     ...(process.env.STORYBOOK
@@ -35,5 +54,22 @@ const store = createStore({
         ]),
   ],
 })
+
+export const registerPluginStore = <S extends Record<any, any>>(id: string, state: S) => {
+  const pluginPath = ['settings.persisted.plugins', id].join('.')
+  const currentPluginState = get(store.state, pluginPath, {})
+  const mergedState = defaultsDeep(currentPluginState, state)
+  set(store.state, pluginPath, mergedState)
+  return {
+    setProperty(property: keyof S, value: any, encryptValue = false) {
+      const fn = encryptValue ? encrypt : (v: any) => v
+      store.dispatch('setProperty', [[pluginPath, property].join('.'), fn(value)])
+    },
+    getProperty(property: keyof S, decryptValue = false) {
+      const fn = decryptValue ? decrypt : (v: any) => v
+      return fn(get(store.state, [pluginPath, property].join('.')))
+    },
+  }
+}
 
 export default store

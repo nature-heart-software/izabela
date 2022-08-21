@@ -1,0 +1,53 @@
+{
+  "name": "@packages/ui",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/ui.cjs",
+  "module": "./dist/ui.es.js",
+  "types": "./dist/main.d.ts",
+  "scripts": {
+    "dev": "vite build --watch --mode development",
+    "build": "vite build",
+    "preview": "vite preview",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
+  },
+  "dependencies": {
+    "element-plus": "^1.2.0-beta.6",
+    "polished": "^4.2.2",
+    "uuid": "^8.3.2",
+    "vue": "^3.2.37",
+    "vue-tippy": "^6.0.0-alpha.63",
+    "vue3-styled-components": "^1.2.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.18.10",
+    "@storybook/addon-actions": "^6.5.10",
+    "@storybook/addon-essentials": "^6.5.10",
+    "@storybook/addon-interactions": "^6.5.10",
+    "@storybook/addon-links": "^6.5.10",
+    "@storybook/builder-vite": "^0.2.2",
+    "@storybook/testing-library": "^0.0.13",
+    "@storybook/vue3": "^6.5.10",
+    "@vitejs/plugin-vue": "^3.0.0",
+    "autoprefixer": "^10.4.8",
+    "babel-loader": "^8.2.5",
+    "postcss": "^8.4.16",
+    "sass": "^1.54.3",
+    "tailwindcss": "^3.1.8",
+    "typescript": "^4.6.4",
+    "vite": "^3.0.0",
+    "vite-plugin-dts": "^1.4.1",
+    "vue-loader": "^16.8.3",
+    "vue-tsc": "^0.38.4"
+  },
+  "optionalDependencies": {
+    "@packages/icons": "*",
+    "@packages/vite-plugin-generate-exports": "*",
+    "@packages/vite-plugin-generate-modules": "*"
+  }
+}

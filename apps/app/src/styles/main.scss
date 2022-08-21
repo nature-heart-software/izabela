@@ -6,14 +6,5 @@
 *::before,
 *::after {
   user-select: none;
-}
-
-.v-enter-active,
-.v-leave-active {
-  transition: all 0.3s;
-}
-
-.v-enter-from,
-.v-leave-to {
-  opacity: 0;
+  outline: 0;
 }

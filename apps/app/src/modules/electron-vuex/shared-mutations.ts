@@ -10,25 +10,19 @@ import {
 import { purify } from '@/utils/object'
 import { IPC_EVENT_CONNECT, IPC_EVENT_NOTIFY_MAIN, IPC_EVENT_NOTIFY_RENDERERS } from './consts'
 
-class SharedMutations {
-  type: ProcessType = typeof window !== 'undefined' ? 'renderer' : 'main'
-
-  ipcMain: Electron.IpcMain = (global as AugmentedGlobal).ipcMain
-
-  ipcRenderer: IpcRenderer | null =
+const SharedMutations = (store: Store<unknown>) => {
+  const processType: ProcessType = typeof window !== 'undefined' ? 'renderer' : 'main'
+  const { ipcMain } = global as AugmentedGlobal
+  const ipcRenderer: IpcRenderer | null =
     typeof window !== 'undefined' ? window.ElectronVuex.ipcRenderer : null
+  let storeOriginalCommit: Commit
+  let storeOriginalDispatch: Dispatch
 
-  store: Store<unknown>
-
-  storeOriginalCommit!: Commit
-
-  storeOriginalDispatch!: Dispatch
-
-  constructor(store: Store<unknown>) {
-    this.store = store
-  }
-
-  static notifyRenderers(connections: Connections, payload: MutationPayload, sourceProcessId = '') {
+  function notifyRenderers(
+    connections: Connections,
+    payload: MutationPayload,
+    sourceProcessId = '',
+  ) {
     Object.keys(connections).forEach((processId) => {
       if (processId !== sourceProcessId) {
         connections[processId].send(IPC_EVENT_NOTIFY_RENDERERS, purify(payload))
@@ -36,62 +30,63 @@ class SharedMutations {
     })
   }
 
-  connect() {
-    if (this.ipcRenderer) this.ipcRenderer.SEND_IPC_EVENT_CONNECT()
+  function connect() {
+    if (ipcRenderer) ipcRenderer.SEND_IPC_EVENT_CONNECT()
   }
 
-  onConnect(handler: IpcMainMutationEventHandler) {
-    this.ipcMain.on(IPC_EVENT_CONNECT, handler)
+  function onConnect(handler: IpcMainMutationEventHandler) {
+    ipcMain.on(IPC_EVENT_CONNECT, handler)
   }
 
-  notifyMain(payload: MutationPayload) {
-    if (this.ipcRenderer) this.ipcRenderer.SEND_IPC_EVENT_NOTIFY_MAIN(payload)
+  function notifyMain(payload: MutationPayload) {
+    if (ipcRenderer) ipcRenderer.SEND_IPC_EVENT_NOTIFY_MAIN(payload)
   }
 
-  onNotifyMain(handler: IpcMainMutationEventHandler) {
-    this.ipcMain.on(IPC_EVENT_NOTIFY_MAIN, handler)
+  function onNotifyMain(handler: IpcMainMutationEventHandler) {
+    ipcMain.on(IPC_EVENT_NOTIFY_MAIN, handler)
   }
 
-  onNotifyRenderers(handler: IpcRendererMutationEventHandler) {
-    if (this.ipcRenderer) this.ipcRenderer.ON_IPC_EVENT_NOTIFY_RENDERERS(handler)
+  function onNotifyRenderers(handler: IpcRendererMutationEventHandler) {
+    if (ipcRenderer) ipcRenderer.ON_IPC_EVENT_NOTIFY_RENDERERS(handler)
   }
 
-  rendererProcessLogic() {
+  function rendererProcessLogic() {
     // Connect renderer to main process
-    this.connect()
+    connect()
 
     // Save original Vuex methods
-    this.storeOriginalCommit = this.store.commit
-    this.storeOriginalDispatch = this.store.dispatch
+    storeOriginalCommit = store.commit
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    storeOriginalDispatch = store.dispatch
 
     // Don't use commit in renderer outside of actions
-    this.store.commit = () => {
-      throw new Error(
-        "[Vuex Electron] Please, don't use direct commit's, use dispatch instead of this.",
-      )
+    // eslint-disable-next-line no-param-reassign
+    store.commit = () => {
+      throw new Error("[Vuex Electron] Please, don't use direct commit's, use dispatch instead of ")
     }
 
     // Forward dispatch to main process
-    this.store.dispatch = (type: string, payload?: any): Promise<any> => {
-      this.notifyMain({
+    // eslint-disable-next-line no-param-reassign
+    store.dispatch = (type: string, payload?: any): Promise<any> => {
+      notifyMain({
         type,
         payload,
       })
-      // return this.storeOriginalDispatch(type, payload, options)
+      // return storeOriginalDispatch(type, payload, options)
       return Promise.resolve()
     }
 
     // Subscribe on changes from main process and apply them
-    this.onNotifyRenderers((event, { type, payload } = { type: '', payload: null }) => {
-      this.storeOriginalCommit(type, payload)
+    onNotifyRenderers((event, { type, payload } = { type: '', payload: null }) => {
+      storeOriginalCommit(type, payload)
     })
   }
 
-  mainProcessLogic() {
+  function mainProcessLogic() {
     const connections: Connections = {}
 
     // Save new connection
-    this.onConnect((event) => {
+    onConnect((event) => {
       const win = event.sender
       const winId = win.id
 
@@ -104,36 +99,39 @@ class SharedMutations {
     })
 
     // Subscribe on changes from renderer processes
-    this.onNotifyMain((event, { type, payload } = { type: '', payload: null }) => {
-      this.store.dispatch(type, payload)
+    onNotifyMain((event, { type, payload } = { type: '', payload: null }) => {
+      store.dispatch(type, payload)
     })
 
     // Subscribe on changes from Vuex store
-    this.store.subscribe((mutation: MutationPayload) => {
+    store.subscribe((mutation: MutationPayload) => {
       const { type, payload } = mutation
 
       // Forward changes to renderer processes
-      SharedMutations.notifyRenderers(connections, { type, payload })
+      notifyRenderers(connections, { type, payload })
     })
   }
 
-  activatePlugin() {
-    switch (this.type) {
+  function start() {
+    switch (processType) {
       case 'renderer':
-        this.rendererProcessLogic()
+        rendererProcessLogic()
         break
       case 'main':
-        this.mainProcessLogic()
+        mainProcessLogic()
         break
       default:
         throw new Error('[Vuex Electron] Type should be "renderer" or "main".')
     }
+  }
+  return {
+    start,
   }
 }
 
 export default (): Plugin<unknown> => (store) => {
   const isPreload = !!(typeof window !== 'undefined' && window.ElectronVuexIsPreload)
   if (isPreload) return
-  const sharedMutations = new SharedMutations(store)
-  sharedMutations.activatePlugin()
+  const sharedMutations = SharedMutations(store)
+  sharedMutations.start()
 }

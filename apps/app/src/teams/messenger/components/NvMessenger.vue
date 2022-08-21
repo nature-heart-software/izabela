@@ -7,18 +7,30 @@
       >
         <!-- Top -->
         <div class="flex space-x-4">
-          <NvButton icon-name="info" type="plain" />
+          <a href="https://github.com/nature-heart-software/izabela" target="_blank">
+            <span class="hidden">GitHub</span>
+            <NvButton icon-name="info" type="plain" />
+          </a>
           <NvCard size="xs">
             <div class="inline-flex space-x-2">
-              <NvButton icon-name="github-alt" size="sm" />
-              <NvButton icon-name="twitter-alt" size="sm" />
-              <NvButton icon-name="discord" size="sm" />
+              <a href="https://github.com/nature-heart-software/izabela" target="_blank">
+                <span class="hidden">GitHub</span>
+                <NvButton icon-name="github-alt" size="sm" />
+              </a>
+              <a href="https://twitter.com/wurielle" target="_blank">
+                <span class="hidden">Twitter</span>
+                <NvButton icon-name="twitter-alt" size="sm" />
+              </a>
+              <a href="https://discord.gg/BmWtmYmaeQ" target="_blank">
+                <span class="hidden">Discord</span>
+                <NvButton icon-name="discord" size="sm" />
+              </a>
             </div>
           </NvCard>
           <div class="flex flex-1 justify-end space-x-4 moveable-handle cursor-all-scroll">
             <NvCard class="flex-1 min-h-8" size="xs">
               <div class="inline-flex space-x-2">
-                <template v-if="$store.getters['settings/persisted'].debugMode">
+                <template v-if="store.getters['settings/persisted'].debugMode">
                   <NvButton icon-name="redo" size="sm" @click="reload" />
                   <NvButton icon-name="brackets-curly" size="sm" @click="openDevTools" />
                 </template>
@@ -26,9 +38,15 @@
             </NvCard>
             <NvCard size="xs">
               <div class="inline-flex items-center space-x-2">
+                <NvButton icon-name="question-circle" size="sm" />
+                <NvDivider class="h-3" direction="vertical" />
                 <NvButton icon-name="comment-alt-lines" size="sm" />
                 <NvDivider class="h-3" direction="vertical" />
-                <NvButton icon-name="setting" size="sm" />
+                <NvButton
+                  @click="navigateTo({ name: 'settings-overview' })"
+                  icon-name="setting"
+                  size="sm"
+                />
               </div>
             </NvCard>
             <NvCard class="inline-flex" size="sm">
@@ -44,95 +62,87 @@
         <!-- Middle -->
         <div class="flex justify-between">
           <NvCard class="inline-flex items-center space-x-3" size="sm">
-            <span ref="settingsToggler">
-              <NvButton icon-name="setting" size="sm" />
-            </span>
+            <NvButton
+              @click="navigateTo({ name: 'settings-speech' })"
+              icon-name="setting"
+              size="sm"
+            />
             <NvDivider class="h-3" direction="vertical" />
             <SpeechEngineSelect
-              :modelValue="$store.getters['settings/persisted'].selectedSpeechEngine"
+              :modelValue="store.getters['speech/selectedSpeechEngine']"
               class="w-13"
               icon-name="direction"
               placeholder="Speech Engine"
               size="sm"
               @update:modelValue="
                 (value) =>
-                  $store.dispatch('settings/setProperty', ['persisted.selectedSpeechEngine', value])
+                  store.dispatch('settings/setProperty', ['persisted.selectedSpeechEngine', value])
               "
             />
-            <template v-if="$store.getters['settings/persisted'].selectedSpeechEngine === 'gctts'">
-              <GCTTSVoiceSelect
-                :modelValue="$store.getters['settings/persisted'].GCTTSSelectedVoice"
+            <template v-if="store.getters['speech/currentSpeechEngine']">
+              <component
+                :is="store.getters['speech/currentSpeechEngine'].voiceSelectComponent"
+                v-if="store.getters['speech/currentSpeechEngine'].voiceSelectComponent"
                 class="w-13"
                 placeholder="Speech Voice"
                 size="sm"
-                @update:modelValue="
-                  (value) =>
-                    $store.dispatch('settings/setProperty', ['persisted.GCTTSSelectedVoice', value])
-                "
-              />
-            </template>
-            <template v-if="$store.getters['settings/persisted'].selectedSpeechEngine === 'iwtts'">
-              <IWTTSVoiceSelect
-                :modelValue="$store.getters['settings/persisted'].IWTTSSelectedVoice"
-                class="w-13"
-                placeholder="Speech Voice"
-                size="sm"
-                @update:modelValue="
-                  (value) =>
-                    $store.dispatch('settings/setProperty', ['persisted.IWTTSSelectedVoice', value])
-                "
-              />
-            </template>
-            <template v-if="$store.getters['settings/persisted'].selectedSpeechEngine === 'matts'">
-              <MATTSVoiceSelect
-                :modelValue="$store.getters['settings/persisted'].MATTSSelectedVoice"
-                class="w-13"
-                placeholder="Speech Voice"
-                size="sm"
-                @update:modelValue="
-                  (value) =>
-                    $store.dispatch('settings/setProperty', ['persisted.MATTSSelectedVoice', value])
-                "
-              />
-            </template>
-            <template v-if="$store.getters['settings/persisted'].selectedSpeechEngine === 'aptts'">
-              <APTTSVoiceSelect
-                :modelValue="$store.getters['settings/persisted'].APTTSSelectedVoice"
-                class="w-13"
-                placeholder="Speech Voice"
-                size="sm"
-                @update:modelValue="
-                  (value) =>
-                    $store.dispatch('settings/setProperty', ['persisted.APTTSSelectedVoice', value])
-                "
-              />
-            </template>
-            <template v-if="$store.getters['settings/persisted'].selectedSpeechEngine === 'saytts'">
-              <SayTTSVoiceSelect
-                :modelValue="$store.getters['settings/persisted'].SayTTSSelectedVoice"
-                class="w-13"
-                placeholder="Speech Voice"
-                size="sm"
-                @update:modelValue="
-                  (value) =>
-                    $store.dispatch('settings/setProperty', [
-                      'persisted.SayTTSSelectedVoice',
-                      value,
-                    ])
-                "
               />
             </template>
             <NvDivider class="h-3" direction="vertical" />
-            <NvButton icon-name="direction" size="sm">Outputs</NvButton>
-            <NvButton icon-name="direction" size="sm">Input</NvButton>
-            <NvDivider class="h-3" direction="vertical" />
-            <NvButton icon-name="question-circle" size="sm" />
+            <NvPopover size="sm" :tippy-options="{ placement: 'top-start' }">
+              <div class="w-screen max-w-full">
+                <NvStack spacing="4">
+                  <NvGroup justify="apart">
+                    <NvText type="label">Play on default playback device</NvText>
+                    <NvSwitch
+                      :modelValue="
+                        store.getters['settings/persisted'].playSpeechOnDefaultPlaybackDevice
+                      "
+                      @update:modelValue="
+                        (value) =>
+                          store.dispatch('settings/setProperty', [
+                            'persisted.playSpeechOnDefaultPlaybackDevice',
+                            value,
+                          ])
+                      "
+                    />
+                  </NvGroup>
+                  <NvDivider direction="horizontal" />
+                  <NvFormItem label="Audio Outputs">
+                    <NvAudioOutputsSelect class="w-full" />
+                  </NvFormItem>
+                </NvStack>
+              </div>
+              <template #reference>
+                <NvButton icon-name="direction" size="sm">Outputs</NvButton>
+              </template>
+            </NvPopover>
+            <NvPopover size="sm" :tippy-options="{ placement: 'top-start' }">
+              <div class="w-screen max-w-full">
+                <NvStack spacing="4">
+                  <NvFormItem label="Audio Input">
+                    <NvAudioInputsSelect class="w-full" />
+                  </NvFormItem>
+                </NvStack>
+              </div>
+              <template #reference>
+                <NvButton icon-name="direction" size="sm">Input</NvButton>
+              </template>
+            </NvPopover>
           </NvCard>
           <NvCard class="inline-flex items-center space-x-3" size="sm">
-            <NvButton size="sm" type="plain">Sentence</NvButton>
-            <NvButton size="sm">Word</NvButton>
-            <NvDivider class="h-3" direction="vertical" />
-            <NvButton icon-name="question-circle" size="sm" />
+            <NvButton
+              :type="store.getters['settings/persisted'].messageMode === 'sentence' && 'plain'"
+              size="sm"
+              @click="store.dispatch('settings/setProperty', ['persisted.messageMode', 'sentence'])"
+              >Sentence
+            </NvButton>
+            <NvButton
+              :type="store.getters['settings/persisted'].messageMode === 'word' && 'plain'"
+              size="sm"
+              @click="store.dispatch('settings/setProperty', ['persisted.messageMode', 'word'])"
+              >Word
+            </NvButton>
           </NvCard>
         </div>
 
@@ -145,7 +155,12 @@
               class="w-full"
               placeholder="So, said the angel to the child who, divided, broke the knife.."
               size="lg"
+              @blur="store.dispatch('messenger/setProperty', ['isInputFocused', false])"
+              @focus="store.dispatch('messenger/setProperty', ['isInputFocused', true])"
               @keydown.enter="playMessage()"
+              @keydown.space="
+                store.getters['settings/persisted'].messageMode === 'word' && playMessage()
+              "
             />
             <NvButton icon-name="message" size="lg" @click="playMessage()" />
           </NvCard>
@@ -180,23 +195,32 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ComponentPublicInstance, computed, defineProps, onMounted, ref } from 'vue'
+import { ComponentPublicInstance, computed, defineProps, onMounted, ref, watch } from 'vue'
 import Moveable from 'vue3-moveable'
-import { NvButton, NvCard } from '@/core/components'
+import {
+  NvButton,
+  NvCard,
+  NvDivider,
+  NvInput,
+  NvPopover,
+  NvFormItem,
+  NvStack,
+  NvGroup,
+  NvSwitch,
+  NvText,
+} from '@packages/ui'
 import DomBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
-import NvDivider from '@/core/components/Divider/NvDivider.vue'
-import NvInput from '@/core/components/Input/NvInput.vue'
-import store from '@/store'
-import { useSettingsPopover } from '@/entities/settings/hooks'
-import SpeechEngineSelect from '@/entities/speech/components/inputs/SpeechEngineSelect.vue'
-import APTTSVoiceSelect from '@/entities/speech/components/inputs/APTTSVoiceSelect.vue'
-import IWTTSVoiceSelect from '@/entities/speech/components/inputs/IWTTSVoiceSelect.vue'
-import GCTTSVoiceSelect from '@/entities/speech/components/inputs/GCTTSVoiceSelect.vue'
-import MATTSVoiceSelect from '@/entities/speech/components/inputs/MATTSVoiceSelect.vue'
-import SayTTSVoiceSelect from '@/entities/speech/components/inputs/SayTTSVoiceSelect.vue'
+import { useRouterViewPopover } from '@/entities/router/hooks'
+import SpeechEngineSelect from '@/entities/speech/components/inputs/NvSpeechEngineSelect.vue'
+import { useStore } from 'vuex'
+import { emitIPCSay } from '@/electron/events/renderer'
+import NvAudioOutputsSelect from '@/entities/audio/components/inputs/NvAudioOutputsSelect.vue'
+import NvAudioInputsSelect from '@/entities/audio/components/inputs/NvAudioInputSelect.vue'
+import { RouteLocationRaw, useRouter } from 'vue-router'
 
-const { ElectronMessengerWindow, ipc } = window
-const componentProps = defineProps({
+const store = useStore()
+const { ElectronMessengerWindow } = window
+const props = defineProps({
   width: {
     type: Number,
     default: null,
@@ -229,20 +253,24 @@ const componentProps = defineProps({
 
 const messenger = ref()
 
-const settingsToggler = ref()
-
 const moveable = ref()
 const moveableTarget = ref()
 const messengerInput = ref()
 
 const inputValue = ref('')
 const doc = document
-useSettingsPopover({
+const settingsPopover = useRouterViewPopover({
   popoverTarget: messenger,
   popoverOptions: {
-    triggerTarget: settingsToggler,
+    trigger: 'manual',
   },
 })
+
+const router = useRouter()
+const navigateTo = (location: RouteLocationRaw) => {
+  router.push(location)
+  settingsPopover.popover.value?.show()
+}
 
 const viewport = computed(() => ({
   width: Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0),
@@ -279,15 +307,15 @@ const onDrag = (event: any) => {
 
 const playMessage = () => {
   if (inputValue.value) {
-    ipc.sendTo('speech-worker', 'say', inputValue.value)
+    emitIPCSay(inputValue.value)
     inputValue.value = ''
   }
 }
 
 const onWindowFocus = () => {
-  // const componentInstance = messengerInput.value as ComponentPublicInstance
-  // const input = componentInstance.$el.querySelector('input')
-  // if (input) input.focus()
+  const componentInstance = messengerInput.value as ComponentPublicInstance
+  const input = componentInstance.$el.querySelector('input')
+  if (input) input.focus()
 }
 
 const onWindowBlur = () => {
@@ -296,25 +324,30 @@ const onWindowBlur = () => {
   if (input) input.blur()
 }
 
-const addEventListeners = () => {
-  ipc.on('main', 'focus', onWindowFocus)
-  ipc.on('main', 'blur', onWindowBlur)
-}
+watch(
+  () => store.state.messenger.isFocused,
+  () => {
+    if (store.state.messenger.isFocused) {
+      onWindowFocus()
+    } else {
+      onWindowBlur()
+    }
+  },
+)
 
 onMounted(() => {
   const moveableTargetEl = (moveableTarget.value as ComponentPublicInstance)
     .$el as HTMLDivElement | null
   if (moveableTargetEl) {
-    if (componentProps.width) moveableTargetEl.style.width = `${componentProps.width}px`
-    if (componentProps.minWidth) moveableTargetEl.style.minWidth = `${componentProps.minWidth}px`
-    if (componentProps.maxWidth) moveableTargetEl.style.maxWidth = `${componentProps.maxWidth}px`
-    if (componentProps.height) moveableTargetEl.style.height = `${componentProps.height}px`
-    if (componentProps.minHeight) moveableTargetEl.style.minHeight = `${componentProps.minHeight}px`
-    if (componentProps.maxHeight) moveableTargetEl.style.maxHeight = `${componentProps.maxHeight}px`
-    if (componentProps.transform) moveableTargetEl.style.transform = componentProps.transform
+    if (props.width) moveableTargetEl.style.width = `${props.width}px`
+    if (props.minWidth) moveableTargetEl.style.minWidth = `${props.minWidth}px`
+    if (props.maxWidth) moveableTargetEl.style.maxWidth = `${props.maxWidth}px`
+    if (props.height) moveableTargetEl.style.height = `${props.height}px`
+    if (props.minHeight) moveableTargetEl.style.minHeight = `${props.minHeight}px`
+    if (props.maxHeight) moveableTargetEl.style.maxHeight = `${props.maxHeight}px`
+    if (props.transform) moveableTargetEl.style.transform = props.transform
   }
   moveable.value.updateTarget()
-  addEventListeners()
 
   /* This fixes focus on focusable elements. Focus won't work unless
    * the window has been dragged once with draggable for some reasons

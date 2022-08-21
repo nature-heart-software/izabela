@@ -1,0 +1,27 @@
+{
+  "name": "@packages/generate-exports",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "microbundle --target=node",
+    "dev": "microbundle --target=node watch"
+  },
+  "source": "src/main.ts",
+  "main": "./dist/generate-exports.cjs",
+  "module": "./dist/generate-exports.es.js",
+  "unpkg": "./dist/generate-exports.umd.js",
+  "types": "./dist/main.d.ts",
+  "files": [
+    "/dist"
+  ],
+  "dependencies": {
+    "chokidar": "^3.5.3",
+    "globby": "^11.1.0"
+  },
+  "devDependencies": {
+    "microbundle": "^0.15.1",
+    "typescript": "^4.6.4",
+    "vite": "^3.0.0"
+  }
+}

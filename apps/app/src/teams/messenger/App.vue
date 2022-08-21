@@ -1,10 +1,11 @@
 <template>
-  <ThemeProvider :theme="$store.getters['theme']">
-    <template v-if="ready">
+  <ThemeProvider :theme="tokens">
+    <template v-if="isReady">
+      <NvBackground />
       <div class="h-0">
         <NvMessenger
           :min-width="768"
-          :transform="$store.getters['messenger/persisted'].position.transform"
+          :transform="store.getters['messenger/persisted'].position.transform"
           class="w-full h-full"
         />
       </div>
@@ -20,14 +21,13 @@ body {
 }
 </style>
 <script lang="ts" setup>
-import { ref } from 'vue'
 import { ThemeProvider } from 'vue3-styled-components'
 import NvMessenger from '@/teams/messenger/components/NvMessenger.vue'
+import { tokens } from '@packages/ui'
+import useStoreReady from '@/hooks/useStoreReady'
+import NvBackground from '@/teams/messenger/components/NvBackground.vue'
 import { useStore } from 'vuex'
 
+const { data: isReady } = useStoreReady()
 const store = useStore()
-const ready = ref(false)
-store.state['electron-vuex'].ready().then(() => {
-  ready.value = true
-})
 </script>

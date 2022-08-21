@@ -1,25 +1,26 @@
 {
-  "name": "@izabela/generate-exports-webpack-plugin",
-  "version": "1.0.0",
-  "description": "",
-  "source": "src/index.ts",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "name": "@packages/generate-exports-webpack-plugin",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "source": "src/main.ts",
   "scripts": {
-    "watch": "parcel watch",
-    "build": "parcel build"
+    "build": "microbundle --target=node",
+    "dev": "microbundle --target=node watch"
   },
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@types/node": "^17.0.4",
-    "parcel": "^2.0.1"
-  },
+  "main": "./dist/generate-exports-webpack-plugin.cjs",
+  "module": "./dist/generate-exports-webpack-plugin.es.js",
+  "unpkg": "./dist/generate-exports-webpack-plugin.umd.js",
+  "types": "./dist/main.d.ts",
+  "files": [
+    "/dist"
+  ],
   "dependencies": {
-    "chokidar": "^3.5.2",
-    "globby": "^11.0.4"
+    "@packages/generate-exports": "*"
   },
-  "engines": {
-    "node": ">= 12"
+  "devDependencies": {
+    "microbundle": "^0.15.1",
+    "typescript": "^4.6.4",
+    "vite": "^3.0.0"
   }
 }

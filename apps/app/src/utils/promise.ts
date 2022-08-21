@@ -1,22 +1,22 @@
-export class Deferred<T> {
-  public readonly promise: Promise<T>
+export function Deferred<T>() {
+  let resolveFn!: (value: T | PromiseLike<T>) => void
+  let rejectFn!: (reason?: any) => void
+  const promise: Promise<T> = new Promise<T>((rslv, rjct) => {
+    resolveFn = rslv
+    rejectFn = rjct
+  })
 
-  private resolveFn!: (value: T | PromiseLike<T>) => void
-
-  private rejectFn!: (reason?: any) => void
-
-  public constructor() {
-    this.promise = new Promise<T>((resolve, reject) => {
-      this.resolveFn = resolve
-      this.rejectFn = reject
-    })
+  function reject(reason?: any): void {
+    rejectFn(reason)
   }
 
-  public reject(reason?: any): void {
-    this.rejectFn(reason)
+  function resolve(param: T): void {
+    resolveFn(param)
   }
 
-  public resolve(param: T): void {
-    this.resolveFn(param)
+  return {
+    promise,
+    resolve,
+    reject,
   }
 }

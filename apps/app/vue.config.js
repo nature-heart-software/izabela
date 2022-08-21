@@ -1,11 +1,11 @@
 const path = require('path')
 const { defineConfig } = require('@vue/cli-service')
-const GenerateExportsPlugin = require('@izabela/generate-exports-webpack-plugin')
+const GenerateExportsPlugin = require('@packages/generate-exports-webpack-plugin')
 const GenerateModulesPlugin = require('@wurielle/generate-modules-webpack-plugin')
 const WebpackNotifierPlugin = require('webpack-notifier')
 
 const setConfigAliases = (config) => {
-  config.resolve.alias.set('@package', path.resolve(__dirname, './package.json'))
+  config.resolve.alias.set('@root', path.resolve(__dirname, './'))
 }
 
 module.exports = defineConfig({
@@ -17,22 +17,18 @@ module.exports = defineConfig({
   configureWebpack: {
     plugins: [
       new WebpackNotifierPlugin({ emoji: true }),
-      new GenerateExportsPlugin([
-        {
-          omitExtension: false,
-          omitSemi: true,
-          filename: 'index.ts',
-          include: ['**/*.vue'],
-          directories: ['./src/core/components'],
-        },
-        {
-          omitExtension: true,
-          omitSemi: true,
-          filename: 'index.ts',
-          include: ['**/*.ts'],
-          directories: ['./src/hooks'],
-        },
-      ]),
+      new GenerateExportsPlugin({
+        watch: process.env.NODE_ENV === 'development',
+        entries: [
+          {
+            omitExtension: true,
+            omitSemi: true,
+            filename: 'index.ts',
+            include: ['**/*.ts'],
+            directories: ['./src/hooks'],
+          },
+        ],
+      }),
       new GenerateModulesPlugin([
         {
           pattern: './src/styles/tokens.ts',
@@ -43,32 +39,30 @@ module.exports = defineConfig({
   },
   chainWebpack: (config) => {
     setConfigAliases(config)
+
+    // https://github.com/vuejs/core/issues/4344#issuecomment-912627569
+    config.resolve.symlinks(false)
+    config.resolve.alias.set('vue', path.resolve('./node_modules/vue'))
   },
   pluginOptions: {
     electronBuilder: {
       externals: ['iohook', '@izabela/app-server', '@google-cloud/speech'],
       chainWebpackMainProcess: (config) => {
         setConfigAliases(config)
-        config.module
-          .rule('babel')
-          .before('ts')
-          .use('babel')
-          .loader('babel-loader')
-          .options({
-            plugins: [['inline-json-import', {}]],
-          })
       },
       /* Documentation:
        * https://nklayman.github.io/vue-cli-plugin-electron-builder/guide/configuration.html
        */
+      mainProcessFile: 'src/electron/background.ts',
       mainProcessWatch: [
         './src/**/{electron,node}*/*',
         './src/**/{electron,node}*',
+        './src/**/store/*',
         '../../libs/**/{electron,node}*/*',
         '../../libs/**/{electron,node}*',
       ],
       preload: {
-        preload: 'src/preload.ts',
+        preload: 'src/electron/preload.ts',
       },
       builderOptions: {
         appId: 'com.nhs.izabela',

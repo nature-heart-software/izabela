@@ -6,28 +6,34 @@ export type Instances = {
   [key: string]: Instance
 }
 
-class ElectronWindowManager {
-  private instances: Instances = {}
+const ElectronWindowManager = () => {
+  const instances: Instances = {}
 
-  async registerInstance(
+  async function registerInstance(
     name: string,
     createWindow: (winName: string) => Promise<Electron.BrowserWindow>,
   ): Promise<Instance> {
     const window = await createWindow(name)
-    this.instances[name] = {
+    instances[name] = {
       name,
       window,
     }
-    return this.instances[name]
+    return instances[name]
   }
 
-  getInstanceByName(name: string): Instance | undefined {
-    return this.instances[name]
+  function getInstanceByName(name: string): Instance | undefined {
+    return instances[name]
   }
 
-  getInstances(): Instance[] {
-    return Object.values(this.instances)
+  function getInstances(): Instance[] {
+    return Object.values(instances)
+  }
+
+  return {
+    getInstances,
+    getInstanceByName,
+    registerInstance,
   }
 }
 
-export default new ElectronWindowManager()
+export default ElectronWindowManager()

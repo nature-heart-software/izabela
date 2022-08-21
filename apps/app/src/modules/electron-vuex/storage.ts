@@ -1,27 +1,32 @@
 import ElectronStore from 'electron-store'
-import { bridge, isRenderer } from '@izabela/electron-bridger'
+import { bridge, isRenderer } from '@packages/electron-bridger'
 
-class ElectronVuexStorage {
-  store: ElectronStore | null = null
+const ElectronVuexStorage = () => {
+  const store: ElectronStore | null = isRenderer ? null : new ElectronStore({ name: 'vuex' })
 
-  constructor() {
-    this.store = isRenderer ? null : new ElectronStore({ name: 'vuex' })
-  }
+  return {
+    store,
+    set(...args: [string, unknown]) {
+      if (!store) return
+      // eslint-disable-next-line consistent-return
+      return store.set(...args)
+    },
 
-  ['set'](...args: [string, unknown]) {
-    if (!this.store) return
-    return this.store.set(...args)
-  }
+    get(...args: [string]) {
+      if (!store) return
+      // eslint-disable-next-line consistent-return
+      return store.get(...args)
+    },
 
-  ['get'](...args: [string]) {
-    if (!this.store) return
-    return this.store.get(...args)
-  }
-
-  ['delete'](...args: [string]) {
-    if (!this.store) return
-    return this.store.delete(...args)
+    delete(...args: [string]) {
+      if (!store) return
+      // eslint-disable-next-line consistent-return
+      return store.delete(...args)
+    },
   }
 }
+const electronVuexStorage = ElectronVuexStorage()
 
-export default bridge.new('ElectronVuexStorage', ElectronVuexStorage)()
+bridge.register([['ElectronVuexStorage', () => electronVuexStorage]])
+
+export default electronVuexStorage

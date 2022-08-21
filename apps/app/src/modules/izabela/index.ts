@@ -5,4 +5,4 @@
 
 import Izabela from './Izabela'
 
-export default new Izabela()
+export default Izabela()
