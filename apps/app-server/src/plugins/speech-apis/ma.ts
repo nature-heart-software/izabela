@@ -41,7 +41,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
     {
       body: {
         credentials: { apiKey, region },
-        payload: { text, voice },
+        payload: { text, voice, expression },
       },
     },
     res,
@@ -63,17 +63,32 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
 
       const synthesizer = new SpeechSynthesizer(speechConfig, audioConfig)
       const audioContent: ArrayBuffer = await new Promise((resolve, reject) => {
-        synthesizer.speakTextAsync(
-          text,
-          (result) => {
-            resolve(result.audioData)
-            synthesizer.close()
-          },
-          (error) => {
-            reject(error)
-            synthesizer.close()
-          },
-        )
+        if (expression) {
+          const ssml = `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US"><voice name="${voice.ShortName}"><mstts:express-as style="${expression}">${text}</mstts:express-as></voice></speak>`
+          synthesizer.speakSsmlAsync(
+            ssml,
+            (result) => {
+              resolve(result.audioData)
+              synthesizer.close()
+            },
+            (error) => {
+              reject(error)
+              synthesizer.close()
+            },
+          )
+        } else {
+          synthesizer.speakTextAsync(
+            text,
+            (result) => {
+              resolve(result.audioData)
+              synthesizer.close()
+            },
+            (error) => {
+              reject(error)
+              synthesizer.close()
+            },
+          )
+        }
       })
 
       const writeFile = util.promisify(fs.writeFile)

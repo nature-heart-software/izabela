@@ -4,7 +4,7 @@ import { registerEngine } from '@/modules/speech-engine-manager'
 import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME } from './consts'
-import { getProperty } from './store'
+import { setProperty, getProperty } from './store'
 
 registerEngine({
   id: ENGINE_ID,
@@ -33,4 +33,5 @@ registerEngine({
   },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,
+  store: { setProperty, getProperty },
 })
