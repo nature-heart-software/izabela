@@ -38,6 +38,8 @@
             </NvCard>
             <NvCard size="xs">
               <div class="inline-flex items-center space-x-2">
+                <NvButton icon-name="question-circle" size="sm" />
+                <NvDivider class="h-3" direction="vertical" />
                 <NvButton icon-name="comment-alt-lines" size="sm" />
                 <NvDivider class="h-3" direction="vertical" />
                   <NvButton @click="navigateTo({ name: 'settings-overview' })" icon-name="setting" size="sm" />
@@ -119,8 +121,6 @@
                 <NvButton icon-name="direction" size="sm">Input</NvButton>
               </template>
             </NvPopover>
-            <NvDivider class="h-3" direction="vertical" />
-            <NvButton icon-name="question-circle" size="sm" />
           </NvCard>
           <NvCard class="inline-flex items-center space-x-3" size="sm">
             <NvButton
@@ -135,8 +135,6 @@
               @click="store.dispatch('settings/setProperty', ['persisted.messageMode', 'word'])"
               >Word
             </NvButton>
-            <NvDivider class="h-3" direction="vertical" />
-            <NvButton icon-name="question-circle" size="sm" />
           </NvCard>
         </div>
 
