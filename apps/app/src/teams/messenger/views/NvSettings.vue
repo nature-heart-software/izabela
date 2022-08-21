@@ -83,16 +83,14 @@ const navigation = [
       },
       {
         name: 'Dictionary',
+        to: { name: 'settings-dictionary' },
       },
       {
         name: 'Keybindings',
       },
       {
         name: 'Startup',
-        to: { name: 'settings-update' },
-      },
-      {
-        name: 'Performance',
+        to: { name: 'settings-startup' },
       },
       {
         name: 'Update',

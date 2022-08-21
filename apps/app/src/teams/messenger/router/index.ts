@@ -22,8 +22,13 @@ const routes: Array<RouteRecordRaw> = [
         component: import('@/teams/messenger/views/NvSettingsAudio.vue')
       },
       {
-        name: 'settings-update',
-        path: 'update',
+        name: 'settings-dictionary',
+        path: 'dictionary',
+        component: import('@/teams/messenger/views/NvSettingsDictionary.vue')
+      },
+      {
+        name: 'settings-startup',
+        path: 'startup',
         component: import('@/teams/messenger/views/NvSettingsStartup.vue')
       },
       {
