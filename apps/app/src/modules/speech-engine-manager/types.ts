@@ -3,7 +3,6 @@ import { Component } from 'vue'
 
 export type Credentials = { [key: string]: any }
 export type Payload = { [key: string]: any }
-type Lazy<T> = () => Promise<T>
 
 export interface SpeechEngine {
   id: string
@@ -18,4 +17,9 @@ export interface SpeechEngine {
   hasCredentials?: () => boolean
   voiceSelectComponent: Component
   settingsComponent: Component
+  commands?: {
+    name: string
+    value: string
+    description?: string
+  }[]
 }
