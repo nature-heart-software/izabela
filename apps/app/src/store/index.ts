@@ -4,6 +4,7 @@ import { createPersistedState, createSharedMutations } from '@/modules/electron-
 import messenger from '@/teams/messenger/store'
 import settings from '@/entities/settings/store'
 import speech from '@/entities/speech/store'
+import dictionary from '@/entities/dictionary/store'
 import { SetPropertyPayload, utilActions, utilMutations } from '@/utils/vuex'
 import domBoundariesStore from '@/modules/vue-dom-boundaries/dom-boundaries.store'
 import { defaultsDeep, get, set } from 'lodash'
@@ -30,6 +31,7 @@ const store = createStore({
     messenger,
     settings,
     speech,
+    dictionary,
   },
   plugins: [
     ...(process.env.STORYBOOK
