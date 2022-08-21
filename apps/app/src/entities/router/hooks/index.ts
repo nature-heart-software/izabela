@@ -9,7 +9,10 @@ export type UseRouterViewPopoverOptions = {
   popoverOptions?: TippyOptions
 }
 
-export const useRouterViewPopover = ({ popoverTarget, popoverOptions }: UseRouterViewPopoverOptions) => {
+export const useRouterViewPopover = ({
+  popoverTarget,
+  popoverOptions,
+}: UseRouterViewPopoverOptions) => {
   const popover: Ref<TippyHookInstance | undefined> = ref()
   if (popoverTarget) {
     popover.value = useTippy(popoverTarget, {
