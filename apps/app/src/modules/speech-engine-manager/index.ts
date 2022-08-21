@@ -9,7 +9,8 @@ const SpeechEngineManager = () => {
   function withDictionary(speechEngine: SpeechEngine): SpeechEngine {
     return {
       ...speechEngine,
-      getPayload: (text) => speechEngine.getPayload(store.getters['dictionary/translateText'](text))
+      getPayload: (text) =>
+        speechEngine.getPayload(store.getters['dictionary/translateText'](text)),
     }
   }
 
