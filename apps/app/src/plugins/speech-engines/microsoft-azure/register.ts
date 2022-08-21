@@ -16,6 +16,7 @@ const commands: SpeechEngine['commands'] = [
   { name: 'chat', value: 'chat'},
   { name: 'customerservice', value: 'customerservice'},
   { name: 'newscast', value: 'newscast'},
+  { name: 'angry', value: 'angry'},
   { name: 'cheerful', value: 'cheerful'},
   { name: 'sad', value: 'sad'},
   { name: 'excited', value: 'excited'},
