@@ -2,7 +2,9 @@ import { createStore, MutationPayload } from 'vuex'
 
 import { createPersistedState, createSharedMutations } from '@/modules/electron-vuex'
 import messenger from '@/teams/messenger/store'
+// eslint-disable-next-line import/no-cycle
 import settings from '@/entities/settings/store'
+// eslint-disable-next-line import/no-cycle
 import speech from '@/entities/speech/store'
 import dictionary from '@/entities/dictionary/store'
 import { SetPropertyPayload, utilActions, utilMutations } from '@/utils/vuex'
