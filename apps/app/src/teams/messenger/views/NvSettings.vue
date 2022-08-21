@@ -28,7 +28,7 @@
                           size="sm"
                           type="ghost-alt"
                           class="w-full"
-                        >{{ entry.name }}
+                          >{{ entry.name }}
                         </NvButton>
                       </router-link>
                     </template>
@@ -40,12 +40,9 @@
           <div class="settings__content flex-1 pl-4">
             <div class="h-full relative">
               <!-- View -->
-              <router-view  v-slot="{ Component }">
+              <router-view v-slot="{ Component }">
                 <Transition class="transition">
-                  <div
-                    :key="Component"
-                    class="absolute inset-0 overflow-y-auto"
-                  >
+                  <div :key="Component" class="absolute inset-0 overflow-y-auto">
                     <component :is="Component" />
                   </div>
                 </Transition>
