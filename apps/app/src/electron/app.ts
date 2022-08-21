@@ -97,7 +97,7 @@ const App = () => {
       exec('Register app listeners', () => addEventListeners()),
       exec('Configure app defaults', () => configureAppDefaults()),
       exec('Register updater', () => registerElectronUpdater()),
-      exec('Register startup', () => registerElectronStartup()),
+      exec('Register update', () => registerElectronStartup()),
       exec('Register debug', () => registerElectronDebug()),
       exec('Bridge modules', () => bridgeModules()),
       exec('Create tray', () => createTray()),

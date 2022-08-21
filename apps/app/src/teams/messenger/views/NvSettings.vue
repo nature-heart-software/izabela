@@ -89,9 +89,14 @@ const navigation = [
       },
       {
         name: 'Startup',
+        to: { name: 'settings-update' },
       },
       {
         name: 'Performance',
+      },
+      {
+        name: 'Update',
+        to: { name: 'settings-update' },
       },
     ],
   },

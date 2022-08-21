@@ -5,7 +5,7 @@ export default () =>
   app.whenReady().then(() =>
     store.getters.isReady().then(() => {
       const { launchOnStartup } = store.getters['settings/persisted']
-      console.log('[electron-startup] Launch on startup:', launchOnStartup)
+      console.log('[electron-update] Launch on update:', launchOnStartup)
       app.setLoginItemSettings({
         openAtLogin: launchOnStartup,
         path: app.getPath('exe'),

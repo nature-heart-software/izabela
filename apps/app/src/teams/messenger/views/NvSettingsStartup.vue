@@ -1,16 +1,17 @@
 <template>
   <NvStack spacing="6">
     <NvStack>
-      <NvText type="subtitle">Development</NvText>
+      <NvText type="subtitle">Startup</NvText>
       <NvCard>
         <NvGroup justify="apart" no-wrap spacing="5">
           <NvStack>
-            <NvText type="label">Debug mode</NvText>
+            <NvText type="label">Launch on startup</NvText>
           </NvStack>
           <NvSwitch
-            :modelValue="store.getters['settings/persisted'].debugMode"
+            :modelValue="store.getters['settings/persisted'].launchOnStartup"
             @update:modelValue="
-              (value) => store.dispatch('settings/setProperty', ['persisted.debugMode', value])
+              (value) =>
+                store.dispatch('settings/setProperty', ['persisted.launchOnStartup', value])
             "
           />
         </NvGroup>
