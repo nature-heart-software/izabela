@@ -1,9 +1,9 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import tokens from '@/styles/tokens'
 import { Story } from '@storybook/vue3'
-import NvIcon from './NvIcon.vue'
 import { props } from './icon.shared'
-import * as Icons from '@izabela/icons'
+import * as Icons from '@packages/icons'
+import { NvIcon } from '@/components'
 
 export default {
   title: 'Icon',

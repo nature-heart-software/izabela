@@ -1,7 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { Story } from '@storybook/vue3'
-import NvCenter from './NvCenter.vue'
-import NvButton from '../Button/NvButton.vue'
+import {NvCenter, NvButton} from '@/components'
 import { props } from './center.shared'
 
 export default {

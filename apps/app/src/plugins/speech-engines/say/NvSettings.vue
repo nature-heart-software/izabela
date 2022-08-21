@@ -4,6 +4,6 @@
   </NvFormItem>
 </template>
 <script lang="ts" setup>
-import { NvFormItem } from '@izabela/ui'
+import { NvFormItem } from '@packages/ui'
 import NvVoiceSelect from './NvVoiceSelect'
 </script>

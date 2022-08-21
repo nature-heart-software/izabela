@@ -2,7 +2,12 @@
   "name": "root",
   "private": true,
   "scripts": {
-    "serve": "lerna bootstrap && lerna run serve --stream"
+    "install": "npm run bootstrap && npm run build:packages",
+    "bootstrap": "npx lerna bootstrap",
+    "dev": "npx lerna run serve --scope izabela-next --stream",
+    "build": "npm run build:app",
+    "build:deps": "npx lerna run build --scope  '{@packages/*,@apps/app-server}' --stream",
+    "build:app": "npx lerna run build --scope '{@packages/*,izabela-next}' --stream"
   },
   "devDependencies": {
     "@parcel/packager-ts": "^2.0.1",

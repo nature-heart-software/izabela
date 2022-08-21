@@ -1,4 +1,4 @@
-import generateExports from 'generate-exports'
+import { generateExports } from '@packages/generate-exports'
 
 const generateExportsPlugin = (...args: Parameters<typeof generateExports>) => {
   const instance = generateExports(...args)

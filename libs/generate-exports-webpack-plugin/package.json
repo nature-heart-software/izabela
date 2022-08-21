@@ -1,5 +1,5 @@
 {
-  "name": "generate-exports-webpack-plugin",
+  "name": "@packages/generate-exports-webpack-plugin",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -8,20 +8,15 @@
     "build": "microbundle --target=node",
     "dev": "microbundle --target=node watch"
   },
-  "exports": {
-    "import": "./dist/generate-exports-webpack-plugin.module.js",
-    "require": "./dist/generate-exports-webpack-plugin.cjs",
-    "default": "./dist/generate-exports-webpack-plugin.modern.js"
-  },
   "main": "./dist/generate-exports-webpack-plugin.cjs",
-  "module": "./dist/generate-exports-webpack-plugin.module.js",
+  "module": "./dist/generate-exports-webpack-plugin.es.js",
   "unpkg": "./dist/generate-exports-webpack-plugin.umd.js",
   "types": "./dist/main.d.ts",
   "files": [
     "/dist"
   ],
   "dependencies": {
-    "generate-exports": "*"
+    "@packages/generate-exports": "*"
   },
   "devDependencies": {
     "microbundle": "^0.15.1",

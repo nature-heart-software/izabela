@@ -1,5 +1,5 @@
 {
-  "name": "@izabela/ui",
+  "name": "@packages/ui",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -21,6 +21,7 @@
     "polished": "^4.2.2",
     "uuid": "^8.3.2",
     "vue": "^3.2.37",
+    "vue-tippy": "^6.0.0-alpha.63",
     "vue3-styled-components": "^1.2.1"
   },
   "devDependencies": {
@@ -45,8 +46,8 @@
     "vue-tsc": "^0.38.4"
   },
   "optionalDependencies": {
-    "@izabela/icons": "*",
-    "vite-plugin-generate-exports": "*",
-    "vite-plugin-generate-modules": "*"
+    "@packages/icons": "*",
+    "@packages/vite-plugin-generate-exports": "*",
+    "@packages/vite-plugin-generate-modules": "*"
   }
 }

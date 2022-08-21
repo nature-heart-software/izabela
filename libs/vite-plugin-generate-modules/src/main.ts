@@ -1,9 +1,9 @@
-import generateModules from 'generate-modules'
+import { generateModules } from '@packages/generate-modules'
 
 const generateModulesPlugin = (...args: Parameters<typeof generateModules>) => {
   generateModules(...args)
   return {
-    name: 'generate-exports',
+    name: 'generate-modules',
   }
 }
 

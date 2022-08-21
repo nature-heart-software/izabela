@@ -151,7 +151,7 @@ const tailwindTheme = { ...tokens,
     lineHeight,
     letterSpacing
   }]]) => [key, [(0, _polished.rem)(fontSize), {
-    lineHeight: (0, _polished.rem)(lineHeight),
+    lineHeight,
     letterSpacing: (0, _polished.rem)(letterSpacing)
   }]]))
 };

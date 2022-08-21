@@ -1,8 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { ref } from 'vue'
 import { Story } from '@storybook/vue3'
-import NvSelect from './NvSelect.vue'
-import NvOption from './NvOption.vue'
+import { NvSelect, NvOption } from '@/components'
 import { props, sizeValues } from './select.shared'
 
 export default {

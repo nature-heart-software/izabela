@@ -21,9 +21,10 @@ const storeState = {
     audioOutputDevices: [] as MediaDeviceInfo['label'][],
     audioInputDevice: 'default' as MediaDeviceInfo['label'],
     selectedSpeechEngine: ENGINE_ID as SpeechEngine['id'],
-    autoUpdateChannel: channel,
+    updateChannel: channel,
     launchOnStartup: true,
     debugMode: process.env.NODE_ENV === 'development',
+    messageMode: 'sentence' as 'sentence' | 'word',
     recordAudioKeybinding: {
       keys: ['161'],
       modifiers: [],

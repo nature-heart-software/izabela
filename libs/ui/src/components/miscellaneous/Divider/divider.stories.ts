@@ -2,9 +2,9 @@
 import {
   directionValues,
   Direction,
-} from '@/core/components/Divider/divider.shared'
+} from '@/components/miscellaneous/Divider/divider.shared'
 import { Story } from '@storybook/vue3'
-import NvDivider from './NvDivider.vue'
+import { NvDivider } from '@/components'
 
 export default {
   title: 'Divider',

@@ -105,5 +105,3 @@ export const generateModules = (config: {
     initialTransform()
   }
 }
-
-export default generateModules

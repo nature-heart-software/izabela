@@ -23,7 +23,7 @@ body {
 <script lang="ts" setup>
 import { ThemeProvider } from 'vue3-styled-components'
 import NvMessenger from '@/teams/messenger/components/NvMessenger.vue'
-import { tokens } from '@izabela/ui'
+import { tokens } from '@packages/ui'
 import useStoreReady from '@/hooks/useStoreReady'
 import NvBackground from '@/teams/messenger/components/NvBackground.vue'
 import { useStore } from 'vuex'

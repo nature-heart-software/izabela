@@ -18,6 +18,7 @@ export { default as NvCenter } from './miscellaneous/Center/NvCenter.vue'
 export { default as NvDivider } from './miscellaneous/Divider/NvDivider.vue'
 export { default as NvGroup } from './miscellaneous/Group/NvGroup.vue'
 export { default as NvStack } from './miscellaneous/Stack/NvStack.vue'
+export { default as NvPopover } from './overlay/Popover/NvPopover.vue'
 export { default as NvIcon } from './typography/Icon/NvIcon.vue'
 export { default as NvText } from './typography/Text/NvText.vue'
 /* End of auto-generated content. */

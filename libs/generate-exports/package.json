@@ -1,5 +1,5 @@
 {
-  "name": "generate-exports",
+  "name": "@packages/generate-exports",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -8,13 +8,8 @@
     "dev": "microbundle --target=node watch"
   },
   "source": "src/main.ts",
-  "exports": {
-    "import": "./dist/generate-exports.module.js",
-    "require": "./dist/generate-exports.cjs",
-    "default": "./dist/generate-exports.modern.js"
-  },
   "main": "./dist/generate-exports.cjs",
-  "module": "./dist/generate-exports.module.js",
+  "module": "./dist/generate-exports.es.js",
   "unpkg": "./dist/generate-exports.umd.js",
   "types": "./dist/main.d.ts",
   "files": [

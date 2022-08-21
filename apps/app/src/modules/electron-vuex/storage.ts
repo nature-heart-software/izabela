@@ -1,5 +1,5 @@
 import ElectronStore from 'electron-store'
-import { bridge, isRenderer } from '@izabela/electron-bridger'
+import { bridge, isRenderer } from '@packages/electron-bridger'
 
 const ElectronVuexStorage = () => {
   const store: ElectronStore | null = isRenderer ? null : new ElectronStore({ name: 'vuex' })

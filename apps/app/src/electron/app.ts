@@ -4,7 +4,7 @@ import createTray from '@/teams/tray/electron-tray'
 import ElectronWindowManager from '@/modules/electron-window-manager'
 import { createMessengerWindow } from '@/teams/messenger/electron/background'
 import { createSpeechWorkerWindow } from '@/teams/speech-worker/electron/background'
-import server from '@izabela/app-server'
+import server from '@apps/app-server'
 import path from 'path'
 import { bridgeModules } from '@/electron/bridge'
 import registerElectronStartup from '@/modules/electron-startup/register'
@@ -97,7 +97,7 @@ const App = () => {
       exec('Register app listeners', () => addEventListeners()),
       exec('Configure app defaults', () => configureAppDefaults()),
       exec('Register updater', () => registerElectronUpdater()),
-      exec('Register startup', () => registerElectronStartup()),
+      exec('Register update', () => registerElectronStartup()),
       exec('Register debug', () => registerElectronDebug()),
       exec('Bridge modules', () => bridgeModules()),
       exec('Create tray', () => createTray()),

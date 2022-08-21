@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { Story } from '@storybook/vue3'
-import { NvCard, NvText } from '@/core/components'
+import { NvCard, NvText } from '@/components'
 import NvAccessBlocker from './NvAccessBlocker.vue'
 
 export default {

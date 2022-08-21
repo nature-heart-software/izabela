@@ -1,5 +1,5 @@
 import { rem, rgba } from 'polished'
-import { tokens } from '@izabela/ui'
+import { tokens } from '@packages/ui'
 import { CSSObject } from '@/types/css-in-js'
 
 const { borderRadius, spacing } = tokens

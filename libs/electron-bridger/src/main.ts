@@ -71,5 +71,3 @@ export const Bridge = () => {
 }
 
 export const bridge = Bridge()
-
-export default bridge.registeredInstances

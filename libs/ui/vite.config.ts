@@ -2,8 +2,8 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import dts from 'vite-plugin-dts'
 import { resolve } from 'path'
-import generateExportsPlugin from 'vite-plugin-generate-exports'
-import generateModulesPlugin from 'vite-plugin-generate-modules'
+import generateExportsPlugin from '@packages/vite-plugin-generate-exports'
+import generateModulesPlugin from '@packages/vite-plugin-generate-modules'
 
 const mode = (() => {
   const args = process.argv
@@ -43,6 +43,10 @@ export default defineConfig({
       entries: [
         {
           pattern: './src/styles/tokens.ts',
+          into: ['commonjs'],
+        },
+        {
+          pattern: './vite.config.ts',
           into: ['commonjs'],
         },
       ],

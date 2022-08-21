@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import generateExports from 'generate-exports'
+import { generateExports } from '@packages/generate-exports'
 
 generateExports({
   entries: [

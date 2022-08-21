@@ -37,10 +37,3 @@ const iconSize = computed(() => {
   return sizes[props.size]
 })
 </script>
-<script lang="ts">
-// eslint-disable-next-line
-// import { watchBoundary } from '@/modules/vue-dom-boundaries'
-//
-// watchBoundary('.el-select-dropdown')
-export default {}
-</script>
