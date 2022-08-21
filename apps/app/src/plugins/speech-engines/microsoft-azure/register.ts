@@ -4,29 +4,16 @@ import type { SpeechEngine } from '@/modules/speech-engine-manager/types'
 import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME } from './consts'
-import { getProperty } from './store'
+import { setProperty, getProperty } from './store'
 
 const getCredentials = () => ({
   apiKey: getProperty('apiKey', true),
   region: getProperty('region'),
 })
 
-const commands: SpeechEngine['commands'] = [
-  { name: 'assistant', value: 'assistant'},
-  { name: 'chat', value: 'chat'},
-  { name: 'customerservice', value: 'customerservice'},
-  { name: 'newscast', value: 'newscast'},
-  { name: 'angry', value: 'angry'},
-  { name: 'cheerful', value: 'cheerful'},
-  { name: 'sad', value: 'sad'},
-  { name: 'excited', value: 'excited'},
-  { name: 'friendly', value: 'friendly'},
-  { name: 'terrified', value: 'terrified'},
-  { name: 'shouting', value: 'shouting'},
-  { name: 'unfriendly', value: 'unfriendly'},
-  { name: 'whispering', value: 'whispering'},
-  { name: 'hopeful', value: 'hopeful'},
-]
+const commands: SpeechEngine['commands'] = (voice) => (voice.StyleList || []).map((style: string) => (
+  { name: style, value: style}
+))
 
 registerEngine({
   id: ENGINE_ID,
@@ -36,12 +23,14 @@ registerEngine({
     return Object.values(getCredentials()).every(Boolean)
   },
   getPayload(text) {
+    const voice = getProperty('selectedVoice')
     let newText = text
     let expression;
-    if (newText.startsWith('/')) {
-      const command = commands.find(({ name }) => newText.startsWith(`/${name}`))
+    const commandString = newText.split(' ')[0] || ''
+    if (commandString.startsWith('/')) {
+      const command = commands(voice).find(({ name }) => commandString.startsWith(`/${name}`))
+      newText = newText.replace(commandString, '')
       if (command) {
-        newText = newText.replace(`/${command.name}`, '')
         expression = command.value
       }
     }
@@ -67,4 +56,8 @@ registerEngine({
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,
   commands,
+  store: {
+    setProperty,
+    getProperty,
+  }
 })

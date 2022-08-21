@@ -1,5 +1,6 @@
 import { AxiosResponse } from 'axios'
 import { Component } from 'vue'
+import { registerPluginStore } from '@/store'
 
 export type Credentials = { [key: string]: any }
 export type Payload = { [key: string]: any }
@@ -17,9 +18,10 @@ export interface SpeechEngine {
   hasCredentials?: () => boolean
   voiceSelectComponent: Component
   settingsComponent: Component
-  commands?: {
+  commands?: (voice: Record<any, any>) => {
     name: string
     value: string
     description?: string
-  }[]
+  }[],
+  store: ReturnType<typeof registerPluginStore>
 }
