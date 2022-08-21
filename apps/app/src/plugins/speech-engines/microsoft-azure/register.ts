@@ -12,19 +12,19 @@ const getCredentials = () => ({
 })
 
 const commands: SpeechEngine['commands'] = [
-  { name: 'assistant', value: 'assistant'},
-  { name: 'chat', value: 'chat'},
-  { name: 'customerservice', value: 'customerservice'},
-  { name: 'newscast', value: 'newscast'},
-  { name: 'cheerful', value: 'cheerful'},
-  { name: 'sad', value: 'sad'},
-  { name: 'excited', value: 'excited'},
-  { name: 'friendly', value: 'friendly'},
-  { name: 'terrified', value: 'terrified'},
-  { name: 'shouting', value: 'shouting'},
-  { name: 'unfriendly', value: 'unfriendly'},
-  { name: 'whispering', value: 'whispering'},
-  { name: 'hopeful', value: 'hopeful'},
+  { name: 'assistant', value: 'assistant' },
+  { name: 'chat', value: 'chat' },
+  { name: 'customerservice', value: 'customerservice' },
+  { name: 'newscast', value: 'newscast' },
+  { name: 'cheerful', value: 'cheerful' },
+  { name: 'sad', value: 'sad' },
+  { name: 'excited', value: 'excited' },
+  { name: 'friendly', value: 'friendly' },
+  { name: 'terrified', value: 'terrified' },
+  { name: 'shouting', value: 'shouting' },
+  { name: 'unfriendly', value: 'unfriendly' },
+  { name: 'whispering', value: 'whispering' },
+  { name: 'hopeful', value: 'hopeful' },
 ]
 
 registerEngine({
@@ -36,7 +36,7 @@ registerEngine({
   },
   getPayload(text) {
     let newText = text
-    let expression;
+    let expression
     if (newText.startsWith('/')) {
       const command = commands.find(({ name }) => newText.startsWith(`/${name}`))
       if (command) {

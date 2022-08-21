@@ -66,27 +66,27 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
         if (expression) {
           const ssml = `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US"><voice name="${voice.ShortName}"><mstts:express-as style="${expression}">${text}</mstts:express-as></voice></speak>`
           synthesizer.speakSsmlAsync(
-              ssml,
-              (result) => {
-                resolve(result.audioData)
-                synthesizer.close()
-              },
-              (error) => {
-                reject(error)
-                synthesizer.close()
-              },
+            ssml,
+            (result) => {
+              resolve(result.audioData)
+              synthesizer.close()
+            },
+            (error) => {
+              reject(error)
+              synthesizer.close()
+            },
           )
         } else {
           synthesizer.speakTextAsync(
-              text,
-              (result) => {
-                resolve(result.audioData)
-                synthesizer.close()
-              },
-              (error) => {
-                reject(error)
-                synthesizer.close()
-              },
+            text,
+            (result) => {
+              resolve(result.audioData)
+              synthesizer.close()
+            },
+            (error) => {
+              reject(error)
+              synthesizer.close()
+            },
           )
         }
       })
