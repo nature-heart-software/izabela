@@ -5,8 +5,8 @@
   "type": "module",
   "source": "src/main.ts",
   "scripts": {
-    "build": "npx microbundle --target=node",
-    "dev": "npx microbundle --target=node watch"
+    "build": "microbundle --target=node",
+    "dev": "microbundle --target=node watch"
   },
   "main": "./dist/generate-exports-webpack-plugin.cjs",
   "module": "./dist/generate-exports-webpack-plugin.es.js",
