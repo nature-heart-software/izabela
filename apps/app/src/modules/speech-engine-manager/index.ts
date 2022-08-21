@@ -1,11 +1,20 @@
 import { SpeechEngine } from '@/modules/speech-engine-manager/types'
 import { ref } from 'vue'
+// eslint-disable-next-line import/no-cycle
+import store from '@/store'
 
 const SpeechEngineManager = () => {
   const engines = ref<SpeechEngine[]>([])
 
+  function withDictionary(speechEngine: SpeechEngine): SpeechEngine {
+    return {
+      ...speechEngine,
+      getPayload: (text) => speechEngine.getPayload(store.getters['dictionary/translateText'](text))
+    }
+  }
+
   function registerEngine(speechEngine: SpeechEngine) {
-    engines.value.push(speechEngine)
+    engines.value.push(withDictionary(speechEngine))
   }
 
   function getEngineById(id: SpeechEngine['id']) {

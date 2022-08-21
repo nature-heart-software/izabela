@@ -226,7 +226,17 @@ export const store: Module<typeof storeState, any> = {
   getters: {
     state: (state) => state,
     persisted: (state) => state.persisted,
-    definitions: (state) => state.persisted.definitions
+    definitions: (state) => state.persisted.definitions,
+    translateText: (state, getters) => (text: string) => {
+      let newText = text
+      getters.definitions.forEach(([word, definition]: [string, string]) => {
+        newText = newText.replace(
+          new RegExp(`(\\b${word}\\b)`, 'gi'),
+          definition,
+        )
+      })
+      return newText
+    }
   },
   mutations: {
     ...utilMutations,
