@@ -10,8 +10,7 @@
           <NvUpdateChannelSelect
             :modelValue="store.getters['settings/persisted'].updateChannel"
             @update:modelValue="
-              (value) =>
-                store.dispatch('settings/setProperty', ['persisted.updateChannel', value])
+              (value) => store.dispatch('settings/setProperty', ['persisted.updateChannel', value])
             "
           />
         </NvGroup>
