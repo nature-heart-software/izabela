@@ -54,7 +54,7 @@
 </template>
 <script lang="ts" setup>
 import { NvCard, NvGroup, NvStack, NvSwitch, NvText } from '@packages/ui'
-import NvAutoUpdateChannelSelect from '@/entities/settings/components/inputs/NvAutoUpdateChannelSelect.vue'
+import NvAutoUpdateChannelSelect from '@/entities/startup/components/inputs/NvAutoUpdateChannelSelect.vue'
 import { useStore } from 'vuex'
 
 const store = useStore()

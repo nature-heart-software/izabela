@@ -121,13 +121,3 @@ const currentRoute = useRoute()
   }
 }
 </style>
-<style lang="scss">
-.tippy-box[data-theme='settings'] {
-  color: inherit;
-  background-color: transparent;
-
-  .tippy-content {
-    padding: 0;
-  }
-}
-</style>

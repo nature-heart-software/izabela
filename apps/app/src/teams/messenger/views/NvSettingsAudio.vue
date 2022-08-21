@@ -79,8 +79,8 @@ import {
   NvFormItem,
   NvSwitch,
 } from '@packages/ui'
-import NvAudioOutputsSelect from '@/entities/settings/components/inputs/NvAudioOutputsSelect.vue'
-import NvAudioInputFormPart from '@/entities/settings/components/inputs/NvAudioInputFormPart.vue'
+import NvAudioOutputsSelect from '@/entities/audio/components/inputs/NvAudioOutputsSelect.vue'
+import NvAudioInputFormPart from '@/entities/audio/components/inputs/NvAudioInputFormPart.vue'
 import { useStore } from 'vuex'
 
 const store = useStore()

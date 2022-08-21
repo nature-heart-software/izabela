@@ -210,13 +210,13 @@ import {
   NvText,
 } from '@packages/ui'
 import DomBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
-import { useSettingsPopover } from '@/entities/settings/hooks'
+import { useRouterViewPopover } from '@/entities/router/hooks'
 import SpeechEngineSelect from '@/entities/speech/components/inputs/NvSpeechEngineSelect.vue'
 import { useStore } from 'vuex'
 import { emitIPCSay } from '@/electron/events/renderer'
-import NvAudioOutputsSelect from '@/entities/settings/components/inputs/NvAudioOutputsSelect.vue'
-import NvAudioInputsSelect from '@/entities/settings/components/inputs/NvAudioInputSelect.vue'
-import { onBeforeRouteLeave, RouteLocationRaw, useRouter } from 'vue-router'
+import NvAudioOutputsSelect from '@/entities/audio/components/inputs/NvAudioOutputsSelect.vue'
+import NvAudioInputsSelect from '@/entities/audio/components/inputs/NvAudioInputSelect.vue'
+import { RouteLocationRaw, useRouter } from 'vue-router'
 
 const store = useStore()
 const { ElectronMessengerWindow } = window
@@ -259,7 +259,7 @@ const messengerInput = ref()
 
 const inputValue = ref('')
 const doc = document
-const settingsPopover = useSettingsPopover({
+const settingsPopover = useRouterViewPopover({
   popoverTarget: messenger,
   popoverOptions: {
     trigger: 'manual',

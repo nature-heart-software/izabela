@@ -63,7 +63,7 @@ import {
 } from '@/entities/settings/hooks'
 import { useQueryClient } from 'vue-query'
 import { useStore } from 'vuex'
-import NvAudioInputSelect from '@/entities/settings/components/inputs/NvAudioInputSelect.vue'
+import NvAudioInputSelect from '@/entities/audio/components/inputs/NvAudioInputSelect.vue'
 
 const store = useStore()
 const { ElectronDialog, ElectronFilesystem } = window
