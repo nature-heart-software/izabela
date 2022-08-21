@@ -68,10 +68,8 @@ jobs:
       - name: Build electron
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        working-directory: apps/app
         run: |
-          npx lerna bootstrap
-          npm run electron:build -- -p never
+          npm run build
       - name: Cleanup electron dist
         shell: bash
         working-directory: apps/app/dist_electron
