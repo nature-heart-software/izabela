@@ -8,7 +8,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service electron:serve",
-    "build": "npx lerna bootstrap && vue-cli-service electron:build -p never",
+    "build": "vue-cli-service electron:build -p never",
     "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
     "lint": "vue-cli-service lint",
@@ -19,7 +19,7 @@
     "storybook:build": "vue-cli-service storybook:build -c config/storybook",
     "storybook:serve": "vue-cli-service storybook:serve -p 6006 -c config/storybook",
     "generate:app-icon": "npx electron-icon-builder --input=./assets/app-icon.png --output=./build --flatten && npx electron-icon-builder --input=./assets/app-icon.png --output=./public --flatten",
-    "rebuild": "electron-builder install-app-deps && npx patch-package"
+    "rebuild": "electron-builder install-app-deps"
   },
   "main": "background.js",
   "dependencies": {
