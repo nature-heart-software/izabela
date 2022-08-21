@@ -9,39 +9,39 @@ const routes: Array<RouteRecordRaw> = [
       {
         name: 'settings-overview',
         path: 'overview',
-        component: import('@/teams/messenger/views/NvSettingsOverview.vue')
+        component: import('@/teams/messenger/views/NvSettingsOverview.vue'),
       },
       {
         name: 'settings-speech',
         path: 'speech',
-        component: import('@/teams/messenger/views/NvSettingsSpeech.vue')
+        component: import('@/teams/messenger/views/NvSettingsSpeech.vue'),
       },
       {
         name: 'settings-audio',
         path: 'audio',
-        component: import('@/teams/messenger/views/NvSettingsAudio.vue')
+        component: import('@/teams/messenger/views/NvSettingsAudio.vue'),
       },
       {
         name: 'settings-dictionary',
         path: 'dictionary',
-        component: import('@/teams/messenger/views/NvSettingsDictionary.vue')
+        component: import('@/teams/messenger/views/NvSettingsDictionary.vue'),
       },
       {
         name: 'settings-startup',
         path: 'startup',
-        component: import('@/teams/messenger/views/NvSettingsStartup.vue')
+        component: import('@/teams/messenger/views/NvSettingsStartup.vue'),
       },
       {
         name: 'settings-update',
         path: 'update',
-        component: import('@/teams/messenger/views/NvSettingsUpdate.vue')
+        component: import('@/teams/messenger/views/NvSettingsUpdate.vue'),
       },
-    ]
+    ],
   },
   {
     path: '/',
-    redirect: {name: 'settings'}
-  }
+    redirect: { name: 'settings' },
+  },
 ]
 
 const router = createRouter({
