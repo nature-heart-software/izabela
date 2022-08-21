@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "start": "node bin/generate-exports && nodemon ./dist/main.js --start-server",
-    "build": "node bin/generate-exports && microbundle --target=node",
-    "dev": "node bin/generate-exports && microbundle --target=node watch"
+    "build": "node bin/generate-exports && npx microbundle --target=node",
+    "dev": "node bin/generate-exports && npx microbundle --target=node watch"
   },
   "source": "src/main.ts",
   "main": "./dist/app-server.cjs",
@@ -23,7 +23,7 @@
     "@types/lodash": "^4.14.182",
     "@types/morgan": "^1.9.3",
     "@types/uuid": "^8.3.4",
-    "microbundle": "^0.15.0",
+    "microbundle": "^0.15.1",
     "typescript": "^4.6.4",
     "vite": "^3.0.0"
   },
