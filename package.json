@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "install": "npm run build:deps",
-    "bootstrap": "npx lerna bootstrap",
+    "bootstrap": "npx lerna bootstrap --no-ci",
     "dev": "npm run bootstrap && npx lerna run serve --scope izabela-next --stream",
     "build": "npm run bootstrap && npx lerna run build",
     "build:deps": "npm run bootstrap && npx lerna run build --scope  '{@packages/*,@apps/app-server}' --stream",
