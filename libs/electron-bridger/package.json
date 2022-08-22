@@ -15,12 +15,12 @@
   "files": [
     "./dist"
   ],
+  "dependencies": {
+    "electron": "^15.5.5"
+  },
   "devDependencies": {
     "microbundle": "^0.15.1",
     "typescript": "^4.6.4",
     "vite": "^3.0.0"
-  },
-  "dependencies": {
-    "electron": "^15.5.5"
   }
 }
