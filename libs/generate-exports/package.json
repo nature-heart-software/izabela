@@ -13,7 +13,7 @@
   "unpkg": "./dist/generate-exports.umd.js",
   "types": "./dist/main.d.ts",
   "files": [
-    "/dist"
+    "./dist"
   ],
   "dependencies": {
     "chokidar": "^3.5.3",

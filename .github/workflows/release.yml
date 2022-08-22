@@ -65,7 +65,7 @@ jobs:
           targets: |
             ./package.json
             ./apps/app/package.json
-      - name: Build electron
+      - name: Build
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |

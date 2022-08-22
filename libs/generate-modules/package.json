@@ -13,7 +13,7 @@
   "unpkg": "./dist/generate-modules.umd.js",
   "types": "./dist/main.d.ts",
   "files": [
-    "/dist"
+    "./dist"
   ],
   "dependencies": {
     "@babel/core": "^7.17.10",
