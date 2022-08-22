@@ -1,40 +1,47 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
+import NvSettings from '@/teams/messenger/views/NvSettings.vue'
+import NvSettingsOverview from '@/teams/messenger/views/NvSettingsOverview.vue'
+import NvSettingsSpeech from '@/teams/messenger/views/NvSettingsSpeech.vue'
+import NvSettingsAudio from '@/teams/messenger/views/NvSettingsAudio.vue'
+import NvSettingsDictionary from '@/teams/messenger/views/NvSettingsDictionary.vue'
+import NvSettingsStartup from '@/teams/messenger/views/NvSettingsStartup.vue'
+import NvSettingsUpdate from '@/teams/messenger/views/NvSettingsUpdate.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
     name: 'settings',
     path: '/settings',
-    component: import('@/teams/messenger/views/NvSettings.vue'),
+    component: NvSettings,
     children: [
       {
         name: 'settings-overview',
         path: 'overview',
-        component: import('@/teams/messenger/views/NvSettingsOverview.vue'),
+        component: NvSettingsOverview,
       },
       {
         name: 'settings-speech',
         path: 'speech',
-        component: import('@/teams/messenger/views/NvSettingsSpeech.vue'),
+        component: NvSettingsSpeech,
       },
       {
         name: 'settings-audio',
         path: 'audio',
-        component: import('@/teams/messenger/views/NvSettingsAudio.vue'),
+        component: NvSettingsAudio,
       },
       {
         name: 'settings-dictionary',
         path: 'dictionary',
-        component: import('@/teams/messenger/views/NvSettingsDictionary.vue'),
+        component: NvSettingsDictionary,
       },
       {
         name: 'settings-startup',
         path: 'startup',
-        component: import('@/teams/messenger/views/NvSettingsStartup.vue'),
+        component: NvSettingsStartup,
       },
       {
         name: 'settings-update',
         path: 'update',
-        component: import('@/teams/messenger/views/NvSettingsUpdate.vue'),
+        component: NvSettingsUpdate,
       },
     ],
   },
@@ -45,7 +52,7 @@ const routes: Array<RouteRecordRaw> = [
 ]
 
 const router = createRouter({
-  history: createWebHashHistory(process.env.BASE_URL),
+  history: createWebHashHistory(),
   routes,
 })
 

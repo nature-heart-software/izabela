@@ -25,7 +25,6 @@
   "dependencies": {
     "@google-cloud/speech": "^4.10.2",
     "@ryanmorr/ready": "^1.4.0",
-    "@types/crypto-js": "^4.1.1",
     "@wurielle/generate-modules-webpack-plugin": "^0.1.0",
     "axios": "^0.27.2",
     "bluebird": "^3.7.2",
@@ -45,9 +44,17 @@
     "vue-tippy": "^6.0.0-alpha.54",
     "vue3-moveable": "^0.3.0",
     "vue3-styled-components": "^1.2.1",
-    "webpack-notifier": "^1.15.0"
+    "vue": "^3.2.31",
+    "vue-router": "^4.0.14",
+    "vuex": "^4.0.0",
+    "@apps/app-server": "*",
+    "@packages/electron-bridger": "*",
+    "@packages/ui": "*",
+    "lodash": "^4.17.21",
+    "electron": "^12.2.3"
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.1.1",
     "@types/bluebird": "^3.5.36",
     "@types/chai": "^4.3.0",
     "@types/electron-devtools-installer": "^2.2.1",
@@ -70,7 +77,6 @@
     "autoprefixer": "^10.4.4",
     "chai": "^4.2.0",
     "cypress": "^9.5.3",
-    "electron": "^12.2.3",
     "electron-devtools-installer": "^3.1.0",
     "electron-rebuild": "^3.2.7",
     "eslint": "^8.12.0",
@@ -78,7 +84,6 @@
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-vue": "^8.5.0",
     "eslint-plugin-vuejs-accessibility": "^1.1.0",
-    "lodash": "^4.17.21",
     "postcss-import": "^14.0.2",
     "prettier": "2.6.2",
     "sass": "^1.49.11",
@@ -86,16 +91,9 @@
     "tailwindcss": "^3.0.12",
     "ts-loader": "^8.3.0",
     "typescript": "~4.6.3",
-    "vue": "^3.2.31",
     "vue-cli-plugin-electron-builder": "~2.1.1",
-    "vue-router": "^4.0.14",
-    "vuex": "^4.0.0"
-  },
-  "optionalDependencies": {
-    "@apps/app-server": "*",
-    "@packages/electron-bridger": "*",
-    "@packages/generate-exports-webpack-plugin": "*",
-    "@packages/ui": "*"
+    "webpack-notifier": "^1.15.0",
+    "@packages/generate-exports-webpack-plugin": "*"
   },
   "iohook": {
     "targets": [
