@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "files": [
-    "dist"
+    "./dist"
   ],
   "main": "./dist/ui.cjs",
   "module": "./dist/ui.es.js",

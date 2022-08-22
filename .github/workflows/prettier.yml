@@ -24,7 +24,7 @@ jobs:
       - name: Prettify code
         uses: creyD/prettier_action@v4.1.1
         with:
-          prettier_options: --write **/*.{js,jsx,ts,tsx,vue,html,css,scss,md,json,yml} --single-quote --tab-width 2 --no-semi --trailing-comma all --arrow-parens always --end-of-line lf
+          prettier_options: --write **/*.{js,jsx,ts,tsx,vue,html,css,scss,md,json,yml} --config .prettier.json
           commit_message: 'style: prettier formatting'
           only_changed: true
           github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}

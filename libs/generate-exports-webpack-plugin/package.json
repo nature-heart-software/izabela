@@ -13,7 +13,7 @@
   "unpkg": "./dist/generate-exports-webpack-plugin.umd.js",
   "types": "./dist/main.d.ts",
   "files": [
-    "/dist"
+    "./dist"
   ],
   "dependencies": {
     "@packages/generate-exports": "*"
