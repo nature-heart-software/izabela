@@ -159,7 +159,7 @@
               @focus="store.dispatch('messenger/setProperty', ['isInputFocused', true])"
               @keydown.enter="playMessage()"
               @keydown.space="
-                store.getters['settings/persisted'].messageMode === 'word' && playMessage()
+                (e) => store.getters['settings/persisted'].messageMode === 'word' && [playMessage(), e.preventDefault()]
               "
             />
             <NvButton icon-name="message" size="lg" @click="playMessage()" />
