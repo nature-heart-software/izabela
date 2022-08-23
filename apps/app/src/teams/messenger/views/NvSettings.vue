@@ -76,6 +76,10 @@ const navigation = [
         to: { name: 'settings-audio' },
       },
       {
+        name: 'Display',
+        to: { name: 'settings-display' },
+      },
+      {
         name: 'Overlay',
       },
       {
