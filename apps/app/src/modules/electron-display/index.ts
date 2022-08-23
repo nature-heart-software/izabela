@@ -10,14 +10,12 @@ export const ElectronDisplay = () => {
       return screen.getPrimaryDisplay()
     },
     setDisplay(id: Electron.Display['id']): void {
-      const display = screen.getAllDisplays().find(d => d.id === id) || screen.getPrimaryDisplay()
-      const window = ElectronWindowManager
-        .getInstanceByName('messenger')
-        ?.window
+      const display = screen.getAllDisplays().find((d) => d.id === id) || screen.getPrimaryDisplay()
+      const window = ElectronWindowManager.getInstanceByName('messenger')?.window
       if (window) {
         window.setBounds(display.bounds)
       }
-    }
+    },
   }
 }
 

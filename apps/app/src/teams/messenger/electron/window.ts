@@ -23,7 +23,7 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
   const setDisplay = (id?: Electron.Display['id']) => {
     const allDisplays = screen.getAllDisplays()
     const primaryDisplay = screen.getPrimaryDisplay()
-    const display = allDisplays.find(d => d.id === id) || primaryDisplay
+    const display = allDisplays.find((d) => d.id === id) || primaryDisplay
     win.setBounds(display.bounds)
   }
 
@@ -43,7 +43,7 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
 
   const screenEvents = ['display-added', 'display-removed', 'display-metrics-changed'] as const
   screenEvents.forEach((event) => {
-    screen.on((event as any), () => {
+    screen.on(event as any, () => {
       setDisplay(store.getters['settings/persisted'].display)
     })
   })
