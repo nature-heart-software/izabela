@@ -31,6 +31,7 @@ const storeState = {
       modifiers: [],
       combination: [161],
     } as KeybindingResult,
+    display: null as null | Electron.Display['id'],
   },
 }
 

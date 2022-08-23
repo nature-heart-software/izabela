@@ -20,17 +20,33 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
 
   ipcMain.registerBrowserWindow(name, win)
 
+  const setDisplay = (id?: Electron.Display['id']) => {
+    const allDisplays = screen.getAllDisplays()
+    const primaryDisplay = screen.getPrimaryDisplay()
+    const display = allDisplays.find((d) => d.id === id) || primaryDisplay
+    win.setBounds(display.bounds)
+  }
+
   {
-    const { workArea } = screen.getPrimaryDisplay()
+    const primaryDisplay = screen.getPrimaryDisplay()
 
-    win.setSize(workArea.width, workArea.height)
-    win.setPosition(workArea.x, workArea.y)
-
+    win.setBounds(primaryDisplay.bounds)
     // https://github.com/electron/electron/issues/10078#issuecomment-331581160
     win.setAlwaysOnTop(true)
     win.setVisibleOnAllWorkspaces(true)
     win.setFullScreenable(false)
   }
+
+  store.getters.isReady().then(() => {
+    setDisplay(store.getters['settings/persisted'].display)
+  })
+
+  const screenEvents = ['display-added', 'display-removed', 'display-metrics-changed'] as const
+  screenEvents.forEach((event) => {
+    screen.on(event as any, () => {
+      setDisplay(store.getters['settings/persisted'].display)
+    })
+  })
 
   win.once('ready-to-show', () => {
     win.on('show', () => {
