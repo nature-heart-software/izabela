@@ -3,7 +3,7 @@ import path from 'path'
 import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
 import store from '@/store'
 
-let tray: Tray|null = null
+let tray: Tray | null = null
 const createTray = (): Promise<Tray> =>
   app.whenReady().then(() => {
     tray = new Tray(path.join(__static, 'icons/256x256.png'))
@@ -17,15 +17,15 @@ const createTray = (): Promise<Tray> =>
             {
               label: 'Display',
               submenu: allDisplays.map(({ id }) => ({
-                label: `${id === primaryDisplay.id && '(Primary) ' || ''}${id}`,
+                label: `${(id === primaryDisplay.id && '(Primary) ') || ''}${id}`,
                 type: 'radio',
                 checked: id === store.getters['settings/persisted'].display,
                 click: () => {
                   store.dispatch('settings/setProperty', ['persisted.display', id])
                   electronMessengerWindow.setDisplay(id)
                   updateContextMenu()
-                }
-              }))
+                },
+              })),
             },
             {
               label: 'Reset Display',
@@ -33,12 +33,12 @@ const createTray = (): Promise<Tray> =>
                 store.dispatch('settings/setProperty', ['persisted.display', null])
                 electronMessengerWindow.setDisplay(primaryDisplay.id)
                 updateContextMenu()
-              }
-            }
-          ]
+              },
+            },
+          ],
         },
         { type: 'separator' },
-        { label: 'Exit', type: 'normal', role: 'quit' }
+        { label: 'Exit', type: 'normal', role: 'quit' },
       ])
     }
     function updateContextMenu() {

@@ -15,7 +15,8 @@ export const ElectronMessengerWindow = () => {
   const doubleKeypressDelta = 500
   let registeredWindow: BrowserWindow | null = null
 
-  const getWindow = () => registeredWindow || ElectronWindowManager.getInstanceByName('messenger')?.window
+  const getWindow = () =>
+    registeredWindow || ElectronWindowManager.getInstanceByName('messenger')?.window
 
   const openDevTools = () =>
     new Promise((resolve) => {
