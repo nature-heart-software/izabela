@@ -1,5 +1,5 @@
 import { screen } from 'electron'
-import ElectronWindowManager from '@/modules/electron-window-manager'
+import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
 
 export const ElectronDisplay = () => {
   return {
@@ -10,11 +10,7 @@ export const ElectronDisplay = () => {
       return screen.getPrimaryDisplay()
     },
     setDisplay(id: Electron.Display['id']): void {
-      const display = screen.getAllDisplays().find((d) => d.id === id) || screen.getPrimaryDisplay()
-      const window = ElectronWindowManager.getInstanceByName('messenger')?.window
-      if (window) {
-        window.setBounds(display.bounds)
-      }
+      electronMessengerWindow.setDisplay(id)
     },
   }
 }

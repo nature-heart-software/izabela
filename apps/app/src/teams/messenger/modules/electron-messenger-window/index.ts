@@ -3,6 +3,7 @@ import iohook, { IOHookEvent } from '@/modules/node-iohook'
 import store from '@/store'
 import { throttle } from 'lodash'
 import { Boundary } from '@/modules/vue-dom-boundaries/types'
+import { screen, shell } from 'electron'
 
 export const ElectronMessengerWindow = () => {
   /* use isFocused as source of truth instead of window.isFocused() as in some instances
@@ -133,7 +134,18 @@ export const ElectronMessengerWindow = () => {
     return Promise.resolve()
   }
 
+  const setDisplay = (id?: Electron.Display['id']) => {
+    const messenger = ElectronWindowManager.getInstanceByName('messenger')
+    if (messenger) {
+      const allDisplays = screen.getAllDisplays()
+      const primaryDisplay = screen.getPrimaryDisplay()
+      const display = allDisplays.find((d) => d.id === id) || primaryDisplay
+      messenger.window.setBounds(display.bounds)
+    }
+  }
+
   const addEventListeners = () => {
+    const messenger = ElectronWindowManager.getInstanceByName('messenger')
     // iohook.on('keypress', ({ keychar }) => console.log(`Key pressed: ${String.fromCharCode(keychar)}`))
     iohook.on('mousemove', throttle(onMouseMove, 150))
     iohook.on('keyup', (event) => {
@@ -149,6 +161,34 @@ export const ElectronMessengerWindow = () => {
     // iohook.registerShortcut([42, 56], () => {
     //   toggleWindow()
     // })
+    store.getters.isReady().then(() => {
+      setDisplay(store.getters['settings/persisted'].display)
+    })
+    if (messenger) {
+      messenger.window.on('show', () => {
+        store.dispatch('messenger/setProperty', ['isShown', true])
+      })
+      messenger.window.on('hide', () => {
+        store.dispatch('messenger/setProperty', ['isShown', false])
+      })
+      messenger.window.on('focus', () => {
+        store.dispatch('messenger/setProperty', ['isFocused', true])
+      })
+      messenger.window.on('blur', () => {
+        store.dispatch('messenger/setProperty', ['isFocused', false])
+      })
+      messenger.window.webContents.setWindowOpenHandler(({ url }) => {
+        shell.openExternal(url)
+        return { action: 'deny' }
+      })
+    }
+
+    const screenEvents = ['display-added', 'display-removed', 'display-metrics-changed'] as const
+    screenEvents.forEach((event) => {
+      screen.on(event as any, () => {
+        setDisplay(store.getters['settings/persisted'].display)
+      })
+    })
   }
 
   const start = () => {
@@ -163,6 +203,7 @@ export const ElectronMessengerWindow = () => {
     hide,
     toggleWindow,
     start,
+    setDisplay,
   }
 }
 
