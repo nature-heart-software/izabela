@@ -88,6 +88,7 @@ const navigation = [
       },
       {
         name: 'Keybindings',
+        to: { name: 'settings-keybindings' },
       },
       {
         name: 'Startup',

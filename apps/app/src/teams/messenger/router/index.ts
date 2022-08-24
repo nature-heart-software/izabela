@@ -7,6 +7,7 @@ import NvSettingsDictionary from '@/teams/messenger/views/NvSettingsDictionary.v
 import NvSettingsStartup from '@/teams/messenger/views/NvSettingsStartup.vue'
 import NvSettingsUpdate from '@/teams/messenger/views/NvSettingsUpdate.vue'
 import NvSettingsDisplay from '@/teams/messenger/views/NvSettingsDisplay.vue'
+import NvSettingsKeybindings from '@/teams/messenger/views/NvSettingsKeybindings.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -38,6 +39,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'settings-dictionary',
         path: 'dictionary',
         component: NvSettingsDictionary,
+      },
+      {
+        name: 'settings-keybindings',
+        path: 'keybindings',
+        component: NvSettingsKeybindings,
       },
       {
         name: 'settings-startup',

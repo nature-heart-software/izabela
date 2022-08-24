@@ -11,6 +11,7 @@ import registerElectronStartup from '@/modules/electron-startup/register'
 import registerElectronUpdater from '@/modules/electron-updater/register'
 import registerElectronDebug from '@/modules/electron-debug/register'
 import registerElectronDisplay from '@/modules/electron-display/register'
+import registerElectronKeybinding from '@/modules/electron-keybinding/register'
 
 const App = () => {
   const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -103,8 +104,9 @@ const App = () => {
       exec('Bridge modules', () => bridgeModules()),
       exec('Create tray', () => createTray()),
       exec('Create windows', () => createWindows()),
-      exec('Register screen', () => registerElectronDisplay()),
       exec('Start server', () => startAppServer()),
+      exec('Register screen', () => registerElectronDisplay()),
+      exec('Register keybindings', () => registerElectronKeybinding()),
     ])
   }
 

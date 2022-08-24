@@ -18,7 +18,6 @@ const props = defineProps({
   },
   modelValue: {
     type: Object as PropType<KeybindingResult>,
-    required: true,
   },
 })
 const emit = defineEmits(['update:modelValue'])
@@ -26,7 +25,7 @@ const { ElectronKeybinding } = window
 const listeningToKeys = ref(false)
 const currentKeybinding = computed(() => props.modelValue)
 const readableKeybinding = computed(() =>
-  [...currentKeybinding.value.modifiers, ...currentKeybinding.value.keys].join('+'),
+  currentKeybinding.value ? [...currentKeybinding.value.modifiers, ...currentKeybinding.value.keys].join('+') : 'None',
 )
 const getKeybinding = () => {
   listeningToKeys.value = true
