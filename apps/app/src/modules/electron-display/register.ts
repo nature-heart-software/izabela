@@ -8,9 +8,12 @@ export default () =>
     store.getters.isReady().then(() => {
       electronMessengerWindow.setDisplay(store.getters['settings/persisted'].display)
 
-      watch(() => store.getters['settings/persisted'].display, () => {
-        electronMessengerWindow.setDisplay(store.getters['settings/persisted'].display)
-      })
+      watch(
+        () => store.getters['settings/persisted'].display,
+        () => {
+          electronMessengerWindow.setDisplay(store.getters['settings/persisted'].display)
+        },
+      )
 
       const screenEvents = ['display-added', 'display-removed', 'display-metrics-changed'] as const
       screenEvents.forEach((event) => {

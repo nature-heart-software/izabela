@@ -20,9 +20,10 @@ const createTray = (): Promise<Tray> =>
               submenu: allDisplays.map(({ id }) => ({
                 label: `${(id === primaryDisplay.id && '(Primary) ') || ''}${id}`,
                 type: 'radio',
-                checked: store.getters['settings/persisted'].display !== null
-                  ? id === store.getters['settings/persisted'].display
-                  : primaryDisplay.id === id,
+                checked:
+                  store.getters['settings/persisted'].display !== null
+                    ? id === store.getters['settings/persisted'].display
+                    : primaryDisplay.id === id,
                 click: () => {
                   store.dispatch('settings/setProperty', ['persisted.display', id])
                 },
