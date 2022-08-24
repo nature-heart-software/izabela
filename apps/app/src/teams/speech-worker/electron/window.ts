@@ -3,8 +3,9 @@ import { ipcMain } from 'electron-postman'
 import path from 'path'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 
+let window: BrowserWindow
 const createWindow = async (name: string): Promise<BrowserWindow> => {
-  const window = new BrowserWindow({
+  window = new BrowserWindow({
     show: true,
     transparent: true,
     frame: false,

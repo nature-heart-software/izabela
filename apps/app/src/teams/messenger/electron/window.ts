@@ -4,8 +4,9 @@ import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import { ipcMain } from 'electron-postman'
 import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
 
+let window: BrowserWindow
 const createWindow = async (name: string): Promise<BrowserWindow> => {
-  const window = new BrowserWindow({
+  window = new BrowserWindow({
     show: false,
     fullscreen: true,
     transparent: true,
