@@ -15,12 +15,12 @@ const createTray = (): Promise<Tray> =>
             click: () => {
               const primaryDisplay = screen.getPrimaryDisplay()
               electronMessengerWindow.setDisplay(primaryDisplay.id)
-            }
-          }
-        ]
+            },
+          },
+        ],
       },
       { type: 'separator' },
-      { label: 'Exit', type: 'normal', role: 'quit' }
+      { label: 'Exit', type: 'normal', role: 'quit' },
     ])
     tray.setToolTip(`${app.name} - v${app.getVersion()}`)
     tray.setContextMenu(contextMenu)
