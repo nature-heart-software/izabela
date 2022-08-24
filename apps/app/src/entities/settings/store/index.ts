@@ -33,8 +33,8 @@ const storeState = {
     } as KeybindingResult,
     display: null as null | Electron.Display['id'],
     multiKeysKeybindings: {
-      toggleMessengerWindow: null
-    } as Record<string, KeybindingResult | null>
+      toggleMessengerWindow: null,
+    } as Record<string, KeybindingResult | null>,
   },
 }
 

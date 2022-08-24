@@ -25,7 +25,9 @@ const { ElectronKeybinding } = window
 const listeningToKeys = ref(false)
 const currentKeybinding = computed(() => props.modelValue)
 const readableKeybinding = computed(() =>
-  currentKeybinding.value ? [...currentKeybinding.value.modifiers, ...currentKeybinding.value.keys].join('+') : 'None',
+  currentKeybinding.value
+    ? [...currentKeybinding.value.modifiers, ...currentKeybinding.value.keys].join('+')
+    : 'None',
 )
 const getKeybinding = () => {
   listeningToKeys.value = true
