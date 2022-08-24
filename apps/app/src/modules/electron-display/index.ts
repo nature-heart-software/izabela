@@ -1,5 +1,4 @@
 import { screen } from 'electron'
-import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
 
 export const ElectronDisplay = () => {
   return {
@@ -8,9 +7,6 @@ export const ElectronDisplay = () => {
     },
     getPrimaryDisplay(): Electron.Display {
       return screen.getPrimaryDisplay()
-    },
-    setDisplay(id: Electron.Display['id']): void {
-      electronMessengerWindow.setDisplay(id)
     },
   }
 }

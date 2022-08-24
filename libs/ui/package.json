@@ -18,6 +18,8 @@
   },
   "dependencies": {
     "@packages/icons": "*",
+    "@vue-reactivity/watch": "^0.2.0",
+    "@vue/reactivity": "^3.2.37",
     "element-plus": "^1.2.0-beta.6",
     "polished": "^4.2.2",
     "uuid": "^8.3.2",
@@ -27,6 +29,8 @@
   },
   "devDependencies": {
     "@babel/core": "^7.18.10",
+    "@packages/vite-plugin-generate-exports": "*",
+    "@packages/vite-plugin-generate-modules": "*",
     "@storybook/addon-actions": "^6.5.10",
     "@storybook/addon-essentials": "^6.5.10",
     "@storybook/addon-interactions": "^6.5.10",
@@ -44,8 +48,6 @@
     "vite": "^3.0.0",
     "vite-plugin-dts": "^1.4.1",
     "vue-loader": "^16.8.3",
-    "vue-tsc": "^0.38.4",
-    "@packages/vite-plugin-generate-exports": "*",
-    "@packages/vite-plugin-generate-modules": "*"
+    "vue-tsc": "^0.38.4"
   }
 }

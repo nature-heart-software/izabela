@@ -38,6 +38,5 @@ const isFetching = computed(() =>
 const store = useStore()
 const onUpdate = (value: Electron.Display['id']) => {
   store.dispatch('settings/setProperty', ['persisted.display', value])
-  ElectronDisplay.setDisplay(value)
 }
 </script>

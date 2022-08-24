@@ -160,9 +160,6 @@ export const ElectronMessengerWindow = () => {
     // iohook.registerShortcut([42, 56], () => {
     //   toggleWindow()
     // })
-    store.getters.isReady().then(() => {
-      setDisplay(store.getters['settings/persisted'].display)
-    })
     if (window) {
       window.on('show', () => {
         store.dispatch('messenger/setProperty', ['isShown', true])
@@ -181,13 +178,6 @@ export const ElectronMessengerWindow = () => {
         return { action: 'deny' }
       })
     }
-
-    const screenEvents = ['display-added', 'display-removed', 'display-metrics-changed'] as const
-    screenEvents.forEach((event) => {
-      screen.on(event as any, () => {
-        setDisplay(store.getters['settings/persisted'].display)
-      })
-    })
   }
 
   const start = (window: BrowserWindow) => {

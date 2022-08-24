@@ -1,5 +1,8 @@
 import { VNode, Comment } from 'vue'
 
+export * from '@vue/reactivity'
+export * from '@vue-reactivity/watch/dist/index.js'
+
 export function isVNodeEmpty(
   slot: (d: object) => VNode | VNode[] | undefined | null,
   data = {},

@@ -22,6 +22,8 @@
     "@babel/plugin-transform-modules-systemjs": "^7.17.8",
     "@babel/plugin-transform-modules-umd": "^7.16.7",
     "@babel/preset-typescript": "^7.16.7",
+    "@vue-reactivity/watch": "^0.2.0",
+    "@vue/reactivity": "^3.2.37",
     "chokidar": "^3.5.3",
     "globby": "^11.0.4",
     "minimatch": "^5.0.1"

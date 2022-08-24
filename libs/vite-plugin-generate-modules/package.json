@@ -16,7 +16,9 @@
     "./dist"
   ],
   "dependencies": {
-    "@packages/generate-modules": "*"
+    "@packages/generate-modules": "*",
+    "@vue-reactivity/watch": "^0.2.0",
+    "@vue/reactivity": "^3.2.37"
   },
   "devDependencies": {
     "microbundle": "^0.15.1",

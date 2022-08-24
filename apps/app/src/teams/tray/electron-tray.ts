@@ -2,6 +2,7 @@ import { app, Menu, Tray, screen } from 'electron'
 import path from 'path'
 import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
 import store from '@/store'
+import { watch } from '@/utils/vue'
 
 let tray: Tray
 const createTray = (): Promise<Tray> =>
@@ -19,11 +20,11 @@ const createTray = (): Promise<Tray> =>
               submenu: allDisplays.map(({ id }) => ({
                 label: `${(id === primaryDisplay.id && '(Primary) ') || ''}${id}`,
                 type: 'radio',
-                checked: id === store.getters['settings/persisted'].display,
+                checked: store.getters['settings/persisted'].display !== null
+                  ? id === store.getters['settings/persisted'].display
+                  : primaryDisplay.id === id,
                 click: () => {
                   store.dispatch('settings/setProperty', ['persisted.display', id])
-                  electronMessengerWindow.setDisplay(id)
-                  updateContextMenu()
                 },
               })),
             },
@@ -31,8 +32,6 @@ const createTray = (): Promise<Tray> =>
               label: 'Reset Display',
               click: () => {
                 store.dispatch('settings/setProperty', ['persisted.display', null])
-                electronMessengerWindow.setDisplay(primaryDisplay.id)
-                updateContextMenu()
               },
             },
           ],
@@ -48,6 +47,7 @@ const createTray = (): Promise<Tray> =>
     tray.setContextMenu(getContextMenu())
     tray.on('click', electronMessengerWindow.show)
     store.getters.isReady().then(updateContextMenu)
+    watch(() => store.getters['settings/persisted'].display, updateContextMenu)
     return tray
   })
 
