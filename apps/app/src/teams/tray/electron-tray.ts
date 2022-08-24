@@ -3,7 +3,7 @@ import path from 'path'
 import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
 import store from '@/store'
 
-let tray: Tray | null = null
+let tray: Tray
 const createTray = (): Promise<Tray> =>
   app.whenReady().then(() => {
     tray = new Tray(path.join(__static, 'icons/256x256.png'))
@@ -42,8 +42,7 @@ const createTray = (): Promise<Tray> =>
       ])
     }
     function updateContextMenu() {
-      console.log('updateContextMenu', store.getters['settings/persisted'].display)
-      tray?.setContextMenu(getContextMenu())
+      tray.setContextMenu(getContextMenu())
     }
     tray.setToolTip(`${app.name} - v${app.getVersion()}`)
     tray.setContextMenu(getContextMenu())
