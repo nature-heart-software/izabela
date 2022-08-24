@@ -3,7 +3,7 @@ import iohook, { IOHookEvent } from '@/modules/node-iohook'
 import store from '@/store'
 import { throttle } from 'lodash'
 import { Boundary } from '@/modules/vue-dom-boundaries/types'
-import { screen, shell } from 'electron'
+import { BrowserWindow, screen, shell } from 'electron'
 
 export const ElectronMessengerWindow = () => {
   /* use isFocused as source of truth instead of window.isFocused() as in some instances
@@ -13,6 +13,10 @@ export const ElectronMessengerWindow = () => {
   let isFocused = false
   let lastKeypressTime = 0
   const doubleKeypressDelta = 500
+  let registeredWindow: BrowserWindow | null = null
+
+  const getWindow = () =>
+    registeredWindow || ElectronWindowManager.getInstanceByName('messenger')?.window
 
   const openDevTools = () =>
     new Promise((resolve) => {
@@ -30,9 +34,8 @@ export const ElectronMessengerWindow = () => {
 
   const focus = () =>
     new Promise((resolve, reject) => {
-      const messenger = ElectronWindowManager.getInstanceByName('messenger')
-      if (messenger) {
-        const { window } = messenger
+      const window = getWindow()
+      if (window) {
         if (!isFocused) {
           isFocused = true
           window.once('show', () => {
@@ -57,9 +60,8 @@ export const ElectronMessengerWindow = () => {
 
   const blur = () =>
     new Promise((resolve, reject) => {
-      const messenger = ElectronWindowManager.getInstanceByName('messenger')
-      if (messenger) {
-        const { window } = messenger
+      const window = getWindow()
+      if (window) {
         if (isFocused) {
           isFocused = false
           /* order matters */
@@ -75,9 +77,8 @@ export const ElectronMessengerWindow = () => {
 
   const hide = () =>
     new Promise((resolve, reject) => {
-      const messenger = ElectronWindowManager.getInstanceByName('messenger')
-      if (messenger) {
-        const { window } = messenger
+      const window = getWindow()
+      if (window) {
         blur()
           .then(() => {
             window.hide()
@@ -90,8 +91,8 @@ export const ElectronMessengerWindow = () => {
 
   const show = () =>
     new Promise((resolve, reject) => {
-      const messenger = ElectronWindowManager.getInstanceByName('messenger')
-      if (messenger) {
+      const window = getWindow()
+      if (window) {
         focus()
         resolve(true)
       } else {
@@ -100,9 +101,8 @@ export const ElectronMessengerWindow = () => {
     })
 
   const onMouseMove = (event: IOHookEvent) => {
-    const messenger = ElectronWindowManager.getInstanceByName('messenger')
-    if (messenger) {
-      const { window } = messenger
+    const window = getWindow()
+    if (window) {
       if (!window.isDestroyed() && window.isVisible()) {
         const { x: mouseX = 0, y: mouseY = 0 } = event
         const [windowX, windowY] = window.getPosition()
@@ -122,9 +122,8 @@ export const ElectronMessengerWindow = () => {
   }
 
   const toggleWindow = () => {
-    const messenger = ElectronWindowManager.getInstanceByName('messenger')
-    if (messenger) {
-      const { window } = messenger
+    const window = getWindow()
+    if (window) {
       if (window.isVisible()) {
         hide()
       } else {
@@ -135,17 +134,17 @@ export const ElectronMessengerWindow = () => {
   }
 
   const setDisplay = (id?: Electron.Display['id']) => {
-    const messenger = ElectronWindowManager.getInstanceByName('messenger')
-    if (messenger) {
+    const window = getWindow()
+    if (window) {
       const allDisplays = screen.getAllDisplays()
       const primaryDisplay = screen.getPrimaryDisplay()
       const display = allDisplays.find((d) => d.id === id) || primaryDisplay
-      messenger.window.setBounds(display.bounds)
+      window.setBounds(display.bounds)
     }
   }
 
   const addEventListeners = () => {
-    const messenger = ElectronWindowManager.getInstanceByName('messenger')
+    const window = getWindow()
     // iohook.on('keypress', ({ keychar }) => console.log(`Key pressed: ${String.fromCharCode(keychar)}`))
     iohook.on('mousemove', throttle(onMouseMove, 150))
     iohook.on('keyup', (event) => {
@@ -164,20 +163,20 @@ export const ElectronMessengerWindow = () => {
     store.getters.isReady().then(() => {
       setDisplay(store.getters['settings/persisted'].display)
     })
-    if (messenger) {
-      messenger.window.on('show', () => {
+    if (window) {
+      window.on('show', () => {
         store.dispatch('messenger/setProperty', ['isShown', true])
       })
-      messenger.window.on('hide', () => {
+      window.on('hide', () => {
         store.dispatch('messenger/setProperty', ['isShown', false])
       })
-      messenger.window.on('focus', () => {
+      window.on('focus', () => {
         store.dispatch('messenger/setProperty', ['isFocused', true])
       })
-      messenger.window.on('blur', () => {
+      window.on('blur', () => {
         store.dispatch('messenger/setProperty', ['isFocused', false])
       })
-      messenger.window.webContents.setWindowOpenHandler(({ url }) => {
+      window.webContents.setWindowOpenHandler(({ url }) => {
         shell.openExternal(url)
         return { action: 'deny' }
       })
@@ -191,7 +190,8 @@ export const ElectronMessengerWindow = () => {
     })
   }
 
-  const start = () => {
+  const start = (window: BrowserWindow) => {
+    registeredWindow = window
     addEventListeners()
   }
 

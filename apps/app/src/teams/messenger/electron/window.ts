@@ -28,7 +28,7 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
   }
 
   window.once('ready-to-show', () => {
-    electronMessengerWindow.start()
+    electronMessengerWindow.start(window)
   })
 
   ipcMain.registerBrowserWindow(name, window)
