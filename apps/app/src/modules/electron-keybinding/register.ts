@@ -1,30 +1,34 @@
-import { app } from 'electron'
+import { app, globalShortcut } from 'electron'
 import store from '@/store'
 import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
 import { watch } from '@/utils/vue'
-import iohook from '@/modules/node-iohook'
 
 export default () =>
   app.whenReady().then(() =>
     store.getters.isReady().then(() => {
-      const multiKeysKeybindings: Record<string, number|null> = {}
-      const setToggleMessengerWindowKeybinding = () => {
-            const keybinding = store.getters['settings/persisted'].multiKeysKeybindings.toggleMessengerWindow
-            if (multiKeysKeybindings.toggleMessengerWindow) {
-              iohook.unregisterShortcut(multiKeysKeybindings.toggleMessengerWindow);
-              multiKeysKeybindings.toggleMessengerWindow = null
-            }
-            if (keybinding) {
-              multiKeysKeybindings.toggleMessengerWindow = iohook.registerShortcut(keybinding.combination, () => {
-                console.log('keybindings: toggleMessengerWindow')
-                electronMessengerWindow.toggleWindow()
-              })
-            }
+      const multiKeysKeybindings = {
+        toggleMessengerWindow: () => electronMessengerWindow.toggleWindow(),
       }
-      watch(() => store.getters['settings/persisted'].multiKeysKeybindings.toggleMessengerWindow, () => {
-        console.log('Changing keybinding for toggleMessengerWindow', store.getters['settings/persisted'].multiKeysKeybindings.toggleMessengerWindow)
+      const registeredShortcuts: Record<string, string> = {}
+
+      const unregisterAllShortcuts = () => {
+        Object.keys(registeredShortcuts).forEach((key) => {
+          globalShortcut.unregister(registeredShortcuts[key])
+          delete registeredShortcuts[key]
+        })
+      }
+      const setToggleMessengerWindowKeybinding = () => {
+        console.log('Registering keybindings', store.getters['settings/persisted'].multiKeysKeybindings.toggleMessengerWindow)
+        globalShortcut.register(store.getters['settings/persisted'].multiKeysKeybindings.toggleMessengerWindow, multiKeysKeybindings.toggleMessengerWindow)
+        registeredShortcuts.toggleMessengerWindow = store.getters['settings/persisted'].multiKeysKeybindings.toggleMessengerWindow
+      }
+
+      watch(() => [store.getters['settings/persisted'].multiKeysKeybindings.toggleMessengerWindow], () => {
+        console.log('Changing keybinding', store.getters['settings/persisted'].multiKeysKeybindings.toggleMessengerWindow)
+        unregisterAllShortcuts()
         setToggleMessengerWindowKeybinding()
-      })
+      }, { deep: true })
+
       setToggleMessengerWindowKeybinding()
     }),
   )

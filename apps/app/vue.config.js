@@ -46,7 +46,7 @@ module.exports = defineConfig({
   },
   pluginOptions: {
     electronBuilder: {
-      externals: ['iohook', '@izabela/app-server', '@google-cloud/speech'],
+      externals: ['iohook', '@izabela/app-server', '@google-cloud/speech', 'native-keymap'],
       chainWebpackMainProcess: (config) => {
         setConfigAliases(config)
       },
