@@ -9,11 +9,16 @@
           </NvStack>
           <NvKeybinding
             multiple
-            :modelValue="store.getters['settings/persisted'].multiKeysKeybindings.toggleMessengerWindow"
+            :modelValue="
+              store.getters['settings/persisted'].multiKeysKeybindings.toggleMessengerWindow
+            "
             @update:modelValue="
-          (value) =>
-            store.dispatch('settings/setProperty', ['persisted.multiKeysKeybindings.toggleMessengerWindow', value])
-        "
+              (value) =>
+                store.dispatch('settings/setProperty', [
+                  'persisted.multiKeysKeybindings.toggleMessengerWindow',
+                  value,
+                ])
+            "
           />
         </NvGroup>
       </NvCard>
