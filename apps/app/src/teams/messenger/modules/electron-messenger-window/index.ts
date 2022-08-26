@@ -11,8 +11,8 @@ export const ElectronMessengerWindow = () => {
    * focus again.
    *  */
   let isFocused = false
-  let lastKeypressTime = 0
-  const doubleKeypressDelta = 500
+  // let lastKeypressTime = 0
+  // const doubleKeypressDelta = 500
   let registeredWindow: BrowserWindow | null = null
 
   const getWindow = () =>
@@ -147,16 +147,16 @@ export const ElectronMessengerWindow = () => {
     const window = getWindow()
     // iohook.on('keypress', ({ keychar }) => console.log(`Key pressed: ${String.fromCharCode(keychar)}`))
     iohook.on('mousemove', throttle(onMouseMove, 150))
-    iohook.on('keyup', (event) => {
-      if (event.keycode === 56) {
-        let keypressTime = Number(new Date())
-        if (keypressTime - lastKeypressTime <= doubleKeypressDelta) {
-          toggleWindow()
-          keypressTime = 0
-        }
-        lastKeypressTime = keypressTime
-      }
-    })
+    // iohook.on('keyup', (event) => {
+    //   if (event.keycode === 56) {
+    //     let keypressTime = Number(new Date())
+    //     if (keypressTime - lastKeypressTime <= doubleKeypressDelta) {
+    //       toggleWindow()
+    //       keypressTime = 0
+    //     }
+    //     lastKeypressTime = keypressTime
+    //   }
+    // })
     // iohook.registerShortcut([42, 56], () => {
     //   toggleWindow()
     // })

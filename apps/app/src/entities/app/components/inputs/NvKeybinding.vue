@@ -29,7 +29,6 @@ const keyAliases: Record<KeyboardEvent['key'], string> = {
   'AltGraph': 'AltGr',
 }
 useEventListener(document, 'keydown', (e) => {
-  console.log(e)
   if (isListeningToKeys.value) {
     console.log(e)
     listenedKeys.value[e.key] = e

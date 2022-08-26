@@ -18,19 +18,14 @@ export default () =>
         })
       }
       const setToggleMessengerWindowKeybinding = () => {
-        const keybinding = store.getters['settings/persisted'].keybindings.toggleMessengerWindow.map(({key}: any) => key).join('+')
-        console.log('Registering keybindings', keybinding)
-        const registered = globalShortcut.register(
-          store.getters['settings/persisted'].keybindings.toggleMessengerWindow.map(({key}: any) => key).join('+'),
-          multiKeysKeybindings.toggleMessengerWindow
-        )
-        console.log({ registered })
-        registeredShortcuts.toggleMessengerWindow = store.getters['settings/persisted'].keybindings.toggleMessengerWindow
+        const keybinding = store.getters['settings/persisted'].keybindings.toggleMessengerWindow
+          .map(({key}: any) => key).join('+')
+        globalShortcut.register(keybinding, multiKeysKeybindings.toggleMessengerWindow)
+        registeredShortcuts.toggleMessengerWindow = keybinding
       }
       setToggleMessengerWindowKeybinding()
 
       watch(() => [store.getters['settings/persisted'].keybindings.toggleMessengerWindow], () => {
-        console.log('Changing keybinding', store.getters['settings/persisted'].keybindings.toggleMessengerWindow)
         unregisterAllShortcuts()
         setToggleMessengerWindowKeybinding()
       }, { deep: true })

@@ -12,10 +12,10 @@ const channel = version.includes('alpha')
   ? 'alpha'
   : // eslint-disable-next-line no-nested-ternary
   version.includes('beta')
-  ? 'beta'
-  : version.includes('rc')
-  ? 'rc'
-  : 'latest'
+    ? 'beta'
+    : version.includes('rc')
+      ? 'rc'
+      : 'latest'
 const storeState = {
   persisted: {
     playSpeechOnDefaultPlaybackDevice: true,
@@ -29,7 +29,29 @@ const storeState = {
     display: null as null | Electron.Display['id'],
     keybindings: {
       recordAudio: [],
-      toggleMessengerWindow: [],
+      toggleMessengerWindow: [
+        {
+          "key": "Control",
+          "code": "ControlLeft",
+          "keyCode": 17,
+          "charCode": 0,
+          "which": 17,
+          "shiftKey": false,
+          "altKey": false,
+          "ctrlKey": true,
+          "metaKey": false,
+        }, {
+          "key": "Enter",
+          "code": "Enter",
+          "keyCode": 13,
+          "charCode": 0,
+          "which": 13,
+          "shiftKey": false,
+          "altKey": false,
+          "ctrlKey": true,
+          "metaKey": false,
+        },
+      ],
     } as Record<string, Key[]>,
   },
 }
