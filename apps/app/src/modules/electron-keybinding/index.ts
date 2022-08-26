@@ -1,4 +1,4 @@
-import keymap from 'native-keymap';
+import keymap from 'native-keymap'
 
 export const ElectronKeybinding = () => ({
   getKeyMap: () => Promise.resolve(keymap.getKeyMap()),
