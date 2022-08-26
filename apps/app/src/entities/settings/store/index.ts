@@ -3,7 +3,7 @@ import { utilActions, utilMutations } from '@/utils/vuex'
 // eslint-disable-next-line import/no-cycle
 import { SpeechEngine } from '@/modules/speech-engine-manager/types'
 import pkg from '@root/package.json'
-import { KeybindingResult } from '@/types/keybinds'
+import { Key, KeybindingResult } from '@/types/keybinds'
 import { ENGINE_ID } from '@/plugins/speech-engines/say/consts'
 
 const { version } = pkg
@@ -26,11 +26,49 @@ const storeState = {
     launchOnStartup: true,
     debugMode: process.env.NODE_ENV === 'development',
     messageMode: 'sentence' as 'sentence' | 'word',
-    recordAudioKeybinding: {
-      keys: ['161'],
-      modifiers: [],
-      combination: [161],
-    } as KeybindingResult,
+    display: null as null | Electron.Display['id'],
+    keybindings: {
+      recordAudio: [
+        {
+          key: 'ShiftRight',
+          code: 'ShiftRight',
+          keyCode: 16,
+          rawCode: 161,
+          charCode: 0,
+          which: 16,
+          shiftKey: true,
+          altKey: false,
+          ctrlKey: false,
+          metaKey: false,
+        },
+      ],
+      toggleMessengerWindow: [
+        {
+          key: 'Control',
+          code: 'ControlLeft',
+          keyCode: 17,
+          rawCode: 162,
+          charCode: 0,
+          which: 17,
+          shiftKey: false,
+          altKey: false,
+          ctrlKey: true,
+          metaKey: false,
+        },
+        {
+          key: 'Enter',
+          code: 'Enter',
+          keyCode: 13,
+          rawCode: 13,
+          charCode: 0,
+          which: 13,
+          shiftKey: false,
+          altKey: false,
+          ctrlKey: true,
+          metaKey: false,
+        },
+      ],
+    } as Record<string, Key[]>,
   },
 }
 

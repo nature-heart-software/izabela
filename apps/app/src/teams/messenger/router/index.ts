@@ -6,6 +6,8 @@ import NvSettingsAudio from '@/teams/messenger/views/NvSettingsAudio.vue'
 import NvSettingsDictionary from '@/teams/messenger/views/NvSettingsDictionary.vue'
 import NvSettingsStartup from '@/teams/messenger/views/NvSettingsStartup.vue'
 import NvSettingsUpdate from '@/teams/messenger/views/NvSettingsUpdate.vue'
+import NvSettingsDisplay from '@/teams/messenger/views/NvSettingsDisplay.vue'
+import NvSettingsKeybindings from '@/teams/messenger/views/NvSettingsKeybindings.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -29,9 +31,19 @@ const routes: Array<RouteRecordRaw> = [
         component: NvSettingsAudio,
       },
       {
+        name: 'settings-display',
+        path: 'display',
+        component: NvSettingsDisplay,
+      },
+      {
         name: 'settings-dictionary',
         path: 'dictionary',
         component: NvSettingsDictionary,
+      },
+      {
+        name: 'settings-keybindings',
+        path: 'keybindings',
+        component: NvSettingsKeybindings,
       },
       {
         name: 'settings-startup',

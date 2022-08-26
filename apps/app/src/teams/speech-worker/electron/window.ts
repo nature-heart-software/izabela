@@ -3,8 +3,9 @@ import { ipcMain } from 'electron-postman'
 import path from 'path'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 
+let window: BrowserWindow
 const createWindow = async (name: string): Promise<BrowserWindow> => {
-  const win = new BrowserWindow({
+  window = new BrowserWindow({
     show: true,
     transparent: true,
     frame: false,
@@ -16,27 +17,27 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     },
   })
 
-  ipcMain.registerBrowserWindow(name, win)
-
   {
-    win.setSize(0, 0)
-    win.setPosition(0, 0)
+    window.setSize(0, 0)
+    window.setPosition(0, 0)
 
     // https://github.com/electron/electron/issues/10078#issuecomment-331581160
-    win.setAlwaysOnTop(true)
-    win.setVisibleOnAllWorkspaces(true)
-    win.setFullScreenable(false)
+    window.setAlwaysOnTop(true)
+    window.setVisibleOnAllWorkspaces(true)
+    window.setFullScreenable(false)
   }
+
+  ipcMain.registerBrowserWindow(name, window)
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
-    await win.loadURL(path.join(process.env.WEBPACK_DEV_SERVER_URL as string, name))
-    if (!process.env.IS_TEST) win.webContents.openDevTools({ mode: 'undocked' })
+    await window.loadURL(path.join(process.env.WEBPACK_DEV_SERVER_URL as string, name))
+    if (!process.env.IS_TEST) window.webContents.openDevTools({ mode: 'undocked' })
   } else {
     createProtocol('app')
-    win.loadURL(`app://./${name}.html`)
+    window.loadURL(`app://./${name}.html`)
   }
 
-  return win
+  return window
 }
 
 export default createWindow
