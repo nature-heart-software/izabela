@@ -28,7 +28,11 @@ const storeState = {
     messageMode: 'sentence' as 'sentence' | 'word',
     display: null as null | Electron.Display['id'],
     keybindings: {
-      recordAudio: [],
+      recordAudio: [
+        {
+          "key":"ShiftRight","code":"ShiftRight","keyCode":16,"rawCode":161,"charCode":0,"which":16,"shiftKey":true,"altKey":false,"ctrlKey":false,"metaKey":false
+        }
+      ],
       toggleMessengerWindow: [
         {
           "key": "Control",

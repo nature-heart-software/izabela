@@ -27,6 +27,8 @@ const isListeningToKeys = ref(false)
 const listenedKeys = ref<Record<KeyboardEvent['code'], KeyboardEvent>>({})
 const keyAliases: Record<KeyboardEvent['code'], string> = {
   AltRight: 'AltGr',
+  ShiftRight: 'ShiftRight',
+  ControlRight: 'ControlRight',
   Space: 'Space',
   ArrowUp: 'Up',
   ArrowDown: 'Down',
