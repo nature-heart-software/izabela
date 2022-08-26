@@ -1,15 +1,16 @@
 <template>
-  <template v-if="listeningToKeys">
+  <template v-if="isListeningToKeys">
     <NvButton class="pointer-events-none">Listening - press Esc to cancel</NvButton>
   </template>
   <template v-else>
-    <NvButton @click.prevent="getKeybinding">{{ readableKeybinding }}</NvButton>
+    <NvButton @click="isListeningToKeys = true">{{ readableKeybinding }}</NvButton>
   </template>
 </template>
 <script lang="ts" setup>
 import { NvButton } from '@packages/ui'
-import { computed, ref, defineProps, defineEmits, PropType } from 'vue'
-import { KeybindingResult } from '@/types/keybinds'
+import { ref, defineProps, defineEmits, computed, watch, Ref, PropType } from 'vue'
+import { useEventListener } from '@vueuse/core'
+import { Key } from '@/types/keybinds'
 
 const props = defineProps({
   multiple: {
@@ -17,22 +18,74 @@ const props = defineProps({
     default: false,
   },
   modelValue: {
-    type: Object as PropType<KeybindingResult>,
-    required: true,
+    type: Array as PropType<Key[]>,
+    default: () => [],
   },
 })
 const emit = defineEmits(['update:modelValue'])
-const { ElectronKeybinding } = window
-const listeningToKeys = ref(false)
-const currentKeybinding = computed(() => props.modelValue)
-const readableKeybinding = computed(() =>
-  [...currentKeybinding.value.modifiers, ...currentKeybinding.value.keys].join('+'),
-)
-const getKeybinding = () => {
-  listeningToKeys.value = true
-  ElectronKeybinding[props.multiple ? 'getKeys' : 'getKey']().then((keybinding) => {
-    listeningToKeys.value = false
-    emit('update:modelValue', keybinding)
-  })
+const isListeningToKeys = ref(false)
+const listenedKeys = ref<Record<KeyboardEvent['code'], KeyboardEvent>>({})
+const keyAliases: Record<KeyboardEvent['code'], string> = {
+  AltRight: 'AltGr',
+  ShiftRight: 'ShiftRight',
+  ControlRight: 'ControlRight',
+  Space: 'Space',
+  ArrowUp: 'Up',
+  ArrowDown: 'Down',
+  ArrowLeft: 'Left',
+  ArrowRight: 'Right',
 }
+const rawCodeAliases: Record<KeyboardEvent['code'], number> = {
+  ShiftLeft: 160,
+  ShiftRight: 161,
+  ControlLeft: 162,
+  ControlRight: 163,
+  AltLeft: 164,
+  AltRight: 165,
+}
+useEventListener(document, 'keydown', (e) => {
+  if (isListeningToKeys.value) {
+    if (e.code === 'AltRight' && listenedKeys.value.ControlLeft) {
+      delete listenedKeys.value.ControlLeft
+    }
+    listenedKeys.value[e.code] = e
+    if (Object.keys(listenedKeys.value).length === 3) {
+      isListeningToKeys.value = false
+    }
+  }
+})
+
+useEventListener(document, 'keyup', () => {
+  if (isListeningToKeys.value) {
+    isListeningToKeys.value = false
+  }
+})
+
+const keybinding: Ref<Key[]> = computed(() =>
+  Object.values(listenedKeys.value).map(
+    ({ code, keyCode, which, key, shiftKey, altKey, ctrlKey, metaKey, charCode }) => ({
+      key: keyAliases[code] || key,
+      code,
+      keyCode,
+      rawCode: rawCodeAliases[code] || keyCode,
+      charCode,
+      which,
+      shiftKey,
+      altKey,
+      ctrlKey,
+      metaKey,
+    }),
+  ),
+)
+
+const readableKeybinding = computed(
+  () => props.modelValue.map(({ key }) => key).join(' + ') || 'None',
+)
+
+watch(isListeningToKeys, (value) => {
+  if (!value) {
+    emit('update:modelValue', keybinding.value)
+    listenedKeys.value = {}
+  }
+})
 </script>

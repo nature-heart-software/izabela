@@ -1,0 +1,700 @@
+diff --git a/node_modules/native-keymap/binding.gyp b/node_modules/native-keymap/binding.gyp
+index a2a3876..5682bee 100644
+--- a/node_modules/native-keymap/binding.gyp
++++ b/node_modules/native-keymap/binding.gyp
+@@ -1,4 +1,7 @@
+ {
++  'variables' : {
++    'openssl_fips': '',
++  },
+   "targets": [
+     {
+       "target_name": "keymapping",
+diff --git a/node_modules/native-keymap/build/Release/keymapping.exp b/node_modules/native-keymap/build/Release/keymapping.exp
+index c758f93..aa039cd 100644
+Binary files a/node_modules/native-keymap/build/Release/keymapping.exp and b/node_modules/native-keymap/build/Release/keymapping.exp differ
+diff --git a/node_modules/native-keymap/build/Release/keymapping.ilk b/node_modules/native-keymap/build/Release/keymapping.ilk
+new file mode 100644
+index 0000000..8ac4ed2
+Binary files /dev/null and b/node_modules/native-keymap/build/Release/keymapping.ilk differ
+diff --git a/node_modules/native-keymap/build/Release/keymapping.iobj b/node_modules/native-keymap/build/Release/keymapping.iobj
+deleted file mode 100644
+index 9b464a1..0000000
+Binary files a/node_modules/native-keymap/build/Release/keymapping.iobj and /dev/null differ
+diff --git a/node_modules/native-keymap/build/Release/keymapping.ipdb b/node_modules/native-keymap/build/Release/keymapping.ipdb
+deleted file mode 100644
+index 7712934..0000000
+Binary files a/node_modules/native-keymap/build/Release/keymapping.ipdb and /dev/null differ
+diff --git a/node_modules/native-keymap/build/Release/keymapping.node b/node_modules/native-keymap/build/Release/keymapping.node
+index 427e1a3..87003e1 100644
+Binary files a/node_modules/native-keymap/build/Release/keymapping.node and b/node_modules/native-keymap/build/Release/keymapping.node differ
+diff --git a/node_modules/native-keymap/build/Release/keymapping.pdb b/node_modules/native-keymap/build/Release/keymapping.pdb
+index 953b3e8..b8ebb44 100644
+Binary files a/node_modules/native-keymap/build/Release/keymapping.pdb and b/node_modules/native-keymap/build/Release/keymapping.pdb differ
+diff --git a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.node.recipe b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.node.recipe
+index be79fe6..6dc33f2 100644
+--- a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.node.recipe
++++ b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.node.recipe
+@@ -2,7 +2,7 @@
+ <Project>
+   <ProjectOutputs>
+     <ProjectOutput>
+-      <FullPath>C:\Users\Noah\AppData\Local\Temp\tmp-7508RAzy2t2kPOdJ\node_modules\native-keymap\build\Release\keymapping.node</FullPath>
++      <FullPath>D:\dev\nhs\izabela\apps\app\node_modules\native-keymap\build\Release\keymapping.node</FullPath>
+     </ProjectOutput>
+   </ProjectOutputs>
+   <ContentFiles />
+diff --git a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/CL.command.1.tlog b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/CL.command.1.tlog
+index ab8bc74..3b484b9 100644
+Binary files a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/CL.command.1.tlog and b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/CL.command.1.tlog differ
+diff --git a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/CL.read.1.tlog b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/CL.read.1.tlog
+index 663aee7..e4f6cee 100644
+Binary files a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/CL.read.1.tlog and b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/CL.read.1.tlog differ
+diff --git a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/CL.write.1.tlog b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/CL.write.1.tlog
+index 973ade8..9cc7c9a 100644
+Binary files a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/CL.write.1.tlog and b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/CL.write.1.tlog differ
+diff --git a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/keymapping.lastbuildstate b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/keymapping.lastbuildstate
+index 7dd5a9c..1a72062 100644
+--- a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/keymapping.lastbuildstate
++++ b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/keymapping.lastbuildstate
+@@ -1,2 +1,2 @@
+ PlatformToolSet=v142:VCToolArchitecture=Native64Bit:VCToolsVersion=14.29.30133:TargetPlatformVersion=10.0.19041.0:
+-Release|x64|C:\Users\Noah\AppData\Local\Temp\tmp-7508RAzy2t2kPOdJ\node_modules\native-keymap\build\|
++Release|x64|D:\dev\nhs\izabela\apps\app\node_modules\native-keymap\build\|
+diff --git a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/keymapping.write.1u.tlog b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/keymapping.write.1u.tlog
+index dcb8efc..59bdfcf 100644
+Binary files a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/keymapping.write.1u.tlog and b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/keymapping.write.1u.tlog differ
+diff --git a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/link.command.1.tlog b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/link.command.1.tlog
+index 66ec500..4a4c79d 100644
+Binary files a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/link.command.1.tlog and b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/link.command.1.tlog differ
+diff --git a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/link.read.1.tlog b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/link.read.1.tlog
+index eed410f..4699fc3 100644
+Binary files a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/link.read.1.tlog and b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/link.read.1.tlog differ
+diff --git a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/link.write.1.tlog b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/link.write.1.tlog
+index 85eced4..6706968 100644
+Binary files a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/link.write.1.tlog and b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/link.write.1.tlog differ
+diff --git a/node_modules/native-keymap/build/Release/obj/keymapping/src/keyboard_win.obj b/node_modules/native-keymap/build/Release/obj/keymapping/src/keyboard_win.obj
+index 887cc96..3b2a9cd 100644
+Binary files a/node_modules/native-keymap/build/Release/obj/keymapping/src/keyboard_win.obj and b/node_modules/native-keymap/build/Release/obj/keymapping/src/keyboard_win.obj differ
+diff --git a/node_modules/native-keymap/build/Release/obj/keymapping/src/keymapping.obj b/node_modules/native-keymap/build/Release/obj/keymapping/src/keymapping.obj
+index fe57c2e..ffd6d29 100644
+Binary files a/node_modules/native-keymap/build/Release/obj/keymapping/src/keymapping.obj and b/node_modules/native-keymap/build/Release/obj/keymapping/src/keymapping.obj differ
+diff --git a/node_modules/native-keymap/build/Release/obj/keymapping/src/string_conversion.obj b/node_modules/native-keymap/build/Release/obj/keymapping/src/string_conversion.obj
+index 62551e1..c9fa256 100644
+Binary files a/node_modules/native-keymap/build/Release/obj/keymapping/src/string_conversion.obj and b/node_modules/native-keymap/build/Release/obj/keymapping/src/string_conversion.obj differ
+diff --git a/node_modules/native-keymap/build/Release/obj/keymapping/win_delay_load_hook.obj b/node_modules/native-keymap/build/Release/obj/keymapping/win_delay_load_hook.obj
+index 35aa539..4a6fb9a 100644
+Binary files a/node_modules/native-keymap/build/Release/obj/keymapping/win_delay_load_hook.obj and b/node_modules/native-keymap/build/Release/obj/keymapping/win_delay_load_hook.obj differ
+diff --git a/node_modules/native-keymap/build/binding.sln b/node_modules/native-keymap/build/binding.sln
+index bb80af2..d61c073 100644
+--- a/node_modules/native-keymap/build/binding.sln
++++ b/node_modules/native-keymap/build/binding.sln
+@@ -1,17 +1,17 @@
+ Microsoft Visual Studio Solution File, Format Version 12.00
+ # Visual Studio 2015
+-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keymapping", "keymapping.vcxproj", "{9A5FA5A1-CC6E-891F-E952-98AE27165AF5}"
++Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keymapping", "keymapping.vcxproj", "{79708C4C-6F11-7A62-58A8-56CE8585639C}"
+ EndProject
+ Global
+ 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+-		Debug|x64 = Debug|x64
+ 		Release|x64 = Release|x64
++		Debug|x64 = Debug|x64
+ 	EndGlobalSection
+ 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+-		{9A5FA5A1-CC6E-891F-E952-98AE27165AF5}.Debug|x64.ActiveCfg = Debug|x64
+-		{9A5FA5A1-CC6E-891F-E952-98AE27165AF5}.Debug|x64.Build.0 = Debug|x64
+-		{9A5FA5A1-CC6E-891F-E952-98AE27165AF5}.Release|x64.ActiveCfg = Release|x64
+-		{9A5FA5A1-CC6E-891F-E952-98AE27165AF5}.Release|x64.Build.0 = Release|x64
++		{79708C4C-6F11-7A62-58A8-56CE8585639C}.Release|x64.ActiveCfg = Release|x64
++		{79708C4C-6F11-7A62-58A8-56CE8585639C}.Release|x64.Build.0 = Release|x64
++		{79708C4C-6F11-7A62-58A8-56CE8585639C}.Debug|x64.ActiveCfg = Debug|x64
++		{79708C4C-6F11-7A62-58A8-56CE8585639C}.Debug|x64.Build.0 = Debug|x64
+ 	EndGlobalSection
+ 	GlobalSection(SolutionProperties) = preSolution
+ 		HideSolutionNode = FALSE
+diff --git a/node_modules/native-keymap/build/config.gypi b/node_modules/native-keymap/build/config.gypi
+index 946b351..a6be0af 100644
+--- a/node_modules/native-keymap/build/config.gypi
++++ b/node_modules/native-keymap/build/config.gypi
+@@ -1,373 +1,38 @@
+ # Do not edit. File was generated by node-gyp's "configure" step
+ {
+-  "target_defaults": {
+-    "cflags": [],
+-    "default_configuration": "Release",
+-    "defines": [],
+-    "include_dirs": [],
+-    "libraries": [],
+-    "msbuild_toolset": "v142",
+-    "msvs_windows_target_platform_version": "10.0.19041.0"
+-  },
+   "variables": {
+-    "asan": 0,
+-    "coverage": "false",
+-    "dcheck_always_on": 0,
+-    "debug_nghttp2": "false",
+-    "debug_node": "false",
+-    "enable_lto": "false",
+-    "enable_pgo_generate": "false",
+-    "enable_pgo_use": "false",
+-    "error_on_warn": "false",
+-    "force_dynamic_crt": 0,
+-    "host_arch": "x64",
+-    "icu_data_in": "..\\..\\deps\\icu-tmp\\icudt70l.dat",
+-    "icu_endianness": "l",
+-    "icu_gyp_path": "tools/icu/icu-generic.gyp",
+-    "icu_path": "deps/icu-small",
+-    "icu_small": "false",
+-    "icu_ver_major": "70",
+-    "is_debug": 0,
+-    "llvm_version": "0.0",
+-    "napi_build_version": "8",
+-    "nasm_version": "2.15",
+-    "node_byteorder": "little",
+-    "node_debug_lib": "false",
+-    "node_enable_d8": "false",
+-    "node_install_corepack": "true",
+-    "node_install_npm": "true",
+-    "node_library_files": [
+-      "lib/assert.js",
+-      "lib/async_hooks.js",
+-      "lib/buffer.js",
+-      "lib/child_process.js",
+-      "lib/cluster.js",
+-      "lib/console.js",
+-      "lib/constants.js",
+-      "lib/crypto.js",
+-      "lib/dgram.js",
+-      "lib/diagnostics_channel.js",
+-      "lib/dns.js",
+-      "lib/domain.js",
+-      "lib/events.js",
+-      "lib/fs.js",
+-      "lib/http.js",
+-      "lib/http2.js",
+-      "lib/https.js",
+-      "lib/inspector.js",
+-      "lib/module.js",
+-      "lib/net.js",
+-      "lib/os.js",
+-      "lib/path.js",
+-      "lib/perf_hooks.js",
+-      "lib/process.js",
+-      "lib/punycode.js",
+-      "lib/querystring.js",
+-      "lib/readline.js",
+-      "lib/repl.js",
+-      "lib/stream.js",
+-      "lib/string_decoder.js",
+-      "lib/sys.js",
+-      "lib/timers.js",
+-      "lib/tls.js",
+-      "lib/trace_events.js",
+-      "lib/tty.js",
+-      "lib/url.js",
+-      "lib/util.js",
+-      "lib/v8.js",
+-      "lib/vm.js",
+-      "lib/wasi.js",
+-      "lib/worker_threads.js",
+-      "lib/zlib.js",
+-      "lib/_http_agent.js",
+-      "lib/_http_client.js",
+-      "lib/_http_common.js",
+-      "lib/_http_incoming.js",
+-      "lib/_http_outgoing.js",
+-      "lib/_http_server.js",
+-      "lib/_stream_duplex.js",
+-      "lib/_stream_passthrough.js",
+-      "lib/_stream_readable.js",
+-      "lib/_stream_transform.js",
+-      "lib/_stream_wrap.js",
+-      "lib/_stream_writable.js",
+-      "lib/_tls_common.js",
+-      "lib/_tls_wrap.js",
+-      "lib/assert/strict.js",
+-      "lib/dns/promises.js",
+-      "lib/fs/promises.js",
+-      "lib/internal/abort_controller.js",
+-      "lib/internal/assert.js",
+-      "lib/internal/async_hooks.js",
+-      "lib/internal/blob.js",
+-      "lib/internal/blocklist.js",
+-      "lib/internal/buffer.js",
+-      "lib/internal/child_process.js",
+-      "lib/internal/cli_table.js",
+-      "lib/internal/constants.js",
+-      "lib/internal/dgram.js",
+-      "lib/internal/dtrace.js",
+-      "lib/internal/encoding.js",
+-      "lib/internal/errors.js",
+-      "lib/internal/error_serdes.js",
+-      "lib/internal/event_target.js",
+-      "lib/internal/fixed_queue.js",
+-      "lib/internal/freelist.js",
+-      "lib/internal/freeze_intrinsics.js",
+-      "lib/internal/heap_utils.js",
+-      "lib/internal/histogram.js",
+-      "lib/internal/http.js",
+-      "lib/internal/idna.js",
+-      "lib/internal/inspector_async_hook.js",
+-      "lib/internal/js_stream_socket.js",
+-      "lib/internal/linkedlist.js",
+-      "lib/internal/net.js",
+-      "lib/internal/options.js",
+-      "lib/internal/priority_queue.js",
+-      "lib/internal/promise_hooks.js",
+-      "lib/internal/querystring.js",
+-      "lib/internal/repl.js",
+-      "lib/internal/socketaddress.js",
+-      "lib/internal/socket_list.js",
+-      "lib/internal/stream_base_commons.js",
+-      "lib/internal/timers.js",
+-      "lib/internal/trace_events_async_hooks.js",
+-      "lib/internal/tty.js",
+-      "lib/internal/url.js",
+-      "lib/internal/util.js",
+-      "lib/internal/v8_prof_polyfill.js",
+-      "lib/internal/v8_prof_processor.js",
+-      "lib/internal/validators.js",
+-      "lib/internal/watchdog.js",
+-      "lib/internal/worker.js",
+-      "lib/internal/assert/assertion_error.js",
+-      "lib/internal/assert/calltracker.js",
+-      "lib/internal/bootstrap/environment.js",
+-      "lib/internal/bootstrap/loaders.js",
+-      "lib/internal/bootstrap/node.js",
+-      "lib/internal/bootstrap/pre_execution.js",
+-      "lib/internal/bootstrap/switches/does_not_own_process_state.js",
+-      "lib/internal/bootstrap/switches/does_own_process_state.js",
+-      "lib/internal/bootstrap/switches/is_main_thread.js",
+-      "lib/internal/bootstrap/switches/is_not_main_thread.js",
+-      "lib/internal/child_process/serialization.js",
+-      "lib/internal/cluster/child.js",
+-      "lib/internal/cluster/primary.js",
+-      "lib/internal/cluster/round_robin_handle.js",
+-      "lib/internal/cluster/shared_handle.js",
+-      "lib/internal/cluster/utils.js",
+-      "lib/internal/cluster/worker.js",
+-      "lib/internal/console/constructor.js",
+-      "lib/internal/console/global.js",
+-      "lib/internal/crypto/aes.js",
+-      "lib/internal/crypto/certificate.js",
+-      "lib/internal/crypto/cipher.js",
+-      "lib/internal/crypto/diffiehellman.js",
+-      "lib/internal/crypto/dsa.js",
+-      "lib/internal/crypto/ec.js",
+-      "lib/internal/crypto/hash.js",
+-      "lib/internal/crypto/hashnames.js",
+-      "lib/internal/crypto/hkdf.js",
+-      "lib/internal/crypto/keygen.js",
+-      "lib/internal/crypto/keys.js",
+-      "lib/internal/crypto/mac.js",
+-      "lib/internal/crypto/pbkdf2.js",
+-      "lib/internal/crypto/random.js",
+-      "lib/internal/crypto/rsa.js",
+-      "lib/internal/crypto/scrypt.js",
+-      "lib/internal/crypto/sig.js",
+-      "lib/internal/crypto/util.js",
+-      "lib/internal/crypto/webcrypto.js",
+-      "lib/internal/crypto/x509.js",
+-      "lib/internal/debugger/inspect.js",
+-      "lib/internal/debugger/inspect_client.js",
+-      "lib/internal/debugger/inspect_repl.js",
+-      "lib/internal/dns/promises.js",
+-      "lib/internal/dns/utils.js",
+-      "lib/internal/fs/dir.js",
+-      "lib/internal/fs/promises.js",
+-      "lib/internal/fs/read_file_context.js",
+-      "lib/internal/fs/rimraf.js",
+-      "lib/internal/fs/streams.js",
+-      "lib/internal/fs/sync_write_stream.js",
+-      "lib/internal/fs/utils.js",
+-      "lib/internal/fs/watchers.js",
+-      "lib/internal/fs/cp/cp-sync.js",
+-      "lib/internal/fs/cp/cp.js",
+-      "lib/internal/http2/compat.js",
+-      "lib/internal/http2/core.js",
+-      "lib/internal/http2/util.js",
+-      "lib/internal/legacy/processbinding.js",
+-      "lib/internal/main/check_syntax.js",
+-      "lib/internal/main/eval_stdin.js",
+-      "lib/internal/main/eval_string.js",
+-      "lib/internal/main/inspect.js",
+-      "lib/internal/main/print_help.js",
+-      "lib/internal/main/prof_process.js",
+-      "lib/internal/main/repl.js",
+-      "lib/internal/main/run_main_module.js",
+-      "lib/internal/main/worker_thread.js",
+-      "lib/internal/modules/package_json_reader.js",
+-      "lib/internal/modules/run_main.js",
+-      "lib/internal/modules/cjs/helpers.js",
+-      "lib/internal/modules/cjs/loader.js",
+-      "lib/internal/modules/esm/assert.js",
+-      "lib/internal/modules/esm/create_dynamic_module.js",
+-      "lib/internal/modules/esm/fetch_module.js",
+-      "lib/internal/modules/esm/formats.js",
+-      "lib/internal/modules/esm/get_format.js",
+-      "lib/internal/modules/esm/get_source.js",
+-      "lib/internal/modules/esm/handle_process_exit.js",
+-      "lib/internal/modules/esm/initialize_import_meta.js",
+-      "lib/internal/modules/esm/load.js",
+-      "lib/internal/modules/esm/loader.js",
+-      "lib/internal/modules/esm/module_job.js",
+-      "lib/internal/modules/esm/module_map.js",
+-      "lib/internal/modules/esm/resolve.js",
+-      "lib/internal/modules/esm/translators.js",
+-      "lib/internal/perf/event_loop_delay.js",
+-      "lib/internal/perf/event_loop_utilization.js",
+-      "lib/internal/perf/nodetiming.js",
+-      "lib/internal/perf/observe.js",
+-      "lib/internal/perf/performance.js",
+-      "lib/internal/perf/performance_entry.js",
+-      "lib/internal/perf/timerify.js",
+-      "lib/internal/perf/usertiming.js",
+-      "lib/internal/perf/utils.js",
+-      "lib/internal/per_context/domexception.js",
+-      "lib/internal/per_context/messageport.js",
+-      "lib/internal/per_context/primordials.js",
+-      "lib/internal/policy/manifest.js",
+-      "lib/internal/policy/sri.js",
+-      "lib/internal/process/esm_loader.js",
+-      "lib/internal/process/execution.js",
+-      "lib/internal/process/per_thread.js",
+-      "lib/internal/process/policy.js",
+-      "lib/internal/process/promises.js",
+-      "lib/internal/process/report.js",
+-      "lib/internal/process/signal.js",
+-      "lib/internal/process/task_queues.js",
+-      "lib/internal/process/warning.js",
+-      "lib/internal/process/worker_thread_only.js",
+-      "lib/internal/readline/callbacks.js",
+-      "lib/internal/readline/emitKeypressEvents.js",
+-      "lib/internal/readline/interface.js",
+-      "lib/internal/readline/utils.js",
+-      "lib/internal/repl/await.js",
+-      "lib/internal/repl/history.js",
+-      "lib/internal/repl/utils.js",
+-      "lib/internal/source_map/prepare_stack_trace.js",
+-      "lib/internal/source_map/source_map.js",
+-      "lib/internal/source_map/source_map_cache.js",
+-      "lib/internal/streams/add-abort-signal.js",
+-      "lib/internal/streams/buffer_list.js",
+-      "lib/internal/streams/compose.js",
+-      "lib/internal/streams/destroy.js",
+-      "lib/internal/streams/duplex.js",
+-      "lib/internal/streams/duplexify.js",
+-      "lib/internal/streams/end-of-stream.js",
+-      "lib/internal/streams/from.js",
+-      "lib/internal/streams/lazy_transform.js",
+-      "lib/internal/streams/legacy.js",
+-      "lib/internal/streams/operators.js",
+-      "lib/internal/streams/passthrough.js",
+-      "lib/internal/streams/pipeline.js",
+-      "lib/internal/streams/readable.js",
+-      "lib/internal/streams/state.js",
+-      "lib/internal/streams/transform.js",
+-      "lib/internal/streams/utils.js",
+-      "lib/internal/streams/writable.js",
+-      "lib/internal/test/binding.js",
+-      "lib/internal/test/transfer.js",
+-      "lib/internal/tls/parse-cert-string.js",
+-      "lib/internal/tls/secure-context.js",
+-      "lib/internal/tls/secure-pair.js",
+-      "lib/internal/util/comparisons.js",
+-      "lib/internal/util/debuglog.js",
+-      "lib/internal/util/inspect.js",
+-      "lib/internal/util/inspector.js",
+-      "lib/internal/util/iterable_weak_map.js",
+-      "lib/internal/util/types.js",
+-      "lib/internal/vm/module.js",
+-      "lib/internal/webstreams/adapters.js",
+-      "lib/internal/webstreams/compression.js",
+-      "lib/internal/webstreams/encoding.js",
+-      "lib/internal/webstreams/queuingstrategies.js",
+-      "lib/internal/webstreams/readablestream.js",
+-      "lib/internal/webstreams/transfer.js",
+-      "lib/internal/webstreams/transformstream.js",
+-      "lib/internal/webstreams/util.js",
+-      "lib/internal/webstreams/writablestream.js",
+-      "lib/internal/worker/io.js",
+-      "lib/internal/worker/js_transferable.js",
+-      "lib/path/posix.js",
+-      "lib/path/win32.js",
+-      "lib/stream/consumers.js",
+-      "lib/stream/promises.js",
+-      "lib/stream/web.js",
+-      "lib/timers/promises.js",
+-      "lib/util/types.js"
+-    ],
+-    "node_module_version": 93,
+-    "node_no_browser_globals": "false",
+-    "node_prefix": "/usr/local",
+-    "node_release_urlbase": "https://nodejs.org/download/release/",
+-    "node_shared": "false",
+-    "node_shared_brotli": "false",
+-    "node_shared_cares": "false",
+-    "node_shared_http_parser": "false",
+-    "node_shared_libuv": "false",
+-    "node_shared_nghttp2": "false",
+-    "node_shared_nghttp3": "false",
+-    "node_shared_ngtcp2": "false",
+-    "node_shared_openssl": "false",
+-    "node_shared_zlib": "false",
+-    "node_tag": "",
+-    "node_target_type": "executable",
+-    "node_use_bundled_v8": "true",
+-    "node_use_dtrace": "false",
+-    "node_use_etw": "true",
+-    "node_use_node_code_cache": "true",
+-    "node_use_node_snapshot": "true",
+-    "node_use_openssl": "true",
+-    "node_use_v8_platform": "true",
+-    "node_with_ltcg": "true",
+-    "node_without_node_options": "false",
+-    "openssl_fips": "",
+-    "openssl_is_fips": "false",
+-    "openssl_quic": "true",
+-    "ossfuzz": "false",
+-    "shlib_suffix": "so.93",
++    "built_with_electron": 1,
+     "target_arch": "x64",
+-    "v8_enable_31bit_smis_on_64bit_arch": 0,
+-    "v8_enable_gdbjit": 0,
+-    "v8_enable_hugepage": 0,
+-    "v8_enable_i18n_support": 1,
+-    "v8_enable_inspector": 1,
+-    "v8_enable_lite_mode": 0,
+-    "v8_enable_object_print": 1,
+-    "v8_enable_pointer_compression": 0,
+-    "v8_enable_webassembly": 1,
+-    "v8_no_strict_aliasing": 1,
+-    "v8_optimized_debug": 1,
+-    "v8_promise_internal_field_count": 1,
+-    "v8_random_seed": 0,
+-    "v8_trace_maps": 0,
+-    "v8_use_siphash": 1,
+-    "want_separate_host_toolset": 0,
+-    "nodedir": "C:\\Users\\Noah\\AppData\\Local\\node-gyp\\Cache\\16.16.0",
++    "nodedir": "C:\\Users\\Noah\\.electron-gyp\\12.2.3",
+     "standalone_static_library": 1,
+     "msbuild_path": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\MSBuild\\Current\\Bin\\MSBuild.exe",
++    "build_from_source": "false",
+     "cache": "C:\\Users\\Noah\\AppData\\Local\\npm-cache",
+-    "force": "true",
++    "disturl": "https://electronjs.org/headers",
++    "fallback_to_build": "true",
+     "globalconfig": "C:\\Users\\Noah\\AppData\\Roaming\\npm\\etc\\npmrc",
+     "global_prefix": "C:\\Users\\Noah\\AppData\\Roaming\\npm",
+     "init_module": "C:\\Users\\Noah\\.npm-init.js",
+-    "local_prefix": "C:\\Users\\Noah\\AppData\\Local\\Temp\\tmp-7508RAzy2t2kPOdJ",
++    "local_prefix": "D:\\dev\\nhs\\izabela\\apps\\app",
+     "metrics_registry": "https://registry.npmjs.org/",
+     "node_gyp": "C:\\Program Files\\nodejs\\node_modules\\npm\\node_modules\\node-gyp\\bin\\node-gyp.js",
++    "platform": "win32",
+     "prefix": "C:\\Users\\Noah\\AppData\\Roaming\\npm",
++    "runtime": "electron",
++    "target": "12.2.3",
++    "target_libc": "unknown",
++    "target_platform": "win32",
++    "update_binary": "true",
+     "userconfig": "C:\\Users\\Noah\\.npmrc",
+     "user_agent": "npm/8.11.0 node/v16.16.0 win32 x64 workspaces/false"
++  },
++  "target_defaults": {
++    "cflags": [],
++    "defines": [],
++    "include_dirs": [],
++    "libraries": [],
++    "default_configuration": "Release",
++    "msbuild_toolset": "v142",
++    "msvs_windows_target_platform_version": "10.0.19041.0"
+   }
+ }
+diff --git a/node_modules/native-keymap/build/keymapping.vcxproj b/node_modules/native-keymap/build/keymapping.vcxproj
+index 149f2a4..0eca3db 100644
+--- a/node_modules/native-keymap/build/keymapping.vcxproj
++++ b/node_modules/native-keymap/build/keymapping.vcxproj
+@@ -11,7 +11,7 @@
+     </ProjectConfiguration>
+   </ItemGroup>
+   <PropertyGroup Label="Globals">
+-    <ProjectGuid>{9A5FA5A1-CC6E-891F-E952-98AE27165AF5}</ProjectGuid>
++    <ProjectGuid>{79708C4C-6F11-7A62-58A8-56CE8585639C}</ProjectGuid>
+     <Keyword>Win32Proj</Keyword>
+     <RootNamespace>keymapping</RootNamespace>
+     <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
+@@ -36,7 +36,6 @@
+     <ExecutablePath>$(ExecutablePath);$(MSBuildProjectDirectory)\..\bin\;$(MSBuildProjectDirectory)\..\bin\</ExecutablePath>
+     <IgnoreImportLibrary>true</IgnoreImportLibrary>
+     <IntDir>$(Configuration)\obj\$(ProjectName)\</IntDir>
+-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.node</TargetExt>
+@@ -48,8 +47,8 @@
+   </PropertyGroup>
+   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+     <ClCompile>
+-      <AdditionalIncludeDirectories>C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\include\node;C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\src;C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\deps\openssl\config;C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\deps\openssl\openssl\include;C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\deps\uv\include;C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\deps\zlib;C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\deps\v8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <AdditionalOptions>/Zc:__cplusplus /Qspectre /guard:cf %(AdditionalOptions)</AdditionalOptions>
++      <AdditionalIncludeDirectories>C:\Users\Noah\.electron-gyp\12.2.3\include\node;C:\Users\Noah\.electron-gyp\12.2.3\src;C:\Users\Noah\.electron-gyp\12.2.3\deps\openssl\config;C:\Users\Noah\.electron-gyp\12.2.3\deps\openssl\openssl\include;C:\Users\Noah\.electron-gyp\12.2.3\deps\uv\include;C:\Users\Noah\.electron-gyp\12.2.3\deps\zlib;C:\Users\Noah\.electron-gyp\12.2.3\deps\v8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <AdditionalOptions>/Qspectre /guard:cf %(AdditionalOptions)</AdditionalOptions>
+       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+       <BufferSecurityCheck>true</BufferSecurityCheck>
+       <DebugInformationFormat>OldStyle</DebugInformationFormat>
+@@ -60,38 +59,32 @@
+       <OmitFramePointers>false</OmitFramePointers>
+       <Optimization>Disabled</Optimization>
+       <PrecompiledHeader>NotUsing</PrecompiledHeader>
+-      <PreprocessorDefinitions>NODE_GYP_MODULE_NAME=keymapping;USING_UV_SHARED=1;USING_V8_SHARED=1;V8_DEPRECATION_WARNINGS=1;V8_DEPRECATION_WARNINGS;V8_IMMINENT_DEPRECATION_WARNINGS;_GLIBCXX_USE_CXX11_ABI=1;WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_HAS_EXCEPTIONS=0;OPENSSL_NO_PINSHARED;OPENSSL_THREADS;BUILDING_NODE_EXTENSION;HOST_BINARY=&quot;node.exe&quot;;DEBUG;_DEBUG;V8_ENABLE_CHECKS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>NODE_GYP_MODULE_NAME=keymapping;USING_UV_SHARED=1;USING_V8_SHARED=1;V8_DEPRECATION_WARNINGS=1;V8_DEPRECATION_WARNINGS;V8_IMMINENT_DEPRECATION_WARNINGS;V8_COMPRESS_POINTERS;V8_31BIT_SMIS_ON_64BIT_ARCH;V8_REVERSE_JSARGS;WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_HAS_EXCEPTIONS=0;OPENSSL_NO_PINSHARED;OPENSSL_THREADS;BUILDING_NODE_EXTENSION;HOST_BINARY=&quot;node.exe&quot;;DEBUG;_DEBUG;V8_ENABLE_CHECKS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+       <StringPooling>true</StringPooling>
+       <SuppressStartupBanner>true</SuppressStartupBanner>
+       <TreatWarningAsError>false</TreatWarningAsError>
+       <WarningLevel>Level3</WarningLevel>
+-      <WholeProgramOptimization>true</WholeProgramOptimization>
+     </ClCompile>
+-    <Lib>
+-      <AdditionalOptions>/LTCG:INCREMENTAL %(AdditionalOptions)</AdditionalOptions>
+-    </Lib>
+     <Link>
+-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;DelayImp.lib;&quot;C:\\Users\\Noah\\AppData\\Local\\node-gyp\\Cache\\16.16.0\\x64\\node.lib&quot;</AdditionalDependencies>
+-      <AdditionalOptions>/LTCG:INCREMENTAL /guard:cf /ignore:4199 %(AdditionalOptions)</AdditionalOptions>
++      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;DelayImp.lib;&quot;C:\\Users\\Noah\\.electron-gyp\\12.2.3\\x64\\node.lib&quot;</AdditionalDependencies>
++      <AdditionalOptions>/guard:cf /ignore:4199 %(AdditionalOptions)</AdditionalOptions>
+       <DelayLoadDLLs>node.exe;%(DelayLoadDLLs)</DelayLoadDLLs>
+-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+       <GenerateDebugInformation>true</GenerateDebugInformation>
+-      <OptimizeReferences>true</OptimizeReferences>
+       <OutputFile>$(OutDir)$(ProjectName).node</OutputFile>
+       <SuppressStartupBanner>true</SuppressStartupBanner>
+       <TargetExt>.node</TargetExt>
+       <TargetMachine>MachineX64</TargetMachine>
+     </Link>
+     <ResourceCompile>
+-      <AdditionalIncludeDirectories>C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\include\node;C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\src;C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\deps\openssl\config;C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\deps\openssl\openssl\include;C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\deps\uv\include;C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\deps\zlib;C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\deps\v8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <PreprocessorDefinitions>NODE_GYP_MODULE_NAME=keymapping;USING_UV_SHARED=1;USING_V8_SHARED=1;V8_DEPRECATION_WARNINGS=1;V8_DEPRECATION_WARNINGS;V8_IMMINENT_DEPRECATION_WARNINGS;_GLIBCXX_USE_CXX11_ABI=1;WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_HAS_EXCEPTIONS=0;OPENSSL_NO_PINSHARED;OPENSSL_THREADS;BUILDING_NODE_EXTENSION;HOST_BINARY=&quot;node.exe&quot;;DEBUG;_DEBUG;V8_ENABLE_CHECKS;%(PreprocessorDefinitions);%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <AdditionalIncludeDirectories>C:\Users\Noah\.electron-gyp\12.2.3\include\node;C:\Users\Noah\.electron-gyp\12.2.3\src;C:\Users\Noah\.electron-gyp\12.2.3\deps\openssl\config;C:\Users\Noah\.electron-gyp\12.2.3\deps\openssl\openssl\include;C:\Users\Noah\.electron-gyp\12.2.3\deps\uv\include;C:\Users\Noah\.electron-gyp\12.2.3\deps\zlib;C:\Users\Noah\.electron-gyp\12.2.3\deps\v8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <PreprocessorDefinitions>NODE_GYP_MODULE_NAME=keymapping;USING_UV_SHARED=1;USING_V8_SHARED=1;V8_DEPRECATION_WARNINGS=1;V8_DEPRECATION_WARNINGS;V8_IMMINENT_DEPRECATION_WARNINGS;V8_COMPRESS_POINTERS;V8_31BIT_SMIS_ON_64BIT_ARCH;V8_REVERSE_JSARGS;WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_HAS_EXCEPTIONS=0;OPENSSL_NO_PINSHARED;OPENSSL_THREADS;BUILDING_NODE_EXTENSION;HOST_BINARY=&quot;node.exe&quot;;DEBUG;_DEBUG;V8_ENABLE_CHECKS;%(PreprocessorDefinitions);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+     </ResourceCompile>
+   </ItemDefinitionGroup>
+   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+     <ClCompile>
+-      <AdditionalIncludeDirectories>C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\include\node;C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\src;C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\deps\openssl\config;C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\deps\openssl\openssl\include;C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\deps\uv\include;C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\deps\zlib;C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\deps\v8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <AdditionalOptions>/Zc:__cplusplus /Qspectre /guard:cf %(AdditionalOptions)</AdditionalOptions>
++      <AdditionalIncludeDirectories>C:\Users\Noah\.electron-gyp\12.2.3\include\node;C:\Users\Noah\.electron-gyp\12.2.3\src;C:\Users\Noah\.electron-gyp\12.2.3\deps\openssl\config;C:\Users\Noah\.electron-gyp\12.2.3\deps\openssl\openssl\include;C:\Users\Noah\.electron-gyp\12.2.3\deps\uv\include;C:\Users\Noah\.electron-gyp\12.2.3\deps\zlib;C:\Users\Noah\.electron-gyp\12.2.3\deps\v8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <AdditionalOptions>/Qspectre /guard:cf %(AdditionalOptions)</AdditionalOptions>
+       <BufferSecurityCheck>true</BufferSecurityCheck>
+       <DebugInformationFormat>OldStyle</DebugInformationFormat>
+       <DisableSpecificWarnings>4351;4355;4800;4251;4275;4244;4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+@@ -104,33 +97,27 @@
+       <OmitFramePointers>true</OmitFramePointers>
+       <Optimization>Full</Optimization>
+       <PrecompiledHeader>NotUsing</PrecompiledHeader>
+-      <PreprocessorDefinitions>NODE_GYP_MODULE_NAME=keymapping;USING_UV_SHARED=1;USING_V8_SHARED=1;V8_DEPRECATION_WARNINGS=1;V8_DEPRECATION_WARNINGS;V8_IMMINENT_DEPRECATION_WARNINGS;_GLIBCXX_USE_CXX11_ABI=1;WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_HAS_EXCEPTIONS=0;OPENSSL_NO_PINSHARED;OPENSSL_THREADS;BUILDING_NODE_EXTENSION;HOST_BINARY=&quot;node.exe&quot;;%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>NODE_GYP_MODULE_NAME=keymapping;USING_UV_SHARED=1;USING_V8_SHARED=1;V8_DEPRECATION_WARNINGS=1;V8_DEPRECATION_WARNINGS;V8_IMMINENT_DEPRECATION_WARNINGS;V8_COMPRESS_POINTERS;V8_31BIT_SMIS_ON_64BIT_ARCH;V8_REVERSE_JSARGS;WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_HAS_EXCEPTIONS=0;OPENSSL_NO_PINSHARED;OPENSSL_THREADS;BUILDING_NODE_EXTENSION;HOST_BINARY=&quot;node.exe&quot;;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+       <RuntimeTypeInfo>false</RuntimeTypeInfo>
+       <StringPooling>true</StringPooling>
+       <SuppressStartupBanner>true</SuppressStartupBanner>
+       <TreatWarningAsError>false</TreatWarningAsError>
+       <WarningLevel>Level3</WarningLevel>
+-      <WholeProgramOptimization>true</WholeProgramOptimization>
+     </ClCompile>
+-    <Lib>
+-      <AdditionalOptions>/LTCG:INCREMENTAL %(AdditionalOptions)</AdditionalOptions>
+-    </Lib>
+     <Link>
+-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;DelayImp.lib;&quot;C:\\Users\\Noah\\AppData\\Local\\node-gyp\\Cache\\16.16.0\\x64\\node.lib&quot;</AdditionalDependencies>
+-      <AdditionalOptions>/LTCG:INCREMENTAL /guard:cf /ignore:4199 %(AdditionalOptions)</AdditionalOptions>
++      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;DelayImp.lib;&quot;C:\\Users\\Noah\\.electron-gyp\\12.2.3\\x64\\node.lib&quot;</AdditionalDependencies>
++      <AdditionalOptions>/guard:cf /ignore:4199 %(AdditionalOptions)</AdditionalOptions>
+       <DelayLoadDLLs>node.exe;%(DelayLoadDLLs)</DelayLoadDLLs>
+-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+       <GenerateDebugInformation>true</GenerateDebugInformation>
+-      <OptimizeReferences>true</OptimizeReferences>
+       <OutputFile>$(OutDir)$(ProjectName).node</OutputFile>
+       <SuppressStartupBanner>true</SuppressStartupBanner>
+       <TargetExt>.node</TargetExt>
+       <TargetMachine>MachineX64</TargetMachine>
+     </Link>
+     <ResourceCompile>
+-      <AdditionalIncludeDirectories>C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\include\node;C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\src;C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\deps\openssl\config;C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\deps\openssl\openssl\include;C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\deps\uv\include;C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\deps\zlib;C:\Users\Noah\AppData\Local\node-gyp\Cache\16.16.0\deps\v8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <PreprocessorDefinitions>NODE_GYP_MODULE_NAME=keymapping;USING_UV_SHARED=1;USING_V8_SHARED=1;V8_DEPRECATION_WARNINGS=1;V8_DEPRECATION_WARNINGS;V8_IMMINENT_DEPRECATION_WARNINGS;_GLIBCXX_USE_CXX11_ABI=1;WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_HAS_EXCEPTIONS=0;OPENSSL_NO_PINSHARED;OPENSSL_THREADS;BUILDING_NODE_EXTENSION;HOST_BINARY=&quot;node.exe&quot;;%(PreprocessorDefinitions);%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <AdditionalIncludeDirectories>C:\Users\Noah\.electron-gyp\12.2.3\include\node;C:\Users\Noah\.electron-gyp\12.2.3\src;C:\Users\Noah\.electron-gyp\12.2.3\deps\openssl\config;C:\Users\Noah\.electron-gyp\12.2.3\deps\openssl\openssl\include;C:\Users\Noah\.electron-gyp\12.2.3\deps\uv\include;C:\Users\Noah\.electron-gyp\12.2.3\deps\zlib;C:\Users\Noah\.electron-gyp\12.2.3\deps\v8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <PreprocessorDefinitions>NODE_GYP_MODULE_NAME=keymapping;USING_UV_SHARED=1;USING_V8_SHARED=1;V8_DEPRECATION_WARNINGS=1;V8_DEPRECATION_WARNINGS;V8_IMMINENT_DEPRECATION_WARNINGS;V8_COMPRESS_POINTERS;V8_31BIT_SMIS_ON_64BIT_ARCH;V8_REVERSE_JSARGS;WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_HAS_EXCEPTIONS=0;OPENSSL_NO_PINSHARED;OPENSSL_THREADS;BUILDING_NODE_EXTENSION;HOST_BINARY=&quot;node.exe&quot;;%(PreprocessorDefinitions);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+     </ResourceCompile>
+   </ItemDefinitionGroup>
+   <ItemGroup>
+@@ -146,7 +133,7 @@
+     <ClCompile Include="..\src\keyboard_win.cc">
+       <ObjectFileName>$(IntDir)\src\keyboard_win.obj</ObjectFileName>
+     </ClCompile>
+-    <ClCompile Include="C:\Program Files\nodejs\node_modules\npm\node_modules\node-gyp\src\win_delay_load_hook.cc"/>
++    <ClCompile Include="D:\dev\nhs\izabela\apps\app\node_modules\node-gyp\src\win_delay_load_hook.cc"/>
+   </ItemGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
+   <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets"/>
+diff --git a/node_modules/native-keymap/build/keymapping.vcxproj.filters b/node_modules/native-keymap/build/keymapping.vcxproj.filters
+index 5928704..68264f6 100644
+--- a/node_modules/native-keymap/build/keymapping.vcxproj.filters
++++ b/node_modules/native-keymap/build/keymapping.vcxproj.filters
+@@ -19,28 +19,31 @@
+     <Filter Include="..\src">
+       <UniqueIdentifier>{8CDEE807-BC53-E450-C8B8-4DEBB66742D4}</UniqueIdentifier>
+     </Filter>
+-    <Filter Include="C:">
+-      <UniqueIdentifier>{7B735499-E5DD-1C2B-6C26-70023832A1CF}</UniqueIdentifier>
++    <Filter Include="D:">
++      <UniqueIdentifier>{E5D29F2B-0177-9942-CA95-0FF700094F89}</UniqueIdentifier>
+     </Filter>
+-    <Filter Include="C:\Program Files">
+-      <UniqueIdentifier>{92EF4BA8-6BC2-65D1-451F-28EBD4AE726A}</UniqueIdentifier>
++    <Filter Include="D:\dev">
++      <UniqueIdentifier>{51D92A3A-C0F8-78D6-DFF5-4F152A3AB774}</UniqueIdentifier>
+     </Filter>
+-    <Filter Include="C:\Program Files\nodejs">
+-      <UniqueIdentifier>{A3C8E949-BCF6-0C67-6656-340A2A097708}</UniqueIdentifier>
++    <Filter Include="D:\dev\nhs">
++      <UniqueIdentifier>{95EF1E90-6993-695E-CF21-0EF3CB757B1F}</UniqueIdentifier>
+     </Filter>
+-    <Filter Include="C:\Program Files\nodejs\node_modules">
+-      <UniqueIdentifier>{56DF7A98-063D-FB9D-485C-089023B4C16A}</UniqueIdentifier>
++    <Filter Include="D:\dev\nhs\izabela">
++      <UniqueIdentifier>{F84F5E53-22AD-7873-318A-D2DA3EEA47DF}</UniqueIdentifier>
++    </Filter>
++    <Filter Include="D:\dev\nhs\izabela\apps">
++      <UniqueIdentifier>{FF146ABB-CCAF-AE8D-FCAE-A2FDD3368B36}</UniqueIdentifier>
+     </Filter>
+-    <Filter Include="C:\Program Files\nodejs\node_modules\npm">
+-      <UniqueIdentifier>{741E0E76-39B2-B1AB-9FA1-F1A20B16F295}</UniqueIdentifier>
++    <Filter Include="D:\dev\nhs\izabela\apps\app">
++      <UniqueIdentifier>{796C56B0-A938-902A-0081-40464DA4EDD9}</UniqueIdentifier>
+     </Filter>
+-    <Filter Include="C:\Program Files\nodejs\node_modules\npm\node_modules">
++    <Filter Include="D:\dev\nhs\izabela\apps\app\node_modules">
+       <UniqueIdentifier>{56DF7A98-063D-FB9D-485C-089023B4C16A}</UniqueIdentifier>
+     </Filter>
+-    <Filter Include="C:\Program Files\nodejs\node_modules\npm\node_modules\node-gyp">
++    <Filter Include="D:\dev\nhs\izabela\apps\app\node_modules\node-gyp">
+       <UniqueIdentifier>{77348C0E-2034-7791-74D5-63C077DF5A3B}</UniqueIdentifier>
+     </Filter>
+-    <Filter Include="C:\Program Files\nodejs\node_modules\npm\node_modules\node-gyp\src">
++    <Filter Include="D:\dev\nhs\izabela\apps\app\node_modules\node-gyp\src">
+       <UniqueIdentifier>{8CDEE807-BC53-E450-C8B8-4DEBB66742D4}</UniqueIdentifier>
+     </Filter>
+     <Filter Include="..">
+@@ -57,8 +60,8 @@
+     <ClCompile Include="..\src\keyboard_win.cc">
+       <Filter>..\src</Filter>
+     </ClCompile>
+-    <ClCompile Include="C:\Program Files\nodejs\node_modules\npm\node_modules\node-gyp\src\win_delay_load_hook.cc">
+-      <Filter>C:\Program Files\nodejs\node_modules\npm\node_modules\node-gyp\src</Filter>
++    <ClCompile Include="D:\dev\nhs\izabela\apps\app\node_modules\node-gyp\src\win_delay_load_hook.cc">
++      <Filter>D:\dev\nhs\izabela\apps\app\node_modules\node-gyp\src</Filter>
+     </ClCompile>
+     <None Include="..\binding.gyp">
+       <Filter>..</Filter>
