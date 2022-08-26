@@ -26,7 +26,7 @@ const emit = defineEmits(['update:modelValue'])
 const isListeningToKeys = ref(false)
 const listenedKeys = ref<Record<KeyboardEvent['key'], KeyboardEvent>>({})
 const keyAliases: Record<KeyboardEvent['key'], string> = {
-  'AltGraph': 'AltGr',
+  AltGraph: 'AltGr',
 }
 useEventListener(document, 'keydown', (e) => {
   console.log(e)
@@ -45,19 +45,25 @@ useEventListener(document, 'keyup', () => {
   }
 })
 
-const keybinding: Ref<Key[]> = computed(() => Object.values(listenedKeys.value).map(({code, keyCode, which, key, shiftKey, altKey, ctrlKey, metaKey, charCode}) => ({
-  key: keyAliases[key] || key,
-  code,
-  keyCode,
-  charCode,
-  which,
-  shiftKey,
-  altKey,
-  ctrlKey,
-  metaKey,
-})))
+const keybinding: Ref<Key[]> = computed(() =>
+  Object.values(listenedKeys.value).map(
+    ({ code, keyCode, which, key, shiftKey, altKey, ctrlKey, metaKey, charCode }) => ({
+      key: keyAliases[key] || key,
+      code,
+      keyCode,
+      charCode,
+      which,
+      shiftKey,
+      altKey,
+      ctrlKey,
+      metaKey,
+    }),
+  ),
+)
 
-const readableKeybinding = computed(() => props.modelValue.map(({key}) => key).join(' + ') || 'None')
+const readableKeybinding = computed(
+  () => props.modelValue.map(({ key }) => key).join(' + ') || 'None',
+)
 
 watch(isListeningToKeys, (value) => {
   if (!value) {

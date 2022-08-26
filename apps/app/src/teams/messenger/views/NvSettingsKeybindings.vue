@@ -9,9 +9,7 @@
           </NvStack>
           <NvKeybinding
             multiple
-            :modelValue="
-              store.getters['settings/persisted'].keybindings.toggleMessengerWindow
-            "
+            :modelValue="store.getters['settings/persisted'].keybindings.toggleMessengerWindow"
             @update:modelValue="
               (value) =>
                 store.dispatch('settings/setProperty', [
