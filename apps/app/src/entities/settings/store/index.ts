@@ -30,8 +30,17 @@ const storeState = {
     keybindings: {
       recordAudio: [
         {
-          "key":"ShiftRight","code":"ShiftRight","keyCode":16,"rawCode":161,"charCode":0,"which":16,"shiftKey":true,"altKey":false,"ctrlKey":false,"metaKey":false
-        }
+          key: 'ShiftRight',
+          code: 'ShiftRight',
+          keyCode: 16,
+          rawCode: 161,
+          charCode: 0,
+          which: 16,
+          shiftKey: true,
+          altKey: false,
+          ctrlKey: false,
+          metaKey: false,
+        },
       ],
       toggleMessengerWindow: [
         {
