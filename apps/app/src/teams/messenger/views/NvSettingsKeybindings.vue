@@ -10,12 +10,12 @@
           <NvKeybinding
             multiple
             :modelValue="
-              store.getters['settings/persisted'].multiKeysKeybindings.toggleMessengerWindow
+              store.getters['settings/persisted'].keybindings.toggleMessengerWindow
             "
             @update:modelValue="
               (value) =>
                 store.dispatch('settings/setProperty', [
-                  'persisted.multiKeysKeybindings.toggleMessengerWindow',
+                  'persisted.keybindings.toggleMessengerWindow',
                   value,
                 ])
             "

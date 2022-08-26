@@ -8,8 +8,9 @@
 </template>
 <script lang="ts" setup>
 import { NvButton } from '@packages/ui'
-import { ref, defineProps, defineEmits, computed, watch } from 'vue'
+import { ref, defineProps, defineEmits, computed, watch, Ref, PropType } from 'vue'
 import { useEventListener } from '@vueuse/core'
+import { Key } from '@/types/keybinds'
 
 const props = defineProps({
   multiple: {
@@ -17,8 +18,8 @@ const props = defineProps({
     default: false,
   },
   modelValue: {
-    type: String,
-    default: '',
+    type: Array as PropType<Key[]>,
+    default: () => [],
   },
 })
 const emit = defineEmits(['update:modelValue'])
@@ -28,6 +29,7 @@ const keyAliases: Record<KeyboardEvent['key'], string> = {
   'AltGraph': 'AltGr',
 }
 useEventListener(document, 'keydown', (e) => {
+  console.log(e)
   if (isListeningToKeys.value) {
     console.log(e)
     listenedKeys.value[e.key] = e
@@ -43,8 +45,19 @@ useEventListener(document, 'keyup', () => {
   }
 })
 
-const keybinding = computed(() => Object.values(listenedKeys.value).map((e) => keyAliases[e.key] || e.key).join('+'))
-const readableKeybinding = computed(() => props.modelValue.split('+').join(' + '))
+const keybinding: Ref<Key[]> = computed(() => Object.values(listenedKeys.value).map(({code, keyCode, which, key, shiftKey, altKey, ctrlKey, metaKey, charCode}) => ({
+  key: keyAliases[key] || key,
+  code,
+  keyCode,
+  charCode,
+  which,
+  shiftKey,
+  altKey,
+  ctrlKey,
+  metaKey,
+})))
+
+const readableKeybinding = computed(() => props.modelValue.map(({key}) => key).join(' + ') || 'None')
 
 watch(isListeningToKeys, (value) => {
   if (!value) {

@@ -36,10 +36,10 @@
         <NvText type="label">Push-to-record Key</NvText>
       </NvStack>
       <NvKeybinding
-        :modelValue="store.getters['settings/persisted'].recordAudioKeybinding"
+        :modelValue="store.getters['settings/persisted'].keybindings.recordAudio"
         @update:modelValue="
           (value) =>
-            store.dispatch('settings/setProperty', ['persisted.recordAudioKeybinding', value])
+            store.dispatch('settings/setProperty', ['persisted.keybindings.recordAudio', value])
         "
       />
     </NvGroup>
