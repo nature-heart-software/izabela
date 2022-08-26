@@ -68,7 +68,6 @@ onIPCStopSpeechTranscription(() => {
 })
 
 onBeforeUnmount(() => {
-  console.log('is this being called')
   if (mediaRecorder?.state !== 'inactive') {
     mediaRecorder?.stop()
   }
