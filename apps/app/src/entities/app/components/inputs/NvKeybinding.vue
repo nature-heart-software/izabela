@@ -24,14 +24,29 @@ const props = defineProps({
 })
 const emit = defineEmits(['update:modelValue'])
 const isListeningToKeys = ref(false)
-const listenedKeys = ref<Record<KeyboardEvent['key'], KeyboardEvent>>({})
-const keyAliases: Record<KeyboardEvent['key'], string> = {
-  AltGraph: 'AltGr',
+const listenedKeys = ref<Record<KeyboardEvent['code'], KeyboardEvent>>({})
+const keyAliases: Record<KeyboardEvent['code'], string> = {
+  AltRight: 'AltGr',
+  Space: 'Space',
+  ArrowUp: 'Up',
+  ArrowDown: 'Down',
+  ArrowLeft: 'Left',
+  ArrowRight: 'Right',
+}
+const rawCodeAliases: Record<KeyboardEvent['code'], number> = {
+  ShiftLeft: 160,
+  ShiftRight: 161,
+  ControlLeft: 162,
+  ControlRight: 163,
+  AltLeft: 164,
+  AltRight: 165,
 }
 useEventListener(document, 'keydown', (e) => {
   if (isListeningToKeys.value) {
-    console.log(e)
-    listenedKeys.value[e.key] = e
+    if (e.code === 'AltRight' && listenedKeys.value.ControlLeft) {
+      delete listenedKeys.value.ControlLeft
+    }
+    listenedKeys.value[e.code] = e
     if (Object.keys(listenedKeys.value).length === 3) {
       isListeningToKeys.value = false
     }
@@ -47,9 +62,10 @@ useEventListener(document, 'keyup', () => {
 const keybinding: Ref<Key[]> = computed(() =>
   Object.values(listenedKeys.value).map(
     ({ code, keyCode, which, key, shiftKey, altKey, ctrlKey, metaKey, charCode }) => ({
-      key: keyAliases[key] || key,
+      key: keyAliases[code] || key,
       code,
       keyCode,
+      rawCode: rawCodeAliases[code] || keyCode,
       charCode,
       which,
       shiftKey,

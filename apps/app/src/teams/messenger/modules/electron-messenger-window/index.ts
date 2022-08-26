@@ -148,14 +148,15 @@ export const ElectronMessengerWindow = () => {
     // iohook.on('keypress', ({ keychar }) => console.log(`Key pressed: ${String.fromCharCode(keychar)}`))
     iohook.on('mousemove', throttle(onMouseMove, 150))
     // iohook.on('keyup', (event) => {
-    //   if (event.keycode === 56) {
-    //     let keypressTime = Number(new Date())
-    //     if (keypressTime - lastKeypressTime <= doubleKeypressDelta) {
-    //       toggleWindow()
-    //       keypressTime = 0
-    //     }
-    //     lastKeypressTime = keypressTime
-    //   }
+    //   console.log(event)
+      // if (event.keycode === 56) {
+      //   let keypressTime = Number(new Date())
+      //   if (keypressTime - lastKeypressTime <= doubleKeypressDelta) {
+      //     toggleWindow()
+      //     keypressTime = 0
+      //   }
+      //   lastKeypressTime = keypressTime
+      // }
     // })
     // iohook.registerShortcut([42, 56], () => {
     //   toggleWindow()

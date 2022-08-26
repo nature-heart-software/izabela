@@ -22,7 +22,7 @@ let deferredRecording: ReturnType<typeof Deferred> | null = null
 
 iohook.on('keydown', (event) => {
   const keybinding = store.getters['settings/persisted'].keybindings.recordAudio[0]
-  if (keybinding && keybinding.keyCode === event.rawcode && !deferredRecording) {
+  if (keybinding && keybinding.rawCode === event.rawcode && !deferredRecording) {
     const deferred = Deferred()
     deferredRecording = deferred
     ipcMain.sendTo('speech-worker', 'start-speech-transcription')
@@ -31,7 +31,7 @@ iohook.on('keydown', (event) => {
 
 iohook.on('keyup', (event) => {
   const keybinding = store.getters['settings/persisted'].keybindings.recordAudio[0]
-  if (keybinding && keybinding.keyCode === event.rawcode && deferredRecording) {
+  if (keybinding && keybinding.rawCode === event.rawcode && deferredRecording) {
     deferredRecording.resolve(true)
     deferredRecording = null
     ipcMain.sendTo('speech-worker', 'stop-speech-transcription')
