@@ -19,20 +19,17 @@ export default ({ engine: engineName, payload, credentials }: IzabelaMessagePayl
   }
 
   function play() {
-    Promise.map(
-      store.getters['settings/persisted'].audioOutputs,
-      async (deviceLabel: string) => {
-        // TODO: Some optimisation possible here
-        const mediaDevice = await getMediaDeviceByLabel(deviceLabel)
-        if (mediaDevice) {
-          const audioElement: any = document.createElement('audio')
-          audioElement.src = audio.src
-          await audioElement.setSinkId(mediaDevice.deviceId)
-          return audioElement
-        }
-        return null
-      },
-    ).then((audioElements: (HTMLAudioElement | null)[]) => {
+    Promise.map(store.getters['settings/persisted'].audioOutputs, async (deviceLabel: string) => {
+      // TODO: Some optimisation possible here
+      const mediaDevice = await getMediaDeviceByLabel(deviceLabel)
+      if (mediaDevice) {
+        const audioElement: any = document.createElement('audio')
+        audioElement.src = audio.src
+        await audioElement.setSinkId(mediaDevice.deviceId)
+        return audioElement
+      }
+      return null
+    }).then((audioElements: (HTMLAudioElement | null)[]) => {
       if (!store.getters['settings/persisted'].playSpeechOnDefaultPlaybackDevice) {
         audio.volume = 0
       }

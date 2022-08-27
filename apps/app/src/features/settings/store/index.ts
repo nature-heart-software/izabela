@@ -12,10 +12,10 @@ const channel = version.includes('alpha')
   ? 'alpha'
   : // eslint-disable-next-line no-nested-ternary
   version.includes('beta')
-    ? 'beta'
-    : version.includes('rc')
-      ? 'rc'
-      : 'latest'
+  ? 'beta'
+  : version.includes('rc')
+  ? 'rc'
+  : 'latest'
 const storeState = {
   persisted: {
     playSpeechOnDefaultPlaybackDevice: true,
