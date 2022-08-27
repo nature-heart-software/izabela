@@ -6,26 +6,26 @@
   >
     <template v-for="display in displays" :key="display.id">
       <NvOption
-        :value="display.id"
         :label="`${(primaryDisplay && display.id === primaryDisplay.id && '(Primary) ') || ''}${
           display.id
         }`"
+        :value="display.id"
       >
-        <template v-if="primaryDisplay && display.id === primaryDisplay.id"> (Primary) </template>
+        <template v-if="primaryDisplay && display.id === primaryDisplay.id"> (Primary)</template>
         {{ display.id }}
       </NvOption>
     </template>
   </NvSelect>
 </template>
 <script lang="ts" setup>
-import { NvSelect, NvOption } from '@packages/ui'
-import {
-  useGetAllDisplaysQuery,
-  useGetPrimaryDisplayQuery,
-} from '@/entities/display/components/hooks'
+import { NvOption, NvSelect } from '@packages/ui'
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import type Electron from 'electron'
+import {
+  useGetAllDisplaysQuery,
+  useGetPrimaryDisplayQuery,
+} from '@/features/display/components/hooks'
 
 const { ElectronDisplay } = window
 

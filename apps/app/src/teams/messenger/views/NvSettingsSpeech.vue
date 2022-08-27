@@ -49,7 +49,7 @@
 import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
 import { NvButton, NvCard, NvDivider, NvGroup, NvStack, NvText } from '@packages/ui'
-import SpeechEngineSelect from '@/entities/speech/components/inputs/NvSpeechEngineSelect.vue'
+import SpeechEngineSelect from '@/features/speech/components/inputs/NvSpeechEngineSelect.vue'
 import { useSpeechEngineManager } from '@/modules/speech-engine-manager'
 import { SpeechEngine } from '@/modules/speech-engine-manager/types'
 

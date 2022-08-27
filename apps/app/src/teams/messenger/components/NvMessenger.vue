@@ -43,9 +43,9 @@
                 <NvButton icon-name="comment-alt-lines" size="sm" />
                 <NvDivider class="h-3" direction="vertical" />
                 <NvButton
-                  @click="navigateTo({ name: 'settings-overview' })"
                   icon-name="setting"
                   size="sm"
+                  @click="navigateTo({ name: 'settings-overview' })"
                 />
               </div>
             </NvCard>
@@ -63,9 +63,9 @@
         <div class="flex justify-between">
           <NvCard class="inline-flex items-center space-x-3" size="sm">
             <NvButton
-              @click="navigateTo({ name: 'settings-speech' })"
               icon-name="setting"
               size="sm"
+              @click="navigateTo({ name: 'settings-speech' })"
             />
             <NvDivider class="h-3" direction="vertical" />
             <SpeechEngineSelect
@@ -89,7 +89,7 @@
               />
             </template>
             <NvDivider class="h-3" direction="vertical" />
-            <NvPopover size="sm" :tippy-options="{ placement: 'top-start' }">
+            <NvPopover :tippy-options="{ placement: 'top-start' }" size="sm">
               <div class="w-screen max-w-full">
                 <NvStack spacing="4">
                   <NvGroup justify="apart">
@@ -117,7 +117,7 @@
                 <NvButton icon-name="direction" size="sm">Outputs</NvButton>
               </template>
             </NvPopover>
-            <NvPopover size="sm" :tippy-options="{ placement: 'top-start' }">
+            <NvPopover :tippy-options="{ placement: 'top-start' }" size="sm">
               <div class="w-screen max-w-full">
                 <NvStack spacing="4">
                   <NvFormItem label="Audio Input">
@@ -205,22 +205,22 @@ import {
   NvButton,
   NvCard,
   NvDivider,
+  NvFormItem,
+  NvGroup,
   NvInput,
   NvPopover,
-  NvFormItem,
   NvStack,
-  NvGroup,
   NvSwitch,
   NvText,
 } from '@packages/ui'
-import DomBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
-import { useRouterViewPopover } from '@/entities/router/hooks'
-import SpeechEngineSelect from '@/entities/speech/components/inputs/NvSpeechEngineSelect.vue'
 import { useStore } from 'vuex'
-import { emitIPCSay } from '@/electron/events/renderer'
-import NvAudioOutputsSelect from '@/entities/audio/components/inputs/NvAudioOutputsSelect.vue'
-import NvAudioInputsSelect from '@/entities/audio/components/inputs/NvAudioInputSelect.vue'
 import { RouteLocationRaw, useRouter } from 'vue-router'
+import DomBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
+import { useRouterViewPopover } from '@/features/router/hooks'
+import SpeechEngineSelect from '@/features/speech/components/inputs/NvSpeechEngineSelect.vue'
+import { emitIPCSay } from '@/electron/events/renderer'
+import NvAudioOutputsSelect from '@/features/audio/components/inputs/NvAudioOutputsSelect.vue'
+import NvAudioInputsSelect from '@/features/audio/components/inputs/NvAudioInputSelect.vue'
 
 const store = useStore()
 const { ElectronMessengerWindow } = window

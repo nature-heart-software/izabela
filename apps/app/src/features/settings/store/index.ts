@@ -1,9 +1,9 @@
 import { Module } from 'vuex'
+import pkg from '@root/package.json'
 import { utilActions, utilMutations } from '@/utils/vuex'
 // eslint-disable-next-line import/no-cycle
 import { SpeechEngine } from '@/modules/speech-engine-manager/types'
-import pkg from '@root/package.json'
-import { Key, KeybindingResult } from '@/types/keybinds'
+import { Key } from '@/types/keybinds'
 import { ENGINE_ID } from '@/plugins/speech-engines/say/consts'
 
 const { version } = pkg

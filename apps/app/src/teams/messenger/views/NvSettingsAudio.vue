@@ -70,18 +70,18 @@
 </template>
 <script lang="ts" setup>
 import {
-  NvCard,
-  NvStack,
-  NvText,
   NvButton,
-  NvGroup,
+  NvCard,
   NvDivider,
   NvFormItem,
+  NvGroup,
+  NvStack,
   NvSwitch,
+  NvText,
 } from '@packages/ui'
-import NvAudioOutputsSelect from '@/entities/audio/components/inputs/NvAudioOutputsSelect.vue'
-import NvAudioInputFormPart from '@/entities/audio/components/inputs/NvAudioInputFormPart.vue'
 import { useStore } from 'vuex'
+import NvAudioOutputsSelect from '@/features/audio/components/inputs/NvAudioOutputsSelect.vue'
+import NvAudioInputFormPart from '@/features/audio/components/inputs/NvAudioInputFormPart.vue'
 
 const store = useStore()
 </script>

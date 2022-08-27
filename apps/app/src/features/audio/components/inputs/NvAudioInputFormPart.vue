@@ -46,24 +46,15 @@
   </NvStack>
 </template>
 <script lang="ts" setup>
-import {
-  NvAccessBlocker,
-  NvButton,
-  NvDivider,
-  NvFormItem,
-  NvGroup,
-  NvIcon,
-  NvStack,
-  NvText,
-} from '@packages/ui'
-import NvKeybinding from '@/entities/app/components/inputs/NvKeybinding.vue'
+import { NvButton, NvDivider, NvFormItem, NvGroup, NvIcon, NvStack, NvText } from '@packages/ui'
+import { useQueryClient } from 'vue-query'
+import { useStore } from 'vuex'
+import NvKeybinding from '@/features/app/components/inputs/NvKeybinding.vue'
 import {
   getGoogleCloudSpeechCredentialsPathQueryKey,
   useGetGoogleCloudSpeechCredentialsPath,
-} from '@/entities/settings/hooks'
-import { useQueryClient } from 'vue-query'
-import { useStore } from 'vuex'
-import NvAudioInputSelect from '@/entities/audio/components/inputs/NvAudioInputSelect.vue'
+} from '@/features/settings/hooks'
+import NvAudioInputSelect from '@/features/audio/components/inputs/NvAudioInputSelect.vue'
 
 const store = useStore()
 const { ElectronDialog, ElectronFilesystem } = window

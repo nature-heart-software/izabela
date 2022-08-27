@@ -1,15 +1,15 @@
 import { createStore, MutationPayload } from 'vuex'
 
+import { defaultsDeep, get, set } from 'lodash'
 import { createPersistedState, createSharedMutations } from '@/modules/electron-vuex'
 import messenger from '@/teams/messenger/store'
 // eslint-disable-next-line import/no-cycle
-import settings from '@/entities/settings/store'
+import settings from '@/features/settings/store'
 // eslint-disable-next-line import/no-cycle
-import speech from '@/entities/speech/store'
-import dictionary from '@/entities/dictionary/store'
+import speech from '@/features/speech/store'
+import dictionary from '@/features/dictionary/store'
 import { SetPropertyPayload, utilActions, utilMutations } from '@/utils/vuex'
 import domBoundariesStore from '@/modules/vue-dom-boundaries/dom-boundaries.store'
-import { defaultsDeep, get, set } from 'lodash'
 import { decrypt, encrypt } from '@/utils/security'
 
 const store = createStore({

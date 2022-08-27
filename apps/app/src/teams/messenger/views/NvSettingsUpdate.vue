@@ -20,8 +20,8 @@
 </template>
 <script lang="ts" setup>
 import { NvCard, NvGroup, NvStack, NvText } from '@packages/ui'
-import NvUpdateChannelSelect from '@/entities/update/components/inputs/NvUpdateChannelSelect.vue'
 import { useStore } from 'vuex'
+import NvUpdateChannelSelect from '@/features/update/components/inputs/NvUpdateChannelSelect.vue'
 
 const store = useStore()
 </script>

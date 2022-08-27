@@ -16,7 +16,7 @@
 <script lang="ts" setup>
 import { NvCard, NvGroup, NvStack, NvText } from '@packages/ui'
 import { useStore } from 'vuex'
-import NvDisplaySelect from '@/entities/display/components/inputs/DisplaySelect.vue'
+import NvDisplaySelect from '@/features/display/components/inputs/DisplaySelect.vue'
 
 const store = useStore()
 </script>
