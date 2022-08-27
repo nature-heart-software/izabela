@@ -12,15 +12,15 @@ const channel = version.includes('alpha')
   ? 'alpha'
   : // eslint-disable-next-line no-nested-ternary
   version.includes('beta')
-  ? 'beta'
-  : version.includes('rc')
-  ? 'rc'
-  : 'latest'
+    ? 'beta'
+    : version.includes('rc')
+      ? 'rc'
+      : 'latest'
 const storeState = {
   persisted: {
     playSpeechOnDefaultPlaybackDevice: true,
-    audioOutputDevices: [] as MediaDeviceInfo['label'][],
-    audioInputDevice: 'default' as MediaDeviceInfo['label'],
+    audioOutputs: [] as MediaDeviceInfo['label'][],
+    audioInput: 'default' as MediaDeviceInfo['label'],
     selectedSpeechEngine: ENGINE_ID as SpeechEngine['id'],
     updateChannel: channel,
     launchOnStartup: true,

@@ -20,7 +20,7 @@ export default ({ engine: engineName, payload, credentials }: IzabelaMessagePayl
 
   function play() {
     Promise.map(
-      store.getters['settings/persisted'].audioOutputDevices,
+      store.getters['settings/persisted'].audioOutputs,
       async (deviceLabel: string) => {
         // TODO: Some optimisation possible here
         const mediaDevice = await getMediaDeviceByLabel(deviceLabel)
