@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.v-enter-active,
+.v-leave-active {
+  transition: all 0.3s;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+
+a {
+  display: inline-flex;
+}
