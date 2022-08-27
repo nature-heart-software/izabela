@@ -1,13 +1,13 @@
 <template>
   <NvSelect
-    :modelValue="store.getters['settings/persisted'].audioInputDevice"
+    :modelValue="store.getters['settings/persisted'].audioInput"
     @update:modelValue="
-      (value) => store.dispatch('settings/setProperty', ['persisted.audioInputDevice', value])
+      (value) => store.dispatch('settings/setProperty', ['persisted.audioInput', value])
     "
   >
-    <template v-for="audioInputDevice in audioInputDevices" :key="audioInputDevice.deviceId">
-      <NvOption :label="audioInputDevice.label" :value="audioInputDevice.label">
-        {{ audioInputDevice.label }}
+    <template v-for="audioInput in audioInputs" :key="audioInput.deviceId">
+      <NvOption :label="audioInput.label" :value="audioInput.label">
+        {{ audioInput.label }}
       </NvOption>
     </template>
   </NvSelect>
@@ -15,8 +15,8 @@
 <script lang="ts" setup>
 import { NvOption, NvSelect } from '@packages/ui'
 import { useStore } from 'vuex'
-import { useMediaDevices } from '@/hooks'
+import { useDevicesList } from '@vueuse/core'
 
 const store = useStore()
-const { audioInputDevices } = useMediaDevices()
+const { audioInputs } = useDevicesList()
 </script>

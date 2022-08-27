@@ -1,17 +1,17 @@
 <template>
   <NvSelect
-    :modelValue="store.getters['settings/persisted'].audioOutputDevices"
+    :modelValue="store.getters['settings/persisted'].audioOutputs"
     multiple
     @update:modelValue="
-      (value) => store.dispatch('settings/setProperty', ['persisted.audioOutputDevices', value])
+      (value) => store.dispatch('settings/setProperty', ['persisted.audioOutputs', value])
     "
   >
     <template
-      v-for="audioOutputDevice in filteredAudioOutputDevices"
-      :key="audioOutputDevice.deviceId"
+      v-for="audioOutput in filteredAudioOutputDevices"
+      :key="audioOutput.deviceId"
     >
-      <NvOption :label="audioOutputDevice.label" :value="audioOutputDevice.label">
-        {{ audioOutputDevice.label }}
+      <NvOption :label="audioOutput.label" :value="audioOutput.label">
+        {{ audioOutput.label }}
       </NvOption>
     </template>
   </NvSelect>
@@ -19,13 +19,13 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { NvOption, NvSelect } from '@packages/ui'
-import { useMediaDevices } from '@/hooks'
+import { useDevicesList } from '@vueuse/core'
 import { useStore } from 'vuex'
 
 const store = useStore()
-const { audioOutputDevices } = useMediaDevices()
+const { audioOutputs } = useDevicesList()
 
 const filteredAudioOutputDevices = computed(() =>
-  audioOutputDevices.value.filter((d) => d.deviceId !== 'default'),
+  audioOutputs.value.filter((d) => d.deviceId !== 'default'),
 )
 </script>
