@@ -12,6 +12,37 @@ import registerElectronUpdater from '@/modules/electron-updater/register'
 import registerElectronDebug from '@/modules/electron-debug/register'
 import registerElectronDisplay from '@/modules/electron-display/register'
 import registerElectronKeybinding from '@/modules/electron-keybinding/register'
+// import '@packages/electron-pinia/dist/main.cjs'
+// import { defineStore } from 'pinia/dist/pinia.cjs'
+//
+// const useCounterStore = defineStore(
+//   'counter',
+//   {
+//     state: () => ({ count: 0, name: 'Eduardo' }),
+//     getters: {
+//       doubleCount: (state) => state.count * 2,
+//     },
+//     actions: {
+//       increment() {
+//         this.count++
+//       },
+//     },
+//   },
+//   {
+//     electron: {
+//       persist: true,
+//     },
+//   },
+// )
+// const counterStore = useCounterStore()
+//
+// setInterval(() => {
+//   counterStore.increment()
+// }, 1000)
+//
+// setInterval(() => {
+//   console.log(counterStore.count)
+// }, 1000)
 
 const App = () => {
   const isDevelopment = process.env.NODE_ENV !== 'production'
