@@ -15,6 +15,15 @@ module.exports = defineConfig({
   },
   transpileDependencies: ['@izabela'],
   configureWebpack: {
+    module: {
+      rules: [
+        {
+          test: /\.mjs$/,
+          include: /node_modules/,
+          type: 'javascript/auto',
+        },
+      ],
+    },
     plugins: [
       new WebpackNotifierPlugin({ emoji: true }),
       new GenerateExportsPlugin({
