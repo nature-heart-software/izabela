@@ -1,6 +1,6 @@
 import { createPinia, PiniaPlugin } from 'pinia'
-import { persistState } from '@/persist-state'
-import { shareState } from '@/share-state'
+import { persistStatePlugin } from '@/persist-state-plugin'
+import { shareStatePlugin } from '@/share-state-plugin'
 import { StoreOptions } from '@/types'
 import { isMain } from '@/consts'
 import { createApp, h } from 'vue'
@@ -17,9 +17,9 @@ export const plugin = (() => {
     if (options.electron) {
       stores.set(store.$id, store)
       if (options.electron.shared)
-        state = { ...state, ...shareState({ store, options, ...rest }) }
+        state = { ...state, ...shareStatePlugin({ store, options, ...rest }) }
       if (options.electron.persisted)
-        state = { ...state, ...persistState({ store, options, ...rest }) }
+        state = { ...state, ...persistStatePlugin({ store, options, ...rest }) }
     }
     return state
   }

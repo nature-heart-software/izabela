@@ -14,21 +14,25 @@ import {
   isPreload,
 } from '@/consts'
 
+let storage: ElectronStore
+
 if (isMain) {
-  const store = new ElectronStore({ name: ELECTRON_STORAGE_NAME })
-  ipcMain.on(IPC_EVENT_STORE_GET, (event, [{ name }]) => {
-    event.reply(store.get(name))
+  storage = new ElectronStore({ name: ELECTRON_STORAGE_NAME })
+  ipcMain.handle(IPC_EVENT_STORE_GET, (_, { name }) => {
+    return storage.get(name)
   })
-  ipcMain.on(IPC_EVENT_STORE_SET, (_, [{ name, state }]) => {
-    store.set(name, state)
+  ipcMain.handle(IPC_EVENT_STORE_SET, (_, { name, state }) => {
+    storage.set(name, state)
+    return true
   })
-  ipcMain.on(IPC_EVENT_STORE_DELETE, (_, [{ name }]) => {
-    store.delete(name)
+  ipcMain.handle(IPC_EVENT_STORE_DELETE, (_, { name }) => {
+    storage.delete(name)
+    return true
   })
 }
 
-export const persistState: PiniaPlugin = ({ store }) => {
-  const storage = createStorage()
+export const persistStatePlugin: PiniaPlugin = ({ store }) => {
+  const storage = getStorage()
   const loaded = isPreload ? Promise.resolve(true) : loadInitialState()
 
   const setState = debounce((state: any) => {
@@ -40,10 +44,8 @@ export const persistState: PiniaPlugin = ({ store }) => {
     return (await storage.get(getStorageName(store.$id))) || {}
   }
 
-  function createStorage(): ElectronStore {
-    return typeof window !== 'undefined'
-      ? window.ElectronPiniaStore
-      : new ElectronStore({ name: ELECTRON_STORAGE_NAME })
+  function getStorage(): ElectronStore {
+    return typeof isMain ? storage : window.ElectronPiniaStorage
   }
 
   function getStorageName(storeId: PiniaPluginContext['store']['$id']) {
