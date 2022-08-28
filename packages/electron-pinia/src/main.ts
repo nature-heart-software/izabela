@@ -1,13 +1,7 @@
-import { createPinia, PiniaPlugin } from 'pinia'
+import { PiniaPlugin } from 'pinia'
 import { persistStatePlugin } from '@/persist-state-plugin'
 import { shareStatePlugin } from '@/share-state-plugin'
 import { StoreOptions } from '@/types'
-import { isMain } from '@/consts'
-import { createApp, h } from 'vue'
-
-if (isMain) {
-  createApp(h({})).use(createPinia())
-}
 
 export const plugin = (() => {
   const stores = new Map()
