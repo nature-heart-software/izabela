@@ -18,7 +18,7 @@ import {
   // ref
 } from 'vue'
 
-createApp(h({})).use(createPinia().use(electronPiniaPlugin));
+createApp(h({})).use(createPinia().use(electronPiniaPlugin))
 
 // const outsideRef = ref(0)
 // const useCounterStore = defineStore(
