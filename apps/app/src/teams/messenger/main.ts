@@ -14,7 +14,7 @@ import { watchBoundary } from '@/modules/vue-dom-boundaries'
 import { createPinia, defineStore } from 'pinia'
 // eslint-disable-next-line
 // @ts-ignore
-import electronPiniaPlugin from '@packages/electron-pinia/dist/renderer.es'
+import electronPiniaPlugin from '@packages/electron-pinia/renderer'
 
 watchBoundary('.el-select-dropdown')
 watchBoundary('.tippy-box')

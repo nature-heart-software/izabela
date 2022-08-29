@@ -6,8 +6,6 @@ import { watch } from 'vue'
 export default () =>
   app.whenReady().then(() =>
     store.getters.isReady().then(() => {
-      electronMessengerWindow.setDisplay(store.getters['settings/persisted'].display)
-
       watch(
         () => store.getters['settings/persisted'].display,
         () => {

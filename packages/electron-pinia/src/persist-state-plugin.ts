@@ -15,7 +15,7 @@ import { AugmentedGlobal } from './types'
 
 
 function getStorage(): ElectronStore {
-  return typeof isMain ? (global as AugmentedGlobal).ElectronPiniaStorage : window.ElectronPiniaStorage
+  return isMain ? (global as AugmentedGlobal).ElectronPiniaStorage : window.ElectronPiniaStorage
 }
 
 if (isMain) {

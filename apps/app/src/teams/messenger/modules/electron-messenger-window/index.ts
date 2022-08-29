@@ -161,6 +161,9 @@ export const ElectronMessengerWindow = () => {
     // iohook.registerShortcut([42, 56], () => {
     //   toggleWindow()
     // })
+
+    setDisplay(store.getters['settings/persisted'].display)
+
     if (window) {
       window.on('show', () => {
         store.dispatch('messenger/setProperty', ['isShown', true])

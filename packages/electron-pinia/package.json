@@ -6,6 +6,25 @@
     "build": "microbundle src/{main,renderer,preload}.ts --target=node",
     "dev": "microbundle src/{main,renderer,preload}.ts --target=node watch"
   },
+  "exports": {
+    ".": {
+      "require": "./dist/renderer.cjs",
+      "default": "./dist/renderer.es.js"
+    },
+    "./main": {
+      "require": "./dist/main.cjs",
+      "default": "./dist/main.es.js"
+    },
+    "./renderer": {
+      "require": "./dist/renderer.cjs",
+      "default": "./dist/renderer.es.js"
+    },
+    "./preload": {
+      "require": "./dist/preload.cjs",
+      "default": "./dist/preload.es.js"
+    }
+  },
+  "type": "module",
   "source": "src/main.ts",
   "main": "./dist/main.cjs",
   "module": "./dist/main.es.js",

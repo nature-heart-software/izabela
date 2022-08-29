@@ -11,5 +11,3 @@ export const isPreload = !!(
   typeof window !== 'undefined' && window.ElectronPiniaIsPreload
 )
 export const isMain = !isRenderer && !isPreload
-
-console.log({ isRenderer, isPreload, isMain })
