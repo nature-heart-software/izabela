@@ -1,4 +1,5 @@
 /* High priority plugins */
+import '@packages/electron-pinia/dist/preload.es'
 import '@/modules/electron-log/preload'
 import '@/modules/electron-vuex/preload'
 /* Other plugins */

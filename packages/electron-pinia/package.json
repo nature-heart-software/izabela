@@ -2,10 +2,9 @@
   "name": "@packages/electron-pinia",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
   "scripts": {
-    "build": "microbundle --target=node",
-    "dev": "microbundle --target=node watch"
+    "build": "microbundle src/{main,renderer,preload}.ts --target=node",
+    "dev": "microbundle src/{main,renderer,preload}.ts --target=node watch"
   },
   "source": "src/main.ts",
   "main": "./dist/main.cjs",

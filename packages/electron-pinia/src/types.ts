@@ -9,6 +9,11 @@ export type StoreOptions = PiniaPluginContext['options'] & {
   }
 }
 
+export type AugmentedGlobal = typeof global & {
+  ElectronPiniaStorage: ElectronStore
+  ipcMain: Electron.IpcMain
+}
+
 export type IpcRendererMutationEventHandler = (
   event: Electron.IpcRendererEvent,
 ) => void
@@ -26,8 +31,5 @@ declare global {
     ElectronPiniaIsPreload?: boolean
   }
 
-  interface Global {
-    ipcMain: Electron.IpcMain
-    ElectronPiniaStorage: ElectronStore
-  }
+  interface Global extends AugmentedGlobal {}
 }

@@ -13,9 +13,9 @@ import registerElectronDebug from '@/modules/electron-debug/register'
 import registerElectronDisplay from '@/modules/electron-display/register'
 import registerElectronKeybinding from '@/modules/electron-keybinding/register'
 
-if (process.env.NODE_ENV === 'development') {
-  require('@/.wips/electron/electron-pinia')
-}
+// if (process.env.NODE_ENV === 'development') {
+//   require('@/.wips/electron/electron-pinia')
+// }
 
 const App = () => {
   const isDevelopment = process.env.NODE_ENV !== 'production'

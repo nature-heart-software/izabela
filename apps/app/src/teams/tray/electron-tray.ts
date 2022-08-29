@@ -2,7 +2,7 @@ import { app, Menu, Tray, screen } from 'electron'
 import path from 'path'
 import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
 import store from '@/store'
-import { watch } from '@/utils/vue'
+import { watch } from 'vue'
 
 let tray: Tray
 const createTray = (): Promise<Tray> =>

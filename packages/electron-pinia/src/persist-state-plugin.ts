@@ -2,27 +2,24 @@ import { PiniaPlugin, PiniaPluginContext } from 'pinia'
 import debounce from 'lodash/debounce'
 import defaultsDeep from 'lodash/defaultsDeep'
 import cloneDeep from 'lodash/cloneDeep'
-import ElectronStore from 'electron-store'
+import type ElectronStore from 'electron-store'
 import { computed } from 'vue'
-import { ipcMain } from 'electron'
 import {
-  ELECTRON_STORAGE_NAME,
   IPC_EVENT_STORE_DELETE,
   IPC_EVENT_STORE_GET,
   IPC_EVENT_STORE_SET,
   isMain,
   isPreload,
-} from '@/consts'
-
-let storage: ElectronStore
+} from './consts'
+import { AugmentedGlobal } from './types'
 
 
 function getStorage(): ElectronStore {
-  if (isMain && !storage) storage = new ElectronStore({ name: ELECTRON_STORAGE_NAME })
-  return typeof isMain ? storage : window.ElectronPiniaStorage
+  return typeof isMain ? (global as AugmentedGlobal).ElectronPiniaStorage : window.ElectronPiniaStorage
 }
 
 if (isMain) {
+  const { ipcMain } = (global as AugmentedGlobal)
   ipcMain.handle(IPC_EVENT_STORE_GET, (_, { name }) => {
     const storage = getStorage()
     return storage.get(name)

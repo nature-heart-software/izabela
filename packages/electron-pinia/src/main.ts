@@ -1,23 +1,11 @@
-import { PiniaPlugin } from 'pinia'
-import { persistStatePlugin } from '@/persist-state-plugin'
-import { shareStatePlugin } from '@/share-state-plugin'
-import { StoreOptions } from '@/types'
+import { ipcMain } from 'electron'
+import { AugmentedGlobal } from './types'
+import { plugin } from './plugin'
+import { ELECTRON_STORAGE_NAME } from './consts'
+import ElectronStore from 'electron-store'
 
-export const plugin = (() => {
-  const stores = new Map()
-  const plugin: PiniaPlugin = ({ store, options: storeOptions, ...rest }) => {
-    const options = storeOptions as StoreOptions
-    let state = {}
-    if (options.electron) {
-      stores.set(store.$id, store)
-      if (options.electron.shared)
-        state = { ...state, ...shareStatePlugin({ store, options, ...rest }) }
-      if (options.electron.persisted)
-        state = { ...state, ...persistStatePlugin({ store, options, ...rest }) }
-    }
-    return state
-  }
-  return plugin
-})()
+(global as AugmentedGlobal).ElectronPiniaStorage =  new ElectronStore({ name: ELECTRON_STORAGE_NAME })
+;(global as AugmentedGlobal).ipcMain = ipcMain
 
+export { plugin } from './plugin'
 export default plugin

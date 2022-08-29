@@ -4,7 +4,7 @@
 // const child = spawn("node", [path.resolve('./playground/electron-pinia-poc.js')], { stdio: ['inherit', 'inherit', 'inherit', 'ipc'] });
 
 // this works too
-import electronPiniaPlugin from '@packages/electron-pinia'
+import electronPiniaPlugin from '@packages/electron-pinia/dist/main.es'
 import { createPinia, defineStore } from 'pinia'
 import { createApp, h, watch, computed, effect, ref } from 'vue'
 
@@ -38,9 +38,9 @@ setInterval(() => {
 effect(() => {
   console.log('effect', counterStore.doubleCount)
 })
-
-watch(() => counterStore.doubleCount as any, () => {
-  console.log(counterStore.count)
+const triple = computed(() => counterStore.count * 3)
+watch(triple as any, () => {
+  console.log('wow tripple', triple.value)
 })
 
 setInterval(() => {

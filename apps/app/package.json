@@ -29,8 +29,6 @@
     "@packages/electron-pinia": "*",
     "@packages/ui": "*",
     "@ryanmorr/ready": "^1.4.0",
-    "@vue-reactivity/watch": "^0.2.0",
-    "@vue/reactivity": "^3.2.37",
     "@vueuse/core": "^9.1.1",
     "@wurielle/generate-modules-webpack-plugin": "^0.1.0",
     "axios": "^0.27.2",

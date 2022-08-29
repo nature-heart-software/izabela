@@ -6,8 +6,10 @@ export const IPC_EVENT_STORE_SET = 'electron-pinia-store-set'
 export const IPC_EVENT_STORE_DELETE = 'electron-pinia-store-delete'
 export const ELECTRON_STORAGE_NAME = 'electron-pinia'
 
-export const isRenderer = process && process.type === 'renderer'
+export const isRenderer = typeof window !== 'undefined'
 export const isPreload = !!(
   typeof window !== 'undefined' && window.ElectronPiniaIsPreload
 )
 export const isMain = !isRenderer && !isPreload
+
+console.log({ isRenderer, isPreload, isMain })
