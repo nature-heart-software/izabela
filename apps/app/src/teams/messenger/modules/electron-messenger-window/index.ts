@@ -4,6 +4,7 @@ import store from '@/store'
 import { throttle } from 'lodash'
 import { Boundary } from '@/modules/vue-dom-boundaries/types'
 import { BrowserWindow, screen, shell } from 'electron'
+import { Deferred } from '@/utils/promise'
 
 export const ElectronMessengerWindow = () => {
   /* use isFocused as source of truth instead of window.isFocused() as in some instances
@@ -14,6 +15,9 @@ export const ElectronMessengerWindow = () => {
   // let lastKeypressTime = 0
   // const doubleKeypressDelta = 500
   let registeredWindow: BrowserWindow | null = null
+  const ready = Deferred<BrowserWindow>()
+
+  const isReady = () => ready.promise
 
   const getWindow = () =>
     registeredWindow || ElectronWindowManager.getInstanceByName('messenger')?.window
@@ -186,8 +190,12 @@ export const ElectronMessengerWindow = () => {
 
   const start = (window: BrowserWindow) => {
     registeredWindow = window
-    addEventListeners()
+    ready.resolve(window)
   }
+
+  isReady().then(() => {
+    addEventListeners()
+  })
 
   return {
     openDevTools,
@@ -198,6 +206,7 @@ export const ElectronMessengerWindow = () => {
     toggleWindow,
     start,
     setDisplay,
+    isReady,
   }
 }
 
