@@ -16,16 +16,24 @@ import {
 
 let storage: ElectronStore
 
+
+function getStorage(): ElectronStore {
+  if (isMain && !storage) storage = new ElectronStore({ name: ELECTRON_STORAGE_NAME })
+  return typeof isMain ? storage : window.ElectronPiniaStorage
+}
+
 if (isMain) {
-  storage = new ElectronStore({ name: ELECTRON_STORAGE_NAME })
   ipcMain.handle(IPC_EVENT_STORE_GET, (_, { name }) => {
+    const storage = getStorage()
     return storage.get(name)
   })
   ipcMain.handle(IPC_EVENT_STORE_SET, (_, { name, state }) => {
+    const storage = getStorage()
     storage.set(name, state)
     return true
   })
   ipcMain.handle(IPC_EVENT_STORE_DELETE, (_, { name }) => {
+    const storage = getStorage()
     storage.delete(name)
     return true
   })
@@ -42,10 +50,6 @@ export const persistStatePlugin: PiniaPlugin = ({ store }) => {
 
   async function getState() {
     return (await storage.get(getStorageName(store.$id))) || {}
-  }
-
-  function getStorage(): ElectronStore {
-    return typeof isMain ? storage : window.ElectronPiniaStorage
   }
 
   function getStorageName(storeId: PiniaPluginContext['store']['$id']) {

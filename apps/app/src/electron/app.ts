@@ -12,44 +12,10 @@ import registerElectronUpdater from '@/modules/electron-updater/register'
 import registerElectronDebug from '@/modules/electron-debug/register'
 import registerElectronDisplay from '@/modules/electron-display/register'
 import registerElectronKeybinding from '@/modules/electron-keybinding/register'
-// import electronPiniaPlugin from '@packages/electron-pinia'
-// import { createPinia, defineStore } from 'pinia'
-// import { computed, ref } from '@vue/reactivity'
-// import { createApp, h } from 'vue'
-// import { watch } from '@vue-reactivity/watch'
-//
-// createApp(h({})).use(createPinia().use(electronPiniaPlugin));
-//
-// const useCounterStore = defineStore(
-//   'counter',
-//   () => {
-//     const count = ref(0)
-//     const name = ref('Eduardo')
-//     const doubleCount = computed(() => count.value * 2)
-//     function increment() {
-//       count.value += 1
-//     }
-//     return { count, name, doubleCount, increment }
-//   },
-//   {
-//     electron: {
-//       persisted: true,
-//     },
-//   } as any,
-// )
-// const counterStore = useCounterStore()
-//
-// setInterval(() => {
-//   counterStore.increment()
-// }, 1000)
-//
-// watch(() => counterStore.doubleCount as any, () => {
-//   console.log(counterStore.count)
-// })
-//
-// setInterval(() => {
-//   console.log(counterStore.count)
-// }, 5000)
+
+if (process.env.NODE_ENV === 'development') {
+  require('@/.wips/electron/electron-pinia')
+}
 
 const App = () => {
   const isDevelopment = process.env.NODE_ENV !== 'production'
