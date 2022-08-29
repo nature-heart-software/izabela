@@ -10,9 +10,7 @@ const plugin = ({ store }) => {
   stores.set(store.$id, store)
   store.$onAction(({ name, store, args }) => {
     if (store.$id === 'main') {
-      console.log(
-        `[${store.$id}] Start "${name}" with params [${args.join(', ')}].`,
-      )
+      console.log(`[${store.$id}] Start "${name}" with params [${args.join(', ')}].`)
       emitter.emit('action', {
         name,
         storeId: store.$id,
@@ -20,9 +18,7 @@ const plugin = ({ store }) => {
       })
     } else {
       console.log(
-        `[${store.$id}] Start "${name}" with params [${args
-          .map(JSON.stringify)
-          .join(', ')}].`,
+        `[${store.$id}] Start "${name}" with params [${args.map(JSON.stringify).join(', ')}].`,
       )
     }
   })
