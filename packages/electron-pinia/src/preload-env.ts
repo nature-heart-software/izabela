@@ -1,2 +1,2 @@
-(window as any).ElectronPiniaIsPreload = true
+;(window as any).ElectronPiniaIsPreload = true
 export {}

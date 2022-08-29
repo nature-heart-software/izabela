@@ -13,13 +13,14 @@ import {
 } from './consts'
 import { AugmentedGlobal } from './types'
 
-
 function getStorage(): ElectronStore {
-  return typeof isMain ? (global as AugmentedGlobal).ElectronPiniaStorage : window.ElectronPiniaStorage
+  return typeof isMain
+    ? (global as AugmentedGlobal).ElectronPiniaStorage
+    : window.ElectronPiniaStorage
 }
 
 if (isMain) {
-  const { ipcMain } = (global as AugmentedGlobal)
+  const { ipcMain } = global as AugmentedGlobal
   ipcMain.handle(IPC_EVENT_STORE_GET, (_, { name }) => {
     const storage = getStorage()
     return storage.get(name)

@@ -8,7 +8,7 @@ import electronPiniaPlugin from '@packages/electron-pinia/dist/main.es'
 import { createPinia, defineStore } from 'pinia'
 import { createApp, h, watch, computed, effect, ref } from 'vue'
 
-createApp(h({})).use(createPinia().use(electronPiniaPlugin));
+createApp(h({})).use(createPinia().use(electronPiniaPlugin))
 
 const outsideRef = ref(0)
 const useCounterStore = defineStore(
