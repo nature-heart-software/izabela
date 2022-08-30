@@ -17,14 +17,23 @@ export type AugmentedGlobal = typeof global & {
 export type Connections = { [key: string]: Electron.IpcMainEvent['sender'] }
 
 export type ShareStatePayload = {
-  name: string,
-  storeId: string,
-  args: (any|{ issuer: string })[]
+  name: string
+  storeId: string
+  args: (any | { issuer: string })[]
 }
 
-export type IpcRendererEventHandler<A extends any[] = any[]> = (event: Electron.IpcRendererEvent, ...arg: A) => void
-export type IpcMainEventHandler<A extends any[] = any[]> = (event: Electron.IpcMainEvent, ...arg: A) => void
-export type IpcMainInvokeEventHandler<A extends any[] = any[]> = (event: Electron.IpcMainInvokeEvent, ...arg: A) => void
+export type IpcRendererEventHandler<A extends any[] = any[]> = (
+  event: Electron.IpcRendererEvent,
+  ...arg: A
+) => void
+export type IpcMainEventHandler<A extends any[] = any[]> = (
+  event: Electron.IpcMainEvent,
+  ...arg: A
+) => void
+export type IpcMainInvokeEventHandler<A extends any[] = any[]> = (
+  event: Electron.IpcMainInvokeEvent,
+  ...arg: A
+) => void
 
 declare global {
   interface Window {

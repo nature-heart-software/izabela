@@ -16,7 +16,9 @@ contextBridge.exposeInMainWorld('ElectronPinia', {
   SEND_IPC_EVENT_NOTIFY_MAIN(payload: ShareStatePayload) {
     ipcRenderer.send(IPC_EVENT_NOTIFY_MAIN, payload)
   },
-  ON_IPC_EVENT_NOTIFY_RENDERERS(handler: IpcRendererEventHandler<[ShareStatePayload]>) {
+  ON_IPC_EVENT_NOTIFY_RENDERERS(
+    handler: IpcRendererEventHandler<[ShareStatePayload]>,
+  ) {
     ipcRenderer.on(IPC_EVENT_NOTIFY_RENDERERS, handler)
   },
 })
