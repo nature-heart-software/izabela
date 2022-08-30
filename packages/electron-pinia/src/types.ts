@@ -14,18 +14,26 @@ export type AugmentedGlobal = typeof global & {
   ipcMain: Electron.IpcMain
 }
 
-export type IpcRendererMutationEventHandler = (
-  event: Electron.IpcRendererEvent,
-) => void
+export type Connections = { [key: string]: Electron.IpcMainEvent['sender'] }
+
+export type ShareStatePayload = {
+  name: string,
+  storeId: string,
+  args: (any|{ issuer: string })[]
+}
+
+export type IpcRendererEventHandler<A extends any[] = any[]> = (event: Electron.IpcRendererEvent, ...arg: A) => void
+export type IpcMainEventHandler<A extends any[] = any[]> = (event: Electron.IpcMainEvent, ...arg: A) => void
+export type IpcMainInvokeEventHandler<A extends any[] = any[]> = (event: Electron.IpcMainInvokeEvent, ...arg: A) => void
 
 declare global {
   interface Window {
     ElectronPinia: {
-      SEND_IPC_EVENT_CONNECT: () => void
+      SEND_IPC_EVENT_CONNECT: () => Promise<string>
       ON_IPC_EVENT_NOTIFY_RENDERERS: (
-        handler: IpcRendererMutationEventHandler,
+        handler: IpcRendererEventHandler<[ShareStatePayload]>,
       ) => void
-      SEND_IPC_EVENT_NOTIFY_MAIN: (payload: any) => void
+      SEND_IPC_EVENT_NOTIFY_MAIN: (payload: ShareStatePayload) => void
     }
     ElectronPiniaStorage: ElectronStore
     ElectronPiniaIsPreload?: boolean

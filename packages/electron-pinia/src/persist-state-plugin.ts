@@ -12,6 +12,7 @@ import {
   isPreload,
 } from './consts'
 import { AugmentedGlobal } from './types'
+import { purify } from './utils'
 
 
 function getStorage(): ElectronStore {
@@ -51,13 +52,6 @@ export const persistStatePlugin: PiniaPlugin = ({ store }) => {
 
   function getStorageName(storeId: PiniaPluginContext['store']['$id']) {
     return `electron-pinia-${storeId}`
-  }
-
-  function purify(o?: object | [] | null) {
-    if (typeof o === 'object') {
-      return JSON.parse(JSON.stringify(o))
-    }
-    return o
   }
 
   async function loadInitialState() {

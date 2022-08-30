@@ -7,15 +7,16 @@ import {
   IPC_EVENT_STORE_SET,
 } from './consts'
 import { contextBridge, ipcRenderer } from 'electron'
+import { IpcRendererEventHandler, ShareStatePayload } from './types'
 
 contextBridge.exposeInMainWorld('ElectronPinia', {
   SEND_IPC_EVENT_CONNECT() {
-    ipcRenderer.send(IPC_EVENT_CONNECT)
+    return ipcRenderer.invoke(IPC_EVENT_CONNECT)
   },
-  SEND_IPC_EVENT_NOTIFY_MAIN(payload: any) {
+  SEND_IPC_EVENT_NOTIFY_MAIN(payload: ShareStatePayload) {
     ipcRenderer.send(IPC_EVENT_NOTIFY_MAIN, payload)
   },
-  ON_IPC_EVENT_NOTIFY_RENDERERS(handler: any) {
+  ON_IPC_EVENT_NOTIFY_RENDERERS(handler: IpcRendererEventHandler<[ShareStatePayload]>) {
     ipcRenderer.on(IPC_EVENT_NOTIFY_RENDERERS, handler)
   },
 })
