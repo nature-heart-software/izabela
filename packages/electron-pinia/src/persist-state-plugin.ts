@@ -41,7 +41,9 @@ if (isMain) {
   })
 }
 
-export const persistStatePlugin: PiniaPlugin = ({ store }): PluginCustomProperties => {
+export const persistStatePlugin: PiniaPlugin = ({
+  store,
+}): PluginCustomProperties => {
   const storage = getStorage()
   const loaded = isPreload ? Promise.resolve(true) : loadInitialState()
 
