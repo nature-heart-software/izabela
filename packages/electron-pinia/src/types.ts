@@ -1,6 +1,7 @@
 import { PiniaPluginContext } from 'pinia'
 import type ElectronStore from 'electron-store'
 import type Electron from 'electron'
+import { Ref } from 'vue'
 
 export type StoreOptions = PiniaPluginContext['options'] & {
   electron?: {
@@ -8,6 +9,8 @@ export type StoreOptions = PiniaPluginContext['options'] & {
     persisted?: boolean
   }
 }
+
+export type PluginCustomProperties = { isReady?: Ref<() =>Promise<boolean>> }
 
 export type AugmentedGlobal = typeof global & {
   ElectronPiniaStorage: ElectronStore

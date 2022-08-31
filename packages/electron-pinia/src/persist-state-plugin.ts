@@ -11,7 +11,7 @@ import {
   isMain,
   isPreload,
 } from './consts'
-import { AugmentedGlobal } from './types'
+import { AugmentedGlobal, PluginCustomProperties } from './types'
 import { purify } from './utils'
 
 function getStorage(): ElectronStore {
@@ -41,7 +41,7 @@ if (isMain) {
   })
 }
 
-export const persistStatePlugin: PiniaPlugin = ({ store }) => {
+export const persistStatePlugin: PiniaPlugin = ({ store }): PluginCustomProperties => {
   const storage = getStorage()
   const loaded = isPreload ? Promise.resolve(true) : loadInitialState()
 
