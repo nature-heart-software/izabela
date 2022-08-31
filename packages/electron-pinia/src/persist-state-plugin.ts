@@ -21,8 +21,8 @@ function getStorage(): ElectronStore {
 }
 
 const storageSetState = isMain // debounce to prevent too many writes to the disk
-    ? debounce((name: string, state: any) => getStorage().set(name, state), 1000)
-    : (name: string, state: any) => getStorage().set(name, state)
+  ? debounce((name: string, state: any) => getStorage().set(name, state), 1000)
+  : (name: string, state: any) => getStorage().set(name, state)
 
 if (isMain) {
   const { ipcMain } = global as AugmentedGlobal
