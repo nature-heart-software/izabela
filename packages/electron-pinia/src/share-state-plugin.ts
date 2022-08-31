@@ -25,10 +25,10 @@ export const shareStatePlugin: PiniaPlugin = ({store}) => {
     function notifyRenderers(
         connections: Connections,
         payload: ShareStatePayload,
-        issuer = '',
+        issuer: string|number = '',
     ) {
         Object.keys(connections).forEach((processId) => {
-            if (processId !== issuer) {
+            if (processId !== (typeof issuer === 'number' ? issuer.toString() : issuer)) {
                 connections[processId].send(IPC_EVENT_NOTIFY_RENDERERS, purify(payload))
             }
         })
@@ -39,7 +39,7 @@ export const shareStatePlugin: PiniaPlugin = ({store}) => {
     }
 
     function onConnect(handler: IpcMainInvokeEventHandler) {
-        ipcMain?.handle(IPC_EVENT_CONNECT, handler)
+        return ipcMain?.handle(IPC_EVENT_CONNECT, handler)
     }
 
     function notifyMain(payload: ShareStatePayload) {
@@ -56,7 +56,6 @@ export const shareStatePlugin: PiniaPlugin = ({store}) => {
 
     async function rendererProcessLogic() {
         const winId = await connect()
-
         store.$onAction(({ name, store, args }) => {
             const hasIssuer = args.some((arg) => typeof arg === 'object' && arg.issuer)
             if (hasIssuer) return
@@ -73,17 +72,17 @@ export const shareStatePlugin: PiniaPlugin = ({store}) => {
         onConnect((event) => {
             const win = event.sender
             const winId = win.id
-
             connections[winId] = win
             win.on('destroyed', () => {
                 delete connections[winId]
             })
-            return winId
+            return Promise.resolve(winId)
         })
 
         store.$onAction(({ name, store, args }) => {
-            const issuer = args.find((arg) => typeof arg === 'object' && arg.issuer) || 'main'
-            notifyRenderers(connections, { name, storeId: store.$id, args: [...args.filter((o) => typeof o !== 'object' || !o.issuer ), { issuer }] }, issuer)
+            const issuer = args.find((arg) => typeof arg === 'object' && arg.issuer)?.issuer || 'main'
+            const newArgs = [...args.filter((o) => typeof o !== 'object' || !o.issuer ), { issuer }]
+            notifyRenderers(connections, { name, storeId: store.$id, args: newArgs }, issuer)
         });
 
         onNotifyMain((_, { name, storeId, args }) => {

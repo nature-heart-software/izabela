@@ -29,7 +29,7 @@ export type IpcMainInvokeEventHandler<A extends any[] = any[]> = (event: Electro
 declare global {
   interface Window {
     ElectronPinia: {
-      SEND_IPC_EVENT_CONNECT: () => Promise<string>
+      SEND_IPC_EVENT_CONNECT: () => Promise<number>
       ON_IPC_EVENT_NOTIFY_RENDERERS: (
         handler: IpcRendererEventHandler<[ShareStatePayload]>,
       ) => void

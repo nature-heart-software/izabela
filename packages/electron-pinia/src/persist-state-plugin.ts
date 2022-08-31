@@ -19,6 +19,10 @@ function getStorage(): ElectronStore {
   return isMain ? (global as AugmentedGlobal).ElectronPiniaStorage : window.ElectronPiniaStorage
 }
 
+const storageSetState = isMain // debounce to prevent too many writes to the disk
+    ? debounce((name: string, state: any) => getStorage().set(name, state), 1000)
+    : (name: string, state: any) => getStorage().set(name, state)
+
 if (isMain) {
   const { ipcMain } = (global as AugmentedGlobal)
   ipcMain.handle(IPC_EVENT_STORE_GET, (_, { name }) => {
@@ -26,8 +30,7 @@ if (isMain) {
     return storage.get(name)
   })
   ipcMain.handle(IPC_EVENT_STORE_SET, (_, { name, state }) => {
-    const storage = getStorage()
-    storage.set(name, state)
+    storageSetState(name, state)
     return true
   })
   ipcMain.handle(IPC_EVENT_STORE_DELETE, (_, { name }) => {
@@ -43,8 +46,8 @@ export const persistStatePlugin: PiniaPlugin = ({ store }) => {
 
   const setState = debounce((state: any) => {
     const sanitizedState = purify(state)
-    storage.set(getStorageName(store.$id), sanitizedState)
-  }, 1000)
+    storageSetState(getStorageName(store.$id), sanitizedState)
+  }, 100)
 
   async function getState() {
     return (await storage.get(getStorageName(store.$id))) || {}
