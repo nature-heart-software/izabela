@@ -1,7 +1,7 @@
 import '@/electron/renderer'
 import '@/modules/electron-debug/renderer'
 import '@/styles'
-import { computed, createApp, ref, watch } from 'vue'
+import { createApp, watch } from 'vue'
 import { VueQueryPlugin, VueQueryPluginOptions } from 'vue-query'
 
 import App from '@/teams/messenger/App.vue'
@@ -11,9 +11,7 @@ import '@/plugins'
 import { NvLoading } from '@packages/ui'
 
 import { watchBoundary } from '@/modules/vue-dom-boundaries'
-import { createPinia, defineStore } from 'pinia'
-// eslint-disable-next-line
-// @ts-ignore
+import { createPinia } from 'pinia'
 import electronPiniaPlugin from '@packages/electron-pinia/renderer'
 import { useMainStore } from '@/store/pinia'
 

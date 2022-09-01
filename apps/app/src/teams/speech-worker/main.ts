@@ -7,8 +7,6 @@ import { VueQueryPlugin } from 'vue-query'
 import '@/plugins'
 import { useMainStore } from '@/store/pinia'
 import { createPinia } from 'pinia'
-// eslint-disable-next-line
-// @ts-ignore
 import electronPiniaPlugin from '@packages/electron-pinia/renderer'
 
 createApp(App).use(store).use(VueQueryPlugin)
