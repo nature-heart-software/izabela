@@ -34,4 +34,3 @@ const app = createApp(App)
   .use(NvLoading)
 
 app.mount('#app')
-
