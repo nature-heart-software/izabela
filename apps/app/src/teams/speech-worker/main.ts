@@ -9,9 +9,6 @@ import { pinia } from '@/store/pinia'
 
 const app = createApp(App)
 
-app
-  .use(store)
-  .use(pinia)
-  .use(VueQueryPlugin)
+app.use(store).use(pinia).use(VueQueryPlugin)
 
 app.mount('#app')
