@@ -6,8 +6,9 @@
 <script lang="ts" setup>
 import { useStore } from 'vuex'
 import { v4 as uuid } from 'uuid'
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { onBeforeUnmount, ref, watch } from 'vue'
 import { throttle } from 'lodash'
+import { useIntersectionObserver, useMutationObserver, useResizeObserver } from '@vueuse/core'
 
 const store = useStore()
 
@@ -28,26 +29,17 @@ const updateBoundary = throttle(() => {
     boundaries.value.h = bounds.height
   }
 }, 250)
-const resizeObserver = new ResizeObserver(updateBoundary)
-const intersectionObserver = new IntersectionObserver(updateBoundary)
-const mutationObserver = new MutationObserver(updateBoundary)
-onMounted(() => {
-  if (componentRef.value) {
-    resizeObserver.observe(componentRef.value)
-    intersectionObserver.observe(componentRef.value)
-    mutationObserver.observe(componentRef.value, { attributes: true })
-  }
-})
+
+useIntersectionObserver(componentRef, updateBoundary)
+useMutationObserver(componentRef, updateBoundary, { attributes: true })
+useResizeObserver(componentRef, updateBoundary)
+
 onBeforeUnmount(() => {
-  if (componentRef.value) {
-    resizeObserver.unobserve(componentRef.value)
-    intersectionObserver.unobserve(componentRef.value)
-    mutationObserver.disconnect()
-    if (store && store.hasModule('dom-boundaries')) {
-      store.dispatch('dom-boundaries/removeBoundary', boundaries.value.id)
-    }
+  if (store && store.hasModule('dom-boundaries')) {
+    store.dispatch('dom-boundaries/removeBoundary', boundaries.value.id)
   }
 })
+
 watch(
   boundaries.value,
   () => {

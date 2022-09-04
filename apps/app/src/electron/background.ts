@@ -21,6 +21,7 @@ const fallback = async () => {
     require('./plugins')
     require('./app').default.start().catch(fallback)
   } catch (e) {
+    console.error(e)
     await fallback()
   }
 })()

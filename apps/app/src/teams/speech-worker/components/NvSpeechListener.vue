@@ -14,7 +14,7 @@ import {
 } from '@/electron/events/renderer'
 
 const mediaDevice = await getMediaDeviceByLabel(
-  store.getters['settings/persisted'].audioInputDevice,
+  store.getters['settings/persisted'].audioInput,
 )
 let audioChunks: Blob[] = []
 const sampleRate = 48000
@@ -55,14 +55,14 @@ mediaRecorder.addEventListener('stop', onStop)
 
 onIPCStartSpeechTranscription(() => {
   if (mediaRecorder) {
-    console.log(`[${getTime()}] Starting web recording`)
+    console.log(`[${ getTime() }] Starting web recording`)
     mediaRecorder.start()
   }
 })
 
 onIPCStopSpeechTranscription(() => {
   if (mediaRecorder) {
-    console.log(`[${getTime()}] Stopping web recording`)
+    console.log(`[${ getTime() }] Stopping web recording`)
     mediaRecorder.stop()
   }
 })

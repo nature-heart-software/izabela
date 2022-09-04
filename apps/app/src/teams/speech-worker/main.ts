@@ -5,5 +5,10 @@ import store from '@/store'
 import App from '@/teams/speech-worker/App.vue'
 import { VueQueryPlugin } from 'vue-query'
 import '@/plugins'
+import { pinia } from '@/store/pinia'
 
-createApp(App).use(store).use(VueQueryPlugin).mount('#app')
+const app = createApp(App)
+
+app.use(store).use(pinia).use(VueQueryPlugin)
+
+app.mount('#app')

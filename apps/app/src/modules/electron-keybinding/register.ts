@@ -1,7 +1,7 @@
 import { app, globalShortcut } from 'electron'
 import store from '@/store'
 import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
-import { watch } from '@/utils/vue'
+import { watch } from 'vue'
 
 export default () =>
   app.whenReady().then(() =>

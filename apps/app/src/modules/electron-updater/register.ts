@@ -10,7 +10,7 @@ export default () =>
       .then(app.whenReady)
       .then(() => {
         const channel = store.getters['settings/persisted'].updateChannel
-        console.log('[electron-updater] Auto update channel:', channel)
+        console.log('[electron-updater] Auto-update channel:', channel)
         autoUpdater.channel = channel
         const notification = createNotification({
           title: `${app.name} update available`,
