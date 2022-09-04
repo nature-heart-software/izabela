@@ -9,7 +9,7 @@ export type StoreOptions = PiniaPluginContext['options'] & {
   }
 }
 
-export type PluginCustomProperties = { isReady?: () => Promise<boolean> }
+export type PluginCustomProperties = {}
 
 export type AugmentedGlobal = typeof global & {
   ElectronPiniaStorage: ElectronStore

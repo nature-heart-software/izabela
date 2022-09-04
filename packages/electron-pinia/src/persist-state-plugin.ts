@@ -9,9 +9,8 @@ import {
   IPC_EVENT_STORE_GET,
   IPC_EVENT_STORE_SET,
   isMain,
-  isPreload,
 } from './consts'
-import { AugmentedGlobal, PluginCustomProperties } from './types'
+import { AugmentedGlobal } from './types'
 import { purify } from './utils'
 
 function getStorage(): ElectronStore {
@@ -43,11 +42,8 @@ if (isMain) {
 
 export const persistStatePlugin: PiniaPlugin = ({
   store,
-}): PluginCustomProperties => {
+}) => {
   const storage = getStorage()
-  const loaded = isPreload
-    ? Promise.resolve(true)
-    : Promise.resolve(loadInitialState())
 
   const setState = debounce((state: any) => {
     const sanitizedState = purify(state)
@@ -74,9 +70,6 @@ export const persistStatePlugin: PiniaPlugin = ({
     return true
   }
 
+  loadInitialState()
   store.$subscribe((_, state) => setState(state))
-
-  return {
-    isReady: () => loaded,
-  }
 }

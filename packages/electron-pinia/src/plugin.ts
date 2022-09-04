@@ -12,16 +12,12 @@ export const plugin = (() => {
       let state: PluginCustomProperties = {}
       if (options.electron) {
         stores.set(store.$id, store)
+        /** load the "persist" plugin first so that it can hydrate the store state without triggering any watcher */
         if (options.electron.persisted) {
-            state = {
-                ...state,
-                ...persistStatePlugin({ store, options, ...rest }),
-            }
+            persistStatePlugin({ store, options, ...rest })
         }
         if (options.electron.shared) {
-            (state.isReady && state.isReady() || Promise.resolve(true)).then(() => {
-                shareStatePlugin({ store, options, ...rest })
-            })
+            shareStatePlugin({ store, options, ...rest })
         }
       }
       return state
