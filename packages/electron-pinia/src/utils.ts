@@ -8,10 +8,11 @@ export function purify(o?: object | [] | null) {
   }
   return o
 }
-
+export const getIssuer = (args: ShareStatePayload['args']): string | number | undefined => {
+  return args.find((arg) => typeof arg === 'object' && arg.issuer)?.issuer
+}
 export function useArgs(args: ShareStatePayload['args']) {
-  const issuer =
-    args.find((arg) => typeof arg === 'object' && arg.issuer)?.issuer || 'main'
+  const issuer = getIssuer(args) || 'main'
 
   const newArgs = [
     ...args.filter((o) => typeof o !== 'object' || !o.issuer),

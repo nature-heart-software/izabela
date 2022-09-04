@@ -33,7 +33,7 @@ export const shareStatePlugin: PiniaPlugin = ({ store }) => {
         storeId: store.$id,
         args: [...args, { issuer: winId }],
       })
-    })
+    }, true)
 
     onNotifyRenderers((_, { name, storeId, args }) => {
       if (storeId === store.$id) store[name](...args)
@@ -47,7 +47,7 @@ export const shareStatePlugin: PiniaPlugin = ({ store }) => {
         { name, storeId: store.$id, args: newArgs },
         issuer,
       )
-    })
+    }, true)
 
     background.onNotifyMain((_, { name, storeId, args }) => {
       if (storeId === store.$id) store[name](...args)

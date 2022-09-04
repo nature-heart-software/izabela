@@ -30,14 +30,14 @@ if (isMain) {
     const storage = getStorage()
     event.returnValue = storage.get(name)
   })
-  ipcMain.handle(IPC_EVENT_STORE_SET, (_, { name, state }) => {
+  ipcMain.on(IPC_EVENT_STORE_SET, (event, { name, state }) => {
     storageSetState(name, state)
-    return true
+    event.returnValue = true
   })
-  ipcMain.handle(IPC_EVENT_STORE_DELETE, (_, { name }) => {
+  ipcMain.on(IPC_EVENT_STORE_DELETE, (event, { name }) => {
     const storage = getStorage()
     storage.delete(name)
-    return true
+    event.returnValue = true
   })
 }
 
@@ -50,7 +50,7 @@ export const persistStatePlugin: PiniaPlugin = ({
   const setState = debounce((state: any) => {
     const sanitizedState = purify(state)
     storageSetState(getStorageName(store.$id), sanitizedState)
-  }, 100)
+  }, 1000)
 
   function getState() {
     return storage.get(getStorageName(store.$id)) || {}
@@ -72,8 +72,8 @@ export const persistStatePlugin: PiniaPlugin = ({
     return true
   }
 
-  /** TODO: potentially triggered multiple times if the state is shared, optimization possible */
   store.$subscribe((_, state) => setState(state))
+
   return {
     isReady: () => loaded,
   }
