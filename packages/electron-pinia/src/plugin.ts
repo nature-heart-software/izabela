@@ -13,15 +13,15 @@ export const plugin = (() => {
       if (options.electron) {
         stores.set(store.$id, store)
         if (options.electron.persisted) {
-            state = {
-                ...state,
-                ...persistStatePlugin({ store, options, ...rest }),
-            }
+          state = {
+            ...state,
+            ...persistStatePlugin({ store, options, ...rest }),
+          }
         }
         if (options.electron.shared) {
-            (state.isReady?.value() || Promise.resolve(true)).then(() => {
-                shareStatePlugin({ store, options, ...rest })
-            })
+          ;(state.isReady?.value() || Promise.resolve(true)).then(() => {
+            shareStatePlugin({ store, options, ...rest })
+          })
         }
       }
       return state

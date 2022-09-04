@@ -1,13 +1,6 @@
 import { PiniaPlugin } from 'pinia'
-import {
-  ipcRenderer,
-  isPreload,
-  isRenderer,
-} from './consts'
-import {
-  IpcRendererEventHandler,
-  ShareStatePayload,
-} from './types'
+import { ipcRenderer, isPreload, isRenderer } from './consts'
+import { IpcRendererEventHandler, ShareStatePayload } from './types'
 import { purify, useArgs } from './utils'
 import background from './background'
 
@@ -17,7 +10,6 @@ export const shareStatePlugin: PiniaPlugin = ({ store }) => {
   function connect() {
     return ipcRenderer?.SEND_IPC_EVENT_CONNECT()
   }
-
 
   function notifyMain(payload: ShareStatePayload) {
     ipcRenderer?.SEND_IPC_EVENT_NOTIFY_MAIN(purify(payload))
