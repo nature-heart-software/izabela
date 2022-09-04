@@ -5,7 +5,7 @@ import { purify, useArgs } from './utils'
 export default (() => {
     const connections: Connections = {}
     function onConnect(handler: IpcMainInvokeEventHandler) {
-        return ipcMain?.handle(IPC_EVENT_CONNECT, handler)
+        return ipcMain?.on(IPC_EVENT_CONNECT, handler)
     }
 
     function notifyRenderers(
@@ -27,14 +27,13 @@ export default (() => {
 
     const start = () => {
         onConnect((event) => {
-            console.log('onConnect', event.sender.id)
             const win = event.sender
             const winId = win.id
             connections[winId] = win
             win.on('destroyed', () => {
                 delete connections[winId]
             })
-            return Promise.resolve(winId)
+            event.returnValue = winId
         })
         onNotifyMain((_, { name, storeId, args }) => {
             const { issuer, args: newArgs } = useArgs(args)

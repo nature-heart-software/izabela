@@ -2,6 +2,8 @@ import { ShareStatePayload } from './types'
 
 export function purify(o?: object | [] | null) {
   if (typeof o === 'object') {
+    /** TODO: replace by structuredClone
+     * https://developer.mozilla.org/en-US/docs/Web/API/structuredClone */
     return JSON.parse(JSON.stringify(o))
   }
   return o

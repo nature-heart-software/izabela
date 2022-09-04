@@ -3,7 +3,7 @@ import debounce from 'lodash/debounce'
 import defaultsDeep from 'lodash/defaultsDeep'
 import cloneDeep from 'lodash/cloneDeep'
 import type ElectronStore from 'electron-store'
-import { computed } from 'vue'
+
 import {
   IPC_EVENT_STORE_DELETE,
   IPC_EVENT_STORE_GET,
@@ -26,9 +26,9 @@ const storageSetState = isMain // debounce to prevent too many writes to the dis
 
 if (isMain) {
   const { ipcMain } = global as AugmentedGlobal
-  ipcMain.handle(IPC_EVENT_STORE_GET, (_, { name }) => {
+  ipcMain.on(IPC_EVENT_STORE_GET, (event, { name }) => {
     const storage = getStorage()
-    return storage.get(name)
+    event.returnValue = storage.get(name)
   })
   ipcMain.handle(IPC_EVENT_STORE_SET, (_, { name, state }) => {
     storageSetState(name, state)
@@ -45,24 +45,23 @@ export const persistStatePlugin: PiniaPlugin = ({
   store,
 }): PluginCustomProperties => {
   const storage = getStorage()
-  const loaded = isPreload ? Promise.resolve(true) : loadInitialState()
+  const loaded = isPreload ? Promise.resolve(true) : Promise.resolve(loadInitialState())
 
   const setState = debounce((state: any) => {
     const sanitizedState = purify(state)
     storageSetState(getStorageName(store.$id), sanitizedState)
   }, 100)
 
-  async function getState() {
-    return (await storage.get(getStorageName(store.$id))) || {}
+  function getState() {
+    return storage.get(getStorageName(store.$id)) || {}
   }
 
   function getStorageName(storeId: PiniaPluginContext['store']['$id']) {
     return `electron-pinia-${storeId}`
   }
 
-  async function loadInitialState() {
-    const state = await getState()
-
+  function loadInitialState() {
+    const state = getState()
     if (state) {
       const mergedState = defaultsDeep(
         cloneDeep(state),
@@ -73,8 +72,9 @@ export const persistStatePlugin: PiniaPlugin = ({
     return true
   }
 
+  /** TODO: potentially triggered multiple times if the state is shared, optimization possible */
   store.$subscribe((_, state) => setState(state))
   return {
-    isReady: computed(() => () => loaded),
+    isReady: () => loaded,
   }
 }

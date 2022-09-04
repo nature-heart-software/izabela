@@ -29,8 +29,8 @@ export const shareStatePlugin: PiniaPlugin = ({ store }) => {
     ipcRenderer?.ON_IPC_EVENT_NOTIFY_RENDERERS(handler)
   }
 
-  async function rendererProcessLogic() {
-    const winId = await connect()
+  function rendererProcessLogic() {
+    const winId = connect()
     store.$onAction(({ name, store, args }) => {
       const hasIssuer = args.some(
         (arg) => typeof arg === 'object' && arg.issuer,

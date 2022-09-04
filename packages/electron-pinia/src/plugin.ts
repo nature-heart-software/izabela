@@ -19,7 +19,7 @@ export const plugin = (() => {
             }
         }
         if (options.electron.shared) {
-            (state.isReady?.value() || Promise.resolve(true)).then(() => {
+            (state.isReady && state.isReady() || Promise.resolve(true)).then(() => {
                 shareStatePlugin({ store, options, ...rest })
             })
         }
