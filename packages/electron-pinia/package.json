@@ -22,7 +22,8 @@
     "./preload": {
       "require": "./dist/preload.cjs",
       "default": "./dist/preload.es.js"
-    }
+    },
+    "./dist/": "./dist/"
   },
   "type": "module",
   "source": "src/main.ts",

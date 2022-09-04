@@ -12,10 +12,9 @@ import registerElectronUpdater from '@/modules/electron-updater/register'
 import registerElectronDebug from '@/modules/electron-debug/register'
 import registerElectronDisplay from '@/modules/electron-display/register'
 import registerElectronKeybinding from '@/modules/electron-keybinding/register'
-import { createApp, h, watch } from 'vue'
+import { createApp, h } from 'vue'
 import { createPinia } from 'pinia'
 import electronPiniaPlugin from '@packages/electron-pinia'
-import { useMainStore } from '@/store/pinia'
 
 const App = () => {
   const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -30,16 +29,9 @@ const App = () => {
       )
 
   const registerElectronPinia = () => {
-    createApp(h({})).use(createPinia().use(electronPiniaPlugin));
-
-    const mainStore = useMainStore()
-    watch(() => mainStore.doubleCount, () => {
-      console.log('[main]', mainStore.doubleCount)
-    })
-
-    setInterval(() => {
-      mainStore.increment()
-    }, 5000)
+    createApp(h({}))
+      .use(createPinia()
+        .use(electronPiniaPlugin()));
   }
 
   const startAppServer = async () =>

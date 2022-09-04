@@ -8,5 +8,5 @@ import ElectronStore from 'electron-store'
 })
 ;(global as AugmentedGlobal).ipcMain = ipcMain
 
-export { plugin } from './plugin'
+export { plugin as electronPiniaPlugin } from './plugin'
 export default plugin

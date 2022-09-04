@@ -11,9 +11,7 @@ import '@/plugins'
 import { NvLoading } from '@packages/ui'
 
 import { watchBoundary } from '@/modules/vue-dom-boundaries'
-import { createPinia } from 'pinia'
-import electronPiniaPlugin from '@packages/electron-pinia/renderer'
-import { useMainStore } from '@/store/pinia'
+import { pinia } from '@/store/pinia'
 
 watchBoundary('.el-select-dropdown')
 watchBoundary('.tippy-box')
@@ -31,15 +29,9 @@ const vueQueryPluginOptions: VueQueryPluginOptions = {
 const app = createApp(App)
   .use(store)
   .use(router)
+  .use(pinia)
   .use(VueQueryPlugin, vueQueryPluginOptions)
   .use(NvLoading)
-  .use(createPinia().use(electronPiniaPlugin))
+
 app.mount('#app')
 
-const mainStore = useMainStore()
-watch(() => mainStore.doubleCount, () => {
-  console.log('[messenger]', mainStore.doubleCount)
-})
-// setInterval(() => {
-//   mainStore.increment()
-// }, 5000)

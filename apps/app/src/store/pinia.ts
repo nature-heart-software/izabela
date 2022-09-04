@@ -1,19 +1,5 @@
-import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { createPinia } from 'pinia'
+import { electronPiniaPlugin } from '@packages/electron-pinia/dist/renderer.es.js'
 
-export const useMainStore = defineStore('main', () => {
-  const count = ref(0)
-  const doubleCount = computed(() => count.value * 2)
-  return {
-    count,
-    doubleCount,
-    increment() {
-      count.value += 1
-    }
-  }
-}, {
-  electron: {
-    persisted: true,
-    shared: true
-  }
-} as any)
+export const pinia = createPinia()
+  .use(electronPiniaPlugin())

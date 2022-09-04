@@ -5,7 +5,7 @@ import { PluginCustomProperties, StoreOptions } from './types'
 
 export const plugin = (() => {
   const stores = new Map()
-  const plugin: PiniaPlugin = async ({ store, options: storeOptions, ...rest }) => {
+  const plugin: () => PiniaPlugin = () => async ({ store, options: storeOptions, ...rest }) => {
     const options = storeOptions as StoreOptions
     let state: PluginCustomProperties = {}
     if (options.electron) {
