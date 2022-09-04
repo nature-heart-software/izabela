@@ -40,9 +40,7 @@ if (isMain) {
   })
 }
 
-export const persistStatePlugin: PiniaPlugin = ({
-  store,
-}) => {
+export const persistStatePlugin: PiniaPlugin = ({ store }) => {
   const storage = getStorage()
 
   const setState = debounce((state: any) => {
