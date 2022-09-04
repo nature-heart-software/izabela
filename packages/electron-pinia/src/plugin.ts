@@ -7,19 +7,22 @@ export const plugin = (() => {
   const stores = new Map()
   const plugin: () => PiniaPlugin =
     () =>
-    async ({ store, options: storeOptions, ...rest }) => {
+    ({ store, options: storeOptions, ...rest }) => {
       const options = storeOptions as StoreOptions
       let state: PluginCustomProperties = {}
       if (options.electron) {
         stores.set(store.$id, store)
-        if (options.electron.persisted)
-          state = {
-            ...state,
-            ...persistStatePlugin({ store, options, ...rest }),
-          }
-        if (options.electron.shared)
-          if (state.isReady) await state.isReady.value()
-        state = { ...state, ...shareStatePlugin({ store, options, ...rest }) }
+        if (options.electron.persisted) {
+            state = {
+                ...state,
+                ...persistStatePlugin({ store, options, ...rest }),
+            }
+        }
+        if (options.electron.shared) {
+            (state.isReady?.value() || Promise.resolve(true)).then(() => {
+                shareStatePlugin({ store, options, ...rest })
+            })
+        }
       }
       return state
     }
