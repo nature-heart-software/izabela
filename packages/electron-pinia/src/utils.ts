@@ -11,8 +11,7 @@ export function purify(o?: object | [] | null) {
 
 export function useArgs(args: ShareStatePayload['args']) {
   const issuer =
-      args.find((arg) => typeof arg === 'object' && arg.issuer)?.issuer ||
-      'main'
+    args.find((arg) => typeof arg === 'object' && arg.issuer)?.issuer || 'main'
 
   const newArgs = [
     ...args.filter((o) => typeof o !== 'object' || !o.issuer),
