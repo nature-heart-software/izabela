@@ -13,8 +13,11 @@ export default () =>
         })
       }
       setLaunchOnStartup(store.getters['settings/persisted'].launchOnStartup)
-      watch(() => store.getters['settings/persisted'].launchOnStartup, () => {
-        setLaunchOnStartup(store.getters['settings/persisted'].launchOnStartup)
-      })
+      watch(
+        () => store.getters['settings/persisted'].launchOnStartup,
+        () => {
+          setLaunchOnStartup(store.getters['settings/persisted'].launchOnStartup)
+        },
+      )
     }),
   )

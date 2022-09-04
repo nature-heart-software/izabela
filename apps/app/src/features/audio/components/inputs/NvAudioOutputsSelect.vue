@@ -6,10 +6,7 @@
       (value) => store.dispatch('settings/setProperty', ['persisted.audioOutputs', value])
     "
   >
-    <template
-      v-for="audioOutput in filteredAudioOutputDevices"
-      :key="audioOutput.deviceId"
-    >
+    <template v-for="audioOutput in filteredAudioOutputDevices" :key="audioOutput.deviceId">
       <NvOption :label="audioOutput.label" :value="audioOutput.label">
         {{ audioOutput.label }}
       </NvOption>

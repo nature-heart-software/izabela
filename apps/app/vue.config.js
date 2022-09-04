@@ -46,19 +46,24 @@ module.exports = defineConfig({
   },
   pluginOptions: {
     electronBuilder: {
-      externals: ['iohook', '@izabela/app-server', '@google-cloud/speech', 'native-keymap', '@vue-reactivity/watch'],
+      externals: [
+        'iohook',
+        '@izabela/app-server',
+        '@google-cloud/speech',
+        'native-keymap',
+        '@vue-reactivity/watch',
+      ],
       chainWebpackMainProcess: (config) => {
         setConfigAliases(config)
         config.module
           .rule('module')
           .test(/\.mjs$/)
-          .include
-            .add(/node_modules/)
-            .end()
+          .include.add(/node_modules/)
+          .end()
           .type('javascript/auto')
           .end()
 
-        config.plugin('define').tap(definitions => {
+        config.plugin('define').tap((definitions) => {
           // eslint-disable-next-line no-param-reassign
           definitions[0] = Object.assign(definitions[0], {
             __VUE_OPTIONS_API__: false,
