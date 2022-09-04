@@ -1,9 +1,9 @@
-import { Module } from 'vuex'
-import { utilActions, utilMutations } from '@/utils/vuex'
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
 
-const storeState = {
-  persisted: {
-    definitions: [
+export const useDictionaryStore = defineStore('dictionary', () => {
+  const definitions = ref<[string, string][]>(
+    [
       ['wyd', 'what are you doing'],
       ['hbu', 'how about you'],
       ['afaik', 'as far as I know'],
@@ -57,43 +57,33 @@ const storeState = {
       ['yolo', 'you only live once'],
       ['ysk', 'you should know'],
       ['yt', 'YouTube'],
-    ] as [string, string][],
-  },
-}
+    ]
+  )
 
-export const store: Module<typeof storeState, any> = {
-  namespaced: true,
-  state: storeState,
-  getters: {
-    state: (state) => state,
-    persisted: (state) => state.persisted,
-    definitions: (state) => state.persisted.definitions,
-    translateText: (state, getters) => (text: string) => {
-      let newText = text
-      getters.definitions.forEach(([word, definition]: [string, string]) => {
-        newText = newText.replace(new RegExp(`(\\b${word}\\b)`, 'gi'), definition)
-      })
-      return newText
-    },
-  },
-  mutations: {
-    ...utilMutations,
-    addDefinition: (state, definition: [string, string]) => {
-      state.persisted.definitions.unshift(definition)
-    },
-    removeDefinition: (state, index: number) => {
-      state.persisted.definitions.splice(index, 1)
-    },
-  },
-  actions: {
-    ...utilActions,
-    addDefinition: async ({ commit }) => {
-      commit('addDefinition', ['', ''])
-    },
-    removeDefinition: async ({ commit }, index: number) => {
-      commit('removeDefinition', index)
-    },
-  },
-}
+  const translateText = (text: string) => {
+    let newText = text
+    definitions.value.forEach(([word, definition]) => {
+      newText = newText.replace(new RegExp(`(\\b${word}\\b)`, 'gi'), definition)
+    })
+    return newText
+  }
 
-export default store
+  return {
+    definitions,
+    translateText,
+    updateDefinition: (index: number, definition: [string, string]) => {
+      definitions.value.splice(index, 1, definition)
+    },
+    addDefinition: (definition: (typeof definitions)['value'][number] = ['', '']) => {
+      definitions.value.unshift(definition)
+    },
+    removeDefinition: (index: number) => {
+      definitions.value.splice(index, 1)
+    },
+  }
+}, {
+  electron: {
+    persisted: true,
+    shared: true,
+  }
+})

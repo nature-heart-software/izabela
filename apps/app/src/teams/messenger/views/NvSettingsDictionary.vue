@@ -15,7 +15,7 @@
           <NvCard>
             <NvStack spacing="5">
               <div>
-                <NvButton size="sm" @click="store.dispatch('dictionary/addDefinition')"
+                <NvButton size="sm" @click="addDefinition()"
                   >Add definition</NvButton
                 >
               </div>
@@ -26,16 +26,13 @@
                 <NvText type="label" class="w-1/2">Definition</NvText>
                 <NvButton class="!grow-0 invisible" type="plain" icon-name="times" size="xs" />
               </NvGroup>
-              <template v-for="(definition, i) in store.getters['dictionary/definitions']" :key="i">
+              <template v-for="(definition, i) in definitions" :key="i">
                 <NvGroup class="w-full" grow>
                   <NvInput
                     :modelValue="definition[0]"
                     @update:modelValue="
                       (value) =>
-                        store.dispatch('dictionary/setProperty', [
-                          `persisted.definitions[${i}][0]`,
-                          value,
-                        ])
+                      updateDefinition(i, [value, definition[1]])
                     "
                   />
                   <NvDivider direction="vertical" class="!grow-0 h-5" />
@@ -43,10 +40,7 @@
                     :modelValue="definition[1]"
                     @update:modelValue="
                       (value) =>
-                        store.dispatch('dictionary/setProperty', [
-                          `persisted.definitions[${i}][1]`,
-                          value,
-                        ])
+                      updateDefinition(i, [definition[0], value])
                     "
                   />
                   <NvButton
@@ -54,7 +48,7 @@
                     type="plain"
                     icon-name="times"
                     size="xs"
-                    @click="store.dispatch('dictionary/removeDefinition', i)"
+                    @click="removeDefinition(i)"
                   />
                 </NvGroup>
               </template>
@@ -68,6 +62,11 @@
 <script lang="ts" setup>
 import { NvCard, NvGroup, NvStack, NvText, NvInput, NvDivider, NvButton } from '@packages/ui'
 import { useStore } from 'vuex'
+import { useDictionaryStore } from '@/features/dictionary/store'
+import { storeToRefs } from 'pinia'
 
+const dictionaryStore = useDictionaryStore()
+const { addDefinition, removeDefinition, updateDefinition } = dictionaryStore
+const { definitions } = storeToRefs(dictionaryStore)
 const store = useStore()
 </script>

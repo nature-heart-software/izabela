@@ -7,7 +7,6 @@ import messenger from '@/teams/messenger/store'
 import settings from '@/features/settings/store'
 // eslint-disable-next-line import/no-cycle
 import speech from '@/features/speech/store'
-import dictionary from '@/features/dictionary/store'
 import { SetPropertyPayload, utilActions, utilMutations } from '@/utils/vuex'
 import domBoundariesStore from '@/modules/vue-dom-boundaries/dom-boundaries.store'
 import { decrypt, encrypt } from '@/utils/security'
@@ -33,7 +32,6 @@ const store = createStore({
     messenger,
     settings,
     speech,
-    dictionary,
   },
   plugins: [
     ...(process.env.STORYBOOK
