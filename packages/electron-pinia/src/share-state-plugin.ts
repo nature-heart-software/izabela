@@ -1,7 +1,7 @@
 import { PiniaPlugin } from 'pinia'
 import { ipcRenderer, isPreload, isRenderer } from './consts'
 import { IpcRendererEventHandler, ShareStatePayload } from './types'
-import { purify, useArgs } from './utils'
+import { getIssuer, purify, useArgs } from './utils'
 import background from './background'
 
 export const shareStatePlugin: PiniaPlugin = ({ store }) => {
@@ -23,10 +23,21 @@ export const shareStatePlugin: PiniaPlugin = ({ store }) => {
 
   function rendererProcessLogic() {
     const winId = connect()
-    store.$onAction(({ name, store, args }) => {
-      const hasIssuer = args.some(
-        (arg) => typeof arg === 'object' && arg.issuer,
+    const $patch = store.$patch
+    store.$patch = (...args: any[]) => {
+      $patch(args[0])
+      const hasIssuer = getIssuer(args)
+      if (hasIssuer || typeof args[0] === 'function') return
+      notifyMain(
+          {
+            name: '$patch',
+            storeId: store.$id,
+            args: [...args, { issuer: winId }],
+          }
       )
+    }
+    store.$onAction(({ name, store, args }) => {
+      const hasIssuer = getIssuer(args)
       if (hasIssuer) return
       notifyMain({
         name,
@@ -41,6 +52,17 @@ export const shareStatePlugin: PiniaPlugin = ({ store }) => {
   }
 
   function mainProcessLogic() {
+    const $patch = store.$patch
+    store.$patch = (...args: any[]) => {
+      $patch(args[0])
+      if (typeof args[0] === 'function') return
+      const { issuer, args: newArgs } = useArgs(args)
+      background.notifyRenderers(
+          { name: '$patch', storeId: store.$id, args: newArgs },
+          issuer,
+      )
+    }
+
     store.$onAction(({ name, store, args }) => {
       const { issuer, args: newArgs } = useArgs(args)
       background.notifyRenderers(

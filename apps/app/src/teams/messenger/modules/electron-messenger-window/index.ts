@@ -5,6 +5,7 @@ import { throttle } from 'lodash'
 import { Boundary } from '@/modules/vue-dom-boundaries/types'
 import { BrowserWindow, screen, shell } from 'electron'
 import { Deferred } from '@/utils/promise'
+import { useMessengerStore } from '@/teams/messenger/store'
 
 export const ElectronMessengerWindow = () => {
   /* use isFocused as source of truth instead of window.isFocused() as in some instances
@@ -16,7 +17,6 @@ export const ElectronMessengerWindow = () => {
   // const doubleKeypressDelta = 500
   let registeredWindow: BrowserWindow | null = null
   const ready = Deferred<BrowserWindow>()
-
   const isReady = () => ready.promise
 
   const getWindow = () =>
@@ -148,6 +148,7 @@ export const ElectronMessengerWindow = () => {
   }
 
   const addEventListeners = () => {
+    const messengerStore = useMessengerStore()
     const window = getWindow()
     // iohook.on('keypress', ({ keychar }) => console.log(`Key pressed: ${String.fromCharCode(keychar)}`))
     iohook.on('mousemove', throttle(onMouseMove, 150))
@@ -170,16 +171,16 @@ export const ElectronMessengerWindow = () => {
 
     if (window) {
       window.on('show', () => {
-        store.dispatch('messenger/setProperty', ['isShown', true])
+        messengerStore.$patch({isShown: true})
       })
       window.on('hide', () => {
-        store.dispatch('messenger/setProperty', ['isShown', false])
+        messengerStore.$patch({isShown: false})
       })
       window.on('focus', () => {
-        store.dispatch('messenger/setProperty', ['isFocused', true])
+        messengerStore.$patch({isFocused: true})
       })
       window.on('blur', () => {
-        store.dispatch('messenger/setProperty', ['isFocused', false])
+        messengerStore.$patch({isFocused: false})
       })
       window.webContents.setWindowOpenHandler(({ url }) => {
         shell.openExternal(url)

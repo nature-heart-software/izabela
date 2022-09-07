@@ -5,7 +5,7 @@
       <div class="h-0">
         <NvMessenger
           :min-width="768"
-          :transform="store.getters['messenger/persisted'].position.transform"
+          :transform="messengerStore.position.transform"
           class="w-full h-full"
         />
       </div>
@@ -27,7 +27,9 @@ import { tokens } from '@packages/ui'
 import useStoreReady from '@/hooks/useStoreReady'
 import NvBackground from '@/teams/messenger/components/NvBackground.vue'
 import { useStore } from 'vuex'
+import { useMessengerStore } from '@/teams/messenger/store'
 
 const { data: isReady } = useStoreReady()
 const store = useStore()
+const messengerStore = useMessengerStore()
 </script>
