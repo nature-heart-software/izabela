@@ -14,10 +14,10 @@ export const plugin = (() => {
         stores.set(store.$id, store)
         /** load the "persist" plugin first so that it can hydrate the store state without triggering any watcher */
         if (options.electron.persisted) {
-            persistStatePlugin({ store, options, ...rest })
+          persistStatePlugin({ store, options, ...rest })
         }
         if (options.electron.shared) {
-            shareStatePlugin({ store, options, ...rest })
+          shareStatePlugin({ store, options, ...rest })
         }
       }
       return state
