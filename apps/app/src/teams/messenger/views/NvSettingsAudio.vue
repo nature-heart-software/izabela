@@ -16,9 +16,7 @@
                 <NvGroup justify="apart">
                   <NvText type="label">Play Izabela's speech on default playback device</NvText>
                   <NvSwitch
-                    :modelValue="
-                      settingsStore.playSpeechOnDefaultPlaybackDevice
-                    "
+                    :modelValue="settingsStore.playSpeechOnDefaultPlaybackDevice"
                     @update:modelValue="
                       (value) =>
                         settingsStore.$patch({

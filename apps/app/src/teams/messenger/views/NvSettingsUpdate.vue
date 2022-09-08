@@ -9,9 +9,7 @@
           </NvStack>
           <NvUpdateChannelSelect
             :modelValue="settingsStore.updateChannel"
-            @update:modelValue="
-              (value) => settingsStore.$patch({ updateChannel: value })
-            "
+            @update:modelValue="(value) => settingsStore.$patch({ updateChannel: value })"
           />
         </NvGroup>
       </NvCard>

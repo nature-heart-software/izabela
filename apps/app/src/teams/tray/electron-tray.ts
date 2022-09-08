@@ -27,14 +27,14 @@ const createTray = (): Promise<Tray> =>
                     ? id === settingsStore.display
                     : primaryDisplay.id === id,
                 click: () => {
-                  settingsStore.$patch({ display: id})
+                  settingsStore.$patch({ display: id })
                 },
               })),
             },
             {
               label: 'Reset Display',
               click: () => {
-                settingsStore.$patch({display: undefined})
+                settingsStore.$patch({ display: undefined })
               },
             },
           ],

@@ -38,8 +38,7 @@
       <NvKeybinding
         :modelValue="settingsStore.keybindings.recordAudio"
         @update:modelValue="
-          (value) =>
-            settingsStore.$patch({ keybindings: { recordAudio: value } })
+          (value) => settingsStore.$patch({ keybindings: { recordAudio: value } })
         "
       />
     </NvGroup>
