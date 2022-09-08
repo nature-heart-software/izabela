@@ -1,10 +1,10 @@
 import { v4 as uuid } from 'uuid'
 import mitt from 'mitt'
 import { Deferred } from '@/utils/promise'
-import store from '@/store'
 import { Promise } from 'bluebird'
 import { getEngineById } from '@/modules/speech-engine-manager'
 import { getMediaDeviceByLabel } from '@/utils/media-devices'
+import { useSettingsStore } from '@/features/settings/store'
 import { IzabelaMessageEvent, IzabelaMessagePayload } from './types'
 
 export default ({ engine: engineName, payload, credentials }: IzabelaMessagePayload) => {
@@ -19,7 +19,8 @@ export default ({ engine: engineName, payload, credentials }: IzabelaMessagePayl
   }
 
   function play() {
-    Promise.map(store.getters['settings/persisted'].audioOutputs, async (deviceLabel: string) => {
+    const settingsStore = useSettingsStore()
+    Promise.map(settingsStore.audioOutputs, async (deviceLabel: string) => {
       // TODO: Some optimisation possible here
       const mediaDevice = await getMediaDeviceByLabel(deviceLabel)
       if (mediaDevice) {
@@ -30,7 +31,7 @@ export default ({ engine: engineName, payload, credentials }: IzabelaMessagePayl
       }
       return null
     }).then((audioElements: (HTMLAudioElement | null)[]) => {
-      if (!store.getters['settings/persisted'].playSpeechOnDefaultPlaybackDevice) {
+      if (!settingsStore.playSpeechOnDefaultPlaybackDevice) {
         audio.volume = 0
       }
       audio.play()

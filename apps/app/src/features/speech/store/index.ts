@@ -1,43 +1,36 @@
-import { Module } from 'vuex'
-import { utilActions, utilMutations } from '@/utils/vuex'
 // eslint-disable-next-line import/no-cycle
 import { getEngineById } from '@/modules/speech-engine-manager'
 import { ENGINE_ID } from '@/plugins/speech-engines/say/consts'
+import { useSettingsStore } from '@/features/settings/store'
+import { defineStore } from 'pinia'
+import { computed } from 'vue'
 
-const storeState = {
-  persisted: {},
-}
-
-const store: Module<typeof storeState, any> = {
-  namespaced: true,
-  state: storeState,
-  getters: {
-    state: (state) => state,
-    persisted: (state) => state.persisted,
-    currentSpeechEngine: (state, getters, rootState, rootGetters) =>
-      getEngineById(rootGetters['speech/selectedSpeechEngine']),
-    selectedSpeechEngine: (state, getters, rootState, rootGetters) => {
-      const engine = getEngineById(rootGetters['settings/persisted'].selectedSpeechEngine)
-      if (engine && engine.hasCredentials && engine.hasCredentials()) {
-        return rootGetters['settings/persisted'].selectedSpeechEngine
-      }
-      return ENGINE_ID
-    },
-    commands: (state, getters, rootState, rootGetters) => {
-      const engine = getEngineById(rootGetters['settings/persisted'].selectedSpeechEngine)
+export const useSpeechStore = defineStore('speech', () => {
+  const selectedSpeechEngine = computed(() => {
+    const settingsStore = useSettingsStore()
+    const engine = getEngineById(settingsStore.selectedSpeechEngine)
+    if (engine && engine.hasCredentials && engine.hasCredentials()) {
+      return settingsStore.selectedSpeechEngine
+    }
+    return ENGINE_ID
+  })
+  return {
+    selectedSpeechEngine,
+    currentSpeechEngine: computed(() =>
+      getEngineById(selectedSpeechEngine.value)),
+    commands: computed(() => {
+      const settingsStore = useSettingsStore()
+      const engine = getEngineById(settingsStore.selectedSpeechEngine)
       if (engine && engine.commands) {
         const voice = engine.store.getProperty('selectedVoice')
         return engine.commands(voice)
       }
       return []
-    },
+    }),
+  }
+}, {
+  electron: {
+    persisted: true,
+    shared: true,
   },
-  mutations: {
-    ...utilMutations,
-  },
-  actions: {
-    ...utilActions,
-  },
-}
-
-export default store
+})

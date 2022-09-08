@@ -2,10 +2,12 @@ import { app, globalShortcut } from 'electron'
 import store from '@/store'
 import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
 import { watch } from 'vue'
+import { useSettingsStore } from '@/features/settings/store'
 
 export default () =>
   app.whenReady().then(() =>
     store.getters.isReady().then(() => {
+      const settingsStore = useSettingsStore()
       const multiKeysKeybindings = {
         toggleMessengerWindow: () => electronMessengerWindow.toggleWindow(),
       }
@@ -18,7 +20,7 @@ export default () =>
         })
       }
       const setToggleMessengerWindowKeybinding = () => {
-        const keybinding = store.getters['settings/persisted'].keybindings.toggleMessengerWindow
+        const keybinding = settingsStore.keybindings.toggleMessengerWindow
           .map(({ key }: any) => key)
           .join('+')
         globalShortcut.register(keybinding, multiKeysKeybindings.toggleMessengerWindow)
@@ -27,7 +29,7 @@ export default () =>
       setToggleMessengerWindowKeybinding()
 
       watch(
-        () => [store.getters['settings/persisted'].keybindings.toggleMessengerWindow],
+        () => [settingsStore.keybindings.toggleMessengerWindow],
         () => {
           unregisterAllShortcuts()
           setToggleMessengerWindowKeybinding()

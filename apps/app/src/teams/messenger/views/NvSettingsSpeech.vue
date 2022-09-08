@@ -10,11 +10,11 @@
               <NvText>Select the speech engine used for Izabela's speech</NvText>
             </NvStack>
             <SpeechEngineSelect
-              :modelValue="store.getters['speech/selectedSpeechEngine']"
+              :modelValue="speechStore.selectedSpeechEngine"
               @update:modelValue="
                 (value) => {
                   selectedEngineTab = value
-                  store.dispatch('settings/setProperty', ['persisted.selectedSpeechEngine', value])
+                  settingsStore.$patch({ speech: { selectedSpeechEngine: value } })
                 }
               "
             />
@@ -30,13 +30,13 @@
                     align="center"
                     type="ghost"
                     @click="selectedEngineTab = engine.id"
-                    >{{ engine.name }}
+                  >{{ engine.name }}
                   </NvButton>
                 </template>
               </NvGroup>
-              <NvDivider direction="horizontal" />
+              <NvDivider direction="horizontal"/>
               <template v-if="currentEngineSettingsComponent">
-                <component :is="currentEngineSettingsComponent" />
+                <component :is="currentEngineSettingsComponent"/>
               </template>
             </NvStack>
           </NvCard>
@@ -52,9 +52,13 @@ import { NvButton, NvCard, NvDivider, NvGroup, NvStack, NvText } from '@packages
 import SpeechEngineSelect from '@/features/speech/components/inputs/NvSpeechEngineSelect.vue'
 import { useSpeechEngineManager } from '@/modules/speech-engine-manager'
 import { SpeechEngine } from '@/modules/speech-engine-manager/types'
+import { useSettingsStore } from '@/features/settings/store'
+import { useSpeechStore } from '@/features/speech/store'
 
+const speechStore = useSpeechStore()
+const settingsStore = useSettingsStore()
 const store = useStore()
-const selectedEngineTab = ref<SpeechEngine['id']>(store.getters['speech/selectedSpeechEngine'])
+const selectedEngineTab = ref<SpeechEngine['id']>(speechStore.selectedSpeechEngine)
 const { engines } = useSpeechEngineManager()
 const currentEngineSettingsComponent = computed(
   () => engines.value.find((e) => e.id === selectedEngineTab.value)?.settingsComponent,

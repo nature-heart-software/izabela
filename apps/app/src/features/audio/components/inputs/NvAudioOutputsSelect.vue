@@ -1,9 +1,9 @@
 <template>
   <NvSelect
-    :modelValue="store.getters['settings/persisted'].audioOutputs"
+    :modelValue="settingsStore.audioOutputs"
     multiple
     @update:modelValue="
-      (value) => store.dispatch('settings/setProperty', ['persisted.audioOutputs', value])
+      (value) => settingsStore.$patch({ audioOutputs: value })
     "
   >
     <template v-for="audioOutput in filteredAudioOutputDevices" :key="audioOutput.deviceId">
@@ -18,7 +18,9 @@ import { computed } from 'vue'
 import { NvOption, NvSelect } from '@packages/ui'
 import { useDevicesList } from '@vueuse/core'
 import { useStore } from 'vuex'
+import { useSettingsStore } from '@/features/settings/store'
 
+const settingsStore = useSettingsStore()
 const store = useStore()
 const { audioOutputs } = useDevicesList()
 

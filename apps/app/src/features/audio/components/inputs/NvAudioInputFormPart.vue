@@ -36,10 +36,10 @@
         <NvText type="label">Push-to-record Key</NvText>
       </NvStack>
       <NvKeybinding
-        :modelValue="store.getters['settings/persisted'].keybindings.recordAudio"
+        :modelValue="settingsStore.keybindings.recordAudio"
         @update:modelValue="
           (value) =>
-            store.dispatch('settings/setProperty', ['persisted.keybindings.recordAudio', value])
+            settingsStore.$patch({ keybindings: { recordAudio: value } })
         "
       />
     </NvGroup>
@@ -55,7 +55,9 @@ import {
   useGetGoogleCloudSpeechCredentialsPath,
 } from '@/features/settings/hooks'
 import NvAudioInputSelect from '@/features/audio/components/inputs/NvAudioInputSelect.vue'
+import { useSettingsStore } from '@/features/settings/store'
 
+const settingsStore = useSettingsStore()
 const store = useStore()
 const { ElectronDialog, ElectronFilesystem } = window
 

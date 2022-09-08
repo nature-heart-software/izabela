@@ -2,6 +2,7 @@ import { autoUpdater } from 'electron-updater'
 import store from '@/store'
 import { createNotification } from '@/utils/electron-notification'
 import { app } from 'electron'
+import { useSettingsStore } from '@/features/settings/store'
 
 export default () =>
   app.whenReady().then(() =>
@@ -9,7 +10,8 @@ export default () =>
       .isReady()
       .then(app.whenReady)
       .then(() => {
-        const channel = store.getters['settings/persisted'].updateChannel
+        const settingsStore = useSettingsStore()
+        const channel = settingsStore.updateChannel
         console.log('[electron-updater] Auto-update channel:', channel)
         autoUpdater.channel = channel
         const notification = createNotification({

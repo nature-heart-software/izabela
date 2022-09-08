@@ -12,8 +12,10 @@ import {
   onIPCStartSpeechTranscription,
   onIPCStopSpeechTranscription,
 } from '@/electron/events/renderer'
+import { useSettingsStore } from '@/features/settings/store'
 
-const mediaDevice = await getMediaDeviceByLabel(store.getters['settings/persisted'].audioInput)
+const settingsStore = useSettingsStore()
+const mediaDevice = await getMediaDeviceByLabel(settingsStore.audioInput)
 let audioChunks: Blob[] = []
 const sampleRate = 48000
 const stream = await navigator.mediaDevices.getUserMedia({

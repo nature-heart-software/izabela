@@ -6,6 +6,7 @@ import { Boundary } from '@/modules/vue-dom-boundaries/types'
 import { BrowserWindow, screen, shell } from 'electron'
 import { Deferred } from '@/utils/promise'
 import { useMessengerStore } from '@/teams/messenger/store'
+import { useSettingsStore } from '@/features/settings/store'
 
 export const ElectronMessengerWindow = () => {
   /* use isFocused as source of truth instead of window.isFocused() as in some instances
@@ -148,6 +149,7 @@ export const ElectronMessengerWindow = () => {
   }
 
   const addEventListeners = () => {
+    const settingsStore = useSettingsStore()
     const messengerStore = useMessengerStore()
     const window = getWindow()
     // iohook.on('keypress', ({ keychar }) => console.log(`Key pressed: ${String.fromCharCode(keychar)}`))
@@ -167,7 +169,7 @@ export const ElectronMessengerWindow = () => {
     //   toggleWindow()
     // })
 
-    setDisplay(store.getters['settings/persisted'].display)
+    setDisplay(settingsStore.display)
 
     if (window) {
       window.on('show', () => {

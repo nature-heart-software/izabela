@@ -30,7 +30,7 @@
           <div class="flex flex-1 justify-end space-x-4 moveable-handle cursor-all-scroll">
             <NvCard class="flex-1 min-h-8" size="xs">
               <div class="inline-flex space-x-2">
-                <template v-if="store.getters['settings/persisted'].debugMode">
+                <template v-if="settingsStore.debugMode">
                   <NvButton icon-name="redo" size="sm" @click="reload"/>
                   <NvButton icon-name="brackets-curly" size="sm" @click="openDevTools"/>
                 </template>
@@ -69,20 +69,20 @@
             />
             <NvDivider class="h-3" direction="vertical"/>
             <SpeechEngineSelect
-              :modelValue="store.getters['speech/selectedSpeechEngine']"
+              :modelValue="speechStore.selectedSpeechEngine"
               class="w-13"
               icon-name="direction"
               placeholder="Speech Engine"
               size="sm"
               @update:modelValue="
                 (value) =>
-                  store.dispatch('settings/setProperty', ['persisted.selectedSpeechEngine', value])
+                  settingsStore.$patch({ selectedSpeechEngine: value })
               "
             />
-            <template v-if="store.getters['speech/currentSpeechEngine']">
+            <template v-if="speechStore.currentSpeechEngine">
               <component
-                :is="store.getters['speech/currentSpeechEngine'].voiceSelectComponent"
-                v-if="store.getters['speech/currentSpeechEngine'].voiceSelectComponent"
+                :is="speechStore.currentSpeechEngine.voiceSelectComponent"
+                v-if="speechStore.currentSpeechEngine.voiceSelectComponent"
                 class="w-13"
                 placeholder="Speech Voice"
                 size="sm"
@@ -96,14 +96,13 @@
                     <NvText type="label">Play on default playback device</NvText>
                     <NvSwitch
                       :modelValue="
-                        store.getters['settings/persisted'].playSpeechOnDefaultPlaybackDevice
+                        settingsStore.playSpeechOnDefaultPlaybackDevice
                       "
                       @update:modelValue="
                         (value) =>
-                          store.dispatch('settings/setProperty', [
-                            'persisted.playSpeechOnDefaultPlaybackDevice',
-                            value,
-                          ])
+                          settingsStore.$patch({
+                            playSpeechOnDefaultPlaybackDevice: value,
+                          })
                       "
                     />
                   </NvGroup>
@@ -132,15 +131,15 @@
           </NvCard>
           <NvCard class="inline-flex items-center space-x-3" size="sm">
             <NvButton
-              :type="store.getters['settings/persisted'].messageMode === 'sentence' && 'plain'"
+              :type="settingsStore.messageMode === 'sentence' && 'plain'"
               size="sm"
-              @click="store.dispatch('settings/setProperty', ['persisted.messageMode', 'sentence'])"
+              @click="settingsStore.$patch({ messageMode: 'sentence' })"
             >Sentence
             </NvButton>
             <NvButton
-              :type="store.getters['settings/persisted'].messageMode === 'word' && 'plain'"
+              :type="settingsStore.messageMode === 'word' && 'plain'"
               size="sm"
-              @click="store.dispatch('settings/setProperty', ['persisted.messageMode', 'word'])"
+              @click="settingsStore.$patch({ messageMode: 'sentence' })"
             >Word
             </NvButton>
           </NvCard>
@@ -160,7 +159,7 @@
               @keydown.enter="playMessage()"
               @keydown.space="
                 (e) =>
-                  store.getters['settings/persisted'].messageMode === 'word' && [
+                  settingsStore.messageMode === 'word' && [
                     playMessage(),
                     e.preventDefault(),
                   ]
@@ -223,7 +222,11 @@ import NvAudioOutputsSelect from '@/features/audio/components/inputs/NvAudioOutp
 import NvAudioInputsSelect from '@/features/audio/components/inputs/NvAudioInputSelect.vue'
 import { useMessengerStore } from '@/teams/messenger/store'
 import { storeToRefs } from 'pinia'
+import { useSettingsStore } from '@/features/settings/store'
+import { useSpeechStore } from '@/features/speech/store'
 
+const speechStore = useSpeechStore()
+const settingsStore = useSettingsStore()
 const store = useStore()
 const messengerStore = useMessengerStore()
 const { position } = storeToRefs(messengerStore)

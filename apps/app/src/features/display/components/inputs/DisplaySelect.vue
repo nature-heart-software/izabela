@@ -1,7 +1,7 @@
 <template>
   <NvSelect
     v-loading="isFetching"
-    :modelValue="store.getters['settings/persisted'].display || primaryDisplay?.id"
+    :modelValue="settingsStore.display || primaryDisplay?.id"
     @update:modelValue="onUpdate"
   >
     <template v-for="display in displays" :key="display.id">
@@ -26,9 +26,11 @@ import {
   useGetAllDisplaysQuery,
   useGetPrimaryDisplayQuery,
 } from '@/features/display/components/hooks'
+import { useSettingsStore } from '@/features/settings/store'
 
 const { ElectronDisplay } = window
 
+const settingsStore = useSettingsStore()
 const { data, isFetching: isAllDisplayFetching } = useGetAllDisplaysQuery()
 const { data: primaryDisplay, isFetching: isPrimaryDisplayFetching } = useGetPrimaryDisplayQuery()
 const displays = computed(() => data.value || [])
@@ -37,6 +39,6 @@ const isFetching = computed(() =>
 )
 const store = useStore()
 const onUpdate = (value: Electron.Display['id']) => {
-  store.dispatch('settings/setProperty', ['persisted.display', value])
+  settingsStore.$patch({ display: value })
 }
 </script>
