@@ -21,5 +21,4 @@ import { NvCard, NvGroup, NvStack, NvSwitch, NvText } from '@packages/ui'
 import { useSettingsStore } from '@/features/settings/store'
 
 const settingsStore = useSettingsStore()
-
 </script>
