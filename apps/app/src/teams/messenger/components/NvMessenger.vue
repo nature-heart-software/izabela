@@ -9,21 +9,21 @@
         <div class="flex space-x-4">
           <a href="https://github.com/nature-heart-software/izabela" target="_blank">
             <span class="hidden">GitHub</span>
-            <NvButton icon-name="info" type="plain"/>
+            <NvButton icon-name="info" type="plain" />
           </a>
           <NvCard size="xs">
             <div class="inline-flex space-x-2">
               <a href="https://github.com/nature-heart-software/izabela" target="_blank">
                 <span class="hidden">GitHub</span>
-                <NvButton icon-name="github-alt" size="sm"/>
+                <NvButton icon-name="github-alt" size="sm" />
               </a>
               <a href="https://twitter.com/wurielle" target="_blank">
                 <span class="hidden">Twitter</span>
-                <NvButton icon-name="twitter-alt" size="sm"/>
+                <NvButton icon-name="twitter-alt" size="sm" />
               </a>
               <a href="https://discord.gg/BmWtmYmaeQ" target="_blank">
                 <span class="hidden">Discord</span>
-                <NvButton icon-name="discord" size="sm"/>
+                <NvButton icon-name="discord" size="sm" />
               </a>
             </div>
           </NvCard>
@@ -31,17 +31,17 @@
             <NvCard class="flex-1 min-h-8" size="xs">
               <div class="inline-flex space-x-2">
                 <template v-if="settingsStore.debugMode">
-                  <NvButton icon-name="redo" size="sm" @click="reload"/>
-                  <NvButton icon-name="brackets-curly" size="sm" @click="openDevTools"/>
+                  <NvButton icon-name="redo" size="sm" @click="reload" />
+                  <NvButton icon-name="brackets-curly" size="sm" @click="openDevTools" />
                 </template>
               </div>
             </NvCard>
             <NvCard size="xs">
               <div class="inline-flex items-center space-x-2">
-                <NvButton icon-name="question-circle" size="sm"/>
-                <NvDivider class="h-3" direction="vertical"/>
-                <NvButton icon-name="comment-alt-lines" size="sm"/>
-                <NvDivider class="h-3" direction="vertical"/>
+                <NvButton icon-name="question-circle" size="sm" />
+                <NvDivider class="h-3" direction="vertical" />
+                <NvButton icon-name="comment-alt-lines" size="sm" />
+                <NvDivider class="h-3" direction="vertical" />
                 <NvButton
                   icon-name="setting"
                   size="sm"
@@ -53,7 +53,7 @@
               <div class="inline-flex space-x-2">
                 <!-- <NvButton size="xs" type="plain" icon-name="minus"/>
                 <NvButton size="xs" type="plain" icon-name="square-full"/> -->
-                <NvButton icon-name="times" size="xs" type="plain" @click="hide"/>
+                <NvButton icon-name="times" size="xs" type="plain" @click="hide" />
               </div>
             </NvCard>
           </div>
@@ -67,17 +67,14 @@
               size="sm"
               @click="navigateTo({ name: 'settings-speech' })"
             />
-            <NvDivider class="h-3" direction="vertical"/>
+            <NvDivider class="h-3" direction="vertical" />
             <SpeechEngineSelect
               :modelValue="speechStore.selectedSpeechEngine"
               class="w-13"
               icon-name="direction"
               placeholder="Speech Engine"
               size="sm"
-              @update:modelValue="
-                (value) =>
-                  settingsStore.$patch({ selectedSpeechEngine: value })
-              "
+              @update:modelValue="(value) => settingsStore.$patch({ selectedSpeechEngine: value })"
             />
             <template v-if="speechStore.currentSpeechEngine">
               <component
@@ -88,16 +85,14 @@
                 size="sm"
               />
             </template>
-            <NvDivider class="h-3" direction="vertical"/>
+            <NvDivider class="h-3" direction="vertical" />
             <NvPopover :tippy-options="{ placement: 'top-start' }" size="sm">
               <div class="w-screen max-w-full">
                 <NvStack spacing="4">
                   <NvGroup justify="apart">
                     <NvText type="label">Play on default playback device</NvText>
                     <NvSwitch
-                      :modelValue="
-                        settingsStore.playSpeechOnDefaultPlaybackDevice
-                      "
+                      :modelValue="settingsStore.playSpeechOnDefaultPlaybackDevice"
                       @update:modelValue="
                         (value) =>
                           settingsStore.$patch({
@@ -106,9 +101,9 @@
                       "
                     />
                   </NvGroup>
-                  <NvDivider direction="horizontal"/>
+                  <NvDivider direction="horizontal" />
                   <NvFormItem label="Audio Outputs">
-                    <NvAudioOutputsSelect class="w-full"/>
+                    <NvAudioOutputsSelect class="w-full" />
                   </NvFormItem>
                 </NvStack>
               </div>
@@ -120,7 +115,7 @@
               <div class="w-screen max-w-full">
                 <NvStack spacing="4">
                   <NvFormItem label="Audio Input">
-                    <NvAudioInputsSelect class="w-full"/>
+                    <NvAudioInputsSelect class="w-full" />
                   </NvFormItem>
                 </NvStack>
               </div>
@@ -134,13 +129,13 @@
               :type="settingsStore.messageMode === 'sentence' && 'plain'"
               size="sm"
               @click="settingsStore.$patch({ messageMode: 'sentence' })"
-            >Sentence
+              >Sentence
             </NvButton>
             <NvButton
               :type="settingsStore.messageMode === 'word' && 'plain'"
               size="sm"
               @click="settingsStore.$patch({ messageMode: 'sentence' })"
-            >Word
+              >Word
             </NvButton>
           </NvCard>
         </div>
@@ -154,18 +149,14 @@
               class="w-full"
               placeholder="So, said the angel to the child who, divided, broke the knife.."
               size="lg"
-              @blur="messengerStore.$patch({isInputFocused: false})"
-              @focus="messengerStore.$patch({isInputFocused: true})"
+              @blur="messengerStore.$patch({ isInputFocused: false })"
+              @focus="messengerStore.$patch({ isInputFocused: true })"
               @keydown.enter="playMessage()"
               @keydown.space="
-                (e) =>
-                  settingsStore.messageMode === 'word' && [
-                    playMessage(),
-                    e.preventDefault(),
-                  ]
+                (e) => settingsStore.messageMode === 'word' && [playMessage(), e.preventDefault()]
               "
             />
-            <NvButton icon-name="message" size="lg" @click="playMessage()"/>
+            <NvButton icon-name="message" size="lg" @click="playMessage()" />
           </NvCard>
         </div>
       </div>
@@ -351,12 +342,12 @@ onMounted(() => {
   const moveableTargetEl = (moveableTarget.value as ComponentPublicInstance)
     .$el as HTMLDivElement | null
   if (moveableTargetEl) {
-    if (props.width) moveableTargetEl.style.width = `${ props.width }px`
-    if (props.minWidth) moveableTargetEl.style.minWidth = `${ props.minWidth }px`
-    if (props.maxWidth) moveableTargetEl.style.maxWidth = `${ props.maxWidth }px`
-    if (props.height) moveableTargetEl.style.height = `${ props.height }px`
-    if (props.minHeight) moveableTargetEl.style.minHeight = `${ props.minHeight }px`
-    if (props.maxHeight) moveableTargetEl.style.maxHeight = `${ props.maxHeight }px`
+    if (props.width) moveableTargetEl.style.width = `${props.width}px`
+    if (props.minWidth) moveableTargetEl.style.minWidth = `${props.minWidth}px`
+    if (props.maxWidth) moveableTargetEl.style.maxWidth = `${props.maxWidth}px`
+    if (props.height) moveableTargetEl.style.height = `${props.height}px`
+    if (props.minHeight) moveableTargetEl.style.minHeight = `${props.minHeight}px`
+    if (props.maxHeight) moveableTargetEl.style.maxHeight = `${props.maxHeight}px`
     if (props.transform) moveableTargetEl.style.transform = props.transform
   }
   moveable.value.updateTarget()

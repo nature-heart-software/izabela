@@ -2,9 +2,7 @@
   <NvSelect
     :modelValue="settingsStore.audioOutputs"
     multiple
-    @update:modelValue="
-      (value) => settingsStore.$patch({ audioOutputs: value })
-    "
+    @update:modelValue="(value) => settingsStore.$patch({ audioOutputs: value })"
   >
     <template v-for="audioOutput in filteredAudioOutputDevices" :key="audioOutput.deviceId">
       <NvOption :label="audioOutput.label" :value="audioOutput.label">

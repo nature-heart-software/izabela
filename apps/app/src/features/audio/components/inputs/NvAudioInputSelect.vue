@@ -1,9 +1,7 @@
 <template>
   <NvSelect
     :modelValue="settingsStore.audioInput"
-    @update:modelValue="
-      (value) => settingsStore.$patch({ audioInput: value })
-    "
+    @update:modelValue="(value) => settingsStore.$patch({ audioInput: value })"
   >
     <template v-for="audioInput in audioInputs" :key="audioInput.deviceId">
       <NvOption :label="audioInput.label" :value="audioInput.label">

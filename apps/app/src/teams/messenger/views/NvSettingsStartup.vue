@@ -9,9 +9,7 @@
           </NvStack>
           <NvSwitch
             :modelValue="settingsStore.launchOnStartup"
-            @update:modelValue="
-             (value) => settingsStore.$patch({ launchOnStartup: value })
-            "
+            @update:modelValue="(value) => settingsStore.$patch({ launchOnStartup: value })"
           />
         </NvGroup>
       </NvCard>

@@ -9,10 +9,7 @@
           </NvStack>
           <NvSwitch
             :modelValue="settingsStore.debugMode"
-            @update:modelValue="
-              (value) =>
-                settingsStore.$patch({ debugMode: value })
-            "
+            @update:modelValue="(value) => settingsStore.$patch({ debugMode: value })"
           />
         </NvGroup>
       </NvCard>
