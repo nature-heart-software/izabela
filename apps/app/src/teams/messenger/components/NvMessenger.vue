@@ -212,7 +212,6 @@ import {
   NvSwitch,
   NvText,
 } from '@packages/ui'
-import { useStore } from 'vuex'
 import { RouteLocationRaw, useRouter } from 'vue-router'
 import DomBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
 import { useRouterViewPopover } from '@/features/router/hooks'
@@ -227,7 +226,7 @@ import { useSpeechStore } from '@/features/speech/store'
 
 const speechStore = useSpeechStore()
 const settingsStore = useSettingsStore()
-const store = useStore()
+
 const messengerStore = useMessengerStore()
 const { position } = storeToRefs(messengerStore)
 const { ElectronMessengerWindow } = window

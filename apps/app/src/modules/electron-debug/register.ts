@@ -15,7 +15,7 @@ export default () =>
         const errorHandler = (error: Error, windowProcess = 'main') => {
           if (settingsStore.debugMode) {
             createNotification({
-              title: `[${windowProcess}] ${error.name}`,
+              title: `[${ windowProcess }] ${ error.name }`,
               body: error.message,
               silent: true,
             }).show()

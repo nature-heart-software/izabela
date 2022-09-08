@@ -8,7 +8,7 @@
 </template>
 <script lang="ts" setup>
 import { NvButton } from '@packages/ui'
-import { ref, defineProps, defineEmits, computed, watch, Ref, PropType } from 'vue'
+import { computed, defineEmits, defineProps, PropType, Ref, ref, watch } from 'vue'
 import { useEventListener } from '@vueuse/core'
 import { Key } from '@/types/keybinds'
 

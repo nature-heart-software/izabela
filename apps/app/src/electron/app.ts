@@ -30,7 +30,7 @@ const App = () => {
 
   const registerElectronPinia = () => {
     createApp(h({})).use(createPinia()
-      .use(electronPiniaPlugin())
+      .use(electronPiniaPlugin()),
     )
 
   }
@@ -64,7 +64,7 @@ const App = () => {
   }
 
   function exec(description: string, action: () => any) {
-    console.log(`[app]: ${description}`)
+    console.log(`[app]: ${ description }`)
     return action()
   }
 

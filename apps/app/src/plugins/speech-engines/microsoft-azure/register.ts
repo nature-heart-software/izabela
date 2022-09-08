@@ -4,7 +4,7 @@ import type { SpeechEngine } from '@/modules/speech-engine-manager/types'
 import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME } from './consts'
-import { setProperty, getProperty } from './store'
+import { getProperty, setProperty } from './store'
 
 const getCredentials = () => ({
   apiKey: getProperty('apiKey', true),
@@ -27,7 +27,7 @@ registerEngine({
     let expression
     const commandString = newText.split(' ')[0] || ''
     if (commandString.startsWith('/')) {
-      const command = commands(voice).find(({ name }) => commandString.startsWith(`/${name}`))
+      const command = commands(voice).find(({ name }) => commandString.startsWith(`/${ name }`))
       newText = newText.replace(commandString, '')
       if (command) {
         expression = command.value

@@ -20,7 +20,6 @@
 <script lang="ts" setup>
 import { NvOption, NvSelect } from '@packages/ui'
 import { computed } from 'vue'
-import { useStore } from 'vuex'
 import type Electron from 'electron'
 import {
   useGetAllDisplaysQuery,
@@ -37,7 +36,7 @@ const displays = computed(() => data.value || [])
 const isFetching = computed(() =>
   [isAllDisplayFetching.value, isPrimaryDisplayFetching.value].some(Boolean),
 )
-const store = useStore()
+
 const onUpdate = (value: Electron.Display['id']) => {
   settingsStore.$patch({ display: value })
 }

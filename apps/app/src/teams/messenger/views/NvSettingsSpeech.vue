@@ -47,7 +47,6 @@
 </template>
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
-import { useStore } from 'vuex'
 import { NvButton, NvCard, NvDivider, NvGroup, NvStack, NvText } from '@packages/ui'
 import SpeechEngineSelect from '@/features/speech/components/inputs/NvSpeechEngineSelect.vue'
 import { useSpeechEngineManager } from '@/modules/speech-engine-manager'
@@ -57,7 +56,7 @@ import { useSpeechStore } from '@/features/speech/store'
 
 const speechStore = useSpeechStore()
 const settingsStore = useSettingsStore()
-const store = useStore()
+
 const selectedEngineTab = ref<SpeechEngine['id']>(speechStore.selectedSpeechEngine)
 const { engines } = useSpeechEngineManager()
 const currentEngineSettingsComponent = computed(

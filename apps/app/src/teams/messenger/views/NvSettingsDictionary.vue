@@ -16,15 +16,16 @@
             <NvStack spacing="5">
               <div>
                 <NvButton size="sm" @click="addDefinition()"
-                  >Add definition</NvButton
+                >Add definition
+                </NvButton
                 >
               </div>
-              <NvDivider direction="horizontal" />
+              <NvDivider direction="horizontal"/>
               <NvGroup class="w-full" grow no-wrap>
-                <NvText type="label" class="w-1/2">Word</NvText>
-                <NvDivider direction="vertical" class="!grow-0 h-5" />
-                <NvText type="label" class="w-1/2">Definition</NvText>
-                <NvButton class="!grow-0 invisible" type="plain" icon-name="times" size="xs" />
+                <NvText class="w-1/2" type="label">Word</NvText>
+                <NvDivider class="!grow-0 h-5" direction="vertical"/>
+                <NvText class="w-1/2" type="label">Definition</NvText>
+                <NvButton class="!grow-0 invisible" icon-name="times" size="xs" type="plain"/>
               </NvGroup>
               <template v-for="(definition, i) in definitions" :key="i">
                 <NvGroup class="w-full" grow>
@@ -35,7 +36,7 @@
                       updateDefinition(i, [value, definition[1]])
                     "
                   />
-                  <NvDivider direction="vertical" class="!grow-0 h-5" />
+                  <NvDivider class="!grow-0 h-5" direction="vertical"/>
                   <NvInput
                     :modelValue="definition[1]"
                     @update:modelValue="
@@ -45,9 +46,9 @@
                   />
                   <NvButton
                     class="!grow-0"
-                    type="plain"
                     icon-name="times"
                     size="xs"
+                    type="plain"
                     @click="removeDefinition(i)"
                   />
                 </NvGroup>
@@ -60,13 +61,12 @@
   </NvStack>
 </template>
 <script lang="ts" setup>
-import { NvCard, NvGroup, NvStack, NvText, NvInput, NvDivider, NvButton } from '@packages/ui'
-import { useStore } from 'vuex'
+import { NvButton, NvCard, NvDivider, NvGroup, NvInput, NvStack, NvText } from '@packages/ui'
 import { useDictionaryStore } from '@/features/dictionary/store'
 import { storeToRefs } from 'pinia'
 
 const dictionaryStore = useDictionaryStore()
 const { addDefinition, removeDefinition, updateDefinition } = dictionaryStore
 const { definitions } = storeToRefs(dictionaryStore)
-const store = useStore()
+
 </script>

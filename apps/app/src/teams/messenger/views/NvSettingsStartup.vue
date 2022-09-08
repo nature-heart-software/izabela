@@ -20,9 +20,8 @@
 </template>
 <script lang="ts" setup>
 import { NvCard, NvGroup, NvStack, NvSwitch, NvText } from '@packages/ui'
-import { useStore } from 'vuex'
 import { useSettingsStore } from '@/features/settings/store'
 
 const settingsStore = useSettingsStore()
-const store = useStore()
+
 </script>

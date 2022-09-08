@@ -20,10 +20,9 @@
 </template>
 <script lang="ts" setup>
 import { NvCard, NvGroup, NvStack, NvText } from '@packages/ui'
-import { useStore } from 'vuex'
 import NvUpdateChannelSelect from '@/features/update/components/inputs/NvUpdateChannelSelect.vue'
 import { useSettingsStore } from '@/features/settings/store'
 
 const settingsStore = useSettingsStore()
-const store = useStore()
+
 </script>

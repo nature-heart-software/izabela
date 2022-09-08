@@ -124,6 +124,7 @@ const SharedMutations = (store: Store<unknown>) => {
         throw new Error('[Vuex Electron] Type should be "renderer" or "main".')
     }
   }
+
   return {
     start,
   }

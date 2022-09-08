@@ -1,15 +1,13 @@
 <template>
   <ThemeProvider :theme="tokens">
-    <template v-if="isReady">
-      <NvBackground />
-      <div class="h-0">
-        <NvMessenger
-          :min-width="768"
-          :transform="messengerStore.position.transform"
-          class="w-full h-full"
-        />
-      </div>
-    </template>
+    <NvBackground/>
+    <div class="h-0">
+      <NvMessenger
+        :min-width="768"
+        :transform="messengerStore.position.transform"
+        class="w-full h-full"
+      />
+    </div>
   </ThemeProvider>
 </template>
 <style lang="scss">
@@ -24,12 +22,8 @@ body {
 import { ThemeProvider } from 'vue3-styled-components'
 import NvMessenger from '@/teams/messenger/components/NvMessenger.vue'
 import { tokens } from '@packages/ui'
-import useStoreReady from '@/hooks/useStoreReady'
 import NvBackground from '@/teams/messenger/components/NvBackground.vue'
-import { useStore } from 'vuex'
 import { useMessengerStore } from '@/teams/messenger/store'
 
-const { data: isReady } = useStoreReady()
-const store = useStore()
 const messengerStore = useMessengerStore()
 </script>

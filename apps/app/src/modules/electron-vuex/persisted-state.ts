@@ -45,7 +45,7 @@ const PersistedState = (options: PersistedStateOptions, store: Store<unknown>) =
       return filter
     }
     throw new Error(
-      `[Vuex Electron] Filter "${name}" should be Array or Function. Please, read the docs.`,
+      `[Vuex Electron] Filter "${ name }" should be Array or Function. Please, read the docs.`,
     )
   }
 
@@ -89,6 +89,7 @@ const PersistedState = (options: PersistedStateOptions, store: Store<unknown>) =
       state: storeState,
     })
   }
+
   return {
     checkStorage,
     subscribeOnChanges,

@@ -14,11 +14,10 @@
 </template>
 <script lang="ts" setup>
 import { NvOption, NvSelect } from '@packages/ui'
-import { useStore } from 'vuex'
 import { useDevicesList } from '@vueuse/core'
 import { useSettingsStore } from '@/features/settings/store'
 
 const settingsStore = useSettingsStore()
-const store = useStore()
+
 const { audioInputs } = useDevicesList()
 </script>

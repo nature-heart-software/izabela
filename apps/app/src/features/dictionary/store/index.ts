@@ -57,7 +57,7 @@ export const useDictionaryStore = defineStore('dictionary', () => {
       ['yolo', 'you only live once'],
       ['ysk', 'you should know'],
       ['yt', 'YouTube'],
-    ]
+    ],
   )
 
   const translateText = (text: string) => {
@@ -85,5 +85,5 @@ export const useDictionaryStore = defineStore('dictionary', () => {
   electron: {
     persisted: true,
     shared: true,
-  }
+  },
 })

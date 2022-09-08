@@ -113,8 +113,8 @@ export const ElectronMessengerWindow = () => {
         const [windowX, windowY] = window.getPosition()
         const domBoundaries = store.getters['dom-boundaries/boundaries']
         const isWithinAnyBoundaries = domBoundaries.some(({ x, y, w, h }: Boundary) => {
-          const isWithinXBoundaries = mouseX >= windowX + x && mouseX <= windowX + x + w
-          const isWithinYBoundaries = mouseY >= windowY + y && mouseY <= windowY + y + h
+          const isWithinXBoundaries = mouseX >= windowX+x && mouseX <= windowX+x+w
+          const isWithinYBoundaries = mouseY >= windowY+y && mouseY <= windowY+y+h
           return isWithinXBoundaries && isWithinYBoundaries
         })
         if (isWithinAnyBoundaries) {
@@ -173,16 +173,16 @@ export const ElectronMessengerWindow = () => {
 
     if (window) {
       window.on('show', () => {
-        messengerStore.$patch({isShown: true})
+        messengerStore.$patch({ isShown: true })
       })
       window.on('hide', () => {
-        messengerStore.$patch({isShown: false})
+        messengerStore.$patch({ isShown: false })
       })
       window.on('focus', () => {
-        messengerStore.$patch({isFocused: true})
+        messengerStore.$patch({ isFocused: true })
       })
       window.on('blur', () => {
-        messengerStore.$patch({isFocused: false})
+        messengerStore.$patch({ isFocused: false })
       })
       window.webContents.setWindowOpenHandler(({ url }) => {
         shell.openExternal(url)

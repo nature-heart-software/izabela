@@ -34,7 +34,7 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     if (!process.env.IS_TEST) window.webContents.openDevTools({ mode: 'undocked' })
   } else {
     createProtocol('app')
-    window.loadURL(`app://./${name}.html`)
+    window.loadURL(`app://./${ name }.html`)
   }
 
   return window

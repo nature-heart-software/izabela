@@ -1,4 +1,4 @@
-import { app, Menu, Tray, screen } from 'electron'
+import { app, Menu, screen, Tray } from 'electron'
 import path from 'path'
 import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
 import store from '@/store'
@@ -20,21 +20,21 @@ const createTray = (): Promise<Tray> =>
             {
               label: 'Display',
               submenu: allDisplays.map(({ id }) => ({
-                label: `${(id === primaryDisplay.id && '(Primary) ') || ''}${id}`,
+                label: `${ (id === primaryDisplay.id && '(Primary) ') || '' }${ id }`,
                 type: 'radio',
                 checked:
                   settingsStore.display !== undefined
                     ? id === settingsStore.display
                     : primaryDisplay.id === id,
                 click: () => {
-                  settingsStore.$patch({ display: id})
+                  settingsStore.$patch({ display: id })
                 },
               })),
             },
             {
               label: 'Reset Display',
               click: () => {
-                settingsStore.$patch({display: undefined})
+                settingsStore.$patch({ display: undefined })
               },
             },
           ],
@@ -43,10 +43,12 @@ const createTray = (): Promise<Tray> =>
         { label: 'Exit', type: 'normal', role: 'quit' },
       ])
     }
+
     function updateContextMenu() {
       tray.setContextMenu(getContextMenu())
     }
-    tray.setToolTip(`${app.name} - v${app.getVersion()}`)
+
+    tray.setToolTip(`${ app.name } - v${ app.getVersion() }`)
     tray.setContextMenu(getContextMenu())
     tray.on('click', electronMessengerWindow.show)
     store.getters.isReady().then(updateContextMenu)

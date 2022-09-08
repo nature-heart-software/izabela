@@ -1,4 +1,4 @@
-import { ActionPayload, Dispatch, MutationPayload, Store, Commit } from 'vuex'
+import { ActionPayload, Commit, Dispatch, MutationPayload, Store } from 'vuex'
 import type ElectronStore from 'electron-store'
 
 export type MutationFilter = (mutationPayload: MutationPayload) => boolean

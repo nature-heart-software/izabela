@@ -54,5 +54,5 @@ export const useMessengerStore = defineStore('messenger', () => {
   electron: {
     persisted: true,
     shared: true,
-  }
+  },
 })

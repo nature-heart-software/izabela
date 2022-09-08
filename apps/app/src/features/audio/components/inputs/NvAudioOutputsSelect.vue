@@ -17,11 +17,10 @@
 import { computed } from 'vue'
 import { NvOption, NvSelect } from '@packages/ui'
 import { useDevicesList } from '@vueuse/core'
-import { useStore } from 'vuex'
 import { useSettingsStore } from '@/features/settings/store'
 
 const settingsStore = useSettingsStore()
-const store = useStore()
+
 const { audioOutputs } = useDevicesList()
 
 const filteredAudioOutputDevices = computed(() =>
