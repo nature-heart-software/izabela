@@ -1,12 +1,10 @@
 import { app, screen } from 'electron'
-import store from '@/store'
 import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
 import { watch } from 'vue'
 import { useSettingsStore } from '@/features/settings/store'
 
 export default () =>
-  app.whenReady().then(() =>
-    store.getters.isReady().then(() => {
+  app.whenReady().then(() => {
       const settingsStore = useSettingsStore()
       electronMessengerWindow.isReady().then(() => {
         electronMessengerWindow.setDisplay(settingsStore.display)
@@ -25,5 +23,5 @@ export default () =>
           electronMessengerWindow.setDisplay(settingsStore.display)
         })
       })
-    }),
+    },
   )

@@ -1,7 +1,6 @@
 import { app, Menu, screen, Tray } from 'electron'
 import path from 'path'
 import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
-import store from '@/store'
 import { watch } from 'vue'
 import { useSettingsStore } from '@/features/settings/store'
 
@@ -51,7 +50,7 @@ const createTray = (): Promise<Tray> =>
     tray.setToolTip(`${ app.name } - v${ app.getVersion() }`)
     tray.setContextMenu(getContextMenu())
     tray.on('click', electronMessengerWindow.show)
-    store.getters.isReady().then(updateContextMenu)
+    updateContextMenu()
     watch(() => settingsStore.display, updateContextMenu)
     return tray
   })

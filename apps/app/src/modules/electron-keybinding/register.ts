@@ -1,12 +1,10 @@
 import { app, globalShortcut } from 'electron'
-import store from '@/store'
 import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
 import { watch } from 'vue'
 import { useSettingsStore } from '@/features/settings/store'
 
 export default () =>
-  app.whenReady().then(() =>
-    store.getters.isReady().then(() => {
+  app.whenReady().then(() => {
       const settingsStore = useSettingsStore()
       const multiKeysKeybindings = {
         toggleMessengerWindow: () => electronMessengerWindow.toggleWindow(),
@@ -36,5 +34,5 @@ export default () =>
         },
         { deep: true },
       )
-    }),
+    },
   )

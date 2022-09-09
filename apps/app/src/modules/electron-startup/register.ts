@@ -1,11 +1,9 @@
-import store from '@/store'
 import { app } from 'electron'
 import { watch } from 'vue'
 import { useSettingsStore } from '@/features/settings/store'
 
 export default () =>
-  app.whenReady().then(() =>
-    store.getters.isReady().then(() => {
+  app.whenReady().then(() => {
       const settingsStore = useSettingsStore()
       const setLaunchOnStartup = (launchOnStartup: boolean) => {
         console.log('[electron-startup] Launch on startup:', launchOnStartup)
@@ -21,5 +19,5 @@ export default () =>
           setLaunchOnStartup(settingsStore.launchOnStartup)
         },
       )
-    }),
+    },
   )
