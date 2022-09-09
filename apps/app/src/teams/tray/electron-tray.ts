@@ -23,7 +23,7 @@ const createTray = (): Promise<Tray> =>
                 label: `${ (id === primaryDisplay.id && '(Primary) ') || '' }${ id }`,
                 type: 'radio',
                 checked:
-                  settingsStore.display !== undefined
+                  settingsStore.display !== null
                     ? id === settingsStore.display
                     : primaryDisplay.id === id,
                 click: () => {
@@ -34,7 +34,7 @@ const createTray = (): Promise<Tray> =>
             {
               label: 'Reset Display',
               click: () => {
-                settingsStore.$patch({ display: undefined })
+                settingsStore.$patch({ display: null })
               },
             },
           ],

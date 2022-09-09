@@ -15,10 +15,10 @@ export const useSettingsStore = defineStore(
       ? 'alpha'
       : // eslint-disable-next-line no-nested-ternary
       version.includes('beta')
-      ? 'beta'
-      : version.includes('rc')
-      ? 'rc'
-      : 'latest'
+        ? 'beta'
+        : version.includes('rc')
+          ? 'rc'
+          : 'latest'
 
     const playSpeechOnDefaultPlaybackDevice = ref(true)
     const audioOutputs = ref<MediaDeviceInfo['label'][]>([])
@@ -28,7 +28,7 @@ export const useSettingsStore = defineStore(
     const launchOnStartup = ref(true)
     const debugMode = ref(process.env.NODE_ENV === 'development')
     const messageMode = ref<'sentence' | 'word'>('sentence')
-    const display = ref<undefined | Electron.Display['id']>()
+    const display = ref<Electron.Display['id'] | null>(null)
     const keybindings = ref<Record<string, Key[]>>({
       recordAudio: [
         {

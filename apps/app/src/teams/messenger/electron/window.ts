@@ -11,6 +11,7 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     fullscreen: true,
     transparent: true,
     frame: false,
+    resizable: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION as unknown as boolean,

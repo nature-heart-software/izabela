@@ -139,7 +139,7 @@ export const ElectronMessengerWindow = () => {
     return Promise.resolve()
   }
 
-  const setDisplay = (id?: Electron.Display['id']) => {
+  const setDisplay = (id?: Electron.Display['id'] | null) => {
     const window = getWindow()
     if (window) {
       const allDisplays = screen.getAllDisplays()
