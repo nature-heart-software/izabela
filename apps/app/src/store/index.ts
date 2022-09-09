@@ -27,28 +27,32 @@ const store = createStore({
     ...(process.env.STORYBOOK
       ? []
       : [
-        createPersistedState({
-          whitelist: (mutation: MutationPayload) =>
-            mutation.type.includes('setPersisted') ||
-            (mutation.type.includes('setProperty') &&
-              (mutation.payload as SetPropertyPayload)[0].includes('persisted')) ||
-            (mutation.type.includes('setProperties') &&
-              (mutation.payload as SetPropertyPayload[]).some((payload) =>
-                payload[0].includes('persisted'),
-              )),
-        }),
-        createSharedMutations(),
-      ]),
+          createPersistedState({
+            whitelist: (mutation: MutationPayload) =>
+              mutation.type.includes('setPersisted') ||
+              (mutation.type.includes('setProperty') &&
+                (mutation.payload as SetPropertyPayload)[0].includes('persisted')) ||
+              (mutation.type.includes('setProperties') &&
+                (mutation.payload as SetPropertyPayload[]).some((payload) =>
+                  payload[0].includes('persisted'),
+                )),
+          }),
+          createSharedMutations(),
+        ]),
   ],
 })
 
 export const registerPluginStore = <S extends Record<any, any>>(id: string, state: S) => {
-  const usePluginStore = defineStore(`plugin-${ id }`, () => {
-    const pluginState = ref<Record<any, any>>(state)
-    return {
-      pluginState,
-    }
-  }, { electron: { shared: true, persisted: true } })
+  const usePluginStore = defineStore(
+    `plugin-${id}`,
+    () => {
+      const pluginState = ref<Record<any, any>>(state)
+      return {
+        pluginState,
+      }
+    },
+    { electron: { shared: true, persisted: true } },
+  )
   const pluginStore = usePluginStore()
   return {
     setProperty(property: keyof S, value: any, encryptValue = false) {
