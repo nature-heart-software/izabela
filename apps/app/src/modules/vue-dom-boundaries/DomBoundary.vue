@@ -4,13 +4,13 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { useStore } from 'vuex'
 import { v4 as uuid } from 'uuid'
 import { onBeforeUnmount, ref, watch } from 'vue'
 import { throttle } from 'lodash'
 import { useIntersectionObserver, useMutationObserver, useResizeObserver } from '@vueuse/core'
+import { useDomBoundariesStore } from '@/modules/vue-dom-boundaries/dom-boundaries.store'
 
-const store = useStore()
+const domBoundariesStore = useDomBoundariesStore()
 
 const componentRef = ref()
 const boundaries = ref({
@@ -35,17 +35,13 @@ useMutationObserver(componentRef, updateBoundary, { attributes: true })
 useResizeObserver(componentRef, updateBoundary)
 
 onBeforeUnmount(() => {
-  if (store && store.hasModule('dom-boundaries')) {
-    store.dispatch('dom-boundaries/removeBoundary', boundaries.value.id)
-  }
+  domBoundariesStore.removeBoundary(boundaries.value.id)
 })
 
 watch(
   boundaries.value,
   () => {
-    if (store && store.hasModule('dom-boundaries')) {
-      store.dispatch('dom-boundaries/addBoundary', { ...boundaries.value })
-    }
+    domBoundariesStore.addBoundary({ ...boundaries.value })
   },
   { deep: true },
 )

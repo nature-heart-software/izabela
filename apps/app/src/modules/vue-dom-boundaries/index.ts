@@ -1,7 +1,7 @@
 import ready from '@ryanmorr/ready'
 import { v4 as uuid } from 'uuid'
 import { throttle } from 'lodash'
-import store from '@/store'
+import { useDomBoundariesStore } from '@/modules/vue-dom-boundaries/dom-boundaries.store'
 
 export const domBoundaryClass = 'dom-boundary'
 
@@ -20,15 +20,14 @@ const onElementChange = (element: Element, callback: () => any) => {
 }
 export const watchBoundary = (selector: string) => {
   ready(selector, (element: Element) => {
+    const domBoundariesStore = useDomBoundariesStore()
     const id = uuid()
     const updateBoundary = throttle(() => {
-      if (store.hasModule('dom-boundaries')) {
-        if (element) {
-          const { x, y, width: w, height: h } = element.getBoundingClientRect()
-          store.dispatch('dom-boundaries/addBoundary', { id, x, y, w, h })
-        } else {
-          store.dispatch('dom-boundaries/removeBoundary', { id })
-        }
+      if (element) {
+        const { x, y, width: w, height: h } = element.getBoundingClientRect()
+        domBoundariesStore.addBoundary({ id, x, y, w, h })
+      } else {
+        domBoundariesStore.removeBoundary(id)
       }
     }, 250)
     onElementChange(element, updateBoundary)

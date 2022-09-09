@@ -1,12 +1,12 @@
 import ElectronWindowManager from '@/modules/electron-window-manager'
 import iohook, { IOHookEvent } from '@/modules/node-iohook'
-import store from '@/store'
 import { throttle } from 'lodash'
 import { Boundary } from '@/modules/vue-dom-boundaries/types'
 import { BrowserWindow, screen, shell } from 'electron'
 import { Deferred } from '@/utils/promise'
 import { useMessengerStore } from '@/teams/messenger/store'
 import { useSettingsStore } from '@/features/settings/store'
+import { useDomBoundariesStore } from '@/modules/vue-dom-boundaries/dom-boundaries.store'
 
 export const ElectronMessengerWindow = () => {
   /* use isFocused as source of truth instead of window.isFocused() as in some instances
@@ -17,6 +17,7 @@ export const ElectronMessengerWindow = () => {
   // let lastKeypressTime = 0
   // const doubleKeypressDelta = 500
   let registeredWindow: BrowserWindow | null = null
+  let domBoundariesStore: ReturnType<typeof useDomBoundariesStore>
   const ready = Deferred<BrowserWindow>()
   const isReady = () => ready.promise
 
@@ -111,7 +112,7 @@ export const ElectronMessengerWindow = () => {
       if (!window.isDestroyed() && window.isVisible()) {
         const { x: mouseX = 0, y: mouseY = 0 } = event
         const [windowX, windowY] = window.getPosition()
-        const domBoundaries = store.getters['dom-boundaries/boundaries']
+        const domBoundaries = domBoundariesStore.boundaries
         const isWithinAnyBoundaries = domBoundaries.some(({ x, y, w, h }: Boundary) => {
           const isWithinXBoundaries = mouseX >= windowX+x && mouseX <= windowX+x+w
           const isWithinYBoundaries = mouseY >= windowY+y && mouseY <= windowY+y+h
@@ -192,6 +193,7 @@ export const ElectronMessengerWindow = () => {
   }
 
   const start = (window: BrowserWindow) => {
+    domBoundariesStore = useDomBoundariesStore()
     registeredWindow = window
     ready.resolve(window)
   }

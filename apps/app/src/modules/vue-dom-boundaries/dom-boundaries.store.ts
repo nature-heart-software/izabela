@@ -1,41 +1,28 @@
-import { Plugin } from 'vuex'
-import { SESSION_ID } from '@/consts'
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
 import { Boundary } from './types'
 
-export default (): Plugin<any> => (store) => {
-  store.registerModule<{ boundaries: Boundary[] }>('dom-boundaries', {
-    namespaced: true,
-    state: {
-      boundaries: [],
+export const useDomBoundariesStore = defineStore('dom-boundaries', () => {
+  const boundaries = ref<Boundary[]>([])
+  return {
+    boundaries,
+    addBoundary(boundary: Boundary) {
+      const newBoundaries = [...boundaries.value]
+      const boundaryIndex = newBoundaries.findIndex((i) => i.id === boundary.id)
+      if (boundaryIndex < 0) {
+        newBoundaries.push({ ...boundary })
+      } else {
+        newBoundaries.splice(boundaryIndex, 1, { ...boundary })
+      }
+      boundaries.value = newBoundaries
     },
-    mutations: {
-      setBoundaries(state, value) {
-        state.boundaries = value
-      },
+    removeBoundary(id: Boundary['id']) {
+      const newBoundaries = [...boundaries.value]
+      const boundaryIndex = newBoundaries.findIndex((i) => i.id === id)
+      if (boundaryIndex >= 0) {
+        newBoundaries.splice(boundaryIndex, 1)
+      }
+      boundaries.value = newBoundaries
     },
-    getters: {
-      state: (state) => state,
-      boundaries: (state) => state.boundaries.filter((i) => i.sessionId === SESSION_ID),
-    },
-    actions: {
-      addBoundary({ commit, getters }, boundary: Boundary) {
-        const newBoundaries = [...getters.boundaries]
-        const boundaryIndex = newBoundaries.findIndex((i) => i.id === boundary.id)
-        if (boundaryIndex < 0) {
-          newBoundaries.push({ ...boundary, sessionId: SESSION_ID })
-        } else {
-          newBoundaries.splice(boundaryIndex, 1, { ...boundary, sessionId: SESSION_ID })
-        }
-        commit('setBoundaries', newBoundaries)
-      },
-      removeBoundary({ commit, getters }, id: Boundary['id']) {
-        const newBoundaries = [...getters.boundaries]
-        const boundaryIndex = newBoundaries.findIndex((i) => i.id === id)
-        if (boundaryIndex >= 0) {
-          newBoundaries.splice(boundaryIndex, 1)
-        }
-        commit('setBoundaries', newBoundaries)
-      },
-    },
-  })
-}
+  }
+}, { electron: { shared: true } })
