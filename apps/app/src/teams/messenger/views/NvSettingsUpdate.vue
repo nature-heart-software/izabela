@@ -22,5 +22,4 @@ import NvUpdateChannelSelect from '@/features/update/components/inputs/NvUpdateC
 import { useSettingsStore } from '@/features/settings/store'
 
 const settingsStore = useSettingsStore()
-
 </script>
