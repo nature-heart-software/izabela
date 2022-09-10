@@ -63,7 +63,7 @@ export const useDictionaryStore = defineStore('dictionary', () => {
   const translateText = (text: string) => {
     let newText = text
     definitions.value.forEach(([word, definition]) => {
-      newText = newText.replace(new RegExp(`(\\b${word}\\b)`, 'gi'), definition)
+      newText = newText.replace(new RegExp(`(\\b${ word }\\b)`, 'gi'), definition)
     })
     return newText
   }
