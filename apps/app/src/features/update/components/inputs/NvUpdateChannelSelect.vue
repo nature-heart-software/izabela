@@ -7,5 +7,4 @@
   </NvSelect>
 </template>
 <script lang="ts" setup>
-import { NvOption, NvSelect } from '@packages/ui'
-</script>
+import { NvOption, NvSelect } from '@packages/ui'</script>

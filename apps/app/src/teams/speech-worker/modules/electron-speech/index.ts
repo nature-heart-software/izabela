@@ -4,10 +4,11 @@ import path from 'path'
 import iohook from 'iohook'
 import { app } from 'electron'
 import { Deferred } from '@/utils/promise'
-import store from '@/store'
 import { ipcMain } from 'electron-postman'
 import { DEFAULT_LANGUAGE_CODE } from '@/consts'
 import { createNotification } from '@/utils/electron-notification'
+import { useSettingsStore } from '@/features/settings/store'
+import { useSpeechStore } from '@/features/speech/store'
 
 app.whenReady().then(() => {
   const credentialsDirPath = path.join(app.getPath('userData'), 'credentials')
@@ -21,7 +22,8 @@ app.whenReady().then(() => {
 let deferredRecording: ReturnType<typeof Deferred> | null = null
 
 iohook.on('keydown', (event) => {
-  const keybinding = store.getters['settings/persisted'].keybindings.recordAudio[0]
+  const settingsStore = useSettingsStore()
+  const keybinding = settingsStore.keybindings.recordAudio[0]
   if (keybinding && keybinding.rawCode === event.rawcode && !deferredRecording) {
     const deferred = Deferred()
     deferredRecording = deferred
@@ -30,7 +32,8 @@ iohook.on('keydown', (event) => {
 })
 
 iohook.on('keyup', (event) => {
-  const keybinding = store.getters['settings/persisted'].keybindings.recordAudio[0]
+  const settingsStore = useSettingsStore()
+  const keybinding = settingsStore.keybindings.recordAudio[0]
   if (keybinding && keybinding.rawCode === event.rawcode && deferredRecording) {
     deferredRecording.resolve(true)
     deferredRecording = null
@@ -58,8 +61,9 @@ ipcMain.on(
     encoding: any
   }) => {
     try {
+      const speechStore = useSpeechStore()
       const client = new speech.SpeechClient()
-      const engine = store.getters['speech/currentSpeechEngine']
+      const engine = speechStore.currentSpeechEngine
 
       const request = {
         config: {

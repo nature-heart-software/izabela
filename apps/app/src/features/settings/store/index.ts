@@ -1,33 +1,35 @@
-import { Module } from 'vuex'
 import pkg from '@root/package.json'
-import { utilActions, utilMutations } from '@/utils/vuex'
 // eslint-disable-next-line import/no-cycle
 import { SpeechEngine } from '@/modules/speech-engine-manager/types'
 import { Key } from '@/types/keybinds'
 import { ENGINE_ID } from '@/plugins/speech-engines/say/consts'
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
 
-const { version } = pkg
-// eslint-disable-next-line no-nested-ternary
-const channel = version.includes('alpha')
-  ? 'alpha'
-  : // eslint-disable-next-line no-nested-ternary
-  version.includes('beta')
-  ? 'beta'
-  : version.includes('rc')
-  ? 'rc'
-  : 'latest'
-const storeState = {
-  persisted: {
-    playSpeechOnDefaultPlaybackDevice: true,
-    audioOutputs: [] as MediaDeviceInfo['label'][],
-    audioInput: 'default' as MediaDeviceInfo['label'],
-    selectedSpeechEngine: ENGINE_ID as SpeechEngine['id'],
-    updateChannel: channel,
-    launchOnStartup: true,
-    debugMode: process.env.NODE_ENV === 'development',
-    messageMode: 'sentence' as 'sentence' | 'word',
-    display: null as null | Electron.Display['id'],
-    keybindings: {
+export const useSettingsStore = defineStore(
+  'settings',
+  () => {
+    const { version } = pkg
+    // eslint-disable-next-line no-nested-ternary
+    const channel = version.includes('alpha')
+      ? 'alpha'
+      : // eslint-disable-next-line no-nested-ternary
+      version.includes('beta')
+        ? 'beta'
+        : version.includes('rc')
+          ? 'rc'
+          : 'latest'
+
+    const playSpeechOnDefaultPlaybackDevice = ref(true)
+    const audioOutputs = ref<MediaDeviceInfo['label'][]>([])
+    const audioInput = ref<MediaDeviceInfo['label']>('default')
+    const selectedSpeechEngine = ref<SpeechEngine['id']>(ENGINE_ID)
+    const updateChannel = ref(channel)
+    const launchOnStartup = ref(true)
+    const debugMode = ref(process.env.NODE_ENV === 'development')
+    const messageMode = ref<'sentence' | 'word'>('sentence')
+    const display = ref<Electron.Display['id'] | null>(null)
+    const keybindings = ref<Record<string, Key[]>>({
       recordAudio: [
         {
           key: 'ShiftRight',
@@ -68,23 +70,24 @@ const storeState = {
           metaKey: false,
         },
       ],
-    } as Record<string, Key[]>,
+    })
+    return {
+      playSpeechOnDefaultPlaybackDevice,
+      audioOutputs,
+      audioInput,
+      selectedSpeechEngine,
+      updateChannel,
+      launchOnStartup,
+      debugMode,
+      messageMode,
+      display,
+      keybindings,
+    }
   },
-}
-
-export const settingsStore: Module<typeof storeState, any> = {
-  namespaced: true,
-  state: storeState,
-  getters: {
-    state: (state) => state,
-    persisted: (state) => state.persisted,
+  {
+    electron: {
+      persisted: true,
+      shared: true,
+    },
   },
-  mutations: {
-    ...utilMutations,
-  },
-  actions: {
-    ...utilActions,
-  },
-}
-
-export default settingsStore
+)

@@ -23,8 +23,8 @@ export const lineHeight = (tailwindFontSize: TailwindFontSize) =>
   typeof tailwindFontSize === 'number' || typeof tailwindFontSize === 'string'
     ? 1
     : typeof tailwindFontSize[1]?.lineHeight === 'string'
-    ? rem(tailwindFontSize[1]?.lineHeight)
-    : tailwindFontSize[1]?.lineHeight || 1
+      ? rem(tailwindFontSize[1]?.lineHeight)
+      : tailwindFontSize[1]?.lineHeight || 1
 
 export const letterSpacing = (tailwindFontSize: TailwindFontSize) =>
   typeof tailwindFontSize === 'number' || typeof tailwindFontSize === 'string'
@@ -111,19 +111,19 @@ export function horizontalPaddingWithIconStyleBySize(size: Size) {
   const styles: Record<Size, CSSObject> = {
     xs: {
       paddingLeft: rem(spacing['2']),
-      paddingRight: rem(spacing['2'] + spacing['4']),
+      paddingRight: rem(spacing['2']+spacing['4']),
     },
     sm: {
       paddingLeft: rem(spacing['3']),
-      paddingRight: rem(spacing['3'] + spacing['5']),
+      paddingRight: rem(spacing['3']+spacing['5']),
     },
     md: {
       paddingLeft: rem(spacing['5']),
-      paddingRight: rem(spacing['5'] + spacing['5']),
+      paddingRight: rem(spacing['5']+spacing['5']),
     },
     lg: {
       paddingLeft: rem(spacing['6']),
-      paddingRight: rem(spacing['6'] + spacing['5']),
+      paddingRight: rem(spacing['6']+spacing['5']),
     },
   }
   return styles[size]
@@ -132,16 +132,16 @@ export function horizontalPaddingWithIconStyleBySize(size: Size) {
 export function iconStyleBySize(size: Size) {
   const styles: Record<Size, CSSObject> = {
     xs: {
-      right: `${rem(spacing['1'])}`,
+      right: `${ rem(spacing['1']) }`,
     },
     sm: {
-      right: `${rem(spacing['2'])}`,
+      right: `${ rem(spacing['2']) }`,
     },
     md: {
-      right: `${rem(spacing['2'])}`,
+      right: `${ rem(spacing['2']) }`,
     },
     lg: {
-      right: `${rem(spacing['3'])}`,
+      right: `${ rem(spacing['3']) }`,
     },
   }
   return styles[size]
@@ -149,6 +149,6 @@ export function iconStyleBySize(size: Size) {
 
 export function disabledItemBackgroundStyle() {
   return `
-    background-color: ${rgba('#fff', 0.9)};
+    background-color: ${ rgba('#fff', 0.9) };
   `
 }

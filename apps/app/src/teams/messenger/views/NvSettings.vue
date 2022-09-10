@@ -5,7 +5,7 @@
       <div></div>
       <NvCard class="inline-flex" size="sm">
         <div class="inline-flex space-x-2">
-          <NvButton icon-name="times" size="xs" type="plain" @click="$emit('close')" />
+          <NvButton icon-name="times" size="xs" type="plain" @click="$emit('close')"/>
         </div>
       </NvCard>
     </div>
@@ -25,10 +25,10 @@
                       <router-link :to="entry.to || { name: 'settings' }" class="w-full">
                         <NvButton
                           :selected="currentRoute.name === entry.to?.name"
+                          class="w-full"
                           size="sm"
                           type="ghost-alt"
-                          class="w-full"
-                          >{{ entry.name }}
+                        >{{ entry.name }}
                         </NvButton>
                       </router-link>
                     </template>
@@ -43,7 +43,7 @@
               <router-view v-slot="{ Component }">
                 <Transition class="transition">
                   <div :key="Component" class="absolute inset-0 overflow-y-auto">
-                    <component :is="Component" />
+                    <component :is="Component"/>
                   </div>
                 </Transition>
               </router-view>

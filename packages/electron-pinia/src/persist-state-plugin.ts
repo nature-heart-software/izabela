@@ -3,16 +3,16 @@ import debounce from 'lodash/debounce'
 import defaultsDeep from 'lodash/defaultsDeep'
 import cloneDeep from 'lodash/cloneDeep'
 import type ElectronStore from 'electron-store'
-import { computed } from 'vue'
+
 import {
   IPC_EVENT_STORE_DELETE,
   IPC_EVENT_STORE_GET,
   IPC_EVENT_STORE_SET,
-  isMain,
-  isPreload,
 } from './consts'
-import { AugmentedGlobal, PluginCustomProperties } from './types'
-import { purify } from './utils'
+import { Deferred, purify } from './utils'
+import { AugmentedGlobal } from './types'
+import { isMain } from './electron'
+import { ref } from 'vue'
 
 function getStorage(): ElectronStore {
   return isMain
@@ -30,27 +30,26 @@ if (isMain) {
     const storage = getStorage()
     return storage.get(name)
   })
-  ipcMain.handle(IPC_EVENT_STORE_SET, (_, { name, state }) => {
+  ipcMain.on(IPC_EVENT_STORE_SET, (_, { name, state }) => {
     storageSetState(name, state)
     return true
   })
-  ipcMain.handle(IPC_EVENT_STORE_DELETE, (_, { name }) => {
+  ipcMain.on(IPC_EVENT_STORE_DELETE, (_, { name }) => {
     const storage = getStorage()
     storage.delete(name)
     return true
   })
 }
 
-export const persistStatePlugin: PiniaPlugin = ({
-  store,
-}): PluginCustomProperties => {
+export const persistStatePlugin: PiniaPlugin = ({ store }) => {
+  const $isReady = ref(false)
+  const deferredIsReady = Deferred<boolean>()
   const storage = getStorage()
-  const loaded = isPreload ? Promise.resolve(true) : loadInitialState()
 
   const setState = debounce((state: any) => {
     const sanitizedState = purify(state)
     storageSetState(getStorageName(store.$id), sanitizedState)
-  }, 100)
+  }, 1000)
 
   async function getState() {
     return (await storage.get(getStorageName(store.$id))) || {}
@@ -62,7 +61,6 @@ export const persistStatePlugin: PiniaPlugin = ({
 
   async function loadInitialState() {
     const state = await getState()
-
     if (state) {
       const mergedState = defaultsDeep(
         cloneDeep(state),
@@ -73,8 +71,17 @@ export const persistStatePlugin: PiniaPlugin = ({
     return true
   }
 
-  store.$subscribe((_, state) => setState(state))
+  loadInitialState()
+    .then(() => {
+      $isReady.value = true
+      deferredIsReady.resolve(true)
+      store.$subscribe((_, state) => setState(state))
+    })
+    .catch(() => {
+      deferredIsReady.reject(false)
+    })
   return {
-    isReady: computed(() => () => loaded),
+    $isReady,
+    $whenReady: () => deferredIsReady.promise,
   }
 }

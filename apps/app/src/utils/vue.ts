@@ -1,4 +1,4 @@
-import { VNode, Comment } from 'vue'
+import { Comment, VNode } from 'vue'
 
 export function isVNodeEmpty(
   slot: (d: object) => VNode | VNode[] | undefined | null,

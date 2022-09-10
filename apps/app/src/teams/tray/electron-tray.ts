@@ -1,12 +1,13 @@
-import { app, Menu, Tray, screen } from 'electron'
+import { app, Menu, screen, Tray } from 'electron'
 import path from 'path'
 import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
-import store from '@/store'
 import { watch } from 'vue'
+import { useSettingsStore } from '@/features/settings/store'
 
 let tray: Tray
 const createTray = (): Promise<Tray> =>
   app.whenReady().then(() => {
+    const settingsStore = useSettingsStore()
     tray = new Tray(path.join(__static, 'icons/256x256.png'))
     const getContextMenu = () => {
       const primaryDisplay = screen.getPrimaryDisplay()
@@ -18,21 +19,21 @@ const createTray = (): Promise<Tray> =>
             {
               label: 'Display',
               submenu: allDisplays.map(({ id }) => ({
-                label: `${(id === primaryDisplay.id && '(Primary) ') || ''}${id}`,
+                label: `${ (id === primaryDisplay.id && '(Primary) ') || '' }${ id }`,
                 type: 'radio',
                 checked:
-                  store.getters['settings/persisted'].display !== null
-                    ? id === store.getters['settings/persisted'].display
+                  settingsStore.display !== null
+                    ? id === settingsStore.display
                     : primaryDisplay.id === id,
                 click: () => {
-                  store.dispatch('settings/setProperty', ['persisted.display', id])
+                  settingsStore.$patch({ display: id })
                 },
               })),
             },
             {
               label: 'Reset Display',
               click: () => {
-                store.dispatch('settings/setProperty', ['persisted.display', null])
+                settingsStore.$patch({ display: null })
               },
             },
           ],
@@ -41,14 +42,16 @@ const createTray = (): Promise<Tray> =>
         { label: 'Exit', type: 'normal', role: 'quit' },
       ])
     }
+
     function updateContextMenu() {
       tray.setContextMenu(getContextMenu())
     }
-    tray.setToolTip(`${app.name} - v${app.getVersion()}`)
+
+    tray.setToolTip(`${ app.name } - v${ app.getVersion() }`)
     tray.setContextMenu(getContextMenu())
     tray.on('click', electronMessengerWindow.show)
-    store.getters.isReady().then(updateContextMenu)
-    watch(() => store.getters['settings/persisted'].display, updateContextMenu)
+    updateContextMenu()
+    watch(() => settingsStore.display, updateContextMenu)
     return tray
   })
 

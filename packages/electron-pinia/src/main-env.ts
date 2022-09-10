@@ -1,0 +1,8 @@
+import { ipcMain } from 'electron'
+import { AugmentedGlobal } from './types'
+import { ELECTRON_STORAGE_NAME } from './consts'
+import ElectronStore from 'electron-store'
+;(global as AugmentedGlobal).ElectronPiniaStorage = new ElectronStore({
+  name: ELECTRON_STORAGE_NAME,
+})
+;(global as AugmentedGlobal).ipcMain = ipcMain

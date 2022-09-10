@@ -21,7 +21,6 @@ contextBridge.exposeInMainWorld('ElectronPinia', {
 contextBridge.exposeInMainWorld('ElectronPiniaStorage', {
   get: (name: string) => ipcRenderer.invoke(IPC_EVENT_STORE_GET, { name }),
   set: (name: string, state: any) =>
-    ipcRenderer.invoke(IPC_EVENT_STORE_SET, { name, state }),
-  delete: (name: string) =>
-    ipcRenderer.invoke(IPC_EVENT_STORE_DELETE, { name }),
+    ipcRenderer.send(IPC_EVENT_STORE_SET, { name, state }),
+  delete: (name: string) => ipcRenderer.send(IPC_EVENT_STORE_DELETE, { name }),
 })

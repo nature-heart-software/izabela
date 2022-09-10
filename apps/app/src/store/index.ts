@@ -1,75 +1,30 @@
-import { createStore, MutationPayload } from 'vuex'
-
-import { defaultsDeep, get, set } from 'lodash'
-import { createPersistedState, createSharedMutations } from '@/modules/electron-vuex'
-import messenger from '@/teams/messenger/store'
-// eslint-disable-next-line import/no-cycle
-import settings from '@/features/settings/store'
-// eslint-disable-next-line import/no-cycle
-import speech from '@/features/speech/store'
-import dictionary from '@/features/dictionary/store'
-import { SetPropertyPayload, utilActions, utilMutations } from '@/utils/vuex'
-import domBoundariesStore from '@/modules/vue-dom-boundaries/dom-boundaries.store'
 import { decrypt, encrypt } from '@/utils/security'
+import { createPinia, defineStore } from 'pinia'
+import { ref } from 'vue'
+import { electronPiniaPlugin } from '@packages/electron-pinia/dist/renderer.es.js'
 
-const store = createStore({
-  state: {
-    persisted: {
-      plugins: {},
-    },
-  },
-  getters: {
-    state: (state) => state,
-    persisted: (state) => state.persisted,
-    isReady: (state: any) => () => Promise.all([state['electron-vuex'].isReady()]),
-  },
-  mutations: {
-    ...utilMutations,
-  },
-  actions: {
-    ...utilActions,
-  },
-  modules: {
-    messenger,
-    settings,
-    speech,
-    dictionary,
-  },
-  plugins: [
-    ...(process.env.STORYBOOK
-      ? []
-      : [
-          createPersistedState({
-            whitelist: (mutation: MutationPayload) =>
-              mutation.type.includes('setPersisted') ||
-              (mutation.type.includes('setProperty') &&
-                (mutation.payload as SetPropertyPayload)[0].includes('persisted')) ||
-              (mutation.type.includes('setProperties') &&
-                (mutation.payload as SetPropertyPayload[]).some((payload) =>
-                  payload[0].includes('persisted'),
-                )),
-          }),
-          createSharedMutations(),
-          domBoundariesStore(),
-        ]),
-  ],
-})
+export const pinia = createPinia().use(electronPiniaPlugin())
 
 export const registerPluginStore = <S extends Record<any, any>>(id: string, state: S) => {
-  const pluginPath = ['settings.persisted.plugins', id].join('.')
-  const currentPluginState = get(store.state, pluginPath, {})
-  const mergedState = defaultsDeep(currentPluginState, state)
-  set(store.state, pluginPath, mergedState)
+  const usePluginStore = defineStore(
+    `plugin-${id}`,
+    () => {
+      const pluginState = ref<Record<any, any>>(state)
+      return {
+        pluginState,
+      }
+    },
+    { electron: { shared: true, persisted: true } },
+  )
+  const pluginStore = usePluginStore()
   return {
     setProperty(property: keyof S, value: any, encryptValue = false) {
       const fn = encryptValue ? encrypt : (v: any) => v
-      store.dispatch('setProperty', [[pluginPath, property].join('.'), fn(value)])
+      pluginStore.$patch({ pluginState: { [property]: fn(value) } })
     },
     getProperty(property: keyof S, decryptValue = false) {
       const fn = decryptValue ? decrypt : (v: any) => v
-      return fn(get(store.state, [pluginPath, property].join('.')))
+      return fn(pluginStore.$state.pluginState[property])
     },
   }
 }
-
-export default store

@@ -1,9 +1,8 @@
 <template>
   <NvFormItem label="Voice">
-    <NvVoiceSelect />
+    <NvVoiceSelect/>
   </NvFormItem>
 </template>
 <script lang="ts" setup>
 import { NvFormItem } from '@packages/ui'
-import NvVoiceSelect from './NvVoiceSelect'
-</script>
+import NvVoiceSelect from './NvVoiceSelect'</script>

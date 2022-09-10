@@ -2,7 +2,6 @@
   <div></div>
 </template>
 <script lang="ts" setup>
-import store from '@/store'
 import { getTime } from '@/utils/time'
 import { blobToBase64 } from '@/utils/blob'
 import { onBeforeUnmount } from 'vue'
@@ -12,8 +11,10 @@ import {
   onIPCStartSpeechTranscription,
   onIPCStopSpeechTranscription,
 } from '@/electron/events/renderer'
+import { useSettingsStore } from '@/features/settings/store'
 
-const mediaDevice = await getMediaDeviceByLabel(store.getters['settings/persisted'].audioInput)
+const settingsStore = useSettingsStore()
+const mediaDevice = await getMediaDeviceByLabel(settingsStore.audioInput)
 let audioChunks: Blob[] = []
 const sampleRate = 48000
 const stream = await navigator.mediaDevices.getUserMedia({
@@ -53,14 +54,14 @@ mediaRecorder.addEventListener('stop', onStop)
 
 onIPCStartSpeechTranscription(() => {
   if (mediaRecorder) {
-    console.log(`[${getTime()}] Starting web recording`)
+    console.log(`[${ getTime() }] Starting web recording`)
     mediaRecorder.start()
   }
 })
 
 onIPCStopSpeechTranscription(() => {
   if (mediaRecorder) {
-    console.log(`[${getTime()}] Stopping web recording`)
+    console.log(`[${ getTime() }] Stopping web recording`)
     mediaRecorder.stop()
   }
 })

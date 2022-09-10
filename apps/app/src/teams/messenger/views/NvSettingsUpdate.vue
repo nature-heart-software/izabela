@@ -8,10 +8,8 @@
             <NvText type="label">Update Channel</NvText>
           </NvStack>
           <NvUpdateChannelSelect
-            :modelValue="store.getters['settings/persisted'].updateChannel"
-            @update:modelValue="
-              (value) => store.dispatch('settings/setProperty', ['persisted.updateChannel', value])
-            "
+            :modelValue="settingsStore.updateChannel"
+            @update:modelValue="(value) => settingsStore.$patch({ updateChannel: value })"
           />
         </NvGroup>
       </NvCard>
@@ -20,8 +18,8 @@
 </template>
 <script lang="ts" setup>
 import { NvCard, NvGroup, NvStack, NvText } from '@packages/ui'
-import { useStore } from 'vuex'
 import NvUpdateChannelSelect from '@/features/update/components/inputs/NvUpdateChannelSelect.vue'
+import { useSettingsStore } from '@/features/settings/store'
 
-const store = useStore()
+const settingsStore = useSettingsStore()
 </script>

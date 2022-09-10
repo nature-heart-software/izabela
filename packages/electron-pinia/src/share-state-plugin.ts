@@ -1,59 +1,18 @@
 import { PiniaPlugin } from 'pinia'
-import {
-  IPC_EVENT_CONNECT,
-  IPC_EVENT_NOTIFY_MAIN,
-  IPC_EVENT_NOTIFY_RENDERERS,
-  isMain,
-  isPreload,
-  isRenderer,
-} from './consts'
-import {
-  AugmentedGlobal,
-  Connections,
-  IpcMainEventHandler,
-  IpcMainInvokeEventHandler,
-  IpcRendererEventHandler,
-  ShareStatePayload,
-} from './types'
-import { purify } from './utils'
+import { getIssuer, purify, useArgs } from './utils'
+import { IpcRendererEventHandler, ShareStatePayload } from './types'
+import background from './background'
+import { ipcRenderer, isPreload, isRenderer } from './electron'
 
 export const shareStatePlugin: PiniaPlugin = ({ store }) => {
   const processType = isRenderer ? 'renderer' : 'main'
-  const ipcMain =
-    isMain && typeof global !== 'undefined'
-      ? (global as AugmentedGlobal).ipcMain
-      : null
-  const ipcRenderer =
-    isRenderer && typeof window !== 'undefined' ? window.ElectronPinia : null
-
-  function notifyRenderers(
-    connections: Connections,
-    payload: ShareStatePayload,
-    issuer: string | number = '',
-  ) {
-    Object.keys(connections).forEach((processId) => {
-      if (
-        processId !== (typeof issuer === 'number' ? issuer.toString() : issuer)
-      ) {
-        connections[processId].send(IPC_EVENT_NOTIFY_RENDERERS, purify(payload))
-      }
-    })
-  }
 
   function connect() {
     return ipcRenderer?.SEND_IPC_EVENT_CONNECT()
   }
 
-  function onConnect(handler: IpcMainInvokeEventHandler) {
-    return ipcMain?.handle(IPC_EVENT_CONNECT, handler)
-  }
-
   function notifyMain(payload: ShareStatePayload) {
     ipcRenderer?.SEND_IPC_EVENT_NOTIFY_MAIN(purify(payload))
-  }
-
-  function onNotifyMain(handler: IpcMainEventHandler<[ShareStatePayload]>) {
-    ipcMain?.on(IPC_EVENT_NOTIFY_MAIN, handler)
   }
 
   function onNotifyRenderers(
@@ -64,17 +23,26 @@ export const shareStatePlugin: PiniaPlugin = ({ store }) => {
 
   async function rendererProcessLogic() {
     const winId = await connect()
+    const $patch = store.$patch
+    store.$patch = (...args: any[]) => {
+      $patch(args[0])
+      const hasIssuer = getIssuer(args)
+      if (hasIssuer || typeof args[0] === 'function') return
+      notifyMain({
+        name: '$patch',
+        storeId: store.$id,
+        args: [...args, { issuer: winId }],
+      })
+    }
     store.$onAction(({ name, store, args }) => {
-      const hasIssuer = args.some(
-        (arg) => typeof arg === 'object' && arg.issuer,
-      )
+      const hasIssuer = getIssuer(args)
       if (hasIssuer) return
       notifyMain({
         name,
         storeId: store.$id,
         args: [...args, { issuer: winId }],
       })
-    })
+    }, true)
 
     onNotifyRenderers((_, { name, storeId, args }) => {
       if (storeId === store.$id) store[name](...args)
@@ -82,33 +50,26 @@ export const shareStatePlugin: PiniaPlugin = ({ store }) => {
   }
 
   function mainProcessLogic() {
-    const connections: Connections = {}
-    onConnect((event) => {
-      const win = event.sender
-      const winId = win.id
-      connections[winId] = win
-      win.on('destroyed', () => {
-        delete connections[winId]
-      })
-      return Promise.resolve(winId)
-    })
+    const $patch = store.$patch
+    store.$patch = (...args: any[]) => {
+      $patch(args[0])
+      if (typeof args[0] === 'function') return
+      const { issuer, args: newArgs } = useArgs(args)
+      background.notifyRenderers(
+        { name: '$patch', storeId: store.$id, args: newArgs },
+        issuer,
+      )
+    }
 
     store.$onAction(({ name, store, args }) => {
-      const issuer =
-        args.find((arg) => typeof arg === 'object' && arg.issuer)?.issuer ||
-        'main'
-      const newArgs = [
-        ...args.filter((o) => typeof o !== 'object' || !o.issuer),
-        { issuer },
-      ]
-      notifyRenderers(
-        connections,
+      const { issuer, args: newArgs } = useArgs(args)
+      background.notifyRenderers(
         { name, storeId: store.$id, args: newArgs },
         issuer,
       )
-    })
+    }, true)
 
-    onNotifyMain((_, { name, storeId, args }) => {
+    background.onNotifyMain((_, { name, storeId, args }) => {
       if (storeId === store.$id) store[name](...args)
     })
   }

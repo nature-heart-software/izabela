@@ -10,7 +10,10 @@ export type StoreOptions = PiniaPluginContext['options'] & {
   }
 }
 
-export type PluginCustomProperties = { isReady?: Ref<() => Promise<boolean>> }
+export type PluginCustomProperties = {
+  $isReady: Ref<boolean>
+  $whenReady: () => Promise<boolean>
+}
 
 export type AugmentedGlobal = typeof global & {
   ElectronPiniaStorage: ElectronStore
@@ -33,10 +36,10 @@ export type IpcMainEventHandler<A extends any[] = any[]> = (
   event: Electron.IpcMainEvent,
   ...arg: A
 ) => void
-export type IpcMainInvokeEventHandler<A extends any[] = any[]> = (
-  event: Electron.IpcMainInvokeEvent,
-  ...arg: A
-) => void
+export type IpcMainInvokeEventHandler<
+  A extends any[] = any[],
+  R extends any = any,
+> = (event: Electron.IpcMainInvokeEvent, ...arg: A) => R | Promise<R>
 
 declare global {
   interface Window {

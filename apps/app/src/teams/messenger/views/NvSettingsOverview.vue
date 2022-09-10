@@ -8,10 +8,8 @@
             <NvText type="label">Debug mode</NvText>
           </NvStack>
           <NvSwitch
-            :modelValue="store.getters['settings/persisted'].debugMode"
-            @update:modelValue="
-              (value) => store.dispatch('settings/setProperty', ['persisted.debugMode', value])
-            "
+            :modelValue="settingsStore.debugMode"
+            @update:modelValue="(value) => settingsStore.$patch({ debugMode: value })"
           />
         </NvGroup>
       </NvCard>
@@ -20,7 +18,7 @@
 </template>
 <script lang="ts" setup>
 import { NvCard, NvGroup, NvStack, NvSwitch, NvText } from '@packages/ui'
-import { useStore } from 'vuex'
+import { useSettingsStore } from '@/features/settings/store'
 
-const store = useStore()
+const settingsStore = useSettingsStore()
 </script>

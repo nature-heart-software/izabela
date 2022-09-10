@@ -8,11 +8,8 @@
             <NvText type="label">Launch on startup</NvText>
           </NvStack>
           <NvSwitch
-            :modelValue="store.getters['settings/persisted'].launchOnStartup"
-            @update:modelValue="
-              (value) =>
-                store.dispatch('settings/setProperty', ['persisted.launchOnStartup', value])
-            "
+            :modelValue="settingsStore.launchOnStartup"
+            @update:modelValue="(value) => settingsStore.$patch({ launchOnStartup: value })"
           />
         </NvGroup>
       </NvCard>
@@ -21,7 +18,7 @@
 </template>
 <script lang="ts" setup>
 import { NvCard, NvGroup, NvStack, NvSwitch, NvText } from '@packages/ui'
-import { useStore } from 'vuex'
+import { useSettingsStore } from '@/features/settings/store'
 
-const store = useStore()
+const settingsStore = useSettingsStore()
 </script>
