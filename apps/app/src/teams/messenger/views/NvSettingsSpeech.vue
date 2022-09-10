@@ -13,7 +13,6 @@
               :modelValue="speechStore.selectedSpeechEngine"
               @update:modelValue="
                 (value) => {
-                  selectedEngineTab = value
                   settingsStore.$patch({ selectedSpeechEngine: value })
                 }
               "
@@ -46,7 +45,7 @@
   </NvStack>
 </template>
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { NvButton, NvCard, NvDivider, NvGroup, NvStack, NvText } from '@packages/ui'
 import SpeechEngineSelect from '@/features/speech/components/inputs/NvSpeechEngineSelect.vue'
 import { useSpeechEngineManager } from '@/modules/speech-engine-manager'
@@ -58,6 +57,9 @@ const speechStore = useSpeechStore()
 const settingsStore = useSettingsStore()
 
 const selectedEngineTab = ref<SpeechEngine['id']>(speechStore.selectedSpeechEngine)
+watch(() => speechStore.selectedSpeechEngine, (value) => {
+  selectedEngineTab.value = value
+})
 const { engines } = useSpeechEngineManager()
 const currentEngineSettingsComponent = computed(
   () => engines.value.find((e) => e.id === selectedEngineTab.value)?.settingsComponent,
