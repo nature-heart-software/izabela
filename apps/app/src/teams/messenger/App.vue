@@ -1,6 +1,6 @@
 <template>
   <ThemeProvider :theme="tokens">
-    <NvBackground/>
+    <NvBackground />
     <div class="h-0">
       <NvMessenger
         v-if="messengerStore.$isReady"
