@@ -34,4 +34,4 @@ export const watchBoundary = (selector: string) => {
   })
 }
 
-watchBoundary(`.${ domBoundaryClass }`)
+watchBoundary(`.${domBoundaryClass}`)

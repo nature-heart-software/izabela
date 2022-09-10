@@ -5,19 +5,17 @@ import { onIPCProcessError } from '@/electron/events/main'
 import { useSettingsStore } from '@/features/settings/store'
 
 export default () =>
-  app.whenReady()
-    .then(() => {
-        const settingsStore = useSettingsStore()
-        const errorHandler = (error: Error, windowProcess = 'main') => {
-          if (settingsStore.debugMode) {
-            createNotification({
-              title: `[${ windowProcess }] ${ error.name }`,
-              body: error.message,
-              silent: true,
-            }).show()
-          }
-        }
-        process.on('uncaughtException', errorHandler)
-        onIPCProcessError((error: Error, processName) => errorHandler(error, processName))
-      },
-    )
+  app.whenReady().then(() => {
+    const settingsStore = useSettingsStore()
+    const errorHandler = (error: Error, windowProcess = 'main') => {
+      if (settingsStore.debugMode) {
+        createNotification({
+          title: `[${windowProcess}] ${error.name}`,
+          body: error.message,
+          silent: true,
+        }).show()
+      }
+    }
+    process.on('uncaughtException', errorHandler)
+    onIPCProcessError((error: Error, processName) => errorHandler(error, processName))
+  })

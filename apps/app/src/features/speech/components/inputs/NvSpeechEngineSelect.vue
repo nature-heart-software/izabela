@@ -6,7 +6,7 @@
         :label="engine.name"
         :title="engine.hasCredentials && !engine.hasCredentials() ? 'Requires credentials' : ''"
         :value="engine.id"
-      >{{ engine.name }}
+        >{{ engine.name }}
       </NvOption>
     </template>
   </NvSelect>

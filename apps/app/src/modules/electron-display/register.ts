@@ -5,23 +5,22 @@ import { useSettingsStore } from '@/features/settings/store'
 
 export default () =>
   app.whenReady().then(() => {
-      const settingsStore = useSettingsStore()
-      electronMessengerWindow.isReady().then(() => {
+    const settingsStore = useSettingsStore()
+    electronMessengerWindow.isReady().then(() => {
+      electronMessengerWindow.setDisplay(settingsStore.display)
+    })
+
+    watch(
+      () => settingsStore.display,
+      () => {
+        electronMessengerWindow.setDisplay(settingsStore.display)
+      },
+    )
+
+    const screenEvents = ['display-added', 'display-removed', 'display-metrics-changed'] as const
+    screenEvents.forEach((event) => {
+      screen.on(event as any, () => {
         electronMessengerWindow.setDisplay(settingsStore.display)
       })
-
-      watch(
-        () => settingsStore.display,
-        () => {
-          electronMessengerWindow.setDisplay(settingsStore.display)
-        },
-      )
-
-      const screenEvents = ['display-added', 'display-removed', 'display-metrics-changed'] as const
-      screenEvents.forEach((event) => {
-        screen.on(event as any, () => {
-          electronMessengerWindow.setDisplay(settingsStore.display)
-        })
-      })
-    },
-  )
+    })
+  })

@@ -27,7 +27,7 @@ registerEngine({
     let expression
     const commandString = newText.split(' ')[0] || ''
     if (commandString.startsWith('/')) {
-      const command = commands(voice).find(({ name }) => commandString.startsWith(`/${ name }`))
+      const command = commands(voice).find(({ name }) => commandString.startsWith(`/${name}`))
       newText = newText.replace(commandString, '')
       if (command) {
         expression = command.value

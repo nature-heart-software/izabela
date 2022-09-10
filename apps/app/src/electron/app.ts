@@ -29,10 +29,7 @@ const App = () => {
       )
 
   const registerElectronPinia = () => {
-    createApp(h({})).use(createPinia()
-      .use(electronPiniaPlugin()),
-    )
-
+    createApp(h({})).use(createPinia().use(electronPiniaPlugin()))
   }
 
   const startAppServer = async () =>
@@ -64,7 +61,7 @@ const App = () => {
   }
 
   function exec(description: string, action: () => any) {
-    console.log(`[app]: ${ description }`)
+    console.log(`[app]: ${description}`)
     return action()
   }
 

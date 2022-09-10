@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
-export const useDictionaryStore = defineStore('dictionary', () => {
-  const definitions = ref<[string, string][]>(
-    [
+export const useDictionaryStore = defineStore(
+  'dictionary',
+  () => {
+    const definitions = ref<[string, string][]>([
       ['wyd', 'what are you doing'],
       ['hbu', 'how about you'],
       ['afaik', 'as far as I know'],
@@ -57,33 +58,34 @@ export const useDictionaryStore = defineStore('dictionary', () => {
       ['yolo', 'you only live once'],
       ['ysk', 'you should know'],
       ['yt', 'YouTube'],
-    ],
-  )
+    ])
 
-  const translateText = (text: string) => {
-    let newText = text
-    definitions.value.forEach(([word, definition]) => {
-      newText = newText.replace(new RegExp(`(\\b${ word }\\b)`, 'gi'), definition)
-    })
-    return newText
-  }
+    const translateText = (text: string) => {
+      let newText = text
+      definitions.value.forEach(([word, definition]) => {
+        newText = newText.replace(new RegExp(`(\\b${word}\\b)`, 'gi'), definition)
+      })
+      return newText
+    }
 
-  return {
-    definitions,
-    translateText,
-    updateDefinition: (index: number, definition: [string, string]) => {
-      definitions.value.splice(index, 1, definition)
-    },
-    addDefinition: (definition: (typeof definitions)['value'][number] = ['', '']) => {
-      definitions.value.unshift(definition)
-    },
-    removeDefinition: (index: number) => {
-      definitions.value.splice(index, 1)
-    },
-  }
-}, {
-  electron: {
-    persisted: true,
-    shared: true,
+    return {
+      definitions,
+      translateText,
+      updateDefinition: (index: number, definition: [string, string]) => {
+        definitions.value.splice(index, 1, definition)
+      },
+      addDefinition: (definition: typeof definitions['value'][number] = ['', '']) => {
+        definitions.value.unshift(definition)
+      },
+      removeDefinition: (index: number) => {
+        definitions.value.splice(index, 1)
+      },
+    }
   },
-})
+  {
+    electron: {
+      persisted: true,
+      shared: true,
+    },
+  },
+)

@@ -25,5 +25,4 @@ import NvKeybinding from '@/features/app/components/inputs/NvKeybinding.vue'
 import { useSettingsStore } from '@/features/settings/store'
 
 const settingsStore = useSettingsStore()
-
 </script>

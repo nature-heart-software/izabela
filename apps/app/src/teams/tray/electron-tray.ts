@@ -19,7 +19,7 @@ const createTray = (): Promise<Tray> =>
             {
               label: 'Display',
               submenu: allDisplays.map(({ id }) => ({
-                label: `${ (id === primaryDisplay.id && '(Primary) ') || '' }${ id }`,
+                label: `${(id === primaryDisplay.id && '(Primary) ') || ''}${id}`,
                 type: 'radio',
                 checked:
                   settingsStore.display !== null
@@ -47,7 +47,7 @@ const createTray = (): Promise<Tray> =>
       tray.setContextMenu(getContextMenu())
     }
 
-    tray.setToolTip(`${ app.name } - v${ app.getVersion() }`)
+    tray.setToolTip(`${app.name} - v${app.getVersion()}`)
     tray.setContextMenu(getContextMenu())
     tray.on('click', electronMessengerWindow.show)
     updateContextMenu()

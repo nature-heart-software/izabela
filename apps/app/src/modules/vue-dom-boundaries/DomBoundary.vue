@@ -1,6 +1,6 @@
 <template>
   <div ref="componentRef">
-    <slot/>
+    <slot />
   </div>
 </template>
 <script lang="ts" setup>

@@ -12,13 +12,14 @@ import { useMessengerStore } from '@/teams/messenger/store'
 
 const messengerStore = useMessengerStore()
 const isWindowShowing = ref(false)
-const isBackgroundShown = computed(
-  () => isWindowShowing.value || messengerStore.isInputFocused,
-)
+const isBackgroundShown = computed(() => isWindowShowing.value || messengerStore.isInputFocused)
 
-watch(() => messengerStore.isShown, () => {
-  if (messengerStore.isShown) {
-    isWindowShowing.value = true
-  }
-})
+watch(
+  () => messengerStore.isShown,
+  () => {
+    if (messengerStore.isShown) {
+      isWindowShowing.value = true
+    }
+  },
+)
 </script>
