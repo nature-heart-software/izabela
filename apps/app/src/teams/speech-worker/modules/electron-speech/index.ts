@@ -52,10 +52,10 @@ ipcMain.on(
   'speech-worker',
   'transcribe-audio',
   async ({
-    content,
-    sampleRate,
-    encoding,
-  }: {
+           content,
+           sampleRate,
+           encoding,
+         }: {
     content: string
     sampleRate: number
     encoding: any

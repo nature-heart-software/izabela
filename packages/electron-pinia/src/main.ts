@@ -1,24 +1,21 @@
-import { ipcMain } from 'electron'
-import { AugmentedGlobal } from './types'
+import './main-env'
 import { plugin } from './plugin'
-import { ELECTRON_STORAGE_NAME } from './consts'
-import ElectronStore from 'electron-store'
 import background from './background'
 import 'pinia'
-;(global as AugmentedGlobal).ElectronPiniaStorage = new ElectronStore({
-  name: ELECTRON_STORAGE_NAME,
-})
-;(global as AugmentedGlobal).ipcMain = ipcMain
+import { PluginCustomProperties } from './types'
 
 background.start()
 
 declare module 'pinia' {
-  export interface DefineStoreOptionsBase<S, Store> {
-    electron?: {
-      persisted?: boolean
-      shared?: boolean
+    export interface DefineStoreOptionsBase<S, Store> {
+        electron?: {
+            persisted?: boolean
+            shared?: boolean
+        }
     }
-  }
+
+    export interface PiniaCustomProperties extends PluginCustomProperties {
+    }
 }
 
 export { plugin as electronPiniaPlugin } from './plugin'

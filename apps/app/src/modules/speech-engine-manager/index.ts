@@ -7,18 +7,17 @@ import { useDictionaryStore } from '@/features/dictionary/store'
 const SpeechEngineManager = () => {
   const engines = ref<SpeechEngine[]>([])
 
-  function withDictionary(speechEngine: SpeechEngine): SpeechEngine {
+  async function withDictionary(speechEngine: SpeechEngine): Promise<SpeechEngine> {
+    const dictionaryStore = useDictionaryStore()
+    await dictionaryStore.$whenReady()
     return {
       ...speechEngine,
-      getPayload: (text) => {
-        const dictionaryStore = useDictionaryStore()
-        return speechEngine.getPayload(dictionaryStore.translateText(text))
-      },
+      getPayload: (text) => speechEngine.getPayload(dictionaryStore.translateText(text)),
     }
   }
 
-  function registerEngine(speechEngine: SpeechEngine) {
-    engines.value.push(withDictionary(speechEngine))
+  async function registerEngine(speechEngine: SpeechEngine) {
+    engines.value.push(await withDictionary(speechEngine))
   }
 
   function getEngineById(id: SpeechEngine['id']) {

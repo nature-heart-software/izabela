@@ -3,6 +3,7 @@
     <NvBackground/>
     <div class="h-0">
       <NvMessenger
+        v-if="messengerStore.$isReady"
         :min-width="768"
         :transform="messengerStore.position.transform"
         class="w-full h-full"

@@ -27,8 +27,6 @@ import {
 } from '@/features/display/components/hooks'
 import { useSettingsStore } from '@/features/settings/store'
 
-const { ElectronDisplay } = window
-
 const settingsStore = useSettingsStore()
 const { data, isFetching: isAllDisplayFetching } = useGetAllDisplaysQuery()
 const { data: primaryDisplay, isFetching: isPrimaryDisplayFetching } = useGetPrimaryDisplayQuery()

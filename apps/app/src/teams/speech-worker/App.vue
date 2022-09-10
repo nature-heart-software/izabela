@@ -1,6 +1,8 @@
 <template>
-  <SpeechSynthesizer/>
-  <SpeechListener :key="settingsStore.audioInput"/>
+  <template v-if="settingsStore.$isReady">
+    <SpeechSynthesizer/>
+    <SpeechListener :key="settingsStore.audioInput"/>
+  </template>
 </template>
 <style lang="scss">
 body {

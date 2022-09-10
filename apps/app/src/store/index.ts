@@ -1,6 +1,10 @@
 import { decrypt, encrypt } from '@/utils/security'
-import { defineStore } from 'pinia'
+import { createPinia, defineStore } from 'pinia'
 import { ref } from 'vue'
+import { electronPiniaPlugin } from '@packages/electron-pinia/dist/renderer.es.js'
+
+export const pinia = createPinia()
+  .use(electronPiniaPlugin())
 
 export const registerPluginStore = <S extends Record<any, any>>(id: string, state: S) => {
   const usePluginStore = defineStore(`plugin-${ id }`, () => {

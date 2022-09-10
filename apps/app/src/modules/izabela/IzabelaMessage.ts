@@ -18,8 +18,9 @@ export default ({ engine: engineName, payload, credentials }: IzabelaMessagePayl
     emitter.on(event, callback)
   }
 
-  function play() {
+  async function play() {
     const settingsStore = useSettingsStore()
+    await settingsStore.$whenReady()
     Promise.map(settingsStore.audioOutputs, async (deviceLabel: string) => {
       // TODO: Some optimisation possible here
       const mediaDevice = await getMediaDeviceByLabel(deviceLabel)

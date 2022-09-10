@@ -1,11 +1,13 @@
 import { Connections, IpcMainEventHandler, IpcMainInvokeEventHandler, ShareStatePayload } from './types'
-import { IPC_EVENT_CONNECT, IPC_EVENT_NOTIFY_MAIN, IPC_EVENT_NOTIFY_RENDERERS, ipcMain } from './consts'
+import { IPC_EVENT_CONNECT, IPC_EVENT_NOTIFY_MAIN, IPC_EVENT_NOTIFY_RENDERERS } from './consts'
 import { purify, useArgs } from './utils'
+import { ipcMain } from './electron'
 
 export default (() => {
     const connections: Connections = {}
+
     function onConnect(handler: IpcMainInvokeEventHandler) {
-        return ipcMain?.on(IPC_EVENT_CONNECT, handler)
+        ipcMain?.handle(IPC_EVENT_CONNECT, handler)
     }
 
     function notifyRenderers(
@@ -33,7 +35,7 @@ export default (() => {
             win.on('destroyed', () => {
                 delete connections[winId]
             })
-            event.returnValue = winId
+            return winId
         })
         onNotifyMain((_, { name, storeId, args }) => {
             const { issuer, args: newArgs } = useArgs(args)
