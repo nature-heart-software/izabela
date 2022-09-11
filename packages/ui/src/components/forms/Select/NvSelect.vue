@@ -2,18 +2,18 @@
   <StSelect v-bind="props">
     <div class="nv-selectWrapper">
       <component
-        :is="WrappedComponent"
-        :filterable="true"
-        :model-value="props.modelValue"
-        :popper-append-to-body="false"
-        v-bind="$attrs"
-        @update:model-value="$emit('update:model-value', $event)"
+          :is="WrappedComponent"
+          :filterable="true"
+          :model-value="props.modelValue"
+          :popper-append-to-body="false"
+          v-bind="$attrs"
+          @update:model-value="$emit('update:model-value', $event)"
       >
         <template v-for="(_, slot) of $slots" v-slot:[slot]="scope">
-          <slot :name="slot" v-bind="scope || {}" />
+          <slot :name="slot" v-bind="scope || {}"/>
         </template>
       </component>
-      <NvIcon :size="iconSize" class="nv-select__icon" name="direction" />
+      <NvIcon :size="iconSize" class="nv-select__icon" name="direction"/>
     </div>
   </StSelect>
 </template>
