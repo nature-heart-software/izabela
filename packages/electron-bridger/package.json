@@ -8,9 +8,9 @@
     "dev": "microbundle --target=node watch"
   },
   "source": "src/main.ts",
-  "main": "./dist/electron-bridger.cjs",
-  "module": "./dist/electron-bridger.es.js",
-  "unpkg": "./dist/electron-bridger.umd.js",
+  "main": "./dist/main.cjs",
+  "module": "./dist/main.es.js",
+  "unpkg": "./dist/main.umd.js",
   "types": "./dist/main.d.ts",
   "files": [
     "./dist"

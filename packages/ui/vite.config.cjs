@@ -28,9 +28,8 @@ const mode = (() => {
   const args = process.argv;
   const index = args.indexOf('--mode');
   return index < 0 ? 'production' : args[index + 1];
-})();
+})(); // https://vitejs.dev/config/
 
-const name = 'ui'; // https://vitejs.dev/config/
 
 var _default = (0, _vite.defineConfig)({
   plugins: [(0, _pluginVue.default)(), (0, _vitePluginDts.default)(), (0, _vitePluginGenerateExports.generateExportsPlugin)({
@@ -68,9 +67,9 @@ var _default = (0, _vite.defineConfig)({
   build: {
     lib: {
       entry: (0, _path.resolve)(__dirname, 'src/main.ts'),
-      name: name,
+      name: 'main',
       formats: ['cjs', 'es'],
-      fileName: format => `${name}.${{
+      fileName: format => `main.${{
         cjs: 'cjs',
         es: 'es.js'
       }[format]}`

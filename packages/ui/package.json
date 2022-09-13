@@ -6,8 +6,8 @@
   "files": [
     "./dist"
   ],
-  "main": "./dist/ui.cjs",
-  "module": "./dist/ui.es.js",
+  "main": "./dist/main.cjs",
+  "module": "./dist/main.es.js",
   "types": "./dist/main.d.ts",
   "scripts": {
     "dev": "vite build --watch --mode development",
