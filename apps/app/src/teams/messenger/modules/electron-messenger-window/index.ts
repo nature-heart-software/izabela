@@ -3,10 +3,10 @@ import iohook, { IOHookEvent } from '@/modules/node-iohook'
 import { throttle } from 'lodash'
 import { Boundary } from '@/modules/vue-dom-boundaries/types'
 import { BrowserWindow, screen, shell } from 'electron'
-import { Deferred } from '@/utils/promise'
 import { useMessengerStore } from '@/teams/messenger/store'
 import { useSettingsStore } from '@/features/settings/store'
 import { useDomBoundariesStore } from '@/modules/vue-dom-boundaries/dom-boundaries.store'
+import { Deferred } from '@packages/toolbox'
 
 export const ElectronMessengerWindow = () => {
   /* use isFocused as source of truth instead of window.isFocused() as in some instances
@@ -114,8 +114,8 @@ export const ElectronMessengerWindow = () => {
         const [windowX, windowY] = window.getPosition()
         const domBoundaries = domBoundariesStore.boundaries
         const isWithinAnyBoundaries = domBoundaries.some(({ x, y, w, h }: Boundary) => {
-          const isWithinXBoundaries = mouseX >= windowX + x && mouseX <= windowX + x + w
-          const isWithinYBoundaries = mouseY >= windowY + y && mouseY <= windowY + y + h
+          const isWithinXBoundaries = mouseX >= windowX+x && mouseX <= windowX+x+w
+          const isWithinYBoundaries = mouseY >= windowY+y && mouseY <= windowY+y+h
           return isWithinXBoundaries && isWithinYBoundaries
         })
         if (isWithinAnyBoundaries) {

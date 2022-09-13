@@ -3,7 +3,7 @@
 </template>
 <script lang="ts" setup>
 import { getTime } from '@/utils/time'
-import { blobToBase64 } from '@/utils/blob'
+import { blobToBase64 } from '@packages/toolbox'
 import { onBeforeUnmount } from 'vue'
 import { getMediaDeviceByLabel } from '@/utils/media-devices'
 import {
@@ -54,14 +54,14 @@ mediaRecorder.addEventListener('stop', onStop)
 
 onIPCStartSpeechTranscription(() => {
   if (mediaRecorder) {
-    console.log(`[${getTime()}] Starting web recording`)
+    console.log(`[${ getTime() }] Starting web recording`)
     mediaRecorder.start()
   }
 })
 
 onIPCStopSpeechTranscription(() => {
   if (mediaRecorder) {
-    console.log(`[${getTime()}] Stopping web recording`)
+    console.log(`[${ getTime() }] Stopping web recording`)
     mediaRecorder.stop()
   }
 })

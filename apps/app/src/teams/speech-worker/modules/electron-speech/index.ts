@@ -3,12 +3,12 @@ import speech from '@google-cloud/speech'
 import path from 'path'
 import iohook from 'iohook'
 import { app } from 'electron'
-import { Deferred } from '@/utils/promise'
 import { ipcMain } from 'electron-postman'
 import { DEFAULT_LANGUAGE_CODE } from '@/consts'
 import { createNotification } from '@/utils/electron-notification'
 import { useSettingsStore } from '@/features/settings/store'
 import { useSpeechStore } from '@/features/speech/store'
+import { Deferred } from '@packages/toolbox'
 
 app.whenReady().then(() => {
   const credentialsDirPath = path.join(app.getPath('userData'), 'credentials')
@@ -52,10 +52,10 @@ ipcMain.on(
   'speech-worker',
   'transcribe-audio',
   async ({
-    content,
-    sampleRate,
-    encoding,
-  }: {
+           content,
+           sampleRate,
+           encoding,
+         }: {
     content: string
     sampleRate: number
     encoding: any
