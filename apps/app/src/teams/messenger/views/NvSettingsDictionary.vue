@@ -15,7 +15,7 @@
           <NvCard>
             <NvStack spacing="5">
               <div>
-                <NvButton size="sm" @click="addDefinition()">Add definition </NvButton>
+                <NvButton size="sm" @click="addDefinition()">Add definition</NvButton>
               </div>
               <NvDivider direction="horizontal" />
               <NvGroup class="w-full" grow no-wrap>

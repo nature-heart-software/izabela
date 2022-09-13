@@ -4,8 +4,8 @@ import { Promise } from 'bluebird'
 import { getEngineById } from '@/modules/speech-engine-manager'
 import { getMediaDeviceByLabel } from '@/utils/media-devices'
 import { useSettingsStore } from '@/features/settings/store'
-import { IzabelaMessageEvent, IzabelaMessagePayload } from './types'
 import { Deferred } from '@packages/toolbox'
+import { IzabelaMessageEvent, IzabelaMessagePayload } from './types'
 
 export default ({ engine: engineName, payload, credentials }: IzabelaMessagePayload) => {
   const id = uuid()

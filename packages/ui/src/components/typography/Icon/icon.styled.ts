@@ -8,8 +8,8 @@ const { fontSize } = tokens
 
 export const StIcon = styled('i', props)`
   display: inline-flex;
-  width: ${({ size }) => rem(fontSize[size][0])};
-  height: ${({ size }) => rem(fontSize[size][0])};
-  font-size: ${({ size }) => rem(fontSize[size][0])};
-  line-height: ${({ size }) => rem(fontSize[size][0])};
+  width: ${ ({ size }) => rem(fontSize[size][0]) };
+  height: ${ ({ size }) => rem(fontSize[size][0]) };
+  font-size: ${ ({ size }) => rem(fontSize[size][0]) };
+  line-height: ${ ({ size }) => rem(fontSize[size][0]) };
 `

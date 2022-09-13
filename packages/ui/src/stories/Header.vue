@@ -3,9 +3,9 @@
     <div class="wrapper">
       <div>
         <svg
-          width="32"
           height="32"
           viewBox="0 0 32 32"
+          width="32"
           xmlns="http://www.w3.org/2000/svg"
         >
           <g fill="none" fill-rule="evenodd">
@@ -26,28 +26,28 @@
         <h1>Acme</h1>
       </div>
       <div>
-        <span class="welcome" v-if="user"
+        <span v-if="user" class="welcome"
           >Welcome, <b>{{ user.name }}</b
           >!</span
         >
         <my-button
+          v-if="user"
+          label="Log out"
           size="small"
           @click="$emit('logout')"
-          label="Log out"
-          v-if="user"
         />
         <my-button
+          v-if="!user"
+          label="Log in"
           size="small"
           @click="$emit('login')"
-          label="Log in"
-          v-if="!user"
         />
         <my-button
+          v-if="!user"
+          label="Sign up"
           primary
           size="small"
           @click="$emit('createAccount')"
-          label="Sign up"
-          v-if="!user"
         />
       </div>
     </div>

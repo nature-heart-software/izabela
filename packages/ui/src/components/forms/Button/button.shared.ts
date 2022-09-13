@@ -1,4 +1,4 @@
-import { PropType, ExtractPropTypes } from 'vue'
+import { ExtractPropTypes, PropType } from 'vue'
 import type { Properties } from 'csstype'
 import { sizeValues as defaultSizeValues } from '@/utils/css-in-js'
 

@@ -17,10 +17,10 @@
 import { computed, watch } from 'vue'
 import { useQueryClient } from 'vue-query'
 import { NvOption, NvSelect } from '@packages/ui'
+import { purify } from '@packages/toolbox'
 import { useListVoicesQuery } from './hooks'
 import { LIST_VOICES_QUERY_KEY } from './consts'
 import { getProperty, setProperty } from './store'
-import { purify } from '@packages/toolbox'
 
 const queryClient = useQueryClient()
 const computedParams = computed(() => ({

@@ -14,5 +14,5 @@ export const StAccessBlockerReason = styled('div', props)`
   left: 0;
   right: 0;
   bottom: 0;
-  ${disabledItemBackgroundStyle}
+  ${ disabledItemBackgroundStyle }
 `
