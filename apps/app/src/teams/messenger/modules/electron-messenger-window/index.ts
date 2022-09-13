@@ -114,8 +114,8 @@ export const ElectronMessengerWindow = () => {
         const [windowX, windowY] = window.getPosition()
         const domBoundaries = domBoundariesStore.boundaries
         const isWithinAnyBoundaries = domBoundaries.some(({ x, y, w, h }: Boundary) => {
-          const isWithinXBoundaries = mouseX >= windowX+x && mouseX <= windowX+x+w
-          const isWithinYBoundaries = mouseY >= windowY+y && mouseY <= windowY+y+h
+          const isWithinXBoundaries = mouseX >= windowX + x && mouseX <= windowX + x + w
+          const isWithinYBoundaries = mouseY >= windowY + y && mouseY <= windowY + y + h
           return isWithinXBoundaries && isWithinYBoundaries
         })
         if (isWithinAnyBoundaries) {
