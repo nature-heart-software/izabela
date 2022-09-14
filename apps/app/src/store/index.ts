@@ -5,7 +5,7 @@ import { electronPiniaPlugin } from '@packages/electron-pinia/dist/renderer.es.j
 
 export const pinia = createPinia().use(electronPiniaPlugin())
 
-export const registerPluginStore = <S extends Record<any, any>>(id: string, state: S) => {
+export const definePluginStore = <S extends Record<any, any>>(id: string, state: S) => {
   const usePluginStore = defineStore(
     `plugin-${id}`,
     () => {

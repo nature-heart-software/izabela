@@ -1,7 +1,7 @@
-import { registerPluginStore } from '@/store'
+import { definePluginStore } from '@/store'
 import { ENGINE_ID } from './consts'
 
-export const { setProperty, getProperty } = registerPluginStore(ENGINE_ID, {
+export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
   identityPoolId: '',
   region: '',
   selectedVoice: {
