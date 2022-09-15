@@ -9,28 +9,28 @@
   "exports": {
     ".": {
       "require": "./dist/renderer.cjs",
-      "default": "./dist/renderer.es.js"
+      "default": "./dist/renderer.js"
     },
     "./main": {
       "require": "./dist/main.cjs",
-      "default": "./dist/main.es.js"
+      "default": "./dist/main.js"
     },
     "./renderer": {
       "require": "./dist/renderer.cjs",
-      "default": "./dist/renderer.es.js"
+      "default": "./dist/renderer.js"
     },
     "./preload": {
       "require": "./dist/preload.cjs",
-      "default": "./dist/preload.es.js"
+      "default": "./dist/preload.js"
     },
     "./dist/": "./dist/"
   },
   "type": "module",
-  "source": "src/main.ts",
-  "main": "./dist/main.cjs",
-  "module": "./dist/main.es.js",
-  "unpkg": "./dist/main.umd.js",
-  "types": "./dist/main.d.ts",
+  "source": "src/renderer.ts",
+  "main": "./dist/renderer.cjs",
+  "module": "./dist/renderer.js",
+  "unpkg": "./dist/renderer.umd.js",
+  "types": "./dist/renderer.d.ts",
   "files": [
     "./dist"
   ],
