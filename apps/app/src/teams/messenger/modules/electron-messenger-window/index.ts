@@ -17,7 +17,9 @@ export const ElectronMessengerWindow = () => {
   // let lastKeypressTime = 0
   // const doubleKeypressDelta = 500
   let registeredWindow: BrowserWindow | null = null
-  let domBoundariesStore: ReturnType<typeof useDomBoundariesStore>
+  let domBoundariesStore: ReturnType<typeof useDomBoundariesStore> | undefined
+  let settingsStore: ReturnType<typeof useSettingsStore> | undefined
+  let messengerStore: ReturnType<typeof useMessengerStore> | undefined
   const ready = Deferred<BrowserWindow>()
   const isReady = () => ready.promise
 
@@ -107,6 +109,7 @@ export const ElectronMessengerWindow = () => {
     })
 
   const onMouseMove = (event: IOHookEvent) => {
+    if (!domBoundariesStore) return
     const window = getWindow()
     if (window) {
       if (!window.isDestroyed() && window.isVisible()) {
@@ -150,8 +153,6 @@ export const ElectronMessengerWindow = () => {
   }
 
   const addEventListeners = () => {
-    const settingsStore = useSettingsStore()
-    const messengerStore = useMessengerStore()
     const window = getWindow()
     // iohook.on('keypress', ({ keychar }) => console.log(`Key pressed: ${String.fromCharCode(keychar)}`))
     iohook.on('mousemove', throttle(onMouseMove, 150))
@@ -170,19 +171,21 @@ export const ElectronMessengerWindow = () => {
     //   toggleWindow()
     // })
 
-    setDisplay(settingsStore.display)
-
     if (window) {
       window.on('show', () => {
+        if (!messengerStore) return
         messengerStore.$patch({ isShown: true })
       })
       window.on('hide', () => {
+        if (!messengerStore) return
         messengerStore.$patch({ isShown: false })
       })
       window.on('focus', () => {
+        if (!messengerStore) return
         messengerStore.$patch({ isFocused: true })
       })
       window.on('blur', () => {
+        if (!messengerStore) return
         messengerStore.$patch({ isFocused: false })
       })
       window.webContents.setWindowOpenHandler(({ url }) => {
@@ -193,8 +196,14 @@ export const ElectronMessengerWindow = () => {
   }
 
   const start = (window: BrowserWindow) => {
+    const localSettingsStore = useSettingsStore()
+    settingsStore = localSettingsStore
+    messengerStore = useMessengerStore()
     domBoundariesStore = useDomBoundariesStore()
     registeredWindow = window
+    settingsStore.$whenReady().then(() => {
+      setDisplay(localSettingsStore.display)
+    })
     ready.resolve(window)
   }
 

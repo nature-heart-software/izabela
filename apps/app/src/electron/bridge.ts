@@ -2,6 +2,7 @@ import { bridge } from '@packages/electron-bridger'
 import electronDialog from '@/modules/electron-dialog'
 import electronFilesystem from '@/modules/electron-filesystem'
 import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
+import electronSpeechWorkerWindow from '@/teams/speech-worker/modules/electron-speech-worker-window'
 import electronKeybinding from '@/modules/electron-keybinding'
 import electronDisplay from '@/modules/electron-display'
 
@@ -10,6 +11,7 @@ export const bridgeModules = () =>
     ['ElectronDialog', () => electronDialog],
     ['ElectronFilesystem', () => electronFilesystem],
     ['ElectronMessengerWindow', () => electronMessengerWindow],
+    ['ElectronSpeechWorkerWindow', () => electronSpeechWorkerWindow],
     ['ElectronKeybinding', () => electronKeybinding],
     ['ElectronDisplay', () => electronDisplay],
   ])
@@ -19,6 +21,7 @@ declare global {
     ElectronDialog: typeof electronDialog
     ElectronFilesystem: typeof electronFilesystem
     ElectronMessengerWindow: typeof electronMessengerWindow
+    ElectronSpeechWorkerWindow: typeof electronSpeechWorkerWindow
     ElectronKeybinding: typeof electronKeybinding
     ElectronDisplay: typeof electronDisplay
   }
