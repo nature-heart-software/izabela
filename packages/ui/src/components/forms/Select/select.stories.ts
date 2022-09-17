@@ -5,55 +5,55 @@ import { NvOption, NvSelect } from '@/components'
 import { props, sizeValues } from './select.shared'
 
 export default {
-    title: 'Select',
-    component: NvSelect,
-    argTypes: {
-        size: {
-            defaultValue: props.size.default,
-            control: 'inline-radio',
-            options: sizeValues,
-        },
-        placeholder: {
-            defaultValue: 'Select some options...',
-            control: 'text',
-        },
+  title: 'Select',
+  component: NvSelect,
+  argTypes: {
+    size: {
+      defaultValue: props.size.default,
+      control: 'inline-radio',
+      options: sizeValues,
     },
+    placeholder: {
+      defaultValue: 'Select some options...',
+      control: 'text',
+    },
+  },
 }
 
 const Template: Story = (args) => ({
-    components: { NvSelect, NvOption },
-    setup() {
-        return {
-            args,
-            inputValue: ref(args.content),
-            options: ref(
-                args.options || [
-                    {
-                        value: 'Option1',
-                        label: 'Option1',
-                    },
-                    {
-                        value: 'Option2',
-                        label: 'Option2',
-                    },
-                    {
-                        value: 'Option3',
-                        label: 'Option3',
-                    },
-                    {
-                        value: 'Option4',
-                        label: 'Option4',
-                        disabled: true,
-                    },
-                    {
-                        value: 'Option5',
-                        label: 'Option5',
-                    },
-                ],
-            ),
-        }
-    },
-    template: `
+  components: { NvSelect, NvOption },
+  setup() {
+    return {
+      args,
+      inputValue: ref(args.content),
+      options: ref(
+        args.options || [
+          {
+            value: 'Option1',
+            label: 'Option1',
+          },
+          {
+            value: 'Option2',
+            label: 'Option2',
+          },
+          {
+            value: 'Option3',
+            label: 'Option3',
+          },
+          {
+            value: 'Option4',
+            label: 'Option4',
+            disabled: true,
+          },
+          {
+            value: 'Option5',
+            label: 'Option5',
+          },
+        ],
+      ),
+    }
+  },
+  template: `
       <NvSelect v-model="inputValue" v-bind="args">
       <NvOption
           v-for="item in options"
