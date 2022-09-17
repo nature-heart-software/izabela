@@ -9,7 +9,8 @@ import {
   IPC_EVENT_NOTIFY_MAIN,
   IPC_EVENT_NOTIFY_RENDERERS,
 } from './consts'
-import { purify, useArgs } from './utils'
+import { purify } from '@packages/toolbox'
+import { useArgs } from './utils'
 import { ipcMain } from './electron'
 
 export default (() => {

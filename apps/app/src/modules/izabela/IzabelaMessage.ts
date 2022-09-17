@@ -1,10 +1,10 @@
 import { v4 as uuid } from 'uuid'
 import mitt from 'mitt'
-import { Deferred } from '@/utils/promise'
 import { Promise } from 'bluebird'
 import { getEngineById } from '@/modules/speech-engine-manager'
 import { getMediaDeviceByLabel } from '@/utils/media-devices'
 import { useSettingsStore } from '@/features/settings/store'
+import { Deferred } from '@packages/toolbox'
 import { IzabelaMessageEvent, IzabelaMessagePayload } from './types'
 
 export default ({ engine: engineName, payload, credentials }: IzabelaMessagePayload) => {

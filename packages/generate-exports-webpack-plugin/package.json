@@ -8,9 +8,9 @@
     "build": "microbundle --target=node",
     "dev": "microbundle --target=node watch"
   },
-  "main": "./dist/generate-exports-webpack-plugin.cjs",
-  "module": "./dist/generate-exports-webpack-plugin.es.js",
-  "unpkg": "./dist/generate-exports-webpack-plugin.umd.js",
+  "main": "./dist/main.cjs",
+  "module": "./dist/main.es.js",
+  "unpkg": "./dist/main.umd.js",
   "types": "./dist/main.d.ts",
   "files": [
     "./dist"

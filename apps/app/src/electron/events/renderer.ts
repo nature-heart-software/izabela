@@ -9,14 +9,6 @@ export const emitIPCProcessError = (payload: { name: string; message: string }) 
   })
 }
 
-export const emitIPCTranscribeAudio = (payload: {
-  content: string
-  sampleRate: number
-  encoding: string
-}) => {
-  ipc.sendTo('main', 'transcribe-audio', payload)
-}
-
 type IPCSayPayload = string | IzabelaMessagePayload
 
 export const onIPCSay = (callback: (payload: IPCSayPayload) => any) => {

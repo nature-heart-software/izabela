@@ -19,7 +19,6 @@ const generateExportsPlugin = (...arg: Parameters<typeof generateExports>) => {
     },
   }
 }
-const name = 'icons'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
@@ -41,10 +40,10 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(__dirname, 'src/main.ts'),
-      name: name,
+      name: 'main',
       formats: ['cjs', 'es'],
       fileName: (format) =>
-        `${name}.${
+        `main.${
           {
             cjs: 'cjs',
             es: 'es.js',

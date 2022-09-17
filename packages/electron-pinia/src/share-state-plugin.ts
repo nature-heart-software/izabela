@@ -1,5 +1,6 @@
 import { PiniaPlugin } from 'pinia'
-import { getIssuer, purify, useArgs } from './utils'
+import { purify } from '@packages/toolbox'
+import { getIssuer, useArgs } from './utils'
 import { IpcRendererEventHandler, ShareStatePayload } from './types'
 import background from './background'
 import { ipcRenderer, isPreload, isRenderer } from './electron'

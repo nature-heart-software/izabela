@@ -8,9 +8,9 @@
     "dev": "microbundle --target=node watch"
   },
   "source": "src/main.ts",
-  "main": "./dist/vite-plugin-generate-exports.cjs",
-  "module": "./dist/vite-plugin-generate-exports.es.js",
-  "unpkg": "./dist/vite-plugin-generate-exports.umd.js",
+  "main": "./dist/main.cjs",
+  "module": "./dist/main.es.js",
+  "unpkg": "./dist/main.umd.js",
   "types": "./dist/main.d.ts",
   "files": [
     "./dist"

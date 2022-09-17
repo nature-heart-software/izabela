@@ -1,4 +1,4 @@
-const { mergeConfig } = require('vite');
+const {mergeConfig} = require('vite');
 const {plugins, resolve} = require('../vite.config.cjs').default;
 
 module.exports = {

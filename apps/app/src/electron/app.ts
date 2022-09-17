@@ -14,7 +14,7 @@ import registerElectronDisplay from '@/modules/electron-display/register'
 import registerElectronKeybinding from '@/modules/electron-keybinding/register'
 import { createApp, h } from 'vue'
 import { createPinia } from 'pinia'
-import electronPiniaPlugin from '@packages/electron-pinia'
+import electronPiniaPlugin from '@packages/electron-pinia/dist/main'
 
 const App = () => {
   const isDevelopment = process.env.NODE_ENV !== 'production'

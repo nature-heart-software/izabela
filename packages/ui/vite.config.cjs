@@ -18,9 +18,9 @@ var _vitePluginDts = _interopRequireDefault(require("vite-plugin-dts"));
 
 var _path = require("path");
 
-var _vitePluginGenerateExports = _interopRequireDefault(require("@packages/vite-plugin-generate-exports"));
+var _vitePluginGenerateExports = require("@packages/vite-plugin-generate-exports");
 
-var _vitePluginGenerateModules = _interopRequireDefault(require("@packages/vite-plugin-generate-modules"));
+var _vitePluginGenerateModules = require("@packages/vite-plugin-generate-modules");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -28,12 +28,11 @@ const mode = (() => {
   const args = process.argv;
   const index = args.indexOf('--mode');
   return index < 0 ? 'production' : args[index + 1];
-})();
+})(); // https://vitejs.dev/config/
 
-const name = 'ui'; // https://vitejs.dev/config/
 
 var _default = (0, _vite.defineConfig)({
-  plugins: [(0, _pluginVue.default)(), (0, _vitePluginDts.default)(), (0, _vitePluginGenerateExports.default)({
+  plugins: [(0, _pluginVue.default)(), (0, _vitePluginDts.default)(), (0, _vitePluginGenerateExports.generateExportsPlugin)({
     watch: mode === 'development',
     entries: [{
       omitExtension: false,
@@ -50,7 +49,7 @@ var _default = (0, _vite.defineConfig)({
       exclude: ['**/*Story.vue'],
       directories: ['./src/components/typography/Icons']
     }]
-  }), (0, _vitePluginGenerateModules.default)({
+  }), (0, _vitePluginGenerateModules.generateModulesPlugin)({
     watch: mode === 'development',
     entries: [{
       pattern: './src/styles/tokens.ts',
@@ -68,9 +67,9 @@ var _default = (0, _vite.defineConfig)({
   build: {
     lib: {
       entry: (0, _path.resolve)(__dirname, 'src/main.ts'),
-      name: name,
+      name: 'main',
       formats: ['cjs', 'es'],
-      fileName: format => `${name}.${{
+      fileName: format => `main.${{
         cjs: 'cjs',
         es: 'es.js'
       }[format]}`

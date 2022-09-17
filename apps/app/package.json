@@ -27,6 +27,7 @@
     "@google-cloud/speech": "^4.10.2",
     "@packages/electron-bridger": "*",
     "@packages/electron-pinia": "*",
+    "@packages/toolbox": "^0.0.0",
     "@packages/ui": "*",
     "@ryanmorr/ready": "^1.4.0",
     "@vueuse/core": "^9.1.1",

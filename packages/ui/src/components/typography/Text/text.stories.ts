@@ -1,42 +1,42 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import tokens from '@/styles/tokens'
 import { Story } from '@storybook/vue3'
-import { typeValues, props } from '@/components/typography/Text/text.shared'
+import { props, typeValues } from '@/components/typography/Text/text.shared'
 import { NvText } from '@/components'
 
 export default {
-  title: 'Text',
-  argTypes: {
-    content: {
-      defaultValue: 'hello world',
-      control: 'text',
+    title: 'Text',
+    argTypes: {
+        content: {
+            defaultValue: 'hello world',
+            control: 'text',
+        },
+        size: {
+            options: Object.keys(tokens.fontSize).map((key) => Number(key)),
+            control: 'inline-radio',
+            defaultValue: props.size.default,
+        },
+        type: {
+            options: typeValues,
+            control: 'inline-radio',
+            defaultValue: props.type.default,
+        },
+        align: {
+            control: 'text',
+            defaultValue: '',
+        },
     },
-    size: {
-      options: Object.keys(tokens.fontSize).map((key) => Number(key)),
-      control: 'inline-radio',
-      defaultValue: props.size.default,
-    },
-    type: {
-      options: typeValues,
-      control: 'inline-radio',
-      defaultValue: props.type.default,
-    },
-    align: {
-      control: 'text',
-      defaultValue: '',
-    },
-  },
 }
 
 const Template: Story = (args) => ({
-  components: { NvText },
-  setup() {
-    return {
-      args,
-    }
-  },
-  template: `
-      <NvText v-bind="args">{{args.content}}</NvText>
+    components: { NvText },
+    setup() {
+        return {
+            args,
+        }
+    },
+    template: `
+      <NvText v-bind="args">{{ args.content }}</NvText>
     `,
 })
 

@@ -1,4 +1,4 @@
-const { tailwindTheme } = require('@packages/ui/dist/ui.cjs')
+const { tailwindTheme } = require('@packages/ui/dist/main.cjs')
 
 module.exports = {
   content: ['./src/**/*.{vue,html,js,ts,scss}'],

@@ -15,11 +15,6 @@ export type PluginCustomProperties = {
   $whenReady: () => Promise<boolean>
 }
 
-export type AugmentedGlobal = typeof global & {
-  ElectronPiniaStorage: ElectronStore
-  ipcMain: Electron.IpcMain
-}
-
 export type Connections = { [key: string]: Electron.IpcMainEvent['sender'] }
 
 export type ShareStatePayload = {
@@ -54,5 +49,6 @@ declare global {
     ElectronPiniaIsPreload?: boolean
   }
 
-  interface Global extends AugmentedGlobal {}
+  var ElectronPiniaStorage: ElectronStore
+  var ipcMain: Electron.IpcMain
 }

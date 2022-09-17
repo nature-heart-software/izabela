@@ -1,6 +1,8 @@
 import { generateExports } from '@packages/generate-exports'
 
-const generateExportsPlugin = (...args: Parameters<typeof generateExports>) => {
+export const generateExportsPlugin = (
+  ...args: Parameters<typeof generateExports>
+) => {
   const instance = generateExports(...args)
   return {
     name: 'generate-exports',
@@ -9,5 +11,3 @@ const generateExportsPlugin = (...args: Parameters<typeof generateExports>) => {
     },
   }
 }
-
-export default generateExportsPlugin

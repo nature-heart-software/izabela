@@ -1,6 +1,6 @@
 import { generateExports } from '@packages/generate-exports'
 
-class GenerateExportsWebpackPlugin {
+export class GenerateExportsPlugin {
   instance: ReturnType<typeof generateExports>
 
   constructor(...args: Parameters<typeof generateExports>) {
@@ -11,5 +11,3 @@ class GenerateExportsWebpackPlugin {
     this.instance.start()
   }
 }
-
-module.exports = GenerateExportsWebpackPlugin
