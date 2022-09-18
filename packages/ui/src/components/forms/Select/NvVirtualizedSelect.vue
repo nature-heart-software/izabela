@@ -6,13 +6,34 @@
     @click="activate"
   >
     <StSelectV2Wrapper v-bind="props">
-      <StSelectV2Input
-        ref="selectInput"
-        :isFocused="hasFocus"
-        :modelValue="inputValue"
-        :placeholder="$attrs.placeholder"
-        @update:modelValue="search = $event"
-      />
+      <NvStack>
+        <template v-if="props.multiple && selectedOptions.length > 0">
+          <NvGroup :spacing="2">
+            <template
+              v-for="option in selectedOptions"
+              :key="get(option, props.valueKey, option)"
+            >
+              <NvTag
+                closable
+                @close="handleValue(option)"
+                @mousedown="blurInput()"
+                @click.stop
+              >
+                {{ get(option, props.labelKey, option) }}
+              </NvTag>
+            </template>
+          </NvGroup>
+        </template>
+        <div ref="inputWrapper">
+          <StSelectV2Input
+            ref="selectInput"
+            :isFocused="hasFocus"
+            :modelValue="inputValue"
+            :placeholder="$attrs.placeholder"
+            @update:modelValue="search = $event"
+          />
+        </div>
+      </NvStack>
     </StSelectV2Wrapper>
     <StSelectV2Icon v-bind="props">
       <NvIcon :size="iconSize" name="direction" />
@@ -51,6 +72,9 @@ import {
 import { propsV2 as propsDefinition, Size, Value } from './select.shared'
 import NvIcon from '@/components/typography/Icon/NvIcon.vue'
 import NvAutocomplete from '@/components/forms/Autocomplete/NvAutocomplete.vue'
+import NvTag from '@/components/forms/Tag/NvTag.vue'
+import NvGroup from '@/components/miscellaneous/Group/NvGroup.vue'
+import NvStack from '@/components/miscellaneous/Stack/NvStack.vue'
 import { get } from 'lodash'
 
 const props = defineProps(propsDefinition)
@@ -76,7 +100,8 @@ const search = ref('')
 const isFocused = ref(false)
 const select = ref()
 const selectInput = ref()
-const { hasFocus, activate, deactivate } = useFocusTrap(select)
+const inputWrapper = ref()
+const { hasFocus, activate, deactivate } = useFocusTrap(inputWrapper)
 const fuseOptions = computed<UseFuseOptions<typeof props.options[number]>>(
   () => ({
     fuseOptions: {
@@ -120,11 +145,14 @@ const handleValue = (value: Value) => {
     emit('update:modelValue', get(value, props.valueKey, value))
   }
 }
-onClickOutside(select, () => {
+const blurInput = () => {
   search.value = ''
   deactivate()
   setTimeout(() => {
     selectInput.value.$el.blur()
   })
+}
+onClickOutside(select, () => {
+  blurInput()
 })
 </script>
