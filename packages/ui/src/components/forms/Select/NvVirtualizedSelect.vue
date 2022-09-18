@@ -39,6 +39,7 @@
                 :modelValue="inputValue"
                 :placeholder="$attrs.placeholder"
                 v-bind="omit(props, ['modelValue'])"
+                @focus="activate"
                 @update:modelValue="search = $event"
               />
             </div>
