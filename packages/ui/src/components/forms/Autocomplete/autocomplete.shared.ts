@@ -33,6 +33,8 @@ export const props = {
   width: {
     type: Number,
   },
-  autoScrollValue: {},
+  autoScrollIndex: {
+    type: Number,
+  },
 }
 export type Props = ExtractPropTypes<typeof props>

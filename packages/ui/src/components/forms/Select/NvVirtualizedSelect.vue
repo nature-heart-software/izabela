@@ -1,7 +1,7 @@
 <template>
   <NvAutocomplete
     ref="autocomplete"
-    :autoScrollValue="selectedValues[0]"
+    :autoScrollIndex="autoScrollIndex"
     :data="searchResults"
     :valueKey="props.valueKey"
     :visible="hasFocus"
@@ -11,7 +11,7 @@
       <StSelectV2
         ref="select"
         :isFocused="hasFocus"
-        v-bind="props"
+        v-bind="{ ...props, isFocused: hasFocus }"
         @click="activate"
       >
         <StSelectV2Wrapper v-bind="props">
@@ -99,8 +99,10 @@ const selectedValues = computed(() =>
   props.multiple ? (props.modelValue as Value[]) : [props.modelValue],
 )
 const selectedOptions = computed(() =>
-  props.options.filter((option) =>
-    selectedValues.value.includes(get(option, props.valueKey, option)),
+  selectedValues.value.map((value) =>
+    props.options.find(
+      (option) => get(option, props.valueKey, option) === value,
+    ),
   ),
 )
 const search = ref('')
@@ -136,6 +138,18 @@ const inputValue = computed(
       )) ||
     search.value,
 )
+
+const autoScrollIndex = computed(() => {
+  return (
+    selectedValues.value.length > 0 &&
+    Math.min(
+      ...selectedValues.value.map((v) =>
+        props.options.findIndex((o) => get(o, props.valueKey, o) === v),
+      ),
+    )
+  )
+})
+
 const handleValue = (value: Value) => {
   if (props.multiple) {
     const newValue = [...selectedValues.value]

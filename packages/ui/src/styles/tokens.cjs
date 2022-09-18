@@ -141,6 +141,20 @@ const tokens = {
   },
   transition: {
     DEFAULT: 'all .3s'
+  },
+  motion: {
+    visible: {
+      opacity: 1,
+      transition: {
+        duration: 300
+      }
+    },
+    hidden: {
+      opacity: 0,
+      transition: {
+        duration: 300
+      }
+    }
   }
 };
 const tailwindTheme = { ...tokens,

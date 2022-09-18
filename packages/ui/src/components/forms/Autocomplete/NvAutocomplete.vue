@@ -10,13 +10,12 @@
         >
           <DynamicScroller
             ref="scroller"
-            :emitUpdate="true"
             :items="props.data"
             :keyField="props.valueKey"
             :min-item-size="props.minItemSize"
             class="autocomplete__scroller"
-            @update="(start, end) => (visibleItems = [start, end])"
             @visible="onVisible"
+            @wheel="selection = null"
           >
             <template v-slot="{ item, index, active }">
               <DynamicScrollerItem
@@ -54,7 +53,6 @@ import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import { StAutocomplete } from './autocomplete.styled'
 import { props as propsDefinition } from './autocomplete.shared'
-import { get } from 'lodash'
 import {
   autoUpdate,
   computePosition,
@@ -71,8 +69,7 @@ const props = defineProps(propsDefinition)
 const scroller = ref()
 const reference = ref()
 const autocomplete = ref()
-const visibleItems = ref<[number, number]>([-1, -1])
-const selection = ref<number | null>(null)
+const selection = ref<number | null | undefined>(null)
 const floatingCleanup = shallowRef()
 const { width } = useElementSize(reference)
 const vLoading = ElLoadingDirective
@@ -114,8 +111,8 @@ const autocompleteWidth = computed(() => {
 onKeyStroke('ArrowDown', (e) => {
   if (!props.visible) return
   e.preventDefault()
-  if (selection.value === null) {
-    selection.value = visibleItems.value[0]
+  if (typeof selection.value !== 'number') {
+    selection.value = props.autoScrollIndex || 0
     return
   }
   if (selection.value === props.data.length - 1) {
@@ -128,8 +125,8 @@ onKeyStroke('ArrowDown', (e) => {
 onKeyStroke('ArrowUp', (e) => {
   if (!props.visible) return
   e.preventDefault()
-  if (selection.value === null) {
-    selection.value = visibleItems.value[0]
+  if (typeof selection.value !== 'number') {
+    selection.value = props.autoScrollIndex || 0
     return
   }
   if (selection.value === 0) {
@@ -146,14 +143,7 @@ onKeyStroke('Enter', (e) => {
 })
 
 const onVisible = () => {
-  if (props.autoScrollValue) {
-    const index = props.data.findIndex(
-      (item) => get(item, props.valueKey, item) === props.autoScrollValue,
-    )
-    if (index > -1) {
-      scroller.value.scrollToItem(index)
-    }
-  }
+  selection.value = props.autoScrollIndex
   loading.value = false
 }
 
@@ -161,7 +151,7 @@ const updateFloating = () => {
   computePosition(reference.value, autocomplete.value, {
     placement: props.placement,
     middleware: [
-      offset(tokens.spacing[2]),
+      offset(tokens.spacing['4']),
       flip(),
       shift({
         padding: tokens.spacing['3'],

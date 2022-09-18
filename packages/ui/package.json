@@ -29,6 +29,7 @@
     "focus-trap": "^7.0.0",
     "fuse.js": "^6.6.2",
     "polished": "^4.2.2",
+    "scroll-into-view": "^1.16.2",
     "uuid": "^8.3.2",
     "vue": "^3.2.37",
     "vue-tippy": "^6.0.0-alpha.63",
