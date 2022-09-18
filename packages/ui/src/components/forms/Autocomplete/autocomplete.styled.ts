@@ -25,7 +25,6 @@ const popperStyleBySize = ({ size }: Props) => {
 }
 
 export const StAutocomplete = styled('div', props)`
-  position: absolute;
   width: ${({ width }) => rem(width || 300)};
   border-width: ${() => rem(tokens.borderWidth.DEFAULT)};
   border-style: solid;

@@ -1,40 +1,44 @@
 <template>
-  <span class="inline-flex">
+  <div class="inline-flex">
     <span ref="reference" class="inline-flex"><slot name="reference" /></span>
-    <StAutocomplete
-      v-show="props.visible"
-      ref="autocomplete"
-      v-bind="{ ...props, width: autocompleteWidth }"
-    >
-      <DynamicScroller
-        ref="scroller"
-        :emitUpdate="true"
-        :items="props.data"
-        :keyField="props.valueKey"
-        :min-item-size="props.minItemSize"
-        class="autocomplete__scroller"
-        @update="(start, end) => (visibleItems = [start, end])"
-        @visible="onVisible"
-      >
-        <template v-slot="{ item, index, active }">
-          <DynamicScrollerItem
-            :active="active"
-            :data-index="index"
-            :item="item"
+    <div ref="autocomplete" class="absolute">
+      <Transition>
+        <StAutocomplete
+          v-if="props.visible"
+          v-loading="loading"
+          v-bind="{ ...props, width: autocompleteWidth }"
+        >
+          <DynamicScroller
+            ref="scroller"
+            :emitUpdate="true"
+            :items="props.data"
+            :keyField="props.valueKey"
+            :min-item-size="props.minItemSize"
+            class="autocomplete__scroller"
+            @update="(start, end) => (visibleItems = [start, end])"
+            @visible="onVisible"
           >
-            <slot
-              v-bind="{
-                item,
-                index,
-                visible: active,
-                active: selection === index,
-              }"
-            />
-          </DynamicScrollerItem>
-        </template>
-      </DynamicScroller>
-    </StAutocomplete>
-  </span>
+            <template v-slot="{ item, index, active }">
+              <DynamicScrollerItem
+                :active="active"
+                :data-index="index"
+                :item="item"
+              >
+                <slot
+                  v-bind="{
+                    item,
+                    index,
+                    visible: active,
+                    active: selection === index,
+                  }"
+                />
+              </DynamicScrollerItem>
+            </template>
+          </DynamicScroller>
+        </StAutocomplete>
+      </Transition>
+    </div>
+  </div>
 </template>
 <script lang="ts" setup>
 import {
@@ -61,6 +65,7 @@ import {
 import { rem } from 'polished'
 import tokens from '@/styles/tokens'
 import { useElementSize } from '@vueuse/core'
+import { ElLoadingDirective } from 'element-plus'
 
 const props = defineProps(propsDefinition)
 const scroller = ref()
@@ -70,9 +75,13 @@ const visibleItems = ref<[number, number]>([-1, -1])
 const selection = ref(-1)
 const floatingCleanup = shallowRef()
 const { width } = useElementSize(reference)
+const vLoading = ElLoadingDirective
+const loading = ref(true)
+
 watch(
   () => props.visible,
-  () => {
+  (visible) => {
+    if (!visible) loading.value = true
     selection.value = -1
   },
 )
@@ -96,10 +105,11 @@ const onVisible = () => {
       scroller.value.scrollToItem(index)
     }
   }
+  loading.value = false
 }
 
 const updateFloating = () => {
-  computePosition(reference.value, autocomplete.value.$el, {
+  computePosition(reference.value, autocomplete.value, {
     placement: props.placement,
     middleware: [
       offset(tokens.spacing[2]),
@@ -109,7 +119,7 @@ const updateFloating = () => {
       }),
     ],
   }).then(({ x, y }) => {
-    Object.assign(autocomplete.value.$el.style, {
+    Object.assign(autocomplete.value.style, {
       left: rem(x),
       top: rem(y),
     })
@@ -119,7 +129,7 @@ const updateFloating = () => {
 onMounted(() => {
   floatingCleanup.value = autoUpdate(
     reference.value,
-    autocomplete.value.$el,
+    autocomplete.value,
     updateFloating,
   )
 })
