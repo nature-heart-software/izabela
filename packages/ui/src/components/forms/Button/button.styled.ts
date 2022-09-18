@@ -4,11 +4,11 @@ import tokens from '@/styles/tokens'
 import { props, Props, Size } from './button.shared'
 import { CSSObject } from '@/types/css-in-js'
 import {
-    borderRadiusStyleBySize,
-    fontSizeStyle,
-    horizontalPaddingStyleBySize,
-    horizontalPaddingWithIconStyleBySize,
-    iconStyleBySize,
+  borderRadiusStyleBySize,
+  fontSizeStyle,
+  horizontalPaddingStyleBySize,
+  horizontalPaddingWithIconStyleBySize,
+  iconStyleBySize,
 } from '@/utils/css-in-js'
 import { rem } from 'polished'
 

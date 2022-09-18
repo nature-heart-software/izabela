@@ -4,11 +4,11 @@ import tokens from '@/styles/tokens'
 import { props } from './tag.shared'
 import { rem } from 'polished'
 import {
-    borderRadiusStyleBySize,
-    fontSizeStyle,
-    horizontalPaddingStyleBySize,
-    horizontalPaddingWithIconStyleBySize,
-    iconStyleBySize,
+  borderRadiusStyleBySize,
+  fontSizeStyle,
+  horizontalPaddingStyleBySize,
+  horizontalPaddingWithIconStyleBySize,
+  iconStyleBySize,
 } from '@/utils/css-in-js'
 
 const { borderWidth, transition, colors, fontSize, spacing } = tokens
