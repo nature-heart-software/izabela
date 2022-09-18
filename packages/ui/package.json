@@ -17,6 +17,7 @@
     "build-storybook": "build-storybook"
   },
   "dependencies": {
+    "@floating-ui/dom": "^1.0.1",
     "@packages/icons": "*",
     "@packages/toolbox": "^0.0.0",
     "@vue-reactivity/watch": "^0.2.0",

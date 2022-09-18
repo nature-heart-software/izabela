@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { Story } from '@storybook/vue3'
-import { NvAutocomplete } from '@/components'
+import { NvAutocomplete, NvInput } from '@/components'
 import { ref } from 'vue'
 import voices from '@/mocks/voices.json'
 import { props, sizeValues } from './autocomplete.shared'
@@ -17,15 +17,19 @@ export default {
 }
 
 const Template: Story = (args) => ({
-  components: { NvAutocomplete },
+  components: { NvAutocomplete, NvInput },
   setup() {
     return {
+      inputValue: ref(),
       data: ref(voices),
       args,
     }
   },
   template: `
       <NvAutocomplete v-bind="args" :data="data" valueKey="voicemodel_uuid">
+      <template #reference>
+        <NvInput v-model="inputValue"/>
+      </template>
       <template #default="{ item }">
         <div class="h-7 flex items-center">
           {{ item.display_name }}
@@ -38,4 +42,5 @@ const Template: Story = (args) => ({
 export const Default = Template.bind({})
 Default.args = {
   autoScrollValue: '42b79bb6-0b41-44dd-9824-e840d336c343',
+  visible: true,
 }

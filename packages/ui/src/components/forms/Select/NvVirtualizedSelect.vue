@@ -1,58 +1,62 @@
 <template>
-  <StSelectV2
-    ref="select"
-    :isFocused="hasFocus"
-    v-bind="props"
-    @click="activate"
-  >
-    <StSelectV2Wrapper v-bind="props">
-      <NvStack>
-        <template v-if="props.multiple && selectedOptions.length > 0">
-          <NvGroup :spacing="2">
-            <template
-              v-for="option in selectedOptions"
-              :key="get(option, props.valueKey, option)"
-            >
-              <NvTag
-                closable
-                @close="handleValue(option)"
-                @mousedown="blurInput()"
-                @click.stop
-              >
-                {{ get(option, props.labelKey, option) }}
-              </NvTag>
-            </template>
-          </NvGroup>
-        </template>
-        <div ref="inputWrapper" class="inline-flex">
-          <StSelectV2Input
-            ref="selectInput"
-            :isFocused="hasFocus"
-            :modelValue="inputValue"
-            :placeholder="$attrs.placeholder"
-            v-bind="omit(props, ['modelValue'])"
-            @update:modelValue="search = $event"
-          />
-        </div>
-      </NvStack>
-    </StSelectV2Wrapper>
-    <StSelectV2Icon v-bind="props">
-      <NvIcon :size="iconSize" name="direction" />
-    </StSelectV2Icon>
-  </StSelectV2>
   <NvAutocomplete
-    :autoScrollValue="selectedValues[selectedValues.length - 1]"
+    ref="autocomplete"
+    :autoScrollValue="selectedValues[0]"
     :data="searchResults"
     :valueKey="props.valueKey"
+    :visible="hasFocus"
   >
+    <template #reference>
+      <StSelectV2
+        ref="select"
+        :isFocused="hasFocus"
+        v-bind="props"
+        @click="activate"
+      >
+        <StSelectV2Wrapper v-bind="props">
+          <NvStack>
+            <template v-if="props.multiple && selectedOptions.length > 0">
+              <NvGroup :spacing="2">
+                <template
+                  v-for="option in selectedOptions"
+                  :key="get(option, props.valueKey, option)"
+                >
+                  <NvTag
+                    closable
+                    @close="handleValue(option)"
+                    @mousedown="blurInput()"
+                    @click.stop
+                  >
+                    {{ get(option, props.labelKey, option) }}
+                  </NvTag>
+                </template>
+              </NvGroup>
+            </template>
+            <div ref="inputWrapper" class="inline-flex">
+              <StSelectV2Input
+                ref="selectInput"
+                :isFocused="hasFocus"
+                :modelValue="inputValue"
+                :placeholder="$attrs.placeholder"
+                v-bind="omit(props, ['modelValue'])"
+                @update:modelValue="search = $event"
+              />
+            </div>
+          </NvStack>
+        </StSelectV2Wrapper>
+        <StSelectV2Icon v-bind="props">
+          <NvIcon :size="iconSize" name="direction" />
+        </StSelectV2Icon>
+      </StSelectV2>
+    </template>
     <template #default="{ item, active }">
       <StSelectV2Option
         :active="active"
-        :disabled="item.__disabled"
+        :disabled="get(item, '__disabled')"
         :selected="selectedValues.includes(get(item, props.valueKey, item))"
-        @click="handleValue(item)"
+        @mousedown="handleValue(item)"
       >
-        {{ item.display_name }}
+        {{ get(item, props.labelKey, item) }}
       </StSelectV2Option>
     </template>
   </NvAutocomplete>
@@ -102,6 +106,7 @@ const isFocused = ref(false)
 const select = ref()
 const selectInput = ref()
 const inputWrapper = ref()
+const autocomplete = ref()
 const { hasFocus, activate, deactivate } = useFocusTrap(inputWrapper)
 const fuseOptions = computed<UseFuseOptions<typeof props.options[number]>>(
   () => ({
@@ -153,7 +158,7 @@ const blurInput = () => {
     selectInput.value.$el.blur()
   })
 }
-onClickOutside(select, () => {
+onClickOutside(autocomplete, () => {
   blurInput()
 })
 </script>
