@@ -24,12 +24,13 @@
             </template>
           </NvGroup>
         </template>
-        <div ref="inputWrapper">
+        <div ref="inputWrapper" class="inline-flex">
           <StSelectV2Input
             ref="selectInput"
             :isFocused="hasFocus"
             :modelValue="inputValue"
             :placeholder="$attrs.placeholder"
+            v-bind="omit(props, ['modelValue'])"
             @update:modelValue="search = $event"
           />
         </div>
@@ -75,7 +76,7 @@ import NvAutocomplete from '@/components/forms/Autocomplete/NvAutocomplete.vue'
 import NvTag from '@/components/forms/Tag/NvTag.vue'
 import NvGroup from '@/components/miscellaneous/Group/NvGroup.vue'
 import NvStack from '@/components/miscellaneous/Stack/NvStack.vue'
-import { get } from 'lodash'
+import { get, omit } from 'lodash'
 
 const props = defineProps(propsDefinition)
 const emit = defineEmits(['update:modelValue'])

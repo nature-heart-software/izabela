@@ -8,10 +8,10 @@ import { defaultTextStyle } from '@/components/typography/Text/text.styled'
 import { ElOption } from 'element-plus'
 import 'element-plus/lib/components/option/style/css'
 import {
-    borderRadiusStyleBySize,
-    fontSizeStyle,
-    horizontalPaddingWithIconStyleBySize,
-    iconStyleBySize,
+  borderRadiusStyleBySize,
+  fontSizeStyle,
+  horizontalPaddingWithIconStyleBySize,
+  iconStyleBySize,
 } from '@/utils/css-in-js'
 
 const { fontSize, spacing, boxShadow, borderWidth, colors, transition } = tokens
@@ -30,7 +30,20 @@ const iconStyle = ({ size }: Props) => {
   }
   return styles[size]
 }
-
+const inputStyleBySize = ({ size }: Props) => {
+  const styles: Record<Size, CSSObject> = {
+    sm: {
+      height: rem(spacing['5']),
+    },
+    md: {
+      height: rem(spacing['6']),
+    },
+    lg: {
+      height: rem(spacing['7']),
+    },
+  }
+  return styles[size]
+}
 const styleBySize = ({ size }: Props) => {
   const borderRadius = borderRadiusStyleBySize(size)
   const horizontalPadding = horizontalPaddingWithIconStyleBySize(size)
@@ -102,8 +115,8 @@ export const StSelectV2 = styled('div', propsV2)`
 
 export const StSelectV2Wrapper = styled('div', propsV2)`
   position: relative;
-  margin-top: ${() => -rem(borderWidth.DEFAULT)};
-  margin-bottom: ${() => -rem(borderWidth.DEFAULT)};
+  margin-top: ${() => rem(-borderWidth.DEFAULT)};
+  margin-bottom: ${() => rem(-borderWidth.DEFAULT)};
   display: flex;
   align-items: center;
   font-weight: 600;
@@ -116,8 +129,8 @@ export const StSelectV2Input = styled('input', propsV2)`
   font-size: inherit;
   font-weight: inherit;
   letter-spacing: inherit;
-  height: ${() => rem(spacing['6'])};
   width: 100%;
+  ${inputStyleBySize};
 
   &::placeholder {
     color: ${() => colors.gray['40']};
