@@ -55,7 +55,12 @@
       <StSelectV2Option
         :active="active"
         :disabled="get(item, '__disabled')"
-        :selected="selectedValues.includes(get(item, props.valueKey, item))"
+        :selected="
+          selectedValues.find(
+            (v) =>
+              get(item, props.valueKey, item) === get(v, props.valueKey, v),
+          )
+        "
         @mousedown="handleValue(item)"
       >
         {{ get(item, props.labelKey, item) }}
@@ -101,7 +106,9 @@ const selectedValues = computed(() =>
 const selectedOptions = computed(() =>
   selectedValues.value.map((value) =>
     props.options.find(
-      (option) => get(option, props.valueKey, option) === value,
+      (option) =>
+        get(option, props.valueKey, option) ===
+        get(value, props.valueKey, value),
     ),
   ),
 )
@@ -144,7 +151,9 @@ const autoScrollIndex = computed(() => {
     selectedValues.value.length > 0 &&
     Math.min(
       ...selectedValues.value.map((v) =>
-        props.options.findIndex((o) => get(o, props.valueKey, o) === v),
+        props.options.findIndex(
+          (o) => get(o, props.valueKey, o) === get(v, props.valueKey, v),
+        ),
       ),
     )
   )
@@ -160,11 +169,11 @@ const handleValue = (value: Value) => {
     if (index > -1) {
       newValue.splice(index, 1)
     } else {
-      newValue.push(get(value, props.valueKey, value))
+      newValue.push(get(value, props.returnValueKey, value))
     }
     emit('update:modelValue', newValue)
   } else {
-    emit('update:modelValue', get(value, props.valueKey, value))
+    emit('update:modelValue', get(value, props.returnValueKey, value))
     blurInput()
   }
 }

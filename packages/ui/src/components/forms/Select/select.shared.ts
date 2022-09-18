@@ -37,6 +37,10 @@ export const propsV2 = {
     type: String,
     default: '',
   },
+  returnValueKey: {
+    type: String,
+    default: '',
+  },
   isFocused: {
     type: Boolean,
     default: false,
