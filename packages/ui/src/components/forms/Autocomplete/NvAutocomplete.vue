@@ -64,7 +64,7 @@ import {
 } from '@floating-ui/dom'
 import { rem } from 'polished'
 import tokens from '@/styles/tokens'
-import { useElementSize } from '@vueuse/core'
+import { onKeyStroke, useElementSize } from '@vueuse/core'
 import { ElLoadingDirective } from 'element-plus'
 
 const props = defineProps(propsDefinition)
@@ -72,30 +72,79 @@ const scroller = ref()
 const reference = ref()
 const autocomplete = ref()
 const visibleItems = ref<[number, number]>([-1, -1])
-const selection = ref(-1)
+const selection = ref<number | null>(null)
 const floatingCleanup = shallowRef()
 const { width } = useElementSize(reference)
 const vLoading = ElLoadingDirective
 const loading = ref(true)
+const emit = defineEmits(['select'])
 
 watch(
   () => props.visible,
   (visible) => {
     if (!visible) loading.value = true
-    selection.value = -1
+    selection.value = null
   },
 )
+
 watch(
   () => props.data,
   () => {
     scroller.value.scrollToItem(0)
   },
 )
+
+watch(selection, (selection) => {
+  if (typeof selection === 'number') {
+    const el: any = document.querySelector(`[data-index="${selection}"]`)
+    if (el) {
+      el?.scrollIntoViewIfNeeded(false)
+    } else {
+      scroller.value.scrollToItem(selection)
+    }
+  }
+})
+
 const autocompleteWidth = computed(() => {
   if (props.width) return props.width
   if (width.value < 300) return 300
   return width.value
 })
+
+onKeyStroke('ArrowDown', (e) => {
+  if (!props.visible) return
+  e.preventDefault()
+  if (selection.value === null) {
+    selection.value = visibleItems.value[0]
+    return
+  }
+  if (selection.value === props.data.length - 1) {
+    selection.value = 0
+  } else {
+    selection.value += 1
+  }
+})
+
+onKeyStroke('ArrowUp', (e) => {
+  if (!props.visible) return
+  e.preventDefault()
+  if (selection.value === null) {
+    selection.value = visibleItems.value[0]
+    return
+  }
+  if (selection.value === 0) {
+    selection.value = props.data.length - 1
+  } else {
+    selection.value -= 1
+  }
+})
+
+onKeyStroke('Enter', (e) => {
+  if (!props.visible || typeof selection.value !== 'number') return
+  e.preventDefault()
+  emit('select', props.data[selection.value])
+})
+
 const onVisible = () => {
   if (props.autoScrollValue) {
     const index = props.data.findIndex(

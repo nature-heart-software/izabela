@@ -5,6 +5,7 @@
     :data="searchResults"
     :valueKey="props.valueKey"
     :visible="hasFocus"
+    @select="(item) => handleValue(item)"
   >
     <template #reference>
       <StSelectV2
@@ -66,7 +67,7 @@
 import { computed, defineProps, ref } from 'vue'
 import { useFocusTrap } from '@vueuse/integrations/useFocusTrap'
 import { useFuse, UseFuseOptions } from '@vueuse/integrations/useFuse'
-import { onClickOutside } from '@vueuse/core'
+import { onClickOutside, onKeyStroke } from '@vueuse/core'
 import tokens from '@/styles/tokens'
 import {
   StSelectV2,
@@ -150,6 +151,7 @@ const handleValue = (value: Value) => {
     emit('update:modelValue', newValue)
   } else {
     emit('update:modelValue', get(value, props.valueKey, value))
+    blurInput()
   }
 }
 const blurInput = () => {
@@ -159,6 +161,8 @@ const blurInput = () => {
     selectInput.value.$el.blur()
   })
 }
+onKeyStroke('Escape', blurInput)
+onKeyStroke('Tab', blurInput)
 onClickOutside(autocomplete, () => {
   blurInput()
 })

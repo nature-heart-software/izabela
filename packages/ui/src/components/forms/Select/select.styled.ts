@@ -157,7 +157,7 @@ export const StSelectV2Option = styled('div', {
   width: 100%;
   height: ${() => rem(spacing['7'])} !important;
   padding: 0 ${() => rem(spacing['5'])} !important;
-  ${({ disabled, selected }) =>
+  ${({ disabled, selected, active }) =>
     disabled
       ? {
           color: `${() => colors.gray['40']} !important`,
@@ -169,6 +169,9 @@ export const StSelectV2Option = styled('div', {
           [selected ? '&' : '&:not()']: {
             fontWeight: 700,
             backgroundColor: `${colors.gray['10']} !important`,
+          },
+          [active ? '&' : '&:not()']: {
+            backgroundColor: `${colors.gray['20']} !important`,
           },
         }}
 `
