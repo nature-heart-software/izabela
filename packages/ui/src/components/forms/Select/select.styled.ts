@@ -8,10 +8,10 @@ import { defaultTextStyle } from '@/components/typography/Text/text.styled'
 import { ElOption } from 'element-plus'
 import 'element-plus/lib/components/option/style/css'
 import {
-    borderRadiusStyleBySize,
-    fontSizeStyle,
-    horizontalPaddingWithIconStyleBySize,
-    iconStyleBySize,
+  borderRadiusStyleBySize,
+  fontSizeStyle,
+  horizontalPaddingWithIconStyleBySize,
+  iconStyleBySize,
 } from '@/utils/css-in-js'
 
 const { fontSize, spacing, boxShadow, borderWidth, colors, transition } = tokens
