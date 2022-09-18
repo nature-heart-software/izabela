@@ -26,7 +26,7 @@
   </StAutocomplete>
 </template>
 <script lang="ts" setup>
-import { defineProps, ref } from 'vue'
+import { defineProps, ref, watch } from 'vue'
 import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import { StAutocomplete } from './autocomplete.styled'
@@ -37,6 +37,12 @@ const props = defineProps(propsDefinition)
 const scroller = ref()
 const visibleItems = ref<[number, number]>([-1, -1])
 const selection = ref(-1)
+watch(
+  () => props.data,
+  () => {
+    scroller.value.scrollToItem(0)
+  },
+)
 const onVisible = () => {
   console.log(scroller.value)
   if (props.autoScrollValue) {

@@ -18,7 +18,11 @@
       <NvIcon :size="iconSize" name="direction" />
     </StSelectV2Icon>
   </StSelectV2>
-  <NvAutocomplete :data="props.options" :valueKey="props.valueKey">
+  <NvAutocomplete
+    :autoScrollValue="selectedValues[selectedValues.length - 1]"
+    :data="searchResults"
+    :valueKey="props.valueKey"
+  >
     <template #default="{ item, active }">
       <StSelectV2Option
         :active="active"
@@ -34,6 +38,7 @@
 <script lang="ts" setup>
 import { computed, defineProps, ref } from 'vue'
 import { useFocusTrap } from '@vueuse/integrations/useFocusTrap'
+import { useFuse, UseFuseOptions } from '@vueuse/integrations/useFuse'
 import { onClickOutside } from '@vueuse/core'
 import tokens from '@/styles/tokens'
 import {
@@ -72,6 +77,21 @@ const isFocused = ref(false)
 const select = ref()
 const selectInput = ref()
 const { hasFocus, activate, deactivate } = useFocusTrap(select)
+const fuseOptions = computed<UseFuseOptions<typeof props.options[number]>>(
+  () => ({
+    fuseOptions: {
+      keys: [props.labelKey],
+      threshold: 0.3,
+    },
+  }),
+)
+const { results } = useFuse(search, props.options, fuseOptions)
+const searchResults = computed(() => {
+  if (search.value) {
+    return results.value.map(({ item }) => item) || []
+  }
+  return props.options || []
+})
 const inputValue = computed(
   () =>
     (!hasFocus.value &&
