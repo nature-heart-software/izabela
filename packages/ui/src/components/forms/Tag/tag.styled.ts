@@ -16,6 +16,10 @@ const { borderWidth, transition, colors, fontSize, spacing } = tokens
 export const StTagContentWrapper = styled('span', props)`
   position: relative;
   margin: ${() => rem(-borderWidth.DEFAULT)};
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
   ${({ closable }) =>
     (closable
       ? horizontalPaddingWithIconStyleBySize
@@ -39,7 +43,7 @@ export const StTag = styled('span', props)`
   transition: ${() => transition.DEFAULT};
   background-color: ${() => colors.white};
   border-color: ${() => colors.gray['20']};
-  white-space: nowrap;
+  min-width: 0;
 
   ${() => fontSizeStyle(fontSize['1'])}
   ${() => borderRadiusStyleBySize('sm')}

@@ -1,22 +1,23 @@
 <template>
-  <NvSelect
+  <NvVirtualizedSelect
     v-loading="isFetching"
     :modelValue="getProperty('selectedVoice')"
+    :options="options"
     v-bind="$attrs"
     valueKey="voicemodel_uuid"
-    @update:modelValue="(value) => setProperty('selectedVoice', value)"
+    @update:modelValue="(value) => setProperty('selectedVoice', purify(value))"
   >
-    <template v-for="voice in voices" :key="voice.name">
-      <NvOption :label="`${voice.display_name}`" :value="purify(voice)">
-        {{ `${voice.display_name}` }}
-      </NvOption>
-    </template>
-  </NvSelect>
+    <!--    <template v-for="voice in voices" :key="voice.name">-->
+    <!--      <NvOption :label="`${voice.display_name}`" :value="purify(voice)">-->
+    <!--        {{ `${voice.display_name}` }}-->
+    <!--      </NvOption>-->
+    <!--    </template>-->
+  </NvVirtualizedSelect>
 </template>
 <script lang="ts" setup>
 import { computed, watch } from 'vue'
 import { useQueryClient } from 'vue-query'
-import { NvOption, NvSelect } from '@packages/ui'
+import { NvVirtualizedSelect } from '@packages/ui'
 import { purify } from '@packages/toolbox'
 import { orderBy } from 'lodash'
 import { useListVoicesQuery } from './hooks'
@@ -36,6 +37,12 @@ const { data, isFetching } = useListVoicesQuery({
   enabled: canFetch,
 })
 const voices = computed(() => orderBy(data.value || [], 'display_name'))
+const options = computed(() =>
+  voices.value.map((voice) => ({
+    label: `${voice.display_name}`,
+    value: voice,
+  })),
+)
 watch(
   () => [getProperty('publicKey', true), getProperty('privateKey', true)],
   () => canFetch.value && queryClient.refetchQueries(LIST_VOICES_QUERY_KEY),

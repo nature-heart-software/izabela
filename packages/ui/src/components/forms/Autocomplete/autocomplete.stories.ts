@@ -28,7 +28,7 @@ const Template: Story = (args) => ({
   template: `
       <NvAutocomplete v-bind="args" :data="data" valueKey="voicemodel_uuid">
       <template #reference>
-        <NvInput v-model="inputValue"/>
+        <NvInput v-model="inputValue" class="w-full"/>
       </template>
       <template #default="{ item }">
         <div class="h-7 flex items-center">

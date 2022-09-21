@@ -12,6 +12,13 @@ export const props = {
 }
 
 export type Value = string | number | boolean | object | null | undefined
+export type Option = {
+  id?: Exclude<Value, object>
+  label: string
+  value: Value
+  disabled?: boolean
+  attr?: Record<string, number | string>
+}
 
 export const propsV2 = {
   multiple: {
@@ -22,7 +29,7 @@ export const propsV2 = {
     type: [String, Number, Object, Array] as PropType<Value | Value[]>,
   },
   options: {
-    type: Array as PropType<unknown[]>,
+    type: Array as PropType<Option[]>,
     default: () => [],
   },
   size: {
@@ -30,14 +37,6 @@ export const propsV2 = {
     default: 'md',
   },
   valueKey: {
-    type: String,
-    default: '',
-  },
-  labelKey: {
-    type: String,
-    default: '',
-  },
-  returnValueKey: {
     type: String,
     default: '',
   },

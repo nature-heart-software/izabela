@@ -157,11 +157,17 @@ export const StSelectV2Option = styled('div', {
   width: 100%;
   height: ${() => rem(spacing['7'])} !important;
   padding: 0 ${() => rem(spacing['5'])} !important;
-
+  ${defaultTextStyle};
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
   ${({ disabled, selected, active }) =>
     disabled
       ? `
-          color: ${() => colors.gray['40']} !important;
+          user-select: none;
+          pointer-events: none;
+          color: ${colors.gray['40']} !important;
       `
       : `
         &:hover {

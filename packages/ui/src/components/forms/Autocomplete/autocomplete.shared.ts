@@ -4,6 +4,7 @@ import { ComputePositionConfig } from '@floating-ui/dom'
 
 export const sizeValues = ['sm', 'md', 'lg'] as const
 export type Size = typeof sizeValues[number]
+export const defaultWidth = 200 as const
 
 export const props = {
   data: {
@@ -24,7 +25,7 @@ export const props = {
   },
   placement: {
     type: String as PropType<ComputePositionConfig['placement']>,
-    value: 'bottom-start',
+    default: 'bottom-start',
   },
   visible: {
     type: Boolean,

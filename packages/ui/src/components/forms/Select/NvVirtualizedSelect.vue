@@ -3,32 +3,34 @@
     ref="autocomplete"
     :autoScrollIndex="autoScrollIndex"
     :data="searchResults"
-    :valueKey="props.valueKey"
+    :valueKey="'id'"
     :visible="hasFocus"
-    @select="(item) => handleValue(item)"
+    @select="(item) => handleValue(item.value)"
   >
     <template #reference>
       <StSelectV2
         ref="select"
         :isFocused="hasFocus"
+        class="w-full"
         v-bind="{ ...props, isFocused: hasFocus }"
         @click="activate"
       >
-        <StSelectV2Wrapper v-bind="props">
-          <NvStack>
+        <StSelectV2Wrapper class="w-full" v-bind="props">
+          <NvStack class="w-full">
             <template v-if="props.multiple && selectedOptions.length > 0">
-              <NvGroup :spacing="2">
+              <NvGroup :spacing="2" class="w-full">
                 <template
                   v-for="option in selectedOptions"
-                  :key="get(option, props.valueKey, option)"
+                  :key="get(option.value, props.valueKey, option.value)"
                 >
                   <NvTag
+                    :title="option.label"
                     closable
-                    @close="handleValue(option)"
+                    @close="handleValue(option.value)"
                     @mousedown="blurInput()"
                     @click.stop
                   >
-                    {{ get(option, props.labelKey, option) }}
+                    {{ option.label }}
                   </NvTag>
                 </template>
               </NvGroup>
@@ -54,16 +56,21 @@
     <template #default="{ item, active }">
       <StSelectV2Option
         :active="active"
-        :disabled="get(item, '__disabled')"
+        :disabled="item.disabled"
         :selected="
           selectedValues.find(
             (v) =>
-              get(item, props.valueKey, item) === get(v, props.valueKey, v),
+              get(item.value, props.valueKey, item.value) ===
+              get(v, props.valueKey, v),
           )
         "
-        @mousedown="handleValue(item)"
+        :title="item.label"
+        v-bind="item.attrs || {}"
+        @mousedown="handleValue(item.value)"
       >
-        {{ get(item, props.labelKey, item) }}
+        <div class="w-full text-ellipsis overflow-hidden">
+          {{ item.label }}
+        </div>
       </StSelectV2Option>
     </template>
   </NvAutocomplete>
@@ -88,6 +95,7 @@ import NvTag from '@/components/forms/Tag/NvTag.vue'
 import NvGroup from '@/components/miscellaneous/Group/NvGroup.vue'
 import NvStack from '@/components/miscellaneous/Stack/NvStack.vue'
 import { get, omit } from 'lodash'
+import { v4 as uuid } from 'uuid'
 
 const props = defineProps(propsDefinition)
 const emit = defineEmits(['update:modelValue'])
@@ -103,15 +111,26 @@ const iconSize = computed(() => {
 const selectedValues = computed(() =>
   props.multiple ? (props.modelValue as Value[]) : [props.modelValue],
 )
-const selectedOptions = computed(() =>
-  selectedValues.value.map((value) =>
-    props.options.find(
-      (option) =>
-        get(option, props.valueKey, option) ===
-        get(value, props.valueKey, value),
-    ),
-  ),
+
+const options = computed(() =>
+  props.options.map((option) => ({
+    id: get(option.value, props.valueKey, option.value) || uuid(),
+    ...option,
+  })),
 )
+
+const selectedOptions = computed(() =>
+  selectedValues.value
+    .map((value) =>
+      options.value.find(
+        (option) =>
+          get(option.value, props.valueKey, option.value) ===
+          get(value, props.valueKey, value),
+      ),
+    )
+    .filter((option) => option !== undefined),
+)
+
 const search = ref('')
 const isFocused = ref(false)
 const select = ref()
@@ -119,30 +138,24 @@ const selectInput = ref()
 const inputWrapper = ref()
 const autocomplete = ref()
 const { hasFocus, activate, deactivate } = useFocusTrap(inputWrapper)
-const fuseOptions = computed<UseFuseOptions<typeof props.options[number]>>(
+const fuseOptions = computed<UseFuseOptions<typeof options.value[number]>>(
   () => ({
     fuseOptions: {
-      keys: [props.labelKey],
+      keys: ['label'],
       threshold: 0.3,
     },
   }),
 )
-const { results } = useFuse(search, props.options, fuseOptions)
+const { results } = useFuse(search, options, fuseOptions)
 const searchResults = computed(() => {
   if (search.value) {
     return results.value.map(({ item }) => item) || []
   }
-  return props.options || []
+  return options.value || []
 })
 const inputValue = computed(
   () =>
-    (!hasFocus.value &&
-      !props.multiple &&
-      get(
-        selectedOptions.value[0],
-        props.labelKey || props.valueKey,
-        selectedOptions.value[0],
-      )) ||
+    (!hasFocus.value && !props.multiple && selectedOptions.value[0]?.label) ||
     search.value,
 )
 
@@ -151,7 +164,7 @@ const autoScrollIndex = computed(() => {
     selectedValues.value.length > 0 &&
     Math.min(
       ...selectedValues.value.map((v) =>
-        props.options.findIndex(
+        options.value.findIndex(
           (o) => get(o, props.valueKey, o) === get(v, props.valueKey, v),
         ),
       ),
@@ -169,11 +182,11 @@ const handleValue = (value: Value) => {
     if (index > -1) {
       newValue.splice(index, 1)
     } else {
-      newValue.push(get(value, props.returnValueKey, value))
+      newValue.push(value)
     }
     emit('update:modelValue', newValue)
   } else {
-    emit('update:modelValue', get(value, props.returnValueKey, value))
+    emit('update:modelValue', value)
     blurInput()
   }
 }
@@ -181,7 +194,9 @@ const blurInput = () => {
   search.value = ''
   deactivate()
   setTimeout(() => {
-    selectInput.value.$el.blur()
+    if (selectInput.value) {
+      selectInput.value.$el.blur()
+    }
   })
 }
 onKeyStroke('Escape', blurInput)

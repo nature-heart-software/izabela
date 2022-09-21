@@ -57,10 +57,6 @@ const routes: Array<RouteRecordRaw> = [
       },
     ],
   },
-  {
-    path: '/',
-    redirect: { name: 'settings' },
-  },
 ]
 
 const router = createRouter({

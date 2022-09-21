@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { ref } from 'vue'
 import { Story } from '@storybook/vue3'
-import { NvOption, NvSelect, NvVirtualizedSelect } from '@/components'
+import { NvCenter, NvOption, NvSelect, NvVirtualizedSelect } from '@/components'
 import { props, sizeValues } from './select.shared'
 import voices from '@/mocks/voices.json'
 
@@ -22,7 +22,7 @@ export default {
 }
 
 const Template: Story = (args) => ({
-  components: { NvSelect, NvOption },
+  components: { NvSelect, NvOption, NvCenter },
   setup() {
     return {
       args,
@@ -55,30 +55,39 @@ const Template: Story = (args) => ({
     }
   },
   template: `
+      <NvCenter :style="{height: '200px'}">
       <NvSelect v-model="inputValue" v-bind="args">
-      <NvOption
-          v-for="item in options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-          :disabled="item.disabled"
-      >
-      </NvOption>
+        <NvOption
+            v-for="item in options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+            :disabled="item.disabled"
+        >
+        </NvOption>
       </NvSelect>
+      </NvCenter>
     `,
 })
 
 const VirtualizedSelectTemplate: Story = (args) => ({
-  components: { NvVirtualizedSelect },
+  components: { NvVirtualizedSelect, NvCenter },
   setup() {
     return {
       args,
       inputValue: ref(args.inputValue),
-      options: ref(voices),
+      options: ref(
+        voices.map((voice) => ({
+          value: voice,
+          label: voice.display_name,
+        })),
+      ),
     }
   },
   template: `
-      <NvVirtualizedSelect v-model="inputValue" v-bind="args" :options="options"/>`,
+      <NvCenter :style="{height: '200px'}">
+      <NvVirtualizedSelect v-model="inputValue" v-bind="args" :options="options"/>
+      </NvCenter>`,
 })
 
 export const Default = Template.bind({})

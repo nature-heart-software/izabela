@@ -1,11 +1,14 @@
 <template>
   <div class="inline-flex">
-    <span ref="reference" class="inline-flex"><slot name="reference" /></span>
-    <div ref="autocomplete" class="absolute">
+    <span ref="reference" class="inline-flex w-full"
+      ><slot name="reference"
+    /></span>
+    <div ref="autocomplete" :style="{ zIndex: 9999 }" class="absolute">
       <Transition>
         <StAutocomplete
           v-if="props.visible"
           v-loading="loading"
+          class="autocomplete"
           v-bind="{ ...props, width: autocompleteWidth }"
         >
           <DynamicScroller
@@ -52,7 +55,7 @@ import {
 import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import { StAutocomplete } from './autocomplete.styled'
-import { props as propsDefinition } from './autocomplete.shared'
+import { defaultWidth, props as propsDefinition } from './autocomplete.shared'
 import {
   autoUpdate,
   computePosition,
@@ -66,7 +69,7 @@ import { onKeyStroke, useElementSize } from '@vueuse/core'
 import { ElLoadingDirective } from 'element-plus'
 
 const props = defineProps(propsDefinition)
-const scroller = ref()
+const scroller = ref<undefined | { scrollToItem: (index: number) => void }>()
 const reference = ref()
 const autocomplete = ref()
 const selection = ref<number | null | undefined>(null)
@@ -87,7 +90,7 @@ watch(
 watch(
   () => props.data,
   () => {
-    scroller.value.scrollToItem(0)
+    scroller.value?.scrollToItem(0)
   },
 )
 
@@ -97,14 +100,18 @@ watch(selection, (selection) => {
     if (el) {
       el?.scrollIntoViewIfNeeded(false)
     } else {
-      scroller.value.scrollToItem(selection)
+      scroller.value?.scrollToItem(selection)
     }
   }
 })
 
 const autocompleteWidth = computed(() => {
-  if (props.width) return props.width
-  if (width.value < 300) return 300
+  if (props.width) {
+    return props.width
+  }
+  if (width.value < defaultWidth) {
+    return defaultWidth
+  }
   return width.value
 })
 
