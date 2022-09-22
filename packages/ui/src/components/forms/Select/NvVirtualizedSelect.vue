@@ -76,7 +76,7 @@
   </NvAutocomplete>
 </template>
 <script lang="ts" setup>
-import { computed, defineProps, ref } from 'vue'
+import { computed, defineProps, onBeforeUnmount, ref } from 'vue'
 import { useFocusTrap } from '@vueuse/integrations/useFocusTrap'
 import { useFuse, UseFuseOptions } from '@vueuse/integrations/useFuse'
 import { onClickOutside, onKeyStroke } from '@vueuse/core'
@@ -137,7 +137,12 @@ const select = ref()
 const selectInput = ref()
 const inputWrapper = ref()
 const autocomplete = ref()
-const { hasFocus, activate, deactivate } = useFocusTrap(inputWrapper)
+const { hasFocus, activate, deactivate } = useFocusTrap(inputWrapper, {
+  returnFocusOnDeactivate: false,
+  onDeactivate() {
+    if (selectInput.value) selectInput.value.$el.blur()
+  },
+})
 const fuseOptions = computed<UseFuseOptions<typeof options.value[number]>>(
   () => ({
     fuseOptions: {
@@ -193,15 +198,9 @@ const handleValue = (value: Value) => {
 const blurInput = () => {
   search.value = ''
   deactivate()
-  setTimeout(() => {
-    if (selectInput.value) {
-      selectInput.value.$el.blur()
-    }
-  })
 }
 onKeyStroke('Escape', blurInput)
 onKeyStroke('Tab', blurInput)
-onClickOutside(autocomplete, () => {
-  blurInput()
-})
+onClickOutside(autocomplete, blurInput)
+onBeforeUnmount(blurInput)
 </script>
