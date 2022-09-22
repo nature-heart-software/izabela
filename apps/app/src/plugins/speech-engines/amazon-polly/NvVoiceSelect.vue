@@ -1,6 +1,7 @@
 <template>
   <NvVirtualizedSelect
     v-loading="isFetching"
+    :autocompleteWidth="300"
     :modelValue="getProperty('selectedVoice')"
     :options="options"
     v-bind="$attrs"

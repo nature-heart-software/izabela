@@ -44,6 +44,9 @@ export const propsV2 = {
     type: Boolean,
     default: false,
   },
+  autocompleteWidth: {
+    type: Number,
+  },
 }
 export type Props = ExtractPropTypes<typeof props>
 export type PropsV2 = ExtractPropTypes<typeof propsV2>

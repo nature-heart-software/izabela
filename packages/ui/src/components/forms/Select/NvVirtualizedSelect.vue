@@ -5,6 +5,7 @@
     :data="searchResults"
     :valueKey="'id'"
     :visible="hasFocus"
+    :width="props.autocompleteWidth"
     @select="(item) => handleValue(item.value)"
   >
     <template #reference>
@@ -168,11 +169,15 @@ const autoScrollIndex = computed(() => {
   return (
     selectedValues.value.length > 0 &&
     Math.min(
-      ...selectedValues.value.map((v) =>
-        options.value.findIndex(
-          (o) => get(o, props.valueKey, o) === get(v, props.valueKey, v),
-        ),
-      ),
+      ...selectedValues.value
+        .map((v) =>
+          options.value.findIndex(
+            (o) =>
+              get(o.value, props.valueKey, o.value) ===
+              get(v, props.valueKey, v),
+          ),
+        )
+        .filter((i) => i !== undefined),
     )
   )
 })
