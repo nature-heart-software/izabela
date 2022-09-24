@@ -22,8 +22,6 @@
     "@packages/toolbox": "^0.0.0",
     "@tanstack/virtual-core": "^3.0.0-beta.18",
     "@types/uuid": "^8.3.4",
-    "@vue-reactivity/watch": "^0.2.0",
-    "@vue/reactivity": "^3.2.37",
     "@vueuse/core": "^9.2.0",
     "@vueuse/integrations": "^9.2.0",
     "@vueuse/motion": "^2.0.0-beta.12",
@@ -31,11 +29,9 @@
     "focus-trap": "^7.0.0",
     "fuse.js": "^6.6.2",
     "polished": "^4.2.2",
-    "scroll-into-view": "^1.16.2",
     "uuid": "^9.0.0",
     "vue": "^3.2.37",
     "vue-tippy": "^6.0.0-alpha.63",
-    "vue-virtual-scroller": "^2.0.0-alpha.1",
     "vue3-styled-components": "^1.2.1"
   },
   "devDependencies": {
