@@ -2,10 +2,8 @@
   <NvAutocomplete
     ref="autocomplete"
     :autoScrollIndex="autoScrollIndex"
-    :data="searchResults"
-    :getItemKey="
-      (index) => get(options[index].value, props.valueKey, options[index].value)
-    "
+    :options="searchResults"
+    :valueKey="props.valueKey"
     :visible="hasFocus"
     :width="props.autocompleteWidth"
     @select="(item) => handleValue(item.value)"
@@ -58,27 +56,24 @@
         </StSelectV2Icon>
       </StSelectV2>
     </template>
-    <template #default="{ index, active }">
+    <template #default="{ active, item }">
       <StSelectV2Option
-        v-if="searchResults[index]"
+        v-if="item"
         :active="active"
-        :disabled="searchResults[index].disabled"
+        :disabled="item.disabled"
         :selected="
           selectedValues.find(
             (v) =>
-              get(
-                searchResults[index].value,
-                props.valueKey,
-                searchResults[index].value,
-              ) === get(v, props.valueKey, v),
+              get(item.value, props.valueKey, item.value) ===
+              get(v, props.valueKey, v),
           )
         "
-        :title="searchResults[index].label"
-        v-bind="searchResults[index].attrs || {}"
-        @mousedown="handleValue(searchResults[index].value)"
+        :title="item.label"
+        v-bind="item.attrs || {}"
+        @mousedown="handleValue(item.value)"
       >
         <div class="w-full text-ellipsis overflow-hidden">
-          {{ searchResults[index].label }}
+          {{ item.label }}
         </div>
       </StSelectV2Option>
     </template>

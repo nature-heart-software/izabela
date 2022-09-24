@@ -3,12 +3,12 @@
     <NvGroup noWrap>
       <NvAutocomplete
         :autoScrollIndex="autocompleteValues.length - 1"
-        :data="autocompleteValues"
-        :getItemKey="(index) => autocompleteValues[index].value"
+        :options="autocompleteValues"
         :selectOnTab="true"
-        :visible="showAutocomplete"
+        :visible="isAutocompleteVisible"
         class="w-full"
         placement="top-start"
+        valueKey="value"
         @select="onAutocompleteSelect"
       >
         <template #reference>
@@ -21,21 +21,21 @@
             @blur="messengerStore.$patch({ isInputFocused: false })"
             @focus="messengerStore.$patch({ isInputFocused: true })"
             @keydown.esc.prevent="onInputEsc"
-            @keydown.enter="!showAutocomplete && playMessage()"
+            @keydown.enter="!isAutocompleteVisible && playMessage()"
             @keydown.space="
               (e) => settingsStore.messageMode === 'word' && [playMessage(), e.preventDefault()]
             "
             @keydown.tab.prevent="onInputTab"
           />
         </template>
-        <template #default="scope">
-          <NvOption v-if="autocompleteValues[scope.index]" :active="scope.active">
+        <template #default="{ item, active }">
+          <NvOption v-if="item" :active="active">
             <NvGroup>
               <NvText type="label">
-                {{ autocompleteValues[scope.index].command }}
+                {{ item.command }}
               </NvText>
-              <NvText v-if="autocompleteValues[scope.index].description" type="caption">
-                {{ autocompleteValues[scope.index].description }}
+              <NvText v-if="item.description" type="caption">
+                {{ item.description }}
               </NvText>
             </NvGroup>
           </NvOption>
@@ -94,7 +94,7 @@ const autocompleteValues = computed(() => {
     ).reverse() || []
   )
 })
-const showAutocomplete = computed(
+const isAutocompleteVisible = computed(
   () =>
     commands.value.length > 0 &&
     inputValue.value.startsWith('/') &&
