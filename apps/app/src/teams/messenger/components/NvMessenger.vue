@@ -62,20 +62,7 @@
         <!-- Middle -->
         <NvGroup justify="between">
           <NvMessengerAudioBar />
-          <NvCard class="inline-flex items-center space-x-3" size="sm">
-            <NvButton
-              :type="settingsStore.messageMode === 'sentence' && 'plain'"
-              size="sm"
-              @click="settingsStore.$patch({ messageMode: 'sentence' })"
-              >Sentence
-            </NvButton>
-            <NvButton
-              :type="settingsStore.messageMode === 'word' && 'plain'"
-              size="sm"
-              @click="settingsStore.$patch({ messageMode: 'word' })"
-              >Word
-            </NvButton>
-          </NvCard>
+          <NvMessengerMessageBar />
         </NvGroup>
 
         <!-- Bottom -->
@@ -123,6 +110,7 @@ import { useMessengerStore } from '@/teams/messenger/store'
 import { useSettingsStore } from '@/features/settings/store'
 import NvMessengerInputBar from '@/teams/messenger/components/NvMessengerInputBar.vue'
 import NvMessengerAudioBar from '@/teams/messenger/components/NvMessengerAudioBar.vue'
+import NvMessengerMessageBar from '@/teams/messenger/components/NvMessengerMessageBar.vue'
 
 const settingsStore = useSettingsStore()
 

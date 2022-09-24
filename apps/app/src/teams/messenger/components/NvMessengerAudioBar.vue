@@ -1,66 +1,68 @@
 <template>
-  <NvCard class="inline-flex items-center space-x-3" size="sm">
-    <NvButton
-      icon-name="setting"
-      size="sm"
-      @click="messengerContext.navigateTo({ name: 'settings-speech' })"
-    />
-    <NvDivider class="h-3" direction="vertical" />
-    <SpeechEngineSelect
-      :modelValue="speechStore.selectedSpeechEngine"
-      class="w-13"
-      icon-name="direction"
-      placeholder="Speech Engine"
-      size="sm"
-      @update:modelValue="(value) => settingsStore.$patch({ selectedSpeechEngine: value })"
-    />
-    <template v-if="speechStore.currentSpeechEngine">
-      <component
-        :is="speechStore.currentSpeechEngine.voiceSelectComponent"
-        v-if="speechStore.currentSpeechEngine.voiceSelectComponent"
-        class="w-13"
-        placeholder="Speech Voice"
+  <NvCard size="sm">
+    <NvGroup noWrap>
+      <NvButton
+        icon-name="setting"
         size="sm"
+        @click="messengerContext.navigateTo({ name: 'settings-speech' })"
       />
-    </template>
-    <NvDivider class="h-3" direction="vertical" />
-    <NvPopover :tippy-options="{ placement: 'top-start' }" size="sm">
-      <div class="w-screen max-w-full">
-        <NvStack spacing="4">
-          <NvGroup justify="apart">
-            <NvText type="label">Play on default playback device</NvText>
-            <NvSwitch
-              :modelValue="settingsStore.playSpeechOnDefaultPlaybackDevice"
-              @update:modelValue="
-                (value) =>
-                  settingsStore.$patch({
-                    playSpeechOnDefaultPlaybackDevice: value,
-                  })
-              "
-            />
-          </NvGroup>
-          <NvDivider direction="horizontal" />
-          <NvFormItem label="Audio Outputs">
-            <NvAudioOutputsSelect class="w-full" />
-          </NvFormItem>
-        </NvStack>
-      </div>
-      <template #reference>
-        <NvButton icon-name="direction" size="sm">Outputs</NvButton>
+      <NvDivider class="h-3" direction="vertical" />
+      <SpeechEngineSelect
+        :modelValue="speechStore.selectedSpeechEngine"
+        class="w-13"
+        icon-name="direction"
+        placeholder="Speech Engine"
+        size="sm"
+        @update:modelValue="(value) => settingsStore.$patch({ selectedSpeechEngine: value })"
+      />
+      <template v-if="speechStore.currentSpeechEngine">
+        <component
+          :is="speechStore.currentSpeechEngine.voiceSelectComponent"
+          v-if="speechStore.currentSpeechEngine.voiceSelectComponent"
+          class="w-13"
+          placeholder="Speech Voice"
+          size="sm"
+        />
       </template>
-    </NvPopover>
-    <NvPopover :tippy-options="{ placement: 'top-start' }" size="sm">
-      <div class="w-screen max-w-full">
-        <NvStack spacing="4">
-          <NvFormItem label="Audio Input">
-            <NvAudioInputsSelect class="w-full" />
-          </NvFormItem>
-        </NvStack>
-      </div>
-      <template #reference>
-        <NvButton icon-name="direction" size="sm">Input</NvButton>
-      </template>
-    </NvPopover>
+      <NvDivider class="h-3" direction="vertical" />
+      <NvPopover :tippy-options="{ placement: 'top-start' }" size="sm">
+        <div class="w-screen max-w-full">
+          <NvStack spacing="4">
+            <NvGroup justify="apart">
+              <NvText type="label">Play on default playback device</NvText>
+              <NvSwitch
+                :modelValue="settingsStore.playSpeechOnDefaultPlaybackDevice"
+                @update:modelValue="
+                  (value) =>
+                    settingsStore.$patch({
+                      playSpeechOnDefaultPlaybackDevice: value,
+                    })
+                "
+              />
+            </NvGroup>
+            <NvDivider direction="horizontal" />
+            <NvFormItem label="Audio Outputs">
+              <NvAudioOutputsSelect class="w-full" />
+            </NvFormItem>
+          </NvStack>
+        </div>
+        <template #reference>
+          <NvButton icon-name="direction" size="sm">Outputs</NvButton>
+        </template>
+      </NvPopover>
+      <NvPopover :tippy-options="{ placement: 'top-start' }" size="sm">
+        <div class="w-screen max-w-full">
+          <NvStack spacing="4">
+            <NvFormItem label="Audio Input">
+              <NvAudioInputsSelect class="w-full" />
+            </NvFormItem>
+          </NvStack>
+        </div>
+        <template #reference>
+          <NvButton icon-name="direction" size="sm">Input</NvButton>
+        </template>
+      </NvPopover>
+    </NvGroup>
   </NvCard>
 </template>
 <script lang="ts" setup>
