@@ -6,28 +6,9 @@
         class="messenger bg-gray-10/95 rounded grid p-4 gap-4 grid-rows-3 grid-rows-none"
       >
         <!-- Top -->
-        <div class="flex space-x-4">
-          <a href="https://github.com/nature-heart-software/izabela" target="_blank">
-            <span class="hidden">GitHub</span>
-            <NvButton icon-name="info" type="plain" />
-          </a>
-          <NvCard size="xs">
-            <div class="inline-flex space-x-2">
-              <a href="https://github.com/nature-heart-software/izabela" target="_blank">
-                <span class="hidden">GitHub</span>
-                <NvButton icon-name="github-alt" size="sm" />
-              </a>
-              <a href="https://twitter.com/wurielle" target="_blank">
-                <span class="hidden">Twitter</span>
-                <NvButton icon-name="twitter-alt" size="sm" />
-              </a>
-              <a href="https://discord.gg/BmWtmYmaeQ" target="_blank">
-                <span class="hidden">Discord</span>
-                <NvButton icon-name="discord" size="sm" />
-              </a>
-            </div>
-          </NvCard>
-          <div class="flex flex-1 justify-end space-x-4 moveable-handle cursor-all-scroll">
+        <NvGroup :spacing="4">
+          <NvMessengerLinksBar />
+          <NvGroup class="flex !flex-1 justify-end space-x-4 moveable-handle cursor-all-scroll">
             <NvCard class="flex-1 min-h-8" size="xs">
               <div class="inline-flex space-x-2">
                 <template v-if="settingsStore.debugMode">
@@ -56,8 +37,8 @@
                 <NvButton icon-name="times" size="xs" type="plain" @click="hide" />
               </div>
             </NvCard>
-          </div>
-        </div>
+          </NvGroup>
+        </NvGroup>
 
         <!-- Middle -->
         <NvGroup justify="between">
@@ -111,6 +92,7 @@ import { useSettingsStore } from '@/features/settings/store'
 import NvMessengerInputBar from '@/teams/messenger/components/NvMessengerInputBar.vue'
 import NvMessengerAudioBar from '@/teams/messenger/components/NvMessengerAudioBar.vue'
 import NvMessengerMessageBar from '@/teams/messenger/components/NvMessengerMessageBar.vue'
+import NvMessengerLinksBar from '@/teams/messenger/components/NvMessengerLinksBar.vue'
 
 const settingsStore = useSettingsStore()
 
