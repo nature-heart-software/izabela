@@ -4,7 +4,7 @@ import { ComputePositionConfig } from '@floating-ui/dom'
 
 export const sizeValues = ['sm', 'md', 'lg'] as const
 export type Size = typeof sizeValues[number]
-export const defaultWidth = 200 as const
+export const defaultWidth = 300 as const
 
 export const props = {
   options: {

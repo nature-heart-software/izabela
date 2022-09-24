@@ -101,7 +101,7 @@ import {
   StSelectTagsWrapper,
   StSelectWrapper,
 } from './select.styled'
-import { propsV2 as propsDefinition, Size, Value } from './select.shared'
+import { selectProps as propsDefinition, Size, Value } from './select.shared'
 import NvIcon from '@/components/typography/Icon/NvIcon.vue'
 import NvAutocomplete from '@/components/forms/Autocomplete/NvAutocomplete.vue'
 import NvTag from '@/components/forms/Tag/NvTag.vue'

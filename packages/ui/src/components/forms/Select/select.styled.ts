@@ -1,7 +1,7 @@
 /* eslint-disable */
 import styled from 'vue3-styled-components'
 import tokens from '@/styles/tokens'
-import { Props, propsV2, Size } from './select.shared'
+import { selectProps, SelectProps, Size } from './select.shared'
 import { CSSObject } from '@/types/css-in-js'
 import { rem } from 'polished'
 import { defaultTextStyle } from '@/components/typography/Text/text.styled'
@@ -14,7 +14,7 @@ import {
 } from '@/utils/css-in-js'
 
 const { fontSize, spacing, borderWidth, colors, transition } = tokens
-const iconStyle = ({ size }: Props) => {
+const iconStyle = ({ size }: SelectProps) => {
   const position = iconStyleBySize(size)
   const styles: Record<Size, CSSObject> = {
     sm: {
@@ -29,7 +29,7 @@ const iconStyle = ({ size }: Props) => {
   }
   return styles[size]
 }
-const inputStyleBySize = ({ size }: Props) => {
+const inputStyleBySize = ({ size }: SelectProps) => {
   const styles: Record<Size, CSSObject> = {
     sm: {
       height: rem(spacing['5']),
@@ -43,7 +43,7 @@ const inputStyleBySize = ({ size }: Props) => {
   }
   return styles[size]
 }
-const styleBySize = ({ size }: Props) => {
+const styleBySize = ({ size }: SelectProps) => {
   const borderRadius = borderRadiusStyleBySize(size)
   const horizontalPadding = horizontalPaddingWithIconStyleBySize(size)
   const styles: Record<Size, CSSObject> = {
@@ -75,7 +75,7 @@ const styleBySize = ({ size }: Props) => {
   return styles[size]
 }
 
-export const StSelect = styled('div', propsV2)`
+export const StSelect = styled('div', selectProps)`
   position: relative;
   cursor: pointer;
   display: inline-flex;
@@ -96,7 +96,7 @@ export const StSelect = styled('div', propsV2)`
     }}
 `
 
-export const StSelectWrapper = styled('div', propsV2)`
+export const StSelectWrapper = styled('div', selectProps)`
   position: relative;
   margin-top: ${() => rem(-borderWidth.DEFAULT)};
   margin-bottom: ${() => rem(-borderWidth.DEFAULT)};
@@ -108,7 +108,7 @@ export const StSelectWrapper = styled('div', propsV2)`
 export const StSelectTagsWrapper = styled('div')`
   margin-left: ${() => rem(-spacing['4'])};
 `
-export const StSelectInput = styled('input', propsV2)`
+export const StSelectInput = styled('input', selectProps)`
   cursor: pointer;
   outline: none;
   font-size: inherit;
@@ -125,7 +125,7 @@ export const StSelectInput = styled('input', propsV2)`
   }
 `
 
-export const StSelectIcon = styled('div', propsV2)`
+export const StSelectIcon = styled('div', selectProps)`
   display: inline-flex;
   pointer-events: none;
   position: absolute;
