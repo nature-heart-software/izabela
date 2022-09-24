@@ -60,70 +60,8 @@
         </div>
 
         <!-- Middle -->
-        <div class="flex justify-between">
-          <NvCard class="inline-flex items-center space-x-3" size="sm">
-            <NvButton
-              icon-name="setting"
-              size="sm"
-              @click="navigateTo({ name: 'settings-speech' })"
-            />
-            <NvDivider class="h-3" direction="vertical" />
-            <SpeechEngineSelect
-              :modelValue="speechStore.selectedSpeechEngine"
-              class="w-13"
-              icon-name="direction"
-              placeholder="Speech Engine"
-              size="sm"
-              @update:modelValue="(value) => settingsStore.$patch({ selectedSpeechEngine: value })"
-            />
-            <template v-if="speechStore.currentSpeechEngine">
-              <component
-                :is="speechStore.currentSpeechEngine.voiceSelectComponent"
-                v-if="speechStore.currentSpeechEngine.voiceSelectComponent"
-                class="w-13"
-                placeholder="Speech Voice"
-                size="sm"
-              />
-            </template>
-            <NvDivider class="h-3" direction="vertical" />
-            <NvPopover :tippy-options="{ placement: 'top-start' }" size="sm">
-              <div class="w-screen max-w-full">
-                <NvStack spacing="4">
-                  <NvGroup justify="apart">
-                    <NvText type="label">Play on default playback device</NvText>
-                    <NvSwitch
-                      :modelValue="settingsStore.playSpeechOnDefaultPlaybackDevice"
-                      @update:modelValue="
-                        (value) =>
-                          settingsStore.$patch({
-                            playSpeechOnDefaultPlaybackDevice: value,
-                          })
-                      "
-                    />
-                  </NvGroup>
-                  <NvDivider direction="horizontal" />
-                  <NvFormItem label="Audio Outputs">
-                    <NvAudioOutputsSelect class="w-full" />
-                  </NvFormItem>
-                </NvStack>
-              </div>
-              <template #reference>
-                <NvButton icon-name="direction" size="sm">Outputs</NvButton>
-              </template>
-            </NvPopover>
-            <NvPopover :tippy-options="{ placement: 'top-start' }" size="sm">
-              <div class="w-screen max-w-full">
-                <NvStack spacing="4">
-                  <NvFormItem label="Audio Input">
-                    <NvAudioInputsSelect class="w-full" />
-                  </NvFormItem>
-                </NvStack>
-              </div>
-              <template #reference>
-                <NvButton icon-name="direction" size="sm">Input</NvButton>
-              </template>
-            </NvPopover>
-          </NvCard>
+        <NvGroup justify="between">
+          <NvMessengerAudioBar />
           <NvCard class="inline-flex items-center space-x-3" size="sm">
             <NvButton
               :type="settingsStore.messageMode === 'sentence' && 'plain'"
@@ -138,11 +76,11 @@
               >Word
             </NvButton>
           </NvCard>
-        </div>
+        </NvGroup>
 
         <!-- Bottom -->
         <div>
-          <NvMessengerInput />
+          <NvMessengerInputBar />
         </div>
       </div>
     </DomBoundary>
@@ -175,31 +113,17 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ComponentPublicInstance, computed, defineProps, onMounted, ref } from 'vue'
+import { ComponentPublicInstance, computed, defineProps, onMounted, provide, ref } from 'vue'
 import Moveable from 'vue3-moveable'
-import {
-  NvButton,
-  NvCard,
-  NvDivider,
-  NvFormItem,
-  NvGroup,
-  NvPopover,
-  NvStack,
-  NvSwitch,
-  NvText,
-} from '@packages/ui'
+import { NvButton, NvCard, NvDivider, NvGroup } from '@packages/ui'
 import { RouteLocationRaw, useRouter } from 'vue-router'
 import DomBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
 import { useRouterViewPopover } from '@/features/router/hooks'
-import SpeechEngineSelect from '@/features/speech/components/inputs/NvSpeechEngineSelect.vue'
-import NvAudioOutputsSelect from '@/features/audio/components/inputs/NvAudioOutputsSelect.vue'
-import NvAudioInputsSelect from '@/features/audio/components/inputs/NvAudioInputSelect.vue'
 import { useMessengerStore } from '@/teams/messenger/store'
 import { useSettingsStore } from '@/features/settings/store'
-import { useSpeechStore } from '@/features/speech/store'
-import NvMessengerInput from '@/teams/messenger/components/NvMessengerInput.vue'
+import NvMessengerInputBar from '@/teams/messenger/components/NvMessengerInputBar.vue'
+import NvMessengerAudioBar from '@/teams/messenger/components/NvMessengerAudioBar.vue'
 
-const speechStore = useSpeechStore()
 const settingsStore = useSettingsStore()
 
 const messengerStore = useMessengerStore()
@@ -253,7 +177,9 @@ const navigateTo = (location: RouteLocationRaw) => {
   router.push(location)
   settingsPopover.popover.value?.show()
 }
-
+provide('messenger', {
+  navigateTo,
+})
 const viewport = computed(() => ({
   width: Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0),
   height: Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0),
