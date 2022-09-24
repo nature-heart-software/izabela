@@ -7,7 +7,7 @@
   />
 </template>
 <script lang="ts" setup>
-import { computed, watch } from 'vue'
+import { computed } from 'vue'
 import { NvVirtualizedSelect } from '@packages/ui'
 import { useDevicesList } from '@vueuse/core'
 import { useSettingsStore } from '@/features/settings/store'
@@ -21,12 +21,5 @@ const options = computed(() =>
     label: output.label,
     value: output.label,
   })),
-)
-watch(
-  options,
-  (value) => {
-    console.log(value, settingsStore.audioOutputs)
-  },
-  { immediate: true },
 )
 </script>
