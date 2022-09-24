@@ -7,13 +7,7 @@
     v-bind="$attrs"
     valueKey="name"
     @update:modelValue="(value) => setProperty('selectedVoice', purify(value))"
-  >
-    <!--    <template v-for="voice in voices" :key="voice.name">-->
-    <!--      <NvOption :label="`${voice.name} - ${voice.ssmlGender}`" :value="purify(voice)">-->
-    <!--        {{ `${voice.name} - ${voice.ssmlGender}` }}-->
-    <!--      </NvOption>-->
-    <!--    </template>-->
-  </NvVirtualizedSelect>
+  />
 </template>
 <script lang="ts" setup>
 import { computed, watch } from 'vue'

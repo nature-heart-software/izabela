@@ -6,14 +6,7 @@
     :options="options"
     v-bind="$attrs"
     @update:modelValue="(value) => setProperty('selectedVoice', value)"
-  >
-    <!--    <NvOption :value="null" label="Default">Default</NvOption>-->
-    <!--    <template v-for="voice in voices" :key="voice">-->
-    <!--      <NvOption :label="voice" :value="voice">-->
-    <!--        {{ voice }}-->
-    <!--      </NvOption>-->
-    <!--    </template>-->
-  </NvVirtualizedSelect>
+  />
 </template>
 <script lang="ts" setup>
 import { computed } from 'vue'

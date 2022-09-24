@@ -4,13 +4,7 @@
     :options="options"
     multiple
     @update:modelValue="(value) => settingsStore.$patch({ audioOutputs: value })"
-  >
-    <!--    <template v-for="audioOutput in filteredAudioOutputDevices" :key="audioOutput.deviceId">-->
-    <!--      <NvOption :label="audioOutput.label" :value="audioOutput.label">-->
-    <!--        {{ audioOutput.label }}-->
-    <!--      </NvOption>-->
-    <!--    </template>-->
-  </NvVirtualizedSelect>
+  />
 </template>
 <script lang="ts" setup>
 import { computed, watch } from 'vue'

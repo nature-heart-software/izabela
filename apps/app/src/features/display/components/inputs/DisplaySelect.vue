@@ -4,19 +4,7 @@
     :modelValue="settingsStore.display || primaryDisplay?.id"
     :options="options"
     @update:modelValue="onUpdate"
-  >
-    <!--    <template v-for="display in displays" :key="display.id">-->
-    <!--      <NvOption-->
-    <!--        :label="`${(primaryDisplay && display.id === primaryDisplay.id && '(Primary) ') || ''}${-->
-    <!--          display.id-->
-    <!--        }`"-->
-    <!--        :value="display.id"-->
-    <!--      >-->
-    <!--        <template v-if="primaryDisplay && display.id === primaryDisplay.id"> (Primary)</template>-->
-    <!--        {{ display.id }}-->
-    <!--      </NvOption>-->
-    <!--    </template>-->
-  </NvVirtualizedSelect>
+  />
 </template>
 <script lang="ts" setup>
 import { NvVirtualizedSelect } from '@packages/ui'

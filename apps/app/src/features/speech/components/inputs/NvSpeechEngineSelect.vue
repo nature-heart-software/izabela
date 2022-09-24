@@ -1,15 +1,5 @@
 <template>
-  <NvVirtualizedSelect :options="options" v-bind="$attrs">
-    <!--    <template v-for="engine in engines" :key="engine.id">-->
-    <!--      <NvOption-->
-    <!--        :disabled="engine.hasCredentials ? !engine.hasCredentials() : false"-->
-    <!--        :label="engine.name"-->
-    <!--        :title="engine.hasCredentials && !engine.hasCredentials() ? 'Requires credentials' : ''"-->
-    <!--        :value="engine.id"-->
-    <!--        >{{ engine.name }}-->
-    <!--      </NvOption>-->
-    <!--    </template>-->
-  </NvVirtualizedSelect>
+  <NvVirtualizedSelect :options="options" v-bind="$attrs" />
 </template>
 <script lang="ts" setup>
 import { NvVirtualizedSelect } from '@packages/ui'
