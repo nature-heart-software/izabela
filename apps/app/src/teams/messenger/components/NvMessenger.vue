@@ -3,7 +3,7 @@
     <DomBoundary id="moveable" ref="moveableTarget" class="inline-flex">
       <div
         ref="messenger"
-        class="messenger bg-gray-10/95 rounded grid p-4 gap-4 grid-rows-3 grid-rows-none"
+        class="messenger bg-gray-10/95 rounded grid p-4 gap-4 grid-rows-3 grid-rows-none min-w-[768px]"
       >
         <!-- Top -->
         <NvGroup :spacing="4">
@@ -169,8 +169,3 @@ onMounted(() => {
   }, 1000)
 })
 </script>
-<style lang="scss" scoped>
-.messenger {
-  min-width: 768px;
-}
-</style>
