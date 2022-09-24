@@ -1,8 +1,8 @@
 <template>
   <div class="inline-flex">
-    <span ref="reference" class="inline-flex w-full"
-      ><slot name="reference"
-    /></span>
+    <span ref="reference" class="inline-flex w-full">
+      <slot name="reference" />
+    </span>
     <div ref="autocomplete" :style="{ zIndex: 9999 }" class="absolute">
       <Transition>
         <StAutocomplete
@@ -139,6 +139,17 @@ onKeyStroke('ArrowUp', (e) => {
 
 onKeyStroke('Enter', (e) => {
   if (!props.visible || typeof selection.value !== 'number') return
+  e.preventDefault()
+  emit('select', props.data[selection.value])
+})
+
+onKeyStroke('Tab', (e) => {
+  if (
+    !props.visible ||
+    typeof selection.value !== 'number' ||
+    !props.selectOnTab
+  )
+    return
   e.preventDefault()
   emit('select', props.data[selection.value])
 })

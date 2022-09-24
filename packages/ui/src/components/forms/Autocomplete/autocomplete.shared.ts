@@ -37,5 +37,9 @@ export const props = {
   autoScrollIndex: {
     type: Number,
   },
+  selectOnTab: {
+    type: Boolean,
+    default: false,
+  },
 }
 export type Props = ExtractPropTypes<typeof props>
