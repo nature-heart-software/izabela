@@ -142,51 +142,7 @@
 
         <!-- Bottom -->
         <div>
-          <NvCard class="flex space-x-3" size="sm">
-            <NvAutocomplete
-              ref="autocomplete"
-              :autoScrollIndex="autocompleteValues.length - 1"
-              :data="autocompleteValues"
-              :getItemKey="(index) => autocompleteValues[index].value"
-              :selectOnTab="true"
-              :visible="showAutocomplete"
-              class="w-full"
-              placement="top-start"
-              @select="onAutocompleteSelect"
-            >
-              <template #reference>
-                <NvInput
-                  ref="messengerInput"
-                  v-model="inputValue"
-                  :placeholder="placeholder"
-                  class="w-full"
-                  size="lg"
-                  @blur="messengerStore.$patch({ isInputFocused: false })"
-                  @focus="messengerStore.$patch({ isInputFocused: true })"
-                  @keydown.esc.prevent="onInputEsc"
-                  @keydown.enter="!showAutocomplete && playMessage()"
-                  @keydown.space="
-                    (e) =>
-                      settingsStore.messageMode === 'word' && [playMessage(), e.preventDefault()]
-                  "
-                  @keydown.tab.prevent="onInputTab"
-                />
-              </template>
-              <template #default="scope">
-                <NvOption v-if="autocompleteValues[scope.index]" :active="scope.active">
-                  <NvGroup>
-                    <NvText type="label">
-                      {{ autocompleteValues[scope.index].command }}
-                    </NvText>
-                    <NvText v-if="autocompleteValues[scope.index].description" type="caption">
-                      {{ autocompleteValues[scope.index].description }}
-                    </NvText>
-                  </NvGroup>
-                </NvOption>
-              </template>
-            </NvAutocomplete>
-            <NvButton icon-name="message" size="lg" @click="playMessage()" />
-          </NvCard>
+          <NvMessengerInput />
         </div>
       </div>
     </DomBoundary>
@@ -219,17 +175,14 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ComponentPublicInstance, computed, defineProps, onMounted, ref, watch } from 'vue'
+import { ComponentPublicInstance, computed, defineProps, onMounted, ref } from 'vue'
 import Moveable from 'vue3-moveable'
 import {
-  NvAutocomplete,
   NvButton,
   NvCard,
   NvDivider,
   NvFormItem,
   NvGroup,
-  NvInput,
-  NvOption,
   NvPopover,
   NvStack,
   NvSwitch,
@@ -239,14 +192,12 @@ import { RouteLocationRaw, useRouter } from 'vue-router'
 import DomBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
 import { useRouterViewPopover } from '@/features/router/hooks'
 import SpeechEngineSelect from '@/features/speech/components/inputs/NvSpeechEngineSelect.vue'
-import { emitIPCSay } from '@/electron/events/renderer'
 import NvAudioOutputsSelect from '@/features/audio/components/inputs/NvAudioOutputsSelect.vue'
 import NvAudioInputsSelect from '@/features/audio/components/inputs/NvAudioInputSelect.vue'
 import { useMessengerStore } from '@/teams/messenger/store'
 import { useSettingsStore } from '@/features/settings/store'
 import { useSpeechStore } from '@/features/speech/store'
-import { useFuse, UseFuseOptions } from '@vueuse/integrations/useFuse'
-import { orderBy } from 'lodash'
+import NvMessengerInput from '@/teams/messenger/components/NvMessengerInput.vue'
 
 const speechStore = useSpeechStore()
 const settingsStore = useSettingsStore()
@@ -288,9 +239,7 @@ const messenger = ref()
 
 const moveable = ref()
 const moveableTarget = ref()
-const messengerInput = ref()
 
-const inputValue = ref('')
 const doc = document
 const settingsPopover = useRouterViewPopover({
   popoverTarget: messenger,
@@ -298,66 +247,7 @@ const settingsPopover = useRouterViewPopover({
     trigger: 'manual',
   },
 })
-const commands = computed(() =>
-  speechStore.commands.map((command) => ({
-    ...command,
-    command: `/${command.value}`,
-  })),
-)
-const latestCommands = ref<string[]>([])
-const fuseOptions = computed<UseFuseOptions<typeof commands.value[number]>>(() => ({
-  fuseOptions: {
-    keys: ['command'],
-    threshold: 0.3,
-  },
-}))
-const { results } = useFuse(inputValue, commands, fuseOptions)
-const autocompleteValues = computed(() => {
-  if (inputValue.value) {
-    return (
-      orderBy(
-        results.value.map(({ item }) => item),
-        [({ command }) => latestCommands.value.indexOf(command), 'command'],
-        ['desc', 'asc'],
-      ).reverse() || []
-    )
-  }
-  return (
-    orderBy(
-      commands.value,
-      [({ command }) => latestCommands.value.indexOf(command), 'command'],
-      ['desc', 'asc'],
-    ).reverse() || []
-  )
-})
-const showAutocomplete = computed(
-  () =>
-    commands.value.length > 0 &&
-    inputValue.value.startsWith('/') &&
-    inputValue.value.split(' ').length < 2,
-)
 
-const onInputTab = () => {
-  if (!inputValue.value) {
-    inputValue.value = '/'
-  }
-}
-const onInputEsc = () => {
-  ElectronMessengerWindow.hide()
-}
-const onAutocompleteSelect = (value: typeof commands.value[number]) => {
-  inputValue.value = `${value.command} `
-  if (latestCommands.value.includes(value.command)) {
-    latestCommands.value.splice(latestCommands.value.indexOf(value.command), 1)
-  }
-  latestCommands.value.push(value.command)
-}
-const placeholder = computed(() => {
-  if (commands.value.length > 0) {
-    return `Type / to see available commands (${commands.value.length})`
-  }
-  return 'So, said the angel to the child who, divided, broke the knife..'
-})
 const router = useRouter()
 const navigateTo = (location: RouteLocationRaw) => {
   router.push(location)
@@ -398,36 +288,6 @@ const onDrag = (event: any) => {
   target.style.transform = transform
   savePosition(event)
 }
-
-const playMessage = () => {
-  if (inputValue.value) {
-    emitIPCSay(inputValue.value)
-    inputValue.value = ''
-  }
-}
-
-const onWindowFocus = () => {
-  const componentInstance = messengerInput.value as ComponentPublicInstance
-  const input = componentInstance.$el.querySelector('input')
-  if (input) input.focus()
-}
-
-const onWindowBlur = () => {
-  const componentInstance = messengerInput.value as ComponentPublicInstance
-  const input = componentInstance.$el.querySelector('input')
-  if (input) input.blur()
-}
-
-watch(
-  () => messengerStore.isFocused,
-  () => {
-    if (messengerStore.isFocused) {
-      onWindowFocus()
-    } else {
-      onWindowBlur()
-    }
-  },
-)
 
 onMounted(() => {
   const moveableTargetEl = (moveableTarget.value as ComponentPublicInstance)
