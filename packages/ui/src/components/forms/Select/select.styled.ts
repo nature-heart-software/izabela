@@ -122,7 +122,9 @@ export const StSelectV2Wrapper = styled('div', propsV2)`
   font-weight: 600;
   transition: ${() => transition.DEFAULT};
 `
-
+export const StSelectV2TagsWrapper = styled('div')`
+  margin-left: ${() => rem(-spacing['4'])};
+`
 export const StSelectV2Input = styled('input', propsV2)`
   cursor: pointer;
   outline: none;

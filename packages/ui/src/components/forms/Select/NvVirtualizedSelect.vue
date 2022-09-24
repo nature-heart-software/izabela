@@ -20,24 +20,26 @@
         @click="activate"
       >
         <StSelectV2Wrapper class="w-full" v-bind="props">
-          <NvStack class="w-full">
+          <NvStack :spacing="2" class="w-full">
             <template v-if="props.multiple && selectedOptions.length > 0">
-              <NvGroup :spacing="2" class="w-full">
-                <template
-                  v-for="option in selectedOptions"
-                  :key="get(option.value, props.valueKey, option.value)"
-                >
-                  <NvTag
-                    :title="option.label"
-                    closable
-                    @close="handleValue(option.value)"
-                    @mousedown="blurInput()"
-                    @click.stop
+              <StSelectV2TagsWrapper>
+                <NvGroup :spacing="2" class="w-full">
+                  <template
+                    v-for="option in selectedOptions"
+                    :key="get(option.value, props.valueKey, option.value)"
                   >
-                    {{ option.label }}
-                  </NvTag>
-                </template>
-              </NvGroup>
+                    <NvTag
+                      :title="option.label"
+                      closable
+                      @close="handleValue(option.value)"
+                      @mousedown="blurInput()"
+                      @click.stop
+                    >
+                      {{ option.label }}
+                    </NvTag>
+                  </template>
+                </NvGroup>
+              </StSelectV2TagsWrapper>
             </template>
             <div ref="inputWrapper" class="inline-flex">
               <StSelectV2Input
@@ -81,6 +83,14 @@
         </div>
       </StSelectV2Option>
     </template>
+    <template #fallback>
+      <StSelectV2Option
+        v-if="searchResults.length === 0"
+        class="justify-center pointer-events-none"
+      >
+        No Data
+      </StSelectV2Option>
+    </template>
   </NvAutocomplete>
 </template>
 <script lang="ts" setup>
@@ -94,6 +104,7 @@ import {
   StSelectV2Icon,
   StSelectV2Input,
   StSelectV2Option,
+  StSelectV2TagsWrapper,
   StSelectV2Wrapper,
 } from './select.styled'
 import { propsV2 as propsDefinition, Size, Value } from './select.shared'

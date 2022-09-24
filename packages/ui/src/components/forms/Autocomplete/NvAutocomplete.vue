@@ -11,7 +11,13 @@
           class="autocomplete"
           v-bind="{ ...props, width: autocompleteWidth }"
         >
-          <NvVirtualListContainer class="autocomplete__list">
+          <template v-if="props.data.length === 0">
+            <slot name="fallback" />
+          </template>
+          <NvVirtualListContainer
+            v-show="props.data.length > 0"
+            class="autocomplete__list"
+          >
             <NvVirtualList
               ref="list"
               :count="props.data.length"
