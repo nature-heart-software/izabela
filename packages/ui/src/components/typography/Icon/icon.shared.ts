@@ -1,5 +1,5 @@
 import tokens from '@/styles/tokens'
-import { PropType } from 'vue'
+import { ExtractPropTypes, PropType } from 'vue'
 
 export const props = {
   name: {
@@ -11,3 +11,5 @@ export const props = {
     default: 5,
   },
 }
+
+export type Props = ExtractPropTypes<typeof props>

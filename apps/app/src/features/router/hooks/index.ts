@@ -24,6 +24,14 @@ export const useRouterViewPopover = ({
       appendTo: () => document.body,
       maxWidth: 'none',
       offset: [0, tokens.spacing['4']],
+      onShow(instance) {
+        setTimeout(() => {
+          instance.popperInstance?.update()
+        })
+      },
+      onShown(instance) {
+        instance.popperInstance?.update()
+      },
       ...popoverOptions,
     })
   }

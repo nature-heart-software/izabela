@@ -12,15 +12,7 @@ import {
 } from '@/utils/css-in-js'
 import { rem } from 'polished'
 
-const {
-  spacing,
-  borderWidth,
-  borderRadius,
-  fontSize,
-  colors,
-  transition,
-  boxShadow,
-} = tokens
+const { spacing, borderWidth, fontSize, colors, transition, boxShadow } = tokens
 
 const styleBySize = ({ size, iconName }: Props) => {
   const horizontalPadding = (
@@ -110,7 +102,7 @@ export const StButton = styled('button', props)`
             }
 
             &:focus {
-                box-shadow: 0 0 0 ${borderWidth.lg} ${colors.gray['10']};
+                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${colors.gray['10']};
             }
 
             ${[
