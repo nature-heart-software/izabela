@@ -8,15 +8,8 @@
         <!-- Top -->
         <NvGroup :spacing="4">
           <NvMessengerLinksBar />
-          <NvGroup class="flex !flex-1 justify-end space-x-4 moveable-handle cursor-all-scroll">
-            <NvCard class="flex-1 min-h-8" size="xs">
-              <div class="inline-flex space-x-2">
-                <template v-if="settingsStore.debugMode">
-                  <NvButton icon-name="redo" size="sm" @click="reload" />
-                  <NvButton icon-name="brackets-curly" size="sm" @click="openDevTools" />
-                </template>
-              </div>
-            </NvCard>
+          <NvGroup :spacing="4" class="!flex-1">
+            <NvMessengerHandleBar class="flex-1 moveable-handle cursor-all-scroll" />
             <NvCard size="xs">
               <div class="inline-flex items-center space-x-2">
                 <NvButton icon-name="question-circle" size="sm" />
@@ -88,13 +81,11 @@ import { RouteLocationRaw, useRouter } from 'vue-router'
 import DomBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
 import { useRouterViewPopover } from '@/features/router/hooks'
 import { useMessengerStore } from '@/teams/messenger/store'
-import { useSettingsStore } from '@/features/settings/store'
 import NvMessengerInputBar from '@/teams/messenger/components/NvMessengerInputBar.vue'
 import NvMessengerAudioBar from '@/teams/messenger/components/NvMessengerAudioBar.vue'
 import NvMessengerMessageBar from '@/teams/messenger/components/NvMessengerMessageBar.vue'
 import NvMessengerLinksBar from '@/teams/messenger/components/NvMessengerLinksBar.vue'
-
-const settingsStore = useSettingsStore()
+import NvMessengerHandleBar from '@/teams/messenger/components/NvMessengerHandleBar.vue'
 
 const messengerStore = useMessengerStore()
 const { ElectronMessengerWindow } = window
@@ -167,16 +158,8 @@ const savePosition = (event: any) => {
   })
 }
 
-const openDevTools = () => {
-  ElectronMessengerWindow.openDevTools()
-}
-
 const hide = () => {
   ElectronMessengerWindow.hide()
-}
-
-const reload = () => {
-  window.location.reload()
 }
 
 const onDrag = (event: any) => {
