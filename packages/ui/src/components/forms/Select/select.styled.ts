@@ -16,80 +16,80 @@ import {
 
 const { fontSize, spacing, boxShadow, borderWidth, colors, transition } = tokens
 const iconStyle = ({ size }: Props) => {
-  const position = iconStyleBySize(size)
-  const styles: Record<Size, CSSObject> = {
-    sm: {
-      ...position,
-    },
-    md: {
-      ...position,
-    },
-    lg: {
-      ...position,
-    },
-  }
-  return styles[size]
+    const position = iconStyleBySize(size)
+    const styles: Record<Size, CSSObject> = {
+        sm: {
+            ...position,
+        },
+        md: {
+            ...position,
+        },
+        lg: {
+            ...position,
+        },
+    }
+    return styles[size]
 }
 const inputStyleBySize = ({ size }: Props) => {
-  const styles: Record<Size, CSSObject> = {
-    sm: {
-      height: rem(spacing['5']),
-    },
-    md: {
-      height: rem(spacing['6']),
-    },
-    lg: {
-      height: rem(spacing['7']),
-    },
-  }
-  return styles[size]
+    const styles: Record<Size, CSSObject> = {
+        sm: {
+            height: rem(spacing['5']),
+        },
+        md: {
+            height: rem(spacing['6']),
+        },
+        lg: {
+            height: rem(spacing['7']),
+        },
+    }
+    return styles[size]
 }
 const styleBySize = ({ size }: Props) => {
-  const borderRadius = borderRadiusStyleBySize(size)
-  const horizontalPadding = horizontalPaddingWithIconStyleBySize(size)
-  const styles: Record<Size, CSSObject> = {
-    sm: {
-      ...borderRadius,
-      ...horizontalPadding,
-      ...fontSizeStyle(fontSize['1']),
-      minHeight: rem(spacing['6']),
-      paddingTop: rem(spacing['2']),
-      paddingBottom: rem(spacing['2']),
-    },
-    md: {
-      ...borderRadius,
-      ...horizontalPadding,
-      ...fontSizeStyle(fontSize['1']),
-      minHeight: rem(spacing['7']),
-      paddingTop: rem(spacing['2']),
-      paddingBottom: rem(spacing['2']),
-    },
-    lg: {
-      ...borderRadius,
-      ...horizontalPadding,
-      ...fontSizeStyle(fontSize['2']),
-      minHeight: rem(spacing['8']),
-      paddingTop: rem(spacing['2']),
-      paddingBottom: rem(spacing['2']),
-    },
-  }
-  return styles[size]
+    const borderRadius = borderRadiusStyleBySize(size)
+    const horizontalPadding = horizontalPaddingWithIconStyleBySize(size)
+    const styles: Record<Size, CSSObject> = {
+        sm: {
+            ...borderRadius,
+            ...horizontalPadding,
+            ...fontSizeStyle(fontSize['1']),
+            minHeight: rem(spacing['6']),
+            paddingTop: rem(spacing['2']),
+            paddingBottom: rem(spacing['2']),
+        },
+        md: {
+            ...borderRadius,
+            ...horizontalPadding,
+            ...fontSizeStyle(fontSize['1']),
+            minHeight: rem(spacing['7']),
+            paddingTop: rem(spacing['2']),
+            paddingBottom: rem(spacing['2']),
+        },
+        lg: {
+            ...borderRadius,
+            ...horizontalPadding,
+            ...fontSizeStyle(fontSize['2']),
+            minHeight: rem(spacing['8']),
+            paddingTop: rem(spacing['2']),
+            paddingBottom: rem(spacing['2']),
+        },
+    }
+    return styles[size]
 }
 
 const popperStyleBySize = ({ size }: Props) => {
-  const borderRadius = borderRadiusStyleBySize(size)
-  const styles: Record<Size, CSSObject> = {
-    sm: {
-      ...borderRadius,
-    },
-    md: {
-      ...borderRadius,
-    },
-    lg: {
-      ...borderRadius,
-    },
-  }
-  return styles[size]
+    const borderRadius = borderRadiusStyleBySize(size)
+    const styles: Record<Size, CSSObject> = {
+        sm: {
+            ...borderRadius,
+        },
+        md: {
+            ...borderRadius,
+        },
+        lg: {
+            ...borderRadius,
+        },
+    }
+    return styles[size]
 }
 
 export const StSelectV2 = styled('div', propsV2)`
@@ -97,33 +97,33 @@ export const StSelectV2 = styled('div', propsV2)`
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  border-width: ${() => rem(borderWidth.DEFAULT)};
-  border-color: ${() => colors.gray['20']};
-  transition: ${() => transition.DEFAULT};
+  border-width: ${ () => rem(borderWidth.DEFAULT) };
+  border-color: ${ () => colors.gray['20'] };
+  transition: ${ () => transition.DEFAULT };
 
-  ${(props) => styleBySize(props)}
+  ${ (props) => styleBySize(props) }
   &:hover {
-    border-color: ${() => colors.gray['30']};
+    border-color: ${ () => colors.gray['30'] };
   }
 
-  ${({ isFocused }) =>
-    isFocused && {
-      boxShadow: `0 0 0 ${rem(borderWidth.lg)} ${colors.gray['10']}`,
-      borderColor: colors.gray['30'],
-    }}
+  ${ ({ isFocused }) =>
+          isFocused && {
+            boxShadow: `0 0 0 ${ rem(borderWidth.lg) } ${ colors.gray['10'] }`,
+            borderColor: colors.gray['30'],
+          } }
 `
 
 export const StSelectV2Wrapper = styled('div', propsV2)`
   position: relative;
-  margin-top: ${() => rem(-borderWidth.DEFAULT)};
-  margin-bottom: ${() => rem(-borderWidth.DEFAULT)};
+  margin-top: ${ () => rem(-borderWidth.DEFAULT) };
+  margin-bottom: ${ () => rem(-borderWidth.DEFAULT) };
   display: flex;
   align-items: center;
   font-weight: 600;
-  transition: ${() => transition.DEFAULT};
+  transition: ${ () => transition.DEFAULT };
 `
 export const StSelectV2TagsWrapper = styled('div')`
-  margin-left: ${() => rem(-spacing['4'])};
+  margin-left: ${ () => rem(-spacing['4']) };
 `
 export const StSelectV2Input = styled('input', propsV2)`
   cursor: pointer;
@@ -132,10 +132,10 @@ export const StSelectV2Input = styled('input', propsV2)`
   font-weight: inherit;
   letter-spacing: inherit;
   width: 100%;
-  ${inputStyleBySize};
+  ${ inputStyleBySize };
 
   &::placeholder {
-    color: ${() => colors.gray['40']};
+    color: ${ () => colors.gray['40'] };
     font-weight: 300;
     font-size: inherit;
     letter-spacing: inherit;
@@ -146,51 +146,51 @@ export const StSelectV2Icon = styled('div', propsV2)`
   display: inline-flex;
   pointer-events: none;
   position: absolute;
-  ${(props) => iconStyle(props)}
+  ${ (props) => iconStyle(props) }
 `
 export const StSelectV2Option = styled('div', {
-  selected: { type: Boolean, default: false },
-  disabled: { type: Boolean, default: false },
-  active: { type: Boolean, default: false },
+    selected: { type: Boolean, default: false },
+    disabled: { type: Boolean, default: false },
+    active: { type: Boolean, default: false },
 })`
   cursor: pointer;
   display: flex;
   align-items: center;
   width: 100%;
-  height: ${() => rem(spacing['7'])} !important;
-  padding: 0 ${() => rem(spacing['5'])} !important;
-  ${defaultTextStyle};
+  height: ${ () => rem(spacing['7']) } !important;
+  padding: 0 ${ () => rem(spacing['5']) } !important;
+  ${ defaultTextStyle };
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
-  ${({ disabled, selected, active }) =>
-    disabled
-      ? `
+  ${ ({ disabled, selected, active }) =>
+          disabled
+                  ? `
           user-select: none;
           pointer-events: none;
-          color: ${colors.gray['40']} !important;
+          color: ${ colors.gray['40'] } !important;
       `
-      : `
+                  : `
         &:hover {
-            background-color: ${colors.gray['10']} !important;
+            background-color: ${ colors.gray['10'] } !important;
         }
         ${
-          selected
-            ? `
+                          selected
+                                  ? `
             font-weight: 700;
-            background-color: ${colors.gray['10']} !important;
+            background-color: ${ colors.gray['10'] } !important;
           `
-            : ''
-        }
+                                  : ''
+                  }
         ${
-          active
-            ? `
-            background-color: ${colors.gray['20']} !important;
+                          active
+                                  ? `
+            background-color: ${ colors.gray['20'] } !important;
           `
-            : ''
-        }
-      `}
+                                  : ''
+                  }
+      ` }
 `
 
 export const StSelect = styled('div', props)`
@@ -205,42 +205,40 @@ export const StSelect = styled('div', props)`
 
     &.is-focus {
       .el-input__inner {
-        box-shadow: 0 0 0 ${() => rem(borderWidth.lg)}
-          ${() => colors.gray['10']};
-        border-color: ${() => colors.gray['30']} !important;
+        box-shadow: 0 0 0 ${ () => rem(borderWidth.lg) } ${ () => colors.gray['10'] };
+        border-color: ${ () => colors.gray['30'] } !important;
       }
     }
 
     .el-input__inner {
       align-items: center;
-      ${() => fontSizeStyle(fontSize['1'])}
+      ${ () => fontSizeStyle(fontSize['1']) }
       font-weight: 600;
-      border-width: ${() => rem(borderWidth.DEFAULT)};
+      border-width: ${ () => rem(borderWidth.DEFAULT) };
       outline: 0;
-      border-color: ${() => colors.gray['20']};
-      transition: ${() => transition.DEFAULT};
+      border-color: ${ () => colors.gray['20'] };
+      transition: ${ () => transition.DEFAULT };
 
-      ${popperStyleBySize}
+      ${ popperStyleBySize }
       &:hover {
-        border-color: ${() => colors.gray['30']};
+        border-color: ${ () => colors.gray['30'] };
       }
 
       &:placeholder-shown {
-        height: ${(props) => styleBySize(props).height || ''} !important;
+        height: ${ (props) => styleBySize(props).height || '' } !important;
       }
 
       &:focus {
-        box-shadow: 0 0 0 ${() => rem(borderWidth.lg)}
-          ${() => colors.gray['10']};
-        border-color: ${() => colors.gray['30']};
+        box-shadow: 0 0 0 ${ () => rem(borderWidth.lg) } ${ () => colors.gray['10'] };
+        border-color: ${ () => colors.gray['30'] };
       }
 
       &::placeholder {
-        color: ${() => colors.gray['40']};
+        color: ${ () => colors.gray['40'] };
         font-weight: 300;
       }
 
-      ${styleBySize}
+      ${ styleBySize }
     }
 
     .el-input__suffix {
@@ -249,11 +247,11 @@ export const StSelect = styled('div', props)`
   }
 
   .el-popper {
-    box-shadow: ${() => boxShadow.lg} !important;
-    border-color: ${() => colors.gray['20']} !important;
+    box-shadow: ${ () => boxShadow.lg } !important;
+    border-color: ${ () => colors.gray['20'] } !important;
     overflow: hidden;
 
-    ${popperStyleBySize}
+    ${ popperStyleBySize }
     .el-popper__arrow {
       display: none;
     }
@@ -263,8 +261,8 @@ export const StSelect = styled('div', props)`
     width: 100%;
 
     .el-select__input {
-      margin-top: ${() => rem(spacing['2'])};
-      height: ${() => rem(spacing['6'])};
+      margin-top: ${ () => rem(spacing['2']) };
+      height: ${ () => rem(spacing['6']) };
       width: 100% !important;
     }
 
@@ -273,20 +271,20 @@ export const StSelect = styled('div', props)`
       transform: none;
 
       .el-tag {
-        margin: ${() => rem(spacing['2'])} 0 0 ${() => rem(spacing['2'])};
+        margin: ${ () => rem(spacing['2']) } 0 0 ${ () => rem(spacing['2']) };
 
         &--info {
-          background-color: ${() => colors.gray['10']};
+          background-color: ${ () => colors.gray['10'] };
         }
 
         .el-tag__close {
           &:hover {
             color: inherit !important;
-            background-color: ${() => colors.gray['20']};
+            background-color: ${ () => colors.gray['20'] };
           }
 
           &:active {
-            background-color: ${() => colors.gray['30']};
+            background-color: ${ () => colors.gray['30'] };
           }
         }
       }
@@ -297,17 +295,17 @@ export const StSelect = styled('div', props)`
     }
 
     .el-select-dropdown__empty {
-      padding: ${() => rem(spacing['3'])};
-      ${() => defaultTextStyle()}
+      padding: ${ () => rem(spacing['3']) };
+      ${ () => defaultTextStyle() }
     }
 
     .el-select-dropdown__item {
-      ${() => defaultTextStyle()}
+      ${ () => defaultTextStyle() }
     }
 
     &:hover {
       .el-input__inner {
-        border-color: ${() => colors.gray['30']};
+        border-color: ${ () => colors.gray['30'] };
       }
     }
   }
@@ -320,7 +318,7 @@ export const StSelect = styled('div', props)`
     .nv-select__icon {
       pointer-events: none;
       position: absolute;
-      ${iconStyle}
+      ${ iconStyle }
     }
   }
 `
@@ -329,31 +327,31 @@ export const StOption = styled(ElOption)`
   display: inline-flex;
   align-items: center;
   width: 100%;
-  height: ${() => rem(spacing['7'])} !important;
-  padding: 0 ${() => rem(spacing['5'])} !important;
+  height: ${ () => rem(spacing['7']) } !important;
+  padding: 0 ${ () => rem(spacing['5']) } !important;
 
   &:hover:not(.is-disabled),
   &.hover:not(.is-disabled) {
-    background-color: ${() => colors.gray['10']} !important;
+    background-color: ${ () => colors.gray['10'] } !important;
   }
 
   //
   // &:active:not(.is-disabled) {
-  //   background-color: ${() => colors.gray['30']} !important;
+    //   background-color: ${ () => colors.gray['30'] } !important;
   // }
   //
   // &:focus:not(.is-disabled) {
-  //   box-shadow: 0 0 0 ${() => rem(borderWidth.lg)} ${() =>
-    colors.gray['10']};
+    //   box-shadow: 0 0 0 ${ () => rem(borderWidth.lg) } ${ () =>
+          colors.gray['10'] };
   // }
 
   &.selected:not(.is-disabled) {
     color: inherit !important;
     font-weight: 600;
-    background-color: ${() => colors.gray['10']} !important;
+    background-color: ${ () => colors.gray['10'] } !important;
   }
 
   &.is-disabled {
-    color: ${() => colors.gray['40']} !important;
+    color: ${ () => colors.gray['40'] } !important;
   }
 `

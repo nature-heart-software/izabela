@@ -6,7 +6,6 @@
     :getItemKey="
       (index) => get(options[index].value, props.valueKey, options[index].value)
     "
-    :valueKey="'id'"
     :visible="hasFocus"
     :width="props.autocompleteWidth"
     @select="(item) => handleValue(item.value)"
