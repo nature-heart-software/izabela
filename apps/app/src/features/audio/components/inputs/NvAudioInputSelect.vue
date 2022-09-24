@@ -1,12 +1,12 @@
 <template>
-  <NvVirtualizedSelect
+  <NvSelect
     :modelValue="settingsStore.audioInput"
     :options="options"
     @update:modelValue="(value) => settingsStore.$patch({ audioInput: value })"
   />
 </template>
 <script lang="ts" setup>
-import { NvVirtualizedSelect } from '@packages/ui'
+import { NvSelect } from '@packages/ui'
 import { useDevicesList } from '@vueuse/core'
 import { useSettingsStore } from '@/features/settings/store'
 import { computed } from 'vue'

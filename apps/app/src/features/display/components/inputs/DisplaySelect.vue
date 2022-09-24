@@ -1,5 +1,5 @@
 <template>
-  <NvVirtualizedSelect
+  <NvSelect
     v-loading="isFetching"
     :modelValue="settingsStore.display || primaryDisplay?.id"
     :options="options"
@@ -7,7 +7,7 @@
   />
 </template>
 <script lang="ts" setup>
-import { NvVirtualizedSelect } from '@packages/ui'
+import { NvSelect } from '@packages/ui'
 import { computed } from 'vue'
 import type Electron from 'electron'
 import {

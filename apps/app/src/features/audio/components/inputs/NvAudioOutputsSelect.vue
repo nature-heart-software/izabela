@@ -1,5 +1,5 @@
 <template>
-  <NvVirtualizedSelect
+  <NvSelect
     :modelValue="settingsStore.audioOutputs"
     :options="options"
     multiple
@@ -8,7 +8,7 @@
 </template>
 <script lang="ts" setup>
 import { computed } from 'vue'
-import { NvVirtualizedSelect } from '@packages/ui'
+import { NvSelect } from '@packages/ui'
 import { useDevicesList } from '@vueuse/core'
 import { useSettingsStore } from '@/features/settings/store'
 
