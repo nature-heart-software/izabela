@@ -9,40 +9,21 @@
         <NvGroup :spacing="4">
           <NvMessengerLinksBar />
           <NvGroup :spacing="4" class="!flex-1">
-            <NvMessengerHandleBar class="flex-1 moveable-handle cursor-all-scroll" />
-            <NvCard size="xs">
-              <div class="inline-flex items-center space-x-2">
-                <NvButton icon-name="question-circle" size="sm" />
-                <NvDivider class="h-3" direction="vertical" />
-                <NvButton icon-name="comment-alt-lines" size="sm" />
-                <NvDivider class="h-3" direction="vertical" />
-                <NvButton
-                  icon-name="setting"
-                  size="sm"
-                  @click="navigateTo({ name: 'settings-overview' })"
-                />
-              </div>
-            </NvCard>
-            <NvCard class="inline-flex" size="sm">
-              <div class="inline-flex space-x-2">
-                <!-- <NvButton size="xs" type="plain" icon-name="minus"/>
-                <NvButton size="xs" type="plain" icon-name="square-full"/> -->
-                <NvButton icon-name="times" size="xs" type="plain" @click="hide" />
-              </div>
-            </NvCard>
+            <NvMessengerHandleBar class="!flex-1 moveable-handle cursor-all-scroll" />
+            <NvMessengerNavigationBar />
           </NvGroup>
         </NvGroup>
 
         <!-- Middle -->
-        <NvGroup justify="between">
+        <NvGroup :spacing="4" justify="between">
           <NvMessengerAudioBar />
           <NvMessengerMessageBar />
         </NvGroup>
 
         <!-- Bottom -->
-        <div>
+        <NvGroup :spacing="4" grow>
           <NvMessengerInputBar />
-        </div>
+        </NvGroup>
       </div>
     </DomBoundary>
     <Moveable
@@ -76,7 +57,7 @@
 <script lang="ts" setup>
 import { ComponentPublicInstance, computed, defineProps, onMounted, provide, ref } from 'vue'
 import Moveable from 'vue3-moveable'
-import { NvButton, NvCard, NvDivider, NvGroup } from '@packages/ui'
+import { NvGroup } from '@packages/ui'
 import { RouteLocationRaw, useRouter } from 'vue-router'
 import DomBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
 import { useRouterViewPopover } from '@/features/router/hooks'
@@ -86,9 +67,9 @@ import NvMessengerAudioBar from '@/teams/messenger/components/NvMessengerAudioBa
 import NvMessengerMessageBar from '@/teams/messenger/components/NvMessengerMessageBar.vue'
 import NvMessengerLinksBar from '@/teams/messenger/components/NvMessengerLinksBar.vue'
 import NvMessengerHandleBar from '@/teams/messenger/components/NvMessengerHandleBar.vue'
+import NvMessengerNavigationBar from '@/teams/messenger/components/NvMessengerNavigationBar.vue'
 
 const messengerStore = useMessengerStore()
-const { ElectronMessengerWindow } = window
 const props = defineProps({
   width: {
     type: Number,
@@ -141,6 +122,7 @@ const navigateTo = (location: RouteLocationRaw) => {
 provide('messenger', {
   navigateTo,
 })
+
 const viewport = computed(() => ({
   width: Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0),
   height: Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0),
@@ -156,10 +138,6 @@ const savePosition = (event: any) => {
       transform,
     },
   })
-}
-
-const hide = () => {
-  ElectronMessengerWindow.hide()
 }
 
 const onDrag = (event: any) => {
