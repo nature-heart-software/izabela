@@ -3,6 +3,9 @@
     ref="autocomplete"
     :autoScrollIndex="autoScrollIndex"
     :data="searchResults"
+    :getItemKey="
+      (index) => get(options[index].value, props.valueKey, options[index].value)
+    "
     :valueKey="'id'"
     :visible="hasFocus"
     :width="props.autocompleteWidth"
@@ -54,23 +57,27 @@
         </StSelectV2Icon>
       </StSelectV2>
     </template>
-    <template #default="{ item, active }">
+    <template #default="{ index, active }">
       <StSelectV2Option
+        v-if="searchResults[index]"
         :active="active"
-        :disabled="item.disabled"
+        :disabled="searchResults[index].disabled"
         :selected="
           selectedValues.find(
             (v) =>
-              get(item.value, props.valueKey, item.value) ===
-              get(v, props.valueKey, v),
+              get(
+                searchResults[index].value,
+                props.valueKey,
+                searchResults[index].value,
+              ) === get(v, props.valueKey, v),
           )
         "
-        :title="item.label"
-        v-bind="item.attrs || {}"
-        @mousedown="handleValue(item.value)"
+        :title="searchResults[index].label"
+        v-bind="searchResults[index].attrs || {}"
+        @mousedown="handleValue(searchResults[index].value)"
       >
         <div class="w-full text-ellipsis overflow-hidden">
-          {{ item.label }}
+          {{ searchResults[index].label }}
         </div>
       </StSelectV2Option>
     </template>

@@ -1,6 +1,7 @@
 import { ExtractPropTypes, PropType } from 'vue'
 import tokens from '@/styles/tokens'
 import { ComputePositionConfig } from '@floating-ui/dom'
+import { VirtualizerOptions } from '@tanstack/virtual-core'
 
 export const sizeValues = ['sm', 'md', 'lg'] as const
 export type Size = typeof sizeValues[number]
@@ -15,13 +16,12 @@ export const props = {
     type: String as PropType<Size>,
     default: 'md',
   },
-  minItemSize: {
+  estimateSize: {
     type: Number,
     default: tokens.spacing['7'],
   },
-  valueKey: {
-    type: String,
-    default: '',
+  getItemKey: {
+    type: Function as PropType<VirtualizerOptions['getItemKey']>,
   },
   placement: {
     type: String as PropType<ComputePositionConfig['placement']>,

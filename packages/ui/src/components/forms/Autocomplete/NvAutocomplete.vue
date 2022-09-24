@@ -11,32 +11,24 @@
           class="autocomplete"
           v-bind="{ ...props, width: autocompleteWidth }"
         >
-          <DynamicScroller
-            ref="scroller"
-            :items="props.data"
-            :keyField="props.valueKey"
-            :min-item-size="props.minItemSize"
-            class="autocomplete__scroller"
-            @visible="onVisible"
-            @wheel="selection = null"
-          >
-            <template v-slot="{ item, index, active }">
-              <DynamicScrollerItem
-                :active="active"
-                :data-index="index"
-                :item="item"
-              >
+          <NvVirtualListContainer class="autocomplete__list">
+            <NvVirtualList
+              ref="list"
+              :count="props.data.length"
+              :estimateSize="() => props.estimateSize"
+              :options="{
+                getItemKey: props.getItemKey,
+              }"
+              @visible="onVisible"
+              @wheel="selection = null"
+            >
+              <template #default="scope">
                 <slot
-                  v-bind="{
-                    item,
-                    index,
-                    visible: active,
-                    active: selection === index,
-                  }"
+                  v-bind="{ ...scope, active: selection === scope.index }"
                 />
-              </DynamicScrollerItem>
-            </template>
-          </DynamicScroller>
+              </template>
+            </NvVirtualList>
+          </NvVirtualListContainer>
         </StAutocomplete>
       </Transition>
     </div>
@@ -52,8 +44,6 @@ import {
   shallowRef,
   watch,
 } from 'vue'
-import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller'
-import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import { StAutocomplete } from './autocomplete.styled'
 import { defaultWidth, props as propsDefinition } from './autocomplete.shared'
 import {
@@ -67,9 +57,12 @@ import { rem } from 'polished'
 import tokens from '@/styles/tokens'
 import { onKeyStroke, useElementSize } from '@vueuse/core'
 import { ElLoadingDirective } from 'element-plus'
+import NvVirtualList from '@/components/miscellaneous/VirtualList/NvVirtualList.vue'
+import NvVirtualListContainer from '@/components/miscellaneous/VirtualList/NvVirtualListContainer.vue'
+import { Virtualizer } from '@tanstack/virtual-core'
 
 const props = defineProps(propsDefinition)
-const scroller = ref<undefined | { scrollToItem: (index: number) => void }>()
+const list = ref<undefined | { scrollToIndex: Virtualizer['scrollToIndex'] }>()
 const reference = ref()
 const autocomplete = ref()
 const selection = ref<number | null | undefined>(null)
@@ -90,18 +83,13 @@ watch(
 watch(
   () => props.data,
   () => {
-    scroller.value?.scrollToItem(0)
+    selection.value = 0
   },
 )
 
 watch(selection, (selection) => {
   if (typeof selection === 'number') {
-    const el: any = document.querySelector(`[data-index="${selection}"]`)
-    if (el) {
-      el?.scrollIntoViewIfNeeded(false)
-    } else {
-      scroller.value?.scrollToItem(selection)
-    }
+    list.value?.scrollToIndex(selection)
   }
 })
 

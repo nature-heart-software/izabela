@@ -44,7 +44,7 @@ export const StAutocomplete = styled('div', props)`
   background-color: ${() => colors.white};
 
   ${popperStyleBySize}
-  .autocomplete__scroller {
+  .autocomplete__list {
     max-height: ${() => rem(200)};
     overflow-y: auto;
   }
