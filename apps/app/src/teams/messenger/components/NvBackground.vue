@@ -8,16 +8,18 @@
 <script lang="ts" setup>
 import DomBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
 import { computed, ref, watch } from 'vue'
-import { useMessengerStore } from '@/teams/messenger/store'
+import { useMessengerWindowStore } from '@/teams/messenger/store'
 
-const messengerStore = useMessengerStore()
+const messengerWindowStore = useMessengerWindowStore()
 const isWindowShowing = ref(false)
-const isBackgroundShown = computed(() => isWindowShowing.value || messengerStore.isInputFocused)
+const isBackgroundShown = computed(
+  () => isWindowShowing.value || messengerWindowStore.isInputFocused,
+)
 
 watch(
-  () => messengerStore.isShown,
+  () => messengerWindowStore.isShown,
   () => {
-    if (messengerStore.isShown) {
+    if (messengerWindowStore.isShown) {
       isWindowShowing.value = true
     }
   },

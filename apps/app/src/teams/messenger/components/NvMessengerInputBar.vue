@@ -50,13 +50,14 @@ import { NvAutocomplete, NvButton, NvCard, NvGroup, NvInput, NvOption, NvText } 
 import { ComponentPublicInstance, computed, ref, watch } from 'vue'
 import { useFuse, UseFuseOptions } from '@vueuse/integrations/useFuse'
 import { orderBy } from 'lodash'
-import { useMessengerStore } from '@/teams/messenger/store'
+import { useMessengerStore, useMessengerWindowStore } from '@/teams/messenger/store'
 import { emitIPCSay } from '@/electron/events/renderer'
 import { useSpeechStore } from '@/features/speech/store'
 import { useSettingsStore } from '@/features/settings/store'
 
 const { ElectronMessengerWindow } = window
 const messengerStore = useMessengerStore()
+const messengerWindowStore = useMessengerWindowStore()
 const messengerInput = ref()
 
 const settingsStore = useSettingsStore()
@@ -143,9 +144,9 @@ const onWindowBlur = () => {
 }
 
 watch(
-  () => messengerStore.isFocused,
+  () => messengerWindowStore.isFocused,
   () => {
-    if (messengerStore.isFocused) {
+    if (messengerWindowStore.isFocused) {
       onWindowFocus()
     } else {
       onWindowBlur()
