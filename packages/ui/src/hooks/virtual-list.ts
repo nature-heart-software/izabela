@@ -47,6 +47,8 @@ function useVirtualizerBase<TScrollElement, TItemElement = unknown>(
       })
 
       virtualizer._willUpdate()
+      // Force an update event
+      triggerRef(state)
     })
 
     onCleanup(virtualizer._didMount())
