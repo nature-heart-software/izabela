@@ -3,11 +3,10 @@ import { ExtractPropTypes, PropType } from 'vue'
 export const sizeValues = ['sm', 'md', 'lg'] as const
 export type Size = typeof sizeValues[number]
 
-export const props = {
-  modelValue: {},
-  size: {
-    type: String as PropType<Size>,
-    default: 'md' as const,
+export const optionProps = {
+  active: {
+    type: Boolean,
+    default: false,
   },
 }
 
@@ -20,7 +19,7 @@ export type Option = {
   attr?: Record<string, number | string>
 }
 
-export const propsV2 = {
+export const selectProps = {
   multiple: {
     type: Boolean,
     default: false,
@@ -48,5 +47,5 @@ export const propsV2 = {
     type: Number,
   },
 }
-export type Props = ExtractPropTypes<typeof props>
-export type PropsV2 = ExtractPropTypes<typeof propsV2>
+export type SelectProps = ExtractPropTypes<typeof selectProps>
+export type OptionProps = ExtractPropTypes<typeof optionProps>

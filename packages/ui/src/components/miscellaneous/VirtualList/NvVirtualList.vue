@@ -1,6 +1,7 @@
 <template>
   <div
     v-if="virtualizer"
+    :key="props.count"
     :style="{
       height: rem(virtualizer.getTotalSize()),
     }"
@@ -43,6 +44,7 @@ const virtualizerOptions = computed(() => ({
   getScrollElement: () => context?.container.value,
   estimateSize: () => tokens.spacing[7],
   enableSmoothScroll: false,
+  overscan: 5,
   ...props.options,
   count: props.count,
   onChange: (instance: Virtualizer) => {

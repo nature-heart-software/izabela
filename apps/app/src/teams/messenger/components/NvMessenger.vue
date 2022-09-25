@@ -3,191 +3,27 @@
     <DomBoundary id="moveable" ref="moveableTarget" class="inline-flex">
       <div
         ref="messenger"
-        class="messenger bg-gray-10/95 rounded grid p-4 gap-4 grid-rows-3 grid-rows-none"
+        class="messenger bg-gray-10/95 rounded grid p-4 gap-4 grid-rows-3 grid-rows-none min-w-[768px]"
       >
         <!-- Top -->
-        <div class="flex space-x-4">
-          <a href="https://github.com/nature-heart-software/izabela" target="_blank">
-            <span class="hidden">GitHub</span>
-            <NvButton icon-name="info" type="plain" />
-          </a>
-          <NvCard size="xs">
-            <div class="inline-flex space-x-2">
-              <a href="https://github.com/nature-heart-software/izabela" target="_blank">
-                <span class="hidden">GitHub</span>
-                <NvButton icon-name="github-alt" size="sm" />
-              </a>
-              <a href="https://twitter.com/wurielle" target="_blank">
-                <span class="hidden">Twitter</span>
-                <NvButton icon-name="twitter-alt" size="sm" />
-              </a>
-              <a href="https://discord.gg/BmWtmYmaeQ" target="_blank">
-                <span class="hidden">Discord</span>
-                <NvButton icon-name="discord" size="sm" />
-              </a>
-            </div>
-          </NvCard>
-          <div class="flex flex-1 justify-end space-x-4 moveable-handle cursor-all-scroll">
-            <NvCard class="flex-1 min-h-8" size="xs">
-              <div class="inline-flex space-x-2">
-                <template v-if="settingsStore.debugMode">
-                  <NvButton icon-name="redo" size="sm" @click="reload" />
-                  <NvButton icon-name="brackets-curly" size="sm" @click="openDevTools" />
-                </template>
-              </div>
-            </NvCard>
-            <NvCard size="xs">
-              <div class="inline-flex items-center space-x-2">
-                <NvButton icon-name="question-circle" size="sm" />
-                <NvDivider class="h-3" direction="vertical" />
-                <NvButton icon-name="comment-alt-lines" size="sm" />
-                <NvDivider class="h-3" direction="vertical" />
-                <NvButton
-                  icon-name="setting"
-                  size="sm"
-                  @click="navigateTo({ name: 'settings-overview' })"
-                />
-              </div>
-            </NvCard>
-            <NvCard class="inline-flex" size="sm">
-              <div class="inline-flex space-x-2">
-                <!-- <NvButton size="xs" type="plain" icon-name="minus"/>
-                <NvButton size="xs" type="plain" icon-name="square-full"/> -->
-                <NvButton icon-name="times" size="xs" type="plain" @click="hide" />
-              </div>
-            </NvCard>
-          </div>
-        </div>
+        <NvGroup :spacing="4">
+          <NvMessengerLinksBar />
+          <NvGroup :spacing="4" class="!flex-1">
+            <NvMessengerHandleBar class="!flex-1 moveable-handle cursor-all-scroll" />
+            <NvMessengerNavigationBar />
+          </NvGroup>
+        </NvGroup>
 
         <!-- Middle -->
-        <div class="flex justify-between">
-          <NvCard class="inline-flex items-center space-x-3" size="sm">
-            <NvButton
-              icon-name="setting"
-              size="sm"
-              @click="navigateTo({ name: 'settings-speech' })"
-            />
-            <NvDivider class="h-3" direction="vertical" />
-            <SpeechEngineSelect
-              :modelValue="speechStore.selectedSpeechEngine"
-              class="w-13"
-              icon-name="direction"
-              placeholder="Speech Engine"
-              size="sm"
-              @update:modelValue="(value) => settingsStore.$patch({ selectedSpeechEngine: value })"
-            />
-            <template v-if="speechStore.currentSpeechEngine">
-              <component
-                :is="speechStore.currentSpeechEngine.voiceSelectComponent"
-                v-if="speechStore.currentSpeechEngine.voiceSelectComponent"
-                class="w-13"
-                placeholder="Speech Voice"
-                size="sm"
-              />
-            </template>
-            <NvDivider class="h-3" direction="vertical" />
-            <NvPopover :tippy-options="{ placement: 'top-start' }" size="sm">
-              <div class="w-screen max-w-full">
-                <NvStack spacing="4">
-                  <NvGroup justify="apart">
-                    <NvText type="label">Play on default playback device</NvText>
-                    <NvSwitch
-                      :modelValue="settingsStore.playSpeechOnDefaultPlaybackDevice"
-                      @update:modelValue="
-                        (value) =>
-                          settingsStore.$patch({
-                            playSpeechOnDefaultPlaybackDevice: value,
-                          })
-                      "
-                    />
-                  </NvGroup>
-                  <NvDivider direction="horizontal" />
-                  <NvFormItem label="Audio Outputs">
-                    <NvAudioOutputsSelect class="w-full" />
-                  </NvFormItem>
-                </NvStack>
-              </div>
-              <template #reference>
-                <NvButton icon-name="direction" size="sm">Outputs</NvButton>
-              </template>
-            </NvPopover>
-            <NvPopover :tippy-options="{ placement: 'top-start' }" size="sm">
-              <div class="w-screen max-w-full">
-                <NvStack spacing="4">
-                  <NvFormItem label="Audio Input">
-                    <NvAudioInputsSelect class="w-full" />
-                  </NvFormItem>
-                </NvStack>
-              </div>
-              <template #reference>
-                <NvButton icon-name="direction" size="sm">Input</NvButton>
-              </template>
-            </NvPopover>
-          </NvCard>
-          <NvCard class="inline-flex items-center space-x-3" size="sm">
-            <NvButton
-              :type="settingsStore.messageMode === 'sentence' && 'plain'"
-              size="sm"
-              @click="settingsStore.$patch({ messageMode: 'sentence' })"
-              >Sentence
-            </NvButton>
-            <NvButton
-              :type="settingsStore.messageMode === 'word' && 'plain'"
-              size="sm"
-              @click="settingsStore.$patch({ messageMode: 'word' })"
-              >Word
-            </NvButton>
-          </NvCard>
-        </div>
+        <NvGroup :spacing="4" justify="between">
+          <NvMessengerAudioBar />
+          <NvMessengerMessageBar />
+        </NvGroup>
 
         <!-- Bottom -->
-        <div>
-          <NvCard class="flex space-x-3" size="sm">
-            <NvAutocomplete
-              ref="autocomplete"
-              :autoScrollIndex="autocompleteValues.length - 1"
-              :data="autocompleteValues"
-              :getItemKey="(index) => autocompleteValues[index].value"
-              :selectOnTab="true"
-              :visible="showAutocomplete"
-              class="w-full"
-              placement="top-start"
-              @select="onAutocompleteSelect"
-            >
-              <template #reference>
-                <NvInput
-                  ref="messengerInput"
-                  v-model="inputValue"
-                  :placeholder="placeholder"
-                  class="w-full"
-                  size="lg"
-                  @blur="messengerStore.$patch({ isInputFocused: false })"
-                  @focus="messengerStore.$patch({ isInputFocused: true })"
-                  @keydown.esc.prevent="onInputEsc"
-                  @keydown.enter="!showAutocomplete && playMessage()"
-                  @keydown.space="
-                    (e) =>
-                      settingsStore.messageMode === 'word' && [playMessage(), e.preventDefault()]
-                  "
-                  @keydown.tab.prevent="onInputTab"
-                />
-              </template>
-              <template #default="scope">
-                <NvOption v-if="autocompleteValues[scope.index]" :active="scope.active">
-                  <NvGroup>
-                    <NvText type="label">
-                      {{ autocompleteValues[scope.index].command }}
-                    </NvText>
-                    <NvText v-if="autocompleteValues[scope.index].description" type="caption">
-                      {{ autocompleteValues[scope.index].description }}
-                    </NvText>
-                  </NvGroup>
-                </NvOption>
-              </template>
-            </NvAutocomplete>
-            <NvButton icon-name="message" size="lg" @click="playMessage()" />
-          </NvCard>
-        </div>
+        <NvGroup :spacing="4" grow>
+          <NvMessengerInputBar />
+        </NvGroup>
       </div>
     </DomBoundary>
     <Moveable
@@ -219,40 +55,21 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ComponentPublicInstance, computed, defineProps, onMounted, ref, watch } from 'vue'
+import { ComponentPublicInstance, computed, defineProps, onMounted, provide, ref } from 'vue'
 import Moveable from 'vue3-moveable'
-import {
-  NvAutocomplete,
-  NvButton,
-  NvCard,
-  NvDivider,
-  NvFormItem,
-  NvGroup,
-  NvInput,
-  NvOption,
-  NvPopover,
-  NvStack,
-  NvSwitch,
-  NvText,
-} from '@packages/ui'
+import { NvGroup } from '@packages/ui'
 import { RouteLocationRaw, useRouter } from 'vue-router'
 import DomBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
 import { useRouterViewPopover } from '@/features/router/hooks'
-import SpeechEngineSelect from '@/features/speech/components/inputs/NvSpeechEngineSelect.vue'
-import { emitIPCSay } from '@/electron/events/renderer'
-import NvAudioOutputsSelect from '@/features/audio/components/inputs/NvAudioOutputsSelect.vue'
-import NvAudioInputsSelect from '@/features/audio/components/inputs/NvAudioInputSelect.vue'
 import { useMessengerStore } from '@/teams/messenger/store'
-import { useSettingsStore } from '@/features/settings/store'
-import { useSpeechStore } from '@/features/speech/store'
-import { useFuse, UseFuseOptions } from '@vueuse/integrations/useFuse'
-import { orderBy } from 'lodash'
-
-const speechStore = useSpeechStore()
-const settingsStore = useSettingsStore()
+import NvMessengerInputBar from '@/teams/messenger/components/NvMessengerInputBar.vue'
+import NvMessengerAudioBar from '@/teams/messenger/components/NvMessengerAudioBar.vue'
+import NvMessengerMessageBar from '@/teams/messenger/components/NvMessengerMessageBar.vue'
+import NvMessengerLinksBar from '@/teams/messenger/components/NvMessengerLinksBar.vue'
+import NvMessengerHandleBar from '@/teams/messenger/components/NvMessengerHandleBar.vue'
+import NvMessengerNavigationBar from '@/teams/messenger/components/NvMessengerNavigationBar.vue'
 
 const messengerStore = useMessengerStore()
-const { ElectronMessengerWindow } = window
 const props = defineProps({
   width: {
     type: Number,
@@ -288,9 +105,7 @@ const messenger = ref()
 
 const moveable = ref()
 const moveableTarget = ref()
-const messengerInput = ref()
 
-const inputValue = ref('')
 const doc = document
 const settingsPopover = useRouterViewPopover({
   popoverTarget: messenger,
@@ -298,71 +113,15 @@ const settingsPopover = useRouterViewPopover({
     trigger: 'manual',
   },
 })
-const commands = computed(() =>
-  speechStore.commands.map((command) => ({
-    ...command,
-    command: `/${command.value}`,
-  })),
-)
-const latestCommands = ref<string[]>([])
-const fuseOptions = computed<UseFuseOptions<typeof commands.value[number]>>(() => ({
-  fuseOptions: {
-    keys: ['command'],
-    threshold: 0.3,
-  },
-}))
-const { results } = useFuse(inputValue, commands, fuseOptions)
-const autocompleteValues = computed(() => {
-  if (inputValue.value) {
-    return (
-      orderBy(
-        results.value.map(({ item }) => item),
-        [({ command }) => latestCommands.value.indexOf(command), 'command'],
-        ['desc', 'asc'],
-      ).reverse() || []
-    )
-  }
-  return (
-    orderBy(
-      commands.value,
-      [({ command }) => latestCommands.value.indexOf(command), 'command'],
-      ['desc', 'asc'],
-    ).reverse() || []
-  )
-})
-const showAutocomplete = computed(
-  () =>
-    commands.value.length > 0 &&
-    inputValue.value.startsWith('/') &&
-    inputValue.value.split(' ').length < 2,
-)
 
-const onInputTab = () => {
-  if (!inputValue.value) {
-    inputValue.value = '/'
-  }
-}
-const onInputEsc = () => {
-  ElectronMessengerWindow.hide()
-}
-const onAutocompleteSelect = (value: typeof commands.value[number]) => {
-  inputValue.value = `${value.command} `
-  if (latestCommands.value.includes(value.command)) {
-    latestCommands.value.splice(latestCommands.value.indexOf(value.command), 1)
-  }
-  latestCommands.value.push(value.command)
-}
-const placeholder = computed(() => {
-  if (commands.value.length > 0) {
-    return `Type / to see available commands (${commands.value.length})`
-  }
-  return 'So, said the angel to the child who, divided, broke the knife..'
-})
 const router = useRouter()
 const navigateTo = (location: RouteLocationRaw) => {
   router.push(location)
   settingsPopover.popover.value?.show()
 }
+provide('messenger', {
+  navigateTo,
+})
 
 const viewport = computed(() => ({
   width: Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0),
@@ -381,53 +140,11 @@ const savePosition = (event: any) => {
   })
 }
 
-const openDevTools = () => {
-  ElectronMessengerWindow.openDevTools()
-}
-
-const hide = () => {
-  ElectronMessengerWindow.hide()
-}
-
-const reload = () => {
-  window.location.reload()
-}
-
 const onDrag = (event: any) => {
   const { target, transform } = event
   target.style.transform = transform
   savePosition(event)
 }
-
-const playMessage = () => {
-  if (inputValue.value) {
-    emitIPCSay(inputValue.value)
-    inputValue.value = ''
-  }
-}
-
-const onWindowFocus = () => {
-  const componentInstance = messengerInput.value as ComponentPublicInstance
-  const input = componentInstance.$el.querySelector('input')
-  if (input) input.focus()
-}
-
-const onWindowBlur = () => {
-  const componentInstance = messengerInput.value as ComponentPublicInstance
-  const input = componentInstance.$el.querySelector('input')
-  if (input) input.blur()
-}
-
-watch(
-  () => messengerStore.isFocused,
-  () => {
-    if (messengerStore.isFocused) {
-      onWindowFocus()
-    } else {
-      onWindowBlur()
-    }
-  },
-)
 
 onMounted(() => {
   const moveableTargetEl = (moveableTarget.value as ComponentPublicInstance)
@@ -452,8 +169,3 @@ onMounted(() => {
   }, 1000)
 })
 </script>
-<style lang="scss" scoped>
-.messenger {
-  min-width: 768px;
-}
-</style>

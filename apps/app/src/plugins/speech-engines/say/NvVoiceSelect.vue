@@ -1,7 +1,6 @@
 <template>
-  <NvVirtualizedSelect
+  <NvSelect
     v-loading="isFetching"
-    :autocompleteWidth="300"
     :modelValue="getProperty('selectedVoice')"
     :options="options"
     v-bind="$attrs"
@@ -10,7 +9,7 @@
 </template>
 <script lang="ts" setup>
 import { computed } from 'vue'
-import { NvVirtualizedSelect } from '@packages/ui'
+import { NvSelect } from '@packages/ui'
 import { sortBy } from 'lodash'
 import { useListVoicesQuery } from './hooks'
 import { getProperty, setProperty } from './store'

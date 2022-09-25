@@ -1,8 +1,8 @@
 <template>
-  <NvVirtualizedSelect :options="options" v-bind="$attrs" />
+  <NvSelect :options="options" v-bind="$attrs" />
 </template>
 <script lang="ts" setup>
-import { NvVirtualizedSelect } from '@packages/ui'
+import { NvSelect } from '@packages/ui'
 import { useSpeechEngineManager } from '@/modules/speech-engine-manager'
 import { computed } from 'vue'
 

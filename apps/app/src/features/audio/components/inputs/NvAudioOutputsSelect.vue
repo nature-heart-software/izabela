@@ -1,5 +1,7 @@
 <template>
-  <NvVirtualizedSelect
+  <NvSelect
+    ref="select"
+    :autocompleteWidth="width"
     :modelValue="settingsStore.audioOutputs"
     :options="options"
     multiple
@@ -7,9 +9,9 @@
   />
 </template>
 <script lang="ts" setup>
-import { computed } from 'vue'
-import { NvVirtualizedSelect } from '@packages/ui'
-import { useDevicesList } from '@vueuse/core'
+import { computed, ref } from 'vue'
+import { NvSelect } from '@packages/ui'
+import { useDevicesList, useElementSize } from '@vueuse/core'
 import { useSettingsStore } from '@/features/settings/store'
 
 const settingsStore = useSettingsStore()
@@ -22,4 +24,6 @@ const options = computed(() =>
     value: output.label,
   })),
 )
+const select = ref()
+const { width } = useElementSize(select)
 </script>

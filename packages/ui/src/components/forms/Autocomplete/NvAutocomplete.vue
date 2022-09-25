@@ -11,26 +11,35 @@
           class="autocomplete"
           v-bind="{ ...props, width: autocompleteWidth }"
         >
-          <template v-if="props.data.length === 0">
+          <template v-if="props.options.length === 0">
             <slot name="fallback" />
           </template>
           <NvVirtualListContainer
-            v-show="props.data.length > 0"
+            v-show="props.options.length > 0"
             class="autocomplete__list"
           >
             <NvVirtualList
               ref="list"
-              :count="props.data.length"
+              :count="props.options.length"
               :estimateSize="() => props.estimateSize"
               :options="{
-                getItemKey: props.getItemKey,
+                getItemKey: (index) =>
+                  get(
+                    props.options[index],
+                    props.valueKey,
+                    props.options[index],
+                  ),
               }"
               @visible="onVisible"
               @wheel="selection = null"
             >
               <template #default="scope">
                 <slot
-                  v-bind="{ ...scope, active: selection === scope.index }"
+                  v-bind="{
+                    ...scope,
+                    active: selection === scope.index,
+                    item: props.options[scope.index],
+                  }"
                 />
               </template>
             </NvVirtualList>
@@ -66,6 +75,7 @@ import { ElLoadingDirective } from 'element-plus'
 import NvVirtualList from '@/components/miscellaneous/VirtualList/NvVirtualList.vue'
 import NvVirtualListContainer from '@/components/miscellaneous/VirtualList/NvVirtualListContainer.vue'
 import { Virtualizer } from '@tanstack/virtual-core'
+import { get } from 'lodash'
 
 const props = defineProps(propsDefinition)
 const list = ref<undefined | { scrollToIndex: Virtualizer['scrollToIndex'] }>()
@@ -87,7 +97,7 @@ watch(
 )
 
 watch(
-  () => props.data,
+  () => props.options,
   () => {
     selection.value = 0
   },
@@ -116,7 +126,7 @@ onKeyStroke('ArrowDown', (e) => {
     selection.value = props.autoScrollIndex || 0
     return
   }
-  if (selection.value === props.data.length - 1) {
+  if (selection.value === props.options.length - 1) {
     selection.value = 0
   } else {
     selection.value += 1
@@ -131,7 +141,7 @@ onKeyStroke('ArrowUp', (e) => {
     return
   }
   if (selection.value === 0) {
-    selection.value = props.data.length - 1
+    selection.value = props.options.length - 1
   } else {
     selection.value -= 1
   }
@@ -140,7 +150,7 @@ onKeyStroke('ArrowUp', (e) => {
 onKeyStroke('Enter', (e) => {
   if (!props.visible || typeof selection.value !== 'number') return
   e.preventDefault()
-  emit('select', props.data[selection.value])
+  emit('select', props.options[selection.value])
 })
 
 onKeyStroke('Tab', (e) => {
@@ -151,7 +161,7 @@ onKeyStroke('Tab', (e) => {
   )
     return
   e.preventDefault()
-  emit('select', props.data[selection.value])
+  emit('select', props.options[selection.value])
 })
 
 const onVisible = () => {

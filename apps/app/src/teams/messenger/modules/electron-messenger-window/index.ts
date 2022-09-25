@@ -3,7 +3,7 @@ import iohook, { IOHookEvent } from '@/modules/node-iohook'
 import { throttle } from 'lodash'
 import { Boundary } from '@/modules/vue-dom-boundaries/types'
 import { BrowserWindow, screen, shell } from 'electron'
-import { useMessengerStore } from '@/teams/messenger/store'
+import { useMessengerStore, useMessengerWindowStore } from '@/teams/messenger/store'
 import { useSettingsStore } from '@/features/settings/store'
 import { useDomBoundariesStore } from '@/modules/vue-dom-boundaries/dom-boundaries.store'
 import { Deferred } from '@packages/toolbox'
@@ -20,6 +20,7 @@ export const ElectronMessengerWindow = () => {
   let domBoundariesStore: ReturnType<typeof useDomBoundariesStore> | undefined
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
   let messengerStore: ReturnType<typeof useMessengerStore> | undefined
+  let messengerWindowStore: ReturnType<typeof useMessengerWindowStore> | undefined
   const ready = Deferred<BrowserWindow>()
   const isReady = () => ready.promise
 
@@ -173,20 +174,20 @@ export const ElectronMessengerWindow = () => {
 
     if (window) {
       window.on('show', () => {
-        if (!messengerStore) return
-        messengerStore.$patch({ isShown: true })
+        if (!messengerWindowStore) return
+        messengerWindowStore.$patch({ isShown: true })
       })
       window.on('hide', () => {
-        if (!messengerStore) return
-        messengerStore.$patch({ isShown: false })
+        if (!messengerWindowStore) return
+        messengerWindowStore.$patch({ isShown: false })
       })
       window.on('focus', () => {
-        if (!messengerStore) return
-        messengerStore.$patch({ isFocused: true })
+        if (!messengerWindowStore) return
+        messengerWindowStore.$patch({ isFocused: true })
       })
       window.on('blur', () => {
-        if (!messengerStore) return
-        messengerStore.$patch({ isFocused: false })
+        if (!messengerWindowStore) return
+        messengerWindowStore.$patch({ isFocused: false })
       })
       window.webContents.setWindowOpenHandler(({ url }) => {
         shell.openExternal(url)
@@ -199,6 +200,7 @@ export const ElectronMessengerWindow = () => {
     const localSettingsStore = useSettingsStore()
     settingsStore = localSettingsStore
     messengerStore = useMessengerStore()
+    messengerWindowStore = useMessengerWindowStore()
     domBoundariesStore = useDomBoundariesStore()
     registeredWindow = window
     settingsStore.$whenReady().then(() => {

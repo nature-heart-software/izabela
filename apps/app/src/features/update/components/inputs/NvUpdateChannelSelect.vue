@@ -1,13 +1,13 @@
 <template>
-  <NvVirtualizedSelect :options="options">
+  <NvSelect :options="options">
     <!--    <NvOption label="Latest" value="latest">Latest</NvOption>-->
     <!--    <NvOption label="Pre-release" value="rc">Pre-release</NvOption>-->
     <!--    <NvOption label="Beta" value="beta">Beta</NvOption>-->
     <!--    <NvOption label="Alpha" value="alpha">Alpha</NvOption>-->
-  </NvVirtualizedSelect>
+  </NvSelect>
 </template>
 <script lang="ts" setup>
-import { NvVirtualizedSelect } from '@packages/ui'
+import { NvSelect } from '@packages/ui'
 
 const options = [
   {
