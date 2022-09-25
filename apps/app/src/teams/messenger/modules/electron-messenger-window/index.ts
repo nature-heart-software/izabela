@@ -1,9 +1,12 @@
 import ElectronWindowManager from '@/modules/electron-window-manager'
 import iohook, { IOHookEvent } from '@/modules/node-iohook'
-import store from '@/store'
 import { throttle } from 'lodash'
 import { Boundary } from '@/modules/vue-dom-boundaries/types'
 import { BrowserWindow, screen, shell } from 'electron'
+import { useMessengerStore, useMessengerWindowStore } from '@/teams/messenger/store'
+import { useSettingsStore } from '@/features/settings/store'
+import { useDomBoundariesStore } from '@/modules/vue-dom-boundaries/dom-boundaries.store'
+import { Deferred } from '@packages/toolbox'
 
 export const ElectronMessengerWindow = () => {
   /* use isFocused as source of truth instead of window.isFocused() as in some instances
@@ -14,6 +17,12 @@ export const ElectronMessengerWindow = () => {
   // let lastKeypressTime = 0
   // const doubleKeypressDelta = 500
   let registeredWindow: BrowserWindow | null = null
+  let domBoundariesStore: ReturnType<typeof useDomBoundariesStore> | undefined
+  let settingsStore: ReturnType<typeof useSettingsStore> | undefined
+  let messengerStore: ReturnType<typeof useMessengerStore> | undefined
+  let messengerWindowStore: ReturnType<typeof useMessengerWindowStore> | undefined
+  const ready = Deferred<BrowserWindow>()
+  const isReady = () => ready.promise
 
   const getWindow = () =>
     registeredWindow || ElectronWindowManager.getInstanceByName('messenger')?.window
@@ -101,12 +110,13 @@ export const ElectronMessengerWindow = () => {
     })
 
   const onMouseMove = (event: IOHookEvent) => {
+    if (!domBoundariesStore) return
     const window = getWindow()
     if (window) {
       if (!window.isDestroyed() && window.isVisible()) {
         const { x: mouseX = 0, y: mouseY = 0 } = event
         const [windowX, windowY] = window.getPosition()
-        const domBoundaries = store.getters['dom-boundaries/boundaries']
+        const domBoundaries = domBoundariesStore.boundaries
         const isWithinAnyBoundaries = domBoundaries.some(({ x, y, w, h }: Boundary) => {
           const isWithinXBoundaries = mouseX >= windowX + x && mouseX <= windowX + x + w
           const isWithinYBoundaries = mouseY >= windowY + y && mouseY <= windowY + y + h
@@ -133,7 +143,7 @@ export const ElectronMessengerWindow = () => {
     return Promise.resolve()
   }
 
-  const setDisplay = (id?: Electron.Display['id']) => {
+  const setDisplay = (id?: Electron.Display['id'] | null) => {
     const window = getWindow()
     if (window) {
       const allDisplays = screen.getAllDisplays()
@@ -161,18 +171,23 @@ export const ElectronMessengerWindow = () => {
     // iohook.registerShortcut([42, 56], () => {
     //   toggleWindow()
     // })
+
     if (window) {
       window.on('show', () => {
-        store.dispatch('messenger/setProperty', ['isShown', true])
+        if (!messengerWindowStore) return
+        messengerWindowStore.$patch({ isShown: true })
       })
       window.on('hide', () => {
-        store.dispatch('messenger/setProperty', ['isShown', false])
+        if (!messengerWindowStore) return
+        messengerWindowStore.$patch({ isShown: false })
       })
       window.on('focus', () => {
-        store.dispatch('messenger/setProperty', ['isFocused', true])
+        if (!messengerWindowStore) return
+        messengerWindowStore.$patch({ isFocused: true })
       })
       window.on('blur', () => {
-        store.dispatch('messenger/setProperty', ['isFocused', false])
+        if (!messengerWindowStore) return
+        messengerWindowStore.$patch({ isFocused: false })
       })
       window.webContents.setWindowOpenHandler(({ url }) => {
         shell.openExternal(url)
@@ -182,9 +197,21 @@ export const ElectronMessengerWindow = () => {
   }
 
   const start = (window: BrowserWindow) => {
+    const localSettingsStore = useSettingsStore()
+    settingsStore = localSettingsStore
+    messengerStore = useMessengerStore()
+    messengerWindowStore = useMessengerWindowStore()
+    domBoundariesStore = useDomBoundariesStore()
     registeredWindow = window
-    addEventListeners()
+    settingsStore.$whenReady().then(() => {
+      setDisplay(localSettingsStore.display)
+    })
+    ready.resolve(window)
   }
+
+  isReady().then(() => {
+    addEventListeners()
+  })
 
   return {
     openDevTools,
@@ -195,6 +222,7 @@ export const ElectronMessengerWindow = () => {
     toggleWindow,
     start,
     setDisplay,
+    isReady,
   }
 }
 

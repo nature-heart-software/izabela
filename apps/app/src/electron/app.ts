@@ -12,6 +12,9 @@ import registerElectronUpdater from '@/modules/electron-updater/register'
 import registerElectronDebug from '@/modules/electron-debug/register'
 import registerElectronDisplay from '@/modules/electron-display/register'
 import registerElectronKeybinding from '@/modules/electron-keybinding/register'
+import { createApp, h } from 'vue'
+import { createPinia } from 'pinia'
+import electronPiniaPlugin from '@packages/electron-pinia/dist/main'
 
 const App = () => {
   const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -24,6 +27,10 @@ const App = () => {
           await ElectronWindowManager.registerInstance('speech-worker', createSpeechWorkerWindow),
         ]),
       )
+
+  const registerElectronPinia = () => {
+    createApp(h({})).use(createPinia().use(electronPiniaPlugin()))
+  }
 
   const startAppServer = async () =>
     app.whenReady().then(async () =>
@@ -98,6 +105,7 @@ const App = () => {
     return Promise.all([
       exec('Register app listeners', () => addEventListeners()),
       exec('Configure app defaults', () => configureAppDefaults()),
+      exec('Register electron-pinia', () => registerElectronPinia()),
       exec('Register updater', () => registerElectronUpdater()),
       exec('Register startup', () => registerElectronStartup()),
       exec('Register debug', () => registerElectronDebug()),
@@ -105,7 +113,7 @@ const App = () => {
       exec('Create tray', () => createTray()),
       exec('Create windows', () => createWindows()),
       exec('Start server', () => startAppServer()),
-      exec('Register screen', () => registerElectronDisplay()),
+      exec('Register display', () => registerElectronDisplay()),
       exec('Register keybindings', () => registerElectronKeybinding()),
     ])
   }

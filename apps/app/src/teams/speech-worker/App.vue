@@ -1,8 +1,8 @@
 <template>
-  <div v-if="storeReady">
+  <template v-if="settingsStore.$isReady">
     <SpeechSynthesizer />
-    <SpeechListener :key="store.getters['settings/persisted'].audioInputDevice" />
-  </div>
+    <SpeechListener :key="settingsStore.audioInput" />
+  </template>
 </template>
 <style lang="scss">
 body {
@@ -15,9 +15,7 @@ body {
 <script lang="ts" setup>
 import SpeechListener from '@/teams/speech-worker/components/NvSpeechListener.vue'
 import SpeechSynthesizer from '@/teams/speech-worker/components/NvSpeechSynthesizer.vue'
-import { useStoreReady } from '@/hooks'
-import { useStore } from 'vuex'
+import { useSettingsStore } from '@/features/settings/store'
 
-const { data: storeReady } = useStoreReady()
-const store = useStore()
+const settingsStore = useSettingsStore()
 </script>

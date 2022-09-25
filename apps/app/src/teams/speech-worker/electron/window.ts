@@ -2,6 +2,7 @@ import { BrowserWindow } from 'electron'
 import { ipcMain } from 'electron-postman'
 import path from 'path'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
+import electronSpeechWorkerWindow from '@/teams/speech-worker/modules/electron-speech-worker-window'
 
 let window: BrowserWindow
 const createWindow = async (name: string): Promise<BrowserWindow> => {
@@ -26,6 +27,10 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     window.setVisibleOnAllWorkspaces(true)
     window.setFullScreenable(false)
   }
+
+  window.once('ready-to-show', () => {
+    electronSpeechWorkerWindow.start(window)
+  })
 
   ipcMain.registerBrowserWindow(name, window)
 

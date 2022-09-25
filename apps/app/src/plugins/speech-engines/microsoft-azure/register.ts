@@ -4,7 +4,7 @@ import type { SpeechEngine } from '@/modules/speech-engine-manager/types'
 import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME } from './consts'
-import { setProperty, getProperty } from './store'
+import { getProperty, setProperty } from './store'
 
 const getCredentials = () => ({
   apiKey: getProperty('apiKey', true),

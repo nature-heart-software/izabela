@@ -25,9 +25,9 @@
                       <router-link :to="entry.to || { name: 'settings' }" class="w-full">
                         <NvButton
                           :selected="currentRoute.name === entry.to?.name"
+                          class="w-full"
                           size="sm"
                           type="ghost-alt"
-                          class="w-full"
                           >{{ entry.name }}
                         </NvButton>
                       </router-link>

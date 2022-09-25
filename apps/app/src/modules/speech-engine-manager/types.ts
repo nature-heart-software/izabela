@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios'
 import { Component } from 'vue'
-import { registerPluginStore } from '@/store'
+import { definePluginStore } from '@/store'
 
 export type Credentials = { [key: string]: any }
 export type Payload = { [key: string]: any }
@@ -23,5 +23,5 @@ export interface SpeechEngine {
     value: string
     description?: string
   }[]
-  store: ReturnType<typeof registerPluginStore>
+  store: ReturnType<typeof definePluginStore>
 }

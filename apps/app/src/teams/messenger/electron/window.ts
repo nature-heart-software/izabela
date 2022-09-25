@@ -1,4 +1,4 @@
-import { BrowserWindow, screen } from 'electron'
+import { app, BrowserWindow, screen } from 'electron'
 import path from 'path'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import { ipcMain } from 'electron-postman'
@@ -11,6 +11,7 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     fullscreen: true,
     transparent: true,
     frame: false,
+    resizable: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION as unknown as boolean,

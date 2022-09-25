@@ -16,15 +16,12 @@
                 <NvGroup justify="apart">
                   <NvText type="label">Play Izabela's speech on default playback device</NvText>
                   <NvSwitch
-                    :modelValue="
-                      store.getters['settings/persisted'].playSpeechOnDefaultPlaybackDevice
-                    "
+                    :modelValue="settingsStore.playSpeechOnDefaultPlaybackDevice"
                     @update:modelValue="
                       (value) =>
-                        store.dispatch('settings/setProperty', [
-                          'persisted.playSpeechOnDefaultPlaybackDevice',
-                          value,
-                        ])
+                        settingsStore.$patch({
+                          playSpeechOnDefaultPlaybackDevice: value,
+                        })
                     "
                   />
                 </NvGroup>
@@ -70,18 +67,18 @@
 </template>
 <script lang="ts" setup>
 import {
-  NvCard,
-  NvStack,
-  NvText,
   NvButton,
-  NvGroup,
+  NvCard,
   NvDivider,
   NvFormItem,
+  NvGroup,
+  NvStack,
   NvSwitch,
+  NvText,
 } from '@packages/ui'
-import NvAudioOutputsSelect from '@/entities/audio/components/inputs/NvAudioOutputsSelect.vue'
-import NvAudioInputFormPart from '@/entities/audio/components/inputs/NvAudioInputFormPart.vue'
-import { useStore } from 'vuex'
+import NvAudioOutputsSelect from '@/features/audio/components/inputs/NvAudioOutputsSelect.vue'
+import NvAudioInputFormPart from '@/features/audio/components/inputs/NvAudioInputFormPart.vue'
+import { useSettingsStore } from '@/features/settings/store'
 
-const store = useStore()
+const settingsStore = useSettingsStore()
 </script>

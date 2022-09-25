@@ -8,14 +8,10 @@
             <NvText type="label">Monitor</NvText>
           </NvStack>
           <NvKeybinding
+            :modelValue="settingsStore.keybindings.toggleMessengerWindow"
             multiple
-            :modelValue="store.getters['settings/persisted'].keybindings.toggleMessengerWindow"
             @update:modelValue="
-              (value) =>
-                store.dispatch('settings/setProperty', [
-                  'persisted.keybindings.toggleMessengerWindow',
-                  value,
-                ])
+              (value) => settingsStore.$patch({ keybindings: { toggleMessengerWindow: value } })
             "
           />
         </NvGroup>
@@ -25,8 +21,8 @@
 </template>
 <script lang="ts" setup>
 import { NvCard, NvGroup, NvStack, NvText } from '@packages/ui'
-import NvKeybinding from '@/entities/app/components/inputs/NvKeybinding.vue'
-import { useStore } from 'vuex'
+import NvKeybinding from '@/features/app/components/inputs/NvKeybinding.vue'
+import { useSettingsStore } from '@/features/settings/store'
 
-const store = useStore()
+const settingsStore = useSettingsStore()
 </script>

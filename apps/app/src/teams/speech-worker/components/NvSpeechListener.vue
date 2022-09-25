@@ -2,20 +2,19 @@
   <div></div>
 </template>
 <script lang="ts" setup>
-import store from '@/store'
 import { getTime } from '@/utils/time'
-import { blobToBase64 } from '@/utils/blob'
+import { blobToBase64 } from '@packages/toolbox'
 import { onBeforeUnmount } from 'vue'
 import { getMediaDeviceByLabel } from '@/utils/media-devices'
 import {
-  emitIPCTranscribeAudio,
   onIPCStartSpeechTranscription,
   onIPCStopSpeechTranscription,
 } from '@/electron/events/renderer'
+import { useSettingsStore } from '@/features/settings/store'
 
-const mediaDevice = await getMediaDeviceByLabel(
-  store.getters['settings/persisted'].audioInputDevice,
-)
+const { ElectronSpeechWorkerWindow } = window
+const settingsStore = useSettingsStore()
+const mediaDevice = await getMediaDeviceByLabel(settingsStore.audioInput)
 let audioChunks: Blob[] = []
 const sampleRate = 48000
 const stream = await navigator.mediaDevices.getUserMedia({
@@ -37,7 +36,7 @@ const onStop = () => {
   const audioBlob = new Blob(audioChunks, { type: mediaRecorder?.mimeType })
   audioChunks = []
   blobToBase64(audioBlob).then((base64) => {
-    emitIPCTranscribeAudio({
+    ElectronSpeechWorkerWindow.transcribeAudio({
       content: (base64 as string).split(',').pop() || '',
       sampleRate,
       encoding: 'WEBM_OPUS',

@@ -9,9 +9,9 @@
     "dev": "node bin/generate-exports && microbundle --target=node watch"
   },
   "source": "src/main.ts",
-  "main": "./dist/app-server.cjs",
-  "module": "./dist/app-server.es.js",
-  "unpkg": "./dist/app-server.umd.js",
+  "main": "./dist/main.cjs",
+  "module": "./dist/main.es.js",
+  "unpkg": "./dist/main.umd.js",
   "types": "./dist/main.d.ts",
   "files": [
     "./dist"
