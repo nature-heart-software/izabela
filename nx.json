@@ -1,8 +1,8 @@
 {
-  "extends": "./node_modules/nx/presets/npm.json",
+  "extends": "nx/presets/npm.json",
   "tasksRunnerOptions": {
     "default": {
-      "runner": "./node_modules/nx/tasks-runners/default",
+      "runner": "nx/tasks-runners/default",
       "options": {
         "cacheableOperations": ["build", "storybook:build", "build-storybook"]
       }
