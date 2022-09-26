@@ -1,5 +1,5 @@
 <template>
-  <NvCard class="min-h-8" size="xs">
+  <NvCard class="h-7" size="xs">
     <NvGroup :spacing="2" noWrap>
       <template v-if="settingsStore.debugMode">
         <NvButton icon-name="redo" size="sm" @click="reload" />
