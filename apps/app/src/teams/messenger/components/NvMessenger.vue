@@ -9,7 +9,9 @@
         <NvGroup :spacing="4">
           <NvMessengerLinksBar />
           <NvGroup :spacing="4" class="!flex-1">
-            <NvMessengerHandleBar class="!flex-1 moveable-handle cursor-all-scroll" />
+            <div class="moveable-handle cursor-all-scroll !flex-1">
+              <NvMessengerHandleBar />
+            </div>
             <NvMessengerNavigationBar />
           </NvGroup>
         </NvGroup>
@@ -45,7 +47,7 @@
         center: true,
         middle: true,
       }"
-      :snapThreshold="40"
+      :snapThreshold="16"
       :snappable="true"
       :verticalGuidelines="[viewport.width / 2]"
       className="opacity-0"
@@ -159,7 +161,17 @@ onMounted(() => {
     if (props.transform) moveableTargetEl.style.transform = props.transform
   }
   moveable.value.updateTarget()
-
+  if (!props.transform) {
+    const { width, height } = moveable.value.getRect()
+    moveable.value.request(
+      'draggable',
+      {
+        x: viewport.value.width / 2 - width / 2,
+        y: viewport.value.height - height - 72,
+      },
+      true,
+    )
+  }
   /* This fixes focus on focusable elements. Focus won't work unless
    * the window has been dragged once with draggable for some reasons
    * */

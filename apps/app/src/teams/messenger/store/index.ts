@@ -5,7 +5,7 @@ export const useMessengerStore = defineStore(
   'messenger',
   () => {
     const position = ref({
-      transform: 'matrix(1, 0, 0, 1, 0, 0) translate(0px, 0px)',
+      transform: null,
       width: 0,
       height: 0,
       translate: [0, 0, 0, 1],
