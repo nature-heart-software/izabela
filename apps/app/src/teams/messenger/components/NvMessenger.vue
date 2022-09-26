@@ -167,7 +167,7 @@ onMounted(() => {
       'draggable',
       {
         x: viewport.value.width / 2 - width / 2,
-        y: viewport.value.height - height - 72,
+        y: viewport.value.height - height - 60,
       },
       true,
     )
