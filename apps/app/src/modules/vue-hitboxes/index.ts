@@ -1,9 +1,9 @@
 import ready from '@ryanmorr/ready'
 import { v4 as uuid } from 'uuid'
 import { throttle } from 'lodash'
-import { useDomBoundariesStore } from '@/modules/vue-dom-boundaries/dom-boundaries.store'
+import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
 
-export const domBoundaryClass = 'dom-boundary'
+export const hitboxClass = 'hitbox'
 
 const onElementChange = (element: Element, callback: () => any) => {
   const resizeObserver = new ResizeObserver(callback)
@@ -18,20 +18,20 @@ const onElementChange = (element: Element, callback: () => any) => {
     mutationObserver.disconnect()
   }
 }
-export const watchBoundary = (selector: string) => {
+export const watchHitbox = (selector: string) => {
   ready(selector, (element: Element) => {
-    const domBoundariesStore = useDomBoundariesStore()
+    const hitboxesStore = useHitboxesStore()
     const id = uuid()
-    const updateBoundary = throttle(() => {
+    const updateHitboxes = throttle(() => {
       if (element) {
         const { x, y, width: w, height: h } = element.getBoundingClientRect()
-        domBoundariesStore.addBoundary({ id, x, y, w, h })
+        hitboxesStore.addHitbox({ id, x, y, w, h })
       } else {
-        domBoundariesStore.removeBoundary(id)
+        hitboxesStore.removeHitbox(id)
       }
     }, 250)
-    onElementChange(element, updateBoundary)
+    onElementChange(element, updateHitboxes)
   })
 }
 
-watchBoundary(`.${domBoundaryClass}`)
+watchHitbox(`.${hitboxClass}`)

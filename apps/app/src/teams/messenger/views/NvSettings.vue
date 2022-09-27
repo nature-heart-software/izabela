@@ -1,5 +1,5 @@
 <template>
-  <DomBoundary class="settings bg-gray-10/95 rounded p-4 flex flex-col space-y-4">
+  <NvHitbox class="settings bg-gray-10/95 rounded p-4 flex flex-col space-y-4">
     <!-- Top -->
     <div class="flex justify-between space-x-4">
       <div></div>
@@ -52,11 +52,11 @@
         </div>
       </div>
     </div>
-  </DomBoundary>
+  </NvHitbox>
 </template>
 <script lang="ts" setup>
 import { NvButton, NvCard, NvStack, NvText } from '@packages/ui'
-import DomBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
+import NvHitbox from '@/modules/vue-hitboxes/NvHitbox.vue'
 import { useRoute } from 'vue-router'
 
 const navigation = [

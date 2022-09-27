@@ -1,11 +1,11 @@
 import ElectronWindowManager from '@/modules/electron-window-manager'
 import iohook, { IOHookEvent } from '@/modules/node-iohook'
 import { throttle } from 'lodash'
-import { Boundary } from '@/modules/vue-dom-boundaries/types'
+import { Hitbox } from '@/modules/vue-hitboxes/types'
 import { BrowserWindow, screen, shell } from 'electron'
 import { useMessengerStore, useMessengerWindowStore } from '@/teams/messenger/store'
 import { useSettingsStore } from '@/features/settings/store'
-import { useDomBoundariesStore } from '@/modules/vue-dom-boundaries/dom-boundaries.store'
+import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
 import { Deferred } from '@packages/toolbox'
 
 export const ElectronMessengerWindow = () => {
@@ -17,7 +17,7 @@ export const ElectronMessengerWindow = () => {
   // let lastKeypressTime = 0
   // const doubleKeypressDelta = 500
   let registeredWindow: BrowserWindow | null = null
-  let domBoundariesStore: ReturnType<typeof useDomBoundariesStore> | undefined
+  let hitboxesStore: ReturnType<typeof useHitboxesStore> | undefined
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
   let messengerStore: ReturnType<typeof useMessengerStore> | undefined
   let messengerWindowStore: ReturnType<typeof useMessengerWindowStore> | undefined
@@ -110,19 +110,19 @@ export const ElectronMessengerWindow = () => {
     })
 
   const onMouseMove = (event: IOHookEvent) => {
-    if (!domBoundariesStore) return
+    if (!hitboxesStore) return
     const window = getWindow()
     if (window) {
       if (!window.isDestroyed() && window.isVisible()) {
         const { x: mouseX = 0, y: mouseY = 0 } = event
         const [windowX, windowY] = window.getPosition()
-        const domBoundaries = domBoundariesStore.boundaries
-        const isWithinAnyBoundaries = domBoundaries.some(({ x, y, w, h }: Boundary) => {
-          const isWithinXBoundaries = mouseX >= windowX + x && mouseX <= windowX + x + w
-          const isWithinYBoundaries = mouseY >= windowY + y && mouseY <= windowY + y + h
-          return isWithinXBoundaries && isWithinYBoundaries
+        const { hitboxes } = hitboxesStore
+        const isWithinAnyHitboxes = hitboxes.some(({ x, y, w, h }: Hitbox) => {
+          const isWithinXHitbox = mouseX >= windowX + x && mouseX <= windowX + x + w
+          const isWithinYHitbox = mouseY >= windowY + y && mouseY <= windowY + y + h
+          return isWithinXHitbox && isWithinYHitbox
         })
-        if (isWithinAnyBoundaries) {
+        if (isWithinAnyHitboxes) {
           focus()
         } else {
           blur()
@@ -201,7 +201,7 @@ export const ElectronMessengerWindow = () => {
     settingsStore = localSettingsStore
     messengerStore = useMessengerStore()
     messengerWindowStore = useMessengerWindowStore()
-    domBoundariesStore = useDomBoundariesStore()
+    hitboxesStore = useHitboxesStore()
     registeredWindow = window
     settingsStore.$whenReady().then(() => {
       setDisplay(localSettingsStore.display)
