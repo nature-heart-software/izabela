@@ -9,6 +9,7 @@
         class="w-full h-full"
       />
     </div>
+    <NvDebug v-if="settingsStore.debugMode" />
   </ThemeProvider>
 </template>
 <style lang="scss">
@@ -25,6 +26,10 @@ import NvMessenger from '@/teams/messenger/components/NvMessenger.vue'
 import { tokens } from '@packages/ui'
 import NvBackground from '@/teams/messenger/components/NvBackground.vue'
 import { useMessengerStore } from '@/teams/messenger/store'
+import NvDebug from '@/teams/messenger/components/NvDebug.vue'
+import { useSettingsStore } from '@/features/settings/store'
 
 const messengerStore = useMessengerStore()
+const settingsStore = useSettingsStore()
+console.log(settingsStore)
 </script>

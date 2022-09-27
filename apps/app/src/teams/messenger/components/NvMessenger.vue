@@ -1,6 +1,6 @@
 <template>
   <div class="messengerWrapper">
-    <DomBoundary id="moveable" ref="moveableTarget" class="inline-flex">
+    <NvHitbox id="moveable" ref="moveableTarget" class="inline-flex">
       <div
         ref="messenger"
         class="messenger bg-gray-10/95 rounded grid p-4 gap-4 grid-rows-3 grid-rows-none min-w-[768px]"
@@ -27,7 +27,7 @@
           <NvMessengerInputBar />
         </NvGroup>
       </div>
-    </DomBoundary>
+    </NvHitbox>
     <Moveable
       ref="moveable"
       :bounds="{
@@ -61,7 +61,7 @@ import { ComponentPublicInstance, computed, defineProps, onMounted, provide, ref
 import Moveable from 'vue3-moveable'
 import { NvGroup } from '@packages/ui'
 import { RouteLocationRaw, useRouter } from 'vue-router'
-import DomBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
+import NvHitbox from '@/modules/vue-hitboxes/NvHitbox.vue'
 import { useRouterViewPopover } from '@/features/router/hooks'
 import { useMessengerStore } from '@/teams/messenger/store'
 import NvMessengerInputBar from '@/teams/messenger/components/NvMessengerInputBar.vue'

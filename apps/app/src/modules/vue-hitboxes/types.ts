@@ -1,4 +1,4 @@
-export interface Boundary {
+export interface Hitbox {
   id: string
   x: number
   y: number
