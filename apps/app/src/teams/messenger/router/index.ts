@@ -8,6 +8,8 @@ import NvSettingsStartup from '@/teams/messenger/views/NvSettingsStartup.vue'
 import NvSettingsUpdate from '@/teams/messenger/views/NvSettingsUpdate.vue'
 import NvSettingsDisplay from '@/teams/messenger/views/NvSettingsDisplay.vue'
 import NvSettingsKeybindings from '@/teams/messenger/views/NvSettingsKeybindings.vue'
+import NvMessages from '@/teams/messenger/views/NvMessages.vue'
+import NvMessagesHistory from '@/teams/messenger/views/NvMessagesHistory.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -54,6 +56,18 @@ const routes: Array<RouteRecordRaw> = [
         name: 'settings-update',
         path: 'update',
         component: NvSettingsUpdate,
+      },
+    ],
+  },
+  {
+    name: 'messages',
+    path: '/messages',
+    component: NvMessages,
+    children: [
+      {
+        name: 'messages-history',
+        path: 'history',
+        component: NvMessagesHistory,
       },
     ],
   },

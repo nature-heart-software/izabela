@@ -12,6 +12,7 @@ onIPCSay((payload: string | IzabelaMessagePayload) => {
     const engine = speechStore.currentSpeechEngine
     if (!engine) return
     message = {
+      message: payload,
       engine: engine.id,
       credentials: engine.getCredentials(),
       payload: engine.getPayload(payload),
