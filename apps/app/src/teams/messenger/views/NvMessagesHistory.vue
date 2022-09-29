@@ -1,9 +1,18 @@
 <template>
   <NvStack spacing="6">
     <NvStack>
-      <NvText type="subtitle">Last 50 messages</NvText>
+      <NvGroup justify="between">
+        <NvText type="subtitle">Last 50 messages</NvText>
+      </NvGroup>
       <NvStack spacing="4">
-        <template v-for="{ id, message, createdAt } in reversedHistory" :key="id">
+        <template v-if="messagesStore.reversedHistory.length === 0">
+          <NvCard>
+            <NvCenter>
+              <NvText>Send a message to see it appear here</NvText>
+            </NvCenter>
+          </NvCard>
+        </template>
+        <template v-for="{ id, message, createdAt } in messagesStore.reversedHistory" :key="id">
           <NvCard class="relative">
             <NvStack>
               <NvGroup align="start" justify="between" noWrap>
@@ -22,7 +31,24 @@
                     </UseTimeAgo>
                   </NvStack>
                 </NvGroup>
-                <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm" />
+                <NvContextMenu>
+                  <NvOption>
+                    <NvGroup>
+                      <NvIcon :size="3" name="download-alt" />
+                      Download
+                    </NvGroup>
+                  </NvOption>
+                  <NvOption @click="messagesStore.deleteMessage(id)">
+                    <NvGroup>
+                      <NvIcon :size="3" name="trash-alt" />
+                      Delete
+                    </NvGroup>
+                  </NvOption>
+
+                  <template #reference>
+                    <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm" />
+                  </template>
+                </NvContextMenu>
               </NvGroup>
               <div
                 v-if="playingMessageStore.id === id && playingMessageStore.progress < 1"
@@ -41,11 +67,20 @@
   </NvStack>
 </template>
 <script lang="ts" setup>
-import { NvButton, NvCard, NvGroup, NvStack, NvText } from '@packages/ui'
+import {
+  NvButton,
+  NvCard,
+  NvCenter,
+  NvContextMenu,
+  NvGroup,
+  NvIcon,
+  NvOption,
+  NvStack,
+  NvText,
+} from '@packages/ui'
 import { storeToRefs } from 'pinia'
 import { useMessagesStore, usePlayingMessageStore } from '@/features/messages/store'
 import { UseTimeAgo } from '@vueuse/components'
-import { computed } from 'vue'
 import { emitIPCSay } from '@/electron/events/renderer'
 import { getEngineById } from '@/modules/speech-engine-manager'
 import { purify } from '@packages/toolbox'
@@ -53,7 +88,6 @@ import { purify } from '@packages/toolbox'
 const messagesStore = useMessagesStore()
 const playingMessageStore = usePlayingMessageStore()
 const { history } = storeToRefs(messagesStore)
-const reversedHistory = computed(() => history.value.slice().reverse())
 const playMessage = (id: string) => {
   const message = history.value.find((m) => m.id === id)
   if (!message) return

@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-cycle
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { IzabelaHistoryMessage, IzabelaMessagePayload } from '@/modules/izabela/types'
 
 export const usePlayingMessageStore = defineStore(
@@ -34,7 +34,7 @@ export const useMessagesStore = defineStore(
         engine,
         payload,
         message,
-        createdAt: new Date().toString(),
+        createdAt: new Date().toISOString(),
       }
       if (history.value.length === 50) {
         history.value.splice(0, 1)
@@ -42,9 +42,20 @@ export const useMessagesStore = defineStore(
       history.value.push(historyMessage)
       return historyMessage
     }
+    const deleteMessage = (id: string) => {
+      history.value = history.value.filter((message) => message.id !== id)
+    }
+    const clearHistory = () => {
+      history.value = []
+    }
+
+    const reversedHistory = computed(() => history.value.slice().reverse())
     return {
       history,
       addToHistory,
+      deleteMessage,
+      clearHistory,
+      reversedHistory,
     }
   },
   {
