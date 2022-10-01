@@ -1,6 +1,12 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { Story } from '@storybook/vue3'
-import { NvButton, NvCenter, NvContextMenu, NvOption, NvText } from '@/components'
+import {
+  NvButton,
+  NvCenter,
+  NvContextMenu,
+  NvOption,
+  NvText,
+} from '@/components'
 
 export default {
   title: 'ContextMenu',
