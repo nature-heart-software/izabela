@@ -13,8 +13,8 @@
           </NvCard>
         </template>
         <template v-for="{ id, message, createdAt } in messagesStore.reversedHistory" :key="id">
-          <NvCard class="relative">
-            <NvStack>
+          <NvCard>
+            <NvStack v-loading="downloading.includes(id)">
               <NvGroup align="start" justify="between" noWrap>
                 <NvGroup align="start" class="w-full" noWrap>
                   <NvButton
@@ -31,23 +31,28 @@
                     </UseTimeAgo>
                   </NvStack>
                 </NvGroup>
-                <NvContextMenu>
-                  <NvOption>
-                    <NvGroup>
-                      <NvIcon :size="3" name="download-alt" />
-                      Download
-                    </NvGroup>
-                  </NvOption>
-                  <NvOption @click="messagesStore.deleteMessage(id)">
-                    <NvGroup>
-                      <NvIcon :size="3" name="trash-alt" />
-                      Delete
-                    </NvGroup>
-                  </NvOption>
-
-                  <template #reference>
-                    <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm" />
-                  </template>
+                <NvContextMenu
+                  :options="[
+                    {
+                      label: 'Download',
+                      icon: 'download-alt',
+                      onClick: () => {
+                        downloadMessageLocally(id)
+                      },
+                    },
+                    {
+                      type: 'divider',
+                    },
+                    {
+                      label: 'Delete',
+                      icon: 'trash-alt',
+                      onClick: () => {
+                        messagesStore.deleteMessage(id)
+                      },
+                    },
+                  ]"
+                >
+                  <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm" />
                 </NvContextMenu>
               </NvGroup>
               <div
@@ -67,27 +72,21 @@
   </NvStack>
 </template>
 <script lang="ts" setup>
-import {
-  NvButton,
-  NvCard,
-  NvCenter,
-  NvContextMenu,
-  NvGroup,
-  NvIcon,
-  NvOption,
-  NvStack,
-  NvText,
-} from '@packages/ui'
+import { NvButton, NvCard, NvCenter, NvContextMenu, NvGroup, NvStack, NvText } from '@packages/ui'
 import { storeToRefs } from 'pinia'
 import { useMessagesStore, usePlayingMessageStore } from '@/features/messages/store'
 import { UseTimeAgo } from '@vueuse/components'
 import { emitIPCSay } from '@/electron/events/renderer'
 import { getEngineById } from '@/modules/speech-engine-manager'
 import { purify } from '@packages/toolbox'
+import IzabelaMessage from '@/modules/izabela/IzabelaMessage'
+import { ref } from 'vue'
 
+const { ElectronFilesystem } = window
 const messagesStore = useMessagesStore()
 const playingMessageStore = usePlayingMessageStore()
 const { history } = storeToRefs(messagesStore)
+const downloading = ref<string[]>([])
 const playMessage = (id: string) => {
   const message = history.value.find((m) => m.id === id)
   if (!message) return
@@ -103,5 +102,39 @@ const playMessage = (id: string) => {
       credentials: engine.getCredentials(),
     }),
   )
+}
+const downloadMessageLocally = async (id: string) => {
+  downloading.value.push(id)
+  try {
+    const message = history.value.find((m) => m.id === id)
+    if (!message) return
+    const engine = getEngineById(message.engine)
+    if (!engine) return
+    const completeMessage = purify({
+      id,
+      message: message.message,
+      engine: message.engine,
+      payload: message.payload,
+      credentials: engine.getCredentials(),
+      excludeFromHistory: true,
+      disableAutoplay: true,
+    })
+    IzabelaMessage(completeMessage)
+      .downloadAudio()
+      .then(({ data }) => {
+        const reader = new FileReader()
+        reader.onload = () => {
+          ElectronFilesystem.downloadMessagePrompt(
+            completeMessage,
+            reader.result as string,
+          ).finally(() => {
+            downloading.value = downloading.value.filter((d) => d !== id)
+          })
+        }
+        reader.readAsDataURL(data)
+      })
+  } catch (error) {
+    downloading.value = downloading.value.filter((d) => d !== id)
+  }
 }
 </script>

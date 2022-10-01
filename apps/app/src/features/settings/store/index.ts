@@ -20,6 +20,7 @@ export const useSettingsStore = defineStore(
       ? 'rc'
       : 'latest'
 
+    const preferredSavDir = ref<null | string>(null)
     const playSpeechOnDefaultPlaybackDevice = ref(true)
     const audioOutputs = ref<MediaDeviceInfo['label'][]>([])
     const audioInput = ref<MediaDeviceInfo['label']>('default')
@@ -72,6 +73,7 @@ export const useSettingsStore = defineStore(
       ],
     })
     return {
+      preferredSavDir,
       playSpeechOnDefaultPlaybackDevice,
       audioOutputs,
       audioInput,

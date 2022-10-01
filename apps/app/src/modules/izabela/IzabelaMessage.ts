@@ -15,9 +15,10 @@ export default (messagePayload: IzabelaMessagePayload) => {
     payload,
     credentials,
     excludeFromHistory,
+    disableAutoplay,
   } = messagePayload
   const id = existingId || uuid()
-  const audio = new Audio()
+  let audio: HTMLAudioElement
   const emitter = mitt()
   const audioDownloaded = Deferred()
   const audioLoaded = Deferred()
@@ -78,12 +79,16 @@ export default (messagePayload: IzabelaMessagePayload) => {
   function downloadAudio() {
     // TODO: change depending on engine
     const engine = getEngineById(engineName)
-    if (!engine)
-      return Promise.reject(new Error('Izabela Message: Selected engine was   not found'))
-    return engine.synthesizeSpeech({
-      credentials,
-      payload,
-    })
+    if (!engine) return Promise.reject(new Error('Izabela Message: Selected engine was not found'))
+    return engine
+      .synthesizeSpeech({
+        credentials,
+        payload,
+      })
+      .then((res) => {
+        audioDownloaded.resolve(true)
+        return Promise.resolve(res)
+      })
   }
 
   function loadAudio(blob: Blob) {
@@ -112,18 +117,21 @@ export default (messagePayload: IzabelaMessagePayload) => {
     audioLoaded.reject(e)
   }
 
-  addEventListeners()
-  downloadAudio()
-    .then(({ data }) => {
-      audioDownloaded.resolve(true)
-      loadAudio(data)
-    })
-    .catch((reason) => onError(reason))
+  if (!disableAutoplay) {
+    audio = new Audio()
+    addEventListeners()
+    downloadAudio()
+      .then(({ data }) => {
+        loadAudio(data)
+      })
+      .catch((reason) => onError(reason))
+  }
 
   return {
     id,
     isReady,
     play,
     on,
+    downloadAudio,
   }
 }

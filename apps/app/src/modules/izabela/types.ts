@@ -13,6 +13,7 @@ export interface IzabelaMessagePayload {
     [key: string]: any
   }
   excludeFromHistory?: boolean
+  disableAutoplay?: boolean
 }
 
 export interface IzabelaHistoryMessage extends Omit<IzabelaMessagePayload, 'credentials'> {

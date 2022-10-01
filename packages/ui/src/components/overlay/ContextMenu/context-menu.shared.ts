@@ -6,6 +6,23 @@ export const props = {
     type: Object as PropType<TippyOptions>,
     default: () => ({}),
   },
+  options: {
+    type: Array as PropType<
+      (
+        | {
+            type?: 'option'
+            label?: string
+            icon?: string
+            disabled?: boolean
+            onClick?: () => void
+          }
+        | {
+            type: 'divider'
+          }
+      )[]
+    >,
+    default: () => [],
+  },
 }
 
 export type Props = ExtractPropTypes<typeof props>
