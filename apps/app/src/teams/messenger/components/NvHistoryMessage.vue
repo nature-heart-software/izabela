@@ -4,6 +4,7 @@
       <NvGroup align="start" justify="between" noWrap>
         <NvGroup align="start" class="!flex-1 min-w-0" noWrap>
           <NvButton
+            :loading="requestingToPlay"
             class="shrink-0"
             icon-name="play"
             size="sm"
@@ -65,7 +66,7 @@
 import { NvButton, NvCard, NvContextMenu, NvGroup, NvStack, NvText } from '@packages/ui'
 import { useMessagesStore, usePlayingMessageStore } from '@/features/messages/store'
 import { storeToRefs } from 'pinia'
-import { computed, defineProps, ref } from 'vue'
+import { computed, defineProps, ref, watch } from 'vue'
 import { getEngineById } from '@/modules/speech-engine-manager'
 import { emitIPCSay } from '@/electron/events/renderer'
 import { purify } from '@packages/toolbox'
@@ -84,14 +85,24 @@ const messagesStore = useMessagesStore()
 const playingMessageStore = usePlayingMessageStore()
 const { history } = storeToRefs(messagesStore)
 const downloading = ref(false)
+const requestingToPlay = ref(false)
 const message = computed(() => history.value.find((m) => m.id === props.id))
 const engine = computed(() => {
   if (!message.value) return null
   return getEngineById(message.value.engine)
 })
 
+watch(
+  () => playingMessageStore.progress,
+  () => {
+    if (playingMessageStore.id === props.id) {
+      requestingToPlay.value = false
+    }
+  },
+)
 const playMessage = () => {
   if (!message.value || !engine.value) return
+  requestingToPlay.value = true
   emitIPCSay(
     purify({
       id: props.id,

@@ -1,5 +1,6 @@
 <template>
   <StButton
+    v-loading="props.loading"
     v-bind="{
       ...props,
       squared: props.squared || isVNodeEmpty($slots.default),
@@ -23,7 +24,9 @@ import tokens from '@/styles/tokens'
 import { StButton } from './button.styled'
 import { props as propsDefinition, Size } from './button.shared'
 import NvIcon from '@/components/typography/Icon/NvIcon.vue'
+import { ElLoadingDirective } from 'element-plus'
 
+const vLoading = ElLoadingDirective
 const props = defineProps(propsDefinition)
 const iconSize = computed(() => {
   const sizes: Record<Size, keyof typeof tokens.spacing> = {
