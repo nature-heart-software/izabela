@@ -1,9 +1,8 @@
-import { copyFile, mkdir, stat } from 'fs/promises'
+import { copyFile, mkdir, stat, writeFile } from 'fs/promises'
 import path from 'path'
 import { app, BrowserWindow, dialog } from 'electron'
 import { IzabelaMessagePayload } from '@/modules/izabela/types'
 import ElectronWindowManager from '@/modules/electron-window-manager'
-import * as fs from 'fs'
 import { useSettingsStore } from '@/features/settings/store'
 
 export const ElectronFilesystem = () => ({
@@ -54,7 +53,7 @@ export const ElectronFilesystem = () => ({
       options,
     )
     if (!res.filePath) return Promise.reject(Error('No file selected'))
-    fs.writeFileSync(res.filePath, content.split(',').pop() as string, 'base64')
+    await writeFile(res.filePath, content.split(',').pop() as string, 'base64')
     settingsStore.preferredSavDir = path.dirname(res.filePath)
     return Promise.resolve(res.filePath)
   },
