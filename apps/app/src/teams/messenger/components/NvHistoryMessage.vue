@@ -92,7 +92,7 @@ const engine = computed(() => {
   if (!message.value) return null
   return getEngineById(message.value.engine)
 })
-const formatedCreatedAt = useDateFormat(message.value?.createdAt, 'YYYY_MM_DD_HH_mm_ss')
+const formatedCreatedAt = useDateFormat(message.value?.createdAt, 'YYYYMMDDHHmmss')
 
 watch(
   () => playingMessageStore.progress,
@@ -141,7 +141,7 @@ const downloadMessageLocally = async () => {
             completeMessage,
             `${formatedCreatedAt.value} - ${engine.value?.name} - ${engine.value?.getVoiceName(
               message.value?.voice,
-            )} - ${message.value?.message}`,
+            )} - ${message.value?.message}`.replace(/([^a-z0-9\s-]+)/gi, '_'),
             reader.result as string,
           ).finally(() => {
             downloading.value = false
