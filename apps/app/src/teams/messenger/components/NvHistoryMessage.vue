@@ -72,6 +72,7 @@ import { emitIPCSay } from '@/electron/events/renderer'
 import { purify } from '@packages/toolbox'
 import IzabelaMessage from '@/modules/izabela/IzabelaMessage'
 import { UseTimeAgo } from '@vueuse/components'
+import { useDateFormat } from '@vueuse/core'
 
 const props = defineProps({
   id: {
@@ -91,6 +92,7 @@ const engine = computed(() => {
   if (!message.value) return null
   return getEngineById(message.value.engine)
 })
+const formatedCreatedAt = useDateFormat(message.value?.createdAt, 'YYYY_MM_DD_HH_mm_ss')
 
 watch(
   () => playingMessageStore.progress,
@@ -137,6 +139,9 @@ const downloadMessageLocally = async () => {
         reader.onload = () => {
           ElectronFilesystem.downloadMessagePrompt(
             completeMessage,
+            `${formatedCreatedAt.value} - ${engine.value?.name} - ${engine.value?.getVoiceName(
+              message.value?.voice,
+            )} - ${message.value?.message}`,
             reader.result as string,
           ).finally(() => {
             downloading.value = false

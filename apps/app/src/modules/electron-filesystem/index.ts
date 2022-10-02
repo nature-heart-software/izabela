@@ -27,7 +27,11 @@ export const ElectronFilesystem = () => ({
       .then(() => googleCloudSpeechCredentialsFilePath)
       .catch(() => '')
   },
-  async downloadMessagePrompt(message: IzabelaMessagePayload, content: string): Promise<string> {
+  async downloadMessagePrompt(
+    message: IzabelaMessagePayload,
+    filename: string,
+    content: string,
+  ): Promise<string> {
     const settingsStore = useSettingsStore()
     await settingsStore.$whenReady()
     const extension = content.split(';')[0].split('/')[1]
@@ -37,7 +41,7 @@ export const ElectronFilesystem = () => ({
         : app.getPath('downloads')
     const options = {
       title: 'Save file',
-      defaultPath: path.join(directory, `${message.message}.${extension}`),
+      defaultPath: path.join(directory, `${filename}.${extension}`),
       // defaultPath: app.getPath('downloads'),
       filters: [
         {
