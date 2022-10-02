@@ -8,6 +8,7 @@ export type Payload = { [key: string]: any }
 export interface SpeechEngine {
   id: string
   name: string
+  getVoiceName: (voice: any) => string
   getCredentials: () => Credentials
   getLanguageCode: () => string
   getPayload: (text: string) => Payload

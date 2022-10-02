@@ -3,7 +3,7 @@ import { registerEngine } from '@/modules/speech-engine-manager'
 import type { SpeechEngine } from '@/modules/speech-engine-manager/types'
 import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
-import { ENGINE_ID, ENGINE_NAME } from './consts'
+import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, setProperty } from './store'
 
 const getCredentials = () => ({
@@ -17,6 +17,7 @@ const commands: SpeechEngine['commands'] = (voice) =>
 registerEngine({
   id: ENGINE_ID,
   name: ENGINE_NAME,
+  getVoiceName,
   getCredentials,
   hasCredentials() {
     return Object.values(getCredentials()).every(Boolean)

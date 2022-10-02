@@ -14,7 +14,7 @@ import { useQueryClient } from 'vue-query'
 import { NvSelect } from '@packages/ui'
 import { purify } from '@packages/toolbox'
 import { useListVoicesQuery } from './hooks'
-import { LIST_VOICES_QUERY_KEY } from './consts'
+import { getVoiceName, LIST_VOICES_QUERY_KEY } from './shared'
 import { getProperty, setProperty } from './store'
 
 const queryClient = useQueryClient()
@@ -30,7 +30,7 @@ const { data, isFetching } = useListVoicesQuery(computedParams, {
 const voices = computed(() => data.value || [])
 const options = computed(() =>
   voices.value.map((voice: any) => ({
-    label: `${voice.name} - ${voice.ssmlGender}`,
+    label: getVoiceName(voice),
     value: voice,
   })),
 )

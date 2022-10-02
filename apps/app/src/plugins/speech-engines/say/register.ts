@@ -3,12 +3,13 @@ import { DEFAULT_LANGUAGE_CODE } from '@/consts'
 import { registerEngine } from '@/modules/speech-engine-manager'
 import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
-import { ENGINE_ID, ENGINE_NAME } from './consts'
+import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, setProperty } from './store'
 
 registerEngine({
   id: ENGINE_ID,
   name: ENGINE_NAME,
+  getVoiceName,
   getCredentials() {
     return {}
   },
