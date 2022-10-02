@@ -14,6 +14,7 @@ onIPCSay((payload: string | IzabelaMessagePayload) => {
     message = {
       message: payload,
       engine: engine.id,
+      voice: engine.getSelectedVoice(),
       credentials: engine.getCredentials(),
       payload: engine.getPayload(payload),
     }

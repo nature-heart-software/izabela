@@ -10,9 +10,11 @@ const getCredentials = () => ({
   privateKey: getProperty('privateKey', true),
 })
 
+const getSelectedVoice = () => getProperty('selectedVoice')
 registerEngine({
   id: ENGINE_ID,
   name: ENGINE_NAME,
+  getSelectedVoice,
   getVoiceName,
   getCredentials,
   hasCredentials() {
@@ -21,11 +23,11 @@ registerEngine({
   getPayload(text) {
     return {
       text,
-      voicemodel_uuid: getProperty('selectedVoice').voicemodel_uuid,
+      voicemodel_uuid: getSelectedVoice().voicemodel_uuid,
     }
   },
   getLanguageCode() {
-    return getProperty('selectedVoice').language
+    return getSelectedVoice().language
   },
   synthesizeSpeech({ credentials, payload }) {
     return api.post<Blob>(

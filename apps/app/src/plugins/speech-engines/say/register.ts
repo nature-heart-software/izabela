@@ -6,9 +6,11 @@ import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, setProperty } from './store'
 
+const getSelectedVoice = () => getProperty('selectedVoice')
 registerEngine({
   id: ENGINE_ID,
   name: ENGINE_NAME,
+  getSelectedVoice,
   getVoiceName,
   getCredentials() {
     return {}
@@ -16,7 +18,7 @@ registerEngine({
   getPayload(text) {
     return {
       text,
-      voice: getProperty('selectedVoice'),
+      voice: getSelectedVoice(),
     }
   },
   getLanguageCode() {

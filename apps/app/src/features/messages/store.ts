@@ -27,13 +27,14 @@ export const useMessagesStore = defineStore(
     const history = ref<IzabelaHistoryMessage[]>([])
     const addToHistory = (
       id: string,
-      { engine, payload, message }: IzabelaMessagePayload,
+      { engine, payload, message, voice }: IzabelaMessagePayload,
     ): IzabelaHistoryMessage => {
       const historyMessage: IzabelaHistoryMessage = {
         id,
         engine,
         payload,
         message,
+        voice,
         createdAt: new Date().toISOString(),
       }
       if (history.value.length === 50) {

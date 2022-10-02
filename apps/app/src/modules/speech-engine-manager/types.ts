@@ -9,6 +9,7 @@ export interface SpeechEngine {
   id: string
   name: string
   getVoiceName: (voice: any) => string
+  getSelectedVoice: () => any
   getCredentials: () => Credentials
   getLanguageCode: () => string
   getPayload: (text: string) => Payload

@@ -6,6 +6,7 @@ export interface IzabelaMessagePayload {
   id?: string
   message: string
   engine: SpeechEngine['id']
+  voice: Record<any, any>
   credentials: {
     [key: string]: any
   }
