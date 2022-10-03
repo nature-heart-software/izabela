@@ -77,6 +77,7 @@ export const StButton = styled('button', props)`
   border-width: ${() => rem(borderWidth.DEFAULT)};
   outline: 0;
   transition: ${() => transition.DEFAULT};
+  overflow: hidden;
 
   ${({ align = '' }) => align && `justify-content: ${align};`}
   ${(props) => styleBySize(props)}

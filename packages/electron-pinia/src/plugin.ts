@@ -4,31 +4,35 @@ import { shareStatePlugin } from './share-state-plugin'
 import { PluginCustomProperties, StoreOptions } from './types'
 import { ref } from 'vue'
 import 'pinia'
+import { Deferred } from '@packages/toolbox'
 
 export const plugin = (() => {
-  const stores = new Map()
   const plugin: () => PiniaPlugin =
     () =>
     ({ store, options: storeOptions, ...rest }) => {
       const options = storeOptions as StoreOptions
-      let state: PluginCustomProperties = {
-        $isReady: ref(true),
-        $whenReady: () => Promise.resolve(true),
+      const { promise: whenAllReady, resolve, reject } = Deferred<boolean>()
+      const state: PluginCustomProperties = {
+        $isReady: ref(false),
+        $whenReady: () => whenAllReady,
       }
-      if (options.electron) {
-        stores.set(store.$id, store)
-        if (options.electron.persisted) {
-          state = {
-            ...state,
-            ...persistStatePlugin({ store, options, ...rest }),
-          }
-        }
-        if (options.electron.shared) {
-          state.$whenReady().then(() => {
-            shareStatePlugin({ store, options, ...rest })
-          })
-        }
-      }
+      const isPersisted = options.electron?.persisted
+      const isShared = options.electron?.shared
+      ;(isPersisted
+        ? persistStatePlugin({ store, options, ...rest })
+        : Promise.resolve(true)
+      )
+        .then(() =>
+          isShared
+            ? shareStatePlugin({ store, options, ...rest })
+            : Promise.resolve(true),
+        )
+        .then(() => {
+          state.$isReady.value = true
+          resolve(true)
+        })
+        .catch(reject)
+
       return state
     }
   return plugin

@@ -15,7 +15,7 @@ import { NvSelect } from '@packages/ui'
 import { purify } from '@packages/toolbox'
 import { orderBy } from 'lodash'
 import { useListVoicesQuery } from './hooks'
-import { LIST_VOICES_QUERY_KEY } from './consts'
+import { getVoiceName, LIST_VOICES_QUERY_KEY } from './shared'
 import { getProperty, setProperty } from './store'
 
 const queryClient = useQueryClient()
@@ -33,7 +33,7 @@ const { data, isFetching } = useListVoicesQuery({
 const voices = computed(() => orderBy(data.value || [], 'display_name'))
 const options = computed(() =>
   voices.value.map((voice) => ({
-    label: `${voice.display_name}`,
+    label: getVoiceName(voice),
     value: voice,
   })),
 )

@@ -11,7 +11,6 @@ import {
 } from './consts'
 import { Deferred, purify } from '@packages/toolbox'
 import { isMain } from './electron'
-import { ref } from 'vue'
 
 function getStorage(): ElectronStore {
   return isMain ? global.ElectronPiniaStorage : window.ElectronPiniaStorage
@@ -38,8 +37,7 @@ if (isMain) {
   })
 }
 
-export const persistStatePlugin: PiniaPlugin = ({ store }) => {
-  const $isReady = ref(false)
+export const persistStatePlugin = ({ store }: Parameters<PiniaPlugin>[0]) => {
   const deferredIsReady = Deferred<boolean>()
   const storage = getStorage()
 
@@ -70,15 +68,11 @@ export const persistStatePlugin: PiniaPlugin = ({ store }) => {
 
   loadInitialState()
     .then(() => {
-      $isReady.value = true
       deferredIsReady.resolve(true)
       store.$subscribe((_, state) => setState(state))
     })
     .catch(() => {
       deferredIsReady.reject(false)
     })
-  return {
-    $isReady,
-    $whenReady: () => deferredIsReady.promise,
-  }
+  return deferredIsReady.promise
 }

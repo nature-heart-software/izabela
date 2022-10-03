@@ -1,5 +1,5 @@
 import { definePluginStore } from '@/store'
-import { ENGINE_ID } from './consts'
+import { ENGINE_ID } from './shared'
 
 export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
   apiKey: '',
@@ -14,5 +14,19 @@ export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
     SampleRateHertz: '24000',
     VoiceType: 'Neural',
     Status: 'GA',
+    LocaleName: 'English (United States)',
+    StyleList: [
+      'angry',
+      'cheerful',
+      'excited',
+      'friendly',
+      'hopeful',
+      'sad',
+      'shouting',
+      'terrified',
+      'unfriendly',
+      'whispering',
+    ],
+    WordsPerMinute: '149',
   },
 })

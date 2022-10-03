@@ -3,7 +3,7 @@ import { registerEngine } from '@/modules/speech-engine-manager'
 import type { SpeechEngine } from '@/modules/speech-engine-manager/types'
 import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
-import { ENGINE_ID, ENGINE_NAME } from './consts'
+import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, setProperty } from './store'
 
 const getCredentials = () => ({
@@ -14,15 +14,18 @@ const getCredentials = () => ({
 const commands: SpeechEngine['commands'] = (voice) =>
   (voice.StyleList || []).map((style: string) => ({ name: style, value: style }))
 
+const getSelectedVoice = () => getProperty('selectedVoice')
 registerEngine({
   id: ENGINE_ID,
   name: ENGINE_NAME,
+  getSelectedVoice,
+  getVoiceName,
   getCredentials,
   hasCredentials() {
     return Object.values(getCredentials()).every(Boolean)
   },
   getPayload(text) {
-    const voice = getProperty('selectedVoice')
+    const voice = getSelectedVoice()
     let newText = text
     let expression
     const commandString = newText.split(' ')[0] || ''
@@ -35,12 +38,12 @@ registerEngine({
     }
     return {
       text: newText,
-      voice: getProperty('selectedVoice'),
+      voice: getSelectedVoice(),
       expression,
     }
   },
   getLanguageCode() {
-    return getProperty('selectedVoice').Locale
+    return getSelectedVoice().Locale
   },
   synthesizeSpeech({ credentials, payload }) {
     return api.post<Blob>(

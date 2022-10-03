@@ -32,6 +32,10 @@ export const props = {
     type: String as PropType<Properties['textAlign']>,
     default: '',
   },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
 }
 
 export type Props = ExtractPropTypes<typeof props>
