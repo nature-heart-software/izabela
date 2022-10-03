@@ -8,7 +8,7 @@
             class="shrink-0"
             icon-name="play"
             size="sm"
-            @click="() => !playingMessageStore.isPlaying && playMessage()"
+            @click="() => playMessage()"
           />
           <NvStack class="!flex-1 min-h-0">
             <NvText>{{ message.message || id }}</NvText>
