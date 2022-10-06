@@ -33,7 +33,6 @@
     "@vueuse/components": "^9.3.0",
     "@vueuse/core": "^9.1.1",
     "@vueuse/integrations": "^9.2.0",
-    "@wurielle/generate-modules-webpack-plugin": "^0.1.0",
     "axios": "^0.27.2",
     "bluebird": "^3.7.2",
     "crypto-js": "^4.1.1",
