@@ -11,13 +11,9 @@
             @click="() => playMessage()"
           />
           <NvStack class="!flex-1 min-h-0">
-            <NvInput
-              v-model="data.message"
-              size="sm" />
+            <NvInput v-model="data.message" size="sm" />
             <NvGroup noWrap>
-              <NvSpeechEngineSelect
-                class="w-1/3"
-                v-model="data.engine" size="sm" />
+              <NvSpeechEngineSelect class="w-1/3" v-model="data.engine" size="sm" />
               <template v-if="engine">
                 <component
                   class="w-1/3"
@@ -28,7 +24,7 @@
                   v-model="data.selectedVoice[data.engine]"
                 />
               </template>
-              <NvKeybinding class="w-1/3" v-model="data.shortcut" size="sm" multiple/>
+              <NvKeybinding class="w-1/3" v-model="data.shortcut" size="sm" multiple />
             </NvGroup>
           </NvStack>
         </NvGroup>
@@ -85,36 +81,44 @@ const { shortcutMessages } = storeToRefs(messagesStore)
 const message = computed(() => shortcutMessages.value.find((m) => m.id === props.id))
 const isDataProvided = ref(false)
 const data = reactive({
-  message:'',
+  message: '',
   engine: '',
   selectedVoice: {} as Record<string, unknown>,
   shortcut: [] as Key[],
 })
 
-watch(() => message, () => {
-  if (!isDataProvided.value) {
-    if (message.value) isDataProvided.value = true
-    const engine = message.value?.engine || settingsStore.selectedSpeechEngine
-    data.engine = engine
-    data.selectedVoice[engine] = message.value?.voice
-    data.shortcut = message.value?.shortcut || ([] as Key[])
-    data.message = message.value?.message || ''
-  }
-}, { deep: true, immediate: true })
+watch(
+  () => message,
+  () => {
+    if (!isDataProvided.value) {
+      if (message.value) isDataProvided.value = true
+      const engine = message.value?.engine || settingsStore.selectedSpeechEngine
+      data.engine = engine
+      data.selectedVoice[engine] = message.value?.voice
+      data.shortcut = message.value?.shortcut || ([] as Key[])
+      data.message = message.value?.message || ''
+    }
+  },
+  { deep: true, immediate: true },
+)
 const requestingToPlay = ref(false)
 const engine = computed(() => {
   if (!data.engine) return null
   return getEngineById(data.engine)
 })
 
-watch(() => data, () => {
-  messagesStore.updateShortcutMessage(props.id, {
-    engine: data.engine,
-    voice: data.selectedVoice[data.engine],
-    shortcut: data.shortcut,
-    message: data.message,
-  })
-}, { deep: true })
+watch(
+  () => data,
+  () => {
+    messagesStore.updateShortcutMessage(props.id, {
+      engine: data.engine,
+      voice: data.selectedVoice[data.engine],
+      shortcut: data.shortcut,
+      message: data.message,
+    })
+  },
+  { deep: true },
+)
 
 watch(
   () => playingMessageStore.progress,

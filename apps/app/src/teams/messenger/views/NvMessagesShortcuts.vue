@@ -18,17 +18,19 @@
 <script lang="ts" setup>
 import { NvCard, NvCenter, NvGroup, NvStack, NvText, NvButton } from '@packages/ui'
 import { useMessagesStore } from '@/features/messages/store'
-import {v4 as uuid } from 'uuid'
+import { v4 as uuid } from 'uuid'
 import NvShortcutMessage from '@/teams/messenger/components/NvShortcutMessage.vue'
 import { useSpeechStore } from '@/features/speech/store'
 
 const messagesStore = useMessagesStore()
 const speechStore = useSpeechStore()
-const addShortcut = () => speechStore.currentSpeechEngine && messagesStore.addShortcutMessage({
-  id: uuid(),
-  engine: speechStore.currentSpeechEngine.id,
-  voice: speechStore.currentSpeechEngine.getSelectedVoice(),
-  message: '',
-  shortcut: [],
-})
+const addShortcut = () =>
+  speechStore.currentSpeechEngine &&
+  messagesStore.addShortcutMessage({
+    id: uuid(),
+    engine: speechStore.currentSpeechEngine.id,
+    voice: speechStore.currentSpeechEngine.getSelectedVoice(),
+    message: '',
+    shortcut: [],
+  })
 </script>

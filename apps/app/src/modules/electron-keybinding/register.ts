@@ -33,16 +33,18 @@ export default () =>
 
     const setShortcutMessagesKeybindings = () => {
       messagesStore.shortcutMessages.forEach((message) => {
-        const keybinding = message.shortcut
-          .map(({ key }: Key) => key)
-          .join('+')
+        const keybinding = message.shortcut.map(({ key }: Key) => key).join('+')
         globalShortcut.register(keybinding, () => {
-          ipcMain.sendTo('speech-worker', 'say', purify({
-            message: message.message,
-            voice: message.voice,
-            engine: message.engine,
-            id: message.id,
-          }) as IzabelaMessage)
+          ipcMain.sendTo(
+            'speech-worker',
+            'say',
+            purify({
+              message: message.message,
+              voice: message.voice,
+              engine: message.engine,
+              id: message.id,
+            }) as IzabelaMessage,
+          )
         })
         registeredShortcuts[message.id] = keybinding
       })
@@ -56,10 +58,7 @@ export default () =>
 
     registerAllShortcuts()
     watch(
-      () => [
-        settingsStore.keybindings.toggleMessengerWindow,
-        messagesStore.shortcutMessages,
-      ],
+      () => [settingsStore.keybindings.toggleMessengerWindow, messagesStore.shortcutMessages],
       registerAllShortcuts,
       { deep: true },
     )
