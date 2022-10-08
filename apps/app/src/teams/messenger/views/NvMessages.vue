@@ -67,6 +67,10 @@ const navigation = [
         name: 'History',
         to: { name: 'messages-history' },
       },
+      {
+        name: 'Shortcuts',
+        to: { name: 'messages-shortcuts' },
+      },
     ],
   },
 ]

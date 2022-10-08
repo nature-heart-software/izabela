@@ -12,7 +12,7 @@ export interface SpeechEngine {
   getSelectedVoice: () => any
   getCredentials: () => Credentials
   getLanguageCode: () => string
-  getPayload: (text: string) => Payload
+  getPayload: (text: string, voice?: any) => Payload
   synthesizeSpeech: (context: {
     credentials: Credentials
     payload: Payload

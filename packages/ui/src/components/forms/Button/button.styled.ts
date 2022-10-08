@@ -70,6 +70,7 @@ const styleBySquared = ({ squared, size }: Props) => {
 }
 
 export const StButton = styled('button', props)`
+  flex-shrink: 0;
   position: relative;
   display: inline-flex;
   align-items: center;

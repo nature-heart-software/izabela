@@ -42,7 +42,7 @@
               label: 'Delete',
               icon: 'trash-alt',
               onClick: () => {
-                messagesStore.deleteMessage(id)
+                messagesStore.removeHistoryMessage(id)
               },
             },
           ]"
@@ -111,8 +111,6 @@ const playMessage = () => {
       message: message.value.message,
       engine: message.value.engine,
       voice: engine.value.getSelectedVoice(),
-      payload: message.value.payload,
-      credentials: engine.value.getCredentials(),
       excludeFromHistory: true,
     }),
   )
