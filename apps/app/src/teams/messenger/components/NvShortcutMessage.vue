@@ -4,11 +4,11 @@
       <NvGroup align="start" justify="between" noWrap>
         <NvGroup align="start" class="!flex-1 min-w-0" noWrap>
           <NvButton
-            :loading="requestingToPlay"
+            :loading="isLoading"
             class="shrink-0"
             icon-name="play"
             size="sm"
-            @click="() => playMessage()"
+            @click="() => play()"
           />
           <NvStack class="!flex-1 min-h-0">
             <NvAutocomplete
@@ -74,11 +74,11 @@
         </NvContextMenu>
       </NvGroup>
       <div
-        v-if="playingMessageStore.id === id && playingMessageStore.progress < 1"
+        v-if="isPlaying"
         class="h-2 relative bg-gray-10"
       >
         <div
-          :style="{ width: `${playingMessageStore.progress * 100}%` }"
+          :style="{ width: `${progress * 100}%` }"
           class="h-full bg-black"
         ></div>
       </div>
@@ -97,18 +97,17 @@ import {
   NvStack,
   NvText,
 } from '@packages/ui'
-import { useMessagesStore, usePlayingMessageStore } from '@/features/messages/store'
+import { useMessagesStore } from '@/features/messages/store'
 import { storeToRefs } from 'pinia'
 import { computed, defineProps, reactive, ref, watch } from 'vue'
 import { getEngineById } from '@/modules/speech-engine-manager'
-import { emitIPCSay } from '@/electron/events/renderer'
-import { purify } from '@packages/toolbox'
 import NvSpeechEngineSelect from '@/features/speech/components/inputs/NvSpeechEngineSelect.vue'
 import { useSettingsStore } from '@/features/settings/store'
 import NvKeybinding from '@/features/app/components/inputs/NvKeybinding.vue'
 import { Key } from '@/types/keybinds'
 import { useFuse, UseFuseOptions } from '@vueuse/integrations/useFuse'
 import { orderBy } from 'lodash'
+import { usePlayMessage } from '@/features/messages/hooks'
 
 const props = defineProps({
   id: {
@@ -119,7 +118,6 @@ const props = defineProps({
 
 const messagesStore = useMessagesStore()
 const settingsStore = useSettingsStore()
-const playingMessageStore = usePlayingMessageStore()
 const { shortcutMessages } = storeToRefs(messagesStore)
 const message = computed(() => shortcutMessages.value.find((m) => m.id === props.id))
 const isDataProvided = ref(false)
@@ -140,7 +138,6 @@ watch(() => message, () => {
     data.message = message.value?.message || ''
   }
 }, { deep: true, immediate: true })
-const requestingToPlay = ref(false)
 const engine = computed(() => {
   if (!data.engine) return null
   return getEngineById(data.engine)
@@ -208,25 +205,12 @@ watch(() => data.engine, () => {
   }
 }, { immediate: true })
 
-watch(
-  () => playingMessageStore.progress,
-  () => {
-    if (playingMessageStore.id === props.id) {
-      requestingToPlay.value = false
-    }
-  },
-)
-
-const playMessage = () => {
-  if (!message.value || !engine.value) return
-  requestingToPlay.value = true
-  const payload = purify({
-    id: props.id,
-    message: data.message,
-    engine: data.engine,
-    voice: data.selectedVoice[data.engine],
-    excludeFromHistory: true,
-  })
-  emitIPCSay(payload)
-}
+const playMessage = computed(() => ({
+  id: props.id,
+  message: data.message,
+  engine: data.engine,
+  voice: data.selectedVoice[data.engine],
+  excludeFromHistory: true,
+}))
+const { play, isPlaying, isLoading, progress } = usePlayMessage(playMessage)
 </script>
