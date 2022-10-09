@@ -20,7 +20,7 @@ export interface SpeechEngine {
   hasCredentials?: () => boolean
   voiceSelectComponent: Component
   settingsComponent: Component
-  commands?: (voice: Record<any, any>) => {
+  commands?: (voice: any) => {
     name: string
     value: string
     description?: string

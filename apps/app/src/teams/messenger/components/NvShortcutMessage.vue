@@ -1,6 +1,6 @@
 <template>
   <NvCard>
-    <NvStack v-loading="downloading">
+    <NvStack>
       <NvGroup align="start" justify="between" noWrap>
         <NvGroup align="start" class="!flex-1 min-w-0" noWrap>
           <NvButton
@@ -11,24 +11,51 @@
             @click="() => playMessage()"
           />
           <NvStack class="!flex-1 min-h-0">
-            <NvInput
-              v-model="data.message"
-              size="sm" />
-            <NvGroup noWrap>
-              <NvSpeechEngineSelect
-                class="w-1/3"
-                v-model="data.engine" size="sm" />
-              <template v-if="engine">
-                <component
-                  class="w-1/3"
-                  :is="engine.voiceSelectComponent"
-                  v-if="engine.voiceSelectComponent"
-                  placeholder="Speech Voice"
+            <NvAutocomplete
+              :autoScrollIndex="autocompleteValues.length - 1"
+              :options="autocompleteValues"
+              :selectOnTab="true"
+              :visible="isAutocompleteVisible"
+              class="w-full"
+              placement="top-start"
+              valueKey="value"
+              @select="onAutocompleteSelect"
+            >
+              <template #reference>
+                <NvInput
+                  v-model="data.message"
+                  class="w-full"
                   size="sm"
-                  v-model="data.selectedVoice[data.engine]"
                 />
               </template>
-              <NvKeybinding class="w-1/3" v-model="data.shortcut" size="sm" multiple/>
+              <template #default="{ item, active }">
+                <NvOption v-if="item" :active="active">
+                  <NvGroup>
+                    <NvText type="label">
+                      {{ item.command }}
+                    </NvText>
+                    <NvText v-if="item.description" type="caption">
+                      {{ item.description }}
+                    </NvText>
+                  </NvGroup>
+                </NvOption>
+              </template>
+            </NvAutocomplete>
+            <NvGroup noWrap>
+              <NvSpeechEngineSelect
+                v-model="data.engine"
+                class="w-1/3" size="sm"/>
+              <template v-if="engine">
+                <component
+                  :is="engine.voiceSelectComponent"
+                  v-if="engine.voiceSelectComponent"
+                  v-model="data.selectedVoice[data.engine]"
+                  class="w-1/3"
+                  placeholder="Speech Voice"
+                  size="sm"
+                />
+              </template>
+              <NvKeybinding v-model="data.shortcut" class="w-1/3" multiple size="sm"/>
             </NvGroup>
           </NvStack>
         </NvGroup>
@@ -43,7 +70,7 @@
             },
           ]"
         >
-          <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm" />
+          <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm"/>
         </NvContextMenu>
       </NvGroup>
       <div
@@ -59,10 +86,20 @@
   </NvCard>
 </template>
 <script lang="ts" setup>
-import { NvButton, NvCard, NvContextMenu, NvGroup, NvStack, NvInput } from '@packages/ui'
+import {
+  NvAutocomplete,
+  NvButton,
+  NvCard,
+  NvContextMenu,
+  NvGroup,
+  NvInput,
+  NvOption,
+  NvStack,
+  NvText,
+} from '@packages/ui'
 import { useMessagesStore, usePlayingMessageStore } from '@/features/messages/store'
 import { storeToRefs } from 'pinia'
-import { computed, defineProps, onMounted, reactive, ref, watch } from 'vue'
+import { computed, defineProps, reactive, ref, watch } from 'vue'
 import { getEngineById } from '@/modules/speech-engine-manager'
 import { emitIPCSay } from '@/electron/events/renderer'
 import { purify } from '@packages/toolbox'
@@ -70,6 +107,8 @@ import NvSpeechEngineSelect from '@/features/speech/components/inputs/NvSpeechEn
 import { useSettingsStore } from '@/features/settings/store'
 import NvKeybinding from '@/features/app/components/inputs/NvKeybinding.vue'
 import { Key } from '@/types/keybinds'
+import { useFuse, UseFuseOptions } from '@vueuse/integrations/useFuse'
+import { orderBy } from 'lodash'
 
 const props = defineProps({
   id: {
@@ -85,7 +124,7 @@ const { shortcutMessages } = storeToRefs(messagesStore)
 const message = computed(() => shortcutMessages.value.find((m) => m.id === props.id))
 const isDataProvided = ref(false)
 const data = reactive({
-  message:'',
+  message: '',
   engine: '',
   selectedVoice: {} as Record<string, unknown>,
   shortcut: [] as Key[],
@@ -107,6 +146,53 @@ const engine = computed(() => {
   return getEngineById(data.engine)
 })
 
+const commands = computed(() =>
+  (engine).value?.commands?.(data.selectedVoice[engine.value.id]).map((command) => ({
+    ...command,
+    command: `/${ command.value }`,
+  })) || [],
+)
+
+const inputValue = computed(() => data.message)
+
+const fuseOptions = computed<UseFuseOptions<typeof commands.value[number]>>(() => ({
+  fuseOptions: {
+    keys: ['command'],
+    threshold: 0.3,
+  },
+}))
+
+const { results } = useFuse(inputValue, commands, fuseOptions)
+const autocompleteValues = computed(() => {
+  if (data.message) {
+    return (
+      orderBy(
+        results.value.map(({ item }) => item),
+        ['command'],
+        ['asc'],
+      ).reverse() || []
+    )
+  }
+  return (
+    orderBy(
+      commands.value,
+      ['command'],
+      ['asc'],
+    ).reverse() || []
+  )
+})
+
+const isAutocompleteVisible = computed(
+  () =>
+    commands.value.length > 0 &&
+    data.message.startsWith('/') &&
+    data.message.split(' ').length < 2,
+)
+
+const onAutocompleteSelect = (value: typeof commands.value[number]) => {
+  data.message = `${ value.command } `
+}
+
 watch(() => data, () => {
   messagesStore.updateShortcutMessage(props.id, {
     engine: data.engine,
@@ -115,6 +201,12 @@ watch(() => data, () => {
     message: data.message,
   })
 }, { deep: true })
+
+watch(() => data.engine, () => {
+  if (!data.selectedVoice[data.engine]) {
+    data.selectedVoice[data.engine] = engine.value?.getSelectedVoice()
+  }
+}, { immediate: true })
 
 watch(
   () => playingMessageStore.progress,
@@ -128,14 +220,13 @@ watch(
 const playMessage = () => {
   if (!message.value || !engine.value) return
   requestingToPlay.value = true
-  emitIPCSay(
-    purify({
-      id: props.id,
-      message: message.value.message,
-      engine: message.value.engine,
-      voice: engine.value.getSelectedVoice(),
-      excludeFromHistory: true,
-    }),
-  )
+  const payload = purify({
+    id: props.id,
+    message: data.message,
+    engine: data.engine,
+    voice: data.selectedVoice[data.engine],
+    excludeFromHistory: true,
+  })
+  emitIPCSay(payload)
 }
 </script>
