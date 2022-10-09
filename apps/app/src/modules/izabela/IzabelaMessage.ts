@@ -23,7 +23,6 @@ export default (messagePayload: IzabelaMessagePayload) => {
   const audioDownloaded = Deferred()
   const audioLoaded = Deferred()
   const playingMessageStore = usePlayingMessageStore()
-  console.log(excludeFromHistory)
   if (!excludeFromHistory) {
     const messageStore = useMessagesStore()
     messageStore.$whenReady().then(() => {

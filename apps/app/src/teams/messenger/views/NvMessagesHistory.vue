@@ -12,7 +12,7 @@
             </NvCenter>
           </NvCard>
         </template>
-        <template v-for="({ id }, i) in messagesStore.reversedHistory" :key="`${i}-${id}`">
+        <template v-for="({ id }) in messagesStore.reversedHistory" :key="id">
           <NvHistoryMessage :id="id"/>
         </template>
       </NvStack>
