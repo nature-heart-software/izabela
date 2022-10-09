@@ -8,6 +8,13 @@
         <div>
           <NvButton size="sm" @click="addShortcut">Add shortcut</NvButton>
         </div>
+        <template v-if="messagesStore.shortcutMessages.length === 0">
+          <NvCard>
+            <NvCenter>
+              <NvText>No shortcuts</NvText>
+            </NvCenter>
+          </NvCard>
+        </template>
         <template v-for="({ id }) in messagesStore.shortcutMessages" :key="id">
           <NvShortcutMessage :id="id"/>
         </template>
@@ -16,7 +23,7 @@
   </NvStack>
 </template>
 <script lang="ts" setup>
-import { NvButton, NvGroup, NvStack, NvText } from '@packages/ui'
+import { NvButton, NvCard, NvCenter, NvGroup, NvStack, NvText } from '@packages/ui'
 import { useMessagesStore } from '@/features/messages/store'
 import { v4 as uuid } from 'uuid'
 import NvShortcutMessage from '@/teams/messenger/components/NvShortcutMessage.vue'

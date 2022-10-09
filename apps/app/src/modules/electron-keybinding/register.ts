@@ -7,6 +7,7 @@ import { Key } from '@/types/keybinds'
 import { ipcMain } from 'electron-postman'
 import { IzabelaMessage } from '@/modules/izabela/types'
 import { purify } from '@packages/toolbox'
+import { debounce } from 'lodash'
 
 export default () =>
   app.whenReady().then(() => {
@@ -56,11 +57,11 @@ export default () =>
       })
     }
 
-    const registerAllShortcuts = () => {
+    const registerAllShortcuts = debounce(() => {
       unregisterAllShortcuts()
       setToggleMessengerWindowKeybinding()
       setShortcutMessagesKeybindings()
-    }
+    }, 1000)
 
     registerAllShortcuts()
     watch(
