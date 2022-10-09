@@ -24,11 +24,13 @@ import { useSpeechStore } from '@/features/speech/store'
 
 const messagesStore = useMessagesStore()
 const speechStore = useSpeechStore()
-const addShortcut = () => speechStore.currentSpeechEngine && messagesStore.addShortcutMessage({
-  id: uuid(),
-  engine: speechStore.currentSpeechEngine.id,
-  voice: speechStore.currentSpeechEngine.getSelectedVoice(),
-  message: '',
-  shortcut: [],
-})
+const addShortcut = () =>
+  speechStore.currentSpeechEngine &&
+  messagesStore.addShortcutMessage({
+    id: uuid(),
+    engine: speechStore.currentSpeechEngine.id,
+    voice: speechStore.currentSpeechEngine.getSelectedVoice(),
+    message: '',
+    shortcut: [],
+  })
 </script>

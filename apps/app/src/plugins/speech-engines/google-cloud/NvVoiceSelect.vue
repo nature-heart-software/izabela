@@ -6,7 +6,7 @@
     v-bind="{
       modelValue: getProperty('selectedVoice'),
       'onUpdate:modelValue': (value) => setProperty('selectedVoice', purify(value)),
-      ...$attrs
+      ...$attrs,
     }"
   />
 </template>
