@@ -9,7 +9,7 @@
           <NvButton size="sm" @click="addShortcut">Add shortcut</NvButton>
         </div>
         <template v-for="({ id }, i) in messagesStore.shortcutMessages" :key="`${i}-${id}`">
-          <NvShortcutMessage :id="id"/>
+          <NvShortcutMessage :id="id" />
         </template>
       </NvStack>
     </NvStack>
