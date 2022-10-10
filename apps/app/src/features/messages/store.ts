@@ -42,7 +42,7 @@ export const useMessagesStore = defineStore(
     const addToHistory = (
       id: string,
       { engine, payload, message, voice }: IzabelaMessagePayload,
-    ): IzabelaHistoryMessage => {
+    ) => {
       const historyMessage: IzabelaHistoryMessage = {
         id,
         engine,
@@ -55,7 +55,6 @@ export const useMessagesStore = defineStore(
         history.value.splice(0, 1)
       }
       history.value.push(historyMessage)
-      return historyMessage
     }
 
     const removeHistoryMessage = (id: string) => {

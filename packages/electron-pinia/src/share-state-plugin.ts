@@ -63,13 +63,13 @@ export const shareStatePlugin = ({ store }: Parameters<PiniaPlugin>[0]) => {
       )
     }
 
-    store.$onAction(({ name, store, args }) => {
-      const { issuer, args: newArgs } = useArgs(args)
-      background.notifyRenderers(
-        { name, storeId: store.$id, args: newArgs },
-        issuer,
-      )
-    }, true)
+    // store.$onAction(({ name, store, args }) => {
+    //   const { issuer, args: newArgs } = useArgs(args)
+    //   background.notifyRenderers(
+    //     { name, storeId: store.$id, args: newArgs },
+    //     issuer,
+    //   )
+    // }, true)
 
     background.onNotifyMain((_, { name, storeId, args }) => {
       if (storeId === store.$id) store[name](...args)
