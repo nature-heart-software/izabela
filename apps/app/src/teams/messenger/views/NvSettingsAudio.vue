@@ -25,21 +25,21 @@
                     "
                   />
                 </NvGroup>
-                <NvDivider direction="horizontal" />
+                <NvDivider direction="horizontal"/>
                 <NvFormItem label="Audio Outputs">
-                  <NvAudioOutputsSelect />
+                  <NvAudioOutputsSelect/>
                 </NvFormItem>
-                <NvDivider direction="horizontal" />
+                <NvDivider direction="horizontal"/>
 
                 <NvGroup align="start" justify="apart" no-wrap>
                   <NvStack>
                     <NvText type="label">Install VB-Audio Virtual Cable</NvText>
                     <NvText
-                      >VB-Audio Virtual Cable creates a virtual audio cable that can be used as a
+                    >VB-Audio Virtual Cable creates a virtual audio cable that can be used as a
                       recording device for Izabela's speech in other applications
                     </NvText>
                     <NvText type="caption"
-                      >VB-Audio Virtual Cable must also be present in Audio Outputs
+                    >VB-Audio Virtual Cable must also be present in Audio Outputs
                     </NvText>
                   </NvStack>
                   <NvButton>Install</NvButton>
@@ -57,7 +57,7 @@
           </NvCard>
           <div class="pl-8">
             <NvCard>
-              <NvAudioInputFormPart />
+              <NvAudioInputFormPart/>
             </NvCard>
           </div>
         </NvStack>

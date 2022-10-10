@@ -1,5 +1,5 @@
 import { processes } from '@/types/electron'
-import { IzabelaMessage, IzabelaMessagePayload } from '@/modules/izabela/types'
+import { IzabelaMessage } from '@/modules/izabela/types'
 
 const { ipc } = window
 

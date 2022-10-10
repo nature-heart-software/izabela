@@ -1,10 +1,10 @@
 <template>
-  <NvSelect :options="options" v-bind="$attrs" />
+  <NvSelect :options="options" v-bind="$attrs"/>
 </template>
 <script lang="ts" setup>
 import { NvSelect } from '@packages/ui'
-import { useSpeechEngineManager } from '@/modules/speech-engine-manager'
 import { computed } from 'vue'
+import { useSpeechEngineManager } from '@/modules/speech-engine-manager'
 
 const { engines } = useSpeechEngineManager()
 const options = computed(() =>

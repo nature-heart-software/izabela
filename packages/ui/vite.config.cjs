@@ -9,28 +9,20 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
 var _vite = require("vite");
-
 var _pluginVue = _interopRequireDefault(require("@vitejs/plugin-vue"));
-
 var _vitePluginDts = _interopRequireDefault(require("vite-plugin-dts"));
-
 var _path = require("path");
-
 var _vitePluginGenerateExports = require("@packages/vite-plugin-generate-exports");
-
 var _vitePluginGenerateModules = require("@packages/vite-plugin-generate-modules");
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 const mode = (() => {
   const args = process.argv;
   const index = args.indexOf('--mode');
   return index < 0 ? 'production' : args[index + 1];
-})(); // https://vitejs.dev/config/
+})();
 
-
+// https://vitejs.dev/config/
 var _default = (0, _vite.defineConfig)({
   plugins: [(0, _pluginVue.default)(), (0, _vitePluginDts.default)(), (0, _vitePluginGenerateExports.generateExportsPlugin)({
     watch: mode === 'development',
@@ -79,6 +71,5 @@ var _default = (0, _vite.defineConfig)({
     }
   }
 });
-
 exports.default = _default;
 /* End of auto-generated content. */

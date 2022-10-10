@@ -1,5 +1,3 @@
-import '@packages/electron-pinia/dist/main.d.ts'
-
 declare module 'vuex-electron'
 declare module 'electron-postman'
 declare module '@ryanmorr/ready'

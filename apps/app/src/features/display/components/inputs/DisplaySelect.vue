@@ -25,7 +25,7 @@ const isFetching = computed(() =>
 )
 const options = computed(() =>
   displays.value.map((display) => ({
-    label: `${(primaryDisplay && display.id === primaryDisplay.value?.id && '(Primary) ') || ''}${
+    label: `${ (primaryDisplay && display.id === primaryDisplay.value?.id && '(Primary) ') || '' }${
       display.id
     }`,
     value: display.id,

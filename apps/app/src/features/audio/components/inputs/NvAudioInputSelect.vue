@@ -10,8 +10,8 @@
 <script lang="ts" setup>
 import { NvSelect } from '@packages/ui'
 import { useDevicesList, useElementSize } from '@vueuse/core'
-import { useSettingsStore } from '@/features/settings/store'
 import { computed, ref } from 'vue'
+import { useSettingsStore } from '@/features/settings/store'
 
 const settingsStore = useSettingsStore()
 

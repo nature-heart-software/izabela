@@ -1,7 +1,7 @@
 import { MaybeRef } from '@vueuse/core'
-import { IzabelaMessage } from '@/modules/izabela/types'
 import { computed, ref, unref, watch } from 'vue'
 import { purify } from '@packages/toolbox'
+import { IzabelaMessage } from '@/modules/izabela/types'
 import { emitIPCSay } from '@/electron/events/renderer'
 import { usePlayingMessageStore } from '@/features/messages/store'
 

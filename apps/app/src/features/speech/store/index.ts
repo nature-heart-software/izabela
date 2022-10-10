@@ -1,9 +1,9 @@
 // eslint-disable-next-line import/no-cycle
+import { defineStore } from 'pinia'
+import { computed } from 'vue'
 import { getEngineById } from '@/modules/speech-engine-manager'
 import { ENGINE_ID } from '@/plugins/speech-engines/say/shared'
 import { useSettingsStore } from '@/features/settings/store'
-import { defineStore } from 'pinia'
-import { computed } from 'vue'
 
 export const useSpeechStore = defineStore(
   'speech',

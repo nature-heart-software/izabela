@@ -1,8 +1,8 @@
-import { TippyHookInstance, TippyTarget } from '@/types/vue-tippy'
 import { TippyOptions, useTippy } from 'vue-tippy'
 import { h, ref, Ref } from 'vue'
 import { tokens } from '@packages/ui'
 import { RouterView } from 'vue-router'
+import { TippyHookInstance, TippyTarget } from '@/types/vue-tippy'
 
 export type UseRouterViewPopoverOptions = {
   popoverTarget?: TippyTarget

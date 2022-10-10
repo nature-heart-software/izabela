@@ -1,10 +1,10 @@
 import pkg from '@root/package.json'
 // eslint-disable-next-line import/no-cycle
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
 import { SpeechEngine } from '@/modules/speech-engine-manager/types'
 import { Key } from '@/types/keybinds'
 import { ENGINE_ID } from '@/plugins/speech-engines/say/shared'
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
 
 export const useSettingsStore = defineStore(
   'settings',

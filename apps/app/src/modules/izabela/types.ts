@@ -1,6 +1,7 @@
 import { SpeechEngine } from '@/modules/speech-engine-manager/types'
 
 export type IzabelaMessageEvent = 'started' | 'ended' | 'progress' | 'error'
+
 export interface IzabelaMessage {
   id?: string
   message: string
@@ -9,6 +10,7 @@ export interface IzabelaMessage {
   excludeFromHistory?: boolean
   disableAutoplay?: boolean
 }
+
 export interface IzabelaMessagePayload extends IzabelaMessage {
   credentials: {
     [key: string]: any

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import izabela from '@/modules/izabela'
-import { IzabelaMessage } from '@/modules/izabela/types'
+import type { IzabelaMessage } from '@/modules/izabela/types'
 import { onIPCSay } from '@/electron/events/renderer'
 import { useSpeechStore } from '@/features/speech/store'
 import { getEngineById } from '@/modules/speech-engine-manager'

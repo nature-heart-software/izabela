@@ -9,9 +9,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.tailwindTheme = exports.default = void 0;
-
 var _polished = require("polished");
-
 const tokens = {
   fontFamily: {
     sans: ['Nunito', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', '"Noto Sans"', 'sans-serif', '"Apple Color Emoji"', '"Segoe UI Emoji"', '"Segoe UI Symbol"', '"Noto Color Emoji"'],
@@ -25,13 +23,11 @@ const tokens = {
       100: '#0E0E2C',
       90: '#2B2B2C',
       80: '#444444',
-
       /* Generated with: https://coolors.co/gradient-palette/444444-DCDCDC?number=6 */
       70: '#626262',
       60: '#818181',
       50: '#9F9F9F',
       40: '#BEBEBE',
-
       /* --------- */
       30: '#DCDCDC',
       20: '#EBEBEB',
@@ -157,7 +153,8 @@ const tokens = {
     }
   }
 };
-const tailwindTheme = { ...tokens,
+const tailwindTheme = {
+  ...tokens,
   spacing: Object.fromEntries(Object.entries(tokens.spacing).map(([key, value]) => [key, (0, _polished.rem)(value)])),
   borderRadius: Object.fromEntries(Object.entries(tokens.borderRadius).map(([key, value]) => [key, (0, _polished.rem)(value)])),
   borderWidth: Object.fromEntries(Object.entries(tokens.borderWidth).map(([key, value]) => [key, (0, _polished.rem)(value)])),

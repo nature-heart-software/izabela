@@ -43,7 +43,7 @@
           </NvOption>
         </template>
       </NvAutocomplete>
-      <NvButton icon-name="message" size="lg" @click="playMessage()" />
+      <NvButton icon-name="message" size="lg" @click="playMessage()"/>
     </NvGroup>
   </NvCard>
 </template>
@@ -73,7 +73,7 @@ const isInputFocused = ref(false)
 const commands = computed(() =>
   speechStore.commands.map((command) => ({
     ...command,
-    command: `/${command.value}`,
+    command: `/${ command.value }`,
   })),
 )
 const latestCommands = ref<string[]>([])
@@ -112,7 +112,7 @@ const isAutocompleteVisible = computed(
 )
 
 const onAutocompleteSelect = (value: typeof commands.value[number]) => {
-  inputValue.value = `${value.command} `
+  inputValue.value = `${ value.command } `
   if (latestCommands.value.includes(value.command)) {
     latestCommands.value.splice(latestCommands.value.indexOf(value.command), 1)
   }
@@ -131,7 +131,7 @@ const onInputEsc = () => {
 
 const placeholder = computed(() => {
   if (commands.value.length > 0) {
-    return `Type / to see available commands (${commands.value.length})`
+    return `Type / to see available commands (${ commands.value.length })`
   }
   return 'So, said the angel to the child who, divided, broke the knife..'
 })
@@ -151,7 +151,7 @@ onKeyStroke('ArrowUp', () => {
   if (
     !isAutocompleteVisible.value &&
     isInputFocused.value &&
-    historyMessageIndex.value < messagesStore.history.length - 1
+    historyMessageIndex.value < messagesStore.history.length-1
   ) {
     historyMessageIndex.value += 1
   }
