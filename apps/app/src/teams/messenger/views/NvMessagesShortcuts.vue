@@ -16,7 +16,7 @@
           </NvCard>
         </template>
         <template v-for="{ id } in messagesStore.shortcutMessages" :key="id">
-          <NvShortcutMessage :id="id"/>
+          <NvShortcutMessage :id="id" />
         </template>
       </NvStack>
     </NvStack>

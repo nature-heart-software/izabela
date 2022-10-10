@@ -7,7 +7,7 @@
           <NvStack>
             <NvText type="label">Monitor</NvText>
           </NvStack>
-          <NvDisplaySelect/>
+          <NvDisplaySelect />
         </NvGroup>
       </NvCard>
     </NvStack>
@@ -15,4 +15,5 @@
 </template>
 <script lang="ts" setup>
 import { NvCard, NvGroup, NvStack, NvText } from '@packages/ui'
-import NvDisplaySelect from '@/features/display/components/inputs/DisplaySelect.vue'</script>
+import NvDisplaySelect from '@/features/display/components/inputs/DisplaySelect.vue'
+</script>
