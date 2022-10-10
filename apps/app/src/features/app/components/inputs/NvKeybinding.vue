@@ -1,9 +1,8 @@
 <template>
   <template v-if="isListeningToKeys">
     <NvButton class="pointer-events-none" title="Press Esc to cancel" v-bind="$attrs"
-    >Listening...
-    </NvButton
-    >
+      >Listening...
+    </NvButton>
   </template>
   <template v-else>
     <NvButton v-bind="$attrs" @click="isListeningToKeys = true">{{ readableKeybinding }}</NvButton>

@@ -1,7 +1,7 @@
 <template>
   <template v-if="settingsStore.$isReady">
-    <SpeechSynthesizer/>
-    <SpeechListener :key="settingsStore.audioInput"/>
+    <SpeechSynthesizer />
+    <SpeechListener :key="settingsStore.audioInput" />
   </template>
 </template>
 <style lang="scss">

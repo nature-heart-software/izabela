@@ -29,13 +29,13 @@
                     align="center"
                     type="ghost"
                     @click="selectedEngineTab = engine.id"
-                  >{{ engine.name }}
+                    >{{ engine.name }}
                   </NvButton>
                 </template>
               </NvGroup>
-              <NvDivider direction="horizontal"/>
+              <NvDivider direction="horizontal" />
               <template v-if="currentEngineSettingsComponent">
-                <component :is="currentEngineSettingsComponent"/>
+                <component :is="currentEngineSettingsComponent" />
               </template>
             </NvStack>
           </NvCard>

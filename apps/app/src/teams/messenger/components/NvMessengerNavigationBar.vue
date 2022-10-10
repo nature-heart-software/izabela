@@ -1,14 +1,14 @@
 <template>
   <NvCard size="xs">
     <NvGroup :spacing="2" noWrap>
-      <NvButton icon-name="question-circle" size="sm"/>
-      <NvDivider class="h-3" direction="vertical"/>
+      <NvButton icon-name="question-circle" size="sm" />
+      <NvDivider class="h-3" direction="vertical" />
       <NvButton
         icon-name="comment-alt-lines"
         size="sm"
         @click="messengerContext.navigateTo({ name: 'messages-history' })"
       />
-      <NvDivider class="h-3" direction="vertical"/>
+      <NvDivider class="h-3" direction="vertical" />
       <NvButton
         icon-name="setting"
         size="sm"
@@ -18,7 +18,7 @@
   </NvCard>
   <NvCard size="sm">
     <NvGroup :spacing="2">
-      <NvButton icon-name="times" size="xs" type="plain" @click="hide"/>
+      <NvButton icon-name="times" size="xs" type="plain" @click="hide" />
     </NvGroup>
   </NvCard>
 </template>

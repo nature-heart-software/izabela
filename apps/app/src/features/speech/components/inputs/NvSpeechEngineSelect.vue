@@ -1,5 +1,5 @@
 <template>
-  <NvSelect :options="options" v-bind="$attrs"/>
+  <NvSelect :options="options" v-bind="$attrs" />
 </template>
 <script lang="ts" setup>
 import { NvSelect } from '@packages/ui'

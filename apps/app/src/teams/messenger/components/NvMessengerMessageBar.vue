@@ -5,13 +5,13 @@
         :type="settingsStore.messageMode === 'sentence' && 'plain'"
         size="sm"
         @click="settingsStore.$patch({ messageMode: 'sentence' })"
-      >Sentence
+        >Sentence
       </NvButton>
       <NvButton
         :type="settingsStore.messageMode === 'word' && 'plain'"
         size="sm"
         @click="settingsStore.$patch({ messageMode: 'word' })"
-      >Word
+        >Word
       </NvButton>
     </NvGroup>
   </NvCard>
