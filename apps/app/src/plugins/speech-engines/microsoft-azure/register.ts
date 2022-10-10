@@ -24,8 +24,8 @@ registerEngine({
   hasCredentials() {
     return Object.values(getCredentials()).every(Boolean)
   },
-  getPayload(text) {
-    const voice = getSelectedVoice()
+  getPayload(text, v) {
+    const voice = v || getSelectedVoice()
     let newText = text
     let expression
     const commandString = newText.split(' ')[0] || ''
@@ -38,7 +38,7 @@ registerEngine({
     }
     return {
       text: newText,
-      voice: getSelectedVoice(),
+      voice: v || getSelectedVoice(),
       expression,
     }
   },

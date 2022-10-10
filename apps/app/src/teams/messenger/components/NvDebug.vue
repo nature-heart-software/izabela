@@ -19,7 +19,5 @@
 import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
 import { rem } from 'polished'
 
-console.log('hello')
 const hitboxStore = useHitboxesStore()
-console.log(hitboxStore)
 </script>

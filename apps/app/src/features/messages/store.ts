@@ -2,6 +2,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { IzabelaHistoryMessage, IzabelaMessagePayload } from '@/modules/izabela/types'
+import { ShortcutMessage } from '@/features/messages/types'
 
 export const usePlayingMessageStore = defineStore(
   'playing-message',
@@ -24,11 +25,24 @@ export const usePlayingMessageStore = defineStore(
 export const useMessagesStore = defineStore(
   'messages',
   () => {
+    const shortcutMessages = ref<ShortcutMessage[]>([])
+    const addShortcutMessage = (message: ShortcutMessage) => {
+      shortcutMessages.value.unshift(message)
+    }
+    const updateShortcutMessage = (id: string, payload: Partial<ShortcutMessage>) => {
+      const message = shortcutMessages.value.find((m) => m.id === id)
+      if (message) {
+        Object.assign(message, payload)
+      }
+    }
+    const removeShortcutMessage = (id: ShortcutMessage['id']) => {
+      shortcutMessages.value = shortcutMessages.value.filter((m) => m.id !== id)
+    }
     const history = ref<IzabelaHistoryMessage[]>([])
     const addToHistory = (
       id: string,
       { engine, payload, message, voice }: IzabelaMessagePayload,
-    ): IzabelaHistoryMessage => {
+    ) => {
       const historyMessage: IzabelaHistoryMessage = {
         id,
         engine,
@@ -41,11 +55,12 @@ export const useMessagesStore = defineStore(
         history.value.splice(0, 1)
       }
       history.value.push(historyMessage)
-      return historyMessage
     }
-    const deleteMessage = (id: string) => {
+
+    const removeHistoryMessage = (id: string) => {
       history.value = history.value.filter((message) => message.id !== id)
     }
+
     const clearHistory = () => {
       history.value = []
     }
@@ -54,9 +69,13 @@ export const useMessagesStore = defineStore(
     return {
       history,
       addToHistory,
-      deleteMessage,
+      removeHistoryMessage,
       clearHistory,
       reversedHistory,
+      shortcutMessages,
+      addShortcutMessage,
+      updateShortcutMessage,
+      removeShortcutMessage,
     }
   },
   {

@@ -1,6 +1,6 @@
 <template>
   <ThemeProvider :theme="tokens">
-    <NvBackground />
+    <NvBackground/>
     <div class="h-0">
       <NvMessenger
         v-if="messengerStore.$isReady"
@@ -9,7 +9,7 @@
         class="w-full h-full"
       />
     </div>
-    <NvDebug v-if="settingsStore.debugMode" />
+    <NvDebug v-if="settingsStore.debugMode"/>
   </ThemeProvider>
 </template>
 <style lang="scss">
@@ -31,5 +31,4 @@ import { useSettingsStore } from '@/features/settings/store'
 
 const messengerStore = useMessengerStore()
 const settingsStore = useSettingsStore()
-console.log(settingsStore)
 </script>

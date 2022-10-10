@@ -1,11 +1,13 @@
 <template>
   <NvSelect
     v-loading="isFetching"
-    :modelValue="getProperty('selectedVoice')"
     :options="options"
-    v-bind="$attrs"
     valueKey="name"
-    @update:modelValue="(value) => setProperty('selectedVoice', purify(value))"
+    v-bind="{
+      modelValue: getProperty('selectedVoice'),
+      'onUpdate:modelValue': (value) => setProperty('selectedVoice', purify(value)),
+      ...$attrs,
+    }"
   />
 </template>
 <script lang="ts" setup>

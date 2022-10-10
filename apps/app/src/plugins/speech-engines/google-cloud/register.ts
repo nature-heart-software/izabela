@@ -20,9 +20,9 @@ registerEngine({
   hasCredentials() {
     return Object.values(getCredentials()).every(Boolean)
   },
-  getPayload(text) {
+  getPayload(text, v) {
     const selectedVoice = getSelectedVoice()
-    const voice: any = pick(selectedVoice, ['name', 'ssmlGender', 'languageCode'])
+    const voice: any = pick(v || selectedVoice, ['name', 'ssmlGender', 'languageCode'])
     // eslint-disable-next-line prefer-destructuring
     voice.languageCode = selectedVoice.languageCodes[0]
     return {

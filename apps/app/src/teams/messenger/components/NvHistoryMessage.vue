@@ -4,11 +4,11 @@
       <NvGroup align="start" justify="between" noWrap>
         <NvGroup align="start" class="!flex-1 min-w-0" noWrap>
           <NvButton
-            :loading="requestingToPlay"
+            :loading="isLoading"
             class="shrink-0"
             icon-name="play"
             size="sm"
-            @click="() => playMessage()"
+            @click="() => play()"
           />
           <NvStack class="!flex-1 min-h-0">
             <NvText>{{ message.message || id }}</NvText>
@@ -42,20 +42,20 @@
               label: 'Delete',
               icon: 'trash-alt',
               onClick: () => {
-                messagesStore.deleteMessage(id)
+                messagesStore.removeHistoryMessage(id)
               },
             },
           ]"
         >
-          <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm" />
+          <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm"/>
         </NvContextMenu>
       </NvGroup>
       <div
-        v-if="playingMessageStore.id === id && playingMessageStore.progress < 1"
+        v-if="isPlaying"
         class="h-2 relative bg-gray-10"
       >
         <div
-          :style="{ width: `${playingMessageStore.progress * 100}%` }"
+          :style="{ width: `${progress * 100}%` }"
           class="h-full bg-black"
         ></div>
       </div>
@@ -68,11 +68,11 @@ import { useMessagesStore, usePlayingMessageStore } from '@/features/messages/st
 import { storeToRefs } from 'pinia'
 import { computed, defineProps, ref, watch } from 'vue'
 import { getEngineById } from '@/modules/speech-engine-manager'
-import { emitIPCSay } from '@/electron/events/renderer'
 import { purify } from '@packages/toolbox'
 import IzabelaMessage from '@/modules/izabela/IzabelaMessage'
 import { UseTimeAgo } from '@vueuse/components'
 import { useDateFormat } from '@vueuse/core'
+import { usePlayMessage } from '@/features/messages/hooks'
 
 const props = defineProps({
   id: {
@@ -102,21 +102,6 @@ watch(
     }
   },
 )
-const playMessage = () => {
-  if (!message.value || !engine.value) return
-  requestingToPlay.value = true
-  emitIPCSay(
-    purify({
-      id: props.id,
-      message: message.value.message,
-      engine: message.value.engine,
-      voice: engine.value.getSelectedVoice(),
-      payload: message.value.payload,
-      credentials: engine.value.getCredentials(),
-      excludeFromHistory: true,
-    }),
-  )
-}
 
 const downloadMessageLocally = async () => {
   downloading.value = true
@@ -139,9 +124,9 @@ const downloadMessageLocally = async () => {
         reader.onload = () => {
           ElectronFilesystem.downloadMessagePrompt(
             completeMessage,
-            `${formatedCreatedAt.value} - ${engine.value?.name} - ${engine.value?.getVoiceName(
+            `${ formatedCreatedAt.value } - ${ engine.value?.name } - ${ engine.value?.getVoiceName(
               message.value?.voice,
-            )} - ${message.value?.message}`.replace(/([^a-z0-9\s-]+)/gi, '_'),
+            ) } - ${ message.value?.message }`.replace(/([^a-z0-9\s-]+)/gi, '_'),
             reader.result as string,
           ).finally(() => {
             downloading.value = false
@@ -153,4 +138,13 @@ const downloadMessageLocally = async () => {
     downloading.value = false
   }
 }
+
+const playMessage = computed(() => ({
+  id: props.id,
+  message: message.value?.message || '',
+  engine: message.value?.engine || '',
+  voice: engine.value?.getSelectedVoice(),
+  excludeFromHistory: true,
+}))
+const { play, isPlaying, isLoading, progress } = usePlayMessage(playMessage)
 </script>

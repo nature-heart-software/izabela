@@ -103,12 +103,21 @@ const autocompleteValues = computed(() => {
     ).reverse() || []
   )
 })
+
 const isAutocompleteVisible = computed(
   () =>
     commands.value.length > 0 &&
     inputValue.value.startsWith('/') &&
     inputValue.value.split(' ').length < 2,
 )
+
+const onAutocompleteSelect = (value: typeof commands.value[number]) => {
+  inputValue.value = `${value.command} `
+  if (latestCommands.value.includes(value.command)) {
+    latestCommands.value.splice(latestCommands.value.indexOf(value.command), 1)
+  }
+  latestCommands.value.push(value.command)
+}
 
 const onInputTab = () => {
   if (!inputValue.value && commands.value.length > 0) {
@@ -118,14 +127,6 @@ const onInputTab = () => {
 
 const onInputEsc = () => {
   ElectronMessengerWindow.hide()
-}
-
-const onAutocompleteSelect = (value: typeof commands.value[number]) => {
-  inputValue.value = `${value.command} `
-  if (latestCommands.value.includes(value.command)) {
-    latestCommands.value.splice(latestCommands.value.indexOf(value.command), 1)
-  }
-  latestCommands.value.push(value.command)
 }
 
 const placeholder = computed(() => {

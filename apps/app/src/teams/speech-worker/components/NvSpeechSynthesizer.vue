@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import izabela from '@/modules/izabela'
-import type { IzabelaMessagePayload } from '@/modules/izabela/types'
+import { IzabelaMessage } from '@/modules/izabela/types'
 import { onIPCSay } from '@/electron/events/renderer'
 import { useSpeechStore } from '@/features/speech/store'
+import { getEngineById } from '@/modules/speech-engine-manager'
 
-onIPCSay((payload: string | IzabelaMessagePayload) => {
-  console.log('saying something...')
+onIPCSay((payload: string | IzabelaMessage) => {
+  console.log('Saying something:', payload)
   let message = null
   const speechStore = useSpeechStore()
   if (typeof payload === 'string') {
@@ -19,8 +20,14 @@ onIPCSay((payload: string | IzabelaMessagePayload) => {
       payload: engine.getPayload(payload),
     }
   } else {
-    message = payload
+    const engine = getEngineById(payload.engine)
+    if (!engine) return
+    message = {
+      ...payload,
+      credentials: engine.getCredentials(),
+      payload: engine.getPayload(payload.message, (payload.voice)),
+    }
   }
-  izabela.say(message)
+  if (message) izabela.say(message)
 })
 </script>

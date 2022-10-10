@@ -20,10 +20,10 @@ registerEngine({
   hasCredentials() {
     return Object.values(getCredentials()).every(Boolean)
   },
-  getPayload(text) {
+  getPayload(text, voice) {
     return {
       text,
-      voice: getSelectedVoice(),
+      voice: voice || getSelectedVoice(),
     }
   },
   getLanguageCode() {

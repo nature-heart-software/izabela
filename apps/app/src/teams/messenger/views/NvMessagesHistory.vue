@@ -8,7 +8,7 @@
         <template v-if="messagesStore.reversedHistory.length === 0">
           <NvCard>
             <NvCenter>
-              <NvText>Send a message to see it appear here</NvText>
+              <NvText>No messages</NvText>
             </NvCenter>
           </NvCard>
         </template>
