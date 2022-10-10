@@ -22,11 +22,7 @@
               @select="onAutocompleteSelect"
             >
               <template #reference>
-                <NvInput
-                  v-model="data.message"
-                  class="w-full"
-                  size="sm"
-                />
+                <NvInput v-model="data.message" class="w-full" size="sm" />
               </template>
               <template #default="{ item, active }">
                 <NvOption v-if="item" :active="active">
@@ -42,9 +38,7 @@
               </template>
             </NvAutocomplete>
             <NvGroup noWrap>
-              <NvSpeechEngineSelect
-                v-model="data.engine"
-                class="w-1/3" size="sm"/>
+              <NvSpeechEngineSelect v-model="data.engine" class="w-1/3" size="sm" />
               <template v-if="engine">
                 <component
                   :is="engine.voiceSelectComponent"
@@ -55,7 +49,7 @@
                   size="sm"
                 />
               </template>
-              <NvKeybinding v-model="data.shortcut" class="w-1/3" multiple size="sm"/>
+              <NvKeybinding v-model="data.shortcut" class="w-1/3" multiple size="sm" />
             </NvGroup>
           </NvStack>
         </NvGroup>
@@ -70,17 +64,11 @@
             },
           ]"
         >
-          <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm"/>
+          <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm" />
         </NvContextMenu>
       </NvGroup>
-      <div
-        v-if="isPlaying"
-        class="h-2 relative bg-gray-10"
-      >
-        <div
-          :style="{ width: `${progress * 100}%` }"
-          class="h-full bg-black"
-        ></div>
+      <div v-if="isPlaying" class="h-2 relative bg-gray-10">
+        <div :style="{ width: `${progress * 100}%` }" class="h-full bg-black"></div>
       </div>
     </NvStack>
   </NvCard>
@@ -128,26 +116,31 @@ const data = reactive({
   shortcut: [] as Key[],
 })
 
-watch(() => message, () => {
-  if (!isDataProvided.value) {
-    if (message.value) isDataProvided.value = true
-    const engine = message.value?.engine || settingsStore.selectedSpeechEngine
-    data.engine = engine
-    data.selectedVoice[engine] = message.value?.voice
-    data.shortcut = message.value?.shortcut || ([] as Key[])
-    data.message = message.value?.message || ''
-  }
-}, { deep: true, immediate: true })
+watch(
+  () => message,
+  () => {
+    if (!isDataProvided.value) {
+      if (message.value) isDataProvided.value = true
+      const engine = message.value?.engine || settingsStore.selectedSpeechEngine
+      data.engine = engine
+      data.selectedVoice[engine] = message.value?.voice
+      data.shortcut = message.value?.shortcut || ([] as Key[])
+      data.message = message.value?.message || ''
+    }
+  },
+  { deep: true, immediate: true },
+)
 const engine = computed(() => {
   if (!data.engine) return null
   return getEngineById(data.engine)
 })
 
-const commands = computed(() =>
-  (engine).value?.commands?.(data.selectedVoice[engine.value.id]).map((command) => ({
-    ...command,
-    command: `/${ command.value }`,
-  })) || [],
+const commands = computed(
+  () =>
+    engine.value?.commands?.(data.selectedVoice[engine.value.id]).map((command) => ({
+      ...command,
+      command: `/${command.value}`,
+    })) || [],
 )
 
 const inputValue = computed(() => data.message)
@@ -170,40 +163,40 @@ const autocompleteValues = computed(() => {
       ).reverse() || []
     )
   }
-  return (
-    orderBy(
-      commands.value,
-      ['command'],
-      ['asc'],
-    ).reverse() || []
-  )
+  return orderBy(commands.value, ['command'], ['asc']).reverse() || []
 })
 
 const isAutocompleteVisible = computed(
   () =>
-    commands.value.length > 0 &&
-    data.message.startsWith('/') &&
-    data.message.split(' ').length < 2,
+    commands.value.length > 0 && data.message.startsWith('/') && data.message.split(' ').length < 2,
 )
 
 const onAutocompleteSelect = (value: typeof commands.value[number]) => {
-  data.message = `${ value.command } `
+  data.message = `${value.command} `
 }
 
-watch(() => data, () => {
-  messagesStore.updateShortcutMessage(props.id, {
-    engine: data.engine,
-    voice: data.selectedVoice[data.engine],
-    shortcut: data.shortcut,
-    message: data.message,
-  })
-}, { deep: true })
+watch(
+  () => data,
+  () => {
+    messagesStore.updateShortcutMessage(props.id, {
+      engine: data.engine,
+      voice: data.selectedVoice[data.engine],
+      shortcut: data.shortcut,
+      message: data.message,
+    })
+  },
+  { deep: true },
+)
 
-watch(() => data.engine, () => {
-  if (!data.selectedVoice[data.engine]) {
-    data.selectedVoice[data.engine] = engine.value?.getSelectedVoice()
-  }
-}, { immediate: true })
+watch(
+  () => data.engine,
+  () => {
+    if (!data.selectedVoice[data.engine]) {
+      data.selectedVoice[data.engine] = engine.value?.getSelectedVoice()
+    }
+  },
+  { immediate: true },
+)
 
 const playMessage = computed(() => ({
   id: props.id,
