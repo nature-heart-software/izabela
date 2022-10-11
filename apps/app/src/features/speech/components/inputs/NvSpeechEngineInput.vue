@@ -70,7 +70,7 @@ const commands = computed(
   () =>
     engine.value?.commands?.(props.voice).map((command) => ({
       ...command,
-      command: `/${ command.value }`,
+      command: `/${command.value}`,
     })) || [],
 )
 
@@ -95,19 +95,25 @@ const autocompleteValues = computed(() => {
       ).reverse() || []
     )
   }
-  return orderBy(commands.value,
-    [({ command }) => latestCommands.value.indexOf(command), 'command'],
-    ['desc', 'asc']).reverse() || []
+  return (
+    orderBy(
+      commands.value,
+      [({ command }) => latestCommands.value.indexOf(command), 'command'],
+      ['desc', 'asc'],
+    ).reverse() || []
+  )
 })
 
 const isAutocompleteVisible = computed(
   () =>
-    commands.value.length > 0 && inputValue.value.startsWith('/') && inputValue.value.split(' ').length < 2,
+    commands.value.length > 0 &&
+    inputValue.value.startsWith('/') &&
+    inputValue.value.split(' ').length < 2,
 )
 
 const onAutocompleteSelect = (value: typeof commands.value[number]) => {
   console.log('weewoo')
-  emit('update:modelValue', `${ value.command } `)
+  emit('update:modelValue', `${value.command} `)
   if (latestCommands.value.includes(value.command)) {
     latestCommands.value.splice(latestCommands.value.indexOf(value.command), 1)
   }
@@ -125,17 +131,20 @@ watch(historyMessageIndex, () => {
   emit('update:modelValue', messagesStore.reversedHistory[historyMessageIndex.value]?.message || '')
 })
 
-watch(() => messagesStore.history, (value, oldValue) => {
-  if (value.length !== oldValue.length) {
-    historyMessageIndex.value = -1
-  }
-})
+watch(
+  () => messagesStore.history,
+  (value, oldValue) => {
+    if (value.length !== oldValue.length) {
+      historyMessageIndex.value = -1
+    }
+  },
+)
 
 onKeyStroke('ArrowUp', () => {
   if (
     !isAutocompleteVisible.value &&
     isInputFocused.value &&
-    historyMessageIndex.value < messagesStore.history.length-1
+    historyMessageIndex.value < messagesStore.history.length - 1
   ) {
     historyMessageIndex.value += 1
   }
