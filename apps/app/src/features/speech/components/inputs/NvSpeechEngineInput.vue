@@ -19,6 +19,8 @@
         @update:modelValue="(value) => emit('update:modelValue', value)"
         @keydown.tab.prevent="onInputTab"
         @keydown.enter="onInputEnter"
+        @keydown.up.prevent
+        @keydown.down.prevent
       />
     </template>
     <template #default="{ item, active }">
@@ -57,6 +59,7 @@ const props = defineProps({
     required: true,
   },
 })
+
 const emit = defineEmits(['update:modelValue'])
 const inputRef = ref()
 const historyMessageIndex = ref(-1)
@@ -106,7 +109,6 @@ const isAutocompleteVisible = computed(
 )
 
 const onAutocompleteSelect = (value: typeof commands.value[number]) => {
-  console.log('weewoo')
   emit('update:modelValue', `${ value.command } `)
   if (latestCommands.value.includes(value.command)) {
     latestCommands.value.splice(latestCommands.value.indexOf(value.command), 1)
@@ -114,8 +116,8 @@ const onAutocompleteSelect = (value: typeof commands.value[number]) => {
   latestCommands.value.push(value.command)
 }
 
-const onInputTab = () => {
-  console.log('woowee')
+const onInputTab = (e: KeyboardEvent) => {
+  if (!isAutocompleteVisible.value) e.stopPropagation()
   if (!inputValue.value && commands.value.length > 0) {
     emit('update:modelValue', '/')
   }
@@ -125,11 +127,9 @@ watch(historyMessageIndex, () => {
   emit('update:modelValue', messagesStore.reversedHistory[historyMessageIndex.value]?.message || '')
 })
 
-watch(() => messagesStore.history, (value, oldValue) => {
-  if (value.length !== oldValue.length) {
-    historyMessageIndex.value = -1
-  }
-})
+watch(() => messagesStore.history, () => {
+  historyMessageIndex.value = -1
+}, { deep: true })
 
 onKeyStroke('ArrowUp', () => {
   if (

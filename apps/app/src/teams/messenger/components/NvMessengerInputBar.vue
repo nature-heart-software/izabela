@@ -11,8 +11,6 @@
         size="lg"
         @blur="onInputBlur"
         @focus="onInputFocus"
-        @keydown.up.prevent
-        @keydown.down.prevent
         @keydown.esc.prevent="onInputEsc"
         @keydown.enter="onInputEnter"
         @keydown.space="
