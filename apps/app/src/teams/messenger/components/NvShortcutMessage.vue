@@ -11,32 +11,14 @@
             @click="() => play()"
           />
           <NvStack class="!flex-1 min-h-0">
-            <NvAutocomplete
-              :autoScrollIndex="autocompleteValues.length - 1"
-              :options="autocompleteValues"
-              :selectOnTab="true"
-              :visible="isAutocompleteVisible"
+            <NvSpeechEngineInput
+              v-model="data.message"
+              :engine="data.engine"
+              :voice="data.selectedVoice[data.engine]"
               class="w-full"
-              placement="top-start"
-              valueKey="value"
-              @select="onAutocompleteSelect"
-            >
-              <template #reference>
-                <NvInput v-model="data.message" class="w-full" size="sm" />
-              </template>
-              <template #default="{ item, active }">
-                <NvOption v-if="item" :active="active">
-                  <NvGroup>
-                    <NvText type="label">
-                      {{ item.command }}
-                    </NvText>
-                    <NvText v-if="item.description" type="caption">
-                      {{ item.description }}
-                    </NvText>
-                  </NvGroup>
-                </NvOption>
-              </template>
-            </NvAutocomplete>
+              size="sm"
+              @enter="() => play()"
+            />
             <NvGroup noWrap>
               <NvSpeechEngineSelect v-model="data.engine" class="w-1/3" size="sm" />
               <template v-if="engine">
@@ -74,17 +56,7 @@
   </NvCard>
 </template>
 <script lang="ts" setup>
-import {
-  NvAutocomplete,
-  NvButton,
-  NvCard,
-  NvContextMenu,
-  NvGroup,
-  NvInput,
-  NvOption,
-  NvStack,
-  NvText,
-} from '@packages/ui'
+import { NvButton, NvCard, NvContextMenu, NvGroup, NvStack } from '@packages/ui'
 import { useMessagesStore } from '@/features/messages/store'
 import { storeToRefs } from 'pinia'
 import { computed, defineProps, reactive, ref, watch } from 'vue'
@@ -96,6 +68,7 @@ import { Key } from '@/types/keybinds'
 import { useFuse, UseFuseOptions } from '@vueuse/integrations/useFuse'
 import { orderBy } from 'lodash'
 import { usePlayMessage } from '@/features/messages/hooks'
+import NvSpeechEngineInput from '@/features/speech/components/inputs/NvSpeechEngineInput.vue'
 
 const props = defineProps({
   id: {
