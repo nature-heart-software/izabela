@@ -19,6 +19,8 @@
         @update:modelValue="(value) => emit('update:modelValue', value)"
         @keydown.tab.prevent="onInputTab"
         @keydown.enter="onInputEnter"
+        @keydown.space="onInputSpace"
+        @keydown.esc.prevent="onInputEsc"
         @keydown.up.prevent
         @keydown.down.prevent
       />
@@ -60,7 +62,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'enter', 'space', 'esc'])
 const inputRef = ref()
 const historyMessageIndex = ref(-1)
 const messagesStore = useMessagesStore()
@@ -148,8 +150,20 @@ onKeyStroke('ArrowDown', () => {
 })
 
 const onInputEnter = (e: KeyboardEvent) => {
-  if (isAutocompleteVisible.value) {
-    e.preventDefault()
+  if (!isAutocompleteVisible.value) {
+    emit('enter', e)
+  }
+}
+
+const onInputSpace = (e: KeyboardEvent) => {
+  if (!isAutocompleteVisible.value) {
+    emit('space', e)
+  }
+}
+
+const onInputEsc = (e: KeyboardEvent) => {
+  if (!isAutocompleteVisible.value) {
+    emit('esc', e)
   }
 }
 
