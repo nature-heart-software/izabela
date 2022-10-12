@@ -20,7 +20,7 @@
               @enter="() => play()"
             />
             <NvGroup noWrap>
-              <NvSpeechEngineSelect v-model="data.engine" class="w-1/3" size="sm"/>
+              <NvSpeechEngineSelect v-model="data.engine" class="w-1/3" size="sm" />
               <template v-if="engine">
                 <component
                   :is="engine.voiceSelectComponent"
@@ -31,7 +31,7 @@
                   size="sm"
                 />
               </template>
-              <NvKeybinding v-model="data.shortcut" class="w-1/3" multiple size="sm"/>
+              <NvKeybinding v-model="data.shortcut" class="w-1/3" multiple size="sm" />
             </NvGroup>
           </NvStack>
         </NvGroup>
@@ -46,7 +46,7 @@
             },
           ]"
         >
-          <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm"/>
+          <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm" />
         </NvContextMenu>
       </NvGroup>
       <div v-if="isPlaying" class="h-2 relative bg-gray-10">
@@ -112,7 +112,7 @@ const commands = computed(
   () =>
     engine.value?.commands?.(data.selectedVoice[engine.value.id]).map((command) => ({
       ...command,
-      command: `/${ command.value }`,
+      command: `/${command.value}`,
     })) || [],
 )
 
@@ -145,7 +145,7 @@ const isAutocompleteVisible = computed(
 )
 
 const onAutocompleteSelect = (value: typeof commands.value[number]) => {
-  data.message = `${ value.command } `
+  data.message = `${value.command} `
 }
 
 watch(
