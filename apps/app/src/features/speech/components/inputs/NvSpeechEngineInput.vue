@@ -44,7 +44,7 @@ import { NvAutocomplete, NvGroup, NvInput, NvOption, NvText } from '@packages/ui
 import { computed, defineEmits, defineExpose, defineProps, ref, watch } from 'vue'
 import { getEngineById } from '@/modules/speech-engine-manager'
 import { useFuse, UseFuseOptions } from '@vueuse/integrations/useFuse'
-import { orderBy } from 'lodash'
+import { orderBy, throttle } from 'lodash'
 import { useMessagesStore } from '@/features/messages/store'
 import { onKeyStroke } from '@vueuse/core'
 
@@ -75,7 +75,7 @@ const commands = computed(
   () =>
     engine.value?.commands?.(props.voice).map((command) => ({
       ...command,
-      command: `/${command.value}`,
+      command: `/${ command.value }`,
     })) || [],
 )
 
@@ -117,7 +117,7 @@ const isAutocompleteVisible = computed(
 )
 
 const onAutocompleteSelect = (value: typeof commands.value[number]) => {
-  emit('update:modelValue', `${value.command} `)
+  emit('update:modelValue', `${ value.command } `)
   if (latestCommands.value.includes(value.command)) {
     latestCommands.value.splice(latestCommands.value.indexOf(value.command), 1)
   }
@@ -147,7 +147,7 @@ onKeyStroke('ArrowUp', () => {
   if (
     !isAutocompleteVisible.value &&
     isInputFocused.value &&
-    historyMessageIndex.value < messagesStore.history.length - 1
+    historyMessageIndex.value < messagesStore.history.length-1
   ) {
     historyMessageIndex.value += 1
   }
@@ -159,23 +159,23 @@ onKeyStroke('ArrowDown', () => {
   }
 })
 
-const onInputEnter = (e: KeyboardEvent) => {
+const onInputEnter = throttle((e: KeyboardEvent) => {
   if (!isAutocompleteVisible.value) {
     emit('enter', e)
   }
-}
+}, 40, { leading: true, trailing: false })
 
-const onInputSpace = (e: KeyboardEvent) => {
+const onInputSpace = throttle((e: KeyboardEvent) => {
   if (!isAutocompleteVisible.value) {
     emit('space', e)
   }
-}
+}, 40, { leading: true, trailing: false })
 
-const onInputEsc = (e: KeyboardEvent) => {
+const onInputEsc = throttle((e: KeyboardEvent) => {
   if (!isAutocompleteVisible.value) {
     emit('esc', e)
   }
-}
+}, 40, { leading: true, trailing: false })
 
 const onInputFocus = () => {
   isInputFocused.value = true
