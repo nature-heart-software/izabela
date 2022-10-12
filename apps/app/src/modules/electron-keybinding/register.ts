@@ -61,7 +61,7 @@ export default () =>
       unregisterAllShortcuts()
       setToggleMessengerWindowKeybinding()
       setShortcutMessagesKeybindings()
-    }, 1000)
+    }, 500)
 
     registerAllShortcuts()
     watch(
