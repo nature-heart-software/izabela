@@ -5,23 +5,27 @@
         :type="settingsStore.messageMode === 'sentence' && 'plain'"
         size="sm"
         @click="settingsStore.$patch({ messageMode: 'sentence' })"
-      >Sentence
+        >Sentence
       </NvButton>
       <NvButton
         :type="settingsStore.messageMode === 'word' && 'plain'"
         size="sm"
         @click="settingsStore.$patch({ messageMode: 'word' })"
-      >Word
+        >Word
       </NvButton>
-      <NvDivider class="h-3" direction="vertical"/>
+      <NvDivider class="h-3" direction="vertical" />
       <NvButton
-        :type="route.name === 'messages-shortcuts' && messengerContext.isViewShown  ? 'plain' : 'default'"
+        :type="
+          route.name === 'messages-shortcuts' && messengerContext.isViewShown ? 'plain' : 'default'
+        "
         icon-name="keyboard-alt"
         size="sm"
         @click="messengerContext.navigateTo({ name: 'messages-shortcuts' })"
       />
       <NvButton
-        :type="route.name === 'messages-history' && messengerContext.isViewShown  ? 'plain' : 'default'"
+        :type="
+          route.name === 'messages-history' && messengerContext.isViewShown ? 'plain' : 'default'
+        "
         icon-name="history"
         size="sm"
         @click="messengerContext.navigateTo({ name: 'messages-history' })"

@@ -1,15 +1,21 @@
 <template>
   <NvCard size="xs">
     <NvGroup :spacing="2" noWrap>
-      <NvButton icon-name="question-circle" size="sm"/>
+      <NvButton icon-name="question-circle" size="sm" />
       <NvButton
-        :type="route.name === 'messages-history' && messengerContext.isViewShown  ? 'plain' : 'default'"
+        :type="
+          route.name === 'messages-history' && messengerContext.isViewShown ? 'plain' : 'default'
+        "
         icon-name="comment-alt-lines"
         size="sm"
         @click="messengerContext.navigateTo({ name: 'messages-history' })"
       />
       <NvButton
-        :type="route.name === 'settings-overview' && log(messengerContext.isViewShown)  ? 'plain' : 'default'"
+        :type="
+          route.name === 'settings-overview' && log(messengerContext.isViewShown)
+            ? 'plain'
+            : 'default'
+        "
         icon-name="setting"
         size="sm"
         @click="messengerContext.navigateTo({ name: 'settings-overview' })"
@@ -18,7 +24,7 @@
   </NvCard>
   <NvCard size="sm">
     <NvGroup :spacing="2">
-      <NvButton icon-name="times" size="xs" type="plain" @click="hide"/>
+      <NvButton icon-name="times" size="xs" type="plain" @click="hide" />
     </NvGroup>
   </NvCard>
 </template>
