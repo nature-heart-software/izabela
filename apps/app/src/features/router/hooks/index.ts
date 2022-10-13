@@ -1,5 +1,5 @@
 import { TippyOptions, useTippy } from 'vue-tippy'
-import { h, ref, Ref } from 'vue'
+import { h, ref, Ref, unref } from 'vue'
 import { tokens } from '@packages/ui'
 import { RouterView } from 'vue-router'
 import { TippyHookInstance, TippyTarget } from '@/types/vue-tippy'
@@ -14,6 +14,9 @@ export const useRouterViewPopover = ({
   popoverOptions,
 }: UseRouterViewPopoverOptions) => {
   const popover: Ref<TippyHookInstance | undefined> = ref()
+  const update = () => {
+    unref(popover.value?.tippy)?.popperInstance?.update()
+  }
   if (popoverTarget) {
     popover.value = useTippy(popoverTarget, {
       content: h(RouterView, {
@@ -29,13 +32,16 @@ export const useRouterViewPopover = ({
           instance.popperInstance?.update()
         })
       },
+
       onShown(instance) {
         instance.popperInstance?.update()
       },
+      hideOnClick: false,
       ...popoverOptions,
     })
   }
   return {
     popover,
+    update,
   }
 }
