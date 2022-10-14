@@ -2,7 +2,7 @@
   <NvCard size="sm">
     <NvGroup noWrap>
       <NvButton
-        :type="route.name === 'settings-speech' && messengerContext.isViewShown  ? 'plain' : 'default'"
+        :type="route.name === 'settings-speech' && messengerContext.isViewShown.value  ?  'plain'  :  'default'"
         icon-name="users-alt"
         size="sm"
         @click="messengerContext.navigateTo({ name: 'settings-speech' })"

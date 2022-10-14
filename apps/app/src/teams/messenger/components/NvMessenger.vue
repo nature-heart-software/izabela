@@ -57,7 +57,15 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ComponentPublicInstance, computed, defineProps, onMounted, provide, ref, unref } from 'vue'
+import {
+  ComponentPublicInstance,
+  computed,
+  defineProps,
+  onMounted,
+  provide,
+  ref,
+  unref,
+} from 'vue'
 import Moveable from 'vue3-moveable'
 import { NvGroup } from '@packages/ui'
 import { RouteLocationRaw, useRouter } from 'vue-router'
@@ -128,7 +136,7 @@ const navigateTo = (location: RouteLocationRaw) => {
 }
 const popover = computed(() => (settingsPopover.popover.value))
 const popoverState = computed<any>(() => (popover.value?.state))
-const isViewShown = computed(() => (popoverState.value?.isShown.values))
+const isViewShown = computed(() => (popoverState.value?.isShown))
 provide('messenger', {
   navigateTo,
   isViewShown,

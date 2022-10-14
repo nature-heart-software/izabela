@@ -3,13 +3,13 @@
     <NvGroup :spacing="2" noWrap>
       <NvButton icon-name="question-circle" size="sm"/>
       <NvButton
-        :type="route.name === 'messages-history' && messengerContext.isViewShown  ? 'plain' : 'default'"
+        :type="route.name.startsWith('messages') && messengerContext.isViewShown.value  ?  'plain'  :  'default'"
         icon-name="comment-alt-lines"
         size="sm"
         @click="messengerContext.navigateTo({ name: 'messages-history' })"
       />
       <NvButton
-        :type="route.name === 'settings-overview' && log(messengerContext.isViewShown)  ? 'plain' : 'default'"
+        :type="route.name.startsWith('settings') && messengerContext.isViewShown.value  ?  'plain'  :  'default'"
         icon-name="setting"
         size="sm"
         @click="messengerContext.navigateTo({ name: 'settings-overview' })"
@@ -26,7 +26,6 @@
 import { NvButton, NvCard, NvGroup } from '@packages/ui'
 import { inject } from 'vue'
 import { useRoute } from 'vue-router'
-import { log } from '@packages/toolbox'
 
 const messengerContext = inject('messenger')
 const { ElectronMessengerWindow } = window

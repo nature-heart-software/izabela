@@ -15,13 +15,13 @@
       </NvButton>
       <NvDivider class="h-3" direction="vertical"/>
       <NvButton
-        :type="route.name === 'messages-shortcuts' && messengerContext.isViewShown  ? 'plain' : 'default'"
+        :type="route.name === 'messages-shortcuts' && messengerContext.isViewShown.value  ?  'plain'  :  'default'"
         icon-name="keyboard-alt"
         size="sm"
         @click="messengerContext.navigateTo({ name: 'messages-shortcuts' })"
       />
       <NvButton
-        :type="route.name === 'messages-history' && messengerContext.isViewShown  ? 'plain' : 'default'"
+        :type="route.name === 'messages-history' && messengerContext.isViewShown.value  ?  'plain'  :  'default'"
         icon-name="history"
         size="sm"
         @click="messengerContext.navigateTo({ name: 'messages-history' })"
