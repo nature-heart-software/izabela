@@ -34,7 +34,6 @@ const playingMessageStore = usePlayingMessageStore()
 watch(() => [messagesStore.history, containerRef, playingMessageStore.progress, playingMessageStore.isPlaying], () => {
   if (autoScroll.value && containerRef.value) {
     nextTick(() => {
-      console.log('scrolling to bottom', containerRef.value.$el.scrollHeight, containerRef.value.$el?.scrollTop)
       containerRef.value.$el.scrollTop = containerRef.value.$el.scrollHeight
     })
   }
