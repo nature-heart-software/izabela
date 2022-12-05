@@ -5,7 +5,7 @@
       <div></div>
       <NvCard class="inline-flex" size="sm">
         <div class="inline-flex space-x-2">
-          <NvButton icon-name="times" size="xs" type="plain" @click="$emit('close')" />
+          <NvButton icon-name="times" size="xs" type="plain" @click="$emit('close')"/>
         </div>
       </NvCard>
     </div>
@@ -17,7 +17,7 @@
             <NvStack spacing="6">
               <template v-for="category in navigation" :key="category.name">
                 <NvStack>
-                  <NvText class="mx-3" type="subtitle">
+                  <NvText v-if="category.name" class="mx-3" type="subtitle">
                     {{ category.name }}
                   </NvText>
                   <NvStack spacing="2">
@@ -28,7 +28,7 @@
                           class="w-full"
                           size="sm"
                           type="ghost-alt"
-                          >{{ entry.name }}
+                        >{{ entry.name }}
                         </NvButton>
                       </router-link>
                     </template>
@@ -43,7 +43,7 @@
               <router-view v-slot="{ Component }">
                 <Transition class="transition">
                   <div :key="Component" class="absolute inset-0 overflow-y-auto">
-                    <component :is="Component" />
+                    <component :is="Component"/>
                   </div>
                 </Transition>
               </router-view>
@@ -68,23 +68,11 @@ const navigation = [
         to: { name: 'settings-overview' },
       },
       {
-        name: 'Speech',
-        to: { name: 'settings-speech' },
-      },
-      {
-        name: 'Audio',
-        to: { name: 'settings-audio' },
-      },
-      {
         name: 'Display',
         to: { name: 'settings-display' },
       },
       {
         name: 'Overlay',
-      },
-      {
-        name: 'Dictionary',
-        to: { name: 'settings-dictionary' },
       },
       {
         name: 'Keybindings',
@@ -97,6 +85,23 @@ const navigation = [
       {
         name: 'Update',
         to: { name: 'settings-update' },
+      },
+    ],
+  },
+  {
+    name: 'Speech',
+    children: [
+      {
+        name: 'Speech',
+        to: { name: 'settings-speech' },
+      },
+      {
+        name: 'Audio',
+        to: { name: 'settings-audio' },
+      },
+      {
+        name: 'Dictionary',
+        to: { name: 'settings-dictionary' },
       },
     ],
   },
