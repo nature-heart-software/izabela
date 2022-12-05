@@ -18,7 +18,7 @@
   "dependencies": {
     "@vue-reactivity/watch": "^0.2.0",
     "@vue/reactivity": "^3.2.37",
-    "electron": "^15.5.5"
+    "electron": "^18.3.7"
   },
   "devDependencies": {
     "microbundle": "^0.15.1",
