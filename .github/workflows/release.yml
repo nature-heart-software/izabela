@@ -35,10 +35,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup Node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 'lts/*'
           registry-url: 'https://npm.pkg.github.com'
@@ -49,7 +49,7 @@ jobs:
           cache-name: cache-node-modules
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
@@ -66,10 +66,12 @@ jobs:
             ./package.json
             ./apps/app/package.json
       - name: Build
+        uses: borales/actions-yarn@v4
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          npm run build
+          VUE_APP_ENCRYPTION_KEY: ${{ secrets.APP_ENCRYPTION_KEY }}
+        with:
+          cmd: build
       - name: Cleanup electron dist
         shell: bash
         working-directory: apps/app/dist_electron
