@@ -28,10 +28,10 @@ jobs:
           prerelease: ${{ contains(github.ref, 'rc') || contains(github.ref, 'beta') || contains(github.ref, 'alpha')}}
 
   deploy:
-    needs: [release]
+    needs: [ release ]
     strategy:
       matrix:
-        os: [windows-latest]
+        os: [ windows-latest ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -65,10 +65,6 @@ jobs:
           targets: |
             ./package.json
             ./apps/app/package.json
-      - name: Install
-        uses: borales/actions-yarn@v4
-        with:
-          cmd: install
       - name: Build
         uses: borales/actions-yarn@v4
         env:

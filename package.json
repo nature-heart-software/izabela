@@ -5,7 +5,7 @@
     "install:deps": "yarn && yarn build:deps",
     "bootstrap": "yarn lerna bootstrap --no-ci",
     "dev": "yarn bootstrap && yarn lerna run serve --scope izabela-next --stream",
-    "build": "yarn bootstrap && yarn lerna run build",
+    "build": "yarn && yarn bootstrap && yarn lerna run build",
     "build:deps": "yarn bootstrap && yarn lerna run build --scope  '{@packages/*,@apps/app-server}' --stream",
     "build:app": "yarn bootstrap && yarn lerna run build --scope '{@packages/*,@apps/app-server,izabela-next}' --stream",
     "postinstall": "yarn patch-package"
@@ -18,6 +18,10 @@
     "nx": "14.5.10",
     "typescript": "^4.5.4"
   },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "release": {
     "branches": [
       "main",
@@ -54,10 +58,6 @@
     "arrowParens": "always",
     "endOfLine": "lf"
   },
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
   "iohook": {
     "targets": [
       "node-83",
