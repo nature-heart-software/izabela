@@ -2,6 +2,16 @@ const path = require('path')
 const { defineConfig } = require('@vue/cli-service')
 const { GenerateExportsPlugin } = require('@packages/generate-exports-webpack-plugin')
 const WebpackNotifierPlugin = require('webpack-notifier')
+const fs = require('fs')
+
+function getElectronVersion() {
+  const electronPath = require.resolve('electron')
+
+  const data = fs.readFileSync(path.join(electronPath, '..', 'package.json'))
+  const version = JSON.parse(data.toString())?.version
+  console.log(version)
+  return version
+}
 
 const setConfigAliases = (config) => {
   config.resolve.alias.set('@root', path.resolve(__dirname, './'))
@@ -86,6 +96,7 @@ module.exports = defineConfig({
         // eslint-disable-next-line no-template-curly-in-string
         artifactName: '${name}-setup-${version}-${os}.${ext}',
         publish: ['github'],
+        electronVersion: getElectronVersion(),
       },
     },
   },
