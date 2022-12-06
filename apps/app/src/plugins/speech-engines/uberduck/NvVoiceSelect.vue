@@ -1,11 +1,13 @@
 <template>
   <NvSelect
     v-loading="isFetching"
-    :modelValue="getProperty('selectedVoice')"
     :options="options"
-    v-bind="$attrs"
+    v-bind="{
+      modelValue: getProperty('selectedVoice'),
+      'onUpdate:modelValue': (value) => setProperty('selectedVoice', purify(value)),
+      ...$attrs,
+    }"
     valueKey="voicemodel_uuid"
-    @update:modelValue="(value) => setProperty('selectedVoice', purify(value))"
   />
 </template>
 <script lang="ts" setup>
@@ -15,7 +17,7 @@ import { NvSelect } from '@packages/ui'
 import { purify } from '@packages/toolbox'
 import { orderBy } from 'lodash'
 import { useListVoicesQuery } from './hooks'
-import { LIST_VOICES_QUERY_KEY } from './consts'
+import { getVoiceName, LIST_VOICES_QUERY_KEY } from './shared'
 import { getProperty, setProperty } from './store'
 
 const queryClient = useQueryClient()
@@ -33,7 +35,7 @@ const { data, isFetching } = useListVoicesQuery({
 const voices = computed(() => orderBy(data.value || [], 'display_name'))
 const options = computed(() =>
   voices.value.map((voice) => ({
-    label: `${voice.display_name}`,
+    label: getVoiceName(voice),
     value: voice,
   })),
 )

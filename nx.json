@@ -4,16 +4,10 @@
     "default": {
       "runner": "nx/tasks-runners/default",
       "options": {
-        "cacheableOperations": ["build", "storybook:build", "build-storybook"]
+        "cacheableOperations": [
+          "build"
+        ]
       }
     }
-  },
-  "targetDefaults": {
-    "build": {
-      "dependsOn": ["^build"]
-    }
-  },
-  "affected": {
-    "defaultBase": "main"
   }
 }

@@ -1,5 +1,5 @@
 import { processes } from '@/types/electron'
-import { IzabelaMessagePayload } from '@/modules/izabela/types'
+import { IzabelaMessage } from '@/modules/izabela/types'
 
 const { ipc } = window
 
@@ -9,7 +9,7 @@ export const emitIPCProcessError = (payload: { name: string; message: string }) 
   })
 }
 
-type IPCSayPayload = string | IzabelaMessagePayload
+type IPCSayPayload = string | IzabelaMessage
 
 export const onIPCSay = (callback: (payload: IPCSayPayload) => any) => {
   processes.forEach((process) => {

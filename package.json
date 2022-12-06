@@ -2,20 +2,21 @@
   "name": "root",
   "private": true,
   "scripts": {
-    "install": "npm run build:deps",
-    "bootstrap": "npx lerna bootstrap --no-ci",
-    "dev": "npm run bootstrap && npx lerna run serve --scope izabela-next --stream",
-    "build": "npm run bootstrap && npx lerna run build",
-    "build:deps": "npm run bootstrap && npx lerna run build --scope  '{@packages/*,@apps/app-server}' --stream",
-    "build:app": "npm run bootstrap && npx lerna run build --scope '{@packages/*,@apps/app-server,izabela-next}' --stream"
+    "install:deps": "yarn && yarn build:deps",
+    "bootstrap": "yarn lerna bootstrap --no-ci",
+    "dev": "yarn bootstrap && yarn lerna run serve --scope izabela-next --stream",
+    "build": "yarn bootstrap && yarn lerna run build",
+    "build:deps": "yarn bootstrap && yarn lerna run build --scope  '{@packages/*,@apps/app-server}' --stream",
+    "build:app": "yarn bootstrap && yarn lerna run build --scope '{@packages/*,@apps/app-server,izabela-next}' --stream",
+    "postinstall": "yarn patch-package"
   },
   "devDependencies": {
     "@parcel/packager-ts": "^2.0.1",
     "@parcel/transformer-typescript-types": "^2.0.1",
-    "lerna": "^5.4.3",
+    "lerna": "^6.1.0",
     "microbundle": "^0.15.0",
-    "typescript": "^4.5.4",
-    "nx": "14.5.10"
+    "nx": "14.5.10",
+    "typescript": "^4.5.4"
   },
   "release": {
     "branches": [
@@ -52,5 +53,24 @@
     "trailingComma": "all",
     "arrowParens": "always",
     "endOfLine": "lf"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "iohook": {
+    "targets": [
+      "node-83",
+      "electron-87"
+    ],
+    "platforms": [
+      "win32"
+    ],
+    "arches": [
+      "x64"
+    ]
+  },
+  "dependencies": {
+    "patch-package": "^6.5.0"
   }
 }

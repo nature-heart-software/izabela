@@ -5,14 +5,30 @@ import { getEngineById } from '@/modules/speech-engine-manager'
 import { getMediaDeviceByLabel } from '@/utils/media-devices'
 import { useSettingsStore } from '@/features/settings/store'
 import { Deferred } from '@packages/toolbox'
+import { useMessagesStore, usePlayingMessageStore } from '@/features/messages/store'
 import { IzabelaMessageEvent, IzabelaMessagePayload } from './types'
 
-export default ({ engine: engineName, payload, credentials }: IzabelaMessagePayload) => {
-  const id = uuid()
-  const audio = new Audio()
+export default (messagePayload: IzabelaMessagePayload) => {
+  const {
+    id: existingId,
+    engine: engineName,
+    payload,
+    credentials,
+    excludeFromHistory,
+    disableAutoplay,
+  } = messagePayload
+  const id = existingId || uuid()
+  let audio: HTMLAudioElement
   const emitter = mitt()
   const audioDownloaded = Deferred()
   const audioLoaded = Deferred()
+  const playingMessageStore = usePlayingMessageStore()
+  if (!excludeFromHistory) {
+    const messageStore = useMessagesStore()
+    messageStore.$whenReady().then(() => {
+      messageStore.addToHistory(id, messagePayload)
+    })
+  }
 
   function on(event: IzabelaMessageEvent, callback: () => void): void {
     emitter.on(event, callback)
@@ -35,6 +51,21 @@ export default ({ engine: engineName, payload, credentials }: IzabelaMessagePayl
       if (!settingsStore.playSpeechOnDefaultPlaybackDevice) {
         audio.volume = 0
       }
+
+      audio.addEventListener('timeupdate', () => {
+        playingMessageStore.$patch({
+          progress: audio.currentTime / audio.duration || 0,
+        })
+      })
+      audio.addEventListener('ended', () => {
+        playingMessageStore.$patch({
+          isPlaying: false,
+        })
+      })
+      playingMessageStore.$patch({
+        id,
+        isPlaying: true,
+      })
       audio.play()
       audioElements.forEach((audioEl) => audioEl && audioEl.play())
     })
@@ -47,12 +78,16 @@ export default ({ engine: engineName, payload, credentials }: IzabelaMessagePayl
   function downloadAudio() {
     // TODO: change depending on engine
     const engine = getEngineById(engineName)
-    if (!engine)
-      return Promise.reject(new Error('Izabela Message: Selected engine was   not found'))
-    return engine.synthesizeSpeech({
-      credentials,
-      payload,
-    })
+    if (!engine) return Promise.reject(new Error('Izabela Message: Selected engine was not found'))
+    return engine
+      .synthesizeSpeech({
+        credentials,
+        payload,
+      })
+      .then((res) => {
+        audioDownloaded.resolve(true)
+        return Promise.resolve(res)
+      })
   }
 
   function loadAudio(blob: Blob) {
@@ -81,18 +116,21 @@ export default ({ engine: engineName, payload, credentials }: IzabelaMessagePayl
     audioLoaded.reject(e)
   }
 
-  addEventListeners()
-  downloadAudio()
-    .then(({ data }) => {
-      audioDownloaded.resolve(true)
-      loadAudio(data)
-    })
-    .catch((reason) => onError(reason))
+  if (!disableAutoplay) {
+    audio = new Audio()
+    addEventListeners()
+    downloadAudio()
+      .then(({ data }) => {
+        loadAudio(data)
+      })
+      .catch((reason) => onError(reason))
+  }
 
   return {
     id,
     isReady,
     play,
     on,
+    downloadAudio,
   }
 }

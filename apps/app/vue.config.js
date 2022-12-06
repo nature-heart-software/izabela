@@ -1,7 +1,6 @@
 const path = require('path')
 const { defineConfig } = require('@vue/cli-service')
 const { GenerateExportsPlugin } = require('@packages/generate-exports-webpack-plugin')
-const GenerateModulesPlugin = require('@wurielle/generate-modules-webpack-plugin')
 const WebpackNotifierPlugin = require('webpack-notifier')
 
 const setConfigAliases = (config) => {
@@ -29,20 +28,14 @@ module.exports = defineConfig({
           },
         ],
       }),
-      new GenerateModulesPlugin([
-        {
-          pattern: './src/styles/tokens.ts',
-          into: ['commonjs'],
-        },
-      ]),
     ],
   },
   chainWebpack: (config) => {
     setConfigAliases(config)
 
-    // https://github.com/vuejs/core/issues/4344#issuecomment-912627569
-    config.resolve.symlinks(false)
-    config.resolve.alias.set('vue', path.resolve('./node_modules/vue'))
+    // // https://github.com/vuejs/core/issues/4344#issuecomment-912627569
+    // config.resolve.symlinks(false)
+    // config.resolve.alias.set('vue', path.resolve('../../node_modules/vue'))
   },
   pluginOptions: {
     electronBuilder: {

@@ -1,28 +1,28 @@
 <template>
   <div class="inline-flex">
     <span ref="reference" class="inline-flex w-full">
-      <slot name="reference" />
+      <slot name="reference"/>
     </span>
     <div ref="autocomplete" :style="{ zIndex: 9999 }" class="absolute">
       <Transition>
         <StAutocomplete
-          v-if="props.visible"
-          v-loading="loading"
-          class="autocomplete"
-          v-bind="{ ...props, width: autocompleteWidth }"
+            v-if="props.visible"
+            v-loading="loading"
+            class="autocomplete"
+            v-bind="{ ...props, width: autocompleteWidth }"
         >
           <template v-if="props.options.length === 0">
-            <slot name="fallback" />
+            <slot name="fallback"/>
           </template>
           <NvVirtualListContainer
-            v-show="props.options.length > 0"
-            class="autocomplete__list"
+              v-show="props.options.length > 0"
+              class="autocomplete__list"
           >
             <NvVirtualList
-              ref="list"
-              :count="props.options.length"
-              :estimateSize="() => props.estimateSize"
-              :options="{
+                ref="list"
+                :count="props.options.length"
+                :estimateSize="() => props.estimateSize"
+                :options="{
                 getItemKey: (index) =>
                   get(
                     props.options[index],
@@ -30,12 +30,12 @@
                     props.options[index],
                   ),
               }"
-              @visible="onVisible"
-              @wheel="selection = null"
+                @visible="onVisible"
+                @wheel="selection = null"
             >
               <template #default="scope">
                 <slot
-                  v-bind="{
+                    v-bind="{
                     ...scope,
                     active: selection === scope.index,
                     item: props.options[scope.index],
@@ -50,35 +50,21 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {
-  computed,
-  defineProps,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-  shallowRef,
-  watch,
-} from 'vue'
+import { computed, defineProps, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import { StAutocomplete } from './autocomplete.styled'
 import { defaultWidth, props as propsDefinition } from './autocomplete.shared'
-import {
-  autoUpdate,
-  computePosition,
-  flip,
-  offset,
-  shift,
-} from '@floating-ui/dom'
+import { autoUpdate, computePosition, flip, offset, shift } from '@floating-ui/dom'
 import { rem } from 'polished'
 import tokens from '@/styles/tokens'
 import { onKeyStroke, useElementSize } from '@vueuse/core'
 import { ElLoadingDirective } from 'element-plus'
 import NvVirtualList from '@/components/miscellaneous/VirtualList/NvVirtualList.vue'
 import NvVirtualListContainer from '@/components/miscellaneous/VirtualList/NvVirtualListContainer.vue'
-import { Virtualizer } from '@tanstack/virtual-core'
 import { get } from 'lodash'
+import { Virtualizer } from '@tanstack/virtual-core'
 
 const props = defineProps(propsDefinition)
-const list = ref<undefined | { scrollToIndex: Virtualizer['scrollToIndex'] }>()
+const list = ref<undefined | { scrollToIndex: Virtualizer<Element, Element>['scrollToIndex'] }>()
 const reference = ref()
 const autocomplete = ref()
 const selection = ref<number | null | undefined>(null)
@@ -89,18 +75,18 @@ const loading = ref(true)
 const emit = defineEmits(['select'])
 
 watch(
-  () => props.visible,
-  (visible) => {
-    if (!visible) loading.value = true
-    selection.value = null
-  },
+    () => props.visible,
+    (visible) => {
+      if (!visible) loading.value = true
+      selection.value = null
+    },
 )
 
 watch(
-  () => props.options,
-  () => {
-    selection.value = 0
-  },
+    () => props.options,
+    () => {
+      selection.value = 0
+    },
 )
 
 watch(selection, (selection) => {
@@ -126,7 +112,7 @@ onKeyStroke('ArrowDown', (e) => {
     selection.value = props.autoScrollIndex || 0
     return
   }
-  if (selection.value === props.options.length - 1) {
+  if (selection.value === props.options.length-1) {
     selection.value = 0
   } else {
     selection.value += 1
@@ -141,7 +127,7 @@ onKeyStroke('ArrowUp', (e) => {
     return
   }
   if (selection.value === 0) {
-    selection.value = props.options.length - 1
+    selection.value = props.options.length-1
   } else {
     selection.value -= 1
   }
@@ -155,9 +141,9 @@ onKeyStroke('Enter', (e) => {
 
 onKeyStroke('Tab', (e) => {
   if (
-    !props.visible ||
-    typeof selection.value !== 'number' ||
-    !props.selectOnTab
+      !props.visible ||
+      typeof selection.value !== 'number' ||
+      !props.selectOnTab
   )
     return
   e.preventDefault()
@@ -189,9 +175,9 @@ const updateFloating = () => {
 
 onMounted(() => {
   floatingCleanup.value = autoUpdate(
-    reference.value,
-    autocomplete.value,
-    updateFloating,
+      reference.value,
+      autocomplete.value,
+      updateFloating,
   )
 })
 

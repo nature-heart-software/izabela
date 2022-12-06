@@ -20,7 +20,7 @@
     "@floating-ui/dom": "^1.0.1",
     "@packages/icons": "*",
     "@packages/toolbox": "^0.0.0",
-    "@tanstack/virtual-core": "^3.0.0-beta.18",
+    "@tanstack/virtual-core": "3.0.0-beta.26",
     "@types/uuid": "^8.3.4",
     "@vueuse/core": "^9.2.0",
     "@vueuse/integrations": "^9.2.0",

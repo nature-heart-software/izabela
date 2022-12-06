@@ -44,9 +44,7 @@
     "@types/lodash": "^4.14.184",
     "electron-store": "^8.1.0",
     "lodash": "^4.17.21",
-    "vite-plugin-dts": "^1.4.1"
-  },
-  "peerDependencies": {
+    "vite-plugin-dts": "^1.4.1",
     "electron": "^12.2.3",
     "pinia": "^2.0.21",
     "vue": "^3.2.37"

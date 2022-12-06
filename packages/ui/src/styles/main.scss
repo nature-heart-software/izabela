@@ -15,3 +15,9 @@
 a {
   display: inline-flex;
 }
+
+.el-loading-spinner {
+  width: auto !important;
+  left: 50%;
+  transform: translateX(-50%);
+}

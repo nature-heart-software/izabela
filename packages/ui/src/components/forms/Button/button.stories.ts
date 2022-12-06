@@ -29,6 +29,10 @@ export default {
       defaultValue: props.squared.default,
       control: 'boolean',
     },
+    loading: {
+      defaultValue: props.loading.default,
+      control: 'boolean',
+    },
     iconName: {
       defaultValue: '',
       control: 'text',

@@ -4,60 +4,73 @@ import {
   observeElementRect,
   observeWindowOffset,
   observeWindowRect,
-  type PartialKeys,
+  PartialKeys,
   Virtualizer,
-  type VirtualizerOptions,
+  VirtualizerOptions,
   windowScroll,
 } from '@tanstack/virtual-core'
 import {
   computed,
-  nextTick,
-  type Ref,
+  onScopeDispose,
+  Ref,
   shallowRef,
   triggerRef,
   unref,
-  watchEffect,
+  watch,
 } from 'vue'
 
 type MaybeRef<T> = T | Ref<T>
 
-function useVirtualizerBase<TScrollElement, TItemElement = unknown>(
+function useVirtualizerBase<
+  TScrollElement extends Element | Window,
+  TItemElement extends Element,
+>(
   options: MaybeRef<VirtualizerOptions<TScrollElement, TItemElement>>,
 ): Ref<Virtualizer<TScrollElement, TItemElement>> {
   const virtualizer = new Virtualizer(unref(options))
   const state = shallowRef(virtualizer)
 
-  watchEffect((onCleanup) => {
-    const opts = unref(options)
+  const cleanup = virtualizer._didMount()
 
-    // If those functions use refs, we need to track them.
-    opts.getScrollElement()
-    opts.estimateSize(0)
+  watch(
+    () => unref(options).getScrollElement(),
+    (el) => {
+      if (el) {
+        virtualizer._willUpdate()
+      }
+    },
+    {
+      immediate: true,
+    },
+  )
 
-    // We don't want to track state here
-    nextTick(() => {
+  watch(
+    () => unref(options),
+    (options) => {
       virtualizer.setOptions({
-        ...opts,
-        onChange: (instance: Virtualizer<TScrollElement, TItemElement>) => {
-          state.value = instance
-          // Force an update event
+        ...options,
+        onChange: (instance) => {
           triggerRef(state)
-          opts.onChange?.(instance)
+          options.onChange?.(instance)
         },
       })
 
       virtualizer._willUpdate()
-      // Force an update event
-      triggerRef(state)
-    })
+    },
+    {
+      immediate: true,
+    },
+  )
 
-    onCleanup(virtualizer._didMount())
-  })
+  onScopeDispose(cleanup)
 
   return state
 }
 
-export function useVirtualizer<TScrollElement, TItemElement = unknown>(
+export function useVirtualizer<
+  TScrollElement extends Element,
+  TItemElement extends Element,
+>(
   options: MaybeRef<
     PartialKeys<
       VirtualizerOptions<TScrollElement, TItemElement>,
@@ -75,7 +88,7 @@ export function useVirtualizer<TScrollElement, TItemElement = unknown>(
   )
 }
 
-export function useWindowVirtualizer<TItemElement = unknown>(
+export function useWindowVirtualizer<TItemElement extends Element>(
   options: MaybeRef<
     PartialKeys<
       VirtualizerOptions<Window, TItemElement>,

@@ -1,18 +1,18 @@
 <template>
   <div
-    v-if="virtualizer"
-    :key="props.count"
-    :style="{
+      v-if="virtualizer"
+      :key="props.count"
+      :style="{
       height: rem(virtualizer.getTotalSize()),
     }"
-    class="relative"
+      class="relative"
   >
     <template
-      v-for="item in virtualizer.getVirtualItems()"
-      :key="`${item.index}-${item.key}`"
+        v-for="item in virtualizer.getVirtualItems()"
+        :key="`${item.index}-${item.key}`"
     >
       <div
-        :style="{
+          :style="{
           position: 'absolute',
           top: 0,
           left: 0,
@@ -21,13 +21,14 @@
           transform: `translateY(${item.start}px)`,
         }"
       >
-        <slot name="default" v-bind="{ ...item }" />
+        <slot name="default" v-bind="{ ...item }"/>
       </div>
     </template>
   </div>
 </template>
 <script lang="ts" setup>
-import { useVirtualizer } from '@/hooks/virtual-list'
+import { useVirtualizer } from '@/hooks/useVirtualizer'
+import { Virtualizer } from '@tanstack/virtual-core'
 import {
   injectVirtualListContainerContext,
   props as propsDefinition,
@@ -35,19 +36,18 @@ import {
 import { rem } from 'polished'
 import tokens from '@/styles/tokens'
 import { computed, onBeforeUnmount, onMounted } from 'vue'
-import { Virtualizer } from '@tanstack/virtual-core'
 
 const emit = defineEmits(['visible', 'hidden', 'change'])
 const props = defineProps(propsDefinition)
 const context = injectVirtualListContainerContext()
 const virtualizerOptions = computed(() => ({
-  getScrollElement: () => context?.container.value,
+  getScrollElement: () => (context?.container.value as any | null),
   estimateSize: () => tokens.spacing[7],
   enableSmoothScroll: false,
   overscan: 5,
   ...props.options,
   count: props.count,
-  onChange: (instance: Virtualizer) => {
+  onChange: (instance: Virtualizer<Element, Element>) => {
     emit('change')
     if (props.options?.onChange) {
       props.options.onChange(instance)

@@ -4,14 +4,18 @@ import { resolve } from 'path'
 import dts from 'vite-plugin-dts'
 import { generateExportsPlugin } from '@packages/vite-plugin-generate-exports'
 
-const mode = (() => {
-  const args = process.argv
-  const index = args.indexOf('--mode')
-  return index < 0 ? 'production' : args[index + 1]
-})()
+const pkg = require('./package.json')
+
+const externalPackages = [
+  ...Object.keys(pkg.dependencies || {}),
+  ...Object.keys(pkg.peerDependencies || {}),
+]
+const externals = externalPackages.map(
+  (packageName) => new RegExp(`^${packageName}(\/.*)?`),
+)
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     vue(),
     dts(),
@@ -49,7 +53,7 @@ export default defineConfig({
         }`,
     },
     rollupOptions: {
-      external: ['vue'],
+      external: externals,
     },
   },
-})
+}))

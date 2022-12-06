@@ -3,7 +3,7 @@ import { VirtualizerOptions } from '@tanstack/virtual-core'
 
 export const props = {
   options: {
-    type: Object as PropType<Partial<VirtualizerOptions>>,
+    type: Object as PropType<Partial<VirtualizerOptions<Element, Element>>>,
     default: () => ({}),
   },
   count: {
@@ -16,7 +16,7 @@ export type Props = ExtractPropTypes<typeof props>
 
 export const virtualListContainerContextKey = Symbol('')
 export type VirtualListContainerContext = {
-  container: Ref<HTMLDivElement>
+  container: Ref<Element | null>
 }
 export const provideVirtualListContainerContext = (
   context: VirtualListContainerContext,

@@ -26,7 +26,7 @@ export const props = {
     default: 'body',
   },
   align: {
-    type: String as unknown as Properties['textAlign'],
+    type: String as PropType<Properties['textAlign']>,
     default: '',
   },
 }

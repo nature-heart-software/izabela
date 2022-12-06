@@ -5,14 +5,19 @@ import { resolve } from 'path'
 import { generateExportsPlugin } from '@packages/vite-plugin-generate-exports'
 import { generateModulesPlugin } from '@packages/vite-plugin-generate-modules'
 
-const mode = (() => {
-  const args = process.argv
-  const index = args.indexOf('--mode')
-  return index < 0 ? 'production' : args[index + 1]
-})()
-
+const pkg = require('./package.json')
+const packagesToOmit = ['element-plus']
+const omitPackages = (keys: string[]) =>
+  keys.filter((key) => !packagesToOmit.includes(key))
+const externalPackages = [
+  ...omitPackages(Object.keys(pkg.dependencies || {})),
+  ...omitPackages(Object.keys(pkg.peerDependencies || {})),
+]
+const externals = externalPackages.map(
+  (packageName) => new RegExp(`^${packageName}(\/.*)?`),
+)
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     vue(),
     dts(),
@@ -70,7 +75,7 @@ export default defineConfig({
         }`,
     },
     rollupOptions: {
-      external: ['vue'],
+      external: externals,
     },
   },
-})
+}))

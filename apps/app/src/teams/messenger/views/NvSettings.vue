@@ -1,5 +1,5 @@
 <template>
-  <DomBoundary class="settings bg-gray-10/95 rounded p-4 flex flex-col space-y-4">
+  <NvHitbox class="settings bg-gray-10/95 rounded p-4 flex flex-col space-y-4">
     <!-- Top -->
     <div class="flex justify-between space-x-4">
       <div></div>
@@ -17,7 +17,7 @@
             <NvStack spacing="6">
               <template v-for="category in navigation" :key="category.name">
                 <NvStack>
-                  <NvText class="mx-3" type="subtitle">
+                  <NvText v-if="category.name" class="mx-3" type="subtitle">
                     {{ category.name }}
                   </NvText>
                   <NvStack spacing="2">
@@ -52,11 +52,11 @@
         </div>
       </div>
     </div>
-  </DomBoundary>
+  </NvHitbox>
 </template>
 <script lang="ts" setup>
 import { NvButton, NvCard, NvStack, NvText } from '@packages/ui'
-import DomBoundary from '@/modules/vue-dom-boundaries/DomBoundary.vue'
+import NvHitbox from '@/modules/vue-hitboxes/NvHitbox.vue'
 import { useRoute } from 'vue-router'
 
 const navigation = [
@@ -68,23 +68,11 @@ const navigation = [
         to: { name: 'settings-overview' },
       },
       {
-        name: 'Speech',
-        to: { name: 'settings-speech' },
-      },
-      {
-        name: 'Audio',
-        to: { name: 'settings-audio' },
-      },
-      {
         name: 'Display',
         to: { name: 'settings-display' },
       },
       {
         name: 'Overlay',
-      },
-      {
-        name: 'Dictionary',
-        to: { name: 'settings-dictionary' },
       },
       {
         name: 'Keybindings',
@@ -97,6 +85,23 @@ const navigation = [
       {
         name: 'Update',
         to: { name: 'settings-update' },
+      },
+    ],
+  },
+  {
+    name: 'Speech',
+    children: [
+      {
+        name: 'Speech',
+        to: { name: 'settings-speech' },
+      },
+      {
+        name: 'Audio',
+        to: { name: 'settings-audio' },
+      },
+      {
+        name: 'Dictionary',
+        to: { name: 'settings-dictionary' },
       },
     ],
   },

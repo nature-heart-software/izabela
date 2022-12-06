@@ -70,6 +70,7 @@ const styleBySquared = ({ squared, size }: Props) => {
 }
 
 export const StButton = styled('button', props)`
+  flex-shrink: 0;
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -77,6 +78,7 @@ export const StButton = styled('button', props)`
   border-width: ${() => rem(borderWidth.DEFAULT)};
   outline: 0;
   transition: ${() => transition.DEFAULT};
+  overflow: hidden;
 
   ${({ align = '' }) => align && `justify-content: ${align};`}
   ${(props) => styleBySize(props)}

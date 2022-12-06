@@ -2,7 +2,7 @@ import { api } from '@/services'
 import { registerEngine } from '@/modules/speech-engine-manager'
 import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
-import { ENGINE_ID, ENGINE_NAME } from './consts'
+import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, setProperty } from './store'
 
 const getCredentials = () => ({
@@ -10,21 +10,24 @@ const getCredentials = () => ({
   region: getProperty('region'),
 })
 
+const getSelectedVoice = () => getProperty('selectedVoice')
 registerEngine({
   id: ENGINE_ID,
   name: ENGINE_NAME,
+  getSelectedVoice,
+  getVoiceName,
   getCredentials,
   hasCredentials() {
     return Object.values(getCredentials()).every(Boolean)
   },
-  getPayload(text) {
+  getPayload(text, voice) {
     return {
       text,
-      voice: getProperty('selectedVoice'),
+      voice: voice || getSelectedVoice(),
     }
   },
   getLanguageCode() {
-    return getProperty('selectedVoice').LanguageCode
+    return getSelectedVoice().LanguageCode
   },
   synthesizeSpeech({ credentials, payload }) {
     return api.post<Blob>(

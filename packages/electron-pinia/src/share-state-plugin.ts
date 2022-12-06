@@ -1,11 +1,12 @@
 import { PiniaPlugin } from 'pinia'
-import { purify } from '@packages/toolbox'
+import { Deferred, purify } from '@packages/toolbox'
 import { getIssuer, useArgs } from './utils'
 import { IpcRendererEventHandler, ShareStatePayload } from './types'
 import background from './background'
 import { ipcRenderer, isPreload, isRenderer } from './electron'
 
-export const shareStatePlugin: PiniaPlugin = ({ store }) => {
+export const shareStatePlugin = ({ store }: Parameters<PiniaPlugin>[0]) => {
+  const deferredIsReady = Deferred<boolean>()
   const processType = isRenderer ? 'renderer' : 'main'
 
   function connect() {
@@ -62,33 +63,26 @@ export const shareStatePlugin: PiniaPlugin = ({ store }) => {
       )
     }
 
-    store.$onAction(({ name, store, args }) => {
-      const { issuer, args: newArgs } = useArgs(args)
-      background.notifyRenderers(
-        { name, storeId: store.$id, args: newArgs },
-        issuer,
-      )
-    }, true)
-
     background.onNotifyMain((_, { name, storeId, args }) => {
       if (storeId === store.$id) store[name](...args)
     })
   }
 
-  function start() {
+  async function start() {
     switch (processType) {
       case 'renderer':
-        rendererProcessLogic()
+        await rendererProcessLogic()
         break
       case 'main':
         mainProcessLogic()
         break
-      default:
-        throw new Error('[Vuex Electron] Type should be "renderer" or "main".')
     }
   }
 
   if (!isPreload) {
-    start()
+    start().then(() => {
+      deferredIsReady.resolve(true)
+    })
   }
+  return deferredIsReady.promise
 }
