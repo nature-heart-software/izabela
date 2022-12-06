@@ -65,6 +65,10 @@ jobs:
           targets: |
             ./package.json
             ./apps/app/package.json
+      - name: Install
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: install
       - name: Build
         uses: borales/actions-yarn@v4
         env:
