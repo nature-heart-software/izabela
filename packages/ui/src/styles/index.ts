@@ -44,16 +44,19 @@ injectGlobal`
       }
     }
   }
-  
+
   // tippy
   [data-v-tippy] {
     display: inline-flex;
   }
+
   [data-animation] {
-    transition: ${transition.DEFAULT}!important;
+    transition: ${transition.DEFAULT} !important;
+
     &[data-state='hidden'] {
       opacity: 0;
     }
+
     &[data-state='visible'] {
       opacity: 1;
     }

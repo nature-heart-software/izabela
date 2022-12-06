@@ -33,9 +33,9 @@ module.exports = defineConfig({
   chainWebpack: (config) => {
     setConfigAliases(config)
 
-    // https://github.com/vuejs/core/issues/4344#issuecomment-912627569
-    config.resolve.symlinks(false)
-    config.resolve.alias.set('vue', path.resolve('./node_modules/vue'))
+    // // https://github.com/vuejs/core/issues/4344#issuecomment-912627569
+    // config.resolve.symlinks(false)
+    // config.resolve.alias.set('vue', path.resolve('../../node_modules/vue'))
   },
   pluginOptions: {
     electronBuilder: {

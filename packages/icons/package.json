@@ -3,11 +3,12 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "sideEffects": false,
   "files": [
     "./dist"
   ],
-  "main": "./dist/main.cjs",
-  "module": "./dist/main.es.js",
+  "main": "./dist/packages/icons/src/main.cjs",
+  "module": "./dist/packages/icons/src/main.es.js",
   "types": "./dist/main.d.ts",
   "scripts": {
     "dev": "vite build --watch",

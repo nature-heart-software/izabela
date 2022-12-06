@@ -16,14 +16,15 @@ var _path = require("path");
 var _vitePluginGenerateExports = require("@packages/vite-plugin-generate-exports");
 var _vitePluginGenerateModules = require("@packages/vite-plugin-generate-modules");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-const mode = (() => {
-  const args = process.argv;
-  const index = args.indexOf('--mode');
-  return index < 0 ? 'production' : args[index + 1];
-})();
-
+const pkg = require('./package.json');
+const packagesToOmit = ['element-plus'];
+const omitPackages = keys => keys.filter(key => !packagesToOmit.includes(key));
+const externalPackages = [...omitPackages(Object.keys(pkg.dependencies || {})), ...omitPackages(Object.keys(pkg.peerDependencies || {}))];
+const externals = externalPackages.map(packageName => new RegExp(`^${packageName}(\/.*)?`));
 // https://vitejs.dev/config/
-var _default = (0, _vite.defineConfig)({
+var _default = (0, _vite.defineConfig)(({
+  mode
+}) => ({
   plugins: [(0, _pluginVue.default)(), (0, _vitePluginDts.default)(), (0, _vitePluginGenerateExports.generateExportsPlugin)({
     watch: mode === 'development',
     entries: [{
@@ -67,9 +68,9 @@ var _default = (0, _vite.defineConfig)({
       }[format]}`
     },
     rollupOptions: {
-      external: ['vue']
+      external: externals
     }
   }
-});
+}));
 exports.default = _default;
 /* End of auto-generated content. */
