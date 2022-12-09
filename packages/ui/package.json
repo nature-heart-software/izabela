@@ -16,28 +16,13 @@
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
-  "dependencies": {
-    "@floating-ui/dom": "^1.0.1",
-    "@packages/icons": "*",
-    "@packages/toolbox": "^0.0.0",
-    "@tanstack/virtual-core": "3.0.0-beta.26",
-    "@types/uuid": "^8.3.4",
-    "@vueuse/core": "^9.2.0",
-    "@vueuse/integrations": "^9.2.0",
-    "@vueuse/motion": "^2.0.0-beta.12",
-    "element-plus": "^1.2.0-beta.6",
-    "focus-trap": "^7.0.0",
-    "fuse.js": "^6.6.2",
-    "polished": "^4.2.2",
-    "uuid": "^9.0.0",
-    "vue": "^3.2.37",
-    "vue-tippy": "^6.0.0-alpha.63",
-    "vue3-styled-components": "^1.2.1"
+  "peerDependencies": {
+    "vue": "3.x"
   },
   "devDependencies": {
     "@babel/core": "^7.18.10",
-    "@packages/vite-plugin-generate-exports": "*",
-    "@packages/vite-plugin-generate-modules": "*",
+    "@packages/vite-plugin-generate-exports": "^0.0.0",
+    "@packages/vite-plugin-generate-modules": "^0.0.0",
     "@storybook/addon-actions": "^6.5.10",
     "@storybook/addon-essentials": "^6.5.10",
     "@storybook/addon-interactions": "^6.5.10",
@@ -55,6 +40,24 @@
     "vite": "^3.0.0",
     "vite-plugin-dts": "^1.4.1",
     "vue-loader": "^16.8.3",
-    "vue-tsc": "^0.38.4"
+    "vue-tsc": "^0.38.4",
+    "@floating-ui/dom": "^1.0.1",
+    "@tanstack/virtual-core": "3.0.0-beta.26",
+    "@types/uuid": "^8.3.4",
+    "@vueuse/core": "^9.2.0",
+    "@vueuse/integrations": "^9.2.0",
+    "@vueuse/motion": "^2.0.0-beta.12",
+    "element-plus": "^1.2.0-beta.6",
+    "focus-trap": "^7.0.0",
+    "fuse.js": "^6.6.2",
+    "polished": "^4.2.2",
+    "uuid": "^9.0.0",
+    "vue": "^3.2.37",
+    "vue-tippy": "^6.0.0-alpha.63",
+    "vue3-styled-components": "^1.2.1"
+  },
+  "dependencies": {
+    "@packages/icons": "^0.0.0",
+    "@packages/toolbox": "^0.0.0"
   }
 }
