@@ -1,5 +1,5 @@
 diff --git a/node_modules/@tanstack/virtual-core/build/lib/index.d.ts b/node_modules/@tanstack/virtual-core/build/lib/index.d.ts
-index 49ee5af..3787c19 100644
+index 3eb35ec..618e287 100644
 --- a/node_modules/@tanstack/virtual-core/build/lib/index.d.ts
 +++ b/node_modules/@tanstack/virtual-core/build/lib/index.d.ts
 @@ -21,7 +21,7 @@ export interface VirtualItem {
