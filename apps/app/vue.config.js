@@ -3,13 +3,13 @@ const { defineConfig } = require('@vue/cli-service')
 const { GenerateExportsPlugin } = require('@packages/generate-exports-webpack-plugin')
 const WebpackNotifierPlugin = require('webpack-notifier')
 const fs = require('fs')
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 
 function getElectronVersion() {
   const electronPath = require.resolve('electron')
 
   const data = fs.readFileSync(path.join(electronPath, '..', 'package.json'))
   const version = JSON.parse(data.toString())?.version
-  console.log(version)
   return version
 }
 
@@ -37,6 +37,10 @@ module.exports = defineConfig({
             directories: ['./src/hooks'],
           },
         ],
+      }),
+      new BundleAnalyzerPlugin({
+        analyzerMode: 'static',
+        openAnalyzer: false,
       }),
     ],
   },

@@ -15,10 +15,11 @@
   "files": [
     "./dist"
   ],
+  "peerDependencies": {
+    "electron": "12.x"
+  },
   "dependencies": {
-    "@vue-reactivity/watch": "^0.2.0",
-    "@vue/reactivity": "^3.2.37",
-    "electron": "^18.3.7"
+    "electron": "^12.2.3"
   },
   "devDependencies": {
     "microbundle": "^0.15.1",
