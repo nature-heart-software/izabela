@@ -5,13 +5,14 @@
     "install:deps": "yarn && yarn build:deps",
     "bootstrap": "yarn lerna bootstrap --no-ci",
     "dev": "yarn bootstrap && yarn lerna run serve --scope izabela-next --stream",
-    "build": "yarn install && yarn bootstrap && yarn patch && yarn lerna run build",
+    "build": "yarn install && yarn bootstrap && yarn npm-delay 5000 && yarn patch && yarn lerna run build",
     "build:deps": "yarn bootstrap && yarn lerna run build --scope  '{@packages/*,@apps/app-server}' --stream",
     "build:app": "yarn bootstrap && yarn lerna run build --scope '{@packages/*,@apps/app-server,izabela-next}' --stream",
     "patch": "yarn patch-package"
   },
   "devDependencies": {
     "lerna": "^6.1.0",
+    "npm-delay": "^1.0.4",
     "patch-package": "^6.5.0"
   },
   "workspaces": [
