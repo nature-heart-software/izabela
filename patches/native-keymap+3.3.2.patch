@@ -1,117 +1,145 @@
 diff --git a/node_modules/native-keymap/binding.gyp b/node_modules/native-keymap/binding.gyp
-index a2a3876..438b276 100644
+index a2a3876..5682bee 100644
 --- a/node_modules/native-keymap/binding.gyp
 +++ b/node_modules/native-keymap/binding.gyp
 @@ -1,4 +1,7 @@
  {
 +  'variables' : {
 +    'openssl_fips': '',
-+  }
++  },
    "targets": [
      {
        "target_name": "keymapping",
 diff --git a/node_modules/native-keymap/build/Release/keymapping.iobj b/node_modules/native-keymap/build/Release/keymapping.iobj
-index 7b810d7..3afb978 100644
+index 401d728..2c500d0 100644
 Binary files a/node_modules/native-keymap/build/Release/keymapping.iobj and b/node_modules/native-keymap/build/Release/keymapping.iobj differ
 diff --git a/node_modules/native-keymap/build/Release/keymapping.ipdb b/node_modules/native-keymap/build/Release/keymapping.ipdb
-index b634398..eb39f1d 100644
+index a4102a4..a770c67 100644
 Binary files a/node_modules/native-keymap/build/Release/keymapping.ipdb and b/node_modules/native-keymap/build/Release/keymapping.ipdb differ
 diff --git a/node_modules/native-keymap/build/Release/keymapping.node b/node_modules/native-keymap/build/Release/keymapping.node
-index 6ea5668..f1c5af1 100644
+index 9fccff9..e2e60d6 100644
 Binary files a/node_modules/native-keymap/build/Release/keymapping.node and b/node_modules/native-keymap/build/Release/keymapping.node differ
 diff --git a/node_modules/native-keymap/build/Release/keymapping.pdb b/node_modules/native-keymap/build/Release/keymapping.pdb
-index 6415784..77d00fa 100644
+index cfcf2f2..fff02be 100644
 Binary files a/node_modules/native-keymap/build/Release/keymapping.pdb and b/node_modules/native-keymap/build/Release/keymapping.pdb differ
 diff --git a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.node.recipe b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.node.recipe
-index d617274..86ae92b 100644
+index 1a298f9..86ae92b 100644
 --- a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.node.recipe
 +++ b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.node.recipe
 @@ -2,7 +2,7 @@
  <Project>
    <ProjectOutputs>
      <ProjectOutput>
--      <FullPath>C:\Users\Wuriko\AppData\Local\Temp\tmp-12604Rv5uyLS6Khv0\node_modules\native-keymap\build\Release\keymapping.node</FullPath>
+-      <FullPath>C:\Users\Wuriko\AppData\Local\Temp\tmp-333529pEmnZeNKG9v\node_modules\native-keymap\build\Release\keymapping.node</FullPath>
 +      <FullPath>C:\Users\Wuriko\Desktop\dev\nhs\izabela\node_modules\native-keymap\build\Release\keymapping.node</FullPath>
      </ProjectOutput>
    </ProjectOutputs>
    <ContentFiles />
 diff --git a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/CL.command.1.tlog b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/CL.command.1.tlog
-index e18c53b..13950d0 100644
+index c46066b..13950d0 100644
 Binary files a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/CL.command.1.tlog and b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/CL.command.1.tlog differ
 diff --git a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/CL.read.1.tlog b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/CL.read.1.tlog
-index 1d01035..2cef39d 100644
+index cf6330e..2cef39d 100644
 Binary files a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/CL.read.1.tlog and b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/CL.read.1.tlog differ
 diff --git a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/CL.write.1.tlog b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/CL.write.1.tlog
-index f098e69..0e0c026 100644
+index ed5e1da..0e0c026 100644
 Binary files a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/CL.write.1.tlog and b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/CL.write.1.tlog differ
 diff --git a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/keymapping.lastbuildstate b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/keymapping.lastbuildstate
-index 39b2f69..aae4980 100644
+index e9ff996..aae4980 100644
 --- a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/keymapping.lastbuildstate
 +++ b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/keymapping.lastbuildstate
 @@ -1,2 +1,2 @@
  PlatformToolSet=v142:VCToolArchitecture=Native64Bit:VCToolsVersion=14.29.30133:TargetPlatformVersion=10.0.19041.0:
--Release|x64|C:\Users\Wuriko\AppData\Local\Temp\tmp-12604Rv5uyLS6Khv0\node_modules\native-keymap\build\|
+-Release|x64|C:\Users\Wuriko\AppData\Local\Temp\tmp-333529pEmnZeNKG9v\node_modules\native-keymap\build\|
 +Release|x64|C:\Users\Wuriko\Desktop\dev\nhs\izabela\node_modules\native-keymap\build\|
 diff --git a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/keymapping.write.1u.tlog b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/keymapping.write.1u.tlog
-index fb37a0c..2c09286 100644
+index f1c0d0a..2c09286 100644
 Binary files a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/keymapping.write.1u.tlog and b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/keymapping.write.1u.tlog differ
 diff --git a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/link.command.1.tlog b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/link.command.1.tlog
-index 027ab44..8c9c6a0 100644
+index cbd5936..8c9c6a0 100644
 Binary files a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/link.command.1.tlog and b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/link.command.1.tlog differ
 diff --git a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/link.read.1.tlog b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/link.read.1.tlog
-index 852f72f..8621613 100644
+index 03ad223..8621613 100644
 Binary files a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/link.read.1.tlog and b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/link.read.1.tlog differ
 diff --git a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/link.write.1.tlog b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/link.write.1.tlog
-index 8b240a8..99f7b24 100644
+index 952a172..99f7b24 100644
 Binary files a/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/link.write.1.tlog and b/node_modules/native-keymap/build/Release/obj/keymapping/keymapping.tlog/link.write.1.tlog differ
 diff --git a/node_modules/native-keymap/build/Release/obj/keymapping/src/keyboard_win.obj b/node_modules/native-keymap/build/Release/obj/keymapping/src/keyboard_win.obj
-index 93236f2..7a22c82 100644
+index b7537d3..e301aa2 100644
 Binary files a/node_modules/native-keymap/build/Release/obj/keymapping/src/keyboard_win.obj and b/node_modules/native-keymap/build/Release/obj/keymapping/src/keyboard_win.obj differ
 diff --git a/node_modules/native-keymap/build/Release/obj/keymapping/src/keymapping.obj b/node_modules/native-keymap/build/Release/obj/keymapping/src/keymapping.obj
-index 05bc2bc..96fb64d 100644
+index 97cd599..4d496fb 100644
 Binary files a/node_modules/native-keymap/build/Release/obj/keymapping/src/keymapping.obj and b/node_modules/native-keymap/build/Release/obj/keymapping/src/keymapping.obj differ
 diff --git a/node_modules/native-keymap/build/Release/obj/keymapping/src/string_conversion.obj b/node_modules/native-keymap/build/Release/obj/keymapping/src/string_conversion.obj
-index 7017636..d93ab48 100644
+index 3abe143..e3bd1eb 100644
 Binary files a/node_modules/native-keymap/build/Release/obj/keymapping/src/string_conversion.obj and b/node_modules/native-keymap/build/Release/obj/keymapping/src/string_conversion.obj differ
 diff --git a/node_modules/native-keymap/build/Release/obj/keymapping/win_delay_load_hook.obj b/node_modules/native-keymap/build/Release/obj/keymapping/win_delay_load_hook.obj
-index 991b5c1..084091b 100644
+index f40989d..849dbc1 100644
 Binary files a/node_modules/native-keymap/build/Release/obj/keymapping/win_delay_load_hook.obj and b/node_modules/native-keymap/build/Release/obj/keymapping/win_delay_load_hook.obj differ
 diff --git a/node_modules/native-keymap/build/binding.sln b/node_modules/native-keymap/build/binding.sln
-index 0d4675f..780ca3d 100644
+index 8998694..8a7faf3 100644
 --- a/node_modules/native-keymap/build/binding.sln
 +++ b/node_modules/native-keymap/build/binding.sln
-@@ -1,6 +1,6 @@
+@@ -1,17 +1,17 @@
  Microsoft Visual Studio Solution File, Format Version 12.00
  # Visual Studio 2015
--Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keymapping", "keymapping.vcxproj", "{72E045B4-615B-62CB-6341-03463EFADABC}"
+-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keymapping", "keymapping.vcxproj", "{4C53AE6C-CE15-7948-94C8-0103696C08E3}"
 +Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keymapping", "keymapping.vcxproj", "{6C15F37D-C094-705B-0477-74FFD8FF0ED8}"
  EndProject
  Global
  	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-@@ -8,10 +8,10 @@ Global
+-		Debug|x64 = Debug|x64
  		Release|x64 = Release|x64
++		Debug|x64 = Debug|x64
  	EndGlobalSection
  	GlobalSection(ProjectConfigurationPlatforms) = postSolution
--		{72E045B4-615B-62CB-6341-03463EFADABC}.Debug|x64.ActiveCfg = Debug|x64
--		{72E045B4-615B-62CB-6341-03463EFADABC}.Debug|x64.Build.0 = Debug|x64
--		{72E045B4-615B-62CB-6341-03463EFADABC}.Release|x64.ActiveCfg = Release|x64
--		{72E045B4-615B-62CB-6341-03463EFADABC}.Release|x64.Build.0 = Release|x64
-+		{6C15F37D-C094-705B-0477-74FFD8FF0ED8}.Debug|x64.ActiveCfg = Debug|x64
-+		{6C15F37D-C094-705B-0477-74FFD8FF0ED8}.Debug|x64.Build.0 = Debug|x64
+-		{4C53AE6C-CE15-7948-94C8-0103696C08E3}.Debug|x64.ActiveCfg = Debug|x64
+-		{4C53AE6C-CE15-7948-94C8-0103696C08E3}.Debug|x64.Build.0 = Debug|x64
+-		{4C53AE6C-CE15-7948-94C8-0103696C08E3}.Release|x64.ActiveCfg = Release|x64
+-		{4C53AE6C-CE15-7948-94C8-0103696C08E3}.Release|x64.Build.0 = Release|x64
 +		{6C15F37D-C094-705B-0477-74FFD8FF0ED8}.Release|x64.ActiveCfg = Release|x64
 +		{6C15F37D-C094-705B-0477-74FFD8FF0ED8}.Release|x64.Build.0 = Release|x64
++		{6C15F37D-C094-705B-0477-74FFD8FF0ED8}.Debug|x64.ActiveCfg = Debug|x64
++		{6C15F37D-C094-705B-0477-74FFD8FF0ED8}.Debug|x64.Build.0 = Debug|x64
  	EndGlobalSection
  	GlobalSection(SolutionProperties) = preSolution
  		HideSolutionNode = FALSE
+diff --git a/node_modules/native-keymap/build/config.gypi b/node_modules/native-keymap/build/config.gypi
+index 3a51d6a..7e1b138 100644
+--- a/node_modules/native-keymap/build/config.gypi
++++ b/node_modules/native-keymap/build/config.gypi
+@@ -369,13 +369,22 @@
+     "standalone_static_library": 1,
+     "msbuild_path": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\MSBuild\\Current\\Bin\\MSBuild.exe",
+     "bin_links": "true",
++    "cache": "C:\\Users\\Wuriko\\AppData\\Local\\npm-cache",
++    "globalconfig": "C:\\Users\\Wuriko\\AppData\\Roaming\\npm\\etc\\npmrc",
++    "global_prefix": "C:\\Users\\Wuriko\\AppData\\Roaming\\npm",
+     "ignore_optional": "",
+     "ignore_scripts": "",
+     "init_license": "MIT",
++    "init_module": "C:\\Users\\Wuriko\\.npm-init.js",
+     "init_version": "1.0.0",
++    "local_prefix": "C:\\Users\\Wuriko\\Desktop\\dev\\nhs\\izabela",
++    "metrics_registry": "https://registry.npmjs.org/",
++    "node_gyp": "C:\\Program Files\\nodejs\\node_modules\\npm\\node_modules\\node-gyp\\bin\\node-gyp.js",
++    "prefix": "C:\\Users\\Wuriko\\AppData\\Roaming\\npm",
+     "registry": "https://registry.yarnpkg.com",
+     "save_prefix": "^",
+     "strict_ssl": "true",
++    "userconfig": "C:\\Users\\Wuriko\\.npmrc",
+     "user_agent": "yarn/1.22.19 npm/? node/v16.17.1 win32 x64",
+     "version_commit_hooks": "true",
+     "version_git_message": "v%s",
 diff --git a/node_modules/native-keymap/build/keymapping.vcxproj b/node_modules/native-keymap/build/keymapping.vcxproj
-index 6095c2f..0fc424a 100644
+index e50197e..0fc424a 100644
 --- a/node_modules/native-keymap/build/keymapping.vcxproj
 +++ b/node_modules/native-keymap/build/keymapping.vcxproj
 @@ -11,7 +11,7 @@
      </ProjectConfiguration>
    </ItemGroup>
    <PropertyGroup Label="Globals">
--    <ProjectGuid>{72E045B4-615B-62CB-6341-03463EFADABC}</ProjectGuid>
+-    <ProjectGuid>{4C53AE6C-CE15-7948-94C8-0103696C08E3}</ProjectGuid>
 +    <ProjectGuid>{6C15F37D-C094-705B-0477-74FFD8FF0ED8}</ProjectGuid>
      <Keyword>Win32Proj</Keyword>
      <RootNamespace>keymapping</RootNamespace>
