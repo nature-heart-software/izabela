@@ -16,7 +16,8 @@
   "files": [
     "./dist"
   ],
-  "devDependencies": {
+  "dependencies": {
+    "morgan": "^1.10.0",
     "say": "^0.16.0",
     "ibm-watson": "^7.0.0",
     "microsoft-cognitiveservices-speech-sdk": "^1.21.0",
@@ -28,10 +29,11 @@
     "body-parser": "^1.20.0",
     "cors": "^2.8.5",
     "express": "^4.17.3",
-    "morgan": "^1.10.0",
     "node-cache": "^5.1.2",
     "uuid": "^8.3.2",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
     "@packages/generate-exports": "^0.0.0",
     "@types/body-parser": "^1.19.2",
     "@types/cors": "^2.8.12",
