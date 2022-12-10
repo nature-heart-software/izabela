@@ -5,6 +5,7 @@
   "main": "index.js",
   "typings": "index.d.ts",
   "scripts": {
+    "install": "",
     "test": "node test/test.js"
   },
   "repository": {
