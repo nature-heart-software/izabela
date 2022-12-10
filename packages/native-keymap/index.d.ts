@@ -4,67 +4,73 @@
  *--------------------------------------------------------------------------------------------*/
 
 export interface IWindowsKeyMapping {
-	vkey: string;
-	value: string;
-	withShift: string;
-	withAltGr: string;
-	withShiftAltGr: string;
+  vkey: string
+  value: string
+  withShift: string
+  withAltGr: string
+  withShiftAltGr: string
 }
 export interface IWindowsKeyboardMapping {
-	[code: string]: IWindowsKeyMapping;
+  [code: string]: IWindowsKeyMapping
 }
 export interface ILinuxKeyMapping {
-	value: string;
-	withShift: string;
-	withAltGr: string;
-	withShiftAltGr: string;
+  value: string
+  withShift: string
+  withAltGr: string
+  withShiftAltGr: string
 }
 export interface ILinuxKeyboardMapping {
-	[code: string]: ILinuxKeyMapping;
+  [code: string]: ILinuxKeyMapping
 }
 export interface IMacKeyMapping {
-	value: string;
-	valueIsDeadKey: boolean;
-	withShift: string;
-	withShiftIsDeadKey: boolean;
-	withAltGr: string;
-	withAltGrIsDeadKey: boolean;
-	withShiftAltGr: string;
-	withShiftAltGrIsDeadKey: boolean;
+  value: string
+  valueIsDeadKey: boolean
+  withShift: string
+  withShiftIsDeadKey: boolean
+  withAltGr: string
+  withAltGrIsDeadKey: boolean
+  withShiftAltGr: string
+  withShiftAltGrIsDeadKey: boolean
 }
 export interface IMacKeyboardMapping {
-	[code: string]: IMacKeyMapping;
+  [code: string]: IMacKeyMapping
 }
 
-export type IKeyboardMapping = IWindowsKeyboardMapping | ILinuxKeyboardMapping | IMacKeyboardMapping;
+export type IKeyboardMapping =
+  | IWindowsKeyboardMapping
+  | ILinuxKeyboardMapping
+  | IMacKeyboardMapping
 
-export function getKeyMap(): IKeyboardMapping;
+export function getKeyMap(): IKeyboardMapping
 
 export interface IWindowsKeyboardLayoutInfo {
-	name: string;
-	id: string;
-	text: string;
+  name: string
+  id: string
+  text: string
 }
 
 export interface ILinuxKeyboardLayoutInfo {
-	model: string;
-	group: number;
-	layout: string;
-	variant: string;
-	options: string;
-	rules: string;
+  model: string
+  group: number
+  layout: string
+  variant: string
+  options: string
+  rules: string
 }
 
 export interface IMacKeyboardLayoutInfo {
-	id: string;
-	localizedName: string;
-	lang: string;
+  id: string
+  localizedName: string
+  lang: string
 }
 
-export type IKeyboardLayoutInfo = IWindowsKeyboardLayoutInfo | ILinuxKeyboardLayoutInfo | IMacKeyboardLayoutInfo;
+export type IKeyboardLayoutInfo =
+  | IWindowsKeyboardLayoutInfo
+  | ILinuxKeyboardLayoutInfo
+  | IMacKeyboardLayoutInfo
 
-export function getCurrentKeyboardLayout(): IKeyboardLayoutInfo;
+export function getCurrentKeyboardLayout(): IKeyboardLayoutInfo
 
-export function onDidChangeKeyboardLayout(callback: () => void): void;
+export function onDidChangeKeyboardLayout(callback: () => void): void
 
-export function isISOKeyboard(): boolean | undefined;
+export function isISOKeyboard(): boolean | undefined
