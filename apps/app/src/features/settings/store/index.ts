@@ -30,6 +30,7 @@ export const useSettingsStore = defineStore(
     const debugMode = ref(process.env.NODE_ENV === 'development')
     const messageMode = ref<'sentence' | 'word'>('sentence')
     const display = ref<Electron.Display['id'] | null>(null)
+    const hideWindowOnMessage = ref(false)
     const keybindings = ref<Record<string, Key[]>>({
       recordAudio: [
         {
@@ -84,6 +85,7 @@ export const useSettingsStore = defineStore(
       messageMode,
       display,
       keybindings,
+      hideWindowOnMessage,
     }
   },
   {

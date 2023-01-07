@@ -64,8 +64,8 @@ const navigation = [
     name: 'Application',
     children: [
       {
-        name: 'Overview',
-        to: { name: 'settings-overview' },
+        name: 'General',
+        to: { name: 'settings-general' },
       },
       {
         name: 'Display',

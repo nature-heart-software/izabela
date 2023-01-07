@@ -1,6 +1,20 @@
 <template>
   <NvStack spacing="6">
     <NvStack>
+      <NvText type="subtitle">General</NvText>
+      <NvCard>
+        <NvGroup justify="apart" no-wrap spacing="5">
+          <NvStack>
+            <NvText type="label">Hide window after sending a message</NvText>
+          </NvStack>
+          <NvSwitch
+            :modelValue="settingsStore.hideWindowOnMessage"
+            @update:modelValue="(value) => settingsStore.$patch({ hideWindowOnMessage: value })"
+          />
+        </NvGroup>
+      </NvCard>
+    </NvStack>
+    <NvStack>
       <NvText type="subtitle">Development</NvText>
       <NvCard>
         <NvGroup justify="apart" no-wrap spacing="5">

@@ -65,6 +65,9 @@ const onInputBlur = () => {
 
 const onInputEnter = () => {
   playMessage()
+  if (settingsStore.hideWindowOnMessage) {
+    ElectronMessengerWindow.hide()
+  }
 }
 
 const onWindowFocus = () => {
