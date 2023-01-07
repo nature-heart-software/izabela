@@ -78,6 +78,7 @@ import NvMessengerMessageBar from '@/teams/messenger/components/NvMessengerMessa
 import NvMessengerLinksBar from '@/teams/messenger/components/NvMessengerLinksBar.vue'
 import NvMessengerHandleBar from '@/teams/messenger/components/NvMessengerHandleBar.vue'
 import NvMessengerNavigationBar from '@/teams/messenger/components/NvMessengerNavigationBar.vue'
+import { debounce } from 'lodash'
 
 const messengerStore = useMessengerStore()
 const props = defineProps({
@@ -147,8 +148,9 @@ const viewport = computed(() => ({
   height: Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0),
 }))
 
-const savePosition = (event: any) => {
+const savePosition = debounce((event: any) => {
   const { width, height, translate, transform } = event
+
   messengerStore.$patch({
     position: {
       width,
@@ -157,7 +159,7 @@ const savePosition = (event: any) => {
       transform,
     },
   })
-}
+}, 1000)
 
 const onDrag = (event: any) => {
   const { target, transform } = event
@@ -179,23 +181,28 @@ onMounted(() => {
     if (props.transform) moveableTargetEl.style.transform = props.transform
   }
   moveable.value.updateTarget()
-  if (!props.transform) {
-    const { width, height } = moveable.value.getRect()
-    moveable.value.request(
-      'draggable',
-      {
-        x: viewport.value.width / 2-width / 2,
-        y: viewport.value.height-height-60,
-      },
-      true,
-    )
-  }
-  /* This fixes focus on focusable elements. Focus won't work unless
-   * the window has been dragged once with draggable for some reasons
-   * */
-  moveable.value.request('draggable', { deltaX: 0, deltaY: -1 }, true)
+
   setTimeout(() => {
-    moveable.value.request('draggable', { deltaX: 0, deltaY: 1 }, true)
+    if (!props.transform) {
+      const rect = moveableTargetEl?.getBoundingClientRect()
+      if (!rect) return
+      const { width, height } = rect
+      moveable.value.request(
+        'draggable',
+        {
+          x: viewport.value.width / 2-width / 2,
+          y: viewport.value.height-height-60,
+        },
+        true,
+      )
+    }
+    /* This fixes focus on focusable elements. Focus won't work unless
+     * the window has been dragged once with draggable for some reasons
+     * */
+    moveable.value.request('draggable', { deltaX: 0, deltaY: -1 }, true)
+    setTimeout(() => {
+      moveable.value.request('draggable', { deltaX: 0, deltaY: 1 }, true)
+    }, 1000)
   }, 1000)
 })
 </script>
