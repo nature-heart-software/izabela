@@ -7,24 +7,24 @@
       >
         <!-- Top -->
         <NvGroup :spacing="4">
-          <NvMessengerLinksBar/>
+          <NvMessengerLinksBar />
           <NvGroup :spacing="4" class="!flex-1">
             <div class="moveable-handle cursor-all-scroll !flex-1">
-              <NvMessengerHandleBar/>
+              <NvMessengerHandleBar />
             </div>
-            <NvMessengerNavigationBar/>
+            <NvMessengerNavigationBar />
           </NvGroup>
         </NvGroup>
 
         <!-- Middle -->
         <NvGroup :spacing="4" justify="between">
-          <NvMessengerAudioBar/>
-          <NvMessengerMessageBar/>
+          <NvMessengerAudioBar />
+          <NvMessengerMessageBar />
         </NvGroup>
 
         <!-- Bottom -->
         <NvGroup :spacing="4" grow>
-          <NvMessengerInputBar/>
+          <NvMessengerInputBar />
         </NvGroup>
       </div>
     </NvHitbox>
@@ -57,15 +57,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {
-  ComponentPublicInstance,
-  computed,
-  defineProps,
-  onMounted,
-  provide,
-  ref,
-  unref,
-} from 'vue'
+import { ComponentPublicInstance, computed, defineProps, onMounted, provide, ref, unref } from 'vue'
 import Moveable from 'vue3-moveable'
 import { NvGroup } from '@packages/ui'
 import { RouteLocationRaw, useRouter } from 'vue-router'
@@ -78,6 +70,7 @@ import NvMessengerMessageBar from '@/teams/messenger/components/NvMessengerMessa
 import NvMessengerLinksBar from '@/teams/messenger/components/NvMessengerLinksBar.vue'
 import NvMessengerHandleBar from '@/teams/messenger/components/NvMessengerHandleBar.vue'
 import NvMessengerNavigationBar from '@/teams/messenger/components/NvMessengerNavigationBar.vue'
+import { debounce } from 'lodash'
 
 const messengerStore = useMessengerStore()
 const props = defineProps({
@@ -126,17 +119,21 @@ const settingsPopover = useRouterViewPopover({
 
 const router = useRouter()
 const navigateTo = (location: RouteLocationRaw) => {
-  if (unref(settingsPopover.popover.value?.state)?.isShown && typeof location === 'object' && 'name' in location && router.currentRoute.value.name === location.name) {
+  if (
+    unref(settingsPopover.popover.value?.state)?.isShown &&
+    typeof location === 'object' &&
+    'name' in location &&
+    router.currentRoute.value.name === location.name
+  ) {
     settingsPopover.popover.value?.hide()
     return
   }
   router.push(location)
   settingsPopover.popover.value?.show()
-
 }
-const popover = computed(() => (settingsPopover.popover.value))
-const popoverState = computed<any>(() => (popover.value?.state))
-const isViewShown = computed(() => (popoverState.value?.isShown))
+const popover = computed(() => settingsPopover.popover.value)
+const popoverState = computed<any>(() => popover.value?.state)
+const isViewShown = computed(() => popoverState.value?.isShown)
 provide('messenger', {
   navigateTo,
   isViewShown,
@@ -147,8 +144,9 @@ const viewport = computed(() => ({
   height: Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0),
 }))
 
-const savePosition = (event: any) => {
+const savePosition = debounce((event: any) => {
   const { width, height, translate, transform } = event
+
   messengerStore.$patch({
     position: {
       width,
@@ -157,7 +155,7 @@ const savePosition = (event: any) => {
       transform,
     },
   })
-}
+}, 1000)
 
 const onDrag = (event: any) => {
   const { target, transform } = event
@@ -170,32 +168,37 @@ onMounted(() => {
   const moveableTargetEl = (moveableTarget.value as ComponentPublicInstance)
     .$el as HTMLDivElement | null
   if (moveableTargetEl) {
-    if (props.width) moveableTargetEl.style.width = `${ props.width }px`
-    if (props.minWidth) moveableTargetEl.style.minWidth = `${ props.minWidth }px`
-    if (props.maxWidth) moveableTargetEl.style.maxWidth = `${ props.maxWidth }px`
-    if (props.height) moveableTargetEl.style.height = `${ props.height }px`
-    if (props.minHeight) moveableTargetEl.style.minHeight = `${ props.minHeight }px`
-    if (props.maxHeight) moveableTargetEl.style.maxHeight = `${ props.maxHeight }px`
+    if (props.width) moveableTargetEl.style.width = `${props.width}px`
+    if (props.minWidth) moveableTargetEl.style.minWidth = `${props.minWidth}px`
+    if (props.maxWidth) moveableTargetEl.style.maxWidth = `${props.maxWidth}px`
+    if (props.height) moveableTargetEl.style.height = `${props.height}px`
+    if (props.minHeight) moveableTargetEl.style.minHeight = `${props.minHeight}px`
+    if (props.maxHeight) moveableTargetEl.style.maxHeight = `${props.maxHeight}px`
     if (props.transform) moveableTargetEl.style.transform = props.transform
   }
   moveable.value.updateTarget()
-  if (!props.transform) {
-    const { width, height } = moveable.value.getRect()
-    moveable.value.request(
-      'draggable',
-      {
-        x: viewport.value.width / 2-width / 2,
-        y: viewport.value.height-height-60,
-      },
-      true,
-    )
-  }
-  /* This fixes focus on focusable elements. Focus won't work unless
-   * the window has been dragged once with draggable for some reasons
-   * */
-  moveable.value.request('draggable', { deltaX: 0, deltaY: -1 }, true)
+
   setTimeout(() => {
-    moveable.value.request('draggable', { deltaX: 0, deltaY: 1 }, true)
+    if (!props.transform) {
+      const rect = moveableTargetEl?.getBoundingClientRect()
+      if (!rect) return
+      const { width, height } = rect
+      moveable.value.request(
+        'draggable',
+        {
+          x: viewport.value.width / 2 - width / 2,
+          y: viewport.value.height - height - 60,
+        },
+        true,
+      )
+    }
+    /* This fixes focus on focusable elements. Focus won't work unless
+     * the window has been dragged once with draggable for some reasons
+     * */
+    moveable.value.request('draggable', { deltaX: 0, deltaY: -1 }, true)
+    setTimeout(() => {
+      moveable.value.request('draggable', { deltaX: 0, deltaY: 1 }, true)
+    }, 1000)
   }, 1000)
 })
 </script>

@@ -20,7 +20,7 @@
         "
         icon-name="setting"
         size="sm"
-        @click="messengerContext.navigateTo({ name: 'settings-overview' })"
+        @click="messengerContext.navigateTo({ name: 'settings-general' })"
       />
     </NvGroup>
   </NvCard>

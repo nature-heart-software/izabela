@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
 import NvSettings from '@/teams/messenger/views/NvSettings.vue'
-import NvSettingsOverview from '@/teams/messenger/views/NvSettingsOverview.vue'
+import NvSettingsGeneral from '@/teams/messenger/views/NvSettingsGeneral.vue'
 import NvSettingsSpeech from '@/teams/messenger/views/NvSettingsSpeech.vue'
 import NvSettingsAudio from '@/teams/messenger/views/NvSettingsAudio.vue'
 import NvSettingsDictionary from '@/teams/messenger/views/NvSettingsDictionary.vue'
@@ -19,9 +19,9 @@ const routes: Array<RouteRecordRaw> = [
     component: NvSettings,
     children: [
       {
-        name: 'settings-overview',
-        path: 'overview',
-        component: NvSettingsOverview,
+        name: 'settings-general',
+        path: 'general',
+        component: NvSettingsGeneral,
       },
       {
         name: 'settings-speech',
