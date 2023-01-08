@@ -1,6 +1,6 @@
 <template>
   <ThemeProvider :theme="tokens">
-    <NvBackground/>
+    <NvBackground />
     <div class="h-0">
       <NvMessenger
         v-if="messengerStore.$isReady"
@@ -9,7 +9,7 @@
         class="w-full h-full"
       />
     </div>
-    <NvDebug v-if="settingsStore.debugMode"/>
+    <NvDebug v-if="settingsStore.debugMode" />
   </ThemeProvider>
 </template>
 <style lang="scss">
@@ -29,11 +29,11 @@ import { useMessengerStore } from '@/teams/messenger/store'
 import NvDebug from '@/teams/messenger/components/NvDebug.vue'
 import { useSettingsStore } from '@/features/settings/store'
 
-import { io } from "socket.io-client"
+import { io } from 'socket.io-client'
 
 const messengerStore = useMessengerStore()
 const settingsStore = useSettingsStore()
-const socket = io(`ws://localhost:${ process.env.VUE_APP_SERVER_WS_PORT }`, {})
+const socket = io(`ws://localhost:${process.env.VUE_APP_SERVER_WS_PORT}`, {})
 socket.on('message', (e) => {
   console.log('[socket.io] Message:', e)
 })
