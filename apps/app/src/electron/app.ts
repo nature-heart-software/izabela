@@ -37,13 +37,16 @@ const App = () => {
       server.start({
         tempPath: path.join(app.getPath('userData'), 'temp'),
         port: process.env.VUE_APP_SERVER_PORT,
+        ws: {
+          port: process.env.VUE_APP_SERVER_WS_PORT,
+        },
       }),
     )
 
   const configureAppDefaults = () => {
     if (process.platform === 'win32') app.setAppUserModelId(app.name)
     app.commandLine.appendSwitch('disable-renderer-backgrounding')
-
+    app.commandLine.appendSwitch('ignore-certificate-errors')
     /* Fixes iohook. See: https://github.com/electron/electron/issues/18397 */
     app.allowRendererProcessReuse = false
 

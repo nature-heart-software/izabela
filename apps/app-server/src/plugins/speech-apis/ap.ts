@@ -7,6 +7,8 @@ import {
 import { fromCognitoIdentityPool } from '@aws-sdk/credential-provider-cognito-identity'
 import { CognitoIdentityClient } from '@aws-sdk/client-cognito-identity'
 import { handleError } from '../../utils/requests'
+import websocket from '../../websocket'
+import { createMessageReceipt } from '../../utils/message'
 
 const plugin: Izabela.Server.Plugin = ({ app }) => {
   const listVoicesHandler: RequestHandler = async (
@@ -56,7 +58,10 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
         VoiceId: voice.Id,
       })
       const { AudioStream } = await client.send(command)
-      ;(AudioStream as any).pipe(res)
+      const stream = (AudioStream as any).pipe(res)
+      stream.on('finish', () => {
+        websocket.sendMessage(createMessageReceipt(text))
+      })
     } catch (e: any) {
       handleError(res, 'Internal server error', e.message, 500)
     }

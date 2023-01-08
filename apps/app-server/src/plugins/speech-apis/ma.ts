@@ -12,6 +12,8 @@ import {
   SpeechSynthesizer,
 } from 'microsoft-cognitiveservices-speech-sdk'
 import util from 'util'
+import websocket from '../../websocket'
+import { createMessageReceipt } from '../../utils/message'
 
 const plugin: Izabela.Server.Plugin = ({ app }) => {
   const listVoicesHandler: RequestHandler = async (
@@ -104,6 +106,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
       const stream = fs.createReadStream(outputFile).pipe(res)
       stream.on('finish', () => {
         fs.unlinkSync(outputFile)
+        websocket.sendMessage(createMessageReceipt(text))
       })
     } catch (e: any) {
       if (fs.existsSync(outputFile)) {

@@ -5,7 +5,10 @@ declare global {
     namespace Server {
       type Config = {
         tempPath: string
-        port: 7070
+        port: number
+        ws: {
+          port: number
+        }
       }
       type Context = {
         app: Express

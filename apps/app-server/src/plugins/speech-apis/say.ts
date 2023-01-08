@@ -5,6 +5,8 @@ import path from 'path'
 import izabelaServer from '../../server'
 import { v4 as uuid } from 'uuid'
 import fs from 'fs'
+import websocket from '../../websocket'
+import { createMessageReceipt } from '../../utils/message'
 
 const plugin: Izabela.Server.Plugin = ({ app }) => {
   const listVoicesHandler: RequestHandler = async (_, res) => {
@@ -59,6 +61,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
       const stream = fs.createReadStream(outputFile).pipe(res)
       stream.on('finish', () => {
         fs.unlinkSync(outputFile)
+        websocket.sendMessage(createMessageReceipt(text))
       })
     } catch (e: any) {
       if (fs.existsSync(outputFile)) {
