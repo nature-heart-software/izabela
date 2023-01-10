@@ -10,8 +10,11 @@ export default (() => {
           methods: ['*'],
         },
       })
-      io.on('connection', (socket) => {
-        console.log('[socket.io] Connection:', socket.id)
+      io.on('connect', (socket) => {
+        console.log('[socket.io] Connected:', socket.id)
+        socket.on('disconnect', () => {
+          console.log('[socket.io] Disconnected:', socket.id)
+        })
       })
     },
     sendMessage(message: { id: string; text: string; timestamp: string }) {
