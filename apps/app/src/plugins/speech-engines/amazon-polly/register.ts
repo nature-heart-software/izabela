@@ -22,8 +22,8 @@ registerEngine({
   },
   getPayload(text, voice) {
     return {
-      text,
-      voice: voice || getSelectedVoice(),
+      Text: text,
+      VoiceId: (voice || getSelectedVoice()).Id,
     }
   },
   getLanguageCode() {

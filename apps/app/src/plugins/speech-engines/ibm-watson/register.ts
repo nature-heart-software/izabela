@@ -23,7 +23,7 @@ registerEngine({
   getPayload(text, voice) {
     return {
       text,
-      voice: voice || getSelectedVoice(),
+      voice: (voice || getSelectedVoice()).name,
     }
   },
   getLanguageCode() {
