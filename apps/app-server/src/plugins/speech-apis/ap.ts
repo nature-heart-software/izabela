@@ -56,7 +56,10 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
         VoiceId: voice.Id,
       })
       const { AudioStream } = await client.send(command)
-      ;(AudioStream as any).pipe(res)
+      const stream = (AudioStream as any).pipe(res)
+      stream.on('finish', () => {
+        //
+      })
     } catch (e: any) {
       handleError(res, 'Internal server error', e.message, 500)
     }

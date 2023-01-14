@@ -50,7 +50,10 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
         voice: voice.name,
       })
 
-      result.pipe(res)
+      const stream = result.pipe(res)
+      stream.on('finish', () => {
+        //
+      })
     } catch (e: any) {
       handleError(res, 'Internal server error', e.message, 500)
     }

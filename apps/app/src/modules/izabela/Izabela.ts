@@ -1,4 +1,5 @@
 import { IzabelaMessagePayload } from '@/modules/izabela/types'
+import { socket } from '@/services'
 import IzabelaMessage from './IzabelaMessage'
 
 export default () => {
@@ -24,13 +25,22 @@ export default () => {
   }
 
   function playMessage(message: ReturnType<typeof IzabelaMessage>) {
+    const socketPayload = message.getSocketPayload()
+    const onEnd = () => {
+      socket.emit('message:end', socketPayload)
+      return endMessage()
+    }
     currentlyPlayingMessage = message
-    message.on('ended', () => endMessage())
-    message.on('error', () => endMessage())
+    message.on('ended', onEnd)
+    message.on('error', onEnd)
+    socket.emit('message:load', socketPayload)
     message
       .isReady()
-      .then(() => message.play())
-      .catch(() => endMessage())
+      .then(() => {
+        socket.emit('message:start', socketPayload)
+        return message.play()
+      })
+      .catch(onEnd)
     return message
   }
 
