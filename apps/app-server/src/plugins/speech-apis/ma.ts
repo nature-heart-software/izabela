@@ -41,7 +41,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
     {
       body: {
         credentials: { apiKey, region },
-        payload: { text, voice, expression },
+        payload,
       },
     },
     res,
@@ -55,18 +55,17 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
       fs.writeFileSync(outputFile, '')
 
       const speechConfig = SpeechConfig.fromSubscription(apiKey, region)
-      speechConfig.speechSynthesisLanguage = voice.Locale
-      speechConfig.speechSynthesisVoiceName = voice.ShortName
+      speechConfig.speechSynthesisLanguage = payload.voice.Locale
+      speechConfig.speechSynthesisVoiceName = payload.voice.ShortName
       speechConfig.speechSynthesisOutputFormat =
         SpeechSynthesisOutputFormat.Audio24Khz160KBitRateMonoMp3
       const audioConfig = AudioConfig.fromAudioFileOutput(outputFile)
 
       const synthesizer = new SpeechSynthesizer(speechConfig, audioConfig)
       const audioContent: ArrayBuffer = await new Promise((resolve, reject) => {
-        if (expression) {
-          const ssml = `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US"><voice name="${voice.ShortName}"><mstts:express-as style="${expression}">${text}</mstts:express-as></voice></speak>`
+        if (payload.ssml) {
           synthesizer.speakSsmlAsync(
-            ssml,
+            payload.ssml,
             (result) => {
               resolve(result.audioData)
               synthesizer.close()
@@ -78,7 +77,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
           )
         } else {
           synthesizer.speakTextAsync(
-            text,
+            payload.text,
             (result) => {
               resolve(result.audioData)
               synthesizer.close()

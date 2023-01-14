@@ -22,8 +22,8 @@ registerEngine({
   },
   getPayload(text, voice) {
     return {
-      text,
-      voicemodel_uuid: voice || getSelectedVoice().voicemodel_uuid,
+      speech: text,
+      voicemodel_uuid: (voice || getSelectedVoice()).voicemodel_uuid,
     }
   },
   getLanguageCode() {

@@ -30,7 +30,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
     {
       body: {
         credentials: { publicKey, privateKey },
-        payload: { voicemodel_uuid, text: speech },
+        payload,
       },
     },
     res,
@@ -51,10 +51,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
             `${publicKey}:${privateKey}`,
           ).toString('base64')}`,
         },
-        data: {
-          voicemodel_uuid,
-          speech,
-        },
+        data: payload,
         responseType: 'arraybuffer',
       })
 
