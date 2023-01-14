@@ -2,6 +2,12 @@ import { Server } from 'socket.io'
 
 export default (() => {
   let io: Server | null = null
+  const forwardEvent = (event: string, message: any) => {
+    if (io) {
+      io.emit(event, message)
+    }
+  }
+
   return {
     start({ port }: { port: number }) {
       io = new Server(port, {
@@ -15,12 +21,11 @@ export default (() => {
         socket.on('disconnect', () => {
           console.log('[socket.io] Disconnected:', socket.id)
         })
+        ;['message:load', 'message:start', 'message:end'].forEach((event) => {
+          socket.on(event, (message) => forwardEvent(event, message))
+        })
       })
     },
-    sendMessage(message: { id: string; text: string; timestamp: string }) {
-      if (io) {
-        io.emit('message', message)
-      }
-    },
+    forwardEvent,
   }
 })()

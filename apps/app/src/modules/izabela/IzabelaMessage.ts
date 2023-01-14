@@ -132,5 +132,13 @@ export default (messagePayload: IzabelaMessagePayload) => {
     play,
     on,
     downloadAudio,
+    getSocketPayload: () => {
+      const { credentials: _, ...rest } = messagePayload
+      return {
+        ...rest,
+        id,
+        timestamp: new Date().toISOString(),
+      }
+    },
   }
 }

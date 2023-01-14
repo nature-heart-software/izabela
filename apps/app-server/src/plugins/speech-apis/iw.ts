@@ -2,8 +2,6 @@ import { RequestHandler } from 'express'
 import TextToSpeechV1 from 'ibm-watson/text-to-speech/v1'
 import { IamAuthenticator } from 'ibm-watson/auth'
 import { handleError } from '../../utils/requests'
-import websocket from '../../websocket'
-import { createMessageReceipt } from '../../utils/message'
 
 const plugin: Izabela.Server.Plugin = ({ app }) => {
   const listVoicesHandler: RequestHandler = async (
@@ -54,7 +52,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
 
       const stream = result.pipe(res)
       stream.on('finish', () => {
-        websocket.sendMessage(createMessageReceipt(text))
+        //
       })
     } catch (e: any) {
       handleError(res, 'Internal server error', e.message, 500)
