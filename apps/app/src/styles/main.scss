@@ -5,15 +5,15 @@
 *,
 *::before,
 *::after {
-    user-select: none;
-    outline: 0;
+  user-select: none;
+  outline: 0;
 }
 
 body {
-    position: relative;
+  position: relative;
 
-    #app {
-        position: relative;
-        z-index: 10000;
-    }
+  #app {
+    position: relative;
+    z-index: 10000;
+  }
 }
