@@ -1,13 +1,16 @@
 <template>
   <NvAccessBlocker
-    :allowed="speechStore.hasUniversalApiCredentials || [getProperty('publicKey', true), getProperty('privateKey', true)].every(Boolean)"
+    :allowed="
+      speechStore.hasUniversalApiCredentials ||
+      [getProperty('publicKey', true), getProperty('privateKey', true)].every(Boolean)
+    "
     reason="Credentials required"
   >
     <NvFormItem label="Voice">
-      <NvVoiceSelect/>
+      <NvVoiceSelect />
     </NvFormItem>
   </NvAccessBlocker>
-  <NvDivider direction="horizontal"/>
+  <NvDivider direction="horizontal" />
   <NvStack spacing="5">
     <NvFormItem label="Public API Key">
       <NvInput
@@ -18,7 +21,7 @@
       />
     </NvFormItem>
   </NvStack>
-  <NvDivider direction="horizontal"/>
+  <NvDivider direction="horizontal" />
   <NvStack spacing="5">
     <NvFormItem label="Private API Key">
       <NvInput

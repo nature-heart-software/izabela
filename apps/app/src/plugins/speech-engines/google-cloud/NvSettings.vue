@@ -1,12 +1,13 @@
 <template>
   <NvAccessBlocker
     :allowed="speechStore.hasUniversalApiCredentials || !!getProperty('apiKey', true)"
-    reason="Credentials required">
+    reason="Credentials required"
+  >
     <NvFormItem label="Voice">
-      <NvVoiceSelect/>
+      <NvVoiceSelect />
     </NvFormItem>
   </NvAccessBlocker>
-  <NvDivider direction="horizontal"/>
+  <NvDivider direction="horizontal" />
   <NvStack spacing="5">
     <NvFormItem label="API Key">
       <NvInput

@@ -8,11 +8,11 @@
         @update:modelValue="(value) => settingsStore.$patch({ universalApiKey: encrypt(value) })"
       />
     </NvFormItem>
-    <NvDivider direction="horizontal"/>
+    <NvDivider direction="horizontal" />
     <NvFormItem label="API Endpoint">
       <NvInput
-        :modelValue="(settingsStore.universalApiEndpoint)"
-        @update:modelValue="(value) => settingsStore.$patch({ universalApiEndpoint: (value) })"
+        :modelValue="settingsStore.universalApiEndpoint"
+        @update:modelValue="(value) => settingsStore.$patch({ universalApiEndpoint: value })"
       />
     </NvFormItem>
   </NvStack>

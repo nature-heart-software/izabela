@@ -29,13 +29,13 @@
                     align="center"
                     type="ghost"
                     @click="selectedEngineTab = engine.id"
-                  >{{ engine.name }}
+                    >{{ engine.name }}
                   </NvButton>
                 </template>
               </NvGroup>
-              <NvDivider direction="horizontal"/>
+              <NvDivider direction="horizontal" />
               <template v-if="currentEngineSettingsComponent">
-                <component :is="currentEngineSettingsComponent"/>
+                <component :is="currentEngineSettingsComponent" />
               </template>
             </NvStack>
           </NvCard>
@@ -49,17 +49,17 @@
           <NvStack spacing="5">
             <NvStack>
               <NvText type="label">Universal Credentials</NvText>
-              <NvText>Gain access to every API using a universal API key
-                <br/>You can obtain a universal API key by being a <a
-                  href="https://ko-fi.com/woowee/tiers"
-                  target="_blank">Ko-fi
-                  supporter</a></NvText>
+              <NvText
+                >Gain access to every API using a universal API key <br />You can obtain a universal
+                API key by being a
+                <a href="https://ko-fi.com/woowee/tiers" target="_blank">Ko-fi supporter</a></NvText
+              >
             </NvStack>
           </NvStack>
         </NvCard>
         <div class="pl-8">
           <NvCard>
-            <NvUniversalApiForm/>
+            <NvUniversalApiForm />
           </NvCard>
         </div>
       </NvStack>
