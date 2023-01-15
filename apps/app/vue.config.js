@@ -75,6 +75,7 @@ module.exports = defineConfig({
           definitions[0] = Object.assign(definitions[0], {
             __VUE_OPTIONS_API__: false,
             __VUE_PROD_DEVTOOLS__: false,
+            ROOT_DIR: JSON.stringify(__dirname),
           })
           return definitions
         })
@@ -102,6 +103,7 @@ module.exports = defineConfig({
         publish: ['github'],
         electronVersion: getElectronVersion(),
       },
+      extraResources: ['./resources/**'],
     },
   },
 })
