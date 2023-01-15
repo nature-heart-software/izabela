@@ -5,6 +5,10 @@
 *,
 *::before,
 *::after {
-  user-select: none;
-  outline: 0;
+    user-select: none;
+    outline: 0;
+}
+
+[data-tippy-root] {
+    z-index: -1 !important;
 }
