@@ -4,6 +4,7 @@ import { computed } from 'vue'
 import { getEngineById } from '@/modules/speech-engine-manager'
 import { ENGINE_ID } from '@/plugins/speech-engines/say/shared'
 import { useSettingsStore } from '@/features/settings/store'
+import { decrypt } from '@/utils/security'
 
 export const useSpeechStore = defineStore(
   'speech',
@@ -15,6 +16,10 @@ export const useSpeechStore = defineStore(
         return settingsStore.selectedSpeechEngine
       }
       return ENGINE_ID
+    })
+    const hasUniversalApiCredentials = computed(() => {
+      const settingsStore = useSettingsStore()
+      return Boolean(decrypt(settingsStore.universalApiKey) && settingsStore.universalApiEndpoint)
     })
     return {
       selectedSpeechEngine,
@@ -28,6 +33,7 @@ export const useSpeechStore = defineStore(
         }
         return []
       }),
+      hasUniversalApiCredentials,
     }
   },
   {

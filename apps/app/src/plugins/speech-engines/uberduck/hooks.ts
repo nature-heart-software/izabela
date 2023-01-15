@@ -5,6 +5,9 @@ import { LIST_VOICES_QUERY_KEY } from './shared'
 export const useListVoicesQuery = (options?: UseQueryOptions) =>
   useQuery<any>(
     LIST_VOICES_QUERY_KEY,
-    () => api.post('/tts/uberduck/list-voices').then(({ data }) => data),
+    () =>
+      api()
+        .post('/tts/uberduck/list-voices')
+        .then(({ data }) => data),
     options,
   )

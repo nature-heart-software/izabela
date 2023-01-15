@@ -9,6 +9,9 @@ export const useListVoicesQuery = (
 ) =>
   useQuery<any>(
     LIST_VOICES_QUERY_KEY,
-    () => api.post('/tts/microsoft-azure/list-voices', params.value).then(({ data }) => data),
+    () =>
+      api()
+        .post('/tts/microsoft-azure/list-voices', params.value)
+        .then(({ data }) => data),
     options,
   )

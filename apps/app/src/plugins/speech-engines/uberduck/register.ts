@@ -1,5 +1,6 @@
 import { api } from '@/services'
 import { registerEngine } from '@/modules/speech-engine-manager'
+import { useSpeechStore } from '@/features/speech/store'
 import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
@@ -18,7 +19,8 @@ registerEngine({
   getVoiceName,
   getCredentials,
   hasCredentials() {
-    return Object.values(getCredentials()).every(Boolean)
+    const speechStore = useSpeechStore()
+    return speechStore.hasUniversalApiCredentials || Object.values(getCredentials()).every(Boolean)
   },
   getPayload(text, voice) {
     return {
@@ -30,7 +32,7 @@ registerEngine({
     return getSelectedVoice().language
   },
   synthesizeSpeech({ credentials, payload }) {
-    return api.post<Blob>(
+    return api().post<Blob>(
       '/tts/uberduck/synthesize-speech',
       {
         credentials,
