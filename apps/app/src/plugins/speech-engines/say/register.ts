@@ -25,7 +25,7 @@ registerEngine({
     return DEFAULT_LANGUAGE_CODE
   },
   synthesizeSpeech({ credentials, payload }) {
-    return api.post<Blob>(
+    return api('local').post<Blob>(
       '/tts/say/synthesize-speech',
       {
         credentials,

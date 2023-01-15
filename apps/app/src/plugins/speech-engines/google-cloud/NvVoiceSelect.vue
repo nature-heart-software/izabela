@@ -15,6 +15,7 @@ import { computed, watch } from 'vue'
 import { useQueryClient } from 'vue-query'
 import { NvSelect } from '@packages/ui'
 import { purify } from '@packages/toolbox'
+import { useSpeechStore } from '@/features/speech/store'
 import { useListVoicesQuery } from './hooks'
 import { getVoiceName, LIST_VOICES_QUERY_KEY } from './shared'
 import { getProperty, setProperty } from './store'
@@ -25,7 +26,8 @@ const computedParams = computed(() => ({
     apiKey: getProperty('apiKey', true),
   },
 }))
-const canFetch = computed(() => Object.values(computedParams.value.credentials).every(Boolean))
+const speechStore = useSpeechStore()
+const canFetch = computed(() => speechStore.hasUniversalApiCredentials || Object.values(computedParams.value.credentials).every(Boolean))
 const { data, isFetching } = useListVoicesQuery(computedParams, {
   enabled: canFetch,
 })

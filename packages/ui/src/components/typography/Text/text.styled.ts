@@ -3,6 +3,7 @@ import styled from 'vue3-styled-components'
 import tokens from '@/styles/tokens'
 import { props } from './text.shared'
 import { fontSizeStyle } from '@/utils/css-in-js'
+import { rem } from 'polished'
 
 const { fontFamily, fontSize, colors } = tokens
 export const defaultTextStyle = () => ({
@@ -40,4 +41,17 @@ export const StText = styled('div', props)`
         fontWeight: 700,
       },
     ].filter(Boolean)}
+  a {
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      bottom: ${() => rem(-tokens.spacing[1])};
+      left: 0;
+      right: 0;
+      height: ${() => rem(tokens.spacing[1])};
+      background-color: ${() => tokens.colors.gray[80]};
+    }
+  }
 `
