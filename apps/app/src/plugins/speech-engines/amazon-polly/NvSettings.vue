@@ -1,4 +1,13 @@
 <template>
+  <NvAccessBlocker
+    :allowed="[getProperty('identityPoolId', true), getProperty('region')].every(Boolean)"
+    reason="Credentials required"
+  >
+    <NvFormItem label="Voice">
+      <NvVoiceSelect />
+    </NvFormItem>
+  </NvAccessBlocker>
+  <NvDivider direction="horizontal" />
   <NvStack spacing="5">
     <NvFormItem label="Identity pool ID">
       <NvInput
@@ -18,15 +27,6 @@
       />
     </NvFormItem>
   </NvStack>
-  <NvDivider direction="horizontal" />
-  <NvAccessBlocker
-    :allowed="[getProperty('identityPoolId', true), getProperty('region')].every(Boolean)"
-    reason="Credentials required"
-  >
-    <NvFormItem label="Voice">
-      <NvVoiceSelect />
-    </NvFormItem>
-  </NvAccessBlocker>
 </template>
 <script lang="ts" setup>
 import { NvAccessBlocker, NvDivider, NvFormItem, NvInput, NvStack } from '@packages/ui'

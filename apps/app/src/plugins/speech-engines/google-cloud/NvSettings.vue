@@ -1,4 +1,10 @@
 <template>
+  <NvAccessBlocker :allowed="!!getProperty('apiKey', true)" reason="Credentials required">
+    <NvFormItem label="Voice">
+      <NvVoiceSelect />
+    </NvFormItem>
+  </NvAccessBlocker>
+  <NvDivider direction="horizontal" />
   <NvStack spacing="5">
     <NvFormItem label="API Key">
       <NvInput
@@ -9,12 +15,6 @@
       />
     </NvFormItem>
   </NvStack>
-  <NvDivider direction="horizontal" />
-  <NvAccessBlocker :allowed="!!getProperty('apiKey', true)" reason="Credentials required">
-    <NvFormItem label="Voice">
-      <NvVoiceSelect />
-    </NvFormItem>
-  </NvAccessBlocker>
 </template>
 <script lang="ts" setup>
 import { NvAccessBlocker, NvDivider, NvFormItem, NvInput, NvStack } from '@packages/ui'
