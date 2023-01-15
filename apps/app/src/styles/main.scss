@@ -8,12 +8,3 @@
     user-select: none;
     outline: 0;
 }
-
-body {
-    position: relative;
-
-    #app {
-        position: relative;
-        z-index: 10000;
-    }
-}
