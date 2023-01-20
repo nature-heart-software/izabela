@@ -16,7 +16,13 @@ export const api = (type?: 'remote' | 'local') => {
   if (type === 'local') return localApi
   if (speechStore.hasUniversalApiCredentials) {
     remoteApi.defaults.baseURL = `${settingsStore.universalApiEndpoint}/api`
-    ;(remoteApi.defaults.headers as any)['api-key'] = decrypt(settingsStore.universalApiKey)
+    remoteApi.interceptors.request.use((config) => ({
+      ...config,
+      params: {
+        ...config.params,
+        apiKey: decrypt(settingsStore.universalApiKey),
+      },
+    }))
     return remoteApi
   }
   return localApi
