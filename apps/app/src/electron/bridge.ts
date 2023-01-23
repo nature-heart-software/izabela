@@ -5,6 +5,7 @@ import electronMessengerWindow from '@/teams/messenger/modules/electron-messenge
 import electronSpeechWorkerWindow from '@/teams/speech-worker/modules/electron-speech-worker-window'
 import electronKeybinding from '@/modules/electron-keybinding'
 import electronDisplay from '@/modules/electron-display'
+import electronResources from '@/modules/electron-resources'
 
 export const bridgeModules = () =>
   bridge.register([
@@ -14,6 +15,7 @@ export const bridgeModules = () =>
     ['ElectronSpeechWorkerWindow', () => electronSpeechWorkerWindow],
     ['ElectronKeybinding', () => electronKeybinding],
     ['ElectronDisplay', () => electronDisplay],
+    ['ElectronResources', () => electronResources],
   ])
 
 declare global {
@@ -24,5 +26,6 @@ declare global {
     ElectronSpeechWorkerWindow: typeof electronSpeechWorkerWindow
     ElectronKeybinding: typeof electronKeybinding
     ElectronDisplay: typeof electronDisplay
+    ElectronResources: typeof electronResources
   }
 }

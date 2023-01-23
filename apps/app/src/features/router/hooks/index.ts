@@ -24,7 +24,7 @@ export const useRouterViewPopover = ({
       }),
       trigger: 'click',
       interactive: true,
-      appendTo: () => document.body,
+      appendTo: () => document.querySelector('#router-overlay') || document.body,
       maxWidth: 'none',
       offset: [0, tokens.spacing['4']],
       onShow(instance) {

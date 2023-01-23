@@ -42,6 +42,28 @@
         </div>
       </NvStack>
     </NvStack>
+    <NvStack>
+      <NvText type="subtitle">Universal Credentials</NvText>
+      <NvStack spacing="4">
+        <NvCard>
+          <NvStack spacing="5">
+            <NvStack>
+              <NvText type="label">Universal Credentials</NvText>
+              <NvText
+                >Gain access to every API using a universal API key <br />You can obtain a universal
+                API key by being a
+                <a href="https://ko-fi.com/woowee/tiers" target="_blank">Ko-fi supporter</a></NvText
+              >
+            </NvStack>
+          </NvStack>
+        </NvCard>
+        <div class="pl-8">
+          <NvCard>
+            <NvUniversalApiForm />
+          </NvCard>
+        </div>
+      </NvStack>
+    </NvStack>
   </NvStack>
 </template>
 <script lang="ts" setup>
@@ -52,6 +74,7 @@ import { useSpeechEngineManager } from '@/modules/speech-engine-manager'
 import { SpeechEngine } from '@/modules/speech-engine-manager/types'
 import { useSettingsStore } from '@/features/settings/store'
 import { useSpeechStore } from '@/features/speech/store'
+import NvUniversalApiForm from '@/features/speech/components/forms/NvUniversalApiForm.vue'
 
 const speechStore = useSpeechStore()
 const settingsStore = useSettingsStore()

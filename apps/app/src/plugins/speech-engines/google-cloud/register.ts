@@ -1,6 +1,7 @@
 import { api } from '@/services'
 import { pick } from 'lodash'
 import { registerEngine } from '@/modules/speech-engine-manager'
+import { useSpeechStore } from '@/features/speech/store'
 import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
@@ -18,7 +19,8 @@ registerEngine({
   getVoiceName,
   getCredentials,
   hasCredentials() {
-    return Object.values(getCredentials()).every(Boolean)
+    const speechStore = useSpeechStore()
+    return speechStore.hasUniversalApiCredentials || Object.values(getCredentials()).every(Boolean)
   },
   getPayload(text, v) {
     const selectedVoice = getSelectedVoice()
@@ -40,7 +42,7 @@ registerEngine({
     return getSelectedVoice().languageCodes[0]
   },
   synthesizeSpeech({ credentials, payload }) {
-    return api.post<Blob>(
+    return api().post<Blob>(
       '/tts/google-cloud/synthesize-speech',
       {
         credentials,

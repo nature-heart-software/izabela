@@ -39,36 +39,51 @@ export default (messagePayload: IzabelaMessagePayload) => {
     await settingsStore.$whenReady()
     Promise.map(settingsStore.audioOutputs, async (deviceLabel: string) => {
       // TODO: Some optimisation possible here
-      const mediaDevice = await getMediaDeviceByLabel(deviceLabel)
+      let mediaDevice
+
+      try {
+        mediaDevice = await getMediaDeviceByLabel(deviceLabel)
+      } catch (error) {
+        console.error(error)
+        return null
+      }
       if (mediaDevice) {
         const audioElement: any = document.createElement('audio')
         audioElement.src = audio.src
-        await audioElement.setSinkId(mediaDevice.deviceId)
+
+        try {
+          await audioElement.setSinkId(mediaDevice.deviceId)
+        } catch (error) {
+          console.error(error)
+          return null
+        }
         return audioElement
       }
       return null
-    }).then((audioElements: (HTMLAudioElement | null)[]) => {
-      if (!settingsStore.playSpeechOnDefaultPlaybackDevice) {
-        audio.volume = 0
-      }
-
-      audio.addEventListener('timeupdate', () => {
-        playingMessageStore.$patch({
-          progress: audio.currentTime / audio.duration || 0,
-        })
-      })
-      audio.addEventListener('ended', () => {
-        playingMessageStore.$patch({
-          isPlaying: false,
-        })
-      })
-      playingMessageStore.$patch({
-        id,
-        isPlaying: true,
-      })
-      audio.play()
-      audioElements.forEach((audioEl) => audioEl && audioEl.play())
     })
+      .then((audioElements: (HTMLAudioElement | null)[]) => {
+        if (!settingsStore.playSpeechOnDefaultPlaybackDevice) {
+          audio.volume = 0
+        }
+
+        audio.addEventListener('timeupdate', () => {
+          playingMessageStore.$patch({
+            progress: audio.currentTime / audio.duration || 0,
+          })
+        })
+        audio.addEventListener('ended', () => {
+          playingMessageStore.$patch({
+            isPlaying: false,
+          })
+        })
+        playingMessageStore.$patch({
+          id,
+          isPlaying: true,
+        })
+        audio.play()
+        audioElements.forEach((audioEl) => audioEl && audioEl.play())
+      })
+      .catch(console.error)
   }
 
   function isReady() {
@@ -132,5 +147,13 @@ export default (messagePayload: IzabelaMessagePayload) => {
     play,
     on,
     downloadAudio,
+    getSocketPayload: () => {
+      const { credentials: _, ...rest } = messagePayload
+      return {
+        ...rest,
+        id,
+        timestamp: new Date().toISOString(),
+      }
+    },
   }
 }

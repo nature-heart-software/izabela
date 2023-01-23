@@ -2,6 +2,7 @@
   <ThemeProvider :theme="tokens">
     <NvBackground />
     <div class="h-0">
+      <div id="router-overlay"></div>
       <NvMessenger
         v-if="messengerStore.$isReady"
         :min-width="768"
@@ -18,6 +19,11 @@ body {
   height: 100vh;
   margin: 0;
   overflow: hidden;
+}
+
+#router-overlay {
+  position: relative;
+  z-index: 0;
 }
 </style>
 <script lang="ts" setup>

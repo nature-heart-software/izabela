@@ -5,6 +5,7 @@ import logger from 'morgan'
 import path from 'path'
 import { defaultsDeep } from 'lodash'
 import * as plugins from './plugins'
+import websocket from './websocket'
 
 const app = express()
 app.use(cors())
@@ -20,20 +21,27 @@ class Server {
   private defaultConfig: Izabela.Server.Config = {
     tempPath: path.resolve('temp'),
     port: 7070,
+    ws: {
+      port: 7071,
+    },
   }
 
   async startServer() {
     const server = app.listen(this.getConfig().port, () => {
       const address = server.address()
+      console.log(address)
       const port =
         address && typeof address !== 'string' && 'port' in address
           ? address.port
-          : ''
+          : null
       if (port) {
         console.log('App server now running on port', port)
       } else {
         console.log('App server now running')
       }
+      websocket.start({
+        port: this.getConfig().ws.port,
+      })
     })
     this.server = server
   }

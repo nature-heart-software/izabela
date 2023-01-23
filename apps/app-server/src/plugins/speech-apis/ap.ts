@@ -37,7 +37,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
     {
       body: {
         credentials: { identityPoolId, region },
-        payload: { text, voice },
+        payload,
       },
     },
     res,
@@ -51,12 +51,14 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
         }),
       })
       const command = new SynthesizeSpeechCommand({
+        ...payload,
         OutputFormat: 'mp3',
-        Text: text,
-        VoiceId: voice.Id,
       })
       const { AudioStream } = await client.send(command)
-      ;(AudioStream as any).pipe(res)
+      const stream = (AudioStream as any).pipe(res)
+      stream.on('finish', () => {
+        //
+      })
     } catch (e: any) {
       handleError(res, 'Internal server error', e.message, 500)
     }

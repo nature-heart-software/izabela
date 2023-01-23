@@ -32,7 +32,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
     {
       body: {
         credentials: { apiKey, url },
-        payload: { text, voice },
+        payload,
       },
     },
     res,
@@ -45,12 +45,14 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
         serviceUrl: url,
       })
       const { result } = await textToSpeech.synthesize({
-        text,
+        ...payload,
         accept: 'audio/mp3',
-        voice: voice.name,
       })
 
-      result.pipe(res)
+      const stream = result.pipe(res)
+      stream.on('finish', () => {
+        //
+      })
     } catch (e: any) {
       handleError(res, 'Internal server error', e.message, 500)
     }
