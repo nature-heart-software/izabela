@@ -1,26 +1,19 @@
-const {mergeConfig} = require('vite');
-const {plugins, resolve} = require('../vite.config.cjs').default;
-
+const path = require('path');
 module.exports = {
     "stories": [
-        "../src/**/*.stories.@(js|jsx|ts|tsx|mdx)",
+        "../src/**/*.mdx",
+        "../src/**/*.stories.@(js|jsx|ts|tsx)",
     ],
     "addons": [
         "@storybook/addon-links",
         "@storybook/addon-essentials",
         "@storybook/addon-interactions",
     ],
-    "framework": "@storybook/vue3",
-    "core": {
-        "builder": "@storybook/builder-vite",
+    "framework": {
+        "name": "@storybook/vue3-vite",
+        "options": {},
     },
-    "features": {
-        "storyStoreV7": true,
-    },
-    viteFinal(config) {
-        return mergeConfig(config, {
-            resolve,
-            plugins: plugins.filter((p) => !p.name.includes('vite')),
-        });
+    "docs": {
+        "autodocs": "tag",
     },
 }

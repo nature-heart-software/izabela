@@ -8,7 +8,7 @@
     "./dist"
   ],
   "main": "./dist/main.cjs",
-  "module": "./dist/main.es.js",
+  "module": "./dist/main.js",
   "types": "./dist/main.d.ts",
   "scripts": {
     "dev": "vite build --watch",
