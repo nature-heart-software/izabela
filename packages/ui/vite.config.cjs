@@ -21,10 +21,14 @@ const packagesToOmit = ['element-plus'];
 const omitPackages = keys => keys.filter(key => !packagesToOmit.includes(key));
 const externalPackages = [...omitPackages(Object.keys(pkg.dependencies || {})), ...omitPackages(Object.keys(pkg.peerDependencies || {}))];
 const externals = externalPackages.map(packageName => new RegExp(`^${packageName}(\/.*)?`));
+const mode = (() => {
+  const args = process.argv;
+  const index = args.indexOf('--mode');
+  return index < 0 ? 'production' : args[index + 1];
+})();
+
 // https://vitejs.dev/config/
-var _default = (0, _vite.defineConfig)(({
-  mode
-}) => ({
+var _default = (0, _vite.defineConfig)({
   plugins: [(0, _pluginVue.default)(), (0, _vitePluginDts.default)(), (0, _vitePluginGenerateExports.generateExportsPlugin)({
     watch: mode === 'development',
     entries: [{
@@ -71,6 +75,6 @@ var _default = (0, _vite.defineConfig)(({
       external: externals
     }
   }
-}));
+});
 exports.default = _default;
 /* End of auto-generated content. */
