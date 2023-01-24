@@ -1,15 +1,15 @@
 <template>
   <StNumberInput v-bind="props">
     <component
-        :is="WrappedComponent"
-        ref="elInputRef"
-        :model-value="props.modelValue"
-        type="number"
-        v-bind="$attrs"
-        @update:model-value="$emit('update:model-value', $event)"
+      :is="WrappedComponent"
+      ref="elInputRef"
+      :model-value="props.modelValue"
+      type="number"
+      v-bind="$attrs"
+      @update:model-value="$emit('update:model-value', $event)"
     >
       <template v-for="(_, slot) of $slots" v-slot:[slot]="scope">
-        <slot :name="slot" v-bind="scope || {}"/>
+        <slot :name="slot" v-bind="scope || {}" />
       </template>
     </component>
   </StNumberInput>
