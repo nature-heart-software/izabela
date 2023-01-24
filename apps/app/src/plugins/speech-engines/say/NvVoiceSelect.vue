@@ -4,7 +4,7 @@
     :options="options"
     v-bind="{
       modelValue: getProperty('selectedVoice'),
-      'onUpdate:modelValue': (value) => setProperty('selectedVoice', purify(value)),
+      'onUpdate:modelValue': (value) => setProperty('selectedVoice', value),
       ...$attrs,
     }"
   />

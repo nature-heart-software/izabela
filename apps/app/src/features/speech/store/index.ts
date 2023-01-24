@@ -12,7 +12,7 @@ export const useSpeechStore = defineStore(
     const selectedSpeechEngine = computed(() => {
       const settingsStore = useSettingsStore()
       const engine = getEngineById(settingsStore.selectedSpeechEngine)
-      if (engine && engine.hasCredentials && engine.hasCredentials()) {
+      if (engine && (!engine.hasCredentials || engine.hasCredentials())) {
         return settingsStore.selectedSpeechEngine
       }
       return ENGINE_ID

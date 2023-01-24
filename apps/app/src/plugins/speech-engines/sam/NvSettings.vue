@@ -1,0 +1,92 @@
+<template>
+  <NvFormItem label="Voice">
+    <NvVoiceSelect />
+  </NvFormItem>
+
+  <NvAccessBlocker
+    :allowed="getProperty('selectedVoice').name === 'Custom'"
+    reason='Only available for the "Custom" voice'
+  >
+    <NvFormItem label="Pitch">
+      <NvGroup>
+        <NvRangeInput
+          :max="255"
+          :min="0"
+          class="!grow"
+          v-bind="{
+            modelValue: getProperty('speech'),
+            'onUpdate:modelValue': (value) => setProperty('speech', value),
+          }"
+        />
+        <NvNumberInput
+          v-bind="{
+            modelValue: getProperty('speech'),
+            'onUpdate:modelValue': (value) => setProperty('speech', value),
+          }"
+        />
+      </NvGroup>
+    </NvFormItem>
+    <NvFormItem label="Speed">
+      <NvGroup>
+        <NvRangeInput
+          :max="255"
+          :min="0"
+          class="!grow"
+          v-bind="{
+            modelValue: getProperty('speed'),
+            'onUpdate:modelValue': (value) => setProperty('speed', value),
+          }"
+        />
+        <NvNumberInput
+          v-bind="{
+            modelValue: getProperty('speed'),
+            'onUpdate:modelValue': (value) => setProperty('speed', value),
+          }"
+        />
+      </NvGroup>
+    </NvFormItem>
+    <NvFormItem label="Mouth">
+      <NvGroup>
+        <NvRangeInput
+          :max="255"
+          :min="0"
+          class="!grow"
+          v-bind="{
+            modelValue: getProperty('mouth'),
+            'onUpdate:modelValue': (value) => setProperty('mouth', value),
+          }"
+        />
+        <NvNumberInput
+          v-bind="{
+            modelValue: getProperty('mouth'),
+            'onUpdate:modelValue': (value) => setProperty('mouth', value),
+          }"
+        />
+      </NvGroup>
+    </NvFormItem>
+    <NvFormItem label="Throat">
+      <NvGroup>
+        <NvRangeInput
+          :max="255"
+          :min="0"
+          class="!grow"
+          v-bind="{
+            modelValue: getProperty('throat'),
+            'onUpdate:modelValue': (value) => setProperty('throat', value),
+          }"
+        />
+        <NvNumberInput
+          v-bind="{
+            modelValue: getProperty('throat'),
+            'onUpdate:modelValue': (value) => setProperty('throat', value),
+          }"
+        />
+      </NvGroup>
+    </NvFormItem>
+  </NvAccessBlocker>
+</template>
+<script lang="ts" setup>
+import { NvAccessBlocker, NvFormItem, NvGroup, NvNumberInput, NvRangeInput } from '@packages/ui'
+import NvVoiceSelect from './NvVoiceSelect'
+import { getProperty, setProperty } from './store'
+</script>

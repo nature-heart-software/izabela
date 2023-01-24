@@ -101,7 +101,7 @@ export default (messagePayload: IzabelaMessagePayload) => {
       })
       .then((res) => {
         audioDownloaded.resolve(true)
-        return Promise.resolve(res)
+        return Promise.resolve('data' in res ? res.data : res)
       })
   }
 
@@ -135,8 +135,8 @@ export default (messagePayload: IzabelaMessagePayload) => {
     audio = new Audio()
     addEventListeners()
     downloadAudio()
-      .then(({ data }) => {
-        loadAudio(data)
+      .then((blob) => {
+        loadAudio(blob)
       })
       .catch((reason) => onError(reason))
   }
