@@ -31,7 +31,16 @@ const Uint16ToUint8Array = (uint16: any) => {
   result[1] = uint16 >> 8
   return result
 }
-const getSelectedVoice = () => getProperty('selectedVoice')
+const getSelectedVoice = () => {
+  const voice = getProperty('selectedVoice')
+  return {
+    speed: getProperty('speed'),
+    speech: getProperty('speech'),
+    throat: getProperty('throat'),
+    mouth: getProperty('mouth'),
+    ...voice
+  }
+}
 registerEngine({
   id: ENGINE_ID,
   name: ENGINE_NAME,
@@ -44,16 +53,7 @@ registerEngine({
     const voice = v || getSelectedVoice()
     return {
       text,
-      voice:
-        voice.name === 'Custom'
-          ? {
-              speed: getProperty('speed'),
-              speech: getProperty('speech'),
-              throat: getProperty('throat'),
-              mouth: getProperty('mouth'),
-              ...voice,
-            }
-          : voice,
+      voice,
     }
   },
   getLanguageCode() {
