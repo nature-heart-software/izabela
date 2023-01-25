@@ -137,7 +137,7 @@ const playMessage = computed(() => ({
   id: props.id,
   message: message.value?.message || '',
   engine: message.value?.engine || '',
-  voice: engine.value?.getSelectedVoice(),
+  voice: message.value?.voice || engine.value?.getSelectedVoice(),
   excludeFromHistory: true,
 }))
 const { play, isPlaying, isLoading, progress } = usePlayMessage(playMessage)
