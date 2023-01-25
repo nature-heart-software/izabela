@@ -1,6 +1,10 @@
 <template>
-  <StRangeInput :value="props.modelValue" type="range" v-bind="props"
-                @input="$emit('update:modelValue', Number($event.target.value))"/>
+  <StRangeInput
+    :value="props.modelValue"
+    type="range"
+    v-bind="props"
+    @input="$emit('update:modelValue', Number($event.target.value))"
+  />
 </template>
 <script lang="ts" setup>
 import { defineEmits, defineProps } from 'vue'
