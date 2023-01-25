@@ -38,7 +38,7 @@ const getSelectedVoice = () => {
     speech: getProperty('speech'),
     throat: getProperty('throat'),
     mouth: getProperty('mouth'),
-    ...voice
+    ...voice,
   }
 }
 registerEngine({
