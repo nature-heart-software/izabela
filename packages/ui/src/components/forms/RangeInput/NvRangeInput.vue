@@ -1,5 +1,5 @@
 <template>
-  <StRangeInput :value="props.modelValue" tabindex="0" type="range" v-bind="props"
+  <StRangeInput :value="props.modelValue" type="range" v-bind="props"
                 @input="$emit('update:modelValue', Number($event.target.value))"/>
 </template>
 <script lang="ts" setup>
