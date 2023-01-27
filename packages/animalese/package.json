@@ -3,6 +3,12 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "files": [
+    "./dist"
+  ],
+  "main": "./dist/main.cjs",
+  "module": "./dist/main.es.js",
+  "types": "./dist/animalese.d.ts",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

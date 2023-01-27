@@ -24,6 +24,7 @@
   "main": "background.js",
   "dependencies": {
     "@apps/app-server": "^0.0.0",
+    "@packages/animalese": "^0.0.0",
     "iohook": "^0.9.3",
     "native-keymap": "^3.3.2",
     "sam-js": "^0.2.0",

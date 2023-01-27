@@ -1,6 +1,23 @@
 // credits go to https://github.com/Acedio/animalese.js
 // @ts-nocheck
 
+import audio from './animalese.js/animalese.wav?url'
+
+var BASE64_MARKER = ';base64,'
+
+function convertDataURIToBinary(dataURI) {
+    var base64Index = dataURI.indexOf(BASE64_MARKER)+BASE64_MARKER.length
+    var base64 = dataURI.substring(base64Index)
+    var raw = window.atob(base64)
+    var rawLength = raw.length
+    var array = new Uint8Array(new ArrayBuffer(rawLength))
+
+    for (var i = 0; i < rawLength; i++) {
+        array[i] = raw.charCodeAt(i)
+    }
+    return array
+}
+
 var FastBase64 = {
     chars: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
     encLookup: [],
@@ -16,7 +33,7 @@ var FastBase64 = {
         var dst = ''
         var i = 0
         while (len > 2) {
-            n = (src[i] << 16) | (src[i+1] << 8) | src[i+2]
+            let n = (src[i] << 16) | (src[i+1] << 8) | src[i+2]
             dst += this.encLookup[n >> 12]+this.encLookup[n & 0xFFF]
             len -= 3
             i += 3
@@ -113,7 +130,7 @@ var RIFFWAVE = function (data) {
 }
 
 var Animalese = function (letters_file, onload) {
-    this.Animalese = function (script, shorten, pitch) {
+    this.getAudio = function (script, shorten, pitch) {
         function shortenWord(str) {
             if (str.length > 1) {
                 return str[0]+str[str.length-1]
@@ -162,16 +179,8 @@ var Animalese = function (letters_file, onload) {
         return wave
     }
 
-    var xhr = new XMLHttpRequest()
-    xhr.open('GET', letters_file)
-    xhr.responseType = 'arraybuffer'
-    var req = this
-    xhr.onload = function (e) {
-        req.letter_library = new Uint8Array(this.response)
-        onload()
-    }
-    xhr.send()
+    this.letter_library = convertDataURIToBinary(audio)
+    onload?.()
 }
-import audio from './animalese.js/animalese.wav'
 
 export default new Animalese(audio)
