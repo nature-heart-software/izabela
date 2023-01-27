@@ -1,9 +1,10 @@
 <template>
   <NvSelect
+    v-loading="isFetching"
     :options="options"
     v-bind="{
       modelValue: getProperty('selectedVoice'),
-      'onUpdate:modelValue': (value) => setProperty('selectedVoice', purify(value)),
+      'onUpdate:modelValue': (value) => setProperty('selectedVoice', value),
       ...$attrs,
     }"
     valueKey="name"
@@ -12,20 +13,19 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { NvSelect } from '@packages/ui'
-import { purify } from '@packages/toolbox'
 import { getProperty, setProperty } from './store'
-import { voices } from './shared'
+import { defaultVoice } from './shared'
 
 const options = computed(() => [
   {
-    label: 'Custom',
-    value: {
+    label: 'Custom', value: {
       name: 'Custom',
-    },
+    }
   },
-  ...voices.map((voice) => ({
-    label: voice.name,
-    value: voice,
-  })),
+  {
+    label: 'Default', value: {
+      ...defaultVoice
+    }
+  },
 ])
 </script>
