@@ -28,5 +28,4 @@ const options = computed(() => [
     value: voice,
   })),
 ])
-console.log('options', options)
 </script>
