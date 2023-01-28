@@ -2,6 +2,7 @@ declare module 'vuex-electron'
 declare module 'electron-postman'
 declare module '@ryanmorr/ready'
 declare module 'hark'
+declare module 'sam-js'
 
 declare module 'socket.io/*'
 declare module '@packages/electron-pinia/*'

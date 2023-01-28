@@ -12,6 +12,8 @@ export { default as NvAutocomplete } from './forms/Autocomplete/NvAutocomplete.v
 export { default as NvButton } from './forms/Button/NvButton.vue'
 export { default as NvFormItem } from './forms/Form/NvFormItem.vue'
 export { default as NvInput } from './forms/Input/NvInput.vue'
+export { default as NvNumberInput } from './forms/NumberInput/NvNumberInput.vue'
+export { default as NvRangeInput } from './forms/RangeInput/NvRangeInput.vue'
 export { default as NvOption } from './forms/Select/NvOption.vue'
 export { default as NvSelect } from './forms/Select/NvSelect.vue'
 export { default as NvSwitch } from './forms/Switch/NvSwitch.vue'

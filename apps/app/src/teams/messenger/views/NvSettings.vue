@@ -1,5 +1,5 @@
 <template>
-  <NvHitbox class="settings bg-gray-10/95 rounded p-4 flex flex-col space-y-4">
+  <div class="settings bg-gray-10/95 rounded p-4 flex flex-col space-y-4">
     <!-- Top -->
     <div class="flex justify-between space-x-4">
       <div></div>
@@ -52,11 +52,10 @@
         </div>
       </div>
     </div>
-  </NvHitbox>
+  </div>
 </template>
 <script lang="ts" setup>
 import { NvButton, NvCard, NvStack, NvText } from '@packages/ui'
-import NvHitbox from '@/modules/vue-hitboxes/NvHitbox.vue'
 import { useRoute } from 'vue-router'
 
 const navigation = [
@@ -67,33 +66,14 @@ const navigation = [
         name: 'General',
         to: { name: 'settings-general' },
       },
-      {
-        name: 'Display',
-        to: { name: 'settings-display' },
-      },
-      {
-        name: 'Overlay',
-      },
-      {
-        name: 'Keybindings',
-        to: { name: 'settings-keybindings' },
-      },
-      {
-        name: 'Startup',
-        to: { name: 'settings-startup' },
-      },
-      {
-        name: 'Update',
-        to: { name: 'settings-update' },
-      },
     ],
   },
   {
     name: 'Speech',
     children: [
       {
-        name: 'Speech',
-        to: { name: 'settings-speech' },
+        name: 'Engine',
+        to: { name: 'settings-engine' },
       },
       {
         name: 'Audio',

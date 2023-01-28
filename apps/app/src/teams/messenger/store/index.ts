@@ -28,10 +28,12 @@ export const useMessengerWindowStore = defineStore(
     const isShown = ref(false)
     const isFocused = ref(false)
     const isInputFocused = ref(false)
+    const focusContext = ref<'mouse' | 'keyboard'>('mouse')
     return {
       isShown,
       isFocused,
       isInputFocused,
+      focusContext,
     }
   },
   {

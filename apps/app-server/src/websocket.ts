@@ -21,7 +21,12 @@ export default (() => {
         socket.on('disconnect', () => {
           console.log('[socket.io] Disconnected:', socket.id)
         })
-        ;['message:load', 'message:start', 'message:end'].forEach((event) => {
+        ;[
+          'message:load',
+          'message:start',
+          'message:end',
+          'message:error',
+        ].forEach((event) => {
           socket.on(event, (message) => forwardEvent(event, message))
         })
       })

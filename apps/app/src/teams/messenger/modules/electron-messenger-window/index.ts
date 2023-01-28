@@ -41,8 +41,9 @@ export const ElectronMessengerWindow = () => {
       resolve(true)
     })
 
-  const focus = () =>
+  const focus = (context: 'mouse' | 'keyboard') =>
     new Promise((resolve, reject) => {
+      messengerWindowStore?.$patch({ focusContext: context })
       const window = getWindow()
       if (window) {
         if (!isFocused) {
@@ -102,7 +103,7 @@ export const ElectronMessengerWindow = () => {
     new Promise((resolve, reject) => {
       const window = getWindow()
       if (window) {
-        focus()
+        focus('mouse')
         resolve(true)
       } else {
         reject()
@@ -123,7 +124,7 @@ export const ElectronMessengerWindow = () => {
           return isWithinXHitbox && isWithinYHitbox
         })
         if (isWithinAnyHitboxes) {
-          focus()
+          focus('mouse')
         } else {
           blur()
         }
@@ -137,7 +138,7 @@ export const ElectronMessengerWindow = () => {
       if (window.isVisible()) {
         hide()
       } else {
-        focus()
+        focus('keyboard')
       }
     }
     return Promise.resolve()

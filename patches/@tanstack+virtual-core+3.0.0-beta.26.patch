@@ -1,8 +1,8 @@
 diff --git a/node_modules/@tanstack/virtual-core/build/lib/index.d.ts b/node_modules/@tanstack/virtual-core/build/lib/index.d.ts
-index 3eb35ec..618e287 100644
+index 3eb35ec..9d98bcb 100644
 --- a/node_modules/@tanstack/virtual-core/build/lib/index.d.ts
 +++ b/node_modules/@tanstack/virtual-core/build/lib/index.d.ts
-@@ -21,7 +21,7 @@ export interface VirtualItem {
+@@ -21,14 +21,14 @@ export interface VirtualItem {
      end: number;
      size: number;
  }
@@ -11,3 +11,25 @@ index 3eb35ec..618e287 100644
      width: number;
      height: number;
  }
+ export declare const defaultKeyExtractor: (index: number) => number;
+ export declare const defaultRangeExtractor: (range: Range) => number[];
+-export declare const observeElementRect: (instance: Virtualizer<any, any>, cb: (rect: Rect) => void) => (() => void) | undefined;
+-export declare const observeWindowRect: (instance: Virtualizer<any, any>, cb: (rect: Rect) => void) => (() => void) | undefined;
++export declare const observeElementRect: (instance: Virtualizer<any, any>, cb: (rect: TRect) => void) => (() => void) | undefined;
++export declare const observeWindowRect: (instance: Virtualizer<any, any>, cb: (rect: TRect) => void) => (() => void) | undefined;
+ export declare const observeElementOffset: (instance: Virtualizer<any, any>, cb: (offset: number) => void) => (() => void) | undefined;
+ export declare const observeWindowOffset: (instance: Virtualizer<any, any>, cb: (offset: number) => void) => (() => void) | undefined;
+ export declare const measureElement: <TItemElement extends Element>(element: TItemElement, instance: Virtualizer<any, TItemElement>) => number;
+@@ -51,10 +51,10 @@ export interface VirtualizerOptions<TScrollElement extends Element | Window, TIt
+         behavior?: ScrollBehavior;
+         sync: boolean;
+     }, instance: Virtualizer<TScrollElement, TItemElement>) => void;
+-    observeElementRect: (instance: Virtualizer<TScrollElement, TItemElement>, cb: (rect: Rect) => void) => void | (() => void);
++    observeElementRect: (instance: Virtualizer<TScrollElement, TItemElement>, cb: (rect: TRect) => void) => void | (() => void);
+     observeElementOffset: (instance: Virtualizer<TScrollElement, TItemElement>, cb: (offset: number) => void) => void | (() => void);
+     debug?: any;
+-    initialRect?: Rect;
++    initialRect?: TRect;
+     onChange?: (instance: Virtualizer<TScrollElement, TItemElement>) => void;
+     measureElement?: (el: TItemElement, instance: Virtualizer<TScrollElement, TItemElement>) => number;
+     overscan?: number;

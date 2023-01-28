@@ -16,8 +16,15 @@ const externalPackages = [
 const externals = externalPackages.map(
   (packageName) => new RegExp(`^${packageName}(\/.*)?`),
 )
+
+const mode = (() => {
+  const args = process.argv
+  const index = args.indexOf('--mode')
+  return index < 0 ? 'production' : args[index + 1]
+})()
+
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
+export default defineConfig({
   plugins: [
     vue(),
     dts(),
@@ -78,4 +85,4 @@ export default defineConfig(({ mode }) => ({
       external: externals,
     },
   },
-}))
+})

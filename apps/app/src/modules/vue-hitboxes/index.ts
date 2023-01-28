@@ -20,8 +20,9 @@ const onElementChange = (element: Element, callback: () => any) => {
 }
 export const watchHitbox = (selector: string) => {
   ready(selector, (element: Element) => {
-    const hitboxesStore = useHitboxesStore()
     const id = uuid()
+    console.log('watching', id)
+    const hitboxesStore = useHitboxesStore()
     const updateHitboxes = throttle(() => {
       if (element) {
         const { x, y, width: w, height: h } = element.getBoundingClientRect()
@@ -34,4 +35,4 @@ export const watchHitbox = (selector: string) => {
   })
 }
 
-watchHitbox(`.${hitboxClass}`)
+watchHitbox(`.${ hitboxClass }`)
