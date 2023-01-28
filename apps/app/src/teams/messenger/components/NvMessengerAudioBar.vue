@@ -2,10 +2,10 @@
   <NvCard size="sm">
     <NvGroup noWrap>
       <NvButton
-        :type="route.name === 'settings-speech' && messengerContext.isViewShown.value  ?  'plain'  :  'default'"
+        :type="route.name === 'settings-engine' && messengerContext.isViewShown.value  ?  'plain'  :  'default'"
         icon-name="users-alt"
         size="sm"
-        @click="messengerContext.navigateTo({ name: 'settings-speech' })"
+        @click="messengerContext.navigateTo({ name: 'settings-engine' })"
       />
       <NvDivider class="h-3" direction="vertical"/>
       <SpeechEngineSelect

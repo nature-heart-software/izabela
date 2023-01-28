@@ -1,13 +1,9 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
 import NvSettings from '@/teams/messenger/views/NvSettings.vue'
 import NvSettingsGeneral from '@/teams/messenger/views/NvSettingsGeneral.vue'
-import NvSettingsSpeech from '@/teams/messenger/views/NvSettingsSpeech.vue'
+import NvSettingsEngine from '@/teams/messenger/views/NvSettingsEngine.vue'
 import NvSettingsAudio from '@/teams/messenger/views/NvSettingsAudio.vue'
 import NvSettingsDictionary from '@/teams/messenger/views/NvSettingsDictionary.vue'
-import NvSettingsStartup from '@/teams/messenger/views/NvSettingsStartup.vue'
-import NvSettingsUpdate from '@/teams/messenger/views/NvSettingsUpdate.vue'
-import NvSettingsDisplay from '@/teams/messenger/views/NvSettingsDisplay.vue'
-import NvSettingsKeybindings from '@/teams/messenger/views/NvSettingsKeybindings.vue'
 import NvMessages from '@/teams/messenger/views/NvMessages.vue'
 import NvMessagesHistory from '@/teams/messenger/views/NvMessagesHistory.vue'
 import NvMessagesShortcuts from '@/teams/messenger/views/NvMessagesShortcuts.vue'
@@ -24,9 +20,9 @@ const routes: Array<RouteRecordRaw> = [
         component: NvSettingsGeneral,
       },
       {
-        name: 'settings-speech',
-        path: 'speech',
-        component: NvSettingsSpeech,
+        name: 'settings-engine',
+        path: 'engine',
+        component: NvSettingsEngine,
       },
       {
         name: 'settings-audio',
@@ -34,29 +30,9 @@ const routes: Array<RouteRecordRaw> = [
         component: NvSettingsAudio,
       },
       {
-        name: 'settings-display',
-        path: 'display',
-        component: NvSettingsDisplay,
-      },
-      {
         name: 'settings-dictionary',
         path: 'dictionary',
         component: NvSettingsDictionary,
-      },
-      {
-        name: 'settings-keybindings',
-        path: 'keybindings',
-        component: NvSettingsKeybindings,
-      },
-      {
-        name: 'settings-startup',
-        path: 'startup',
-        component: NvSettingsStartup,
-      },
-      {
-        name: 'settings-update',
-        path: 'update',
-        component: NvSettingsUpdate,
       },
     ],
   },
