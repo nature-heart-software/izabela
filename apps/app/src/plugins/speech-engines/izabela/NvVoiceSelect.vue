@@ -25,10 +25,7 @@ const computedParams = computed(() => ({
   credentials: {},
 }))
 const speechStore = useSpeechStore()
-const canFetch = computed(
-  () =>
-    speechStore.hasUniversalApiCredentials,
-)
+const canFetch = computed(() => speechStore.hasUniversalApiCredentials)
 const { data, isFetching } = useListVoicesQuery(computedParams, {
   enabled: canFetch,
 })
