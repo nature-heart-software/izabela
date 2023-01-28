@@ -1,7 +1,7 @@
 <template>
   <NvCard size="xs">
     <NvGroup :spacing="2" noWrap>
-      <NvButton icon-name="question-circle" size="sm" />
+      <NvButton icon-name="question-circle" size="sm"/>
       <NvButton
         :type="
           route.name?.startsWith('messages') && messengerContext.isViewShown.value
@@ -26,7 +26,7 @@
   </NvCard>
   <NvCard size="sm">
     <NvGroup :spacing="2">
-      <NvButton icon-name="times" size="xs" type="plain" @click="hide" />
+      <NvButton icon-name="times" size="xs" type="plain" @click="hide"/>
     </NvGroup>
   </NvCard>
 </template>
