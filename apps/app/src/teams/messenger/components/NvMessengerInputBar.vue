@@ -71,7 +71,7 @@ const onInputEnter = () => {
 }
 
 const onWindowFocus = () => {
-  if (inputRef.value) inputRef.value.focus()
+  if (inputRef.value && messengerWindowStore.focusContext === 'keyboard') inputRef.value.focus()
 }
 
 const onWindowBlur = () => {
