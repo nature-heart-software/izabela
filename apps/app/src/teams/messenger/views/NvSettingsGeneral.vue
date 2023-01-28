@@ -8,9 +8,9 @@
             <NvStack>
               <NvText type="label">Monitor</NvText>
             </NvStack>
-            <NvDisplaySelect/>
+            <NvDisplaySelect />
           </NvGroup>
-          <NvDivider direction="horizontal"/>
+          <NvDivider direction="horizontal" />
           <NvGroup justify="apart" no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Hide window after sending a message</NvText>
@@ -53,7 +53,7 @@
               @update:modelValue="(value) => settingsStore.$patch({ launchOnStartup: value })"
             />
           </NvGroup>
-          <NvDivider direction="horizontal"/>
+          <NvDivider direction="horizontal" />
           <NvGroup justify="apart" no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Update Channel</NvText>
