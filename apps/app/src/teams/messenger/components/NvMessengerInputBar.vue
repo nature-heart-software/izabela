@@ -15,7 +15,7 @@
         @focus="onInputFocus"
         @space="(e) => settingsStore.messageMode === 'word' && [playMessage(), e.preventDefault()]"
       />
-      <NvButton icon-name="message" size="lg" @click="playMessage()"/>
+      <NvButton icon-name="message" size="lg" @click="playMessage()" />
     </NvGroup>
   </NvCard>
 </template>
@@ -43,7 +43,7 @@ const onInputEsc = () => {
 
 const placeholder = computed(() => {
   if (speechStore.commands.length > 0) {
-    return `Type / to see available commands (${ speechStore.commands.length })`
+    return `Type / to see available commands (${speechStore.commands.length})`
   }
   return 'So, said the angel to the child who, divided, broke the knife..'
 })
