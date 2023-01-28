@@ -27,6 +27,7 @@ export default () => {
   function playMessage(message: ReturnType<typeof IzabelaMessage>) {
     const socketPayload = message.getSocketPayload()
     const onEnd = () => {
+      socket.emit('message:error', socketPayload)
       socket.emit('message:end', socketPayload)
       return endMessage()
     }
