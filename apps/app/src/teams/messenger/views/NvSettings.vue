@@ -5,7 +5,7 @@
       <div></div>
       <NvCard class="inline-flex" size="sm">
         <div class="inline-flex space-x-2">
-          <NvButton icon-name="times" size="xs" type="plain" @click="$emit('close')"/>
+          <NvButton icon-name="times" size="xs" type="plain" @click="$emit('close')" />
         </div>
       </NvCard>
     </div>
@@ -28,7 +28,7 @@
                           class="w-full"
                           size="sm"
                           type="ghost-alt"
-                        >{{ entry.name }}
+                          >{{ entry.name }}
                         </NvButton>
                       </router-link>
                     </template>
@@ -43,7 +43,7 @@
               <router-view v-slot="{ Component }">
                 <Transition class="transition">
                   <div :key="Component" class="absolute inset-0 overflow-y-auto">
-                    <component :is="Component"/>
+                    <component :is="Component" />
                   </div>
                 </Transition>
               </router-view>
@@ -66,33 +66,14 @@ const navigation = [
         name: 'General',
         to: { name: 'settings-general' },
       },
-      {
-        name: 'Display',
-        to: { name: 'settings-display' },
-      },
-      {
-        name: 'Overlay',
-      },
-      {
-        name: 'Keybindings',
-        to: { name: 'settings-keybindings' },
-      },
-      {
-        name: 'Startup',
-        to: { name: 'settings-startup' },
-      },
-      {
-        name: 'Update',
-        to: { name: 'settings-update' },
-      },
     ],
   },
   {
     name: 'Speech',
     children: [
       {
-        name: 'Speech',
-        to: { name: 'settings-speech' },
+        name: 'Engine',
+        to: { name: 'settings-engine' },
       },
       {
         name: 'Audio',
