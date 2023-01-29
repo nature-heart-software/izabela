@@ -1,4 +1,58 @@
-# izabela
+<p align="center">
+    <picture>
+      <img alt="Izabela" src="https://raw.githubusercontent.com/nature-heart-software/izabela/dev/apps/app/build/icons/64x64.png" width="64" height="64">
+    </picture>
+</p>
+
+<h1 align="center">
+  Izabela
+</h1>
+
+<p align="center">
+  Your speech Assistant ✨
+</p>
+
+## What is Izabela?
+
+Izabela is a text-to-speech application that allows you to communicate with an artificial voice through your speakers or
+as your microphone!
+
+It was designed primarily to help mute people and people with speech disabilities communicate with their friends over
+applications such as Discord or games that don't include text chat without interrupting their activity. Over time, it
+evolved to be a tool for anyone
+who wants to communicate with text-to-speech and for that reason, you can see Izabela as a sort of speech assistant!
+
+## Features
+
+- [x] Appears above any application (as long as it is not fullscreen)
+- [x] Multiple text-to-speech engines (Amazon Polly, Microsoft Azure, Google Cloud, IBM Watson, etc..)
+- [x] Multiple voices (per engine)
+- [x] Multiple audio outputs
+- [x] Download messages to audio files
+- [x] Supports keyboard shortcuts for quick messages
+- [x] Supports audio input for speech-to-text
+- [x] Supports voice expressions (Microsoft Azure)
+- [x] Dictionary to translate abbreviations (ily -> I love you (💖))
+- [x] Local and remote servers to help you build your own text-to-speech implementations
+- [x] Local websocket server to retrieve messages (useful for video streaming elements!)
+
+## How to use
+
+By default, press `Ctrl` + `Enter` to open Izabela.
+
+The text input will be focused allowing you to type your message and send it. The selected text-to-speech engine will
+translate your text into audio using the selected voice. The audio is then sent through every audio outputs you have
+configured.
+
+If you have a virtual audio cable installed, you can configure it as an audio output in Izabela then use it as audio
+input in any application that can receive audio from a microphone. If you don't have a virtual audio cable installed,
+you can install one directly in Izabela from the settings.
+
+> **Note:** A restart is required after installing a virtual audio cable.
+
+You can keep using any app (that isn't in fullscreen) in the background while Izabela is in the foreground. If you're
+using Izabela over games, I recommend setting your game in borderless, windowed or borderless windowed mode instead of
+fullscreen.
 
 ## Resources
 
