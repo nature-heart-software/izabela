@@ -11,7 +11,7 @@
         size="sm"
         @click="messengerContext.navigateTo({ name: 'settings-engine' })"
       />
-      <NvDivider class="h-3" direction="vertical" />
+      <NvDivider class="h-3" direction="vertical"/>
       <SpeechEngineSelect
         :modelValue="speechStore.selectedSpeechEngine"
         class="w-13"
@@ -29,7 +29,7 @@
           size="sm"
         />
       </template>
-      <NvDivider class="h-3" direction="vertical" />
+      <NvDivider class="h-3" direction="vertical"/>
       <NvPopover :tippy-options="{ placement: 'top-start' }" size="sm">
         <div class="w-screen max-w-full">
           <NvStack spacing="4">
@@ -45,21 +45,23 @@
                 "
               />
             </NvGroup>
-            <NvDivider direction="horizontal" />
+            <NvDivider direction="horizontal"/>
             <NvFormItem label="Audio Outputs">
-              <NvAudioOutputsSelect class="w-full" />
+              <NvAudioOutputsSelect class="w-full"/>
             </NvFormItem>
           </NvStack>
         </div>
         <template #reference>
-          <NvButton icon-name="direction" size="sm">Outputs</NvButton>
+          <NvButton icon-name="direction" size="sm">Outputs
+            ({{ settingsStore.audioOutputs.length + (settingsStore.playSpeechOnDefaultPlaybackDevice ? 1 : 0) }})
+          </NvButton>
         </template>
       </NvPopover>
       <NvPopover :tippy-options="{ placement: 'top-start' }" size="sm">
         <div class="w-screen max-w-full">
           <NvStack spacing="4">
             <NvFormItem label="Audio Input">
-              <NvAudioInputsSelect class="w-full" />
+              <NvAudioInputsSelect class="w-full"/>
             </NvFormItem>
           </NvStack>
         </div>
