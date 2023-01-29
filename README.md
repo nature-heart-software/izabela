@@ -1,7 +1,5 @@
 <p align="center">
-    <picture>
-      <img alt="Izabela" src="https://raw.githubusercontent.com/nature-heart-software/izabela/dev/apps/app/build/icons/64x64.png" width="64" height="64">
-    </picture>
+    <img alt="Izabela" src="https://raw.githubusercontent.com/nature-heart-software/izabela/dev/apps/app/build/icons/64x64.png" width="64" height="64">
 </p>
 
 <h1 align="center">
@@ -24,17 +22,17 @@ who wants to communicate with text-to-speech and for that reason, you can see Iz
 
 ## Features
 
-- [x] Appears above any application (as long as it is not fullscreen)
+- [x] Appears above any non-fullscreen application
 - [x] Multiple text-to-speech engines (Amazon Polly, Microsoft Azure, Google Cloud, IBM Watson, etc..)
 - [x] Multiple voices (per engine)
 - [x] Multiple audio outputs
+- [x] Audio input for speech-to-text
+- [x] Keyboard shortcuts for quick messages
+- [x] Voice expressions (Microsoft Azure)
 - [x] Download messages to audio files
-- [x] Supports keyboard shortcuts for quick messages
-- [x] Supports audio input for speech-to-text
-- [x] Supports voice expressions (Microsoft Azure)
 - [x] Dictionary to translate abbreviations (ily -> I love you (💖))
 - [x] Local and remote servers to help you build your own text-to-speech implementations
-- [x] Local websocket server to retrieve messages (useful for video streaming elements!)
+- [x] Local websocket server to retrieve messages (useful for streaming elements!)
 
 ## How to use
 
@@ -50,7 +48,7 @@ you can install one directly in Izabela from the settings.
 
 > **Note:** A restart is required after installing a virtual audio cable.
 
-You can keep using any app (that isn't in fullscreen) in the background while Izabela is in the foreground. If you're
+You can keep using any non-fullscreen application in the background while Izabela is in the foreground. If you're
 using Izabela over games, I recommend setting your game in borderless, windowed or borderless windowed mode instead of
 fullscreen.
 
