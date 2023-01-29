@@ -1,14 +1,15 @@
 <template>
-  <NvSelect :options="options" v-bind="$attrs" />
+  <NvSelect :options="options" v-bind="$attrs"/>
 </template>
 <script lang="ts" setup>
 import { NvSelect } from '@packages/ui'
 import { computed } from 'vue'
 import { useSpeechEngineManager } from '@/modules/speech-engine-manager'
+import { orderBy } from 'lodash'
 
 const { engines } = useSpeechEngineManager()
 const options = computed(() =>
-  engines.value.map((engine) => {
+  orderBy(engines.value.map((engine) => {
     const disabled = engine.hasCredentials ? !engine.hasCredentials() : false
     return {
       disabled,
@@ -18,6 +19,6 @@ const options = computed(() =>
         title: disabled ? 'Requires credentials' : '',
       },
     }
-  }),
+  }), ['disabled', 'label'], ['asc', 'asc']),
 )
 </script>
