@@ -52,7 +52,12 @@
           </NvStack>
         </div>
         <template #reference>
-          <NvButton icon-name="direction" size="sm">Outputs</NvButton>
+          <NvButton icon-name="direction" size="sm"
+            >Outputs ({{
+              settingsStore.audioOutputs.length +
+              (settingsStore.playSpeechOnDefaultPlaybackDevice ? 1 : 0)
+            }})
+          </NvButton>
         </template>
       </NvPopover>
       <NvPopover :tippy-options="{ placement: 'top-start' }" size="sm">
