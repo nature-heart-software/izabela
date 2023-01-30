@@ -52,6 +52,9 @@ You can keep using any non-fullscreen application in the background while Izabel
 using Izabela over games, I recommend setting your game in borderless, windowed or borderless windowed mode instead of
 fullscreen.
 
+## Guides
+* [How to use Izabela as audio input](https://github.com/nature-heart-software/izabela/blob/dev/guides/onboarding/how-to-use-as-audio-input.md)
+
 ## Resources
 
 - [Figma](https://www.figma.com/proto/U4A6IwSY8T4W2tm2agW92S/Izabela-v1.0.0?node-id=103%3A4&scaling=min-zoom&page-id=103%3A3&starting-point-node-id=103%3A4)
