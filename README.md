@@ -26,7 +26,7 @@ who wants to communicate with text-to-speech and for that reason, you can see Iz
 - [x] Multiple text-to-speech engines (Amazon Polly, Microsoft Azure, Google Cloud, IBM Watson, etc..)
 - [x] Multiple voices (per engine)
 - [x] Multiple audio outputs
-- [x] Accepts an audio input for speech-to-text
+- [x] Supports audio inputs for speech-to-text
 - [x] Keyboard shortcuts for quick messages
 - [x] Voice expressions (Microsoft Azure)
 - [x] Download messages to audio files
