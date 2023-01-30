@@ -1,11 +1,11 @@
 # How to use Izabela as an audio input?
 
-Izabela can be used as an audio input on any application that can receive audio from a microphone.
+Izabela can be used as an audio input on any application that can receive audio inputs.
 
 You only need 2 things to make this work:
 
 - A virtual audio cable installed
-- Configure the virtual audio cable as an audio output in Izabela
+- The virtual audio cable configured as an audio output in Izabela
 
 ## Install a virtual audio cable
 
@@ -37,6 +37,6 @@ You can install a virtual audio cable directly from Izabela in the settings.
 ![](https://github.com/nature-heart-software/izabela/blob/dev/assets/select-audio-input.png?raw=true)
 
 If all the steps above were followed correctly, you should be able to see audio being sent to the target application
-after sending a message
+after sending a message from Izabela
 
 ![](https://github.com/nature-heart-software/izabela/blob/dev/assets/mic-test.png?raw=true)
