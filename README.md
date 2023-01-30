@@ -53,7 +53,8 @@ using Izabela over games, I recommend setting your game in borderless, windowed 
 fullscreen.
 
 ## Guides
-* [How to use Izabela as audio input](https://github.com/nature-heart-software/izabela/blob/dev/guides/onboarding/how-to-use-as-audio-input.md)
+
+- [How to use Izabela as audio input](https://github.com/nature-heart-software/izabela/blob/dev/guides/onboarding/how-to-use-as-audio-input.md)
 
 ## Resources
 
