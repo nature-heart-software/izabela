@@ -43,10 +43,8 @@ translate your text into audio using the selected voice. The audio is then sent 
 configured.
 
 If you have a virtual audio cable installed, you can configure it as an audio output in Izabela then use it as audio
-input in any application that can receive audio from a microphone. If you don't have a virtual audio cable installed,
+input in any application that can receive audio inputs. If you don't have a virtual audio cable installed,
 you can install one directly in Izabela from the settings.
-
-> **Note:** A restart is required after installing a virtual audio cable.
 
 You can keep using any non-fullscreen application in the background while Izabela is in the foreground. If you're
 using Izabela over games, I recommend setting your game in borderless, windowed or borderless windowed mode instead of
