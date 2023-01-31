@@ -23,11 +23,13 @@ export const useSpeechStore = defineStore(
       return Boolean(decrypt(settingsStore.universalApiKey) && settingsStore.universalApiEndpoint)
     })
     const customCommands = ref<SpeechCommand[]>([])
-    const addCustomCommand = (command: SpeechCommand = {
-      name: '',
-      value: '',
-      description: '',
-    }) => {
+    const addCustomCommand = (
+      command: SpeechCommand = {
+        name: '',
+        value: '',
+        description: '',
+      },
+    ) => {
       customCommands.value.unshift(command)
     }
     const removeCustomCommand = (index: number) => {

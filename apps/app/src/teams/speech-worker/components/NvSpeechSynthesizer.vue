@@ -14,7 +14,8 @@ const getCommand = (message: string) => {
 
 const cleanMessage = (message: string) => {
   const command = getCommand(message)
-  if (command && !speechStore.engineCommands.find((c) => c.value === command)) return message.replace(`/${ command }`, '').trim()
+  if (command && !speechStore.engineCommands.find((c) => c.value === command))
+    return message.replace(`/${command}`, '').trim()
   return message
 }
 
