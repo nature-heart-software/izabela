@@ -47,6 +47,7 @@ import { useFuse, UseFuseOptions } from '@vueuse/integrations/useFuse'
 import { orderBy, throttle } from 'lodash'
 import { useMessagesStore } from '@/features/messages/store'
 import { onKeyStroke } from '@vueuse/core'
+import { useSpeechStore } from '@/features/speech/store'
 
 const props = defineProps({
   engine: {
@@ -66,6 +67,7 @@ const emit = defineEmits(['update:modelValue', 'enter', 'space', 'esc'])
 const inputRef = ref()
 const historyMessageIndex = ref(-1)
 const messagesStore = useMessagesStore()
+const speechStore = useSpeechStore()
 const engine = computed(() => {
   if (!props.engine) return null
   return getEngineById(props.engine)
@@ -73,9 +75,9 @@ const engine = computed(() => {
 
 const commands = computed(
   () =>
-    engine.value?.commands?.(props.voice).map((command) => ({
+    [...(engine.value?.commands?.(props.voice) || []), ...speechStore.customCommands].map((command) => ({
       ...command,
-      command: `/${command.value}`,
+      command: `/${ command.value }`,
     })) || [],
 )
 
@@ -117,7 +119,7 @@ const isAutocompleteVisible = computed(
 )
 
 const onAutocompleteSelect = (value: typeof commands.value[number]) => {
-  emit('update:modelValue', `${value.command} `)
+  emit('update:modelValue', `${ value.command } `)
   if (latestCommands.value.includes(value.command)) {
     latestCommands.value.splice(latestCommands.value.indexOf(value.command), 1)
   }
@@ -132,7 +134,8 @@ const onInputTab = (e: KeyboardEvent) => {
 }
 
 watch(historyMessageIndex, () => {
-  emit('update:modelValue', messagesStore.reversedHistory[historyMessageIndex.value]?.message || '')
+  const historyMessage = messagesStore.reversedHistory[historyMessageIndex.value]
+  emit('update:modelValue', historyMessage?.originalMessage || historyMessage?.message || '')
 })
 
 watch(
@@ -147,7 +150,7 @@ onKeyStroke('ArrowUp', () => {
   if (
     !isAutocompleteVisible.value &&
     isInputFocused.value &&
-    historyMessageIndex.value < messagesStore.history.length - 1
+    historyMessageIndex.value < messagesStore.history.length-1
   ) {
     historyMessageIndex.value += 1
   }

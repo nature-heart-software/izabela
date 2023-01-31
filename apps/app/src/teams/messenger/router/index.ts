@@ -7,6 +7,7 @@ import NvSettingsDictionary from '@/teams/messenger/views/NvSettingsDictionary.v
 import NvMessages from '@/teams/messenger/views/NvMessages.vue'
 import NvMessagesHistory from '@/teams/messenger/views/NvMessagesHistory.vue'
 import NvMessagesShortcuts from '@/teams/messenger/views/NvMessagesShortcuts.vue'
+import NvSettingsCommands from '@/teams/messenger/views/NvSettingsCommands.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -33,6 +34,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'settings-dictionary',
         path: 'dictionary',
         component: NvSettingsDictionary,
+      },
+      {
+        name: 'settings-commands',
+        path: 'commands',
+        component: NvSettingsCommands,
       },
     ],
   },

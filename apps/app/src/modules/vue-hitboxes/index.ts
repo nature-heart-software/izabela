@@ -21,7 +21,6 @@ const onElementChange = (element: Element, callback: () => any) => {
 export const watchHitbox = (selector: string) => {
   ready(selector, (element: Element) => {
     const id = uuid()
-    console.log('watching', id)
     const hitboxesStore = useHitboxesStore()
     const updateHitboxes = throttle(() => {
       if (element) {

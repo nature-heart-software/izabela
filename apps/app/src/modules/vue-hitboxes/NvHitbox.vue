@@ -24,7 +24,6 @@ const hitboxes = ref({
 const onHitboxUpdate = () => {
   // console.log('hitbox update', hitboxes.value, componentRef.value)
   if (componentRef.value) {
-    console.log('adding', id)
     hitboxesStore.addHitbox({ ...hitboxes.value })
   } else {
     hitboxesStore.removeHitbox(hitboxes.value.id)
