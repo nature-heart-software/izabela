@@ -18,3 +18,5 @@ Here's a list of all the events you can intercept:
 | `message:start` | `IzabelaMessage` | Triggered when the audio for a message started playing                      |
 | `message:end`   | `IzabelaMessage` | Triggered when the audio for a message stopped playing or an error occurred |
 | `message:error` | `IzabelaMessage` | Triggered when an error occurred                                            |
+
+I recommend working with [socket.io](https://github.com/socketio/socket.io-client) to intercept these events.

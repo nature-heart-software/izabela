@@ -53,6 +53,7 @@ fullscreen.
 ## Guides
 
 - [How to use Izabela as audio input](https://github.com/nature-heart-software/izabela/blob/dev/guides/onboarding/how-to-use-as-audio-input.md)
+- [How to intercept websocket events](https://github.com/nature-heart-software/izabela/blob/dev/guides/onboarding/how-to-intercept-websocket-events.md)
 
 ## Resources
 
