@@ -13,7 +13,7 @@
 ## What is Izabela?
 
 Izabela is a text-to-speech application that allows you to communicate with an artificial voice through your speakers or
-as your microphone!
+as an audio input!
 
 It was designed primarily to help mute people and people with speech disabilities communicate with their friends over
 applications such as Discord or games that don't include text chat without interrupting their activity. Over time, it
