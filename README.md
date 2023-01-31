@@ -44,10 +44,10 @@ configured.
 
 If you have a virtual audio cable installed, you can configure it as an audio output in Izabela then use it as audio
 input in any application that can receive audio inputs. If you don't have a virtual audio cable installed,
-you can install one directly in Izabela from the settings.
+you can install one directly from Izabela in the settings.
 
 You can keep using any non-fullscreen application in the background while Izabela is in the foreground. If you're
-using Izabela over games, I recommend setting your game in borderless, windowed or borderless windowed mode instead of
+using Izabela over games, I recommend setting your game to borderless, windowed or borderless windowed mode instead of
 fullscreen.
 
 ## Guides
