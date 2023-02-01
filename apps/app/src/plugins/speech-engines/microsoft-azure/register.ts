@@ -13,7 +13,7 @@ const getCredentials = () => ({
 })
 
 const commands: SpeechEngine['commands'] = (voice) =>
-  (voice.StyleList || []).map((style: string) => ({ name: style, value: style }))
+  (voice?.StyleList || []).map((style: string) => ({ name: style, value: style }))
 
 const getSelectedVoice = () => getProperty('selectedVoice')
 registerEngine({
@@ -32,14 +32,14 @@ registerEngine({
     let expression
     const commandString = newText.split(' ')[0] || ''
     if (commandString.startsWith('/')) {
-      const command = commands(voice).find(({ name }) => commandString.startsWith(`/${name}`))
+      const command = commands(voice).find(({ name }) => commandString.startsWith(`/${ name }`))
       newText = newText.replace(commandString, '')
       if (command) {
         expression = command.value
       }
     }
     const ssml = expression
-      ? `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US"><voice name="${voice.ShortName}"><mstts:express-as style="${expression}">${newText}</mstts:express-as></voice></speak>`
+      ? `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US"><voice name="${ voice.ShortName }"><mstts:express-as style="${ expression }">${ newText }</mstts:express-as></voice></speak>`
       : null
     return {
       ssml,

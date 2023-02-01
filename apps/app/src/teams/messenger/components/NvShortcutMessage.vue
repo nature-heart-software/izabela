@@ -12,7 +12,7 @@
           />
           <NvStack class="!flex-1 min-h-0">
             <NvSpeechEngineInput
-              v-model="data.message"
+              v-model="data.originalMessage"
               :engine="data.engine"
               :voice="data.selectedVoice[data.engine]"
               class="w-full"
@@ -20,7 +20,7 @@
               @enter="() => play()"
             />
             <NvGroup noWrap>
-              <NvSpeechEngineSelect v-model="data.engine" class="w-1/3" size="sm" />
+              <NvSpeechEngineSelect v-model="data.engine" class="w-1/3" size="sm"/>
               <template v-if="engine">
                 <component
                   :is="engine.voiceSelectComponent"
@@ -31,7 +31,7 @@
                   size="sm"
                 />
               </template>
-              <NvKeybinding v-model="data.shortcut" class="w-1/3" multiple size="sm" />
+              <NvKeybinding v-model="data.shortcut" class="w-1/3" multiple size="sm"/>
             </NvGroup>
           </NvStack>
         </NvGroup>
@@ -46,7 +46,7 @@
             },
           ]"
         >
-          <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm" />
+          <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm"/>
         </NvContextMenu>
       </NvGroup>
       <div v-if="isPlaying" class="h-2 relative bg-gray-10">
@@ -65,10 +65,9 @@ import NvSpeechEngineSelect from '@/features/speech/components/inputs/NvSpeechEn
 import { useSettingsStore } from '@/features/settings/store'
 import NvKeybinding from '@/features/app/components/inputs/NvKeybinding.vue'
 import { Key } from '@/types/keybinds'
-import { useFuse, UseFuseOptions } from '@vueuse/integrations/useFuse'
-import { orderBy } from 'lodash'
 import { usePlayMessage } from '@/features/messages/hooks'
 import NvSpeechEngineInput from '@/features/speech/components/inputs/NvSpeechEngineInput.vue'
+import { getCleanMessage, getMessageCommand } from '@/modules/izabela/utils'
 
 const props = defineProps({
   id: {
@@ -84,9 +83,16 @@ const message = computed(() => shortcutMessages.value.find((m) => m.id === props
 const isDataProvided = ref(false)
 const data = reactive({
   message: '',
+  originalMessage: '',
+  command: null as string | null,
   engine: '',
   selectedVoice: {} as Record<string, unknown>,
   shortcut: [] as Key[],
+})
+
+const engine = computed(() => {
+  if (!data.engine) return null
+  return getEngineById(data.engine)
 })
 
 watch(
@@ -94,68 +100,33 @@ watch(
   () => {
     if (!isDataProvided.value) {
       if (message.value) isDataProvided.value = true
-      const engine = message.value?.engine || settingsStore.selectedSpeechEngine
-      data.engine = engine
-      data.selectedVoice[engine] = message.value?.voice
+      const engineId = message.value?.engine || settingsStore.selectedSpeechEngine
+      data.engine = engineId
+      data.selectedVoice[engineId] = message.value?.voice
       data.shortcut = message.value?.shortcut || ([] as Key[])
       data.message = message.value?.message || ''
+      data.originalMessage = message.value?.originalMessage || ''
+      data.command = message.value?.command || null
     }
   },
   { deep: true, immediate: true },
 )
-const engine = computed(() => {
-  if (!data.engine) return null
-  return getEngineById(data.engine)
-})
 
-const commands = computed(
-  () =>
-    engine.value?.commands?.(data.selectedVoice[engine.value.id]).map((command) => ({
-      ...command,
-      command: `/${command.value}`,
-    })) || [],
-)
-
-const inputValue = computed(() => data.message)
-
-const fuseOptions = computed<UseFuseOptions<typeof commands.value[number]>>(() => ({
-  fuseOptions: {
-    keys: ['command'],
-    threshold: 0.3,
-  },
-}))
-
-const { results } = useFuse(inputValue, commands, fuseOptions)
-const autocompleteValues = computed(() => {
-  if (data.message) {
-    return (
-      orderBy(
-        results.value.map(({ item }) => item),
-        ['command'],
-        ['asc'],
-      ).reverse() || []
-    )
-  }
-  return orderBy(commands.value, ['command'], ['asc']).reverse() || []
-})
-
-const isAutocompleteVisible = computed(
-  () =>
-    commands.value.length > 0 && data.message.startsWith('/') && data.message.split(' ').length < 2,
-)
-
-const onAutocompleteSelect = (value: typeof commands.value[number]) => {
-  data.message = `${value.command} `
-}
-
+// NOTE: HOLY SHIT DO SOMETHING ABOUT THIS IT'S AWFUL LOL
+// Check NvHistoryMessage, NvSpeechSynthesizer and electron-keybinding/register
+// Thank you in advance future me, I did my best...
 watch(
   () => data,
   () => {
+    const voice = data.selectedVoice[data.engine]
+    const cleanMessage = getCleanMessage(data.originalMessage, engine.value?.commands?.(voice) || [])
     messagesStore.updateShortcutMessage(props.id, {
       engine: data.engine,
-      voice: data.selectedVoice[data.engine],
+      voice,
       shortcut: data.shortcut,
-      message: data.message,
+      message: cleanMessage,
+      originalMessage: data.originalMessage,
+      command: getMessageCommand(data.originalMessage),
     })
   },
   { deep: true },
@@ -171,12 +142,18 @@ watch(
   { immediate: true },
 )
 
-const playMessage = computed(() => ({
-  id: props.id,
-  message: data.message,
-  engine: data.engine,
-  voice: data.selectedVoice[data.engine],
-  excludeFromHistory: true,
-}))
+const playMessage = computed(() => {
+  const voice = data.selectedVoice[data.engine]
+  const cleanMessage = getCleanMessage(data.originalMessage, engine.value?.commands?.(voice) || [])
+  return ({
+    id: props.id,
+    message: cleanMessage,
+    originalMessage: data.originalMessage,
+    command: getMessageCommand(data.originalMessage),
+    engine: data.engine,
+    voice,
+    excludeFromHistory: true,
+  })
+})
 const { play, isPlaying, isLoading, progress } = usePlayMessage(playMessage)
 </script>

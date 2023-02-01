@@ -5,8 +5,8 @@ export type IzabelaMessageEvent = 'started' | 'ended' | 'progress' | 'error'
 export interface IzabelaMessage {
   id?: string
   message: string
-  originalMessage?: string
-  command?: string | null
+  originalMessage: string
+  command: string | null
   engine: SpeechEngine['id']
   voice: any
   excludeFromHistory?: boolean

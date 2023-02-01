@@ -38,21 +38,24 @@ export default () =>
         if (!keybinding) return
         try {
           globalShortcut.register(keybinding, () => {
+            const payload: IzabelaMessage = {
+              message: message.message,
+              originalMessage: message.originalMessage,
+              command: message.command,
+              voice: message.voice,
+              engine: message.engine,
+              excludeFromHistory: true,
+              id: message.id,
+            }
             ipcMain.sendTo(
               'speech-worker',
               'say',
-              purify({
-                message: message.message,
-                voice: message.voice,
-                engine: message.engine,
-                excludeFromHistory: true,
-                id: message.id,
-              }) as IzabelaMessage,
+              purify(payload) as IzabelaMessage,
             )
           })
           registeredShortcuts[message.id] = keybinding
         } catch (e) {
-          console.error(`Couldn't register shortcut "${keybinding}"`, e)
+          console.error(`Couldn't register shortcut "${ keybinding }"`, e)
         }
       })
     }

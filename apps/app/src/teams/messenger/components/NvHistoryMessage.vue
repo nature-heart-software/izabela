@@ -11,7 +11,7 @@
             @click="() => play()"
           />
           <NvStack class="!flex-1 min-h-0">
-            <NvText>{{ message.message || id }}</NvText>
+            <NvText>{{ message.originalMessage || id }}</NvText>
             <NvText type="caption">
               <NvGroup class="w-full" justify="between" noWrap>
                 <span class="truncate">
@@ -136,6 +136,8 @@ const downloadMessageLocally = async () => {
 const playMessage = computed(() => ({
   id: props.id,
   message: message.value?.message || '',
+  originalMessage: message.value?.originalMessage || '',
+  command: message.value?.command || null,
   engine: message.value?.engine || '',
   voice: message.value?.voice || engine.value?.getSelectedVoice(),
   excludeFromHistory: true,
