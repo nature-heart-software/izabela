@@ -8,6 +8,7 @@ export const getMessageCommand = (message: string) => {
 
 export const getCleanMessage = (message: string, engineCommands: SpeechCommand[]) => {
   const command = getMessageCommand(message)
-  if (command && !engineCommands.find((c) => c.value === command)) return message.replace(`/${ command }`, '').trim()
+  if (command && !engineCommands.find((c) => c.value === command))
+    return message.replace(`/${command}`, '').trim()
   return message
 }

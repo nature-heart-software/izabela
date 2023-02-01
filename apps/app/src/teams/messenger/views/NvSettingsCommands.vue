@@ -17,12 +17,12 @@
               <div>
                 <NvButton size="sm" @click="addCustomCommand()">Add command</NvButton>
               </div>
-              <NvDivider direction="horizontal"/>
+              <NvDivider direction="horizontal" />
               <NvGroup class="w-full" grow no-wrap>
                 <NvText class="w-1/2" type="label">Name</NvText>
-                <NvDivider class="!grow-0 h-5" direction="vertical"/>
+                <NvDivider class="!grow-0 h-5" direction="vertical" />
                 <NvText class="w-1/2" type="label">Description</NvText>
-                <NvButton class="!grow-0 invisible" icon-name="times" size="xs" type="plain"/>
+                <NvButton class="!grow-0 invisible" icon-name="times" size="xs" type="plain" />
               </NvGroup>
               <template v-for="(customCommand, i) in customCommands" :key="i">
                 <NvGroup class="w-full" grow>
@@ -37,7 +37,7 @@
                         })
                     "
                   />
-                  <NvDivider class="!grow-0 h-5" direction="vertical"/>
+                  <NvDivider class="!grow-0 h-5" direction="vertical" />
                   <NvInput
                     :modelValue="customCommand.description"
                     @update:modelValue="
