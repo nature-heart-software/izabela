@@ -1,6 +1,6 @@
 <template>
   <div ref="componentRef" :data-hitbox-id="id">
-    <slot/>
+    <slot />
   </div>
 </template>
 <script lang="ts" setup>
@@ -24,21 +24,24 @@ const hitboxes = ref({
 const onHitboxUpdate = () => {
   // console.log('hitbox update', hitboxes.value, componentRef.value)
   if (componentRef.value) {
-    console.log('adding', id)
     hitboxesStore.addHitbox({ ...hitboxes.value })
   } else {
     hitboxesStore.removeHitbox(hitboxes.value.id)
   }
 }
-const updateHitbox = throttle(() => {
-  if (componentRef.value) {
-    const bounds = componentRef.value.getBoundingClientRect()
-    hitboxes.value.x = bounds.x
-    hitboxes.value.y = bounds.y
-    hitboxes.value.w = bounds.width
-    hitboxes.value.h = bounds.height
-  }
-}, 250, { leading: true, trailing: true })
+const updateHitbox = throttle(
+  () => {
+    if (componentRef.value) {
+      const bounds = componentRef.value.getBoundingClientRect()
+      hitboxes.value.x = bounds.x
+      hitboxes.value.y = bounds.y
+      hitboxes.value.w = bounds.width
+      hitboxes.value.h = bounds.height
+    }
+  },
+  250,
+  { leading: true, trailing: true },
+)
 
 useIntersectionObserver(componentRef, updateHitbox)
 useMutationObserver(componentRef, updateHitbox, { attributes: true })
@@ -50,9 +53,5 @@ onBeforeUnmount(() => {
 onMounted(() => {
   updateHitbox()
 })
-watch(
-  hitboxes.value,
-  onHitboxUpdate,
-  { deep: true },
-)
+watch(hitboxes.value, onHitboxUpdate, { deep: true })
 </script>

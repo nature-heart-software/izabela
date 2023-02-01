@@ -5,7 +5,7 @@ import { IzabelaMessage } from '@/modules/izabela/types'
 import { emitIPCSay } from '@/electron/events/renderer'
 import { usePlayingMessageStore } from '@/features/messages/store'
 
-export const usePlayMessage = (message: MaybeRef<IzabelaMessage>) => {
+export const usePlayMessage = (message: MaybeRef<IzabelaMessage | undefined>) => {
   const playingMessageStore = usePlayingMessageStore()
   const isLoading = ref(false)
   const play = () => {
@@ -14,13 +14,13 @@ export const usePlayMessage = (message: MaybeRef<IzabelaMessage>) => {
     emitIPCSay(payload)
   }
   const isPlaying = computed(
-    () => playingMessageStore.id === unref(message).id && playingMessageStore.progress < 1,
+    () => playingMessageStore.id === unref(message)?.id && playingMessageStore.progress < 1,
   )
   const progress = computed(() => (isPlaying.value ? playingMessageStore.progress : 0))
   watch(
     () => playingMessageStore.progress,
     () => {
-      if (playingMessageStore.id === unref(message).id) {
+      if (playingMessageStore.id === unref(message)?.id) {
         isLoading.value = false
       }
     },

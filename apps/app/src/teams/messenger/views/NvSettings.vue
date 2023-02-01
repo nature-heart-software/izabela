@@ -83,6 +83,10 @@ const navigation = [
         name: 'Dictionary',
         to: { name: 'settings-dictionary' },
       },
+      {
+        name: 'Commands',
+        to: { name: 'settings-commands' },
+      },
     ],
   },
   {

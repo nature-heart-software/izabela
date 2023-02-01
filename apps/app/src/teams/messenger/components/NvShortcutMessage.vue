@@ -12,7 +12,7 @@
           />
           <NvStack class="!flex-1 min-h-0">
             <NvSpeechEngineInput
-              v-model="data.message"
+              v-model="data.originalMessage"
               :engine="data.engine"
               :voice="data.selectedVoice[data.engine]"
               class="w-full"
@@ -65,10 +65,9 @@ import NvSpeechEngineSelect from '@/features/speech/components/inputs/NvSpeechEn
 import { useSettingsStore } from '@/features/settings/store'
 import NvKeybinding from '@/features/app/components/inputs/NvKeybinding.vue'
 import { Key } from '@/types/keybinds'
-import { useFuse, UseFuseOptions } from '@vueuse/integrations/useFuse'
-import { orderBy } from 'lodash'
 import { usePlayMessage } from '@/features/messages/hooks'
 import NvSpeechEngineInput from '@/features/speech/components/inputs/NvSpeechEngineInput.vue'
+import { getCleanMessage, getMessageCommand } from '@/modules/izabela/utils'
 
 const props = defineProps({
   id: {
@@ -83,10 +82,15 @@ const { shortcutMessages } = storeToRefs(messagesStore)
 const message = computed(() => shortcutMessages.value.find((m) => m.id === props.id))
 const isDataProvided = ref(false)
 const data = reactive({
-  message: '',
+  originalMessage: '',
   engine: '',
   selectedVoice: {} as Record<string, unknown>,
   shortcut: [] as Key[],
+})
+
+const engine = computed(() => {
+  if (!data.engine) return null
+  return getEngineById(data.engine)
 })
 
 watch(
@@ -94,68 +98,31 @@ watch(
   () => {
     if (!isDataProvided.value) {
       if (message.value) isDataProvided.value = true
-      const engine = message.value?.engine || settingsStore.selectedSpeechEngine
-      data.engine = engine
-      data.selectedVoice[engine] = message.value?.voice
+      const engineId = message.value?.engine || settingsStore.selectedSpeechEngine
+      data.engine = engineId
+      data.selectedVoice[engineId] = message.value?.voice
       data.shortcut = message.value?.shortcut || ([] as Key[])
-      data.message = message.value?.message || ''
+      data.originalMessage = message.value?.originalMessage || ''
     }
   },
   { deep: true, immediate: true },
 )
-const engine = computed(() => {
-  if (!data.engine) return null
-  return getEngineById(data.engine)
-})
-
-const commands = computed(
-  () =>
-    engine.value?.commands?.(data.selectedVoice[engine.value.id]).map((command) => ({
-      ...command,
-      command: `/${command.value}`,
-    })) || [],
-)
-
-const inputValue = computed(() => data.message)
-
-const fuseOptions = computed<UseFuseOptions<typeof commands.value[number]>>(() => ({
-  fuseOptions: {
-    keys: ['command'],
-    threshold: 0.3,
-  },
-}))
-
-const { results } = useFuse(inputValue, commands, fuseOptions)
-const autocompleteValues = computed(() => {
-  if (data.message) {
-    return (
-      orderBy(
-        results.value.map(({ item }) => item),
-        ['command'],
-        ['asc'],
-      ).reverse() || []
-    )
-  }
-  return orderBy(commands.value, ['command'], ['asc']).reverse() || []
-})
-
-const isAutocompleteVisible = computed(
-  () =>
-    commands.value.length > 0 && data.message.startsWith('/') && data.message.split(' ').length < 2,
-)
-
-const onAutocompleteSelect = (value: typeof commands.value[number]) => {
-  data.message = `${value.command} `
-}
 
 watch(
   () => data,
   () => {
+    const voice = data.selectedVoice[data.engine]
+    const engineCommands = engine.value?.commands?.(voice) || []
+    const cleanMessage = getCleanMessage(data.originalMessage, engineCommands)
     messagesStore.updateShortcutMessage(props.id, {
+      ...message.value,
+      id: message.value?.id || props.id,
       engine: data.engine,
-      voice: data.selectedVoice[data.engine],
+      voice,
       shortcut: data.shortcut,
-      message: data.message,
+      message: cleanMessage,
+      originalMessage: data.originalMessage,
+      command: getMessageCommand(data.originalMessage),
     })
   },
   { deep: true },
@@ -171,12 +138,13 @@ watch(
   { immediate: true },
 )
 
-const playMessage = computed(() => ({
-  id: props.id,
-  message: data.message,
-  engine: data.engine,
-  voice: data.selectedVoice[data.engine],
-  excludeFromHistory: true,
-}))
+const playMessage = computed(() =>
+  message.value
+    ? {
+        ...message.value,
+        excludeFromHistory: true,
+      }
+    : undefined,
+)
 const { play, isPlaying, isLoading, progress } = usePlayMessage(playMessage)
 </script>

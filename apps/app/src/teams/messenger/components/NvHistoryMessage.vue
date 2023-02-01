@@ -11,7 +11,7 @@
             @click="() => play()"
           />
           <NvStack class="!flex-1 min-h-0">
-            <NvText>{{ message.message || id }}</NvText>
+            <NvText>{{ message.originalMessage || id }}</NvText>
             <NvText type="caption">
               <NvGroup class="w-full" justify="between" noWrap>
                 <span class="truncate">
@@ -47,7 +47,7 @@
             },
           ]"
         >
-          <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm"/>
+          <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm" />
         </NvContextMenu>
       </NvGroup>
       <div v-if="isPlaying" class="h-2 relative bg-gray-10">
@@ -102,11 +102,7 @@ const downloadMessageLocally = async () => {
   try {
     if (!message.value || !engine.value) return
     const completeMessage = purify({
-      id: props.id,
-      message: message.value.message,
-      engine: message.value.engine,
-      payload: message.value.payload,
-      voice: message.value.voice,
+      ...message.value,
       credentials: engine.value.getCredentials(),
       excludeFromHistory: true,
       disableAutoplay: true,
@@ -118,9 +114,9 @@ const downloadMessageLocally = async () => {
         reader.onload = () => {
           ElectronFilesystem.downloadMessagePrompt(
             completeMessage,
-            `${ formatedCreatedAt.value } - ${ engine.value?.name } - ${ engine.value?.getVoiceName(
+            `${formatedCreatedAt.value} - ${engine.value?.name} - ${engine.value?.getVoiceName(
               message.value?.voice,
-            ) } - ${ message.value?.message }`.replace(/([^a-z0-9\s-]+)/gi, '_'),
+            )} - ${message.value?.message}`.replace(/([^a-z0-9\s-]+)/gi, '_'),
             reader.result as string,
           ).finally(() => {
             downloading.value = false
@@ -133,12 +129,13 @@ const downloadMessageLocally = async () => {
   }
 }
 
-const playMessage = computed(() => ({
-  id: props.id,
-  message: message.value?.message || '',
-  engine: message.value?.engine || '',
-  voice: message.value?.voice || engine.value?.getSelectedVoice(),
-  excludeFromHistory: true,
-}))
+const playMessage = computed(() =>
+  message.value
+    ? {
+        ...message.value,
+        excludeFromHistory: true,
+      }
+    : undefined,
+)
 const { play, isPlaying, isLoading, progress } = usePlayMessage(playMessage)
 </script>
