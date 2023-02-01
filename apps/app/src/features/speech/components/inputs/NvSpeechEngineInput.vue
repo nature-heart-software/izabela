@@ -75,16 +75,18 @@ const engine = computed(() => {
 
 const commands = computed(
   () =>
-    [...(engine.value?.commands?.(props.voice) || []), ...speechStore.customCommands].map((command) => ({
-      ...command,
-      command: `/${ command.value }`,
-    })) || [],
+    [...(engine.value?.commands?.(props.voice) || []), ...speechStore.customCommands].map(
+      (command) => ({
+        ...command,
+        command: `/${command.value}`,
+      }),
+    ) || [],
 )
 
 const inputValue = computed(() => props.modelValue)
 const isInputFocused = ref(false)
 const latestCommands = ref<string[]>([])
-const fuseOptions = computed<UseFuseOptions<typeof commands.value[number]>>(() => ({
+const fuseOptions = computed<UseFuseOptions<(typeof commands.value)[number]>>(() => ({
   fuseOptions: {
     keys: ['command'],
     threshold: 0.3,
@@ -118,8 +120,8 @@ const isAutocompleteVisible = computed(
     inputValue.value.split(' ').length < 2,
 )
 
-const onAutocompleteSelect = (value: typeof commands.value[number]) => {
-  emit('update:modelValue', `${ value.command } `)
+const onAutocompleteSelect = (value: (typeof commands.value)[number]) => {
+  emit('update:modelValue', `${value.command} `)
   if (latestCommands.value.includes(value.command)) {
     latestCommands.value.splice(latestCommands.value.indexOf(value.command), 1)
   }
@@ -150,7 +152,7 @@ onKeyStroke('ArrowUp', () => {
   if (
     !isAutocompleteVisible.value &&
     isInputFocused.value &&
-    historyMessageIndex.value < messagesStore.history.length-1
+    historyMessageIndex.value < messagesStore.history.length - 1
   ) {
     historyMessageIndex.value += 1
   }

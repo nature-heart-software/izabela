@@ -39,10 +39,7 @@ export const useMessagesStore = defineStore(
       shortcutMessages.value = shortcutMessages.value.filter((m) => m.id !== id)
     }
     const history = ref<IzabelaHistoryMessage[]>([])
-    const addToHistory = (
-      id: string,
-      { credentials, ...rest }: IzabelaMessagePayload,
-    ) => {
+    const addToHistory = (id: string, { credentials, ...rest }: IzabelaMessagePayload) => {
       const historyMessage: IzabelaHistoryMessage = {
         id,
         ...rest,

@@ -34,4 +34,4 @@ export const watchHitbox = (selector: string) => {
   })
 }
 
-watchHitbox(`.${ hitboxClass }`)
+watchHitbox(`.${hitboxClass}`)
