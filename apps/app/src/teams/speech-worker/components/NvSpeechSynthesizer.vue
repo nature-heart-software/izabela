@@ -6,7 +6,6 @@ import { useSpeechStore } from '@/features/speech/store'
 import { getEngineById } from '@/modules/speech-engine-manager'
 import { getCleanMessage, getMessageCommand } from '@/modules/izabela/utils'
 
-
 const speechStore = useSpeechStore()
 onIPCSay((payload: string | IzabelaMessage) => {
   console.log('Saying something:', payload)

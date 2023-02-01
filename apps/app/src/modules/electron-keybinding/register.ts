@@ -42,15 +42,11 @@ export default () =>
               ...message,
               excludeFromHistory: true,
             }
-            ipcMain.sendTo(
-              'speech-worker',
-              'say',
-              purify(payload),
-            )
+            ipcMain.sendTo('speech-worker', 'say', purify(payload))
           })
           registeredShortcuts[message.id] = keybinding
         } catch (e) {
-          console.error(`Couldn't register shortcut "${ keybinding }"`, e)
+          console.error(`Couldn't register shortcut "${keybinding}"`, e)
         }
       })
     }

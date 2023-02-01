@@ -14,7 +14,8 @@ export default (messagePayload: IzabelaMessagePayload) => {
     engine: engineName,
     excludeFromHistory,
     disableAutoplay,
-    credentials, payload,
+    credentials,
+    payload,
   } = messagePayload
   const id = existingId || uuid()
   let audio: HTMLAudioElement
