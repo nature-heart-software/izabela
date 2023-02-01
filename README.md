@@ -13,6 +13,7 @@
 <p align="center">
     <img alt="Izabela Example" src="https://github.com/nature-heart-software/izabela/blob/dev/assets/izabela-example.gif?raw=true">
 </p>
+
 ## What is Izabela?
 
 Izabela is a text-to-speech application that allows you to communicate with an artificial voice through your speakers or
