@@ -1,5 +1,5 @@
 <p align="center">
-    <img alt="Izabela" src="https://raw.githubusercontent.com/nature-heart-software/izabela/dev/apps/app/build/icons/64x64.png" width="64" height="64">
+    <img alt="Izabela Logo" src="https://raw.githubusercontent.com/nature-heart-software/izabela/dev/apps/app/build/icons/64x64.png" width="64" height="64">
 </p>
 
 <h1 align="center">
@@ -10,6 +10,9 @@
   Your speech Assistant ✨
 </p>
 
+<p align="center">
+    <img alt="Izabela Example" src="https://github.com/nature-heart-software/izabela/blob/dev/assets/izabela-example.gif?raw=true">
+</p>
 ## What is Izabela?
 
 Izabela is a text-to-speech application that allows you to communicate with an artificial voice through your speakers or
