@@ -14,22 +14,28 @@ onIPCSay((payload: string | IzabelaMessage) => {
   if (typeof payload === 'string') {
     const engine = speechStore.currentSpeechEngine
     if (!engine) return
+    const voice = engine.getSelectedVoice()
+    const engineCommands = engine.commands?.(voice) || []
+    const cleanMessage = getCleanMessage(payload, engineCommands)
     message = {
-      message: getCleanMessage(payload, engine.commands?.(engine.getSelectedVoice()) || []),
+      voice,
+      message: cleanMessage,
       originalMessage: payload,
       engine: engine.id,
-      voice: engine.getSelectedVoice(),
       credentials: engine.getCredentials(),
-      payload: engine.getPayload(getCleanMessage(payload, engine.commands?.(engine.getSelectedVoice()) || [])),
+      payload: engine.getPayload(cleanMessage, voice),
       command: getMessageCommand(payload),
     }
   } else {
     const engine = getEngineById(payload.engine)
     if (!engine) return
+    const { voice } = payload
+    const engineCommands = engine.commands?.(voice) || []
+    const cleanMessage = getCleanMessage(payload.message, engineCommands)
     message = {
       ...payload,
       credentials: engine.getCredentials(),
-      payload: engine.getPayload(getCleanMessage(payload.message, engine.commands?.(payload.voice) || []), payload.voice),
+      payload: engine.getPayload(cleanMessage, voice),
     }
   }
   if (message) izabela.say(message)

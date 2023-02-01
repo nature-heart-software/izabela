@@ -29,7 +29,7 @@ export const useMessagesStore = defineStore(
     const addShortcutMessage = (message: ShortcutMessage) => {
       shortcutMessages.value.unshift(message)
     }
-    const updateShortcutMessage = (id: string, payload: Partial<ShortcutMessage>) => {
+    const updateShortcutMessage = (id: string, payload: ShortcutMessage) => {
       const message = shortcutMessages.value.find((m) => m.id === id)
       if (message) {
         Object.assign(message, payload)

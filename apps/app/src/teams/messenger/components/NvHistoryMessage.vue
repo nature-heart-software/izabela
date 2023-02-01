@@ -102,11 +102,7 @@ const downloadMessageLocally = async () => {
   try {
     if (!message.value || !engine.value) return
     const completeMessage = purify({
-      id: props.id,
-      message: message.value.message,
-      engine: message.value.engine,
-      payload: message.value.payload,
-      voice: message.value.voice,
+      ...message.value,
       credentials: engine.value.getCredentials(),
       excludeFromHistory: true,
       disableAutoplay: true,
@@ -133,14 +129,9 @@ const downloadMessageLocally = async () => {
   }
 }
 
-const playMessage = computed(() => ({
-  id: props.id,
-  message: message.value?.message || '',
-  originalMessage: message.value?.originalMessage || '',
-  command: message.value?.command || null,
-  engine: message.value?.engine || '',
-  voice: message.value?.voice || engine.value?.getSelectedVoice(),
+const playMessage = computed(() => message.value ? ({
+  ...message.value,
   excludeFromHistory: true,
-}))
+}) : undefined)
 const { play, isPlaying, isLoading, progress } = usePlayMessage(playMessage)
 </script>

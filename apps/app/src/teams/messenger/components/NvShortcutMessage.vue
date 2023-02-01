@@ -82,9 +82,7 @@ const { shortcutMessages } = storeToRefs(messagesStore)
 const message = computed(() => shortcutMessages.value.find((m) => m.id === props.id))
 const isDataProvided = ref(false)
 const data = reactive({
-  message: '',
   originalMessage: '',
-  command: null as string | null,
   engine: '',
   selectedVoice: {} as Record<string, unknown>,
   shortcut: [] as Key[],
@@ -104,23 +102,21 @@ watch(
       data.engine = engineId
       data.selectedVoice[engineId] = message.value?.voice
       data.shortcut = message.value?.shortcut || ([] as Key[])
-      data.message = message.value?.message || ''
       data.originalMessage = message.value?.originalMessage || ''
-      data.command = message.value?.command || null
     }
   },
   { deep: true, immediate: true },
 )
 
-// NOTE: HOLY SHIT DO SOMETHING ABOUT THIS IT'S AWFUL LOL
-// Check NvHistoryMessage, NvSpeechSynthesizer and electron-keybinding/register
-// Thank you in advance future me, I did my best...
 watch(
   () => data,
   () => {
     const voice = data.selectedVoice[data.engine]
-    const cleanMessage = getCleanMessage(data.originalMessage, engine.value?.commands?.(voice) || [])
+    const engineCommands = engine.value?.commands?.(voice) || []
+    const cleanMessage = getCleanMessage(data.originalMessage, engineCommands)
     messagesStore.updateShortcutMessage(props.id, {
+      ...message.value,
+      id: message.value?.id || props.id,
       engine: data.engine,
       voice,
       shortcut: data.shortcut,
@@ -142,18 +138,9 @@ watch(
   { immediate: true },
 )
 
-const playMessage = computed(() => {
-  const voice = data.selectedVoice[data.engine]
-  const cleanMessage = getCleanMessage(data.originalMessage, engine.value?.commands?.(voice) || [])
-  return ({
-    id: props.id,
-    message: cleanMessage,
-    originalMessage: data.originalMessage,
-    command: getMessageCommand(data.originalMessage),
-    engine: data.engine,
-    voice,
-    excludeFromHistory: true,
-  })
-})
+const playMessage = computed(() => (message.value ? {
+  ...message.value,
+  excludeFromHistory: true,
+} : undefined))
 const { play, isPlaying, isLoading, progress } = usePlayMessage(playMessage)
 </script>
