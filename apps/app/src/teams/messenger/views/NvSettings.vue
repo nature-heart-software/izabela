@@ -96,7 +96,7 @@ const navigation = [
         name: 'About',
         to: { name: 'settings-about' },
       },
-      { name: 'Support', to: { name: 'settings-support' } },
+      { name: '🖤', to: { name: 'settings-support' } },
 
     ],
   },

@@ -9,8 +9,8 @@ export const ElectronSI = () => ({
     arch: process.arch,
     nodeVersion: process.versions.node,
     electronVersion: process.versions.electron,
-    chromiumVersion: process.versions.chrome,
     electronAbi: nodeAbi.getAbi(process.versions.electron, 'electron'),
+    chromiumVersion: process.versions.chrome,
   }),
 })
 
