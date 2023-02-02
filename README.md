@@ -62,7 +62,7 @@ If you don't want to bother configuring credentials for the more advanced text-t
 
 > **Note:** The Izabela engine is only available to "Supporter" members or above on [Ko-fi](https://ko-fi.com/woowee#tier16753544656830).
 
-If you prefer configuring your credentials yourself, you can follow the guides below (coming soon).
+If you prefer configuring your credentials yourself, you can do so by following the guides below (coming soon).
 
 ## Guides
 
