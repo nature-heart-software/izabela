@@ -5,6 +5,10 @@ You can use these events to trigger actions in other applications.
 
 <img src="https://github.com/nature-heart-software/izabela/blob/dev/assets/hyiro-clip.gif?raw=true" alt="Hyiro's stream with text appearing" style="width:1012px"/>
 
+Here's an example on [Hyiro](https://twitter.com/HRAK___S2)'s stream with text appearing on screen after sending
+messages from
+Izabela.
+
 By default, Izabela runs a websocket server on the following address: `ws://localhost:7071`.
 
 Here's a [code sample](https://glitch.com/edit/#!/radical-witty-blanket?path=src%2Fapp.jsx%3A11%3A49) using the
@@ -13,7 +17,7 @@ Here's a [code sample](https://glitch.com/edit/#!/radical-witty-blanket?path=src
 Here's a list of all the events you can intercept:
 
 | Event           | Payload          | Trigger                                                                     |
-| --------------- | ---------------- | --------------------------------------------------------------------------- |
+|-----------------|------------------|-----------------------------------------------------------------------------|
 | `message:load`  | `IzabelaMessage` | Triggered when a message started loading                                    |
 | `message:start` | `IzabelaMessage` | Triggered when the audio for a message started playing                      |
 | `message:end`   | `IzabelaMessage` | Triggered when the audio for a message stopped playing or an error occurred |

@@ -16,7 +16,7 @@
 
 ## What is Izabela?
 
-Izabela is a text-to-speech application that allows you to communicate with an artificial voice through your speakers or
+Izabela is a text-to-speech application that allows you to communicate with an artificial voice on your speakers or
 as an audio input!
 
 It was designed primarily to help mute people and people with speech disabilities communicate with their friends over
@@ -53,7 +53,8 @@ input in any application that can receive audio inputs. If you don't have a virt
 you can install one directly from Izabela in the settings.
 
 You can keep using any non-fullscreen application in the background while Izabela is in the foreground. If you're
-using Izabela over games, I recommend setting your game to borderless, windowed or borderless windowed mode instead of
+using Izabela over games, I recommend setting your game to `borderless`, `windowed` or `borderless windowed` mode
+instead of
 fullscreen.
 
 > **Note:** Credentials for the more advanced text-to-speech engines (Amazon Polly, Microsoft Azure, Google Cloud and
