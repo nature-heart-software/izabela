@@ -54,6 +54,14 @@ You can keep using any non-fullscreen application in the background while Izabel
 using Izabela over games, I recommend setting your game to borderless, windowed or borderless windowed mode instead of
 fullscreen.
 
+> **Note:** Credentials for the more advanced text-to-speech engines (Amazon Polly, Microsoft Azure, Google Cloud and IBM Watson) are not provided by default.
+## Support
+
+If you don't want to bother configuring credentials for the more advanced text-to-speech engines, I provide universal API keys to all "Supporter" members or above on my [Ko-fi](https://ko-fi.com/woowee#tier16753544656830).
+> **Note:** The Izabela engine is only available to "Supporter" members or above on [Ko-fi](https://ko-fi.com/woowee#tier16753544656830).
+
+If you prefer configuring your credentials yourself, you can follow the guides below (coming soon). 
+
 ## Guides
 
 - [How to use Izabela as audio input](https://github.com/nature-heart-software/izabela/blob/dev/guides/onboarding/how-to-use-as-audio-input.md)
