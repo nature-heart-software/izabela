@@ -62,10 +62,10 @@ fullscreen.
 ## Support
 
 If you don't want to bother configuring credentials for the more advanced text-to-speech engines, I provide universal
-API keys to all "Supporter" members or above on my [Ko-fi](https://ko-fi.com/woowee#tier16753544656830).
+API keys to all "Supporter" members or above on my [Ko-fi](https://ko-fi.com/woowee/tiers)!
 
 > **Note:** The Izabela engine is only available to "Supporter" members or above
-> on [Ko-fi](https://ko-fi.com/woowee#tier16753544656830).
+> on [Ko-fi](https://ko-fi.com/woowee/tiers).
 
 If you prefer configuring your credentials yourself, you can do so by following the guides below (coming soon).
 
