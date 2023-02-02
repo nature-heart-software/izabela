@@ -46,6 +46,8 @@ The text input will be focused allowing you to type your message and send it. Th
 translate your text into audio using the selected voice. The audio is then sent through every audio outputs you have
 configured.
 
+<img src="https://github.com/nature-heart-software/izabela/blob/dev/assets/wuriko-clip.gif?raw=true" alt="Izabela appearing over the game Overwatch 2"/>
+
 If you have a virtual audio cable installed, you can configure it as an audio output in Izabela then use it as audio
 input in any application that can receive audio inputs. If you don't have a virtual audio cable installed,
 you can install one directly from Izabela in the settings.
@@ -54,13 +56,16 @@ You can keep using any non-fullscreen application in the background while Izabel
 using Izabela over games, I recommend setting your game to borderless, windowed or borderless windowed mode instead of
 fullscreen.
 
-> **Note:** Credentials for the more advanced text-to-speech engines (Amazon Polly, Microsoft Azure, Google Cloud and IBM Watson) are not provided by default.
+> **Note:** Credentials for the more advanced text-to-speech engines (Amazon Polly, Microsoft Azure, Google Cloud and
+> IBM Watson) are not provided by default.
 
 ## Support
 
-If you don't want to bother configuring credentials for the more advanced text-to-speech engines, I provide universal API keys to all "Supporter" members or above on my [Ko-fi](https://ko-fi.com/woowee#tier16753544656830).
+If you don't want to bother configuring credentials for the more advanced text-to-speech engines, I provide universal
+API keys to all "Supporter" members or above on my [Ko-fi](https://ko-fi.com/woowee#tier16753544656830).
 
-> **Note:** The Izabela engine is only available to "Supporter" members or above on [Ko-fi](https://ko-fi.com/woowee#tier16753544656830).
+> **Note:** The Izabela engine is only available to "Supporter" members or above
+> on [Ko-fi](https://ko-fi.com/woowee#tier16753544656830).
 
 If you prefer configuring your credentials yourself, you can do so by following the guides below (coming soon).
 
