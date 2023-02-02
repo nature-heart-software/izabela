@@ -83,6 +83,10 @@ const navigation = [
         name: 'Dictionary',
         to: { name: 'settings-dictionary' },
       },
+      {
+        name: 'Commands',
+        to: { name: 'settings-commands' },
+      },
     ],
   },
   {
@@ -90,8 +94,9 @@ const navigation = [
     children: [
       {
         name: 'About',
+        to: { name: 'settings-about' },
       },
-      { name: 'Support' },
+      { name: '🖤', to: { name: 'settings-support' } },
     ],
   },
 ]

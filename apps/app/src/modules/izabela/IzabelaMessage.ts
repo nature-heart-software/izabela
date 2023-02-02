@@ -12,10 +12,10 @@ export default (messagePayload: IzabelaMessagePayload) => {
   const {
     id: existingId,
     engine: engineName,
-    payload,
-    credentials,
     excludeFromHistory,
     disableAutoplay,
+    credentials,
+    payload,
   } = messagePayload
   const id = existingId || uuid()
   let audio: HTMLAudioElement

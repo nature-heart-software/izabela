@@ -47,6 +47,7 @@ import { useFuse, UseFuseOptions } from '@vueuse/integrations/useFuse'
 import { orderBy, throttle } from 'lodash'
 import { useMessagesStore } from '@/features/messages/store'
 import { onKeyStroke } from '@vueuse/core'
+import { useSpeechStore } from '@/features/speech/store'
 
 const props = defineProps({
   engine: {
@@ -66,6 +67,7 @@ const emit = defineEmits(['update:modelValue', 'enter', 'space', 'esc'])
 const inputRef = ref()
 const historyMessageIndex = ref(-1)
 const messagesStore = useMessagesStore()
+const speechStore = useSpeechStore()
 const engine = computed(() => {
   if (!props.engine) return null
   return getEngineById(props.engine)
@@ -73,16 +75,18 @@ const engine = computed(() => {
 
 const commands = computed(
   () =>
-    engine.value?.commands?.(props.voice).map((command) => ({
-      ...command,
-      command: `/${command.value}`,
-    })) || [],
+    [...(engine.value?.commands?.(props.voice) || []), ...speechStore.customCommands].map(
+      (command) => ({
+        ...command,
+        command: `/${command.value}`,
+      }),
+    ) || [],
 )
 
 const inputValue = computed(() => props.modelValue)
 const isInputFocused = ref(false)
 const latestCommands = ref<string[]>([])
-const fuseOptions = computed<UseFuseOptions<typeof commands.value[number]>>(() => ({
+const fuseOptions = computed<UseFuseOptions<(typeof commands.value)[number]>>(() => ({
   fuseOptions: {
     keys: ['command'],
     threshold: 0.3,
@@ -116,7 +120,7 @@ const isAutocompleteVisible = computed(
     inputValue.value.split(' ').length < 2,
 )
 
-const onAutocompleteSelect = (value: typeof commands.value[number]) => {
+const onAutocompleteSelect = (value: (typeof commands.value)[number]) => {
   emit('update:modelValue', `${value.command} `)
   if (latestCommands.value.includes(value.command)) {
     latestCommands.value.splice(latestCommands.value.indexOf(value.command), 1)
@@ -132,7 +136,8 @@ const onInputTab = (e: KeyboardEvent) => {
 }
 
 watch(historyMessageIndex, () => {
-  emit('update:modelValue', messagesStore.reversedHistory[historyMessageIndex.value]?.message || '')
+  const historyMessage = messagesStore.reversedHistory[historyMessageIndex.value]
+  emit('update:modelValue', historyMessage?.originalMessage || historyMessage?.message || '')
 })
 
 watch(

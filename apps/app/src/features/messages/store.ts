@@ -29,7 +29,7 @@ export const useMessagesStore = defineStore(
     const addShortcutMessage = (message: ShortcutMessage) => {
       shortcutMessages.value.unshift(message)
     }
-    const updateShortcutMessage = (id: string, payload: Partial<ShortcutMessage>) => {
+    const updateShortcutMessage = (id: string, payload: ShortcutMessage) => {
       const message = shortcutMessages.value.find((m) => m.id === id)
       if (message) {
         Object.assign(message, payload)
@@ -39,16 +39,10 @@ export const useMessagesStore = defineStore(
       shortcutMessages.value = shortcutMessages.value.filter((m) => m.id !== id)
     }
     const history = ref<IzabelaHistoryMessage[]>([])
-    const addToHistory = (
-      id: string,
-      { engine, payload, message, voice }: IzabelaMessagePayload,
-    ) => {
+    const addToHistory = (id: string, { credentials, ...rest }: IzabelaMessagePayload) => {
       const historyMessage: IzabelaHistoryMessage = {
         id,
-        engine,
-        payload,
-        message,
-        voice,
+        ...rest,
         createdAt: new Date().toISOString(),
       }
       if (history.value.length === 50) {

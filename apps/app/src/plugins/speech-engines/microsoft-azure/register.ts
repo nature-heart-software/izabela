@@ -13,7 +13,7 @@ const getCredentials = () => ({
 })
 
 const commands: SpeechEngine['commands'] = (voice) =>
-  (voice.StyleList || []).map((style: string) => ({ name: style, value: style }))
+  (voice?.StyleList || []).map((style: string) => ({ name: style, value: style }))
 
 const getSelectedVoice = () => getProperty('selectedVoice')
 registerEngine({

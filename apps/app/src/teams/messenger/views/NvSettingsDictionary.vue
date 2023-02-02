@@ -7,7 +7,7 @@
           <NvGroup no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Definitions</NvText>
-              <NvText>Provide the definition of a word to help Izabela's pronunciation</NvText>
+              <NvText>Provide the definition of a word to improve its pronunciation</NvText>
             </NvStack>
           </NvGroup>
         </NvCard>

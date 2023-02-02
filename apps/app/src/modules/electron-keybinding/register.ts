@@ -38,17 +38,11 @@ export default () =>
         if (!keybinding) return
         try {
           globalShortcut.register(keybinding, () => {
-            ipcMain.sendTo(
-              'speech-worker',
-              'say',
-              purify({
-                message: message.message,
-                voice: message.voice,
-                engine: message.engine,
-                excludeFromHistory: true,
-                id: message.id,
-              }) as IzabelaMessage,
-            )
+            const payload: IzabelaMessage = {
+              ...message,
+              excludeFromHistory: true,
+            }
+            ipcMain.sendTo('speech-worker', 'say', purify(payload))
           })
           registeredShortcuts[message.id] = keybinding
         } catch (e) {

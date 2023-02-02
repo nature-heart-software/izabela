@@ -7,9 +7,9 @@ import { parse, stringify } from '@ungap/structured-clone/json'
 
 export { stringify, parse } from '@ungap/structured-clone/json'
 
-export const purify = (o?: any) => {
+export const purify = <O = any>(o?: O): O => {
   if (typeof o === 'object') {
     return parse(stringify(o))
   }
-  return o
+  return o as O
 }
