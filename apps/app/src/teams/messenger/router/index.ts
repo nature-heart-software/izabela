@@ -8,6 +8,8 @@ import NvMessages from '@/teams/messenger/views/NvMessages.vue'
 import NvMessagesHistory from '@/teams/messenger/views/NvMessagesHistory.vue'
 import NvMessagesShortcuts from '@/teams/messenger/views/NvMessagesShortcuts.vue'
 import NvSettingsCommands from '@/teams/messenger/views/NvSettingsCommands.vue'
+import NvSettingsAbout from '@/teams/messenger/views/NvSettingsAbout.vue'
+import NvSettingsSupport from '@/teams/messenger/views/NvSettingsSupport.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -39,6 +41,16 @@ const routes: Array<RouteRecordRaw> = [
         name: 'settings-commands',
         path: 'commands',
         component: NvSettingsCommands,
+      },
+      {
+        name: 'settings-about',
+        path: 'about',
+        component: NvSettingsAbout,
+      },
+      {
+        name: 'settings-support',
+        path: 'support',
+        component: NvSettingsSupport,
       },
     ],
   },
