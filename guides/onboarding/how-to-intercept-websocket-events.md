@@ -17,7 +17,7 @@ Here's a [code sample](https://glitch.com/edit/#!/radical-witty-blanket?path=src
 Here's a list of all the events you can intercept:
 
 | Event           | Payload          | Trigger                                                                     |
-|-----------------|------------------|-----------------------------------------------------------------------------|
+| --------------- | ---------------- | --------------------------------------------------------------------------- |
 | `message:load`  | `IzabelaMessage` | Triggered when a message started loading                                    |
 | `message:start` | `IzabelaMessage` | Triggered when the audio for a message started playing                      |
 | `message:end`   | `IzabelaMessage` | Triggered when the audio for a message stopped playing or an error occurred |

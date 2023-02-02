@@ -17,12 +17,12 @@
               <div>
                 <NvButton size="sm" @click="addDefinition()">Add definition</NvButton>
               </div>
-              <NvDivider direction="horizontal"/>
+              <NvDivider direction="horizontal" />
               <NvGroup class="w-full" grow no-wrap>
                 <NvText class="w-1/2" type="label">Word</NvText>
-                <NvDivider class="!grow-0 h-5" direction="vertical"/>
+                <NvDivider class="!grow-0 h-5" direction="vertical" />
                 <NvText class="w-1/2" type="label">Definition</NvText>
-                <NvButton class="!grow-0 invisible" icon-name="times" size="xs" type="plain"/>
+                <NvButton class="!grow-0 invisible" icon-name="times" size="xs" type="plain" />
               </NvGroup>
               <template v-for="(definition, i) in definitions" :key="i">
                 <NvGroup class="w-full" grow>
@@ -30,7 +30,7 @@
                     :modelValue="definition[0]"
                     @update:modelValue="(value) => updateDefinition(i, [value, definition[1]])"
                   />
-                  <NvDivider class="!grow-0 h-5" direction="vertical"/>
+                  <NvDivider class="!grow-0 h-5" direction="vertical" />
                   <NvInput
                     :modelValue="definition[1]"
                     @update:modelValue="(value) => updateDefinition(i, [definition[0], value])"
