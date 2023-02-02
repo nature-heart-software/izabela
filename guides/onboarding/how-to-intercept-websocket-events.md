@@ -3,7 +3,7 @@
 Izabela runs a local websocket server enabling you to intercept different events.
 You can use these events to trigger actions in other applications.
 
-<img src="https://github.com/nature-heart-software/izabela/blob/dev/assets/hyiro-clip.gif?raw=true" alt="Hyiro's stream with text appearing"/>
+<img src="https://github.com/nature-heart-software/izabela/blob/dev/assets/hyiro-clip.gif?raw=true" alt="Hyiro's stream with text appearing" style="width:1012px"/>
 
 By default, Izabela runs a websocket server on the following address: `ws://localhost:7071`.
 
