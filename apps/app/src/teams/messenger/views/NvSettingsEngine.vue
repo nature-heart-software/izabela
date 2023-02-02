@@ -4,10 +4,10 @@
       <NvText type="subtitle">Engine</NvText>
       <NvStack spacing="4">
         <NvCard>
-          <NvGroup no-wrap spacing="5">
+          <NvGroup justify="apart" no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Speech Engine</NvText>
-              <NvText>Select the speech engine used for Izabela's speech</NvText>
+              <NvText>Select the speech engine to use</NvText>
             </NvStack>
             <SpeechEngineSelect
               :modelValue="speechStore.selectedSpeechEngine"
@@ -50,8 +50,8 @@
             <NvStack>
               <NvText type="label">Universal Credentials</NvText>
               <NvText
-                >Gain access to every API using a universal API key <br />You can obtain a universal
-                API key by being a
+                >Gain access to every text-to-speech engine using a universal API key <br />You can
+                obtain a universal API key by being a
                 <a href="https://ko-fi.com/woowee/tiers" target="_blank">Ko-fi supporter</a></NvText
               >
             </NvStack>

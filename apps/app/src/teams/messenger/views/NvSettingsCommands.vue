@@ -7,7 +7,7 @@
           <NvGroup no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Commands</NvText>
-              <NvText>Provide custom commands for websocket integrations</NvText>
+              <NvText>Provide custom commands for websocket integration</NvText>
             </NvStack>
           </NvGroup>
         </NvCard>
