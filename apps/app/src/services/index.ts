@@ -5,10 +5,10 @@ import { decrypt } from '@/utils/security'
 import { useSpeechStore } from '@/features/speech/store'
 import path from 'path-browserify'
 
-export const socket = io(`ws://localhost:${ process.env.VUE_APP_SERVER_WS_PORT }`, {})
+export const socket = io(`ws://localhost:${process.env.VUE_APP_SERVER_WS_PORT}`, {})
 
 export const localApi = axios.create({
-  baseURL: `http://localhost:${ process.env.VUE_APP_SERVER_PORT }/api`,
+  baseURL: `http://localhost:${process.env.VUE_APP_SERVER_PORT}/api`,
 })
 export const remoteApi = axios.create()
 export const api = (type?: 'remote' | 'local') => {
