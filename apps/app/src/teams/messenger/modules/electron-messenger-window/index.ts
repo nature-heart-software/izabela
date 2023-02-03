@@ -27,8 +27,8 @@ export const ElectronMessengerWindow = () => {
   let foregroundWindow: string | number | null = null
 
   const user32 = new ffi.Library('user32', {
-    'SetForegroundWindow': ['bool', ['long']],
-    'GetForegroundWindow': ['long', []],
+    SetForegroundWindow: ['bool', ['long']],
+    GetForegroundWindow: ['long', []],
   })
 
   const getWindow = () =>
@@ -131,8 +131,8 @@ export const ElectronMessengerWindow = () => {
         const [windowX, windowY] = window.getPosition()
         const { hitboxes } = hitboxesStore
         const isWithinAnyHitboxes = hitboxes.some(({ x, y, w, h }: Hitbox) => {
-          const isWithinXHitbox = mouseX >= windowX+x && mouseX <= windowX+x+w
-          const isWithinYHitbox = mouseY >= windowY+y && mouseY <= windowY+y+h
+          const isWithinXHitbox = mouseX >= windowX + x && mouseX <= windowX + x + w
+          const isWithinYHitbox = mouseY >= windowY + y && mouseY <= windowY + y + h
           return isWithinXHitbox && isWithinYHitbox
         })
         if (isWithinAnyHitboxes) {
