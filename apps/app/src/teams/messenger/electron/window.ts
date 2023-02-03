@@ -24,7 +24,7 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     window.setBounds(primaryDisplay.bounds)
 
     // https://github.com/electron/electron/issues/10078#issuecomment-331581160
-    window.setAlwaysOnTop(true)
+    window.setAlwaysOnTop(true, 'screen-saver', 1)
     window.setVisibleOnAllWorkspaces(true)
     window.setFullScreenable(false)
   }
