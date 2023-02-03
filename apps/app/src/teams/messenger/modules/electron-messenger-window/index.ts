@@ -7,6 +7,7 @@ import { useMessengerStore, useMessengerWindowStore } from '@/teams/messenger/st
 import { useSettingsStore } from '@/features/settings/store'
 import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
 import { Deferred } from '@packages/toolbox'
+import ffi from 'ffi-napi'
 
 export const ElectronMessengerWindow = () => {
   /* use isFocused as source of truth instead of window.isFocused() as in some instances
@@ -23,6 +24,12 @@ export const ElectronMessengerWindow = () => {
   let messengerWindowStore: ReturnType<typeof useMessengerWindowStore> | undefined
   const ready = Deferred<BrowserWindow>()
   const isReady = () => ready.promise
+  let foregroundWindow: string | number | null = null
+
+  const user32 = new ffi.Library('user32', {
+    'SetForegroundWindow': ['bool', ['long']],
+    'GetForegroundWindow': ['long', []],
+  })
 
   const getWindow = () =>
     registeredWindow || ElectronWindowManager.getInstanceByName('messenger')?.window
@@ -47,6 +54,7 @@ export const ElectronMessengerWindow = () => {
       const window = getWindow()
       if (window) {
         if (!isFocused) {
+          foregroundWindow = user32.GetForegroundWindow()
           isFocused = true
           window.once('show', () => {
             /* The focus needs to be delayed after the show() to actually focus properly... */
@@ -78,6 +86,10 @@ export const ElectronMessengerWindow = () => {
           window.blur() // Fixes issues with Chrome and input elements
           window.setIgnoreMouseEvents(true)
           window.setFocusable(false) // Fixes alwaysOnTop going in the background sometimes for some reasons
+          if (foregroundWindow) {
+            user32.SetForegroundWindow(foregroundWindow)
+            foregroundWindow = null
+          }
         }
         resolve(true)
       } else {
@@ -119,8 +131,8 @@ export const ElectronMessengerWindow = () => {
         const [windowX, windowY] = window.getPosition()
         const { hitboxes } = hitboxesStore
         const isWithinAnyHitboxes = hitboxes.some(({ x, y, w, h }: Hitbox) => {
-          const isWithinXHitbox = mouseX >= windowX + x && mouseX <= windowX + x + w
-          const isWithinYHitbox = mouseY >= windowY + y && mouseY <= windowY + y + h
+          const isWithinXHitbox = mouseX >= windowX+x && mouseX <= windowX+x+w
+          const isWithinYHitbox = mouseY >= windowY+y && mouseY <= windowY+y+h
           return isWithinXHitbox && isWithinYHitbox
         })
         if (isWithinAnyHitboxes) {
