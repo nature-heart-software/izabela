@@ -1,13 +1,10 @@
 <template>
-  <NvAccessBlocker
-    :allowed="!!getProperty('apiKey', true)"
-    reason="Credentials required"
-  >
+  <NvAccessBlocker :allowed="!!getProperty('apiKey', true)" reason="Credentials required">
     <NvFormItem label="Voice">
-      <NvVoiceSelect/>
+      <NvVoiceSelect />
     </NvFormItem>
   </NvAccessBlocker>
-  <NvDivider direction="horizontal"/>
+  <NvDivider direction="horizontal" />
   <NvStack spacing="5">
     <NvFormItem label="API Key">
       <NvInput

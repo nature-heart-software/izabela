@@ -32,12 +32,13 @@ registerEngine({
   },
   synthesizeSpeech({ credentials, payload }) {
     return axios.post<Blob>(
-      `https://api.elevenlabs.io/v1/text-to-speech/${ payload.voice.voice_id }`,
+      `https://api.elevenlabs.io/v1/text-to-speech/${payload.voice.voice_id}`,
       {
         text: payload.text,
       },
       {
-        responseType: 'blob', headers: {
+        responseType: 'blob',
+        headers: {
           'xi-api-key': credentials.apiKey,
         },
       },

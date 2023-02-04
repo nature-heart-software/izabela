@@ -9,12 +9,13 @@ export const useListVoicesQuery = (
 ) =>
   useQuery<any>(
     LIST_VOICES_QUERY_KEY,
-    () => axios
-      .get('https://api.elevenlabs.io/v1/voices', {
-        headers: {
-          'xi-api-key': params.value.credentials.apiKey,
-        },
-      })
-      .then(({ data }) => data.voices),
+    () =>
+      axios
+        .get('https://api.elevenlabs.io/v1/voices', {
+          headers: {
+            'xi-api-key': params.value.credentials.apiKey,
+          },
+        })
+        .then(({ data }) => data.voices),
     options,
   )
