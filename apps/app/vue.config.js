@@ -1,9 +1,9 @@
 const path = require('path')
-const { defineConfig } = require('@vue/cli-service')
-const { GenerateExportsPlugin } = require('@packages/generate-exports-webpack-plugin')
+const {defineConfig} = require('@vue/cli-service')
+const {GenerateExportsPlugin} = require('@packages/generate-exports-webpack-plugin')
 const WebpackNotifierPlugin = require('webpack-notifier')
 const fs = require('fs')
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer')
 
 function getElectronVersion() {
   const electronPath = require.resolve('electron')
@@ -25,7 +25,7 @@ module.exports = defineConfig({
   transpileDependencies: ['@izabela'],
   configureWebpack: {
     plugins: [
-      new WebpackNotifierPlugin({ emoji: true }),
+      new WebpackNotifierPlugin({emoji: true}),
       new GenerateExportsPlugin({
         watch: process.env.NODE_ENV === 'development',
         entries: [
@@ -57,7 +57,7 @@ module.exports = defineConfig({
         'iohook',
         '@izabela/app-server',
         '@google-cloud/speech',
-        'native-keymap',
+        '@packages/native-keymap',
         '@vue-reactivity/watch',
       ],
       chainWebpackMainProcess: (config) => {

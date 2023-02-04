@@ -27,7 +27,7 @@
     "@types/ffi-napi": "^4.0.7",
     "ffi-napi": "^4.0.3",
     "iohook": "^0.9.3",
-    "native-keymap": "^3.3.2",
+    "@packages/native-keymap": "^3.3.2",
     "node-abi": "^3.31.0",
     "sudo-prompt": "^9.2.1",
     "systeminformation": "^5.17.3"
