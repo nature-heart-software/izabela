@@ -1,10 +1,10 @@
 <template>
   <NvAccessBlocker :allowed="!!getProperty('apiKey', true)" reason="Credentials required">
     <NvFormItem label="Voice">
-      <NvVoiceSelect/>
+      <NvVoiceSelect />
     </NvFormItem>
   </NvAccessBlocker>
-  <NvDivider direction="horizontal"/>
+  <NvDivider direction="horizontal" />
   <NvStack spacing="5">
     <NvFormItem label="API Key">
       <NvInput
@@ -15,11 +15,8 @@
       />
     </NvFormItem>
   </NvStack>
-  <NvDivider direction="horizontal"/>
-  <NvAccessBlocker
-    :allowed="!!getProperty('apiKey', true)"
-    reason="Credentials required"
-  >
+  <NvDivider direction="horizontal" />
+  <NvAccessBlocker :allowed="!!getProperty('apiKey', true)" reason="Credentials required">
     <NvStack spacing="5">
       <NvFormItem label="Stability">
         <NvGroup>
@@ -29,22 +26,22 @@
             :step="0.01"
             class="!grow"
             v-bind="{
-            modelValue: getProperty('stability'),
-            'onUpdate:modelValue': (value) => setProperty('stability', value),
-          }"
+              modelValue: getProperty('stability'),
+              'onUpdate:modelValue': (value) => setProperty('stability', value),
+            }"
           />
           <NvNumberInput
             :max="1"
             :min="0"
             :step="0.01"
             v-bind="{
-            modelValue: getProperty('stability'),
-            'onUpdate:modelValue': (value) => setProperty('stability', value),
-          }"
+              modelValue: getProperty('stability'),
+              'onUpdate:modelValue': (value) => setProperty('stability', value),
+            }"
           />
         </NvGroup>
       </NvFormItem>
-      <NvDivider direction="horizontal"/>
+      <NvDivider direction="horizontal" />
       <NvFormItem label="Clarity + Similarity Enhancement">
         <NvGroup>
           <NvRangeInput
@@ -53,18 +50,18 @@
             :step="0.01"
             class="!grow"
             v-bind="{
-            modelValue: getProperty('similarity_boost'),
-            'onUpdate:modelValue': (value) => setProperty('similarity_boost', value),
-          }"
+              modelValue: getProperty('similarity_boost'),
+              'onUpdate:modelValue': (value) => setProperty('similarity_boost', value),
+            }"
           />
           <NvNumberInput
             :max="1"
             :min="0"
             :step="0.01"
             v-bind="{
-            modelValue: getProperty('similarity_boost'),
-            'onUpdate:modelValue': (value) => setProperty('similarity_boost', value),
-          }"
+              modelValue: getProperty('similarity_boost'),
+              'onUpdate:modelValue': (value) => setProperty('similarity_boost', value),
+            }"
           />
         </NvGroup>
       </NvFormItem>
