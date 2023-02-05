@@ -8,7 +8,7 @@ import { ipcMain } from 'electron-postman'
 import { IzabelaMessage } from '@/modules/izabela/types'
 import { purify } from '@packages/toolbox'
 import { debounce } from 'lodash'
-import { IGlobalKeyListener } from "node-global-key-listener"
+import { IGlobalKeyListener } from 'node-global-key-listener'
 import { gkl, keybindingTriggered } from '@/modules/electron-keybinding/utils'
 
 export default () =>
@@ -59,7 +59,7 @@ export default () =>
           })
           registeredShortcuts[message.id] = keybinding
         } catch (e) {
-          console.error(`Couldn't register shortcut "${ keybinding }"`, e)
+          console.error(`Couldn't register shortcut "${keybinding}"`, e)
         }
       })
     }
