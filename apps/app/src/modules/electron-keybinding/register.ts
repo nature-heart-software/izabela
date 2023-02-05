@@ -16,7 +16,8 @@ export default () =>
     const settingsStore = useSettingsStore()
     const messagesStore = useMessagesStore()
     const multiKeysKeybindings = {
-      toggleMessengerWindow: () => electronMessengerWindow.toggleWindow(),
+      toggleMessengerWindow: () => electronMessengerWindow.toggleWindow('keyboard'),
+      toggleMessengerWindowAlt: () => electronMessengerWindow.toggleWindow('mouse'),
     }
     const registeredShortcuts: Record<string, string> = {}
     const registeredCallbacks: Record<string, (e: IGlobalKeyEvent, down: IGlobalKeyDownMap) => void> = {}
@@ -24,7 +25,7 @@ export default () =>
     const toggleMessengerWindowListener: IGlobalKeyListener = (e, down) => {
       if (e.state === 'DOWN') {
         if (keybindingTriggered(settingsStore.keybindings.toggleMessengerWindowAlt, down)) {
-          multiKeysKeybindings.toggleMessengerWindow()
+          multiKeysKeybindings.toggleMessengerWindowAlt()
         }
       }
     }
