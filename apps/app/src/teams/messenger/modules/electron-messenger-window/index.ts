@@ -131,8 +131,8 @@ export const ElectronMessengerWindow = () => {
         const [windowX, windowY] = window.getPosition()
         const { hitboxes } = hitboxesStore
         const isWithinAnyHitboxes = hitboxes.some(({ x, y, w, h }: Hitbox) => {
-          const isWithinXHitbox = mouseX >= windowX + x && mouseX <= windowX + x + w
-          const isWithinYHitbox = mouseY >= windowY + y && mouseY <= windowY + y + h
+          const isWithinXHitbox = mouseX >= windowX+x && mouseX <= windowX+x+w
+          const isWithinYHitbox = mouseY >= windowY+y && mouseY <= windowY+y+h
           return isWithinXHitbox && isWithinYHitbox
         })
         if (isWithinAnyHitboxes) {
@@ -144,7 +144,7 @@ export const ElectronMessengerWindow = () => {
     }
   }
 
-  const toggleWindow = () => {
+  const toggleWindow = throttle(() => {
     const window = getWindow()
     if (window) {
       if (window.isVisible()) {
@@ -154,7 +154,7 @@ export const ElectronMessengerWindow = () => {
       }
     }
     return Promise.resolve()
-  }
+  }, 500)
 
   const setDisplay = (id?: Electron.Display['id'] | null) => {
     const window = getWindow()

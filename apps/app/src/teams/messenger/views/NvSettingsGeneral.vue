@@ -8,9 +8,9 @@
             <NvStack>
               <NvText type="label">Monitor</NvText>
             </NvStack>
-            <NvDisplaySelect />
+            <NvDisplaySelect/>
           </NvGroup>
-          <NvDivider direction="horizontal" />
+          <NvDivider direction="horizontal"/>
           <NvGroup justify="apart" no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Hide window after sending a message</NvText>
@@ -26,18 +26,33 @@
     <NvStack>
       <NvText type="subtitle">Keybindings</NvText>
       <NvCard>
-        <NvGroup justify="apart" no-wrap spacing="5">
-          <NvStack>
-            <NvText type="label">Show Messenger window</NvText>
-          </NvStack>
-          <NvKeybinding
-            :modelValue="settingsStore.keybindings.toggleMessengerWindow"
-            multiple
-            @update:modelValue="
+        <NvStack spacing="5">
+          <NvGroup justify="apart" no-wrap spacing="5">
+            <NvStack>
+              <NvText type="label">Show Messenger window</NvText>
+            </NvStack>
+            <NvKeybinding
+              :modelValue="settingsStore.keybindings.toggleMessengerWindow"
+              multiple
+              @update:modelValue="
               (value) => settingsStore.$patch({ keybindings: { toggleMessengerWindow: value } })
             "
-          />
-        </NvGroup>
+            />
+          </NvGroup>
+          <NvDivider direction="horizontal"/>
+          <NvGroup justify="apart" no-wrap spacing="5">
+            <NvStack>
+              <NvText type="label">Show Messenger window (alt)</NvText>
+            </NvStack>
+            <NvKeybinding
+              :modelValue="settingsStore.keybindings.toggleMessengerWindowAlt"
+              multiple
+              @update:modelValue="
+              (value) => settingsStore.$patch({ keybindings: { toggleMessengerWindowAlt: value } })
+            "
+            />
+          </NvGroup>
+        </NvStack>
       </NvCard>
     </NvStack>
     <NvStack>
@@ -53,7 +68,7 @@
               @update:modelValue="(value) => settingsStore.$patch({ launchOnStartup: value })"
             />
           </NvGroup>
-          <NvDivider direction="horizontal" />
+          <NvDivider direction="horizontal"/>
           <NvGroup justify="apart" no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Update Channel</NvText>
