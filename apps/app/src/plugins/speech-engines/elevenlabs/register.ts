@@ -1,6 +1,6 @@
 import { registerEngine } from '@/modules/speech-engine-manager'
 import { DEFAULT_LANGUAGE_CODE } from '@/consts'
-import axios from 'axios'
+import { api } from '@/services'
 import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
@@ -31,16 +31,14 @@ registerEngine({
     return DEFAULT_LANGUAGE_CODE
   },
   synthesizeSpeech({ credentials, payload }) {
-    return axios.post<Blob>(
-      `https://api.elevenlabs.io/v1/text-to-speech/${payload.voice.voice_id}`,
+    return api('local').post<Blob>(
+      '/tts/elevenlabs/synthesize-speech',
       {
-        text: payload.text,
+        credentials,
+        payload,
       },
       {
         responseType: 'blob',
-        headers: {
-          'xi-api-key': credentials.apiKey,
-        },
       },
     )
   },

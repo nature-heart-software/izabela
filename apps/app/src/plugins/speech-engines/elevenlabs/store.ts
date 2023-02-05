@@ -4,13 +4,12 @@ import { ENGINE_ID } from './shared'
 export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
   apiKey: '',
   selectedVoice: {
-    voice_id: '21m00Tcm4TlvDq8ikWAM',
-    name: 'Rachel (american, mellow)',
-    samples: [],
-    category: 'conversational',
-    preview_url:
-      'https://storage.googleapis.com/eleven-public-prod/premade/voices/21m00Tcm4TlvDq8ikWAM/dff5d82d-d16d-45b9-ae73-be2ad8850855.mp3',
-    available_for_tiers: [],
-    settings: null,
+    "voice_id": "MF3mGyEYCl7XYWbV9V6O",
+    "name": "Elli (american, clear)",
+    "samples": [],
+    "category": "dynamic",
+    "preview_url": "https://storage.googleapis.com/eleven-public-prod/premade/voices/MF3mGyEYCl7XYWbV9V6O/bea2dc16-9abf-4162-b011-66531458e022.mp3",
+    "available_for_tiers": [],
+    "settings": null,
   },
 })
