@@ -60,7 +60,6 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
             } = await api.post(
                 `/text-to-speech/${ voice.voice_id }/stream`, { text }, {
                     headers: {
-                        'Content-Type': 'audio/mpeg',
                         "xi-api-key": apiKey,
                     },
                     responseType: 'stream',
