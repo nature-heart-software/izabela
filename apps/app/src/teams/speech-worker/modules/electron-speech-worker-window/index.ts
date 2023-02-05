@@ -27,10 +27,10 @@ export const ElectronSpeechWindow = () => {
   }
 
   const transcribeAudio = async ({
-                                   content,
-                                   sampleRate,
-                                   encoding,
-                                 }: {
+    content,
+    sampleRate,
+    encoding,
+  }: {
     content: string
     sampleRate: number
     encoding: any
@@ -83,7 +83,11 @@ export const ElectronSpeechWindow = () => {
 
     gkl.addListener((e, down) => {
       if (!settingsStore) return
-      if (e.state === 'DOWN' && !deferredRecording && keybindingTriggered(settingsStore.keybindings.recordAudio, down)) {
+      if (
+        e.state === 'DOWN' &&
+        !deferredRecording &&
+        keybindingTriggered(settingsStore.keybindings.recordAudio, down)
+      ) {
         deferredRecording = Deferred()
         ipcMain.sendTo('speech-worker', 'start-speech-transcription')
       }
@@ -99,7 +103,11 @@ export const ElectronSpeechWindow = () => {
 
     gkl.addListener((e, down) => {
       if (!settingsStore) return
-      if (e.state === 'UP' && deferredRecording && keybindingReleased(settingsStore.keybindings.recordAudio, down)) {
+      if (
+        e.state === 'UP' &&
+        deferredRecording &&
+        keybindingReleased(settingsStore.keybindings.recordAudio, down)
+      ) {
         deferredRecording.resolve(true)
         deferredRecording = null
         ipcMain.sendTo('speech-worker', 'stop-speech-transcription')
