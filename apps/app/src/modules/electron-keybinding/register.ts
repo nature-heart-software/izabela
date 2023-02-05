@@ -8,7 +8,7 @@ import { ipcMain } from 'electron-postman'
 import { IzabelaMessage } from '@/modules/izabela/types'
 import { purify } from '@packages/toolbox'
 import { debounce } from 'lodash'
-import { IGlobalKeyDownMap, IGlobalKeyEvent, IGlobalKeyListener } from "node-global-key-listener"
+import { IGlobalKeyDownMap, IGlobalKeyEvent, IGlobalKeyListener } from 'node-global-key-listener'
 import { gkl, keybindingTriggered } from '@/modules/electron-keybinding/utils'
 
 export default () =>
@@ -20,7 +20,10 @@ export default () =>
       toggleMessengerWindowAlt: () => electronMessengerWindow.toggleWindow('mouse'),
     }
     const registeredShortcuts: Record<string, string> = {}
-    const registeredCallbacks: Record<string, (e: IGlobalKeyEvent, down: IGlobalKeyDownMap) => void> = {}
+    const registeredCallbacks: Record<
+      string,
+      (e: IGlobalKeyEvent, down: IGlobalKeyDownMap) => void
+    > = {}
 
     const toggleMessengerWindowListener: IGlobalKeyListener = (e, down) => {
       if (e.state === 'DOWN') {

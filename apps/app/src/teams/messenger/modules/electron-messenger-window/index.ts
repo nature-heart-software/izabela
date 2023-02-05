@@ -28,22 +28,22 @@ export const ElectronMessengerWindow = () => {
   let foregroundWindow: string | number | null = null
 
   const kernel32 = new ffi.Library('Kernel32.dll', {
-    'GetCurrentThreadId': ['int', []],
+    GetCurrentThreadId: ['int', []],
   })
 
   const user32 = new ffi.Library('user32', {
     SetForegroundWindow: ['bool', ['long']],
     GetForegroundWindow: ['long', []],
-    'SetFocus': ['long', ['long']],
-    'SetActiveWindow': ['long', ['long']],
-    'AttachThreadInput': ['bool', ['int', 'long', 'bool']],
-    'ShowWindow': ['bool', ['long', 'int']],
-    'FindWindowA': ['long', ['string', 'string']],
-    'GetTopWindow': ['long', ['long']],
-    'BringWindowToTop': ['bool', ['long']],
-    'SwitchToThisWindow': ['void', ['long', 'bool']],
-    'GetWindowThreadProcessId': ['int', ['long', 'int']],
-    'SetWindowPos': ['bool', ['long', 'long', 'int', 'int', 'int', 'int', 'uint']],
+    SetFocus: ['long', ['long']],
+    SetActiveWindow: ['long', ['long']],
+    AttachThreadInput: ['bool', ['int', 'long', 'bool']],
+    ShowWindow: ['bool', ['long', 'int']],
+    FindWindowA: ['long', ['string', 'string']],
+    GetTopWindow: ['long', ['long']],
+    BringWindowToTop: ['bool', ['long']],
+    SwitchToThisWindow: ['void', ['long', 'bool']],
+    GetWindowThreadProcessId: ['int', ['long', 'int']],
+    SetWindowPos: ['bool', ['long', 'long', 'int', 'int', 'int', 'int', 'uint']],
   })
 
   const getWindow = () =>
@@ -103,7 +103,8 @@ export const ElectronMessengerWindow = () => {
           window.setIgnoreMouseEvents(true)
           window.setFocusable(false) // Fixes alwaysOnTop going in the background sometimes for some reasons
           if (foregroundWindow) {
-            if (foregroundWindow !== windowNativeHandle) user32.SetForegroundWindow(foregroundWindow)
+            if (foregroundWindow !== windowNativeHandle)
+              user32.SetForegroundWindow(foregroundWindow)
             foregroundWindow = null
           }
         }
@@ -147,8 +148,8 @@ export const ElectronMessengerWindow = () => {
         const [windowX, windowY] = window.getPosition()
         const { hitboxes } = hitboxesStore
         const isWithinAnyHitboxes = hitboxes.some(({ x, y, w, h }: Hitbox) => {
-          const isWithinXHitbox = mouseX >= windowX+x && mouseX <= windowX+x+w
-          const isWithinYHitbox = mouseY >= windowY+y && mouseY <= windowY+y+h
+          const isWithinXHitbox = mouseX >= windowX + x && mouseX <= windowX + x + w
+          const isWithinYHitbox = mouseY >= windowY + y && mouseY <= windowY + y + h
           return isWithinXHitbox && isWithinYHitbox
         })
         if (isWithinAnyHitboxes) {
