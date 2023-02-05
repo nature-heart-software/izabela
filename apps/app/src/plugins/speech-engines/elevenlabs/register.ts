@@ -25,6 +25,8 @@ registerEngine({
     return {
       text,
       voice,
+      stability: getProperty('stability'),
+      similarity_boost: getProperty('similarity_boost'),
     }
   },
   getLanguageCode() {

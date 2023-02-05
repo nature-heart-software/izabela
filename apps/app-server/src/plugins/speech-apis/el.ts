@@ -1,8 +1,13 @@
 import { RequestHandler } from 'express'
 import axios from 'axios'
 import { handleError } from '../../utils/requests'
+import hash from 'object-hash'
 
 const plugin: Izabela.Server.Plugin = ({ app }) => {
+    const api = axios.create({
+        baseURL: 'https://api.elevenlabs.io/v1',
+    })
+    let settingsCache: string = ''
     const listVoicesHandler: RequestHandler = async (
         {
             body: {
@@ -14,8 +19,8 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
         try {
             const {
                 data: { voices },
-            } = await axios
-                .get('https://api.elevenlabs.io/v1/voices', {
+            } = await api
+                .get('/voices', {
                     headers: {
                         "xi-api-key": apiKey,
                     },
@@ -30,17 +35,30 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
         {
             body: {
                 credentials: { apiKey },
-                payload: { text, voice },
+                payload: { text, voice, stability, similarity_boost },
             },
         },
         res,
     ) => {
 
         try {
+            const settings = {
+                stability,
+                similarity_boost,
+            }
+            const hashedSettings = hash({ ...settings, voice_id: voice.voice_id })
+            if (settingsCache !== hashedSettings) {
+                await api.post(`/voices/${ voice.voice_id }/settings/edit`, settings, {
+                    headers: {
+                        "xi-api-key": apiKey,
+                    },
+                })
+                settingsCache = hashedSettings
+            }
             const {
                 data,
-            } = await axios.post(
-                `https://api.elevenlabs.io/v1/text-to-speech/${ voice.voice_id }/stream`, { text }, {
+            } = await api.post(
+                `/text-to-speech/${ voice.voice_id }/stream`, { text }, {
                     headers: {
                         'Content-Type': 'audio/mpeg',
                         "xi-api-key": apiKey,

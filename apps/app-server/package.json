@@ -21,6 +21,7 @@
     "@aws-sdk/client-polly": "^3.87.0",
     "@aws-sdk/credential-provider-cognito-identity": "^3.87.0",
     "@google-cloud/text-to-speech": "^3.4.0",
+    "@types/object-hash": "^3.0.2",
     "axios": "^0.26.1",
     "body-parser": "^1.20.0",
     "cors": "^2.8.5",
@@ -30,6 +31,7 @@
     "microsoft-cognitiveservices-speech-sdk": "^1.21.0",
     "morgan": "^1.10.0",
     "node-cache": "^5.1.2",
+    "object-hash": "^3.0.0",
     "say": "^0.16.0",
     "socket.io": "^4.5.4",
     "uuid": "^8.3.2"

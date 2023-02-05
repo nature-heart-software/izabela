@@ -12,4 +12,6 @@ export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
     "available_for_tiers": [],
     "settings": null,
   },
+  "stability": 0.75,
+  "similarity_boost": 0.75,
 })
