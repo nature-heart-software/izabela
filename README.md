@@ -74,7 +74,7 @@ section (coming soon).
 
 ## Available engines
 
-Here's a list of all the text-to-speech engines that are supported in Izabela.
+Here's a list of all the text-to-speech engines that are supported in Izabela:
 
 | Engine                      | Credits                                                                       | Included with Universal Credentials |
 | --------------------------- | ----------------------------------------------------------------------------- | ----------------------------------- |
