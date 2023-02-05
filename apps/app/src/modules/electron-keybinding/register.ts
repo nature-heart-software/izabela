@@ -12,7 +12,7 @@ import {
   GlobalKeyboardListener,
   IGlobalKeyEvent,
   IGlobalKeyListener,
-} from "node-global-key-listener"
+} from 'node-global-key-listener'
 import nativeKeymap from '@packages/native-keymap'
 
 const gkl = new GlobalKeyboardListener()
@@ -22,21 +22,25 @@ export default () =>
     const messagesStore = useMessagesStore()
     const typedKeys: Partial<Record<Required<IGlobalKeyEvent>['name'], any>> = {}
     const keyCodeMap: any = {
-      ControlRight: "VK_RCONTROL",
-      ControlLeft: "VK_LCONTROL",
-      ShiftRight: "VK_RSHIFT",
-      ShiftLeft: "VK_LSHIFT",
-      AltRight: "VK_RMENU",
-      AltLeft: "VK_LMENU",
-      MetaRight: "VK_RWIN",
-      MetaLeft: "VK_LWIN",
+      ControlRight: 'VK_RCONTROL',
+      ControlLeft: 'VK_LCONTROL',
+      ShiftRight: 'VK_RSHIFT',
+      ShiftLeft: 'VK_LSHIFT',
+      AltRight: 'VK_RMENU',
+      AltLeft: 'VK_LMENU',
+      MetaRight: 'VK_RWIN',
+      MetaLeft: 'VK_LWIN',
     }
-    const keymapByVKey = Object.fromEntries(Object.entries(nativeKeymap.getKeyMap()).map(([code, value]) => ([keyCodeMap[code] || (value as any).vkey, {
-        ...value,
-        code,
-        vkey: keyCodeMap[code] || (value as any).vkey,
-      }]),
-    ))
+    const keymapByVKey = Object.fromEntries(
+      Object.entries(nativeKeymap.getKeyMap()).map(([code, value]) => [
+        keyCodeMap[code] || (value as any).vkey,
+        {
+          ...value,
+          code,
+          vkey: keyCodeMap[code] || (value as any).vkey,
+        },
+      ]),
+    )
     const multiKeysKeybindings = {
       toggleMessengerWindow: () => electronMessengerWindow.toggleWindow(),
     }
@@ -44,16 +48,23 @@ export default () =>
 
     const toggleMessengerWindowListener: IGlobalKeyListener = (e, down) => {
       if (e.state === 'DOWN') {
-        if (e.name) typedKeys[e.name] = {
-          event: e,
-          // eslint-disable-next-line no-underscore-dangle
-          nativeKey: keymapByVKey[e.rawKey._nameRaw],
-        }
-        const downNames = Object.entries(down).map(([name, value]) => value ? name : null).filter(Boolean) as string[]
-        if (settingsStore.keybindings.toggleMessengerWindowAlt.map((key) => {
-          const typedKey = find(typedKeys, (t) => t.nativeKey.code.includes(key.code))
-          return downNames.includes(typedKey?.event.name)
-        }).every(Boolean)) {
+        if (e.name)
+          typedKeys[e.name] = {
+            event: e,
+            // eslint-disable-next-line no-underscore-dangle
+            nativeKey: keymapByVKey[e.rawKey._nameRaw],
+          }
+        const downNames = Object.entries(down)
+          .map(([name, value]) => (value ? name : null))
+          .filter(Boolean) as string[]
+        if (
+          settingsStore.keybindings.toggleMessengerWindowAlt
+            .map((key) => {
+              const typedKey = find(typedKeys, (t) => t.nativeKey.code.includes(key.code))
+              return downNames.includes(typedKey?.event.name)
+            })
+            .every(Boolean)
+        ) {
           multiKeysKeybindings.toggleMessengerWindow()
         }
       }
@@ -90,7 +101,7 @@ export default () =>
           })
           registeredShortcuts[message.id] = keybinding
         } catch (e) {
-          console.error(`Couldn't register shortcut "${ keybinding }"`, e)
+          console.error(`Couldn't register shortcut "${keybinding}"`, e)
         }
       })
     }

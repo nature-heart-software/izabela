@@ -8,9 +8,9 @@
             <NvStack>
               <NvText type="label">Monitor</NvText>
             </NvStack>
-            <NvDisplaySelect/>
+            <NvDisplaySelect />
           </NvGroup>
-          <NvDivider direction="horizontal"/>
+          <NvDivider direction="horizontal" />
           <NvGroup justify="apart" no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Hide window after sending a message</NvText>
@@ -35,11 +35,11 @@
               :modelValue="settingsStore.keybindings.toggleMessengerWindow"
               multiple
               @update:modelValue="
-              (value) => settingsStore.$patch({ keybindings: { toggleMessengerWindow: value } })
-            "
+                (value) => settingsStore.$patch({ keybindings: { toggleMessengerWindow: value } })
+              "
             />
           </NvGroup>
-          <NvDivider direction="horizontal"/>
+          <NvDivider direction="horizontal" />
           <NvGroup justify="apart" no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Show Messenger window (alt)</NvText>
@@ -48,8 +48,9 @@
               :modelValue="settingsStore.keybindings.toggleMessengerWindowAlt"
               multiple
               @update:modelValue="
-              (value) => settingsStore.$patch({ keybindings: { toggleMessengerWindowAlt: value } })
-            "
+                (value) =>
+                  settingsStore.$patch({ keybindings: { toggleMessengerWindowAlt: value } })
+              "
             />
           </NvGroup>
         </NvStack>
@@ -68,7 +69,7 @@
               @update:modelValue="(value) => settingsStore.$patch({ launchOnStartup: value })"
             />
           </NvGroup>
-          <NvDivider direction="horizontal"/>
+          <NvDivider direction="horizontal" />
           <NvGroup justify="apart" no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Update Channel</NvText>
