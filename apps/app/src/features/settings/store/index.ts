@@ -15,10 +15,10 @@ export const useSettingsStore = defineStore(
       ? 'alpha'
       : // eslint-disable-next-line no-nested-ternary
       version.includes('beta')
-        ? 'beta'
-        : version.includes('rc')
-          ? 'rc'
-          : 'latest'
+      ? 'beta'
+      : version.includes('rc')
+      ? 'rc'
+      : 'latest'
 
     const preferredSavDir = ref<null | string>(null)
     const playSpeechOnDefaultPlaybackDevice = ref(true)
@@ -74,29 +74,32 @@ export const useSettingsStore = defineStore(
           metaKey: false,
         },
       ],
-      toggleMessengerWindowAlt: [{
-        "key": "Control",
-        "code": "ControlLeft",
-        "keyCode": 17,
-        "rawCode": 162,
-        "charCode": 0,
-        "which": 17,
-        "shiftKey": false,
-        "altKey": false,
-        "ctrlKey": true,
-        "metaKey": false,
-      }, {
-        "key": "Space",
-        "code": "Space",
-        "keyCode": 32,
-        "rawCode": 32,
-        "charCode": 0,
-        "which": 32,
-        "shiftKey": false,
-        "altKey": false,
-        "ctrlKey": true,
-        "metaKey": false,
-      }],
+      toggleMessengerWindowAlt: [
+        {
+          key: 'Control',
+          code: 'ControlLeft',
+          keyCode: 17,
+          rawCode: 162,
+          charCode: 0,
+          which: 17,
+          shiftKey: false,
+          altKey: false,
+          ctrlKey: true,
+          metaKey: false,
+        },
+        {
+          key: 'Space',
+          code: 'Space',
+          keyCode: 32,
+          rawCode: 32,
+          charCode: 0,
+          which: 32,
+          shiftKey: false,
+          altKey: false,
+          ctrlKey: true,
+          metaKey: false,
+        },
+      ],
     })
     return {
       preferredSavDir,
