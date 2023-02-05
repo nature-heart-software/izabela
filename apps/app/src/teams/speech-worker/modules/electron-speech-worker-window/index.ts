@@ -1,7 +1,7 @@
 // see: https://tipsfordev.com/stream-audio-with-websocket-and-get-back-audio-transcription-obtained-with-google-speech-api
 import speech from '@google-cloud/speech'
 import path from 'path'
-import iohook from 'iohook'
+// import iohook from 'iohook'
 import { app, BrowserWindow } from 'electron'
 import { ipcMain } from 'electron-postman'
 import { DEFAULT_LANGUAGE_CODE } from '@/consts'
@@ -9,6 +9,7 @@ import { createNotification } from '@/utils/electron-notification'
 import { useSettingsStore } from '@/features/settings/store'
 import { useSpeechStore } from '@/features/speech/store'
 import { Deferred } from '@packages/toolbox'
+import { gkl, keybindingReleased, keybindingTriggered } from '@/modules/electron-keybinding/utils'
 
 export const ElectronSpeechWindow = () => {
   let deferredRecording: ReturnType<typeof Deferred> | null = null
@@ -26,10 +27,10 @@ export const ElectronSpeechWindow = () => {
   }
 
   const transcribeAudio = async ({
-    content,
-    sampleRate,
-    encoding,
-  }: {
+                                   content,
+                                   sampleRate,
+                                   encoding,
+                                 }: {
     content: string
     sampleRate: number
     encoding: any
@@ -80,24 +81,39 @@ export const ElectronSpeechWindow = () => {
       process.env.GOOGLE_APPLICATION_CREDENTIALS = googleCloudSpeechCredentialsFilePath
     })
 
-    iohook.on('keydown', (event) => {
+    gkl.addListener((e, down) => {
       if (!settingsStore) return
-      const keybinding = settingsStore.keybindings.recordAudio[0]
-      if (keybinding && keybinding.rawCode === event.rawcode && !deferredRecording) {
+      if (e.state === 'DOWN' && !deferredRecording && keybindingTriggered(settingsStore.keybindings.recordAudio, down)) {
         deferredRecording = Deferred()
         ipcMain.sendTo('speech-worker', 'start-speech-transcription')
       }
     })
+    // iohook.on('keydown', (event) => {
+    //   if (!settingsStore) return
+    //   const keybinding = settingsStore.keybindings.recordAudio[0]
+    //   if (keybinding && keybinding.rawCode === event.rawcode && !deferredRecording) {
+    //     deferredRecording = Deferred()
+    //     ipcMain.sendTo('speech-worker', 'start-speech-transcription')
+    //   }
+    // })
 
-    iohook.on('keyup', (event) => {
+    gkl.addListener((e, down) => {
       if (!settingsStore) return
-      const keybinding = settingsStore.keybindings.recordAudio[0]
-      if (keybinding && keybinding.rawCode === event.rawcode && deferredRecording) {
+      if (e.state === 'UP' && deferredRecording && keybindingReleased(settingsStore.keybindings.recordAudio, down)) {
         deferredRecording.resolve(true)
         deferredRecording = null
         ipcMain.sendTo('speech-worker', 'stop-speech-transcription')
       }
     })
+    // iohook.on('keyup', (event) => {
+    //   if (!settingsStore) return
+    //   const keybinding = settingsStore.keybindings.recordAudio[0]
+    //   if (keybinding && keybinding.rawCode === event.rawcode && deferredRecording) {
+    //     deferredRecording.resolve(true)
+    //     deferredRecording = null
+    //     ipcMain.sendTo('speech-worker', 'stop-speech-transcription')
+    //   }
+    // })
   }
 
   isReady().then(() => {

@@ -71,3 +71,14 @@ export const keybindingTriggered = (keybinding: Key[], down: IGlobalKeyDownMap) 
     })
     .every(Boolean)
 }
+
+export const keybindingReleased = (keybinding: Key[], down: IGlobalKeyDownMap) => {
+  if (!keybinding.length) return false
+  const downNames = getDownNames(down)
+  return keybinding
+    .map((key) => {
+      const registeredEvent = find(registeredEvents, (t) => !!t?.nativeKey.code.includes(key.code))
+      return downNames.includes(registeredEvent?.event.name || '')
+    })
+    .some((v) => !v)
+}
