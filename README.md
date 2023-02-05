@@ -76,7 +76,7 @@ section (coming soon).
 
 Here's a list of all the text-to-speech engines that are supported in Izabela.
 
-| Engine                      | Credit                                                                        | Included with Universal Credentials |
+| Engine                      | Credits                                                                       | Included with Universal Credentials |
 | --------------------------- | ----------------------------------------------------------------------------- | ----------------------------------- |
 | Izabela (multiple engines)  | https://github.com/Weilbyte/tiktok-tts                                        | Yes                                 |
 | Amazon Polly                | https://aws.amazon.com/polly/                                                 | Yes                                 |
