@@ -8,7 +8,7 @@ import { ipcMain } from 'electron-postman'
 import { IzabelaMessage } from '@/modules/izabela/types'
 import { purify } from '@packages/toolbox'
 import { debounce } from 'lodash'
-import { IGlobalKeyListener } from "node-global-key-listener"
+import { IGlobalKeyDownMap, IGlobalKeyEvent, IGlobalKeyListener } from "node-global-key-listener"
 import { gkl, keybindingTriggered } from '@/modules/electron-keybinding/utils'
 
 export default () =>
@@ -19,6 +19,7 @@ export default () =>
       toggleMessengerWindow: () => electronMessengerWindow.toggleWindow(),
     }
     const registeredShortcuts: Record<string, string> = {}
+    const registeredCallbacks: Record<string, (e: IGlobalKeyEvent, down: IGlobalKeyDownMap) => void> = {}
 
     const toggleMessengerWindowListener: IGlobalKeyListener = (e, down) => {
       if (e.state === 'DOWN') {
@@ -31,6 +32,10 @@ export default () =>
       gkl.removeListener(toggleMessengerWindowListener)
       Object.keys(registeredShortcuts).forEach((key) => {
         globalShortcut.unregister(registeredShortcuts[key])
+        delete registeredShortcuts[key]
+      })
+      Object.keys(registeredCallbacks).forEach((key) => {
+        gkl.removeListener(registeredCallbacks[key])
         delete registeredShortcuts[key]
       })
     }
@@ -47,21 +52,33 @@ export default () =>
 
     const setShortcutMessagesKeybindings = () => {
       messagesStore.shortcutMessages.forEach((message) => {
-        const keybinding = message.shortcut.map(({ key }: Key) => key).join('+')
-        if (!keybinding) return
-        try {
-          globalShortcut.register(keybinding, () => {
+        registeredCallbacks[message.id] = (e, down) => {
+          if (e.state === 'DOWN' && keybindingTriggered(message.shortcut, down)) {
             const payload: IzabelaMessage = {
               ...message,
               excludeFromHistory: true,
             }
             ipcMain.sendTo('speech-worker', 'say', purify(payload))
-          })
-          registeredShortcuts[message.id] = keybinding
-        } catch (e) {
-          console.error(`Couldn't register shortcut "${ keybinding }"`, e)
+          }
         }
+        gkl.addListener(registeredCallbacks[message.id])
       })
+      // messagesStore.shortcutMessages.forEach((message) => {
+      //   const keybinding = message.shortcut.map(({ key }: Key) => key).join('+')
+      //   if (!keybinding) return
+      //   try {
+      //     globalShortcut.register(keybinding, () => {
+      //       const payload: IzabelaMessage = {
+      //         ...message,
+      //         excludeFromHistory: true,
+      //       }
+      //       ipcMain.sendTo('speech-worker', 'say', purify(payload))
+      //     })
+      //     registeredShortcuts[message.id] = keybinding
+      //   } catch (e) {
+      //     console.error(`Couldn't register shortcut "${ keybinding }"`, e)
+      //   }
+      // })
     }
 
     const registerAllShortcuts = debounce(() => {

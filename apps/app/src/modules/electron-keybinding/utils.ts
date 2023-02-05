@@ -49,6 +49,7 @@ gkl.addListener((e) => {
 const getDownNames = (downKeys: IGlobalKeyDownMap) => Object.entries(downKeys).map(([name, value]) => value ? name : null).filter(Boolean) as string[]
 
 export const keybindingTriggered = (keybinding: Key[], down: IGlobalKeyDownMap) => {
+  if (!keybinding.length) return false
   const downNames = getDownNames(down)
   return keybinding.map((key) => {
     const registeredEvent = find(registeredEvents, (t) => !!t?.nativeKey.code.includes(key.code))
