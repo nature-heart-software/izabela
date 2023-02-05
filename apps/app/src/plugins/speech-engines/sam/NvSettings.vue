@@ -20,6 +20,8 @@
           }"
           />
           <NvNumberInput
+            :max="255"
+            :min="0"
             v-bind="{
             modelValue: getProperty('speech'),
             'onUpdate:modelValue': (value) => setProperty('speech', value),
@@ -40,6 +42,8 @@
           }"
           />
           <NvNumberInput
+            :max="255"
+            :min="0"
             v-bind="{
             modelValue: getProperty('speed'),
             'onUpdate:modelValue': (value) => setProperty('speed', value),
