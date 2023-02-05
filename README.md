@@ -57,18 +57,36 @@ using Izabela over games, I recommend setting your game to `borderless`, `window
 instead of
 fullscreen.
 
-> **Note:** Credentials for the more advanced text-to-speech engines (Amazon Polly, Microsoft Azure, Google Cloud and
-> IBM Watson) are not provided by default.
-
 ## Support
 
-If you don't want to bother configuring credentials for the more advanced text-to-speech engines, I provide universal
+Credentials for the more advanced text-to-speech engines are not provided by default. If you don't want to bother
+configuring them for each engine, I provide universal
 API keys to all "Supporter" members or above on my [Ko-fi](https://ko-fi.com/woowee/tiers)!
+
+You can see the list of engines that are included with universal credentials in
+the [Available engines](#available-engines) section.
 
 > **Note:** The Izabela engine is only available to "Supporter" members or above
 > on [Ko-fi](https://ko-fi.com/woowee/tiers).
 
-If you prefer configuring your credentials yourself, you can do so by following the guides below (coming soon).
+If you prefer configuring your credentials yourself, you can do so by following the guides in the [Guides](#guides)
+section (coming soon).
+
+## Available engines
+
+Here's a list of all the text-to-speech engines that are supported in Izabela.
+
+| Engine                      | Credit                                                                        | Included with Universal Credentials |
+|-----------------------------|-------------------------------------------------------------------------------|-------------------------------------|
+| Izabela (multiple engines)  | https://github.com/Weilbyte/tiktok-tts                                        | Yes                                 |
+| Amazon Polly                | https://aws.amazon.com/polly/                                                 | Yes                                 |
+| Google Cloud Text-to-Speech | https://cloud.google.com/text-to-speech                                       | Yes                                 |
+| IBM Watson Text-to-Speech   | https://www.ibm.com/cloud/watson-text-to-speech                               | Yes                                 |
+| Microsoft Azure             | https://azure.microsoft.com/en-us/products/cognitive-services/text-to-speech/ | Yes                                 |
+| Say                         | https://github.com/Marak/say.js/                                              | Included by default                 |
+| Sam                         | https://github.com/discordier/sam                                             | Included by default                 |
+| Animalese                   | https://github.com/Acedio/animalese.js                                        | Included by default                 |
+| ElevenLabs                  | https://beta.elevenlabs.io/speech-synthesis                                   | No                                  |
 
 ## Guides
 
