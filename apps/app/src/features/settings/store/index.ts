@@ -74,6 +74,32 @@ export const useSettingsStore = defineStore(
           metaKey: false,
         },
       ],
+      toggleMessengerWindowAlt: [
+        {
+          key: 'Control',
+          code: 'ControlLeft',
+          keyCode: 17,
+          rawCode: 162,
+          charCode: 0,
+          which: 17,
+          shiftKey: false,
+          altKey: false,
+          ctrlKey: true,
+          metaKey: false,
+        },
+        {
+          key: 'Space',
+          code: 'Space',
+          keyCode: 32,
+          rawCode: 32,
+          charCode: 0,
+          which: 32,
+          shiftKey: false,
+          altKey: false,
+          ctrlKey: true,
+          metaKey: false,
+        },
+      ],
     })
     return {
       preferredSavDir,
