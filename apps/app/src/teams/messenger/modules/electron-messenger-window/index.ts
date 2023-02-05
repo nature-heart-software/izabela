@@ -8,6 +8,7 @@ import { useSettingsStore } from '@/features/settings/store'
 import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
 import { Deferred } from '@packages/toolbox'
 import ffi from 'ffi-napi'
+import { getNativeWindowHandleInt } from '@/utils/electron-window'
 
 export const ElectronMessengerWindow = () => {
   /* use isFocused as source of truth instead of window.isFocused() as in some instances
@@ -26,9 +27,23 @@ export const ElectronMessengerWindow = () => {
   const isReady = () => ready.promise
   let foregroundWindow: string | number | null = null
 
+  const kernel32 = new ffi.Library('Kernel32.dll', {
+    'GetCurrentThreadId': ['int', []],
+  })
+
   const user32 = new ffi.Library('user32', {
     SetForegroundWindow: ['bool', ['long']],
     GetForegroundWindow: ['long', []],
+    'SetFocus': ['long', ['long']],
+    'SetActiveWindow': ['long', ['long']],
+    'AttachThreadInput': ['bool', ['int', 'long', 'bool']],
+    'ShowWindow': ['bool', ['long', 'int']],
+    'FindWindowA': ['long', ['string', 'string']],
+    'GetTopWindow': ['long', ['long']],
+    'BringWindowToTop': ['bool', ['long']],
+    'SwitchToThisWindow': ['void', ['long', 'bool']],
+    'GetWindowThreadProcessId': ['int', ['long', 'int']],
+    'SetWindowPos': ['bool', ['long', 'long', 'int', 'int', 'int', 'int', 'uint']],
   })
 
   const getWindow = () =>
@@ -81,13 +96,14 @@ export const ElectronMessengerWindow = () => {
       const window = getWindow()
       if (window) {
         if (isFocused) {
+          const windowNativeHandle = getNativeWindowHandleInt(window)
           isFocused = false
           /* order matters */
           window.blur() // Fixes issues with Chrome and input elements
           window.setIgnoreMouseEvents(true)
           window.setFocusable(false) // Fixes alwaysOnTop going in the background sometimes for some reasons
           if (foregroundWindow) {
-            user32.SetForegroundWindow(foregroundWindow)
+            if (foregroundWindow !== windowNativeHandle) user32.SetForegroundWindow(foregroundWindow)
             foregroundWindow = null
           }
         }
@@ -131,8 +147,8 @@ export const ElectronMessengerWindow = () => {
         const [windowX, windowY] = window.getPosition()
         const { hitboxes } = hitboxesStore
         const isWithinAnyHitboxes = hitboxes.some(({ x, y, w, h }: Hitbox) => {
-          const isWithinXHitbox = mouseX >= windowX + x && mouseX <= windowX + x + w
-          const isWithinYHitbox = mouseY >= windowY + y && mouseY <= windowY + y + h
+          const isWithinXHitbox = mouseX >= windowX+x && mouseX <= windowX+x+w
+          const isWithinYHitbox = mouseY >= windowY+y && mouseY <= windowY+y+h
           return isWithinXHitbox && isWithinYHitbox
         })
         if (isWithinAnyHitboxes) {
@@ -144,17 +160,17 @@ export const ElectronMessengerWindow = () => {
     }
   }
 
-  const toggleWindow = () => {
+  const toggleWindow = throttle((context: 'mouse' | 'keyboard') => {
     const window = getWindow()
     if (window) {
       if (window.isVisible()) {
         hide()
       } else {
-        focus('keyboard')
+        focus(context)
       }
     }
     return Promise.resolve()
-  }
+  }, 500)
 
   const setDisplay = (id?: Electron.Display['id'] | null) => {
     const window = getWindow()

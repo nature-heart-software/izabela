@@ -8,9 +8,9 @@
             <NvStack>
               <NvText type="label">Monitor</NvText>
             </NvStack>
-            <NvDisplaySelect />
+            <NvDisplaySelect/>
           </NvGroup>
-          <NvDivider direction="horizontal" />
+          <NvDivider direction="horizontal"/>
           <NvGroup justify="apart" no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Hide window after sending a message</NvText>
@@ -24,20 +24,42 @@
       </NvCard>
     </NvStack>
     <NvStack>
-      <NvText type="subtitle">Keybindings</NvText>
+      <NvText type="subtitle">Shortcuts</NvText>
       <NvCard>
-        <NvGroup justify="apart" no-wrap spacing="5">
-          <NvStack>
-            <NvText type="label">Show Messenger window</NvText>
-          </NvStack>
-          <NvKeybinding
-            :modelValue="settingsStore.keybindings.toggleMessengerWindow"
-            multiple
-            @update:modelValue="
-              (value) => settingsStore.$patch({ keybindings: { toggleMessengerWindow: value } })
-            "
-          />
-        </NvGroup>
+        <NvStack spacing="5">
+          <NvGroup justify="apart" no-wrap spacing="5">
+            <NvStack>
+              <NvText type="label">Show Messenger window</NvText>
+            </NvStack>
+            <NvKeybinding
+              :modelValue="settingsStore.keybindings.toggleMessengerWindow"
+              multiple
+              @update:modelValue="
+                (value) => settingsStore.$patch({ keybindings: { toggleMessengerWindow: value } })
+              "
+            />
+          </NvGroup>
+          <NvDivider direction="horizontal"/>
+          <NvGroup align="start" justify="apart" no-wrap spacing="5">
+            <NvStack>
+              <NvText type="label">Show Messenger window (for compatibility)</NvText>
+              <NvText>Applications sometimes block system-wide keyboard shortcuts. If the Messenger
+                window
+                doesn't show with the shortcut above, use this one.
+              </NvText>
+              <NvText type="caption">The Messenger window will not be focused when shown however
+              </NvText>
+            </NvStack>
+            <NvKeybinding
+              :modelValue="settingsStore.keybindings.toggleMessengerWindowAlt"
+              multiple
+              @update:modelValue="
+                (value) =>
+                  settingsStore.$patch({ keybindings: { toggleMessengerWindowAlt: value } })
+              "
+            />
+          </NvGroup>
+        </NvStack>
       </NvCard>
     </NvStack>
     <NvStack>
@@ -53,7 +75,7 @@
               @update:modelValue="(value) => settingsStore.$patch({ launchOnStartup: value })"
             />
           </NvGroup>
-          <NvDivider direction="horizontal" />
+          <NvDivider direction="horizontal"/>
           <NvGroup justify="apart" no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Update Channel</NvText>
