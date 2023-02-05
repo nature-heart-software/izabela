@@ -8,10 +8,9 @@ import { ipcMain } from 'electron-postman'
 import { IzabelaMessage } from '@/modules/izabela/types'
 import { purify } from '@packages/toolbox'
 import { debounce } from 'lodash'
-import { GlobalKeyboardListener, IGlobalKeyListener } from "node-global-key-listener"
-import { keybindingTriggered } from '@/modules/electron-keybinding/utils'
+import { IGlobalKeyListener } from "node-global-key-listener"
+import { gkl, keybindingTriggered } from '@/modules/electron-keybinding/utils'
 
-const gkl = new GlobalKeyboardListener()
 export default () =>
   app.whenReady().then(async () => {
     const settingsStore = useSettingsStore()
