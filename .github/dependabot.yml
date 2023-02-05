@@ -10,7 +10,7 @@ updates:
     schedule:
       interval: weekly
     ignore:
-      - dependency-name: '*'
+      - dependency-name: "*"
   #        update-types: ['version-update:semver-major']
 
   - package-ecosystem: npm
@@ -18,5 +18,5 @@ updates:
     schedule:
       interval: weekly
     ignore:
-      - dependency-name: '*'
+      - dependency-name: "*"
 #        update-types: ['version-update:semver-major']

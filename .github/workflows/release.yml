@@ -1,21 +1,22 @@
 name: Release
 on:
+  workflow_dispatch:
   push:
     tags:
-      - 'v*'
+      - "v*"
 jobs:
   release:
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Create changelog for release
         id: github_release
-        uses: mikepenz/release-changelog-builder-action@v1
+        uses: mikepenz/release-changelog-builder-action@{latest-release}
         with:
-          configuration: 'changelog.config.json'
+          configuration: "changelog.config.json"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -41,8 +42,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16.x
-          registry-url: 'https://npm.pkg.github.com'
-          cache: 'yarn'
+          registry-url: "https://npm.pkg.github.com"
+          cache: "yarn"
 
       - name: Set env variables
         shell: bash
@@ -60,7 +61,7 @@ jobs:
       - name: Build
         uses: borales/actions-yarn@v4
         env:
-          NODE_OPTIONS: '--max_old_space_size=4096'
+          NODE_OPTIONS: "--max_old_space_size=4096"
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           VUE_APP_ENCRYPTION_KEY: ${{ secrets.APP_ENCRYPTION_KEY }}
         with:

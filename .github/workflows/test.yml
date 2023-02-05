@@ -1,0 +1,31 @@
+name: Test
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "dev"
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [windows-2019]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          registry-url: "https://npm.pkg.github.com"
+          cache: "yarn"
+
+      - name: Build
+        uses: borales/actions-yarn@v4
+        env:
+          NODE_OPTIONS: "--max_old_space_size=4096"
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          VUE_APP_ENCRYPTION_KEY: ${{ secrets.APP_ENCRYPTION_KEY }}
+        with:
+          cmd: build
