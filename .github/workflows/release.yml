@@ -60,7 +60,7 @@ jobs:
       - name: Build
         uses: borales/actions-yarn@v4
         env:
-          NODE_OPTIONS: '--max_old_space_size=4096'
+          NODE_OPTIONS: '--max_old_space_size=4096 --network-timeout=100000'
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           VUE_APP_ENCRYPTION_KEY: ${{ secrets.APP_ENCRYPTION_KEY }}
         with:
