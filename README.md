@@ -27,7 +27,7 @@ who wants to communicate with text-to-speech and for that reason, you can see Iz
 ## Features
 
 - [x] Appears above any non-fullscreen application
-- [x] Multiple text-to-speech engines (Amazon Polly, Microsoft Azure, Google Cloud, IBM Watson, etc..)
+- [x] Multiple text-to-speech engines (Amazon Polly, Microsoft Azure, Google Cloud, IBM Watson, etc..) - [see list](#available-engines)
 - [x] Multiple voices (per engine)
 - [x] Multiple audio outputs
 - [x] Supports audio inputs for speech-to-text-to-speech
