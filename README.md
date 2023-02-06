@@ -27,7 +27,8 @@ who wants to communicate with text-to-speech and for that reason, you can see Iz
 ## Features
 
 - [x] Appears above any non-fullscreen application
-- [x] Multiple text-to-speech engines (Amazon Polly, Microsoft Azure, Google Cloud, IBM Watson, etc..) - [see list](#available-engines)
+- [x] Multiple text-to-speech engines (Amazon Polly, Microsoft Azure, Google Cloud, IBM Watson,
+  etc..) - [see list](#available-engines)
 - [x] Multiple voices (per engine)
 - [x] Multiple audio outputs
 - [x] Supports audio inputs for speech-to-text-to-speech
@@ -76,17 +77,17 @@ section (coming soon).
 
 Here's a list of all the text-to-speech engines that are supported in Izabela:
 
-| Engine                     | Included with Universal Credentials | Credits                                                                       |
-| -------------------------- | ----------------------------------- | ----------------------------------------------------------------------------- |
-| Izabela (multiple engines) | Yes                                 | https://github.com/Weilbyte/tiktok-tts                                        |
-| Amazon Polly               | Yes                                 | https://aws.amazon.com/polly/                                                 |
-| Google Cloud TTS           | Yes                                 | https://cloud.google.com/text-to-speech                                       |
-| IBM Watson TTS             | Yes                                 | https://www.ibm.com/cloud/watson-text-to-speech                               |
-| Microsoft Azure TTS        | Yes                                 | https://azure.microsoft.com/en-us/products/cognitive-services/text-to-speech/ |
-| Say                        | Included by default                 | https://github.com/Marak/say.js/                                              |
-| Sam                        | Included by default                 | https://github.com/discordier/sam                                             |
-| Animalese                  | Included by default                 | https://github.com/Acedio/animalese.js                                        |
-| ElevenLabs                 | No                                  | https://beta.elevenlabs.io/speech-synthesis                                   |
+| Engine                     | Included with Universal Credentials | Samples                                                                                                                               | Credits                                                                       |
+|----------------------------|-------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
+| Izabela (multiple engines) | Yes                                 | ![Izabela engine sample](https://github.com/nature-heart-software/izabela/blob/dev/assets/izabela-sample.mp3)                         | https://github.com/Weilbyte/tiktok-tts                                        |
+| Amazon Polly               | Yes                                 | ![Amazon Polly engine sample](https://github.com/nature-heart-software/izabela/blob/dev/assets/amazon-polly-sample.mp3)               | https://aws.amazon.com/polly/                                                 |
+| Google Cloud TTS           | Yes                                 | ![Google Cloud TTS engine sample](https://github.com/nature-heart-software/izabela/blob/dev/assets/google-cloud-tts-sample.mp3)       | https://cloud.google.com/text-to-speech                                       |
+| IBM Watson TTS             | Yes                                 |                                                                                                                                       | https://www.ibm.com/cloud/watson-text-to-speech                               |
+| Microsoft Azure TTS        | Yes                                 | ![Microsoft Azure TTS engine sample](https://github.com/nature-heart-software/izabela/blob/dev/assets/microsoft-azure-tts-sample.mp3) | https://azure.microsoft.com/en-us/products/cognitive-services/text-to-speech/ |
+| Say                        | Included by default                 | ![Say engine sample](https://github.com/nature-heart-software/izabela/blob/dev/assets/say-sample.mp3)                                 | https://github.com/Marak/say.js/                                              |
+| Sam                        | Included by default                 | ![Sam engine sample](https://github.com/nature-heart-software/izabela/blob/dev/assets/sam-sample.mp3)                                 | https://github.com/discordier/sam                                             |
+| Animalese                  | Included by default                 | ![Animalese engine sample](https://github.com/nature-heart-software/izabela/blob/dev/assets/animalese-sample.wav)                     | https://github.com/Acedio/animalese.js                                        |
+| ElevenLabs                 | No                                  | ![ElevenLabs engine sample](https://github.com/nature-heart-software/izabela/blob/dev/assets/elevenlabs-sample.mp3)                   | https://beta.elevenlabs.io/speech-synthesis                                   |
 
 ## Guides
 
