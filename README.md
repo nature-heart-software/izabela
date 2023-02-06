@@ -28,7 +28,7 @@ who wants to communicate with text-to-speech and for that reason, you can see Iz
 
 - [x] Appears above any non-fullscreen application
 - [x] Multiple text-to-speech engines (Amazon Polly, Microsoft Azure, Google Cloud, IBM Watson,
-  etc..) - [see list](#available-engines)
+      etc..) - [see list](#available-engines)
 - [x] Multiple voices (per engine)
 - [x] Multiple audio outputs
 - [x] Supports audio inputs for speech-to-text-to-speech
@@ -78,7 +78,7 @@ section (coming soon).
 Here's a list of all the text-to-speech engines that are supported in Izabela:
 
 | Engine                     | Included with Universal Credentials | Samples                                                                                                                               | Credits                                                                       |
-|----------------------------|-------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
+| -------------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
 | Izabela (multiple engines) | Yes                                 | ![Izabela engine sample](https://github.com/nature-heart-software/izabela/blob/dev/assets/izabela-sample.mp3)                         | https://github.com/Weilbyte/tiktok-tts                                        |
 | Amazon Polly               | Yes                                 | ![Amazon Polly engine sample](https://github.com/nature-heart-software/izabela/blob/dev/assets/amazon-polly-sample.mp3)               | https://aws.amazon.com/polly/                                                 |
 | Google Cloud TTS           | Yes                                 | ![Google Cloud TTS engine sample](https://github.com/nature-heart-software/izabela/blob/dev/assets/google-cloud-tts-sample.mp3)       | https://cloud.google.com/text-to-speech                                       |
