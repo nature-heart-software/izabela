@@ -2,9 +2,9 @@
   <NvAccessBlocker :allowed="!!getProperty('apiKey', true)" reason="Credentials required">
     <NvStack spacing="5">
       <NvFormItem label="Voice">
-        <NvVoiceSelect/>
+        <NvVoiceSelect />
       </NvFormItem>
-      <NvDivider direction="horizontal"/>
+      <NvDivider direction="horizontal" />
       <NvFormItem label="Stability">
         <NvGroup>
           <NvRangeInput
@@ -28,7 +28,7 @@
           />
         </NvGroup>
       </NvFormItem>
-      <NvDivider direction="horizontal"/>
+      <NvDivider direction="horizontal" />
       <NvFormItem label="Clarity + Similarity Enhancement">
         <NvGroup>
           <NvRangeInput
@@ -54,7 +54,7 @@
       </NvFormItem>
     </NvStack>
   </NvAccessBlocker>
-  <NvDivider direction="horizontal"/>
+  <NvDivider direction="horizontal" />
   <NvStack spacing="5">
     <NvFormItem label="API Key">
       <NvInput

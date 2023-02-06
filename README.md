@@ -27,7 +27,7 @@ who wants to communicate with text-to-speech and for that reason, you can see Iz
 ## Features
 
 - [x] Appears above any non-fullscreen application
-- [x] Multiple text-to-speech engines (Amazon Polly, Microsoft Azure, Google Cloud, IBM Watson, etc..)
+- [x] Multiple text-to-speech engines (Amazon Polly, Microsoft Azure, Google Cloud, IBM Watson, etc..) - [see list](#available-engines)
 - [x] Multiple voices (per engine)
 - [x] Multiple audio outputs
 - [x] Supports audio inputs for speech-to-text-to-speech
@@ -76,17 +76,17 @@ section (coming soon).
 
 Here's a list of all the text-to-speech engines that are supported in Izabela:
 
-| Engine                      | Credits                                                                       | Included with Universal Credentials |
-| --------------------------- | ----------------------------------------------------------------------------- | ----------------------------------- |
-| Izabela (multiple engines)  | https://github.com/Weilbyte/tiktok-tts                                        | Yes                                 |
-| Amazon Polly                | https://aws.amazon.com/polly/                                                 | Yes                                 |
-| Google Cloud Text-to-Speech | https://cloud.google.com/text-to-speech                                       | Yes                                 |
-| IBM Watson Text-to-Speech   | https://www.ibm.com/cloud/watson-text-to-speech                               | Yes                                 |
-| Microsoft Azure             | https://azure.microsoft.com/en-us/products/cognitive-services/text-to-speech/ | Yes                                 |
-| Say                         | https://github.com/Marak/say.js/                                              | Included by default                 |
-| Sam                         | https://github.com/discordier/sam                                             | Included by default                 |
-| Animalese                   | https://github.com/Acedio/animalese.js                                        | Included by default                 |
-| ElevenLabs                  | https://beta.elevenlabs.io/speech-synthesis                                   | No                                  |
+| Engine                     | Included with Universal Credentials | Credits                                                                       |
+| -------------------------- | ----------------------------------- | ----------------------------------------------------------------------------- |
+| Izabela (multiple engines) | Yes                                 | https://github.com/Weilbyte/tiktok-tts                                        |
+| Amazon Polly               | Yes                                 | https://aws.amazon.com/polly/                                                 |
+| Google Cloud TTS           | Yes                                 | https://cloud.google.com/text-to-speech                                       |
+| IBM Watson TTS             | Yes                                 | https://www.ibm.com/cloud/watson-text-to-speech                               |
+| Microsoft Azure TTS        | Yes                                 | https://azure.microsoft.com/en-us/products/cognitive-services/text-to-speech/ |
+| Say                        | Included by default                 | https://github.com/Marak/say.js/                                              |
+| Sam                        | Included by default                 | https://github.com/discordier/sam                                             |
+| Animalese                  | Included by default                 | https://github.com/Acedio/animalese.js                                        |
+| ElevenLabs                 | No                                  | https://beta.elevenlabs.io/speech-synthesis                                   |
 
 ## Guides
 
