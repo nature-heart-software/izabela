@@ -37,7 +37,7 @@ export const useDictionaryStore = defineStore(
       ['lmk', 'let me know'],
       ['mfw', 'my face when'],
       ['nsfw', 'not safe for work'],
-      ['nvm', 'nervermind'],
+      ['nvm', 'nevermind'],
       ['oan', 'on another note'],
       ['omg', 'oh my god'],
       ['omw', 'on my way'],
