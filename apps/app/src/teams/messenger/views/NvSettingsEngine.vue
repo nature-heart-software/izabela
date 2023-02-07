@@ -50,8 +50,8 @@
             <NvStack>
               <NvText type="label">Universal Credentials</NvText>
               <NvText
-                >Gain access to every text-to-speech engine using a universal API key <br />You can
-                obtain a universal API key by being a
+                >Gain access to multiple text-to-speech engines using a universal API key <br />You
+                can obtain a universal API key by being a
                 <a href="https://ko-fi.com/woowee/tiers" target="_blank">Ko-fi supporter</a></NvText
               >
             </NvStack>

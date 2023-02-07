@@ -15,4 +15,5 @@ export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
     description: 'Allison: American English female voice. Dnn technology.',
     language: 'en-US',
   },
+  useLocalCredentials: false,
 })
