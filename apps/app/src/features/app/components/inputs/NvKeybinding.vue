@@ -1,6 +1,9 @@
 <template>
   <template v-if="isListeningToKeys">
-    <NvButton class="pointer-events-none" title="Press Esc to cancel" v-bind="$attrs"
+    <NvButton
+      class="pointer-events-none"
+      title="Press Esc to cancel. Hold to remove"
+      v-bind="$attrs"
       >Listening...
     </NvButton>
   </template>
@@ -10,7 +13,7 @@
 </template>
 <script lang="ts" setup>
 import { NvButton } from '@packages/ui'
-import { computed, defineEmits, defineProps, PropType, Ref, ref, watch } from 'vue'
+import { computed, defineEmits, defineProps, PropType, Ref, ref, shallowRef, watch } from 'vue'
 import { useEventListener } from '@vueuse/core'
 import { Key } from '@/types/keybinds'
 
@@ -27,6 +30,7 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 const isListeningToKeys = ref(false)
 const listenedKeys = ref<Record<KeyboardEvent['code'], KeyboardEvent>>({})
+const cancelled = ref(false)
 const keyAliases: Record<KeyboardEvent['code'], string> = {
   AltRight: 'AltGr',
   ShiftRight: 'ShiftRight',
@@ -45,8 +49,18 @@ const rawCodeAliases: Record<KeyboardEvent['code'], number> = {
   AltLeft: 164,
   AltRight: 165,
 }
+const escTimeout = shallowRef<ReturnType<typeof setTimeout> | null>(null)
+
 useEventListener(document, 'keydown', (e) => {
   if (isListeningToKeys.value) {
+    if (e.code === 'Escape' && !escTimeout.value) {
+      escTimeout.value = setTimeout(() => {
+        listenedKeys.value = {}
+        if (escTimeout.value) clearTimeout(escTimeout.value)
+        escTimeout.value = null
+        isListeningToKeys.value = false
+      }, 500)
+    }
     if (e.code === 'AltRight' && listenedKeys.value.ControlLeft) {
       delete listenedKeys.value.ControlLeft
     }
@@ -57,9 +71,16 @@ useEventListener(document, 'keydown', (e) => {
   }
 })
 
-useEventListener(document, 'keyup', () => {
+useEventListener(document, 'keyup', (e) => {
   if (isListeningToKeys.value) {
+    if (e.code === 'Escape' && escTimeout.value) {
+      cancelled.value = true
+    }
     isListeningToKeys.value = false
+  }
+  if (escTimeout.value) {
+    clearTimeout(escTimeout.value)
+    escTimeout.value = null
   }
 })
 
@@ -86,8 +107,9 @@ const readableKeybinding = computed(
 
 watch(isListeningToKeys, (value) => {
   if (!value) {
-    emit('update:modelValue', keybinding.value)
+    if (!cancelled.value) emit('update:modelValue', keybinding.value)
     listenedKeys.value = {}
+    cancelled.value = false
   }
 })
 </script>
