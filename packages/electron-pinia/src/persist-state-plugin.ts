@@ -1,6 +1,6 @@
 import { PiniaPlugin, PiniaPluginContext } from 'pinia'
 import debounce from 'lodash/debounce'
-import defaultsDeep from 'lodash/defaultsDeep'
+import defaults from 'lodash/defaults'
 import cloneDeep from 'lodash/cloneDeep'
 import type ElectronStore from 'electron-store'
 
@@ -57,10 +57,7 @@ export const persistStatePlugin = ({ store }: Parameters<PiniaPlugin>[0]) => {
   async function loadInitialState() {
     const state = await getState()
     if (state) {
-      const mergedState = defaultsDeep(
-        cloneDeep(state),
-        cloneDeep(store.$state),
-      )
+      const mergedState = defaults(cloneDeep(state), cloneDeep(store.$state))
       store.$patch(mergedState)
     }
     return true
