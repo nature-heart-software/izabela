@@ -5,6 +5,15 @@ import { entries, keyBy, map } from 'lodash'
 
 export const gkl = new GlobalKeyboardListener()
 export const down: Partial<Record<IGlobalKeyEvent['rawKey']['_nameRaw'], boolean>> = {}
+
+// Makes sure down is reset when a shortcut is triggered
+export const handleShortcut = <C extends (...args: any[]) => void>(c: C) => {
+  Object.keys(down).forEach((key) => {
+    delete down[key]
+  })
+  return (...args: any[]) => c(...args)
+}
+
 export const registeredEvents: Partial<
   Record<
     Required<IGlobalKeyEvent>['name'],

@@ -9,15 +9,15 @@ import { IzabelaMessage } from '@/modules/izabela/types'
 import { purify } from '@packages/toolbox'
 import { debounce } from 'lodash'
 import { IGlobalKeyDownMap, IGlobalKeyEvent, IGlobalKeyListener } from 'node-global-key-listener'
-import { gkl, keybindingTriggered } from '@/modules/electron-keybinding/utils'
+import { gkl, handleShortcut, keybindingTriggered } from '@/modules/electron-keybinding/utils'
 
 export default () =>
   app.whenReady().then(async () => {
     const settingsStore = useSettingsStore()
     const messagesStore = useMessagesStore()
     const multiKeysKeybindings = {
-      toggleMessengerWindow: () => electronMessengerWindow.toggleWindow('keyboard'),
-      toggleMessengerWindowAlt: () => electronMessengerWindow.toggleWindow('mouse'),
+      toggleMessengerWindow: handleShortcut(() => electronMessengerWindow.toggleWindow('keyboard')),
+      toggleMessengerWindowAlt: handleShortcut(() => electronMessengerWindow.toggleWindow('mouse')),
     }
     const registeredShortcuts: Record<string, string> = {}
     const registeredCallbacks: Record<
@@ -56,7 +56,7 @@ export default () =>
 
     const setShortcutMessagesKeybindings = () => {
       messagesStore.shortcutMessages.forEach((message) => {
-        registeredCallbacks[message.id] = (e, down) => {
+        registeredCallbacks[message.id] = handleShortcut((e: IGlobalKeyEvent) => {
           if (e.state === 'DOWN' && keybindingTriggered(message.shortcut)) {
             const payload: IzabelaMessage = {
               ...message,
@@ -64,7 +64,7 @@ export default () =>
             }
             ipcMain.sendTo('speech-worker', 'say', purify(payload))
           }
-        }
+        })
         gkl.addListener(registeredCallbacks[message.id])
       })
       // messagesStore.shortcutMessages.forEach((message) => {
