@@ -27,7 +27,7 @@ export default () =>
 
     const toggleMessengerWindowListener: IGlobalKeyListener = (e, down) => {
       if (e.state === 'DOWN') {
-        if (keybindingTriggered(settingsStore.keybindings.toggleMessengerWindowAlt, down)) {
+        if (keybindingTriggered(settingsStore.keybindings.toggleMessengerWindowAlt)) {
           multiKeysKeybindings.toggleMessengerWindowAlt()
         }
       }
@@ -57,7 +57,7 @@ export default () =>
     const setShortcutMessagesKeybindings = () => {
       messagesStore.shortcutMessages.forEach((message) => {
         registeredCallbacks[message.id] = (e, down) => {
-          if (e.state === 'DOWN' && keybindingTriggered(message.shortcut, down)) {
+          if (e.state === 'DOWN' && keybindingTriggered(message.shortcut)) {
             const payload: IzabelaMessage = {
               ...message,
               excludeFromHistory: true,
