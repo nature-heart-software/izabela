@@ -32,7 +32,7 @@ registerEngine({
     return getSelectedVoice().language
   },
   synthesizeSpeech({ credentials, payload }) {
-    return api().post<Blob>(
+    return api(getProperty('useLocalCredentials') ? 'local' : 'remote').post<Blob>(
       '/tts/uberduck/synthesize-speech',
       {
         credentials,

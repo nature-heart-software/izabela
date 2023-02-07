@@ -8,4 +8,5 @@ export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
     ssmlGender: 'FEMALE',
     name: 'en-GB-Wavenet-A',
   },
+  useLocalCredentials: false,
 })
