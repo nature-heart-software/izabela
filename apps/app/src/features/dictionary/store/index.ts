@@ -74,7 +74,7 @@ export const useDictionaryStore = defineStore(
       updateDefinition: (index: number, definition: [string, string]) => {
         definitions.value.splice(index, 1, definition)
       },
-      addDefinition: (definition: typeof definitions['value'][number] = ['', '']) => {
+      addDefinition: (definition: (typeof definitions)['value'][number] = ['', '']) => {
         definitions.value.unshift(definition)
       },
       removeDefinition: (index: number) => {
