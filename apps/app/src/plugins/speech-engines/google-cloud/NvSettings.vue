@@ -1,14 +1,17 @@
 <template>
   <NvAccessBlocker
-    :allowed="(speechStore.hasUniversalApiCredentials && !getProperty('useLocalCredentials')) || !!getProperty('apiKey', true)"
+    :allowed="
+      (speechStore.hasUniversalApiCredentials && !getProperty('useLocalCredentials')) ||
+      !!getProperty('apiKey', true)
+    "
     reason="Credentials required"
   >
     <NvFormItem label="Voice">
-      <NvVoiceSelect/>
+      <NvVoiceSelect />
     </NvFormItem>
   </NvAccessBlocker>
   <template v-if="speechStore.hasUniversalApiCredentials">
-    <NvDivider direction="horizontal"/>
+    <NvDivider direction="horizontal" />
     <NvGroup justify="apart" no-wrap spacing="5">
       <NvStack>
         <NvText type="label">Use my own credentials</NvText>
@@ -20,7 +23,7 @@
     </NvGroup>
   </template>
   <template v-if="getProperty('useLocalCredentials') || !speechStore.hasUniversalApiCredentials">
-    <NvDivider direction="horizontal"/>
+    <NvDivider direction="horizontal" />
     <NvStack spacing="5">
       <NvFormItem label="API Key">
         <NvInput
