@@ -1,8 +1,10 @@
 <template>
   <template v-if="isListeningToKeys">
-    <NvButton class="pointer-events-none" title="Press Esc to cancel. Hold to remove"
-              v-bind="$attrs"
-    >Listening...
+    <NvButton
+      class="pointer-events-none"
+      title="Press Esc to cancel. Hold to remove"
+      v-bind="$attrs"
+      >Listening...
     </NvButton>
   </template>
   <template v-else>
