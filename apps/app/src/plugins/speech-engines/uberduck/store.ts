@@ -23,4 +23,5 @@ export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
     speaker_id: 0,
     language: 'english',
   },
+  useLocalCredentials: false,
 })

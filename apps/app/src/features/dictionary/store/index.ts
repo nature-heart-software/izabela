@@ -37,7 +37,7 @@ export const useDictionaryStore = defineStore(
       ['lmk', 'let me know'],
       ['mfw', 'my face when'],
       ['nsfw', 'not safe for work'],
-      ['nvm', 'nervermind'],
+      ['nvm', 'nevermind'],
       ['oan', 'on another note'],
       ['omg', 'oh my god'],
       ['omw', 'on my way'],
@@ -74,7 +74,7 @@ export const useDictionaryStore = defineStore(
       updateDefinition: (index: number, definition: [string, string]) => {
         definitions.value.splice(index, 1, definition)
       },
-      addDefinition: (definition: typeof definitions['value'][number] = ['', '']) => {
+      addDefinition: (definition: (typeof definitions)['value'][number] = ['', '']) => {
         definitions.value.unshift(definition)
       },
       removeDefinition: (index: number) => {

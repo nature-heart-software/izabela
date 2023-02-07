@@ -32,7 +32,7 @@ registerEngine({
     return getSelectedVoice().LanguageCode
   },
   synthesizeSpeech({ credentials, payload }) {
-    return api().post<Blob>(
+    return api(getProperty('useLocalCredentials') ? 'local' : 'remote').post<Blob>(
       '/tts/amazon-polly/synthesize-speech',
       {
         credentials,

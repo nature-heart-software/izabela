@@ -86,7 +86,7 @@ export const ElectronSpeechWindow = () => {
       if (
         e.state === 'DOWN' &&
         !deferredRecording &&
-        keybindingTriggered(settingsStore.keybindings.recordAudio, down)
+        keybindingTriggered(settingsStore.keybindings.recordAudio)
       ) {
         deferredRecording = Deferred()
         ipcMain.sendTo('speech-worker', 'start-speech-transcription')
@@ -106,7 +106,7 @@ export const ElectronSpeechWindow = () => {
       if (
         e.state === 'UP' &&
         deferredRecording &&
-        keybindingReleased(settingsStore.keybindings.recordAudio, down)
+        keybindingReleased(settingsStore.keybindings.recordAudio)
       ) {
         deferredRecording.resolve(true)
         deferredRecording = null
