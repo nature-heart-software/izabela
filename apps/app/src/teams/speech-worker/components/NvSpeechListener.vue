@@ -103,7 +103,7 @@ if (realTime) {
 }
 onIPCStartSpeechTranscription(() => {
   if (mediaRecorder && !realTime) {
-    console.log(`[${ getTime() }] Starting web recording`)
+    console.log(`[${getTime()}] Starting web recording`)
     mediaRecorder.start(200)
   }
   if (realTime) {
@@ -113,7 +113,7 @@ onIPCStartSpeechTranscription(() => {
 
 onIPCStopSpeechTranscription(() => {
   if (mediaRecorder && !realTime) {
-    console.log(`[${ getTime() }] Stopping web recording`)
+    console.log(`[${getTime()}] Stopping web recording`)
     mediaRecorder.stop()
   }
   if (realTime) {
