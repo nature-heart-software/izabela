@@ -11,7 +11,7 @@ import {
   onIPCStopSpeechTranscription,
 } from '@/electron/events/renderer'
 import { useSettingsStore } from '@/features/settings/store'
-import hark from 'hark/hark.bundle.js'
+import hark from 'hark'
 import { takeRight } from 'lodash'
 
 let speaking = false
@@ -35,8 +35,8 @@ let mediaRecorder: MediaRecorder | null = new MediaRecorder(stream)
 const options = {
   threshold: -60,
 }
-const speechEvents = hark(stream.clone(), options)
-speechEvents.on('speaking', () => {
+const speech = hark(stream.clone(), options)
+speech.on('speaking', () => {
   console.log('speaking')
 
   if (realTime) {
@@ -44,7 +44,7 @@ speechEvents.on('speaking', () => {
   }
 })
 
-speechEvents.on('stopped_speaking', () => {
+speech.on('stopped_speaking', () => {
   console.log('stopped_speaking')
 
   if (realTime) {
@@ -65,7 +65,6 @@ function stopRecording() {
 }
 
 function startRecording() {
-  console.log('recording', new Date().getTime())
   mediaRecorder?.start()
   setTimeout(() => {
     if (!speaking) {
@@ -86,9 +85,9 @@ const onStop = () => {
   })
 
   // debug
-  const audioUrl = URL.createObjectURL(audioBlob)
-  const audio = new Audio(audioUrl)
-  audio.play()
+  // const audioUrl = URL.createObjectURL(audioBlob)
+  // const audio = new Audio(audioUrl)
+  // audio.play()
 }
 
 mediaRecorder.addEventListener('dataavailable', onDataAvailable)
@@ -98,28 +97,27 @@ mediaRecorder.addEventListener('stop', () => {
     onStop()
   }
 })
-if (realTime) {
-  startRecording()
-}
+
 onIPCStartSpeechTranscription(() => {
-  if (mediaRecorder && !realTime) {
+  if (!realTime) {
     console.log(`[${ getTime() }] Starting web recording`)
-    mediaRecorder.start(200)
-  }
-  if (realTime) {
-    speaking = true
+    mediaRecorder?.start()
   }
 })
 
 onIPCStopSpeechTranscription(() => {
-  if (mediaRecorder && !realTime) {
+  if (!realTime) {
     console.log(`[${ getTime() }] Stopping web recording`)
-    mediaRecorder.stop()
-  }
-  if (realTime) {
-    stopRecording()
+    mediaRecorder?.stop()
   }
 })
+
+if (realTime) {
+  startRecording()
+} else {
+  speech?.stop()
+}
+
 onBeforeUnmount(() => {
   if (mediaRecorder?.state !== 'inactive') {
     mediaRecorder?.stop()
@@ -131,6 +129,7 @@ onBeforeUnmount(() => {
       track.stop()
     }
   })
+  speech?.stop()
   mediaRecorder = null
 })
 </script>
