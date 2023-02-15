@@ -1,7 +1,7 @@
 <template>
   <template v-if="settingsStore.$isReady">
-    <SpeechSynthesizer />
-    <SpeechListener :key="settingsStore.audioInput" />
+    <SpeechSynthesizer/>
+    <SpeechListener :key="speechListenerKey"/>
   </template>
 </template>
 <style lang="scss">
@@ -16,6 +16,15 @@ body {
 import SpeechListener from '@/teams/speech-worker/components/NvSpeechListener.vue'
 import SpeechSynthesizer from '@/teams/speech-worker/components/NvSpeechSynthesizer.vue'
 import { useSettingsStore } from '@/features/settings/store'
+import { computed } from 'vue'
+import hash from 'object-hash'
 
 const settingsStore = useSettingsStore()
+const speechListenerKey = computed(() => hash([
+  settingsStore.audioInput,
+  settingsStore.audioInputSensibility,
+  settingsStore.speechPrerecordTime,
+  settingsStore.speechPostrecordTime,
+  settingsStore.automaticSpeechDetection,
+]))
 </script>

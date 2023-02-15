@@ -15,7 +15,6 @@ import hark from 'hark'
 import { takeRight } from 'lodash'
 
 let speaking = false
-const realTime = true
 const { ElectronSpeechWorkerWindow } = window
 const settingsStore = useSettingsStore()
 const mediaDevice = await getMediaDeviceByLabel(settingsStore.audioInput)
@@ -33,11 +32,13 @@ const stream = await navigator.mediaDevices.getUserMedia({
 let mediaRecorder: MediaRecorder | null = new MediaRecorder(stream)
 
 const options = {
-  threshold: -60,
+  threshold: settingsStore.audioInputSensibility,
+  interval: settingsStore.speechPostrecordTime,
 }
+const realTime = settingsStore.automaticSpeechDetection
 const speech = hark(stream.clone(), options)
 speech.on('speaking', () => {
-  console.log('speaking')
+  console.log('Started speaking')
 
   if (realTime) {
     speaking = true
@@ -45,13 +46,15 @@ speech.on('speaking', () => {
 })
 
 speech.on('stopped_speaking', () => {
-  console.log('stopped_speaking')
+  console.log('Stopped speaking')
 
   if (realTime) {
     stopRecording()
   }
 })
 
+// We want to keep a few chunks of audio in case the user starts speaking
+// right when the recording stopped and started again
 const onDataAvailable = (event: any) => {
   if (realTime && !speaking) {
     audioChunks = takeRight(audioChunks, 1)
@@ -70,7 +73,7 @@ function startRecording() {
     if (!speaking) {
       stopRecording()
     }
-  }, 300)
+  }, settingsStore.speechPrerecordTime)
 }
 
 const onStop = () => {
@@ -96,19 +99,24 @@ mediaRecorder.addEventListener('stop', () => {
     speaking = false
     onStop()
   }
+  if (!realTime) {
+    onStop()
+  }
 })
 
+
+// TODO: The listeners below are not removed on unmount, gotta fix that
 onIPCStartSpeechTranscription(() => {
-  if (!realTime) {
+  if (!realTime && mediaRecorder) {
     console.log(`[${ getTime() }] Starting web recording`)
-    mediaRecorder?.start()
+    mediaRecorder.start()
   }
 })
 
 onIPCStopSpeechTranscription(() => {
-  if (!realTime) {
+  if (!realTime && mediaRecorder) {
     console.log(`[${ getTime() }] Stopping web recording`)
-    mediaRecorder?.stop()
+    mediaRecorder.stop()
   }
 })
 
@@ -131,5 +139,6 @@ onBeforeUnmount(() => {
   })
   speech?.stop()
   mediaRecorder = null
+  console.log('Reloading Speech listener')
 })
 </script>
