@@ -1,7 +1,7 @@
 <template>
   <template v-if="settingsStore.$isReady">
-    <SpeechSynthesizer/>
-    <SpeechListener :key="speechListenerKey"/>
+    <SpeechSynthesizer />
+    <SpeechListener :key="speechListenerKey" />
   </template>
 </template>
 <style lang="scss">
@@ -20,12 +20,14 @@ import { computed } from 'vue'
 import hash from 'object-hash'
 
 const settingsStore = useSettingsStore()
-const speechListenerKey = computed(() => hash([
-  settingsStore.audioInput,
-  settingsStore.audioInputSensibility,
-  settingsStore.speechPrerecordTime,
-  settingsStore.speechPostrecordTime,
-  settingsStore.automaticSpeechDetection,
-  settingsStore.enableSTTTS,
-]))
+const speechListenerKey = computed(() =>
+  hash([
+    settingsStore.audioInput,
+    settingsStore.audioInputSensibility,
+    settingsStore.speechPrerecordTime,
+    settingsStore.speechPostrecordTime,
+    settingsStore.automaticSpeechDetection,
+    settingsStore.enableSTTTS,
+  ]),
+)
 </script>
