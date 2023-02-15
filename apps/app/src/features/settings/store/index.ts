@@ -37,6 +37,7 @@ export const useSettingsStore = defineStore(
     const audioInputSensibility = ref(-60)
     const speechPrerecordTime = ref(300)
     const speechPostrecordTime = ref(100)
+    const enableSTTTS = ref(false)
     const keybindings = ref<Record<string, Key[]>>({
       recordAudio: [
         {
@@ -124,6 +125,7 @@ export const useSettingsStore = defineStore(
       audioInputSensibility,
       speechPrerecordTime,
       speechPostrecordTime,
+      enableSTTTS,
     }
   },
   {

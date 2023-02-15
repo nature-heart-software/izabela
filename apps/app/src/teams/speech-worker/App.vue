@@ -26,5 +26,6 @@ const speechListenerKey = computed(() => hash([
   settingsStore.speechPrerecordTime,
   settingsStore.speechPostrecordTime,
   settingsStore.automaticSpeechDetection,
+  settingsStore.enableSTTTS,
 ]))
 </script>
