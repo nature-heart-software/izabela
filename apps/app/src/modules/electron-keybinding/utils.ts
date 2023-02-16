@@ -3,7 +3,8 @@ import { Key } from '@/types/keybinds'
 import { GlobalKeyboardListener, IGlobalKeyEvent } from 'node-global-key-listener'
 import { entries, keyBy, map } from 'lodash'
 
-export const gkl = new GlobalKeyboardListener()
+export const gkl = typeof window === 'undefined' ? new GlobalKeyboardListener() : undefined
+
 export const down: Partial<Record<IGlobalKeyEvent['rawKey']['_nameRaw'], boolean>> = {}
 
 // Makes sure down is reset when a shortcut is triggered
@@ -62,7 +63,7 @@ const keymapByVKey = Object.fromEntries(
 
 // gkl uses its events name to map the downMap but it's impossible to remap them any other way
 // so we save them with more infos for later use
-gkl.addListener((e) => {
+gkl?.addListener((e) => {
   if (e.state === 'DOWN') {
     // eslint-disable-next-line no-underscore-dangle
     down[e.rawKey._nameRaw] = true

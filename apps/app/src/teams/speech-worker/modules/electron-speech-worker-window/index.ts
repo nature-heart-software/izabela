@@ -81,7 +81,7 @@ export const ElectronSpeechWindow = () => {
       process.env.GOOGLE_APPLICATION_CREDENTIALS = googleCloudSpeechCredentialsFilePath
     })
 
-    gkl.addListener((e, down) => {
+    gkl?.addListener((e, down) => {
       if (!settingsStore) return
       if (
         e.state === 'DOWN' &&
@@ -101,7 +101,7 @@ export const ElectronSpeechWindow = () => {
     //   }
     // })
 
-    gkl.addListener((e, down) => {
+    gkl?.addListener((e, down) => {
       if (!settingsStore) return
       if (
         e.state === 'UP' &&
