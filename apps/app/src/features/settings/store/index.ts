@@ -33,11 +33,11 @@ export const useSettingsStore = defineStore(
     const hideWindowOnMessage = ref(false)
     const universalApiKey = ref<string>('')
     const universalApiEndpoint = ref<string>('')
-    const automaticSpeechDetection = ref(false)
     const audioInputSensibility = ref(-60)
     const speechPrerecordTime = ref(300)
     const speechPostrecordTime = ref(100)
     const enableSTTTS = ref(false)
+    const speechRecordingStrategy = ref<'continuous-node' | 'continuous-web' | 'ptt'>('ptt')
     const keybindings = ref<Record<string, Key[]>>({
       recordAudio: [
         {
@@ -121,11 +121,11 @@ export const useSettingsStore = defineStore(
       hideWindowOnMessage,
       universalApiKey,
       universalApiEndpoint,
-      automaticSpeechDetection,
       audioInputSensibility,
       speechPrerecordTime,
       speechPostrecordTime,
       enableSTTTS,
+      speechRecordingStrategy,
     }
   },
   {

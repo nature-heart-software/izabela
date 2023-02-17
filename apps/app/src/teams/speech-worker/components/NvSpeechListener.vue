@@ -22,7 +22,7 @@ let mediaRecorder: MediaRecorder | null = null
 const { ElectronSpeechWorkerWindow } = window
 const settingsStore = useSettingsStore()
 const mediaDevice = await getMediaDeviceByLabel(settingsStore.audioInput)
-const realTime = settingsStore.automaticSpeechDetection
+const realTime = settingsStore.speechRecordingStrategy === 'continuous-web'
 const sampleRate = 48000
 if (settingsStore.enableSTTTS) {
   stream = await navigator.mediaDevices.getUserMedia({
@@ -113,14 +113,14 @@ function startRecording() {
 // TODO: The listeners below are not removed on unmount, gotta fix that
 onIPCStartSpeechTranscription(() => {
   if (!realTime && mediaRecorder) {
-    console.log(`[${getTime()}] Starting web recording`)
+    console.log(`[${ getTime() }] Starting web recording`)
     mediaRecorder.start()
   }
 })
 
 onIPCStopSpeechTranscription(() => {
   if (!realTime && mediaRecorder) {
-    console.log(`[${getTime()}] Stopping web recording`)
+    console.log(`[${ getTime() }] Stopping web recording`)
     mediaRecorder.stop()
   }
 })

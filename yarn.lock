@@ -15066,6 +15066,12 @@ node-notifier@^9.0.0:
     uuid "^8.3.0"
     which "^2.0.2"
 
+node-record-lpcm16@Wurielle/node-record-lpcm16:
+  version "1.0.1"
+  resolved "https://codeload.github.com/Wurielle/node-record-lpcm16/tar.gz/402084232aa92255838e63bcc3daf8712dc9d1e6"
+  dependencies:
+    debug "^2.6.8"
+
 node-releases@^2.0.8:
   version "2.0.9"
   resolved "https://registry.yarnpkg.com/node-releases/-/node-releases-2.0.9.tgz#fe66405285382b0c4ac6bcfbfbe7e8a510650b4d"
