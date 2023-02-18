@@ -45,6 +45,9 @@ export default () => {
       encoding,
       sampleRateHertz,
       languageCode,
+      enableAutomaticPunctuation: true,
+      model: 'latest_long',
+      useEnhanced: true,
     } as const
 
     const request = {
