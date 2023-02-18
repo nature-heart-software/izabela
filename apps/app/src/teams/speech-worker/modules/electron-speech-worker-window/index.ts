@@ -114,6 +114,7 @@ export const ElectronSpeechWindow = () => {
       () => [
         settingsStore?.soxThreshold,
         settingsStore?.soxSilence,
+        settingsStore?.soxDevice,
         settingsStore?.enableSTTTS,
         settingsStore?.speechRecognitionStrategy,
         speechStore?.currentSpeechEngine,

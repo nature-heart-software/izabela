@@ -131,10 +131,22 @@
         <NvDivider direction="horizontal"/>
         <NvGroup align="start" justify="apart" no-wrap spacing="5">
           <NvStack>
+            <NvText type="label">Recording device</NvText>
+            <NvText>The index of the recording device you want to use</NvText>
+          </NvStack>
+          <NvNumberInput
+            :min="0"
+            :modelValue="settingsStore.soxDevice"
+            @update:modelValue="
+                  (value) => settingsStore.$patch({ soxDevice: value })
+                "
+          />
+        </NvGroup>
+        <NvDivider direction="horizontal"/>
+        <NvGroup align="start" justify="apart" no-wrap spacing="5">
+          <NvStack>
             <NvText type="label">Restart speech recognition server</NvText>
-            <NvStack>
-              <NvText>Restart speech recognition server if it stops working</NvText>
-            </NvStack>
+            <NvText>Restart speech recognition server if it stops working</NvText>
           </NvStack>
           <NvButton @click="ElectronSpeechWorkerWindow.restartNativeSpeechRecognition()">Restart
           </NvButton>

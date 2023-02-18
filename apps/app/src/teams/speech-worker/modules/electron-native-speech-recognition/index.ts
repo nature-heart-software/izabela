@@ -7,9 +7,11 @@ import { EXTERNALS_DIR } from '@/electron/utils'
 import { ipcMain } from 'electron-postman'
 import { DEFAULT_LANGUAGE_CODE } from '@/consts'
 import { useSpeechStore } from '@/features/speech/store'
+import { useSettingsStore } from '@/features/settings/store'
 
 export default () => {
   console.log('Starting native speech recognition...')
+  const settingsStore = useSettingsStore()
   const speechStore = useSpeechStore()
   const engine = speechStore.currentSpeechEngine
   const encoding = 'LINEAR16'
@@ -130,6 +132,7 @@ export default () => {
     sampleRateHertz,
     recordProgram: 'rec',
     binPath: path.join(EXTERNALS_DIR, 'sox/sox.exe'),
+    device: settingsStore.soxDevice,
   })
 
   rec

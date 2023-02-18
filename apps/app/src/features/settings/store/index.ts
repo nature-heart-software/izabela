@@ -36,6 +36,7 @@ export const useSettingsStore = defineStore(
     const audioInputSensibility = ref(-60)
     const soxThreshold = ref(0.5)
     const soxSilence = ref(100)
+    const soxDevice = ref(0)
     const speechPrerecordTime = ref(300)
     const speechPostrecordTime = ref(100)
     const enableSTTTS = ref(false)
@@ -130,6 +131,7 @@ export const useSettingsStore = defineStore(
       speechRecognitionStrategy,
       soxThreshold,
       soxSilence,
+      soxDevice,
     }
   },
   {
