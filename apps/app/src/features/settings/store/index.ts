@@ -34,10 +34,12 @@ export const useSettingsStore = defineStore(
     const universalApiKey = ref<string>('')
     const universalApiEndpoint = ref<string>('')
     const audioInputSensibility = ref(-60)
+    const soxThreshold = ref(0.5)
+    const soxSilence = ref(100)
     const speechPrerecordTime = ref(300)
     const speechPostrecordTime = ref(100)
     const enableSTTTS = ref(false)
-    const speechRecordingStrategy = ref<'continuous-node' | 'continuous-web' | 'ptt'>('ptt')
+    const speechRecognitionStrategy = ref<'continuous-node' | 'continuous-web' | 'ptr'>('ptr')
     const keybindings = ref<Record<string, Key[]>>({
       recordAudio: [
         {
@@ -125,7 +127,9 @@ export const useSettingsStore = defineStore(
       speechPrerecordTime,
       speechPostrecordTime,
       enableSTTTS,
-      speechRecordingStrategy,
+      speechRecognitionStrategy,
+      soxThreshold,
+      soxSilence,
     }
   },
   {

@@ -9,7 +9,7 @@ import { gkl, keybindingReleased, keybindingTriggered } from '@/modules/electron
 import { Deferred } from '@packages/toolbox'
 import { useSettingsStore } from '@/features/settings/store'
 import { watch } from 'vue'
-import electronNodeSpeechRecognition from '@/teams/speech-worker/modules/electron-node-speech-recognition'
+import electronNativeSpeechRecognition from '@/teams/speech-worker/modules/electron-native-speech-recognition'
 
 export const ElectronSpeechWindow = () => {
   let registeredWindow: BrowserWindow | null = null
@@ -18,8 +18,8 @@ export const ElectronSpeechWindow = () => {
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
   let speechStore: ReturnType<typeof useSpeechStore> | undefined
   let deferredRecording: ReturnType<typeof Deferred> | null = null
-  let electronNodeSpeechRecognitionCallback: ReturnType<
-    typeof electronNodeSpeechRecognition
+  let electronNativeSpeechRecognitionCallback: ReturnType<
+    typeof electronNativeSpeechRecognition
   > | null = null
 
   const onListeningError = () => {
@@ -94,30 +94,31 @@ export const ElectronSpeechWindow = () => {
       }
     })
   }
+  const restartNativeSpeechRecognition = () => {
+    if (electronNativeSpeechRecognitionCallback) {
+      electronNativeSpeechRecognitionCallback()
+    }
+    if (
+      settingsStore?.enableSTTTS &&
+      settingsStore.speechRecognitionStrategy === 'continuous-node'
+    ) {
+      electronNativeSpeechRecognitionCallback = electronNativeSpeechRecognition()
+    }
+  }
 
   isReady().then(() => {
-    console.log('electron speech worker window ready')
     settingsStore = useSettingsStore()
     speechStore = useSpeechStore()
 
     watch(
       () => [
-        settingsStore?.speechRecordingStrategy,
-        settingsStore?.speechPostrecordTime,
+        settingsStore?.soxThreshold,
+        settingsStore?.soxSilence,
         settingsStore?.enableSTTTS,
+        settingsStore?.speechRecognitionStrategy,
         speechStore?.currentSpeechEngine,
       ],
-      () => {
-        if (electronNodeSpeechRecognitionCallback) {
-          electronNodeSpeechRecognitionCallback()
-        }
-        if (
-          settingsStore?.enableSTTTS &&
-          settingsStore.speechRecordingStrategy === 'continuous-node'
-        ) {
-          electronNodeSpeechRecognitionCallback = electronNodeSpeechRecognition()
-        }
-      },
+      restartNativeSpeechRecognition,
       { deep: true, immediate: true },
     )
   })
@@ -131,6 +132,7 @@ export const ElectronSpeechWindow = () => {
   return {
     start,
     transcribeAudio,
+    restartNativeSpeechRecognition,
   }
 }
 

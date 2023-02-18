@@ -26,9 +26,8 @@ const speechListenerKey = computed(() =>
     settingsStore.audioInputSensibility,
     settingsStore.speechPrerecordTime,
     settingsStore.speechPostrecordTime,
-    settingsStore.automaticSpeechDetection,
     settingsStore.enableSTTTS,
-    settingsStore.speechRecordingStrategy,
+    settingsStore.speechRecognitionStrategy,
   ]),
 )
 </script>

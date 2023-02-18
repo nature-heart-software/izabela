@@ -7,10 +7,9 @@ import { EXTERNALS_DIR } from '@/electron/utils'
 import { ipcMain } from 'electron-postman'
 import { DEFAULT_LANGUAGE_CODE } from '@/consts'
 import { useSpeechStore } from '@/features/speech/store'
-import { useSettingsStore } from '@/features/settings/store'
 
 export default () => {
-  const settingsStore = useSettingsStore()
+  console.log('Starting native speech recognition...')
   const speechStore = useSpeechStore()
   const engine = speechStore.currentSpeechEngine
   const encoding = 'LINEAR16'
@@ -33,10 +32,10 @@ export default () => {
     resultEndTime =
       stream.results[0].resultEndTime.seconds * 1000 +
       Math.round(stream.results[0].resultEndTime.nanos / 1000000)
-    console.log(stream.results[0].alternatives[0].transcript)
+    // console.log(stream.results[0].alternatives[0].transcript)
     if (stream.results[0].isFinal) {
       ipcMain.sendTo('speech-worker', 'say', stream.results[0].alternatives[0].transcript)
-
+      audioInput = []
       isFinalEndTime = resultEndTime
     }
   }
@@ -56,7 +55,7 @@ export default () => {
     recognizeStream = client
       .streamingRecognize(request)
       .on('error', (err) => {
-        if ('code' in err && err.code === 11) {
+        if ('code' in err && (err as unknown as { code: number }).code === 11) {
           // restartStream();
         } else {
           console.error(`API request error ${err}`)
@@ -126,9 +125,6 @@ export default () => {
 
   const rec = recorder.record({
     sampleRateHertz,
-    threshold: 0,
-    silence: settingsStore.speechPostrecordTime,
-    keepSilence: true,
     recordProgram: 'rec',
     binPath: path.join(EXTERNALS_DIR, 'sox/sox.exe'),
   })
@@ -143,6 +139,7 @@ export default () => {
   startStream()
 
   return () => {
+    console.log('Stopping native speech recognition...')
     rec.stop()
     client.close()
   }

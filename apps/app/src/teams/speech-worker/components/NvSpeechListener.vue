@@ -22,9 +22,14 @@ let mediaRecorder: MediaRecorder | null = null
 const { ElectronSpeechWorkerWindow } = window
 const settingsStore = useSettingsStore()
 const mediaDevice = await getMediaDeviceByLabel(settingsStore.audioInput)
-const realTime = settingsStore.speechRecordingStrategy === 'continuous-web'
+const realTime = settingsStore.speechRecognitionStrategy === 'continuous-web'
 const sampleRate = 48000
 if (settingsStore.enableSTTTS) {
+  if (realTime) {
+    console.log('Starting web speech recognition...')
+  } else {
+    console.log('Starting push-to-record speech recognition...')
+  }
   stream = await navigator.mediaDevices.getUserMedia({
     audio: {
       deviceId: mediaDevice?.deviceId,
@@ -144,6 +149,10 @@ onBeforeUnmount(() => {
   })
   speech?.stop()
   mediaRecorder = null
-  console.log('Reloading Speech listener')
+  if (realTime) {
+    console.log('Stopping web speech recognition...')
+  } else {
+    console.log('Stopping push-to-record speech recognition...')
+  }
 })
 </script>
