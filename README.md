@@ -58,6 +58,8 @@ using Izabela over games, I recommend setting your game to `borderless`, `window
 instead of
 fullscreen.
 
+You can press `Ctrl` + `Enter` (or `Esc` if the text input is focused) to close the window.
+
 ## Support
 
 Credentials for the more advanced text-to-speech engines are not provided by default. If you don't want to bother
