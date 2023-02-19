@@ -2164,6 +2164,15 @@
   resolved "https://registry.yarnpkg.com/@gar/promisify/-/promisify-1.1.3.tgz#555193ab2e3bb3b6adc3d551c9c030d9e860daf6"
   integrity sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==
 
+"@globalhive/vuejs-tour@^1.3.4":
+  version "1.3.4"
+  resolved "https://registry.yarnpkg.com/@globalhive/vuejs-tour/-/vuejs-tour-1.3.4.tgz#49d5cdfae52e12dba941b32bb70d0c39e9a38507"
+  integrity sha512-5FH/x4lb2SgvnKhts9HHpgGQbczqmZxYD4an2uA8OUPdeTGjmWBihwLoiSn1C5xzhQu4/4+4+P62YxRcBkSuGw==
+  dependencies:
+    "@popperjs/core" "^2.11.6"
+    jump.js "^1.0.2"
+    vue "^3.2.41"
+
 "@google-cloud/common@^3.0.0":
   version "3.10.0"
   resolved "https://registry.yarnpkg.com/@google-cloud/common/-/common-3.10.0.tgz#454d1155bb512109cd83c6183aabbd39f9aabda7"
@@ -3531,7 +3540,7 @@
   resolved "https://registry.yarnpkg.com/@polka/url/-/url-1.0.0-next.21.tgz#5de5a2385a35309427f6011992b544514d559aa1"
   integrity sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==
 
-"@popperjs/core@^2.10.2", "@popperjs/core@^2.9.0", "@popperjs/core@^2.9.1":
+"@popperjs/core@^2.10.2", "@popperjs/core@^2.11.6", "@popperjs/core@^2.9.0", "@popperjs/core@^2.9.1":
   version "2.11.6"
   resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.11.6.tgz#cee20bd55e68a1720bdab363ecf0c821ded4cd45"
   integrity sha512-50/17A98tWUfQ176raKiOGXuYpLyyVMkxxG6oylzL3BPOlA6ADGdK7EYunSa4I064xerltq9TGXs8HmOk5E+vw==
@@ -20395,7 +20404,7 @@ vue@^2.6.12:
     "@vue/compiler-sfc" "2.7.14"
     csstype "^3.1.0"
 
-vue@^3.2.31, vue@^3.2.37:
+vue@^3.2.31, vue@^3.2.37, vue@^3.2.41:
   version "3.2.47"
   resolved "https://registry.yarnpkg.com/vue/-/vue-3.2.47.tgz#3eb736cbc606fc87038dbba6a154707c8a34cff0"
   integrity sha512-60188y/9Dc9WVrAZeUVSDxRQOZ+z+y5nO2ts9jWXSTkMvayiWxCWOWtBQoYjLeccfXkiiPZWAHcV+WTPhkqJHQ==

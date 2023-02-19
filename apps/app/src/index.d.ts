@@ -4,6 +4,7 @@ declare module '@ryanmorr/ready'
 declare module 'sam-js'
 declare module 'node-record-lpcm16'
 declare module '@globalhive/vuejs-tour'
+declare module '@globalhive/vuejs-tour/*'
 
 declare module 'socket.io/*'
 declare module '@packages/electron-pinia/*'
