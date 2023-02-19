@@ -4,7 +4,7 @@
       <NvTooltip>
         <NvText>Message mode</NvText>
         <template #reference>
-          <NvGroup noWrap>
+          <NvGroup data-v-step="8" noWrap>
             <NvButton
               :type="settingsStore.messageMode === 'sentence' && 'plain'"
               size="sm"
@@ -26,6 +26,7 @@
         <template #reference>
           <NvButton
             :type="route.name === 'messages-shortcuts' && messengerContext.isViewShown.value  ?  'plain'  :  'default'"
+            data-v-step="9"
             icon-name="keyboard-alt"
             size="sm"
             @click="messengerContext.navigateTo({ name: 'messages-shortcuts' })"
@@ -37,6 +38,7 @@
         <template #reference>
           <NvButton
             :type="route.name === 'messages-history' && messengerContext.isViewShown.value  ?  'plain'  :  'default'"
+            data-v-step="10"
             icon-name="history"
             size="sm"
             @click="messengerContext.navigateTo({ name: 'messages-history' })"

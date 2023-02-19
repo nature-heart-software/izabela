@@ -10,6 +10,7 @@
             ? 'plain'
             : 'default'
         "
+            data-v-step="7"
             icon-name="users-alt"
             size="sm"
             @click="messengerContext.navigateTo({ name: 'settings-engine' })"
@@ -23,6 +24,7 @@
           <SpeechEngineSelect
             :modelValue="speechStore.selectedSpeechEngine"
             class="w-13"
+            data-v-step="3"
             icon-name="direction"
             placeholder="Speech Engine"
             size="sm"
@@ -38,6 +40,7 @@
               :is="speechStore.currentSpeechEngine.voiceSelectComponent"
               v-if="speechStore.currentSpeechEngine.voiceSelectComponent"
               class="w-13"
+              data-v-step="4"
               placeholder="Speech Voice"
               size="sm"
             />
@@ -70,7 +73,7 @@
           <NvTooltip>
             <NvText>Audio outputs</NvText>
             <template #reference>
-              <NvButton icon-name="direction" size="sm"
+              <NvButton data-v-step="5" icon-name="direction" size="sm"
               >Outputs ({{
                   settingsStore.audioOutputs.length +
                   (settingsStore.playSpeechOnDefaultPlaybackDevice ? 1 : 0)
@@ -115,7 +118,7 @@
           <NvTooltip>
             <NvText>Audio input</NvText>
             <template #reference>
-              <NvButton icon-name="direction" size="sm">Input</NvButton>
+              <NvButton data-v-step="6" icon-name="direction" size="sm">Input</NvButton>
             </template>
           </NvTooltip>
         </template>
