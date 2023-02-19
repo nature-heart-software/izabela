@@ -147,6 +147,8 @@ export default () => {
   return () => {
     console.log('Stopping native speech recognition...')
     rec.stop()
+    recognizeStream?.end()
+    recognizeStream?.removeListener('data', speechCallback)
     client.close()
   }
 }
