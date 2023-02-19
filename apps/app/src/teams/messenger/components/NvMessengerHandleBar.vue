@@ -1,5 +1,5 @@
 <template>
-  <NvCard class="h-7" size="xs">
+  <NvCard class="h-7" data-v-step="13" size="xs">
     <NvGroup :spacing="2" noWrap>
       <template v-if="settingsStore.debugMode">
         <NvTooltip>

@@ -4,6 +4,7 @@
       <div
         ref="messenger"
         class="messenger bg-gray-10/95 rounded grid p-4 gap-4 grid-rows-3 grid-rows-none min-w-[768px]"
+        data-v-step="14"
       >
         <!-- Top -->
         <NvGroup :spacing="4">
