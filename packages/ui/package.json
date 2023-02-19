@@ -60,6 +60,7 @@
     "vue3-styled-components": "^1.2.1"
   },
   "dependencies": {
+    "@floating-ui/vue": "^0.2.1",
     "@packages/icons": "^0.0.0",
     "@packages/toolbox": "^0.0.0"
   }

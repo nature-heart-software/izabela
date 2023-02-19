@@ -15,6 +15,7 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION as unknown as boolean,
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
+      backgroundThrottling: false,
     },
   })
 
@@ -26,6 +27,8 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     window.setAlwaysOnTop(true)
     window.setVisibleOnAllWorkspaces(true)
     window.setFullScreenable(false)
+
+    window.webContents.setBackgroundThrottling(false)
   }
 
   window.once('ready-to-show', () => {

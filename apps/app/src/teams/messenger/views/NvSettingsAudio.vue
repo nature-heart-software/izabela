@@ -95,9 +95,7 @@
                 <NvText type="label">Audio Input</NvText>
                 <NvText>(optional)</NvText>
               </NvGroup>
-              <NvText
-                >Select an audio input to generate text from (speech-to-text-to-speech)
-              </NvText>
+              <NvText>Generate audio using your voice (speech-to-text-to-speech) </NvText>
             </NvStack>
           </NvCard>
           <div class="pl-8">

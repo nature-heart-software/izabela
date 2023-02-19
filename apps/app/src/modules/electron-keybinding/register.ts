@@ -33,13 +33,13 @@ export default () =>
       }
     }
     const unregisterAllShortcuts = () => {
-      gkl.removeListener(toggleMessengerWindowListener)
+      gkl?.removeListener(toggleMessengerWindowListener)
       Object.keys(registeredShortcuts).forEach((key) => {
         globalShortcut.unregister(registeredShortcuts[key])
         delete registeredShortcuts[key]
       })
       Object.keys(registeredCallbacks).forEach((key) => {
-        gkl.removeListener(registeredCallbacks[key])
+        gkl?.removeListener(registeredCallbacks[key])
         delete registeredShortcuts[key]
       })
     }
@@ -49,7 +49,7 @@ export default () =>
         .map(({ key }: Key) => key)
         .join('+')
 
-      gkl.addListener(toggleMessengerWindowListener)
+      gkl?.addListener(toggleMessengerWindowListener)
       globalShortcut.register(keybinding, multiKeysKeybindings.toggleMessengerWindow)
       registeredShortcuts.toggleMessengerWindow = keybinding
     }
@@ -65,7 +65,7 @@ export default () =>
             ipcMain.sendTo('speech-worker', 'say', purify(payload))
           }
         })
-        gkl.addListener(registeredCallbacks[message.id])
+        gkl?.addListener(registeredCallbacks[message.id])
       })
       // messagesStore.shortcutMessages.forEach((message) => {
       //   const keybinding = message.shortcut.map(({ key }: Key) => key).join('+')

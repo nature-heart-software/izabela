@@ -1,6 +1,6 @@
 import { ExtractPropTypes, PropType } from 'vue'
 import tokens from '@/styles/tokens'
-import { ComputePositionConfig } from '@floating-ui/dom'
+import { ComputePositionConfig } from '@floating-ui/vue'
 
 export const sizeValues = ['sm', 'md', 'lg'] as const
 export type Size = typeof sizeValues[number]
