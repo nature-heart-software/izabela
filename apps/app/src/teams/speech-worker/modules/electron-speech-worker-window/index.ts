@@ -69,7 +69,7 @@ export const ElectronSpeechWindow = () => {
     }
   }
   const addEventListeners = () => {
-    gkl.addListener((e) => {
+    gkl?.addListener((e) => {
       if (
         settingsStore &&
         e.state === 'DOWN' &&
@@ -81,7 +81,7 @@ export const ElectronSpeechWindow = () => {
       }
     })
 
-    gkl.addListener((e) => {
+    gkl?.addListener((e) => {
       if (
         settingsStore &&
         e.state === 'UP' &&
