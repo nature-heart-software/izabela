@@ -1,7 +1,7 @@
 <template>
   <template v-if="settingsStore.$isReady">
-    <SpeechSynthesizer />
-    <SpeechListener :key="speechListenerKey" />
+    <SpeechSynthesizer/>
+    <SpeechListener :key="speechListenerKey"/>
   </template>
 </template>
 <style lang="scss">
@@ -26,8 +26,8 @@ const speechListenerKey = computed(() =>
     settingsStore.audioInputSensibility,
     settingsStore.speechPrerecordTime,
     settingsStore.speechPostrecordTime,
-    settingsStore.automaticSpeechDetection,
     settingsStore.enableSTTTS,
+    settingsStore.speechRecognitionStrategy,
   ]),
 )
 </script>

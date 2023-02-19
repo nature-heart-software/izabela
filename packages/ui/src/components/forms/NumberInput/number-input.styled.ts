@@ -3,11 +3,7 @@ import styled from 'vue3-styled-components'
 import tokens from '@/styles/tokens'
 import { props, Props, Size } from './number-input.shared'
 import { CSSObject } from '@/types/css-in-js'
-import {
-  borderRadiusStyleBySize,
-  fontSizeStyle,
-  horizontalPaddingStyleBySize,
-} from '@/utils/css-in-js'
+import { borderRadiusStyleBySize, fontSizeStyle, horizontalPaddingStyleBySize } from '@/utils/css-in-js'
 import { rem } from 'polished'
 
 const { fontSize, spacing, borderRadius, borderWidth, colors, transition } =
@@ -39,6 +35,7 @@ const styleBySize = ({ size }: Props) => {
 }
 export const StNumberInput = styled('div', props)`
   display: inline-flex;
+  width: min-content;
 
   & > * {
     width: 100%;
@@ -54,7 +51,8 @@ export const StNumberInput = styled('div', props)`
       outline: 0;
       border-color: ${() => colors.gray['20']};
       transition: ${() => transition.DEFAULT};
-      width: ${() => rem(80)};
+      min-width: ${() => rem(80)};
+      width: 100%;
 
       &:hover {
         border-color: ${() => colors.gray['30']};

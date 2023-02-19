@@ -22,9 +22,14 @@ let mediaRecorder: MediaRecorder | null = null
 const { ElectronSpeechWorkerWindow } = window
 const settingsStore = useSettingsStore()
 const mediaDevice = await getMediaDeviceByLabel(settingsStore.audioInput)
-const realTime = settingsStore.automaticSpeechDetection
+const realTime = settingsStore.speechRecognitionStrategy === 'continuous-web'
 const sampleRate = 48000
 if (settingsStore.enableSTTTS) {
+  if (realTime) {
+    console.log('Starting web speech recognition...')
+  } else {
+    console.log('Starting push-to-record speech recognition...')
+  }
   stream = await navigator.mediaDevices.getUserMedia({
     audio: {
       deviceId: mediaDevice?.deviceId,
@@ -113,14 +118,14 @@ function startRecording() {
 // TODO: The listeners below are not removed on unmount, gotta fix that
 onIPCStartSpeechTranscription(() => {
   if (!realTime && mediaRecorder) {
-    console.log(`[${getTime()}] Starting web recording`)
+    console.log(`[${ getTime() }] Starting web recording`)
     mediaRecorder.start()
   }
 })
 
 onIPCStopSpeechTranscription(() => {
   if (!realTime && mediaRecorder) {
-    console.log(`[${getTime()}] Stopping web recording`)
+    console.log(`[${ getTime() }] Stopping web recording`)
     mediaRecorder.stop()
   }
 })
@@ -144,6 +149,10 @@ onBeforeUnmount(() => {
   })
   speech?.stop()
   mediaRecorder = null
-  console.log('Reloading Speech listener')
+  if (realTime) {
+    console.log('Stopping web speech recognition...')
+  } else {
+    console.log('Stopping push-to-record speech recognition...')
+  }
 })
 </script>
