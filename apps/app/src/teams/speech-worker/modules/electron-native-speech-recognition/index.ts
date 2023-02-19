@@ -131,7 +131,7 @@ export default () => {
   const rec = recorder.record({
     sampleRateHertz,
     recordProgram: 'rec',
-    binPath: path.join(EXTERNALS_DIR, 'sox/sox.exe'),
+    binPath: path.join(EXTERNALS_DIR, '/sox/sox.exe'),
     device: settingsStore.soxDevice,
   })
 
