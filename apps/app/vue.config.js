@@ -102,8 +102,8 @@ module.exports = defineConfig({
         artifactName: '${name}-setup-${version}-${os}.${ext}',
         publish: ['github'],
         electronVersion: getElectronVersion(),
+        extraFiles: ['./resources/**'],
       },
-      extraResources: ['./resources/**'],
     },
   },
 })
