@@ -53,7 +53,7 @@
 import { computed, defineProps, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import { StAutocomplete } from './autocomplete.styled'
 import { defaultWidth, props as propsDefinition } from './autocomplete.shared'
-import { autoUpdate, computePosition, flip, offset, shift } from '@floating-ui/dom'
+import { autoUpdate, computePosition, flip, offset, shift } from '@floating-ui/vue'
 import { rem } from 'polished'
 import tokens from '@/styles/tokens'
 import { onKeyStroke, useElementSize } from '@vueuse/core'

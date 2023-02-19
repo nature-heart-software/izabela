@@ -26,6 +26,7 @@ export { default as NvVirtualList } from './miscellaneous/VirtualList/NvVirtualL
 export { default as NvVirtualListContainer } from './miscellaneous/VirtualList/NvVirtualListContainer.vue'
 export { default as NvContextMenu } from './overlay/ContextMenu/NvContextMenu.vue'
 export { default as NvPopover } from './overlay/Popover/NvPopover.vue'
+export { default as NvTooltip } from './overlay/Tooltip/NvTooltip.vue'
 export { default as NvIcon } from './typography/Icon/NvIcon.vue'
 export { default as NvText } from './typography/Text/NvText.vue'
 /* End of auto-generated content. */

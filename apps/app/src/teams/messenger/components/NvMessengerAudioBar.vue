@@ -1,33 +1,48 @@
 <template>
   <NvCard size="sm">
     <NvGroup noWrap>
-      <NvButton
-        :type="
+      <NvTooltip>
+        <NvText>Speech settings</NvText>
+        <template #reference>
+          <NvButton
+            :type="
           route.name === 'settings-engine' && messengerContext.isViewShown.value
             ? 'plain'
             : 'default'
         "
-        icon-name="users-alt"
-        size="sm"
-        @click="messengerContext.navigateTo({ name: 'settings-engine' })"
-      />
+            icon-name="users-alt"
+            size="sm"
+            @click="messengerContext.navigateTo({ name: 'settings-engine' })"
+          />
+        </template>
+      </NvTooltip>
       <NvDivider class="h-3" direction="vertical"/>
-      <SpeechEngineSelect
-        :modelValue="speechStore.selectedSpeechEngine"
-        class="w-13"
-        icon-name="direction"
-        placeholder="Speech Engine"
-        size="sm"
-        @update:modelValue="(value) => settingsStore.$patch({ selectedSpeechEngine: value })"
-      />
+      <NvTooltip>
+        <NvText>Speech engine</NvText>
+        <template #reference>
+          <SpeechEngineSelect
+            :modelValue="speechStore.selectedSpeechEngine"
+            class="w-13"
+            icon-name="direction"
+            placeholder="Speech Engine"
+            size="sm"
+            @update:modelValue="(value) => settingsStore.$patch({ selectedSpeechEngine: value })"
+          />
+        </template>
+      </NvTooltip>
       <template v-if="speechStore.currentSpeechEngine">
-        <component
-          :is="speechStore.currentSpeechEngine.voiceSelectComponent"
-          v-if="speechStore.currentSpeechEngine.voiceSelectComponent"
-          class="w-13"
-          placeholder="Speech Voice"
-          size="sm"
-        />
+        <NvTooltip>
+          <NvText>Speech engine voice</NvText>
+          <template #reference>
+            <component
+              :is="speechStore.currentSpeechEngine.voiceSelectComponent"
+              v-if="speechStore.currentSpeechEngine.voiceSelectComponent"
+              class="w-13"
+              placeholder="Speech Voice"
+              size="sm"
+            />
+          </template>
+        </NvTooltip>
       </template>
       <NvDivider class="h-3" direction="vertical"/>
       <NvPopover :tippy-options="{ placement: 'top-start' }" size="sm">
@@ -52,12 +67,17 @@
           </NvStack>
         </div>
         <template #reference>
-          <NvButton icon-name="direction" size="sm"
-          >Outputs ({{
-              settingsStore.audioOutputs.length +
-              (settingsStore.playSpeechOnDefaultPlaybackDevice ? 1 : 0)
-            }})
-          </NvButton>
+          <NvTooltip>
+            <NvText>Audio outputs</NvText>
+            <template #reference>
+              <NvButton icon-name="direction" size="sm"
+              >Outputs ({{
+                  settingsStore.audioOutputs.length +
+                  (settingsStore.playSpeechOnDefaultPlaybackDevice ? 1 : 0)
+                }})
+              </NvButton>
+            </template>
+          </NvTooltip>
         </template>
       </NvPopover>
       <NvPopover :tippy-options="{ placement: 'top-start' }" size="sm">
@@ -92,7 +112,12 @@
           </NvStack>
         </div>
         <template #reference>
-          <NvButton icon-name="direction" size="sm">Input</NvButton>
+          <NvTooltip>
+            <NvText>Audio input</NvText>
+            <template #reference>
+              <NvButton icon-name="direction" size="sm">Input</NvButton>
+            </template>
+          </NvTooltip>
         </template>
       </NvPopover>
     </NvGroup>
@@ -109,6 +134,7 @@ import {
   NvStack,
   NvSwitch,
   NvText,
+  NvTooltip,
 } from '@packages/ui'
 import { useSpeechStore } from '@/features/speech/store'
 import { useSettingsStore } from '@/features/settings/store'

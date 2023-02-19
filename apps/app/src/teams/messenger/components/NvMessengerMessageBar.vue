@@ -1,36 +1,53 @@
 <template>
   <NvCard size="sm">
     <NvGroup noWrap>
-      <NvButton
-        :type="settingsStore.messageMode === 'sentence' && 'plain'"
-        size="sm"
-        @click="settingsStore.$patch({ messageMode: 'sentence' })"
-      >Sentence
-      </NvButton>
-      <NvButton
-        :type="settingsStore.messageMode === 'word' && 'plain'"
-        size="sm"
-        @click="settingsStore.$patch({ messageMode: 'word' })"
-      >Word
-      </NvButton>
+      <NvTooltip>
+        <NvText>Message mode</NvText>
+        <template #reference>
+          <NvGroup noWrap>
+            <NvButton
+              :type="settingsStore.messageMode === 'sentence' && 'plain'"
+              size="sm"
+              @click="settingsStore.$patch({ messageMode: 'sentence' })"
+            >Sentence
+            </NvButton>
+            <NvButton
+              :type="settingsStore.messageMode === 'word' && 'plain'"
+              size="sm"
+              @click="settingsStore.$patch({ messageMode: 'word' })"
+            >Word
+            </NvButton>
+          </NvGroup>
+        </template>
+      </NvTooltip>
       <NvDivider class="h-3" direction="vertical"/>
-      <NvButton
-        :type="route.name === 'messages-shortcuts' && messengerContext.isViewShown.value  ?  'plain'  :  'default'"
-        icon-name="keyboard-alt"
-        size="sm"
-        @click="messengerContext.navigateTo({ name: 'messages-shortcuts' })"
-      />
-      <NvButton
-        :type="route.name === 'messages-history' && messengerContext.isViewShown.value  ?  'plain'  :  'default'"
-        icon-name="history"
-        size="sm"
-        @click="messengerContext.navigateTo({ name: 'messages-history' })"
-      />
+      <NvTooltip>
+        <NvText>Message shortcuts</NvText>
+        <template #reference>
+          <NvButton
+            :type="route.name === 'messages-shortcuts' && messengerContext.isViewShown.value  ?  'plain'  :  'default'"
+            icon-name="keyboard-alt"
+            size="sm"
+            @click="messengerContext.navigateTo({ name: 'messages-shortcuts' })"
+          />
+        </template>
+      </NvTooltip>
+      <NvTooltip>
+        <NvText>Message history</NvText>
+        <template #reference>
+          <NvButton
+            :type="route.name === 'messages-history' && messengerContext.isViewShown.value  ?  'plain'  :  'default'"
+            icon-name="history"
+            size="sm"
+            @click="messengerContext.navigateTo({ name: 'messages-history' })"
+          />
+        </template>
+      </NvTooltip>
     </NvGroup>
   </NvCard>
 </template>
 <script lang="ts" setup>
-import { NvButton, NvCard, NvDivider, NvGroup } from '@packages/ui'
+import { NvButton, NvCard, NvDivider, NvGroup, NvText, NvTooltip } from '@packages/ui'
 import { useSettingsStore } from '@/features/settings/store'
 import { inject } from 'vue'
 import { useRoute } from 'vue-router'
