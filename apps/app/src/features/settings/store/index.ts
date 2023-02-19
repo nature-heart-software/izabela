@@ -40,7 +40,7 @@ export const useSettingsStore = defineStore(
     const speechPrerecordTime = ref(300)
     const speechPostrecordTime = ref(100)
     const enableSTTTS = ref(false)
-    const speechRecognitionStrategy = ref<'continuous-node' | 'continuous-web' | 'ptr'>('ptr')
+    const speechRecognitionStrategy = ref<'continuous-native' | 'continuous-web' | 'ptr'>('ptr')
     const keybindings = ref<Record<string, Key[]>>({
       recordAudio: [
         {

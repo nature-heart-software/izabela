@@ -100,7 +100,7 @@ export const ElectronSpeechWindow = () => {
     }
     if (
       settingsStore?.enableSTTTS &&
-      settingsStore.speechRecognitionStrategy === 'continuous-node'
+      settingsStore.speechRecognitionStrategy === 'continuous-native'
     ) {
       electronNativeSpeechRecognitionCallback = electronNativeSpeechRecognition()
     }

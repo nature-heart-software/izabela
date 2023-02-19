@@ -52,14 +52,7 @@
           <NvText type="label">
             Speech recognition strategy
           </NvText>
-          <NvSelect :modelValue="settingsStore.speechRecognitionStrategy"
-                    :options="[
-              { label: 'Automatic (Native)', value: 'continuous-node' },
-              { label: 'Automatic (Web)', value: 'continuous-web' },
-              { label: 'Push-to-record', value: 'ptr' },
-            ]"
-                    @update:modelValue="(value) => settingsStore.$patch({ speechRecognitionStrategy: value })"
-          />
+          <NvSpeechRecognitionStrategySelect/>
         </NvGroup>
         <template
           v-if="['continuous-web', 'ptr'].includes(settingsStore.speechRecognitionStrategy)">
@@ -127,7 +120,7 @@
           </template>
         </template>
       </NvStack>
-      <template v-if="settingsStore.speechRecognitionStrategy === 'continuous-node'">
+      <template v-if="settingsStore.speechRecognitionStrategy === 'continuous-native'">
         <NvDivider direction="horizontal"/>
         <NvGroup align="start" justify="apart" no-wrap spacing="5">
           <NvStack>
@@ -196,7 +189,6 @@ import {
   NvGroup,
   NvIcon,
   NvNumberInput,
-  NvSelect,
   NvStack,
   NvSwitch,
   NvText,
@@ -209,6 +201,8 @@ import {
 } from '@/features/settings/hooks'
 import NvAudioInputSelect from '@/features/audio/components/inputs/NvAudioInputSelect.vue'
 import { useSettingsStore } from '@/features/settings/store'
+import NvSpeechRecognitionStrategySelect
+  from '@/features/speech/components/inputs/NvSpeechRecognitionStrategySelect.vue'
 
 const settingsStore = useSettingsStore()
 
