@@ -22,7 +22,7 @@ onIPCSay(async (payload: string | IzabelaMessage) => {
     const translatedMessage = settingsStore.enableTranslation ? await ElectronTranslation.translate(cleanMessage, {
       from: settingsStore.textInputLanguage || undefined,
       to: settingsStore.textOutputLanguage,
-    }) : cleanMessage
+    }) : null
     console.log('Translated message:', translatedMessage)
     message = {
       voice,
@@ -33,7 +33,11 @@ onIPCSay(async (payload: string | IzabelaMessage) => {
       translatedTo: settingsStore.textOutputLanguage,
       engine: engine.id,
       credentials: engine.getCredentials(),
-      payload: engine.getPayload(cleanMessage, voice),
+      payload: engine.getPayload({
+        voice,
+        translatedText: translatedMessage,
+        text: cleanMessage,
+      }),
       command: getMessageCommand(payload),
     }
   } else {
@@ -45,7 +49,11 @@ onIPCSay(async (payload: string | IzabelaMessage) => {
     message = {
       ...payload,
       credentials: engine.getCredentials(),
-      payload: engine.getPayload(cleanMessage, voice),
+      payload: engine.getPayload({
+        voice,
+        translatedText: payload.translatedMessage,
+        text: cleanMessage,
+      }),
     }
   }
   if (message) izabela.say(message)

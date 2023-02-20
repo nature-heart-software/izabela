@@ -22,9 +22,9 @@ registerEngine({
     const speechStore = useSpeechStore()
     return speechStore.hasUniversalApiCredentials || Object.values(getCredentials()).every(Boolean)
   },
-  getPayload(text, voice) {
+  getPayload({ text, translatedText, voice }) {
     return {
-      speech: text,
+      speech: translatedText || text,
       voicemodel_uuid: (voice || getSelectedVoice()).voicemodel_uuid,
     }
   },
