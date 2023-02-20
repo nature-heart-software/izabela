@@ -50,6 +50,18 @@
         <NvDivider direction="horizontal"/>
         <NvGroup justify="apart" no-wrap>
           <NvText type="label">
+            Speech recognition language
+          </NvText>
+          <NvSelect
+            :modelValue="settingsStore.speechInputLanguage"
+            :options="bcp47codes.map(({languageCode, name}) => ({ label: name, value: languageCode }))"
+            @update:modelValue="
+              (value) => settingsStore.$patch({ speechInputLanguage: value })
+            "/>
+        </NvGroup>
+        <NvDivider direction="horizontal"/>
+        <NvGroup justify="apart" no-wrap>
+          <NvText type="label">
             Speech recognition strategy
           </NvText>
           <NvSpeechRecognitionStrategySelect/>
@@ -189,6 +201,7 @@ import {
   NvGroup,
   NvIcon,
   NvNumberInput,
+  NvSelect,
   NvStack,
   NvSwitch,
   NvText,
@@ -203,6 +216,7 @@ import NvAudioInputSelect from '@/features/audio/components/inputs/NvAudioInputS
 import { useSettingsStore } from '@/features/settings/store'
 import NvSpeechRecognitionStrategySelect
   from '@/features/speech/components/inputs/NvSpeechRecognitionStrategySelect.vue'
+import bcp47codes from '@/data/bcp-47-codes.json'
 
 const settingsStore = useSettingsStore()
 

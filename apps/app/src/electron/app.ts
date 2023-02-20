@@ -69,6 +69,15 @@ const App = () => {
   }
 
   function addEventListeners() {
+    app.whenReady().then(() => {
+      const credentialsDirPath = path.join(app.getPath('userData'), 'credentials')
+      const googleCloudSpeechCredentialsFilePath = path.join(
+        credentialsDirPath,
+        'google-cloud-speech-credentials.json',
+      )
+      process.env.GOOGLE_APPLICATION_CREDENTIALS = googleCloudSpeechCredentialsFilePath
+    })
+
     app.on('ready', async () => {
       if (isDevelopment && !process.env.IS_TEST) {
         try {

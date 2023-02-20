@@ -85,6 +85,10 @@ const navigation = [
         to: { name: 'settings-audio' },
       },
       {
+        name: 'Translation',
+        to: { name: 'settings-translation' },
+      },
+      {
         name: 'Dictionary',
         to: { name: 'settings-dictionary' },
       },
