@@ -8,24 +8,24 @@
       >
         <!-- Top -->
         <NvGroup :spacing="4">
-          <NvMessengerLinksBar/>
+          <NvMessengerLinksBar />
           <NvGroup :spacing="4" class="!flex-1">
             <div class="moveable-handle cursor-all-scroll !flex-1">
-              <NvMessengerHandleBar/>
+              <NvMessengerHandleBar />
             </div>
-            <NvMessengerNavigationBar/>
+            <NvMessengerNavigationBar />
           </NvGroup>
         </NvGroup>
 
         <!-- Middle -->
         <NvGroup :spacing="4" justify="between">
-          <NvMessengerAudioBar/>
-          <NvMessengerMessageBar/>
+          <NvMessengerAudioBar />
+          <NvMessengerMessageBar />
         </NvGroup>
 
         <!-- Bottom -->
         <NvGroup :spacing="4" grow>
-          <NvMessengerInputBar/>
+          <NvMessengerInputBar />
         </NvGroup>
       </div>
     </NvHitbox>
@@ -169,12 +169,12 @@ onMounted(() => {
   const moveableTargetEl = (moveableTarget.value as ComponentPublicInstance)
     .$el as HTMLDivElement | null
   if (moveableTargetEl) {
-    if (props.width) moveableTargetEl.style.width = `${ props.width }px`
-    if (props.minWidth) moveableTargetEl.style.minWidth = `${ props.minWidth }px`
-    if (props.maxWidth) moveableTargetEl.style.maxWidth = `${ props.maxWidth }px`
-    if (props.height) moveableTargetEl.style.height = `${ props.height }px`
-    if (props.minHeight) moveableTargetEl.style.minHeight = `${ props.minHeight }px`
-    if (props.maxHeight) moveableTargetEl.style.maxHeight = `${ props.maxHeight }px`
+    if (props.width) moveableTargetEl.style.width = `${props.width}px`
+    if (props.minWidth) moveableTargetEl.style.minWidth = `${props.minWidth}px`
+    if (props.maxWidth) moveableTargetEl.style.maxWidth = `${props.maxWidth}px`
+    if (props.height) moveableTargetEl.style.height = `${props.height}px`
+    if (props.minHeight) moveableTargetEl.style.minHeight = `${props.minHeight}px`
+    if (props.maxHeight) moveableTargetEl.style.maxHeight = `${props.maxHeight}px`
     if (props.transform) moveableTargetEl.style.transform = props.transform
   }
   moveable.value.updateTarget()
@@ -187,8 +187,8 @@ onMounted(() => {
       moveable.value.request(
         'draggable',
         {
-          x: viewport.value.width / 2-width / 2,
-          y: viewport.value.height-height-60,
+          x: viewport.value.width / 2 - width / 2,
+          y: viewport.value.height - height - 60,
         },
         true,
       )

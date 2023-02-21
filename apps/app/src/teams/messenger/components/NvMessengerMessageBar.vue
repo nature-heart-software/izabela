@@ -9,18 +9,18 @@
               :type="settingsStore.messageMode === 'sentence' && 'plain'"
               size="sm"
               @click="settingsStore.$patch({ messageMode: 'sentence' })"
-            >Sentence
+              >Sentence
             </NvButton>
             <NvButton
               :type="settingsStore.messageMode === 'word' && 'plain'"
               size="sm"
               @click="settingsStore.$patch({ messageMode: 'word' })"
-            >Word
+              >Word
             </NvButton>
           </NvGroup>
         </template>
       </NvTooltip>
-      <NvDivider class="h-3" direction="vertical"/>
+      <NvDivider class="h-3" direction="vertical" />
       <NvPopover :tippy-options="{ placement: 'top-end' }" size="sm">
         <div class="w-screen max-w-full">
           <NvStack spacing="4">
@@ -36,15 +36,20 @@
             </NvGroup>
             <NvAccessBlocker
               :allowed="!!googleCloudSpeechCredentialsPath && settingsStore.enableTranslation"
-              :reason="settingsStore.enableTranslation ? 'Google Cloud Credentials required' : 'Translation needs to be enabled'">
+              :reason="
+                settingsStore.enableTranslation
+                  ? 'Google Cloud Credentials required'
+                  : 'Translation needs to be enabled'
+              "
+            >
               <NvStack spacing="4">
-                <NvDivider direction="horizontal"/>
+                <NvDivider direction="horizontal" />
                 <NvFormItem label="From">
-                  <NvTranslationFromSelect/>
+                  <NvTranslationFromSelect />
                 </NvFormItem>
-                <NvDivider direction="horizontal"/>
+                <NvDivider direction="horizontal" />
                 <NvFormItem label="To">
-                  <NvTranslationToSelect/>
+                  <NvTranslationToSelect />
                 </NvFormItem>
               </NvStack>
             </NvAccessBlocker>
@@ -54,7 +59,7 @@
           <NvTooltip>
             <NvText>Translation</NvText>
             <template #reference>
-              <NvButton data-v-step="translation-button" icon-name="english-to-chinese" size="sm"/>
+              <NvButton data-v-step="translation-button" icon-name="english-to-chinese" size="sm" />
             </template>
           </NvTooltip>
         </template>
@@ -63,7 +68,11 @@
         <NvText>Message shortcuts</NvText>
         <template #reference>
           <NvButton
-            :type="route.name === 'messages-shortcuts' && messengerContext.isViewShown.value  ?  'plain'  :  'default'"
+            :type="
+              route.name === 'messages-shortcuts' && messengerContext.isViewShown.value
+                ? 'plain'
+                : 'default'
+            "
             data-v-step="message-shortcuts-button"
             icon-name="keyboard-alt"
             size="sm"
@@ -75,7 +84,11 @@
         <NvText>Message history</NvText>
         <template #reference>
           <NvButton
-            :type="route.name === 'messages-history' && messengerContext.isViewShown.value  ?  'plain'  :  'default'"
+            :type="
+              route.name === 'messages-history' && messengerContext.isViewShown.value
+                ? 'plain'
+                : 'default'
+            "
             data-v-step="message-history-button"
             icon-name="history"
             size="sm"
@@ -103,10 +116,8 @@ import {
 import { useSettingsStore } from '@/features/settings/store'
 import { inject } from 'vue'
 import { useRoute } from 'vue-router'
-import NvTranslationFromSelect
-  from '@/features/translation/components/inputs/NvTranslationFromSelect.vue'
-import NvTranslationToSelect
-  from '@/features/translation/components/inputs/NvTranslationToSelect.vue'
+import NvTranslationFromSelect from '@/features/translation/components/inputs/NvTranslationFromSelect.vue'
+import NvTranslationToSelect from '@/features/translation/components/inputs/NvTranslationToSelect.vue'
 import { useGetGoogleCloudSpeechCredentialsPath } from '@/features/settings/hooks'
 
 const settingsStore = useSettingsStore()
