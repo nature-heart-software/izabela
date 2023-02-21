@@ -17,6 +17,7 @@ export const ElectronSpeechWindow = () => {
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
   let speechStore: ReturnType<typeof useSpeechStore> | undefined
   let deferredRecording: ReturnType<typeof Deferred> | null = null
+  // eslint-disable-next-line prefer-const
   let electronNativeSpeechRecognitionCallback: ReturnType<
     typeof electronNativeSpeechRecognition
   > | null = null
@@ -103,7 +104,7 @@ export const ElectronSpeechWindow = () => {
       settingsStore?.enableSTTTS &&
       settingsStore.speechRecognitionStrategy === 'continuous-native'
     ) {
-      electronNativeSpeechRecognitionCallback = electronNativeSpeechRecognition()
+      // electronNativeSpeechRecognitionCallback = electronNativeSpeechRecognition()
     }
   }
 
