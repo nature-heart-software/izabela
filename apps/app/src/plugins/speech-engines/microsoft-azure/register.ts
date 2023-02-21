@@ -51,8 +51,8 @@ registerEngine({
       voice: v || getSelectedVoice(),
     }
   },
-  getLanguageCode() {
-    return getSelectedVoice().Locale
+  getLanguageCode(voice) {
+    return (voice || getSelectedVoice()).Locale
   },
   synthesizeSpeech({ credentials, payload }) {
     return api(getProperty('useLocalCredentials') ? 'local' : 'remote').post<Blob>(

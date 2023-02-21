@@ -46,6 +46,9 @@ export const ElectronSpeechWindow = () => {
           encoding,
           sampleRateHertz: sampleRate,
           languageCode: settingsStore.speechInputLanguage,
+          enableAutomaticPunctuation: true,
+          model: 'latest_long',
+          useEnhanced: true,
         },
         audio: {
           content,

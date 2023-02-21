@@ -8,7 +8,7 @@ export interface IzabelaMessage {
   originalMessage: string
   translatedMessage: string | null
   translatedFrom: string | null
-  translatedTo: string
+  translatedTo: string | null
   command: string | null
   engine: SpeechEngine['id']
   voice: any

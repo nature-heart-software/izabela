@@ -2,8 +2,8 @@
 import { Writable } from 'stream'
 import recorder from 'node-record-lpcm16'
 import speech, { SpeechClient } from '@google-cloud/speech'
-import path from 'path'
-import { EXTERNALS_DIR } from '@/electron/utils'
+// import path from 'path'
+// import { EXTERNALS_DIR } from '@/electron/utils'
 import { ipcMain } from 'electron-postman'
 import { useSettingsStore } from '@/features/settings/store'
 
@@ -127,7 +127,7 @@ export default () => {
   const rec = recorder.record({
     sampleRateHertz,
     recordProgram: 'rec',
-    binPath: path.join(EXTERNALS_DIR, '/sox/sox.exe'),
+    // binPath: path.join(EXTERNALS_DIR, '/sox/sox.exe'),
     device: settingsStore.soxDevice,
   })
 

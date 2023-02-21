@@ -21,7 +21,7 @@ onIPCSay(async (payload: string | IzabelaMessage) => {
     const cleanMessage = getCleanMessage(payload, engineCommands)
     const translatedMessage = settingsStore.enableTranslation ? await ElectronTranslation.translate(cleanMessage, {
       from: settingsStore.textInputLanguage || undefined,
-      to: settingsStore.textOutputLanguage,
+      to: settingsStore.textOutputLanguage || engine.getLanguageCode(voice),
     }) : null
     console.log('Translated message:', translatedMessage)
     message = {

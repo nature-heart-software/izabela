@@ -64,7 +64,7 @@
               />
             </NvGroup>
             <NvDivider direction="horizontal"/>
-            <NvFormItem label="Audio Outputs">
+            <NvFormItem label="Audio outputs">
               <NvAudioOutputsSelect class="w-full"/>
             </NvFormItem>
           </NvStack>
@@ -90,28 +90,37 @@
               <NvStack>
                 <NvText type="label">Enable speech-to-text-to-speech</NvText>
               </NvStack>
-
               <NvSwitch
                 :modelValue="settingsStore.enableSTTTS"
                 class="shrink-0"
                 @update:modelValue="(value) => settingsStore.$patch({ enableSTTTS: value })"
               />
             </NvGroup>
-            <NvDivider direction="horizontal"/>
-            <NvFormItem label="Speech Recognition Strategy">
-              <NvSpeechRecognitionStrategySelect/>
-            </NvFormItem>
-            <NvDivider direction="horizontal"/>
-            <NvFormItem label="Audio Input">
-              <template
-                v-if="['continuous-web', 'ptr'].includes(settingsStore.speechRecognitionStrategy)">
-                <NvAudioInputsSelect class="w-full"/>
-              </template>
-              <template
-                v-if="['continuous-native'].includes(settingsStore.speechRecognitionStrategy)">
-                <NvSoxAudioInputSelect class="!w-full"/>
-              </template>
-            </NvFormItem>
+            <NvAccessBlocker
+              :allowed="!!googleCloudSpeechCredentialsPath && settingsStore.enableSTTTS"
+              :reason="settingsStore.enableSTTTS ? 'Google Cloud Credentials required' : 'STTTS needs to be enabled'">
+              <NvStack spacing="4">
+                <NvDivider direction="horizontal"/>
+                <NvFormItem label="Speech recognition language">
+                  <NvSpeechInputLanguageSelect/>
+                </NvFormItem>
+                <NvDivider direction="horizontal"/>
+                <NvFormItem label="Speech recognition strategy">
+                  <NvSpeechRecognitionStrategySelect/>
+                </NvFormItem>
+                <NvDivider direction="horizontal"/>
+                <NvFormItem label="Audio input">
+                  <template
+                    v-if="['continuous-web', 'ptr'].includes(settingsStore.speechRecognitionStrategy)">
+                    <NvAudioInputsSelect class="w-full"/>
+                  </template>
+                  <template
+                    v-if="['continuous-native'].includes(settingsStore.speechRecognitionStrategy)">
+                    <NvSoxAudioInputSelect class="!w-full"/>
+                  </template>
+                </NvFormItem>
+              </NvStack>
+            </NvAccessBlocker>
           </NvStack>
         </div>
         <template #reference>
@@ -128,6 +137,7 @@
 </template>
 <script lang="ts" setup>
 import {
+  NvAccessBlocker,
   NvButton,
   NvCard,
   NvDivider,
@@ -145,14 +155,17 @@ import SpeechEngineSelect from '@/features/speech/components/inputs/NvSpeechEngi
 import NvAudioOutputsSelect from '@/features/audio/components/inputs/NvAudioOutputsSelect.vue'
 import NvAudioInputsSelect from '@/features/audio/components/inputs/NvAudioInputSelect.vue'
 import NvSoxAudioInputSelect from '@/features/audio/components/inputs/NvSoxAudioInputSelect.vue'
-
+import NvSpeechInputLanguageSelect
+  from '@/features/speech/components/inputs/NvSpeechInputLanguageSelect.vue'
 import { inject } from 'vue'
 import { useRoute } from 'vue-router'
 import NvSpeechRecognitionStrategySelect
   from '@/features/speech/components/inputs/NvSpeechRecognitionStrategySelect.vue'
+import { useGetGoogleCloudSpeechCredentialsPath } from '@/features/settings/hooks'
 
 const speechStore = useSpeechStore()
 const settingsStore = useSettingsStore()
 const messengerContext = inject('messenger')
 const route = useRoute()
+const { data: googleCloudSpeechCredentialsPath } = useGetGoogleCloudSpeechCredentialsPath()
 </script>

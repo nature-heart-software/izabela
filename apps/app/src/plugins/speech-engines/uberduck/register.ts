@@ -1,6 +1,7 @@
 import { api } from '@/services'
 import { registerEngine } from '@/modules/speech-engine-manager'
 import { useSpeechStore } from '@/features/speech/store'
+import { DEFAULT_LANGUAGE_CODE } from '@/consts'
 import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
@@ -29,7 +30,7 @@ registerEngine({
     }
   },
   getLanguageCode() {
-    return getSelectedVoice().language
+    return DEFAULT_LANGUAGE_CODE
   },
   synthesizeSpeech({ credentials, payload }) {
     return api(getProperty('useLocalCredentials') ? 'local' : 'remote').post<Blob>(

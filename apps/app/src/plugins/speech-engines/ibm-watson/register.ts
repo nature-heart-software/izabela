@@ -28,8 +28,8 @@ registerEngine({
       voice: (voice || getSelectedVoice()).name,
     }
   },
-  getLanguageCode() {
-    return getSelectedVoice().language
+  getLanguageCode(voice) {
+    return (voice || getSelectedVoice()).language
   },
   synthesizeSpeech({ credentials, payload }) {
     return api(getProperty('useLocalCredentials') ? 'local' : 'remote').post<Blob>(
