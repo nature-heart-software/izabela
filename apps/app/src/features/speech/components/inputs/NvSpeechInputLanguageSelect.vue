@@ -3,10 +3,9 @@
     ref="select"
     :autocompleteWidth="width"
     :modelValue="settingsStore.speechInputLanguage"
-    :options="bcp47codes.map(({languageCode, name}) => ({ label: name, value: languageCode }))"
-    @update:modelValue="
-              (value) => settingsStore.$patch({ speechInputLanguage: value })
-            "/>
+    :options="bcp47codes.map(({ languageCode, name }) => ({ label: name, value: languageCode }))"
+    @update:modelValue="(value) => settingsStore.$patch({ speechInputLanguage: value })"
+  />
 </template>
 <script lang="ts" setup>
 import { NvSelect } from '@packages/ui'

@@ -19,10 +19,12 @@ onIPCSay(async (payload: string | IzabelaMessage) => {
     const voice = engine.getSelectedVoice()
     const engineCommands = engine.commands?.(voice) || []
     const cleanMessage = getCleanMessage(payload, engineCommands)
-    const translatedMessage = settingsStore.enableTranslation ? await ElectronTranslation.translate(cleanMessage, {
-      from: settingsStore.textInputLanguage || undefined,
-      to: settingsStore.textOutputLanguage || engine.getLanguageCode(voice),
-    }) : null
+    const translatedMessage = settingsStore.enableTranslation
+      ? await ElectronTranslation.translate(cleanMessage, {
+          from: settingsStore.textInputLanguage || undefined,
+          to: settingsStore.textOutputLanguage || engine.getLanguageCode(voice),
+        })
+      : null
     console.log('Translated message:', translatedMessage)
     message = {
       voice,

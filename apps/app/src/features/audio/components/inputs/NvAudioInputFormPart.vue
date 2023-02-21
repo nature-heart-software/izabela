@@ -11,40 +11,34 @@
         @update:modelValue="(value) => settingsStore.$patch({ enableSTTTS: value })"
       />
     </NvGroup>
-    <template
-      v-if="settingsStore.enableSTTTS"
-    >
+    <template v-if="settingsStore.enableSTTTS">
       <NvStack spacing="5">
-        <NvDivider direction="horizontal"/>
+        <NvDivider direction="horizontal" />
 
         <NvGoogleCloudCredentialsFormPart>
           Izabela uses Google Cloud Speech for speech recognition which requires Google Cloud
-          Credentials to
-          be imported
+          Credentials to be imported
         </NvGoogleCloudCredentialsFormPart>
         <template v-if="!!googleCloudSpeechCredentialsPath">
-          <NvDivider direction="horizontal"/>
+          <NvDivider direction="horizontal" />
           <NvGroup justify="apart" no-wrap>
-            <NvText type="label">
-              Speech recognition language
-            </NvText>
-            <NvSpeechInputLanguageSelect/>
+            <NvText type="label"> Speech recognition language </NvText>
+            <NvSpeechInputLanguageSelect />
           </NvGroup>
-          <NvDivider direction="horizontal"/>
+          <NvDivider direction="horizontal" />
           <NvGroup justify="apart" no-wrap>
-            <NvText type="label">
-              Speech recognition strategy
-            </NvText>
-            <NvSpeechRecognitionStrategySelect/>
+            <NvText type="label"> Speech recognition strategy </NvText>
+            <NvSpeechRecognitionStrategySelect />
           </NvGroup>
           <template
-            v-if="['continuous-web', 'ptr'].includes(settingsStore.speechRecognitionStrategy)">
-            <NvDivider direction="horizontal"/>
+            v-if="['continuous-web', 'ptr'].includes(settingsStore.speechRecognitionStrategy)"
+          >
+            <NvDivider direction="horizontal" />
             <NvFormItem label="Audio Input">
-              <NvAudioInputSelect/>
+              <NvAudioInputSelect />
             </NvFormItem>
             <template v-if="settingsStore.speechRecognitionStrategy === 'ptr'">
-              <NvDivider direction="horizontal"/>
+              <NvDivider direction="horizontal" />
               <NvGroup justify="apart" no-wrap spacing="5">
                 <NvStack>
                   <NvText type="label">Push-to-record Key</NvText>
@@ -54,13 +48,13 @@
                 <NvKeybinding
                   :modelValue="settingsStore.keybindings.recordAudio"
                   @update:modelValue="
-                  (value) => settingsStore.$patch({ keybindings: { recordAudio: value } })
-                "
+                    (value) => settingsStore.$patch({ keybindings: { recordAudio: value } })
+                  "
                 />
               </NvGroup>
             </template>
             <template v-if="settingsStore.speechRecognitionStrategy === 'continuous-web'">
-              <NvDivider direction="horizontal"/>
+              <NvDivider direction="horizontal" />
               <NvGroup justify="apart" no-wrap spacing="5">
                 <NvStack>
                   <NvText type="label">Activation threshold</NvText>
@@ -70,11 +64,11 @@
                 <NvNumberInput
                   :modelValue="settingsStore.audioInputSensibility"
                   @update:modelValue="
-                  (value) => settingsStore.$patch({ audioInputSensibility: value })
-                "
+                    (value) => settingsStore.$patch({ audioInputSensibility: value })
+                  "
                 />
               </NvGroup>
-              <NvDivider direction="horizontal"/>
+              <NvDivider direction="horizontal" />
               <NvGroup justify="apart" no-wrap spacing="5">
                 <NvStack>
                   <NvText type="label">Pre-recording time</NvText>
@@ -84,10 +78,12 @@
                 <NvNumberInput
                   :min="100"
                   :modelValue="settingsStore.speechPrerecordTime"
-                  @update:modelValue="(value) => settingsStore.$patch({ speechPrerecordTime: value })"
+                  @update:modelValue="
+                    (value) => settingsStore.$patch({ speechPrerecordTime: value })
+                  "
                 />
               </NvGroup>
-              <NvDivider direction="horizontal"/>
+              <NvDivider direction="horizontal" />
               <NvGroup justify="apart" no-wrap spacing="5">
                 <NvStack>
                   <NvText type="label">Post-recording time</NvText>
@@ -96,14 +92,14 @@
                 <NvNumberInput
                   :modelValue="settingsStore.speechPostrecordTime"
                   @update:modelValue="
-                  (value) => settingsStore.$patch({ speechPostrecordTime: value })
-                "
+                    (value) => settingsStore.$patch({ speechPostrecordTime: value })
+                  "
                 />
               </NvGroup>
             </template>
           </template>
           <template v-if="settingsStore.speechRecognitionStrategy === 'continuous-native'">
-            <NvDivider direction="horizontal"/>
+            <NvDivider direction="horizontal" />
             <NvGroup align="start" justify="apart" no-wrap spacing="5">
               <NvStack>
                 <NvText type="label">Recording device</NvText>
@@ -112,18 +108,17 @@
               <NvNumberInput
                 :min="0"
                 :modelValue="settingsStore.soxDevice"
-                @update:modelValue="
-                  (value) => settingsStore.$patch({ soxDevice: value })
-                "
+                @update:modelValue="(value) => settingsStore.$patch({ soxDevice: value })"
               />
             </NvGroup>
-            <NvDivider direction="horizontal"/>
+            <NvDivider direction="horizontal" />
             <NvGroup align="start" justify="apart" no-wrap spacing="5">
               <NvStack>
                 <NvText type="label">Restart speech recognition server</NvText>
                 <NvText>Restart speech recognition server if it stops working</NvText>
               </NvStack>
-              <NvButton @click="ElectronSpeechWorkerWindow.restartNativeSpeechRecognition()">Restart
+              <NvButton @click="ElectronSpeechWorkerWindow.restartNativeSpeechRecognition()"
+                >Restart
               </NvButton>
             </NvGroup>
             <!--        <NvGroup justify="apart" no-wrap spacing="5">-->
@@ -179,19 +174,15 @@ import {
 import NvKeybinding from '@/features/app/components/inputs/NvKeybinding.vue'
 import NvAudioInputSelect from '@/features/audio/components/inputs/NvAudioInputSelect.vue'
 import { useSettingsStore } from '@/features/settings/store'
-import NvSpeechRecognitionStrategySelect
-  from '@/features/speech/components/inputs/NvSpeechRecognitionStrategySelect.vue'
+import NvSpeechRecognitionStrategySelect from '@/features/speech/components/inputs/NvSpeechRecognitionStrategySelect.vue'
 
-import NvGoogleCloudCredentialsFormPart
-  from '@/features/settings/components/NvGoogleCloudCredentialsFormPart.vue'
+import NvGoogleCloudCredentialsFormPart from '@/features/settings/components/NvGoogleCloudCredentialsFormPart.vue'
 import { useGetGoogleCloudSpeechCredentialsPath } from '@/features/settings/hooks'
-import NvSpeechInputLanguageSelect
-  from '@/features/speech/components/inputs/NvSpeechInputLanguageSelect.vue'
+import NvSpeechInputLanguageSelect from '@/features/speech/components/inputs/NvSpeechInputLanguageSelect.vue'
 
 const settingsStore = useSettingsStore()
 
 const { ElectronSpeechWorkerWindow } = window
 
 const { data: googleCloudSpeechCredentialsPath } = useGetGoogleCloudSpeechCredentialsPath()
-
 </script>

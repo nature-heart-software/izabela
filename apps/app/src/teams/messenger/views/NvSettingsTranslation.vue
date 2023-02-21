@@ -25,13 +25,13 @@
                 />
               </NvGroup>
               <template v-if="settingsStore.enableTranslation">
-                <NvDivider direction="horizontal"/>
+                <NvDivider direction="horizontal" />
                 <NvGoogleCloudCredentialsFormPart>
-                  Izabela uses Google Cloud Translation AI for translation which requires
-                  Google Cloud Credentials to be imported
+                  Izabela uses Google Cloud Translation AI for translation which requires Google
+                  Cloud Credentials to be imported
                 </NvGoogleCloudCredentialsFormPart>
                 <template v-if="googleCloudSpeechCredentialsPath">
-                  <NvDivider direction="horizontal"/>
+                  <NvDivider direction="horizontal" />
                   <NvGroup justify="apart" no-wrap spacing="5">
                     <NvStack>
                       <NvText type="label">From</NvText>
@@ -40,10 +40,12 @@
                       :modelValue="settingsStore.textInputLanguage"
                       :options="options"
                       class="shrink-0"
-                      @update:modelValue="(value) => settingsStore.$patch({ textInputLanguage: value })"
+                      @update:modelValue="
+                        (value) => settingsStore.$patch({ textInputLanguage: value })
+                      "
                     />
                   </NvGroup>
-                  <NvDivider direction="horizontal"/>
+                  <NvDivider direction="horizontal" />
                   <NvGroup justify="apart" no-wrap spacing="5">
                     <NvStack>
                       <NvText type="label">To</NvText>
@@ -52,7 +54,9 @@
                       :modelValue="settingsStore.textOutputLanguage"
                       :options="options"
                       class="shrink-0"
-                      @update:modelValue="(value) => settingsStore.$patch({ textOutputLanguage: value })"
+                      @update:modelValue="
+                        (value) => settingsStore.$patch({ textOutputLanguage: value })
+                      "
                     />
                   </NvGroup>
                 </template>
@@ -70,8 +74,7 @@ import { useSettingsStore } from '@/features/settings/store'
 // eslint-disable-next-line camelcase
 import { getAll639_1, getName } from 'all-iso-language-codes'
 import { useGetGoogleCloudSpeechCredentialsPath } from '@/features/settings/hooks'
-import NvGoogleCloudCredentialsFormPart
-  from '@/features/settings/components/NvGoogleCloudCredentialsFormPart.vue'
+import NvGoogleCloudCredentialsFormPart from '@/features/settings/components/NvGoogleCloudCredentialsFormPart.vue'
 
 const settingsStore = useSettingsStore()
 const isoCodes = getAll639_1()
@@ -82,7 +85,6 @@ const options = [
   },
   ...isoCodes.map((code) => ({ label: getName(code, 'en'), value: code })),
 ]
-
 
 const { data: googleCloudSpeechCredentialsPath } = useGetGoogleCloudSpeechCredentialsPath()
 </script>

@@ -4,9 +4,8 @@
     :autocompleteWidth="width"
     :modelValue="settingsStore.textInputLanguage"
     :options="options"
-    @update:modelValue="
-              (value) => settingsStore.$patch({ textInputLanguage: value })
-            "/>
+    @update:modelValue="(value) => settingsStore.$patch({ textInputLanguage: value })"
+  />
 </template>
 <script lang="ts" setup>
 import { NvSelect } from '@packages/ui'

@@ -3,18 +3,15 @@
     <NvStack>
       <NvGroup>
         <NvText type="label">Google Cloud Credentials</NvText>
-        <NvText>
-          (required)
-        </NvText>
+        <NvText> (required) </NvText>
       </NvGroup>
-      <NvText
-      >
-        <slot/>
+      <NvText>
+        <slot />
       </NvText>
       <template v-if="googleCloudSpeechCredentialsPath">
         <NvText type="caption">
           <NvGroup>
-            <NvIcon name="check-circle" size="3"/>
+            <NvIcon name="check-circle" size="3" />
             <span>Credentials found</span>
           </NvGroup>
         </NvText>
@@ -22,7 +19,7 @@
       <template v-else>
         <NvText type="caption">
           <NvGroup>
-            <NvIcon name="exclamation-triangle" size="3"/>
+            <NvIcon name="exclamation-triangle" size="3" />
             <span>Credentials not found</span>
           </NvGroup>
         </NvText>

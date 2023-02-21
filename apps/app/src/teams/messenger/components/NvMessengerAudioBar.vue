@@ -6,10 +6,10 @@
         <template #reference>
           <NvButton
             :type="
-          route.name === 'settings-engine' && messengerContext.isViewShown.value
-            ? 'plain'
-            : 'default'
-        "
+              route.name === 'settings-engine' && messengerContext.isViewShown.value
+                ? 'plain'
+                : 'default'
+            "
             data-v-step="speech-settings-button"
             icon-name="users-alt"
             size="sm"
@@ -17,7 +17,7 @@
           />
         </template>
       </NvTooltip>
-      <NvDivider class="h-3" direction="vertical"/>
+      <NvDivider class="h-3" direction="vertical" />
       <NvTooltip>
         <NvText>Speech engine</NvText>
         <template #reference>
@@ -47,7 +47,7 @@
           </template>
         </NvTooltip>
       </template>
-      <NvDivider class="h-3" direction="vertical"/>
+      <NvDivider class="h-3" direction="vertical" />
       <NvPopover :tippy-options="{ placement: 'top-start' }" size="sm">
         <div class="w-screen max-w-full">
           <NvStack spacing="4">
@@ -63,9 +63,9 @@
                 "
               />
             </NvGroup>
-            <NvDivider direction="horizontal"/>
+            <NvDivider direction="horizontal" />
             <NvFormItem label="Audio outputs">
-              <NvAudioOutputsSelect class="w-full"/>
+              <NvAudioOutputsSelect class="w-full" />
             </NvFormItem>
           </NvStack>
         </div>
@@ -74,7 +74,7 @@
             <NvText>Audio outputs</NvText>
             <template #reference>
               <NvButton data-v-step="audio-outputs-select" icon-name="direction" size="sm"
-              >Outputs ({{
+                >Outputs ({{
                   settingsStore.audioOutputs.length +
                   (settingsStore.playSpeechOnDefaultPlaybackDevice ? 1 : 0)
                 }})
@@ -98,25 +98,34 @@
             </NvGroup>
             <NvAccessBlocker
               :allowed="!!googleCloudSpeechCredentialsPath && settingsStore.enableSTTTS"
-              :reason="settingsStore.enableSTTTS ? 'Google Cloud Credentials required' : 'STTTS needs to be enabled'">
+              :reason="
+                settingsStore.enableSTTTS
+                  ? 'Google Cloud Credentials required'
+                  : 'STTTS needs to be enabled'
+              "
+            >
               <NvStack spacing="4">
-                <NvDivider direction="horizontal"/>
+                <NvDivider direction="horizontal" />
                 <NvFormItem label="Speech recognition language">
-                  <NvSpeechInputLanguageSelect/>
+                  <NvSpeechInputLanguageSelect />
                 </NvFormItem>
-                <NvDivider direction="horizontal"/>
+                <NvDivider direction="horizontal" />
                 <NvFormItem label="Speech recognition strategy">
-                  <NvSpeechRecognitionStrategySelect/>
+                  <NvSpeechRecognitionStrategySelect />
                 </NvFormItem>
-                <NvDivider direction="horizontal"/>
+                <NvDivider direction="horizontal" />
                 <NvFormItem label="Audio input">
                   <template
-                    v-if="['continuous-web', 'ptr'].includes(settingsStore.speechRecognitionStrategy)">
-                    <NvAudioInputsSelect class="w-full"/>
+                    v-if="
+                      ['continuous-web', 'ptr'].includes(settingsStore.speechRecognitionStrategy)
+                    "
+                  >
+                    <NvAudioInputsSelect class="w-full" />
                   </template>
                   <template
-                    v-if="['continuous-native'].includes(settingsStore.speechRecognitionStrategy)">
-                    <NvSoxAudioInputSelect class="!w-full"/>
+                    v-if="['continuous-native'].includes(settingsStore.speechRecognitionStrategy)"
+                  >
+                    <NvSoxAudioInputSelect class="!w-full" />
                   </template>
                 </NvFormItem>
               </NvStack>
@@ -127,7 +136,8 @@
           <NvTooltip>
             <NvText>Audio input</NvText>
             <template #reference>
-              <NvButton data-v-step="audio-input-select" icon-name="direction" size="sm">Input
+              <NvButton data-v-step="audio-input-select" icon-name="direction" size="sm"
+                >Input
               </NvButton>
             </template>
           </NvTooltip>
@@ -156,12 +166,10 @@ import SpeechEngineSelect from '@/features/speech/components/inputs/NvSpeechEngi
 import NvAudioOutputsSelect from '@/features/audio/components/inputs/NvAudioOutputsSelect.vue'
 import NvAudioInputsSelect from '@/features/audio/components/inputs/NvAudioInputSelect.vue'
 import NvSoxAudioInputSelect from '@/features/audio/components/inputs/NvSoxAudioInputSelect.vue'
-import NvSpeechInputLanguageSelect
-  from '@/features/speech/components/inputs/NvSpeechInputLanguageSelect.vue'
+import NvSpeechInputLanguageSelect from '@/features/speech/components/inputs/NvSpeechInputLanguageSelect.vue'
 import { inject } from 'vue'
 import { useRoute } from 'vue-router'
-import NvSpeechRecognitionStrategySelect
-  from '@/features/speech/components/inputs/NvSpeechRecognitionStrategySelect.vue'
+import NvSpeechRecognitionStrategySelect from '@/features/speech/components/inputs/NvSpeechRecognitionStrategySelect.vue'
 import { useGetGoogleCloudSpeechCredentialsPath } from '@/features/settings/hooks'
 
 const speechStore = useSpeechStore()
