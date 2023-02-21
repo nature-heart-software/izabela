@@ -8,7 +8,7 @@
         :placeholder="placeholder"
         :voice="speechStore.currentSpeechEngine?.getSelectedVoice()"
         class="w-full"
-        data-v-step="1"
+        data-v-step="messenger-text-input"
         size="lg"
         @blur="onInputBlur"
         @enter="onInputEnter"
@@ -16,7 +16,8 @@
         @focus="onInputFocus"
         @space="(e) => settingsStore.messageMode === 'word' && [playMessage(), e.preventDefault()]"
       />
-      <NvButton data-v-step="2" icon-name="message" size="lg" @click="playMessage()"/>
+      <NvButton data-v-step="messenger-text-input-submit" icon-name="message" size="lg"
+                @click="playMessage()"/>
     </NvGroup>
   </NvCard>
 </template>
