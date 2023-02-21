@@ -10,6 +10,7 @@ import NvMessagesShortcuts from '@/teams/messenger/views/NvMessagesShortcuts.vue
 import NvSettingsCommands from '@/teams/messenger/views/NvSettingsCommands.vue'
 import NvSettingsAbout from '@/teams/messenger/views/NvSettingsAbout.vue'
 import NvSettingsSupport from '@/teams/messenger/views/NvSettingsSupport.vue'
+import NvSettingsTranslation from '@/teams/messenger/views/NvSettingsTranslation.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -31,6 +32,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'settings-audio',
         path: 'audio',
         component: NvSettingsAudio,
+      },
+      {
+        name: 'settings-translation',
+        path: 'translation',
+        component: NvSettingsTranslation,
       },
       {
         name: 'settings-dictionary',

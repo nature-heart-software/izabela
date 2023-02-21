@@ -2,7 +2,6 @@
 import speech from '@google-cloud/speech'
 import { BrowserWindow } from 'electron'
 import { ipcMain } from 'electron-postman'
-import { DEFAULT_LANGUAGE_CODE } from '@/consts'
 import { createNotification } from '@/utils/electron-notification'
 import { useSpeechStore } from '@/features/speech/store'
 import { gkl, keybindingReleased, keybindingTriggered } from '@/modules/electron-keybinding/utils'
@@ -38,16 +37,18 @@ export const ElectronSpeechWindow = () => {
     sampleRate: number
     encoding: any
   }) => {
-    if (!speechStore) return
+    if (!settingsStore) return
     try {
       const client = new speech.SpeechClient()
-      const engine = speechStore.currentSpeechEngine
 
       const request = {
         config: {
           encoding,
           sampleRateHertz: sampleRate,
-          languageCode: engine?.getLanguageCode() || DEFAULT_LANGUAGE_CODE,
+          languageCode: settingsStore.speechInputLanguage,
+          enableAutomaticPunctuation: true,
+          model: 'latest_long',
+          useEnhanced: true,
         },
         audio: {
           content,
@@ -117,6 +118,7 @@ export const ElectronSpeechWindow = () => {
         settingsStore?.soxDevice,
         settingsStore?.enableSTTTS,
         settingsStore?.speechRecognitionStrategy,
+        settingsStore?.speechInputLanguage,
         speechStore?.currentSpeechEngine,
       ],
       restartNativeSpeechRecognition,

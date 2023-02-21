@@ -20,10 +20,10 @@ registerEngine({
   getCredentials() {
     return {}
   },
-  getPayload(text, v) {
+  getPayload({ text, translatedText, voice: v }) {
     const voice = v || getSelectedVoice()
     return {
-      text,
+      text: translatedText || text,
       voice,
     }
   },

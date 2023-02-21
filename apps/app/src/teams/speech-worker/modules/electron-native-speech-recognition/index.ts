@@ -2,21 +2,17 @@
 import { Writable } from 'stream'
 import recorder from 'node-record-lpcm16'
 import speech, { SpeechClient } from '@google-cloud/speech'
-import path from 'path'
-import { EXTERNALS_DIR } from '@/electron/utils'
+// import path from 'path'
+// import { EXTERNALS_DIR } from '@/electron/utils'
 import { ipcMain } from 'electron-postman'
-import { DEFAULT_LANGUAGE_CODE } from '@/consts'
-import { useSpeechStore } from '@/features/speech/store'
 import { useSettingsStore } from '@/features/settings/store'
 
 export default () => {
   console.log('Starting native speech recognition...')
   const settingsStore = useSettingsStore()
-  const speechStore = useSpeechStore()
-  const engine = speechStore.currentSpeechEngine
   const encoding = 'LINEAR16'
   const sampleRateHertz = 16000
-  const languageCode = engine?.getLanguageCode() || DEFAULT_LANGUAGE_CODE
+  const languageCode = settingsStore.speechInputLanguage
   const streamingLimit = 290000 // ms - set to low number for demo purposes
 
   const client = new speech.v1p1beta1.SpeechClient()
@@ -131,7 +127,7 @@ export default () => {
   const rec = recorder.record({
     sampleRateHertz,
     recordProgram: 'rec',
-    binPath: path.join(EXTERNALS_DIR, '/sox/sox.exe'),
+    // binPath: path.join(EXTERNALS_DIR, '/sox/sox.exe'),
     device: settingsStore.soxDevice,
   })
 

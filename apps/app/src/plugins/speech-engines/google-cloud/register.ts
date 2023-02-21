@@ -22,14 +22,14 @@ registerEngine({
     const speechStore = useSpeechStore()
     return speechStore.hasUniversalApiCredentials || Object.values(getCredentials()).every(Boolean)
   },
-  getPayload(text, v) {
+  getPayload({ text, translatedText, voice: v }) {
     const selectedVoice = getSelectedVoice()
     const voice: any = pick(v || selectedVoice, ['name', 'ssmlGender', 'languageCode'])
     // eslint-disable-next-line prefer-destructuring
     voice.languageCode = selectedVoice.languageCodes[0]
     return {
       input: {
-        text,
+        text: translatedText || text,
       },
       voice,
       audioConfig: {
@@ -38,8 +38,8 @@ registerEngine({
       },
     }
   },
-  getLanguageCode() {
-    return getSelectedVoice().languageCodes[0]
+  getLanguageCode(voice) {
+    return (voice || getSelectedVoice()).languageCodes[0]
   },
   synthesizeSpeech({ credentials, payload }) {
     return api(getProperty('useLocalCredentials') ? 'local' : 'remote').post<Blob>(
