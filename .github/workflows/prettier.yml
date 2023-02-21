@@ -22,7 +22,7 @@ jobs:
           persist-credentials: false
 
       - name: Prettify code
-        uses: creyD/prettier_action@v4.1.1
+        uses: creyD/prettier_action@v4.3
         with:
           prettier_options: --write **/*.{js,jsx,ts,tsx,vue,html,css,scss,md,json,yml} --config .prettier.json
           commit_message: 'style: prettier formatting'

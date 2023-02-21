@@ -22,14 +22,14 @@ registerEngine({
     const speechStore = useSpeechStore()
     return speechStore.hasUniversalApiCredentials || Object.values(getCredentials()).every(Boolean)
   },
-  getPayload(text, voice) {
+  getPayload({ text, translatedText, voice }) {
     return {
-      text,
+      text: translatedText || text,
       voice: (voice || getSelectedVoice()).name,
     }
   },
-  getLanguageCode() {
-    return getSelectedVoice().language
+  getLanguageCode(voice) {
+    return (voice || getSelectedVoice()).language
   },
   synthesizeSpeech({ credentials, payload }) {
     return api(getProperty('useLocalCredentials') ? 'local' : 'remote').post<Blob>(

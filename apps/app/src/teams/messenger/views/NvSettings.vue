@@ -8,7 +8,7 @@
           <NvTooltip>
             <NvText>Close</NvText>
             <template #reference>
-              <NvButton icon-name="times" size="xs" type="plain" @click="$emit('close')"/>
+              <NvButton icon-name="times" size="xs" type="plain" @click="$emit('close')" />
             </template>
           </NvTooltip>
         </div>
@@ -33,7 +33,7 @@
                           class="w-full"
                           size="sm"
                           type="ghost-alt"
-                        >{{ entry.name }}
+                          >{{ entry.name }}
                         </NvButton>
                       </router-link>
                     </template>
@@ -48,7 +48,7 @@
               <router-view v-slot="{ Component }">
                 <Transition class="transition">
                   <div :key="Component" class="absolute inset-0 overflow-y-auto">
-                    <component :is="Component"/>
+                    <component :is="Component" />
                   </div>
                 </Transition>
               </router-view>
@@ -83,6 +83,10 @@ const navigation = [
       {
         name: 'Audio',
         to: { name: 'settings-audio' },
+      },
+      {
+        name: 'Translation',
+        to: { name: 'settings-translation' },
       },
       {
         name: 'Dictionary',

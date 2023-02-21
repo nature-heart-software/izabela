@@ -12,8 +12,11 @@ const SpeechEngineManager = () => {
     await dictionaryStore.$whenReady()
     return {
       ...speechEngine,
-      getPayload: (text, voice) =>
-        speechEngine.getPayload(dictionaryStore.translateText(text), voice),
+      getPayload: (options) =>
+        speechEngine.getPayload({
+          ...options,
+          text: dictionaryStore.translateText(options.text),
+        }),
     }
   }
 

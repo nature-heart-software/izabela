@@ -26,7 +26,7 @@ registerEngine({
     const speechStore = useSpeechStore()
     return speechStore.hasUniversalApiCredentials || Object.values(getCredentials()).every(Boolean)
   },
-  getPayload(text, v) {
+  getPayload({ text, translatedText, voice: v }) {
     const voice = v || getSelectedVoice()
     let newText = text
     let expression
@@ -39,16 +39,20 @@ registerEngine({
       }
     }
     const ssml = expression
-      ? `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US"><voice name="${voice.ShortName}"><mstts:express-as style="${expression}">${newText}</mstts:express-as></voice></speak>`
+      ? `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US"><voice name="${
+          voice.ShortName
+        }"><mstts:express-as style="${expression}">${
+          translatedText || newText
+        }</mstts:express-as></voice></speak>`
       : null
     return {
       ssml,
-      text: newText,
+      text: translatedText || newText,
       voice: v || getSelectedVoice(),
     }
   },
-  getLanguageCode() {
-    return getSelectedVoice().Locale
+  getLanguageCode(voice) {
+    return (voice || getSelectedVoice()).Locale
   },
   synthesizeSpeech({ credentials, payload }) {
     return api(getProperty('useLocalCredentials') ? 'local' : 'remote').post<Blob>(

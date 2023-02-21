@@ -1,7 +1,7 @@
 import { TippyOptions, useTippy } from 'vue-tippy'
 import { h, ref, Ref, unref } from 'vue'
 import { tokens } from '@packages/ui'
-import { RouterView } from 'vue-router'
+import { RouterView, useRouter } from 'vue-router'
 import { TippyHookInstance, TippyTarget } from '@/types/vue-tippy'
 
 export type UseRouterViewPopoverOptions = {
@@ -17,10 +17,15 @@ export const useRouterViewPopover = ({
   const update = () => {
     unref(popover.value?.tippy)?.popperInstance?.update()
   }
+  const router = useRouter()
   if (popoverTarget) {
     popover.value = useTippy(popoverTarget, {
       content: h(RouterView, {
-        onClose: () => popover.value?.hide(),
+        onClose: () => {
+          popover.value?.hide()
+          // forces refresh of pages when it's opened again
+          router.push({ path: '/' })
+        },
       }),
       trigger: 'click',
       interactive: true,

@@ -7,6 +7,7 @@ import electronKeybinding from '@/modules/electron-keybinding'
 import electronDisplay from '@/modules/electron-display'
 import electronResources from '@/modules/electron-resources'
 import electronSi from '@/modules/electron-si'
+import electronTranslation from '@/modules/electron-translation'
 
 export const bridgeModules = () =>
   bridge.register([
@@ -18,6 +19,7 @@ export const bridgeModules = () =>
     ['ElectronDisplay', () => electronDisplay],
     ['ElectronResources', () => electronResources],
     ['ElectronSI', () => electronSi],
+    ['ElectronTranslation', () => electronTranslation],
   ])
 
 declare global {
@@ -30,5 +32,6 @@ declare global {
     ElectronDisplay: typeof electronDisplay
     ElectronResources: typeof electronResources
     ElectronSI: typeof electronSi
+    ElectronTranslation: typeof electronTranslation
   }
 }

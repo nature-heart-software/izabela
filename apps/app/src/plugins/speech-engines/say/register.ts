@@ -15,9 +15,9 @@ registerEngine({
   getCredentials() {
     return {}
   },
-  getPayload(text, voice) {
+  getPayload({ text, translatedText, voice }) {
     return {
-      text,
+      text: translatedText || text,
       voice: voice || getSelectedVoice(),
     }
   },

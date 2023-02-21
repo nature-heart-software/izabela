@@ -5,9 +5,12 @@ import { onIPCSay } from '@/electron/events/renderer'
 import { useSpeechStore } from '@/features/speech/store'
 import { getEngineById } from '@/modules/speech-engine-manager'
 import { getCleanMessage, getMessageCommand } from '@/modules/izabela/utils'
+import { useSettingsStore } from '@/features/settings/store'
 
+const { ElectronTranslation } = window
 const speechStore = useSpeechStore()
-onIPCSay((payload: string | IzabelaMessage) => {
+const settingsStore = useSettingsStore()
+onIPCSay(async (payload: string | IzabelaMessage) => {
   console.log('Saying something:', payload)
   let message = null
   if (typeof payload === 'string') {
@@ -16,13 +19,27 @@ onIPCSay((payload: string | IzabelaMessage) => {
     const voice = engine.getSelectedVoice()
     const engineCommands = engine.commands?.(voice) || []
     const cleanMessage = getCleanMessage(payload, engineCommands)
+    const translatedMessage = settingsStore.enableTranslation
+      ? await ElectronTranslation.translate(cleanMessage, {
+          from: settingsStore.textInputLanguage || undefined,
+          to: settingsStore.textOutputLanguage || engine.getLanguageCode(voice),
+        })
+      : null
+    console.log('Translated message:', translatedMessage)
     message = {
       voice,
       message: cleanMessage,
       originalMessage: payload,
+      translatedMessage,
+      translatedFrom: settingsStore.textInputLanguage,
+      translatedTo: settingsStore.textOutputLanguage,
       engine: engine.id,
       credentials: engine.getCredentials(),
-      payload: engine.getPayload(cleanMessage, voice),
+      payload: engine.getPayload({
+        voice,
+        translatedText: translatedMessage,
+        text: cleanMessage,
+      }),
       command: getMessageCommand(payload),
     }
   } else {
@@ -34,7 +51,11 @@ onIPCSay((payload: string | IzabelaMessage) => {
     message = {
       ...payload,
       credentials: engine.getCredentials(),
-      payload: engine.getPayload(cleanMessage, voice),
+      payload: engine.getPayload({
+        voice,
+        translatedText: payload.translatedMessage,
+        text: cleanMessage,
+      }),
     }
   }
   if (message) izabela.say(message)
