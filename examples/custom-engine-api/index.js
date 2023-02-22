@@ -25,6 +25,7 @@ app.post('/list-voices', async (req, res) => {
         },
       },
     } = req
+    console.log(req.body)
     const voices = await new Promise((resolve, reject) => {
       say.getInstalledVoices((err, voices) => {
         if (err) return reject(err)
@@ -62,6 +63,7 @@ app.post('/synthesize-speech', async (req, res) => {
         },
       },
     } = req
+    console.log(req.body)
     const outputFile = path.join(__dirname, 'example.mp3')
     fs.mkdirSync(path.parse(outputFile).dir, { recursive: true })
     fs.writeFileSync(outputFile, '')
