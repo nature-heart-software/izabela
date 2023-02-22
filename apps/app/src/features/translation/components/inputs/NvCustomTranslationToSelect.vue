@@ -20,8 +20,11 @@ const settingsStore = useSettingsStore()
 const select = ref()
 const { width } = useElementSize(select)
 const { data, isFetching } = useGetCustomLanguagesQuery()
-const options = computed(() => data.value?.to.map((language) => ({
-  label: language.name,
-  value: language.id,
-})) || [])
+const options = computed(
+  () =>
+    data.value?.to.map((language) => ({
+      label: language.name,
+      value: language.id,
+    })) || [],
+)
 </script>

@@ -14,7 +14,7 @@
             <NvStack>
               <NvText>{{ message.originalMessage || id }}</NvText>
               <NvGroup v-if="message.translatedMessage" align="start" noWrap>
-                <NvIcon name="english-to-chinese" size="3"/>
+                <NvIcon name="english-to-chinese" size="3" />
                 <NvText>{{ message.translatedMessage || id }}</NvText>
               </NvGroup>
             </NvStack>
@@ -53,7 +53,7 @@
             },
           ]"
         >
-          <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm"/>
+          <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm" />
         </NvContextMenu>
       </NvGroup>
       <div v-if="isPlaying" class="h-2 relative bg-gray-10">
@@ -120,9 +120,9 @@ const downloadMessageLocally = async () => {
         reader.onload = () => {
           ElectronFilesystem.downloadMessagePrompt(
             completeMessage,
-            `${ formatedCreatedAt.value } - ${ engine.value?.name } - ${ engine.value?.getVoiceName(
+            `${formatedCreatedAt.value} - ${engine.value?.name} - ${engine.value?.getVoiceName(
               message.value?.voice,
-            ) } - ${ message.value?.message }`.replace(/([^a-z0-9\s-]+)/gi, '_'),
+            )} - ${message.value?.message}`.replace(/([^a-z0-9\s-]+)/gi, '_'),
             reader.result as string,
           ).finally(() => {
             downloading.value = false
@@ -138,9 +138,9 @@ const downloadMessageLocally = async () => {
 const playMessage = computed(() =>
   message.value
     ? {
-      ...message.value,
-      excludeFromHistory: true,
-    }
+        ...message.value,
+        excludeFromHistory: true,
+      }
     : undefined,
 )
 const { play, isPlaying, isLoading, progress } = usePlayMessage(playMessage)

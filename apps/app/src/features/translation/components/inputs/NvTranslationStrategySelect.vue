@@ -3,13 +3,16 @@
     ref="select"
     :autocompleteWidth="width"
     :modelValue="settingsStore.textTranslationStrategy"
-    :options="[{
-      label: 'Cloud Translation',
-      value: 'cloud-translation'
-    }, {
-      label: 'Custom',
-      value: 'custom'
-    }]"
+    :options="[
+      {
+        label: 'Cloud Translation',
+        value: 'cloud-translation',
+      },
+      {
+        label: 'Custom',
+        value: 'custom',
+      },
+    ]"
     class="shrink-0"
     @update:modelValue="(value) => settingsStore.$patch({ textTranslationStrategy: value })"
   />

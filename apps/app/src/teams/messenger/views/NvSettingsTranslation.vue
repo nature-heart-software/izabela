@@ -15,11 +15,11 @@
           <NvCard>
             <NvStack spacing="5">
               <NvGoogleCloudCredentialsFormPart>
-                Izabela uses Google Cloud Translation AI for translation which requires Google
-                Cloud Credentials to be imported
+                Izabela uses Google Cloud Translation AI for translation which requires Google Cloud
+                Credentials to be imported
               </NvGoogleCloudCredentialsFormPart>
               <template v-if="googleCloudSpeechCredentialsPath">
-                <NvDivider direction="horizontal"/>
+                <NvDivider direction="horizontal" />
                 <NvGroup justify="apart" no-wrap spacing="5">
                   <NvStack>
                     <NvText type="label">Enable translation</NvText>
@@ -27,19 +27,21 @@
                   <NvSwitch
                     :modelValue="settingsStore.enableTranslation"
                     class="shrink-0"
-                    @update:modelValue="(value) => settingsStore.$patch({ enableTranslation: value })"
+                    @update:modelValue="
+                      (value) => settingsStore.$patch({ enableTranslation: value })
+                    "
                   />
                 </NvGroup>
                 <template v-if="settingsStore.enableTranslation">
-                  <NvDivider direction="horizontal"/>
+                  <NvDivider direction="horizontal" />
                   <NvGroup justify="apart" no-wrap spacing="5">
                     <NvStack>
                       <NvText type="label">Translation strategy</NvText>
                     </NvStack>
-                    <NvTranslationStrategySelect/>
+                    <NvTranslationStrategySelect />
                   </NvGroup>
                   <template v-if="settingsStore.textTranslationStrategy === 'cloud-translation'">
-                    <NvDivider direction="horizontal"/>
+                    <NvDivider direction="horizontal" />
                     <NvGroup justify="apart" no-wrap spacing="5">
                       <NvStack>
                         <NvText type="label">From</NvText>
@@ -49,11 +51,11 @@
                         :options="options"
                         class="shrink-0"
                         @update:modelValue="
-                        (value) => settingsStore.$patch({ textInputLanguage: value })
-                      "
+                          (value) => settingsStore.$patch({ textInputLanguage: value })
+                        "
                       />
                     </NvGroup>
-                    <NvDivider direction="horizontal"/>
+                    <NvDivider direction="horizontal" />
                     <NvGroup justify="apart" no-wrap spacing="5">
                       <NvStack>
                         <NvText type="label">To</NvText>
@@ -63,13 +65,13 @@
                         :options="options"
                         class="shrink-0"
                         @update:modelValue="
-                        (value) => settingsStore.$patch({ textOutputLanguage: value })
-                      "
+                          (value) => settingsStore.$patch({ textOutputLanguage: value })
+                        "
                       />
                     </NvGroup>
                   </template>
                   <template v-if="settingsStore.textTranslationStrategy === 'custom'">
-                    <NvDivider direction="horizontal"/>
+                    <NvDivider direction="horizontal" />
                     <NvAccessBlocker
                       :allowed="!!settingsStore.customTextTranslationEndpoint"
                       reason="Endpoint and/or credentials required"
@@ -79,31 +81,34 @@
                           <NvStack>
                             <NvText type="label">From</NvText>
                           </NvStack>
-                          <NvCustomTranslationFromSelect/>
+                          <NvCustomTranslationFromSelect />
                         </NvGroup>
-                        <NvDivider direction="horizontal"/>
+                        <NvDivider direction="horizontal" />
                         <NvGroup justify="apart" no-wrap spacing="5">
                           <NvStack>
                             <NvText type="label">To</NvText>
                           </NvStack>
-                          <NvCustomTranslationToSelect/>
+                          <NvCustomTranslationToSelect />
                         </NvGroup>
                       </NvStack>
                     </NvAccessBlocker>
-                    <NvDivider direction="horizontal"/>
+                    <NvDivider direction="horizontal" />
                     <NvFormItem label="API Endpoint">
                       <NvInput
                         :modelValue="settingsStore.customTextTranslationEndpoint"
                         @update:modelValue="
-                        (value) => settingsStore.$patch({ customTextTranslationEndpoint: value })"
+                          (value) => settingsStore.$patch({ customTextTranslationEndpoint: value })
+                        "
                       />
                     </NvFormItem>
-                    <NvDivider direction="horizontal"/>
+                    <NvDivider direction="horizontal" />
                     <NvFormItem label="API Key">
                       <NvInput
                         :modelValue="decrypt(settingsStore.customTextTranslationApiKey)"
                         @update:modelValue="
-                        (value) => settingsStore.$patch({ customTextTranslationApiKey: encrypt(value) })"
+                          (value) =>
+                            settingsStore.$patch({ customTextTranslationApiKey: encrypt(value) })
+                        "
                       />
                     </NvFormItem>
                   </template>
@@ -133,20 +138,14 @@ import { useSettingsStore } from '@/features/settings/store'
 // eslint-disable-next-line camelcase
 import { getAll639_1, getName } from 'all-iso-language-codes'
 import { useGetGoogleCloudSpeechCredentialsPath } from '@/features/settings/hooks'
-import NvGoogleCloudCredentialsFormPart
-  from '@/features/settings/components/NvGoogleCloudCredentialsFormPart.vue'
-import NvCustomTranslationFromSelect
-  from '@/features/translation/components/inputs/NvCustomTranslationFromSelect.vue'
-import NvCustomTranslationToSelect
-  from '@/features/translation/components/inputs/NvCustomTranslationToSelect.vue'
+import NvGoogleCloudCredentialsFormPart from '@/features/settings/components/NvGoogleCloudCredentialsFormPart.vue'
+import NvCustomTranslationFromSelect from '@/features/translation/components/inputs/NvCustomTranslationFromSelect.vue'
+import NvCustomTranslationToSelect from '@/features/translation/components/inputs/NvCustomTranslationToSelect.vue'
 import { decrypt, encrypt } from '@/utils/security'
 import { useQueryClient } from 'vue-query'
 import { watch } from 'vue'
-import {
-  useGetCustomLanguagesQueryKey,
-} from '@/features/translation/hooks/useGetCustomLanguagesQuery'
-import NvTranslationStrategySelect
-  from '@/features/translation/components/inputs/NvTranslationStrategySelect.vue'
+import { useGetCustomLanguagesQueryKey } from '@/features/translation/hooks/useGetCustomLanguagesQuery'
+import NvTranslationStrategySelect from '@/features/translation/components/inputs/NvTranslationStrategySelect.vue'
 
 const settingsStore = useSettingsStore()
 const isoCodes = getAll639_1()
@@ -161,7 +160,11 @@ const options = [
 const { data: googleCloudSpeechCredentialsPath } = useGetGoogleCloudSpeechCredentialsPath()
 
 const queryClient = useQueryClient()
-watch(() => [settingsStore.customTextTranslationEndpoint, settingsStore.customTextTranslationApiKey], () => {
-  queryClient.invalidateQueries(useGetCustomLanguagesQueryKey())
-}, { deep: true })
+watch(
+  () => [settingsStore.customTextTranslationEndpoint, settingsStore.customTextTranslationApiKey],
+  () => {
+    queryClient.invalidateQueries(useGetCustomLanguagesQueryKey())
+  },
+  { deep: true },
+)
 </script>
