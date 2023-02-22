@@ -45,6 +45,11 @@ export const useSettingsStore = defineStore(
     const speechInputLanguage = ref('en-US')
     const enableTranslation = ref(false)
     const speechRecognitionStrategy = ref<'continuous-native' | 'continuous-web' | 'ptr'>('ptr')
+    const textTranslationStrategy = ref<'cloud-translation' | 'custom'>('cloud-translation')
+    const customTextTranslationEndpoint = ref('')
+    const customTextTranslationApiKey = ref('')
+    const customTextTranslationFrom = ref('')
+    const customTextTranslationTo = ref('')
     const keybindings = ref<Record<string, Key[]>>({
       recordAudio: [
         {
@@ -140,6 +145,11 @@ export const useSettingsStore = defineStore(
       textOutputLanguage,
       speechInputLanguage,
       enableTranslation,
+      textTranslationStrategy,
+      customTextTranslationEndpoint,
+      customTextTranslationApiKey,
+      customTextTranslationFrom,
+      customTextTranslationTo,
     }
   },
   {
