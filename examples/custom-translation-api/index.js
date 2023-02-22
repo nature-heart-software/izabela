@@ -33,7 +33,6 @@ app.post('/languages', async (req, res) => {
         {
           id: 'English',
           name: 'English',
-          languageCode: 'en',
         },
       ],
       // array of language codes that can be translated to
@@ -41,12 +40,10 @@ app.post('/languages', async (req, res) => {
         {
           id: 'Japanese',
           name: 'Japanese',
-          languageCode: 'jp',
         },
         {
           id: 'Shakespearean English',
-          name: 'English',
-          languageCode: 'shakespearean',
+          name: 'Shakespearean English',
         },
       ],
     })
@@ -63,8 +60,8 @@ app.post('/translate', async (req, res) => {
         },
         payload: {
           text, // text to be translated
-          from, // language code of the text
-          to, // language code of the translation
+          from, // language.id of the text
+          to, // language.id of the translation
         },
       },
     } = req

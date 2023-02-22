@@ -13,7 +13,7 @@
           <NvStack class="!flex-1 min-h-0">
             <NvStack>
               <NvText>{{ message.originalMessage || id }}</NvText>
-              <NvGroup v-if="message.translatedMessage">
+              <NvGroup v-if="message.translatedMessage" align="start" noWrap>
                 <NvIcon name="english-to-chinese" size="3"/>
                 <NvText>{{ message.translatedMessage || id }}</NvText>
               </NvGroup>
