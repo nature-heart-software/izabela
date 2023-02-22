@@ -42,5 +42,6 @@ watch(
   () => canFetch.value && queryClient.refetchQueries(LIST_VOICES_QUERY_KEY),
   {
     deep: true,
-  })
+  },
+)
 </script>

@@ -1,18 +1,20 @@
 <template>
-  <NvAccessBlocker :allowed="!!getProperty('endpoint')"
-                   reason="Endpoint and/or credentials required">
+  <NvAccessBlocker
+    :allowed="!!getProperty('endpoint')"
+    reason="Endpoint and/or credentials required"
+  >
     <NvFormItem label="Voice">
-      <NvVoiceSelect placeholder="Select a voice"/>
+      <NvVoiceSelect placeholder="Select a voice" />
     </NvFormItem>
   </NvAccessBlocker>
-  <NvDivider direction="horizontal"/>
+  <NvDivider direction="horizontal" />
   <NvFormItem label="API Endpoint">
     <NvInput
       :modelValue="getProperty('endpoint')"
       @update:modelValue="(value) => setProperty('endpoint', value)"
     />
   </NvFormItem>
-  <NvDivider direction="horizontal"/>
+  <NvDivider direction="horizontal" />
   <NvFormItem label="API Key">
     <NvInput
       :modelValue="getProperty('apiKey', true)"
@@ -25,4 +27,5 @@
 <script lang="ts" setup>
 import { NvAccessBlocker, NvDivider, NvFormItem, NvInput } from '@packages/ui'
 import NvVoiceSelect from './NvVoiceSelect'
-import { getProperty, setProperty } from './store'</script>
+import { getProperty, setProperty } from './store'
+</script>
