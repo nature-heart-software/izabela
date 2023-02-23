@@ -64,6 +64,8 @@
                     </NvText>
                   </NvStack>
                   <NvNumberInput
+                    :max="0"
+                    :min="minMeterValue"
                     :modelValue="settingsStore.audioInputSensibility"
                     @update:modelValue="
                       (value) => settingsStore.$patch({ audioInputSensibility: value })
