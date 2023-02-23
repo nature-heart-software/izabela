@@ -6,7 +6,7 @@
     </NvGoogleCloudCredentialsFormPart>
     <template v-if="!!googleCloudSpeechCredentialsPath">
       <NvStack spacing="5">
-        <NvDivider direction="horizontal" />
+        <NvDivider direction="horizontal"/>
         <NvGroup justify="apart" no-wrap spacing="5">
           <NvStack>
             <NvText type="label">Enable speech-to-text-to-speech</NvText>
@@ -19,7 +19,7 @@
           />
         </NvGroup>
         <template v-if="settingsStore.enableSTTTS">
-          <NvDivider direction="horizontal" />
+          <NvDivider direction="horizontal"/>
           <NvGroup justify="apart" no-wrap>
             <NvText type="label"> Speech recognition language</NvText>
             <NvSpeechInputLanguageSelect />
@@ -64,6 +64,8 @@
                     </NvText>
                   </NvStack>
                   <NvNumberInput
+                    :max="0"
+                    :min="minMeterValue"
                     :modelValue="settingsStore.audioInputSensibility"
                     @update:modelValue="
                       (value) => settingsStore.$patch({ audioInputSensibility: value })
