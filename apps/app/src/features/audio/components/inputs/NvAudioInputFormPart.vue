@@ -1,26 +1,25 @@
 <template>
   <NvStack spacing="5">
-    <NvGroup justify="apart" no-wrap spacing="5">
-      <NvStack>
-        <NvText type="label">Enable speech-to-text-to-speech</NvText>
-        <NvText type="caption">This might prevent your device from going to sleep</NvText>
-      </NvStack>
-      <NvSwitch
-        :modelValue="settingsStore.enableSTTTS"
-        class="shrink-0"
-        @update:modelValue="(value) => settingsStore.$patch({ enableSTTTS: value })"
-      />
-    </NvGroup>
-    <template v-if="settingsStore.enableSTTTS">
+    <NvGoogleCloudCredentialsFormPart>
+      Izabela uses Google Cloud Speech for speech recognition which requires Google Cloud
+      Credentials to be imported
+    </NvGoogleCloudCredentialsFormPart>
+    <template v-if="!!googleCloudSpeechCredentialsPath">
       <NvStack spacing="5">
-        <NvDivider direction="horizontal"/>
-
-        <NvGoogleCloudCredentialsFormPart>
-          Izabela uses Google Cloud Speech for speech recognition which requires Google Cloud
-          Credentials to be imported
-        </NvGoogleCloudCredentialsFormPart>
-        <template v-if="!!googleCloudSpeechCredentialsPath">
-          <NvDivider direction="horizontal"/>
+        <NvDivider direction="horizontal" />
+        <NvGroup justify="apart" no-wrap spacing="5">
+          <NvStack>
+            <NvText type="label">Enable speech-to-text-to-speech</NvText>
+            <NvText type="caption">This might prevent your device from going to sleep</NvText>
+          </NvStack>
+          <NvSwitch
+            :modelValue="settingsStore.enableSTTTS"
+            class="shrink-0"
+            @update:modelValue="(value) => settingsStore.$patch({ enableSTTTS: value })"
+          />
+        </NvGroup>
+        <template v-if="settingsStore.enableSTTTS">
+          <NvDivider direction="horizontal" />
           <NvGroup justify="apart" no-wrap>
             <NvText type="label"> Speech recognition language</NvText>
             <NvSpeechInputLanguageSelect/>
