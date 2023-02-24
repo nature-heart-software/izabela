@@ -4,7 +4,11 @@ import type { IzabelaMessage } from '@/modules/izabela/types'
 import { onIPCSay } from '@/electron/events/renderer'
 import { useSpeechStore } from '@/features/speech/store'
 import { getEngineById } from '@/modules/speech-engine-manager'
-import { getCleanMessage, getMessageCommand } from '@/modules/izabela/utils'
+import {
+  getCleanMessage,
+  getMessageCommand,
+  removeCommandFromMessage,
+} from '@/modules/izabela/utils'
 import { useSettingsStore } from '@/features/settings/store'
 
 const { ElectronTranslation } = window
@@ -20,10 +24,10 @@ onIPCSay(async (payload: string | IzabelaMessage) => {
     const engineCommands = engine.commands?.(voice) || []
     const cleanMessage = getCleanMessage(payload, engineCommands)
     const translatedMessage = settingsStore.enableTranslation
-      ? await ElectronTranslation.translate(cleanMessage, {
-          from: settingsStore.textInputLanguage || undefined,
-          to: settingsStore.textOutputLanguage || engine.getLanguageCode(voice),
-        })
+      ? await ElectronTranslation.translate(removeCommandFromMessage(payload), {
+        from: settingsStore.textInputLanguage || undefined,
+        to: settingsStore.textOutputLanguage || engine.getLanguageCode(voice),
+      })
       : null
     console.log('Translated message:', translatedMessage)
     message = {
