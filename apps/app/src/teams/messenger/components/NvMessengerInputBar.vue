@@ -49,7 +49,7 @@ const onInputEsc = () => {
 
 const placeholder = computed(() => {
   if (speechStore.commands.length > 0) {
-    return `Type / to see available commands (${speechStore.commands.length})`
+    return `Type / to see available commands (${ speechStore.commands.length })`
   }
   return 'So, said the angel to the child who, divided, broke the knife..'
 })
@@ -70,10 +70,10 @@ const onInputBlur = () => {
 }
 
 const onInputEnter = () => {
-  playMessage()
-  if (settingsStore.hideWindowOnMessage) {
+  if (settingsStore.hideWindowOnMessage || !inputValue.value) {
     ElectronMessengerWindow.hide()
   }
+  playMessage()
 }
 
 const onWindowFocus = () => {
