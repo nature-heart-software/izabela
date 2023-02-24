@@ -6,6 +6,7 @@ import { getMediaDeviceByLabel } from '@/utils/media-devices'
 import { useSettingsStore } from '@/features/settings/store'
 import { blobToBase64, Deferred } from '@packages/toolbox'
 import { useMessagesStore, usePlayingMessageStore } from '@/features/messages/store'
+import objectHash from 'object-hash'
 import { IzabelaMessageEvent, IzabelaMessagePayload } from './types'
 
 export default (messagePayload: IzabelaMessagePayload) => {
@@ -28,6 +29,10 @@ export default (messagePayload: IzabelaMessagePayload) => {
     messageStore.$whenReady().then(() => {
       messageStore.addToHistory(id, messagePayload)
     })
+  }
+
+  function getCacheId() {
+    return `${id}-${objectHash(payload)}`
   }
 
   function on(event: IzabelaMessageEvent, callback: () => void): void {
@@ -93,7 +98,7 @@ export default (messagePayload: IzabelaMessagePayload) => {
   async function downloadAudio() {
     if (typeof window) {
       const { ElectronFilesystem } = window
-      const cachedAudio = await ElectronFilesystem.getCachedAudio(id)
+      const cachedAudio = await ElectronFilesystem.getCachedAudio(getCacheId())
       if (cachedAudio) {
         const res = await fetch(cachedAudio)
         const blob = await res.blob()
@@ -123,7 +128,7 @@ export default (messagePayload: IzabelaMessagePayload) => {
     if (typeof window) {
       const { ElectronFilesystem } = window
       const base64 = await blobToBase64(blob)
-      if (base64) ElectronFilesystem.cacheAudio(id, base64)
+      if (base64) ElectronFilesystem.cacheAudio(getCacheId(), base64)
     }
   }
 
