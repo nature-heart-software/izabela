@@ -4,8 +4,9 @@ import { Promise } from 'bluebird'
 import { getEngineById } from '@/modules/speech-engine-manager'
 import { getMediaDeviceByLabel } from '@/utils/media-devices'
 import { useSettingsStore } from '@/features/settings/store'
-import { Deferred } from '@packages/toolbox'
+import { blobToBase64, Deferred } from '@packages/toolbox'
 import { useMessagesStore, usePlayingMessageStore } from '@/features/messages/store'
+import objectHash from 'object-hash'
 import { IzabelaMessageEvent, IzabelaMessagePayload } from './types'
 
 export default (messagePayload: IzabelaMessagePayload) => {
@@ -28,6 +29,10 @@ export default (messagePayload: IzabelaMessagePayload) => {
     messageStore.$whenReady().then(() => {
       messageStore.addToHistory(id, messagePayload)
     })
+  }
+
+  function getCacheId() {
+    return `${id}-${objectHash(payload)}`
   }
 
   function on(event: IzabelaMessageEvent, callback: () => void): void {
@@ -90,7 +95,19 @@ export default (messagePayload: IzabelaMessagePayload) => {
     return Promise.all([audioDownloaded.promise, audioLoaded.promise])
   }
 
-  function downloadAudio() {
+  async function downloadAudio() {
+    if (typeof window) {
+      const { ElectronFilesystem } = window
+      const cachedAudio = await ElectronFilesystem.getCachedAudio(getCacheId())
+      if (cachedAudio) {
+        const res = await fetch(cachedAudio)
+        const blob = await res.blob()
+        if (blob) {
+          audioDownloaded.resolve(true)
+          return Promise.resolve(blob)
+        }
+      }
+    }
     // TODO: change depending on engine
     const engine = getEngineById(engineName)
     if (!engine) return Promise.reject(new Error('Izabela Message: Selected engine was not found'))
@@ -101,8 +118,18 @@ export default (messagePayload: IzabelaMessagePayload) => {
       })
       .then((res) => {
         audioDownloaded.resolve(true)
-        return Promise.resolve('data' in res ? res.data : res)
+        const blob = 'data' in res ? res.data : res
+        cacheAudio(blob)
+        return Promise.resolve(blob)
       })
+  }
+
+  async function cacheAudio(blob: Blob) {
+    if (typeof window) {
+      const { ElectronFilesystem } = window
+      const base64 = await blobToBase64(blob)
+      if (base64) ElectronFilesystem.cacheAudio(getCacheId(), base64)
+    }
   }
 
   function loadAudio(blob: Blob) {
