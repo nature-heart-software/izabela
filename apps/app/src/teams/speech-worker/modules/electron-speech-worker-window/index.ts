@@ -1,6 +1,6 @@
 // see: https://tipsfordev.com/stream-audio-with-websocket-and-get-back-audio-transcription-obtained-with-google-speech-api
 import speech from '@google-cloud/speech'
-import { BrowserWindow } from 'electron'
+import { BrowserWindow, screen } from 'electron'
 import { ipcMain } from 'electron-postman'
 import { createNotification } from '@/utils/electron-notification'
 import { useSpeechStore } from '@/features/speech/store'
@@ -9,6 +9,8 @@ import { Deferred } from '@packages/toolbox'
 import { useSettingsStore } from '@/features/settings/store'
 import { watch } from 'vue'
 import electronNativeSpeechRecognition from '@/teams/speech-worker/modules/electron-native-speech-recognition'
+import ElectronWindowManager from '@/modules/electron-window-manager'
+import { mapValues } from 'lodash'
 
 export const ElectronSpeechWindow = () => {
   let registeredWindow: BrowserWindow | null = null
@@ -22,6 +24,8 @@ export const ElectronSpeechWindow = () => {
     typeof electronNativeSpeechRecognition
   > | null = null
 
+  const getWindow = () =>
+    registeredWindow || ElectronWindowManager.getInstanceByName('speech-worker')?.window
   const onListeningError = () => {
     createNotification({
       body: "Sorry, I didn't catch that..\nCould you say that again please?",
@@ -70,6 +74,17 @@ export const ElectronSpeechWindow = () => {
       onListeningError()
     }
   }
+
+  const setDisplay = (id?: Electron.Display['id'] | null) => {
+    const window = getWindow()
+    if (window) {
+      const allDisplays = screen.getAllDisplays()
+      const primaryDisplay = screen.getPrimaryDisplay()
+      const display = allDisplays.find((d) => d.id === id) || primaryDisplay
+      window.setBounds(mapValues(display.bounds, (v) => v + 24))
+    }
+  }
+
   const addEventListeners = () => {
     gkl?.addListener((e) => {
       if (
@@ -137,6 +152,7 @@ export const ElectronSpeechWindow = () => {
     start,
     transcribeAudio,
     restartNativeSpeechRecognition,
+    setDisplay,
   }
 }
 
