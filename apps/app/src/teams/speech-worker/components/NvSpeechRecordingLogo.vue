@@ -71,7 +71,7 @@
 #inner-circle {
   width: 24px;
   height: 24px;
-  background-color: #0E0E2C;
+  background-color: #0e0e2c;
   animation: inner-border ease-out 1s infinite;
   animation-delay: 0.25s;
 }
