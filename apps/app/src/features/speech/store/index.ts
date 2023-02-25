@@ -7,6 +7,21 @@ import { useSettingsStore } from '@/features/settings/store'
 import { decrypt } from '@/utils/security'
 import { SpeechCommand } from '@/features/speech/types'
 
+export const useSpeechRecognitionStore = defineStore(
+  'speechRecognition',
+  () => {
+    const recording = ref(false)
+    return {
+      recording,
+    }
+  },
+  {
+    electron: {
+      shared: true,
+    },
+  },
+)
+
 export const useSpeechStore = defineStore(
   'speech',
   () => {

@@ -13,6 +13,7 @@ import {
 import { useSettingsStore } from '@/features/settings/store'
 import hark from 'hark'
 import { takeRight } from 'lodash'
+import { useSpeechRecognitionStore } from '@/features/speech/store'
 
 let speaking = false
 let audioChunks: Blob[] = []
@@ -21,6 +22,7 @@ let speech: ReturnType<typeof hark> | null = null
 let mediaRecorder: MediaRecorder | null = null
 const { ElectronSpeechWorkerWindow } = window
 const settingsStore = useSettingsStore()
+const speechRecognitionStore = useSpeechRecognitionStore()
 const mediaDevice = await getMediaDeviceByLabel(settingsStore.audioInput)
 const realTime = settingsStore.speechRecognitionStrategy === 'continuous-web'
 const sampleRate = 48000
@@ -47,7 +49,9 @@ if (settingsStore.enableSTTTS) {
 
   speech.on('speaking', () => {
     console.log('Started speaking')
-
+    speechRecognitionStore.$patch({
+      recording: true,
+    })
     if (realTime) {
       speaking = true
     }
@@ -55,7 +59,9 @@ if (settingsStore.enableSTTTS) {
 
   speech.on('stopped_speaking', () => {
     console.log('Stopped speaking')
-
+    speechRecognitionStore.$patch({
+      recording: false,
+    })
     if (realTime) {
       stopRecording()
     }
@@ -119,6 +125,9 @@ function startRecording() {
 onIPCStartSpeechTranscription(() => {
   if (!realTime && mediaRecorder) {
     console.log(`[${ getTime() }] Starting web recording`)
+    speechRecognitionStore.$patch({
+      recording: true,
+    })
     mediaRecorder.start()
   }
 })
@@ -126,6 +135,9 @@ onIPCStartSpeechTranscription(() => {
 onIPCStopSpeechTranscription(() => {
   if (!realTime && mediaRecorder) {
     console.log(`[${ getTime() }] Stopping web recording`)
+    speechRecognitionStore.$patch({
+      recording: false,
+    })
     mediaRecorder.stop()
   }
 })

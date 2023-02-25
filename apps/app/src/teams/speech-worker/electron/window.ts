@@ -11,6 +11,7 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     transparent: true,
     frame: false,
     focusable: false,
+    resizable: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION as unknown as boolean,
@@ -20,11 +21,11 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
   })
 
   {
-    window.setSize(0, 0)
-    window.setPosition(0, 0)
+    window.setSize(64, 64)
+    window.setPosition(24, 24)
 
     // https://github.com/electron/electron/issues/10078#issuecomment-331581160
-    window.setAlwaysOnTop(true)
+    window.setAlwaysOnTop(true, 'screen-saver', 1)
     window.setVisibleOnAllWorkspaces(true)
     window.setFullScreenable(false)
 
