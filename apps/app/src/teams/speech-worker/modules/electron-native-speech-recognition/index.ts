@@ -19,7 +19,7 @@ export default () => {
   const encoding = 'LINEAR16'
   const sampleRateHertz = 16000
   const languageCode = settingsStore.speechInputLanguage
-  const maxEndingChunksCount = 3
+  const maxEndingChunksCount = settingsStore.soxPostRecordingChunks
   const client = new speech.v1p1beta1.SpeechClient()
 
   let audioInput: any[] = []
@@ -40,7 +40,6 @@ export default () => {
 
   function recorderCleanup() {
     rec?.stop()
-    rec?.removeListener('error', onRecorderError)
   }
 
   function startStream() {
@@ -59,6 +58,7 @@ export default () => {
           enableAutomaticPunctuation: true,
           model: 'latest_long',
           useEnhanced: true,
+          profanityFilter: settingsStore.speechProfanityFilter,
         },
         singleUtterance: true,
         interimResults: true,
@@ -74,7 +74,6 @@ export default () => {
     function onRecognizeStreamData(res: any) {
       currentTranscript = res.results[0]?.alternatives[0].transcript
       if (res.results[0]?.isFinal) {
-        console.log(`Final: ${res.results[0].alternatives[0].transcript}`)
         deferredMessage.resolve(res.results[0].alternatives[0].transcript)
         stream.removeListener('data', onRecognizeStreamData)
         stream.removeListener('error', onRecognizeStreamError)
@@ -116,12 +115,14 @@ export default () => {
     recStream?.pipe(transformer)
 
     deferredMessage.promise.then((message) => {
+      const messageWithoutProfanityFilter = message.replace(/\*/g, '-')
       const pendingMessage = pendingMessages.find((m) => m.id === id)
       if (pendingMessage) {
         const index = pendingMessages.indexOf(pendingMessage)
         if (pendingMessages[index - 1]) {
           pendingMessages[index - 1].message.then(() => {
-            if (message) ipcMain.sendTo('speech-worker', 'say', message)
+            if (messageWithoutProfanityFilter)
+              ipcMain.sendTo('speech-worker', 'say', messageWithoutProfanityFilter)
             pendingMessages.splice(pendingMessages.indexOf(pendingMessage), 1)
           })
           // if previous stream failed because nothing was recognized, resolve it
@@ -130,7 +131,8 @@ export default () => {
             pendingMessages.splice(index - 1, 1)
           }
         } else {
-          if (message) ipcMain.sendTo('speech-worker', 'say', message)
+          if (messageWithoutProfanityFilter)
+            ipcMain.sendTo('speech-worker', 'say', messageWithoutProfanityFilter)
           pendingMessages.splice(pendingMessages.indexOf(pendingMessage), 1)
         }
       }
@@ -158,7 +160,7 @@ export default () => {
 
   const audioInputStreamTransform = new Writable({
     write(chunk, _encoding, next) {
-      audioInput = [...takeRight(audioInput, 10), chunk]
+      audioInput = [...takeRight(audioInput, settingsStore.soxPreRecordingChunks), chunk]
       next()
     },
     final() {
@@ -170,17 +172,16 @@ export default () => {
     sampleRateHertz,
     recordProgram: 'rec',
     binPath: path.join(EXTERNALS_DIR, '/sox/sox.exe'),
-    // device: settingsStore.soxDevice,
+    device: settingsStore.soxDevice,
   })
 
   recStream = rec.stream()
   recStream.on('error', onRecorderError).pipe(audioInputStreamTransform)
 
-  watch(
+  const stopWatch = watch(
     () => speechRecognitionStore.recording,
     () => {
       if (speechRecognitionStore.recording) {
-        console.log(pendingMessages.length)
         startStream()
       } else {
         stopStream()
@@ -191,5 +192,6 @@ export default () => {
     console.log('Stopping native speech recognition...')
     recorderCleanup()
     client.close()
+    stopWatch()
   }
 }
