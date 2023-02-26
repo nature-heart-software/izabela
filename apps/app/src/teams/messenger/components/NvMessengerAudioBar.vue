@@ -114,19 +114,8 @@
                   <NvSpeechRecognitionStrategySelect />
                 </NvFormItem>
                 <NvDivider direction="horizontal" />
-                <NvFormItem label="Audio input">
-                  <template
-                    v-if="
-                      ['continuous-web', 'ptr'].includes(settingsStore.speechRecognitionStrategy)
-                    "
-                  >
-                    <NvAudioInputsSelect class="w-full" />
-                  </template>
-                  <template
-                    v-if="['continuous-native'].includes(settingsStore.speechRecognitionStrategy)"
-                  >
-                    <NvSoxAudioInputSelect class="!w-full" />
-                  </template>
+                <NvFormItem label="Recording device">
+                  <NvSoxAudioInputSelect class="!w-full" />
                 </NvFormItem>
               </NvStack>
             </NvAccessBlocker>
@@ -164,7 +153,6 @@ import { useSpeechStore } from '@/features/speech/store'
 import { useSettingsStore } from '@/features/settings/store'
 import SpeechEngineSelect from '@/features/speech/components/inputs/NvSpeechEngineSelect.vue'
 import NvAudioOutputsSelect from '@/features/audio/components/inputs/NvAudioOutputsSelect.vue'
-import NvAudioInputsSelect from '@/features/audio/components/inputs/NvAudioInputSelect.vue'
 import NvSoxAudioInputSelect from '@/features/audio/components/inputs/NvSoxAudioInputSelect.vue'
 import NvSpeechInputLanguageSelect from '@/features/speech/components/inputs/NvSpeechInputLanguageSelect.vue'
 import { inject } from 'vue'

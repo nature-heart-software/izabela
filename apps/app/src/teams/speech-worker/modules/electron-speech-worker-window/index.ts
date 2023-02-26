@@ -115,11 +115,8 @@ export const ElectronSpeechWindow = () => {
     if (electronNativeSpeechRecognitionCallback) {
       electronNativeSpeechRecognitionCallback()
     }
-    if (
-      settingsStore?.enableSTTTS &&
-      settingsStore.speechRecognitionStrategy === 'continuous-native'
-    ) {
-      // electronNativeSpeechRecognitionCallback = electronNativeSpeechRecognition()
+    if (settingsStore?.enableSTTTS) {
+      electronNativeSpeechRecognitionCallback = electronNativeSpeechRecognition()
     }
   }
 
@@ -129,12 +126,13 @@ export const ElectronSpeechWindow = () => {
 
     watch(
       () => [
-        settingsStore?.soxThreshold,
-        settingsStore?.soxSilence,
         settingsStore?.soxDevice,
         settingsStore?.enableSTTTS,
         settingsStore?.speechRecognitionStrategy,
         settingsStore?.speechInputLanguage,
+        settingsStore?.soxPreRecordingChunks,
+        settingsStore?.soxPostRecordingChunks,
+        settingsStore?.speechProfanityFilter,
         speechStore?.currentSpeechEngine,
       ],
       restartNativeSpeechRecognition,

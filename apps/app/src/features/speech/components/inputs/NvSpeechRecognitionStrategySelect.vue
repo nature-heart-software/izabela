@@ -4,10 +4,9 @@
     :autocompleteWidth="width"
     :modelValue="settingsStore.speechRecognitionStrategy"
     :options="[
-             { label: 'Automatic (Native)', value: 'continuous-native' },
-             { label: 'Automatic (Web)', value: 'continuous-web' },
-             { label: 'Push-to-record', value: 'ptr' },
-           ]"
+      { label: 'Automatic', value: 'continuous' },
+      { label: 'Push-to-record', value: 'ptr' },
+    ]"
     @update:modelValue="(value) => settingsStore.$patch({ speechRecognitionStrategy: value })"
   />
 </template>

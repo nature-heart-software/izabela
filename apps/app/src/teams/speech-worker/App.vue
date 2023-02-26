@@ -30,11 +30,11 @@ const speechListenerKey = computed(() =>
   hash([
     settingsStore.audioInput,
     settingsStore.audioInputSensibility,
-    settingsStore.speechPrerecordTime,
-    settingsStore.speechPostrecordTime,
+    settingsStore.speechDetectionPolling,
     settingsStore.enableSTTTS,
     settingsStore.speechRecognitionStrategy,
     settingsStore.speechInputLanguage,
+    settingsStore.soxDevice,
   ]),
 )
 </script>

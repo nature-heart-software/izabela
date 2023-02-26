@@ -3,28 +3,22 @@
 </template>
 <script lang="ts" setup>
 import { getTime } from '@/utils/time'
-import { blobToBase64 } from '@packages/toolbox'
 import { onBeforeUnmount } from 'vue'
-import { getMediaDeviceByLabel } from '@/utils/media-devices'
+import { getSoxMediaDeviceByIndex } from '@/utils/media-devices'
 import {
   onIPCStartSpeechTranscription,
   onIPCStopSpeechTranscription,
 } from '@/electron/events/renderer'
 import { useSettingsStore } from '@/features/settings/store'
 import hark from 'hark'
-import { takeRight } from 'lodash'
 import { useSpeechRecognitionStore } from '@/features/speech/store'
 
-let speaking = false
-let audioChunks: Blob[] = []
 let stream: MediaStream | null = null
 let speech: ReturnType<typeof hark> | null = null
-let mediaRecorder: MediaRecorder | null = null
-const { ElectronSpeechWorkerWindow } = window
 const settingsStore = useSettingsStore()
 const speechRecognitionStore = useSpeechRecognitionStore()
-const mediaDevice = await getMediaDeviceByLabel(settingsStore.audioInput)
-const realTime = settingsStore.speechRecognitionStrategy === 'continuous-web'
+const mediaDevice = await getSoxMediaDeviceByIndex(settingsStore.soxDevice)
+const realTime = settingsStore.speechRecognitionStrategy === 'continuous'
 const sampleRate = 48000
 if (settingsStore.enableSTTTS) {
   if (realTime) {
@@ -42,9 +36,9 @@ if (settingsStore.enableSTTTS) {
     video: false,
   })
 
-  speech = hark(stream.clone(), {
+  speech = hark(stream, {
     threshold: settingsStore.audioInputSensibility,
-    interval: settingsStore.speechPostrecordTime,
+    interval: settingsStore.speechDetectionPolling,
   })
 
   speech.on('speaking', () => {
@@ -52,9 +46,6 @@ if (settingsStore.enableSTTTS) {
     speechRecognitionStore.$patch({
       recording: true,
     })
-    if (realTime) {
-      speaking = true
-    }
   })
 
   speech.on('stopped_speaking', () => {
@@ -62,105 +53,34 @@ if (settingsStore.enableSTTTS) {
     speechRecognitionStore.$patch({
       recording: false,
     })
-    if (realTime) {
-      stopRecording()
-    }
-  })
-
-  mediaRecorder = stream ? new MediaRecorder(stream) : null
-
-  const onStop = () => {
-    const audioBlob = new Blob(audioChunks, { type: mediaRecorder?.mimeType })
-    audioChunks = []
-    blobToBase64(audioBlob).then((base64) => {
-      ElectronSpeechWorkerWindow.transcribeAudio({
-        content: (base64 as string).split(',').pop() || '',
-        sampleRate,
-        encoding: 'WEBM_OPUS',
-      })
-    })
-
-    // debug
-    // const audioUrl = URL.createObjectURL(audioBlob)
-    // const audio = new Audio(audioUrl)
-    // audio.play()
-  }
-
-  mediaRecorder?.addEventListener('dataavailable', onDataAvailable)
-  mediaRecorder?.addEventListener('stop', () => {
-    if (speaking) {
-      speaking = false
-      onStop()
-    }
-    if (!realTime) {
-      onStop()
-    }
   })
 }
 
-// We want to keep a few chunks of audio in case the user starts speaking
-// right when the recording stopped and started again
-function onDataAvailable(event: any) {
-  if (realTime && !speaking) {
-    audioChunks = takeRight(audioChunks, 1)
-  }
-  audioChunks.push(event.data)
-}
-
-function stopRecording() {
-  mediaRecorder?.stop()
-  startRecording()
-}
-
-function startRecording() {
-  mediaRecorder?.start()
-  setTimeout(() => {
-    if (!speaking) {
-      stopRecording()
-    }
-  }, settingsStore.speechPrerecordTime)
-}
-
-// TODO: The listeners below are not removed on unmount, gotta fix that
 onIPCStartSpeechTranscription(() => {
-  if (!realTime && mediaRecorder) {
+  if (!realTime) {
     console.log(`[${getTime()}] Starting web recording`)
     speechRecognitionStore.$patch({
       recording: true,
     })
-    mediaRecorder.start()
   }
 })
 
 onIPCStopSpeechTranscription(() => {
-  if (!realTime && mediaRecorder) {
+  if (!realTime) {
     console.log(`[${getTime()}] Stopping web recording`)
     speechRecognitionStore.$patch({
       recording: false,
     })
-    mediaRecorder.stop()
   }
 })
 
-if (realTime) {
-  startRecording()
-} else {
-  speech?.stop()
-}
-
 onBeforeUnmount(() => {
-  if (mediaRecorder?.state !== 'inactive') {
-    mediaRecorder?.stop()
-  }
-  mediaRecorder?.removeEventListener('dataavailable', onDataAvailable)
-  mediaRecorder?.removeEventListener('stop', onDataAvailable)
   stream?.getTracks().forEach((track) => {
     if (track.readyState === 'live') {
       track.stop()
     }
   })
   speech?.stop()
-  mediaRecorder = null
   if (realTime) {
     console.log('Stopping web speech recognition...')
   } else {

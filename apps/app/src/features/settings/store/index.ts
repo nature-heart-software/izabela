@@ -34,17 +34,17 @@ export const useSettingsStore = defineStore(
     const universalApiKey = ref<string>('')
     const universalApiEndpoint = ref<string>('')
     const audioInputSensibility = ref(-60)
-    const soxThreshold = ref(0.5)
-    const soxSilence = ref(100)
+    const soxPreRecordingChunks = ref(3)
+    const soxPostRecordingChunks = ref(3)
     const soxDevice = ref(0)
-    const speechPrerecordTime = ref(1000)
-    const speechPostrecordTime = ref(40)
+    const speechDetectionPolling = ref(40)
     const enableSTTTS = ref(false)
     const textInputLanguage = ref(null)
     const textOutputLanguage = ref(null)
     const speechInputLanguage = ref('en-US')
     const enableTranslation = ref(false)
-    const speechRecognitionStrategy = ref<'continuous-native' | 'continuous-web' | 'ptr'>('ptr')
+    const speechProfanityFilter = ref(true)
+    const speechRecognitionStrategy = ref<'continuous' | 'ptr'>('ptr')
     const textTranslationStrategy = ref<'cloud-translation' | 'custom'>('cloud-translation')
     const customTextTranslationEndpoint = ref('')
     const customTextTranslationApiKey = ref('')
@@ -134,12 +134,9 @@ export const useSettingsStore = defineStore(
       universalApiKey,
       universalApiEndpoint,
       audioInputSensibility,
-      speechPrerecordTime,
-      speechPostrecordTime,
+      speechDetectionPolling,
       enableSTTTS,
       speechRecognitionStrategy,
-      soxThreshold,
-      soxSilence,
       soxDevice,
       textInputLanguage,
       textOutputLanguage,
@@ -150,6 +147,9 @@ export const useSettingsStore = defineStore(
       customTextTranslationApiKey,
       customTextTranslationFrom,
       customTextTranslationTo,
+      speechProfanityFilter,
+      soxPreRecordingChunks,
+      soxPostRecordingChunks,
     }
   },
   {

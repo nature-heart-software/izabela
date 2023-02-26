@@ -1,150 +1,197 @@
 /* inspired by (stolen from) https://github.com/GoogleCloudPlatform/nodejs-docs-samples/blob/main/speech/infiniteStreaming.js */
 import { Writable } from 'stream'
 import recorder from 'node-record-lpcm16'
-import speech, { SpeechClient } from '@google-cloud/speech'
+import speech from '@google-cloud/speech'
 import path from 'path'
 import { EXTERNALS_DIR } from '@/electron/utils'
 import { ipcMain } from 'electron-postman'
 import { useSettingsStore } from '@/features/settings/store'
+import { takeRight } from 'lodash'
+import { watch } from 'vue'
+import { useSpeechRecognitionStore } from '@/features/speech/store'
+import { Deferred } from '@packages/toolbox'
+import { v4 as uuid } from 'uuid'
 
 export default () => {
   console.log('Starting native speech recognition...')
   const settingsStore = useSettingsStore()
+  const speechRecognitionStore = useSpeechRecognitionStore()
   const encoding = 'LINEAR16'
   const sampleRateHertz = 16000
   const languageCode = settingsStore.speechInputLanguage
-  const streamingLimit = 290000 // ms - set to low number for demo purposes
-
+  const maxEndingChunksCount = settingsStore.soxPostRecordingChunks
   const client = new speech.v1p1beta1.SpeechClient()
 
-  let recognizeStream: ReturnType<SpeechClient['streamingRecognize']> | null = null
   let audioInput: any[] = []
-  let lastAudioInput: any[] = []
-  let resultEndTime = 0
-  let isFinalEndTime = 0
-  let finalRequestEndTime = 0
-  let newStream = true
-  let bridgingOffset = 0
+  let rec: ReturnType<typeof recorder> | null = null
+  let recStream: any = null
+  const pendingMessages: {
+    id: string
+    end: () => void
+    message: Promise<string>
+    currentTranscript: string
+    resolve: (message: string) => void
+    reject: (err: Error) => void
+  }[] = []
 
-  const speechCallback = (stream: any) => {
-    resultEndTime =
-      stream.results[0].resultEndTime.seconds * 1000 +
-      Math.round(stream.results[0].resultEndTime.nanos / 1000000)
-    // console.log(stream.results[0].alternatives[0].transcript)
-    if (stream.results[0].isFinal) {
-      ipcMain.sendTo('speech-worker', 'say', stream.results[0].alternatives[0].transcript)
-      audioInput = []
-      isFinalEndTime = resultEndTime
-    }
+  const onRecorderError = (err: Error) => {
+    console.error(`Audio recording error ${err}`)
+  }
+
+  function recorderCleanup() {
+    rec?.stop()
   }
 
   function startStream() {
-    const config = {
-      encoding,
-      sampleRateHertz,
-      languageCode,
-      enableAutomaticPunctuation: true,
-      model: 'latest_long',
-      useEnhanced: true,
-    } as const
+    const id = uuid()
+    const deferredMessage = Deferred<string>()
+    let currentTranscript = ''
+    let ending = false
+    let endingChunksCount = 0
 
-    const request = {
-      config,
-      interimResults: true,
-    } as const
-    audioInput = []
-    recognizeStream = client
-      .streamingRecognize(request)
-      .on('error', (err) => {
-        if ('code' in err && (err as unknown as { code: number }).code === 11) {
-          // restartStream();
-        } else {
-          console.error(`API request error ${err}`)
-        }
+    const stream = client
+      .streamingRecognize({
+        config: {
+          encoding,
+          sampleRateHertz,
+          languageCode,
+          enableAutomaticPunctuation: true,
+          model: 'latest_long',
+          useEnhanced: true,
+          profanityFilter: settingsStore.speechProfanityFilter,
+        },
+        singleUtterance: true,
+        interimResults: true,
       })
-      .on('data', speechCallback)
+      .on('error', onRecognizeStreamError)
+      .on('data', onRecognizeStreamData)
 
-    setTimeout(restartStream, streamingLimit)
+    function onRecognizeStreamError(err: Error) {
+      console.error(`API request error ${err}`)
+      deferredMessage.resolve('')
+    }
+
+    function onRecognizeStreamData(res: any) {
+      currentTranscript = res.results[0]?.alternatives[0].transcript
+      if (res.results[0]?.isFinal) {
+        deferredMessage.resolve(res.results[0].alternatives[0].transcript)
+        stream.removeListener('data', onRecognizeStreamData)
+        stream.removeListener('error', onRecognizeStreamError)
+      }
+    }
+
+    const transformer = new Writable({
+      write(chunk, _encoding, next) {
+        stream.write(chunk)
+        if (ending) {
+          endingChunksCount += 1
+          if (endingChunksCount >= maxEndingChunksCount) {
+            onEnded()
+          }
+        }
+        next()
+      },
+    })
+
+    function onEnded() {
+      recStream?.unpipe(transformer)
+      stream.end()
+      setTimeout(() => {
+        // automatically resolve if nothing was recognized after some time
+        if (!currentTranscript) {
+          deferredMessage.resolve('')
+          const index = pendingMessages.findIndex((m) => m.id === id)
+          if (index >= 0) {
+            pendingMessages.splice(index, 1)
+          }
+        }
+      }, 1000)
+    }
+
+    audioInput.forEach((item) => {
+      stream.write(item)
+    })
+
+    recStream?.pipe(transformer)
+
+    deferredMessage.promise.then((message) => {
+      const messageWithoutProfanityFilter = message.replace(/\*/g, '-')
+      const pendingMessage = pendingMessages.find((m) => m.id === id)
+      if (pendingMessage) {
+        const index = pendingMessages.indexOf(pendingMessage)
+        if (pendingMessages[index - 1]) {
+          pendingMessages[index - 1].message.then(() => {
+            if (messageWithoutProfanityFilter)
+              ipcMain.sendTo('speech-worker', 'say', messageWithoutProfanityFilter)
+            pendingMessages.splice(pendingMessages.indexOf(pendingMessage), 1)
+          })
+          // if previous stream failed because nothing was recognized, resolve it
+          if (!pendingMessages[index - 1].currentTranscript) {
+            pendingMessages[index - 1].resolve('')
+            pendingMessages.splice(index - 1, 1)
+          }
+        } else {
+          if (messageWithoutProfanityFilter)
+            ipcMain.sendTo('speech-worker', 'say', messageWithoutProfanityFilter)
+          pendingMessages.splice(pendingMessages.indexOf(pendingMessage), 1)
+        }
+      }
+    })
+
+    pendingMessages.push({
+      id,
+      end: () => {
+        ending = true
+      },
+      message: deferredMessage.promise,
+      resolve: deferredMessage.resolve,
+      reject: deferredMessage.reject,
+      currentTranscript,
+    })
+  }
+
+  // let endOnNextChunk = false
+
+  function stopStream() {
+    audioInput = []
+    pendingMessages[pendingMessages.length - 1]?.end()
+    // endOnNextChunk = true
   }
 
   const audioInputStreamTransform = new Writable({
     write(chunk, _encoding, next) {
-      if (newStream && lastAudioInput.length !== 0) {
-        // Approximate math to calculate time of chunks
-        const chunkTime = streamingLimit / lastAudioInput.length
-        if (chunkTime !== 0) {
-          if (bridgingOffset < 0) {
-            bridgingOffset = 0
-          }
-          if (bridgingOffset > finalRequestEndTime) {
-            bridgingOffset = finalRequestEndTime
-          }
-          const chunksFromMS = Math.floor((finalRequestEndTime - bridgingOffset) / chunkTime)
-          bridgingOffset = Math.floor((lastAudioInput.length - chunksFromMS) * chunkTime)
-
-          lastAudioInput.forEach((item) => {
-            recognizeStream?.write(item)
-          })
-        }
-        newStream = false
-      }
-
-      audioInput.push(chunk)
-
-      if (recognizeStream) {
-        recognizeStream.write(chunk)
-      }
-
+      audioInput = [...takeRight(audioInput, settingsStore.soxPreRecordingChunks), chunk]
       next()
     },
-
     final() {
-      if (recognizeStream) {
-        recognizeStream.end()
-      }
+      recorderCleanup()
     },
   })
 
-  function restartStream() {
-    if (recognizeStream) {
-      recognizeStream.end()
-      recognizeStream.removeListener('data', speechCallback)
-      recognizeStream = null
-    }
-    if (resultEndTime > 0) {
-      finalRequestEndTime = isFinalEndTime
-    }
-    resultEndTime = 0
-
-    lastAudioInput = []
-    lastAudioInput = audioInput
-
-    newStream = true
-
-    startStream()
-  }
-
-  const rec = recorder.record({
+  rec = recorder.record({
     sampleRateHertz,
     recordProgram: 'rec',
     binPath: path.join(EXTERNALS_DIR, '/sox/sox.exe'),
     device: settingsStore.soxDevice,
   })
 
-  rec
-    .stream()
-    .on('error', (err: Error) => {
-      console.error(`Audio recording error ${err}`)
-    })
-    .pipe(audioInputStreamTransform)
+  recStream = rec.stream()
+  recStream.on('error', onRecorderError).pipe(audioInputStreamTransform)
 
-  startStream()
-
+  const stopWatch = watch(
+    () => speechRecognitionStore.recording,
+    () => {
+      if (speechRecognitionStore.recording) {
+        startStream()
+      } else {
+        stopStream()
+      }
+    },
+  )
   return () => {
     console.log('Stopping native speech recognition...')
-    rec.stop()
-    recognizeStream?.end()
-    recognizeStream?.removeListener('data', speechCallback)
+    recorderCleanup()
     client.close()
+    stopWatch()
   }
 }

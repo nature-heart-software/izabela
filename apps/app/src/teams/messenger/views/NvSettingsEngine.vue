@@ -4,7 +4,7 @@
       <NvText type="subtitle">Engine</NvText>
       <NvStack spacing="4">
         <NvCard>
-          <NvGroup justify="apart" no-wrap spacing="5">
+          <NvGroup align="start" justify="apart" no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Speech Engine</NvText>
               <NvText>Select the speech engine to use</NvText>
