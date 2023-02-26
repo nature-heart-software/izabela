@@ -115,12 +115,13 @@ export const ElectronSpeechWindow = () => {
     if (electronNativeSpeechRecognitionCallback) {
       electronNativeSpeechRecognitionCallback()
     }
-    if (
-      settingsStore?.enableSTTTS &&
-      settingsStore.speechRecognitionStrategy === 'continuous-native'
-    ) {
-      // electronNativeSpeechRecognitionCallback = electronNativeSpeechRecognition()
-    }
+    // if (
+    //   settingsStore?.enableSTTTS &&
+    //   settingsStore.speechRecognitionStrategy === 'continuous-native'
+    // ) {
+    //   electronNativeSpeechRecognitionCallback = electronNativeSpeechRecognition()
+    // }
+    electronNativeSpeechRecognitionCallback = electronNativeSpeechRecognition()
   }
 
   isReady().then(() => {
