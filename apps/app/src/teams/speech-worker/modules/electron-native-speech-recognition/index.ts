@@ -19,7 +19,7 @@ export default () => {
   const encoding = 'LINEAR16'
   const sampleRateHertz = 16000
   const languageCode = settingsStore.speechInputLanguage
-
+  const maxEndingChunksCount = 3
   const client = new speech.v1p1beta1.SpeechClient()
 
   let audioInput: any[] = []
@@ -29,11 +29,10 @@ export default () => {
     id: string
     end: () => void
     message: Promise<string>
+    currentTranscript: string
+    resolve: (message: string) => void
+    reject: (err: Error) => void
   }[] = []
-
-  function onRecognizeStreamError(err: Error) {
-    console.error(`API request error ${err}`)
-  }
 
   const onRecorderError = (err: Error) => {
     console.error(`Audio recording error ${err}`)
@@ -47,14 +46,9 @@ export default () => {
   function startStream() {
     const id = uuid()
     const deferredMessage = Deferred<string>()
-
-    function onRecognizeStreamData(stream: any) {
-      console.log(stream.results[0].alternatives[0].transcript)
-      if (stream.results[0]?.isFinal) {
-        console.log(`Final: ${stream.results[0].alternatives[0].transcript}`)
-        deferredMessage.resolve(stream.results[0].alternatives[0].transcript)
-      }
-    }
+    let currentTranscript = ''
+    let ending = false
+    let endingChunksCount = 0
 
     const stream = client
       .streamingRecognize({
@@ -72,12 +66,48 @@ export default () => {
       .on('error', onRecognizeStreamError)
       .on('data', onRecognizeStreamData)
 
+    function onRecognizeStreamError(err: Error) {
+      console.error(`API request error ${err}`)
+      deferredMessage.resolve('')
+    }
+
+    function onRecognizeStreamData(res: any) {
+      currentTranscript = res.results[0]?.alternatives[0].transcript
+      if (res.results[0]?.isFinal) {
+        console.log(`Final: ${res.results[0].alternatives[0].transcript}`)
+        deferredMessage.resolve(res.results[0].alternatives[0].transcript)
+        stream.removeListener('data', onRecognizeStreamData)
+        stream.removeListener('error', onRecognizeStreamError)
+      }
+    }
+
     const transformer = new Writable({
       write(chunk, _encoding, next) {
         stream.write(chunk)
+        if (ending) {
+          endingChunksCount += 1
+          if (endingChunksCount >= maxEndingChunksCount) {
+            onEnded()
+          }
+        }
         next()
       },
     })
+
+    function onEnded() {
+      recStream?.unpipe(transformer)
+      stream.end()
+      setTimeout(() => {
+        // automatically resolve if nothing was recognized after some time
+        if (!currentTranscript) {
+          deferredMessage.resolve('')
+          const index = pendingMessages.findIndex((m) => m.id === id)
+          if (index >= 0) {
+            pendingMessages.splice(index, 1)
+          }
+        }
+      }, 1000)
+    }
 
     audioInput.forEach((item) => {
       stream.write(item)
@@ -91,12 +121,17 @@ export default () => {
         const index = pendingMessages.indexOf(pendingMessage)
         if (pendingMessages[index - 1]) {
           pendingMessages[index - 1].message.then(() => {
-            ipcMain.sendTo('speech-worker', 'say', message)
-            pendingMessages.splice(index, 1)
+            if (message) ipcMain.sendTo('speech-worker', 'say', message)
+            pendingMessages.splice(pendingMessages.indexOf(pendingMessage), 1)
           })
+          // if previous stream failed because nothing was recognized, resolve it
+          if (!pendingMessages[index - 1].currentTranscript) {
+            pendingMessages[index - 1].resolve('')
+            pendingMessages.splice(index - 1, 1)
+          }
         } else {
-          ipcMain.sendTo('speech-worker', 'say', message)
-          pendingMessages.splice(index, 1)
+          if (message) ipcMain.sendTo('speech-worker', 'say', message)
+          pendingMessages.splice(pendingMessages.indexOf(pendingMessage), 1)
         }
       }
     })
@@ -104,12 +139,12 @@ export default () => {
     pendingMessages.push({
       id,
       end: () => {
-        recStream?.unpipe(transformer)
-        stream.end()
-        stream.removeListener('data', onRecognizeStreamData)
-        stream.removeListener('error', onRecognizeStreamError)
+        ending = true
       },
       message: deferredMessage.promise,
+      resolve: deferredMessage.resolve,
+      reject: deferredMessage.reject,
+      currentTranscript,
     })
   }
 
