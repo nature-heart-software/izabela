@@ -124,7 +124,7 @@ function startRecording() {
 // TODO: The listeners below are not removed on unmount, gotta fix that
 onIPCStartSpeechTranscription(() => {
   if (!realTime && mediaRecorder) {
-    console.log(`[${ getTime() }] Starting web recording`)
+    console.log(`[${getTime()}] Starting web recording`)
     speechRecognitionStore.$patch({
       recording: true,
     })
@@ -134,7 +134,7 @@ onIPCStartSpeechTranscription(() => {
 
 onIPCStopSpeechTranscription(() => {
   if (!realTime && mediaRecorder) {
-    console.log(`[${ getTime() }] Stopping web recording`)
+    console.log(`[${getTime()}] Stopping web recording`)
     speechRecognitionStore.$patch({
       recording: false,
     })
