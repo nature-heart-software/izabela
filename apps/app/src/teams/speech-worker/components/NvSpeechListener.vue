@@ -58,7 +58,7 @@ if (settingsStore.enableSTTTS) {
 
 onIPCStartSpeechTranscription(() => {
   if (!realTime) {
-    console.log(`[${ getTime() }] Starting web recording`)
+    console.log(`[${getTime()}] Starting web recording`)
     speechRecognitionStore.$patch({
       recording: true,
     })
@@ -67,13 +67,12 @@ onIPCStartSpeechTranscription(() => {
 
 onIPCStopSpeechTranscription(() => {
   if (!realTime) {
-    console.log(`[${ getTime() }] Stopping web recording`)
+    console.log(`[${getTime()}] Stopping web recording`)
     speechRecognitionStore.$patch({
       recording: false,
     })
   }
 })
-
 
 onBeforeUnmount(() => {
   stream?.getTracks().forEach((track) => {

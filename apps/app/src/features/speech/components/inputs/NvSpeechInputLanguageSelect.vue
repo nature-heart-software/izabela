@@ -17,10 +17,8 @@ import bcp47codes from '@/data/bcp-47-codes.json'
 const settingsStore = useSettingsStore()
 const select = ref()
 const { width } = useElementSize(select)
-const options = computed(() => bcp47codes.map(({
-                                                 languageCode,
-                                                 name,
-                                               }) => ({
+const options = computed(() =>
+  bcp47codes.map(({ languageCode, name }) => ({
     label: name,
     value: languageCode,
   })),

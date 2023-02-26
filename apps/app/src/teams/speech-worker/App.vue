@@ -1,10 +1,10 @@
 <template>
   <template v-if="settingsStore.$isReady">
     <Transition>
-      <NvSpeechRecordingLogo v-if="speechRecognitionStore.recording"/>
+      <NvSpeechRecordingLogo v-if="speechRecognitionStore.recording" />
     </Transition>
-    <NvSpeechSynthesizer/>
-    <NvSpeechListener :key="speechListenerKey"/>
+    <NvSpeechSynthesizer />
+    <NvSpeechListener :key="speechListenerKey" />
   </template>
 </template>
 <style lang="scss">
