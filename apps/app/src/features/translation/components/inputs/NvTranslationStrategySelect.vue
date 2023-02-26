@@ -2,12 +2,19 @@
   <NvSelect
     ref="select"
     :autocompleteWidth="width"
-    :modelValue="settingsStore.speechRecognitionStrategy"
+    :modelValue="settingsStore.textTranslationStrategy"
     :options="[
-      { label: 'Automatic', value: 'continuous' },
-      { label: 'Push-to-record', value: 'ptr' },
+      {
+        label: 'Cloud Translation',
+        value: 'cloud-translation',
+      },
+      {
+        label: 'Custom',
+        value: 'custom',
+      },
     ]"
-    @update:modelValue="(value) => settingsStore.$patch({ speechRecognitionStrategy: value })"
+    class="shrink-0"
+    @update:modelValue="(value) => settingsStore.$patch({ textTranslationStrategy: value })"
   />
 </template>
 <script lang="ts" setup>

@@ -34,6 +34,10 @@
                 @update:modelValue="(value) => settingsStore.$patch({ enableTranslation: value })"
               />
             </NvGroup>
+            <NvDivider direction="horizontal" />
+            <NvFormItem label="Translation strategy">
+              <NvTranslationStrategySelect />
+            </NvFormItem>
             <NvAccessBlocker
               :allowed="!!googleCloudSpeechCredentialsPath && settingsStore.enableTranslation"
               :reason="
@@ -44,13 +48,31 @@
             >
               <NvStack spacing="4">
                 <NvDivider direction="horizontal" />
-                <NvFormItem label="From">
-                  <NvTranslationFromSelect />
-                </NvFormItem>
-                <NvDivider direction="horizontal" />
-                <NvFormItem label="To">
-                  <NvTranslationToSelect />
-                </NvFormItem>
+                <template v-if="settingsStore.textTranslationStrategy === 'cloud-translation'">
+                  <NvFormItem label="From">
+                    <NvTranslationFromSelect />
+                  </NvFormItem>
+                  <NvDivider direction="horizontal" />
+                  <NvFormItem label="To">
+                    <NvTranslationToSelect />
+                  </NvFormItem>
+                </template>
+                <template v-if="settingsStore.textTranslationStrategy === 'custom'">
+                  <NvAccessBlocker
+                    :allowed="!!settingsStore.customTextTranslationEndpoint"
+                    reason="Endpoint and/or credentials required"
+                  >
+                    <NvStack spacing="4">
+                      <NvFormItem label="From">
+                        <NvCustomTranslationFromSelect />
+                      </NvFormItem>
+                      <NvDivider direction="horizontal" />
+                      <NvFormItem label="To">
+                        <NvCustomTranslationToSelect />
+                      </NvFormItem>
+                    </NvStack>
+                  </NvAccessBlocker>
+                </template>
               </NvStack>
             </NvAccessBlocker>
           </NvStack>
@@ -118,7 +140,10 @@ import { inject } from 'vue'
 import { useRoute } from 'vue-router'
 import NvTranslationFromSelect from '@/features/translation/components/inputs/NvTranslationFromSelect.vue'
 import NvTranslationToSelect from '@/features/translation/components/inputs/NvTranslationToSelect.vue'
+import NvCustomTranslationFromSelect from '@/features/translation/components/inputs/NvCustomTranslationFromSelect.vue'
+import NvCustomTranslationToSelect from '@/features/translation/components/inputs/NvCustomTranslationToSelect.vue'
 import { useGetGoogleCloudSpeechCredentialsPath } from '@/features/settings/hooks'
+import NvTranslationStrategySelect from '@/features/translation/components/inputs/NvTranslationStrategySelect.vue'
 
 const settingsStore = useSettingsStore()
 const messengerContext = inject('messenger')
