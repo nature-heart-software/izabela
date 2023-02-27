@@ -35,6 +35,7 @@ who wants to communicate with text-to-speech and for that reason, you can see Iz
 - [x] Keyboard shortcuts for quick messages
 - [x] Voice expressions (Microsoft Azure)
 - [x] Download messages to audio files
+- [x] Translate messages into any language
 - [x] Dictionary to translate abbreviations (ily -> I love you (💖))
 - [x] Local and remote servers to help you build your own text-to-speech implementations
 - [x] Local websocket server to retrieve messages (useful for streaming elements!)
