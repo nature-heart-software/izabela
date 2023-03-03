@@ -1,8 +1,9 @@
 <template>
   <template v-if="settingsStore.$isReady">
-    <NvSpeechRecordingLogo v-if="settingsStore.enableSTTTS && speechRecognitionStore.recording" />
-    <NvSpeechSynthesizer />
-    <NvSpeechListener :key="speechListenerKey" />
+    <NvSpeechRecordingLogo v-if="settingsStore.enableSTTTS && speechRecognitionStore.recording"/>
+    <NvSpeechSynthesizer/>
+    <NvSpeechListener :key="speechListenerKey"/>
+    <NvAudioInputUpdater/>
   </template>
 </template>
 <style lang="scss">
@@ -21,6 +22,7 @@ import { computed } from 'vue'
 import hash from 'object-hash'
 import NvSpeechRecordingLogo from '@/teams/speech-worker/components/NvSpeechRecordingLogo.vue'
 import { useSpeechRecognitionStore } from '@/features/speech/store'
+import NvAudioInputUpdater from '@/teams/speech-worker/components/NvAudioInputUpdater.vue'
 
 const speechRecognitionStore = useSpeechRecognitionStore()
 const settingsStore = useSettingsStore()
