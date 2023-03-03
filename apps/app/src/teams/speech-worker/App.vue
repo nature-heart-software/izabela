@@ -1,8 +1,8 @@
 <template>
   <template v-if="settingsStore.$isReady">
-    <NvSpeechRecordingLogo v-if="settingsStore.enableSTTTS && speechRecognitionStore.recording"/>
-    <NvSpeechSynthesizer/>
-    <NvSpeechListener :key="speechListenerKey"/>
+    <NvSpeechRecordingLogo v-if="settingsStore.enableSTTTS && speechRecognitionStore.recording" />
+    <NvSpeechSynthesizer />
+    <NvSpeechListener :key="speechListenerKey" />
   </template>
 </template>
 <style lang="scss">
