@@ -3,7 +3,7 @@ import speech from '@google-cloud/speech'
 import { BrowserWindow, screen } from 'electron'
 import { ipcMain } from 'electron-postman'
 import { createNotification } from '@/utils/electron-notification'
-import { useSpeechStore } from '@/features/speech/store'
+import { useSpeechRecognitionStore, useSpeechStore } from '@/features/speech/store'
 import { gkl, keybindingReleased, keybindingTriggered } from '@/modules/electron-keybinding/utils'
 import { Deferred } from '@packages/toolbox'
 import { useSettingsStore } from '@/features/settings/store'
@@ -11,6 +11,7 @@ import { watch } from 'vue'
 import electronNativeSpeechRecognition from '@/teams/speech-worker/modules/electron-native-speech-recognition'
 import ElectronWindowManager from '@/modules/electron-window-manager'
 import { mapValues } from 'lodash'
+import { getTime } from '@/utils/time'
 
 export const ElectronSpeechWindow = () => {
   let registeredWindow: BrowserWindow | null = null
@@ -18,6 +19,7 @@ export const ElectronSpeechWindow = () => {
   const isReady = () => ready.promise
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
   let speechStore: ReturnType<typeof useSpeechStore> | undefined
+  let speechRecognitionStore: ReturnType<typeof useSpeechRecognitionStore> | undefined
   let deferredRecording: ReturnType<typeof Deferred> | null = null
   // eslint-disable-next-line prefer-const
   let electronNativeSpeechRecognitionCallback: ReturnType<
@@ -89,25 +91,35 @@ export const ElectronSpeechWindow = () => {
     gkl?.addListener((e) => {
       if (
         settingsStore &&
+        settingsStore.enableSTTTS &&
+        settingsStore.speechRecognitionStrategy === 'ptr' &&
         e.state === 'DOWN' &&
         !deferredRecording &&
         keybindingTriggered(settingsStore.keybindings.recordAudio)
       ) {
         deferredRecording = Deferred()
-        ipcMain.sendTo('speech-worker', 'start-speech-transcription')
+        console.log(`[${getTime()}] Starting recording`)
+        speechRecognitionStore?.$patch({
+          recording: true,
+        })
       }
     })
 
     gkl?.addListener((e) => {
       if (
         settingsStore &&
+        settingsStore.enableSTTTS &&
+        settingsStore.speechRecognitionStrategy === 'ptr' &&
         e.state === 'UP' &&
         deferredRecording &&
         keybindingReleased(settingsStore.keybindings.recordAudio)
       ) {
         deferredRecording.resolve(true)
         deferredRecording = null
-        ipcMain.sendTo('speech-worker', 'stop-speech-transcription')
+        console.log(`[${getTime()}] Stopping recording`)
+        speechRecognitionStore?.$patch({
+          recording: false,
+        })
       }
     })
   }
@@ -123,6 +135,7 @@ export const ElectronSpeechWindow = () => {
   isReady().then(() => {
     settingsStore = useSettingsStore()
     speechStore = useSpeechStore()
+    speechRecognitionStore = useSpeechRecognitionStore()
 
     watch(
       () => [
