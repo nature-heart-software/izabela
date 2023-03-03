@@ -16,14 +16,17 @@ watch(
   async () => {
     if (audioInputLabel.value) {
       const targetAudioDeviceIndex = audioInputs.value.findIndex(
-        (input) => audioInputLabel.value.includes(input.label) || input.label.includes(audioInputLabel.value),
+        (input) =>
+          audioInputLabel.value.includes(input.label) ||
+          input.label.includes(audioInputLabel.value),
       )
-      if (targetAudioDeviceIndex > -1 && (targetAudioDeviceIndex !== settingsStore.soxDevice)) {
+      if (targetAudioDeviceIndex > -1 && targetAudioDeviceIndex !== settingsStore.soxDevice) {
         settingsStore.$patch({ soxDevice: targetAudioDeviceIndex })
       }
     }
   },
-  { immediate: true })
+  { immediate: true },
+)
 
 watch(
   () => settingsStore.soxDevice,
@@ -31,5 +34,6 @@ watch(
     const audioDevice = await getSoxMediaDeviceByIndex(newValue)
     if (audioDevice) audioInputLabel.value = audioDevice.label
   },
-  { immediate: false })
+  { immediate: false },
+)
 </script>
