@@ -9,18 +9,18 @@
               :type="settingsStore.messageMode === 'sentence' && 'plain'"
               size="sm"
               @click="settingsStore.$patch({ messageMode: 'sentence' })"
-              >Sentence
+            >Sentence
             </NvButton>
             <NvButton
               :type="settingsStore.messageMode === 'word' && 'plain'"
               size="sm"
               @click="settingsStore.$patch({ messageMode: 'word' })"
-              >Word
+            >Word
             </NvButton>
           </NvGroup>
         </template>
       </NvTooltip>
-      <NvDivider class="h-3" direction="vertical" />
+      <NvDivider class="h-3" direction="vertical"/>
       <NvPopover :tippy-options="{ placement: 'top-end' }" size="sm">
         <div class="w-screen max-w-full">
           <NvStack spacing="4">
@@ -34,10 +34,6 @@
                 @update:modelValue="(value) => settingsStore.$patch({ enableTranslation: value })"
               />
             </NvGroup>
-            <NvDivider direction="horizontal" />
-            <NvFormItem label="Translation strategy">
-              <NvTranslationStrategySelect />
-            </NvFormItem>
             <NvAccessBlocker
               :allowed="!!googleCloudSpeechCredentialsPath && settingsStore.enableTranslation"
               :reason="
@@ -47,14 +43,18 @@
               "
             >
               <NvStack spacing="4">
-                <NvDivider direction="horizontal" />
+                <NvDivider direction="horizontal"/>
+                <NvFormItem label="Translation strategy">
+                  <NvTranslationStrategySelect/>
+                </NvFormItem>
+                <NvDivider direction="horizontal"/>
                 <template v-if="settingsStore.textTranslationStrategy === 'cloud-translation'">
                   <NvFormItem label="From">
-                    <NvTranslationFromSelect />
+                    <NvTranslationFromSelect/>
                   </NvFormItem>
-                  <NvDivider direction="horizontal" />
+                  <NvDivider direction="horizontal"/>
                   <NvFormItem label="To">
-                    <NvTranslationToSelect />
+                    <NvTranslationToSelect/>
                   </NvFormItem>
                 </template>
                 <template v-if="settingsStore.textTranslationStrategy === 'custom'">
@@ -64,11 +64,11 @@
                   >
                     <NvStack spacing="4">
                       <NvFormItem label="From">
-                        <NvCustomTranslationFromSelect />
+                        <NvCustomTranslationFromSelect/>
                       </NvFormItem>
-                      <NvDivider direction="horizontal" />
+                      <NvDivider direction="horizontal"/>
                       <NvFormItem label="To">
-                        <NvCustomTranslationToSelect />
+                        <NvCustomTranslationToSelect/>
                       </NvFormItem>
                     </NvStack>
                   </NvAccessBlocker>
@@ -81,7 +81,7 @@
           <NvTooltip>
             <NvText>Translation</NvText>
             <template #reference>
-              <NvButton data-v-step="translation-button" icon-name="english-to-chinese" size="sm" />
+              <NvButton data-v-step="translation-button" icon-name="english-to-chinese" size="sm"/>
             </template>
           </NvTooltip>
         </template>
@@ -138,12 +138,17 @@ import {
 import { useSettingsStore } from '@/features/settings/store'
 import { inject } from 'vue'
 import { useRoute } from 'vue-router'
-import NvTranslationFromSelect from '@/features/translation/components/inputs/NvTranslationFromSelect.vue'
-import NvTranslationToSelect from '@/features/translation/components/inputs/NvTranslationToSelect.vue'
-import NvCustomTranslationFromSelect from '@/features/translation/components/inputs/NvCustomTranslationFromSelect.vue'
-import NvCustomTranslationToSelect from '@/features/translation/components/inputs/NvCustomTranslationToSelect.vue'
+import NvTranslationFromSelect
+  from '@/features/translation/components/inputs/NvTranslationFromSelect.vue'
+import NvTranslationToSelect
+  from '@/features/translation/components/inputs/NvTranslationToSelect.vue'
+import NvCustomTranslationFromSelect
+  from '@/features/translation/components/inputs/NvCustomTranslationFromSelect.vue'
+import NvCustomTranslationToSelect
+  from '@/features/translation/components/inputs/NvCustomTranslationToSelect.vue'
 import { useGetGoogleCloudSpeechCredentialsPath } from '@/features/settings/hooks'
-import NvTranslationStrategySelect from '@/features/translation/components/inputs/NvTranslationStrategySelect.vue'
+import NvTranslationStrategySelect
+  from '@/features/translation/components/inputs/NvTranslationStrategySelect.vue'
 
 const settingsStore = useSettingsStore()
 const messengerContext = inject('messenger')

@@ -7,7 +7,7 @@
           <NvGroup no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Translation</NvText>
-              <NvText>Translate messages before speaking</NvText>
+              <NvText>Translate messages before generating speech</NvText>
             </NvStack>
           </NvGroup>
         </NvCard>
@@ -15,11 +15,14 @@
           <NvCard>
             <NvStack spacing="5">
               <NvGoogleCloudCredentialsFormPart>
-                Izabela uses Google Cloud Translation AI for translation which requires Google Cloud
-                Credentials to be imported
+                Izabela uses Google Cloud Translation AI for translation which requires a <a
+                href="https://developers.google.com/workspace/guides/create-credentials#service-account"
+                target="_blank">Google
+                Cloud
+                service account credentials</a> file to be imported
               </NvGoogleCloudCredentialsFormPart>
               <template v-if="googleCloudSpeechCredentialsPath">
-                <NvDivider direction="horizontal" />
+                <NvDivider direction="horizontal"/>
                 <NvGroup justify="apart" no-wrap spacing="5">
                   <NvStack>
                     <NvText type="label">Enable translation</NvText>
@@ -33,15 +36,15 @@
                   />
                 </NvGroup>
                 <template v-if="settingsStore.enableTranslation">
-                  <NvDivider direction="horizontal" />
+                  <NvDivider direction="horizontal"/>
                   <NvGroup justify="apart" no-wrap spacing="5">
                     <NvStack>
                       <NvText type="label">Translation strategy</NvText>
                     </NvStack>
-                    <NvTranslationStrategySelect />
+                    <NvTranslationStrategySelect/>
                   </NvGroup>
                   <template v-if="settingsStore.textTranslationStrategy === 'cloud-translation'">
-                    <NvDivider direction="horizontal" />
+                    <NvDivider direction="horizontal"/>
                     <NvGroup justify="apart" no-wrap spacing="5">
                       <NvStack>
                         <NvText type="label">From</NvText>
@@ -55,7 +58,7 @@
                         "
                       />
                     </NvGroup>
-                    <NvDivider direction="horizontal" />
+                    <NvDivider direction="horizontal"/>
                     <NvGroup justify="apart" no-wrap spacing="5">
                       <NvStack>
                         <NvText type="label">To</NvText>
@@ -71,7 +74,7 @@
                     </NvGroup>
                   </template>
                   <template v-if="settingsStore.textTranslationStrategy === 'custom'">
-                    <NvDivider direction="horizontal" />
+                    <NvDivider direction="horizontal"/>
                     <NvAccessBlocker
                       :allowed="!!settingsStore.customTextTranslationEndpoint"
                       reason="Endpoint and/or credentials required"
@@ -81,18 +84,18 @@
                           <NvStack>
                             <NvText type="label">From</NvText>
                           </NvStack>
-                          <NvCustomTranslationFromSelect />
+                          <NvCustomTranslationFromSelect/>
                         </NvGroup>
-                        <NvDivider direction="horizontal" />
+                        <NvDivider direction="horizontal"/>
                         <NvGroup justify="apart" no-wrap spacing="5">
                           <NvStack>
                             <NvText type="label">To</NvText>
                           </NvStack>
-                          <NvCustomTranslationToSelect />
+                          <NvCustomTranslationToSelect/>
                         </NvGroup>
                       </NvStack>
                     </NvAccessBlocker>
-                    <NvDivider direction="horizontal" />
+                    <NvDivider direction="horizontal"/>
                     <NvFormItem label="API Endpoint">
                       <NvInput
                         :modelValue="settingsStore.customTextTranslationEndpoint"
@@ -101,7 +104,7 @@
                         "
                       />
                     </NvFormItem>
-                    <NvDivider direction="horizontal" />
+                    <NvDivider direction="horizontal"/>
                     <NvFormItem label="API Key">
                       <NvInput
                         :modelValue="decrypt(settingsStore.customTextTranslationApiKey)"
@@ -138,14 +141,20 @@ import { useSettingsStore } from '@/features/settings/store'
 // eslint-disable-next-line camelcase
 import { getAll639_1, getName } from 'all-iso-language-codes'
 import { useGetGoogleCloudSpeechCredentialsPath } from '@/features/settings/hooks'
-import NvGoogleCloudCredentialsFormPart from '@/features/settings/components/NvGoogleCloudCredentialsFormPart.vue'
-import NvCustomTranslationFromSelect from '@/features/translation/components/inputs/NvCustomTranslationFromSelect.vue'
-import NvCustomTranslationToSelect from '@/features/translation/components/inputs/NvCustomTranslationToSelect.vue'
+import NvGoogleCloudCredentialsFormPart
+  from '@/features/settings/components/NvGoogleCloudCredentialsFormPart.vue'
+import NvCustomTranslationFromSelect
+  from '@/features/translation/components/inputs/NvCustomTranslationFromSelect.vue'
+import NvCustomTranslationToSelect
+  from '@/features/translation/components/inputs/NvCustomTranslationToSelect.vue'
 import { decrypt, encrypt } from '@/utils/security'
 import { useQueryClient } from 'vue-query'
 import { watch } from 'vue'
-import { useGetCustomLanguagesQueryKey } from '@/features/translation/hooks/useGetCustomLanguagesQuery'
-import NvTranslationStrategySelect from '@/features/translation/components/inputs/NvTranslationStrategySelect.vue'
+import {
+  useGetCustomLanguagesQueryKey,
+} from '@/features/translation/hooks/useGetCustomLanguagesQuery'
+import NvTranslationStrategySelect
+  from '@/features/translation/components/inputs/NvTranslationStrategySelect.vue'
 
 const settingsStore = useSettingsStore()
 const isoCodes = getAll639_1()

@@ -2,7 +2,8 @@ import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
 import NvSettings from '@/teams/messenger/views/NvSettings.vue'
 import NvSettingsGeneral from '@/teams/messenger/views/NvSettingsGeneral.vue'
 import NvSettingsEngine from '@/teams/messenger/views/NvSettingsEngine.vue'
-import NvSettingsAudio from '@/teams/messenger/views/NvSettingsAudio.vue'
+import NvSettingsAudioInput from '@/teams/messenger/views/NvSettingsAudioInput.vue'
+import NvSettingsAudioOutputs from '@/teams/messenger/views/NvSettingsAudioOutputs.vue'
 import NvSettingsDictionary from '@/teams/messenger/views/NvSettingsDictionary.vue'
 import NvMessages from '@/teams/messenger/views/NvMessages.vue'
 import NvMessagesHistory from '@/teams/messenger/views/NvMessagesHistory.vue'
@@ -29,9 +30,14 @@ const routes: Array<RouteRecordRaw> = [
         component: NvSettingsEngine,
       },
       {
-        name: 'settings-audio',
-        path: 'audio',
-        component: NvSettingsAudio,
+        name: 'settings-audio-outputs',
+        path: 'audio-outputs',
+        component: NvSettingsAudioOutputs,
+      },
+      {
+        name: 'settings-audio-input',
+        path: 'audio-input',
+        component: NvSettingsAudioInput,
       },
       {
         name: 'settings-translation',
