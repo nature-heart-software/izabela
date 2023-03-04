@@ -71,14 +71,14 @@ export const ElectronMessengerWindow = () => {
         if (!isFocused) {
           foregroundWindow = user32.GetForegroundWindow()
           isFocused = true
-          window.once('show', () => {
-            /* The focus needs to be delayed after the show() to actually focus properly... */
-            setTimeout(() => {
-              isFocused = true
-              window.focus() // Fixes issues with Chrome and input elements
-              resolve(true)
-            }, 250)
-          })
+          // window.once('show', () => {
+          //   /* The focus needs to be delayed after the show() to actually focus properly... */
+          //   setTimeout(() => {
+          //     isFocused = true
+          //     window.focus() // Fixes issues with Chrome and input elements
+          //     resolve(true)
+          //   }, 250)
+          // })
 
           /* order matters */
           window.setFocusable(true) // Fixes alwaysOnTop going in the background sometimes for some reasons
@@ -185,22 +185,7 @@ export const ElectronMessengerWindow = () => {
 
   const addEventListeners = () => {
     const window = getWindow()
-    // iohook.on('keypress', ({ keychar }) => console.log(`Key pressed: ${String.fromCharCode(keychar)}`))
     iohook.on('mousemove', throttle(onMouseMove, 150))
-    // iohook.on('keyup', (event) => {
-    //   console.log(event)
-    // if (event.keycode === 56) {
-    //   let keypressTime = Number(new Date())
-    //   if (keypressTime - lastKeypressTime <= doubleKeypressDelta) {
-    //     toggleWindow()
-    //     keypressTime = 0
-    //   }
-    //   lastKeypressTime = keypressTime
-    // }
-    // })
-    // iohook.registerShortcut([42, 56], () => {
-    //   toggleWindow()
-    // })
 
     if (window) {
       window.on('show', () => {
