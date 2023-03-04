@@ -33,6 +33,7 @@ import { emitIPCSay } from '@/electron/events/renderer'
 import { useSpeechStore } from '@/features/speech/store'
 import { useSettingsStore } from '@/features/settings/store'
 import NvSpeechEngineInput from '@/features/speech/components/inputs/NvSpeechEngineInput.vue'
+import { socket } from '@/services'
 
 const { ElectronMessengerWindow } = window
 const messengerWindowStore = useMessengerWindowStore()
@@ -63,10 +64,12 @@ const playMessage = () => {
 
 const onInputFocus = () => {
   messengerWindowStore.$patch({ isInputFocused: true })
+  socket.emit('input:focus')
 }
 
 const onInputBlur = () => {
   messengerWindowStore.$patch({ isInputFocused: false })
+  socket.emit('input:blur')
 }
 
 const onInputEnter = () => {

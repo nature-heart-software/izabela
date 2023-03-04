@@ -1,8 +1,13 @@
 <template>
   <NvStack spacing="5">
     <NvGoogleCloudCredentialsFormPart>
-      Izabela uses Google Cloud Speech for speech recognition which requires Google Cloud
-      Credentials to be imported
+      Izabela uses Google Cloud Speech for speech recognition which requires a
+      <a
+        href="https://developers.google.com/workspace/guides/create-credentials#service-account"
+        target="_blank"
+        >Google Cloud service account credentials</a
+      >
+      file to be imported
     </NvGoogleCloudCredentialsFormPart>
     <template v-if="!!googleCloudSpeechCredentialsPath">
       <NvStack spacing="5">
@@ -40,7 +45,7 @@
             <NvDivider direction="horizontal" />
             <NvGroup justify="apart" no-wrap spacing="5">
               <NvStack>
-                <NvText type="label">Push-to-record Key</NvText>
+                <NvText type="label">Push-to-record key</NvText>
                 <NvText>Key to press in order to record speech</NvText>
                 <NvText type="caption">Release the key to transcribe speech</NvText>
               </NvStack>
@@ -59,7 +64,7 @@
                 <NvStack>
                   <NvText type="label">Activation threshold</NvText>
                   <NvText>Minimum volume required to record speech (dB)</NvText>
-                  <NvText type="caption">A lower value activates the recording more easily </NvText>
+                  <NvText type="caption">A lower value activates the recording more easily</NvText>
                 </NvStack>
                 <NvNumberInput
                   :max="0"
@@ -73,6 +78,7 @@
               <NvStack>
                 <NvGroup
                   :style="{
+                    marginTop: rem(tokens.spacing['2']),
                     paddingTop: rem(tokens.spacing['5']),
                   }"
                   align="start"
@@ -121,6 +127,17 @@
                       top: 0,
                       left: 0,
                       width: `${micVolumeBarWidth}%`,
+                    }"
+                  />
+                  <div
+                    :style="{
+                      backgroundColor: tokens.colors.gray['90'],
+                      height: rem(tokens.spacing['5']),
+                      position: 'absolute',
+                      top: '50%',
+                      left: `${currentVolumeBarPosition}%`,
+                      width: rem(tokens.spacing['1']),
+                      transform: 'translate(-50%, -50%)',
                     }"
                   />
                 </div>
@@ -235,6 +252,9 @@ const soxAudioInputs = computed(() => soxMediaInputsFilter(audioInputs.value))
 const soxAudioInput = computed(() => soxAudioInputs.value[settingsStore.soxDevice])
 const meter = new Tone.Meter()
 let mic = new Tone.UserMedia()
+const currentVolumeBarPosition = computed(
+  () => 100 - Math.abs((settingsStore.audioInputSensibility / minMeterValue) * 100),
+)
 const micVolumeBarWidth = computed(() => Math.abs(minMeterValue - micVolume.value))
 let interval: any = null
 watch(

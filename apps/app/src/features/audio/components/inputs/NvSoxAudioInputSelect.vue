@@ -15,9 +15,9 @@ import { computed, ref } from 'vue'
 import { useSoxDevicesList } from '@/features/audio/hooks'
 
 const settingsStore = useSettingsStore()
-const audioInput = useSoxDevicesList()
+const audioInputs = useSoxDevicesList()
 const options = computed(() =>
-  audioInput.value.map((input, i) => ({
+  audioInputs.value.map((input, i) => ({
     label: input.label,
     value: i,
   })),

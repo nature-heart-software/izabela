@@ -34,10 +34,6 @@
                 @update:modelValue="(value) => settingsStore.$patch({ enableTranslation: value })"
               />
             </NvGroup>
-            <NvDivider direction="horizontal" />
-            <NvFormItem label="Translation strategy">
-              <NvTranslationStrategySelect />
-            </NvFormItem>
             <NvAccessBlocker
               :allowed="!!googleCloudSpeechCredentialsPath && settingsStore.enableTranslation"
               :reason="
@@ -47,6 +43,10 @@
               "
             >
               <NvStack spacing="4">
+                <NvDivider direction="horizontal" />
+                <NvFormItem label="Translation strategy">
+                  <NvTranslationStrategySelect />
+                </NvFormItem>
                 <NvDivider direction="horizontal" />
                 <template v-if="settingsStore.textTranslationStrategy === 'cloud-translation'">
                   <NvFormItem label="From">

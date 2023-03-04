@@ -20,11 +20,3 @@ export const onIPCSay = (callback: (payload: IPCSayPayload) => any) => {
 export const emitIPCSay = (payload: IPCSayPayload) => {
   ipc.sendTo('speech-worker', 'say', payload)
 }
-
-export const onIPCStartSpeechTranscription = (payload: () => any) => {
-  ipc.on('main', 'start-speech-transcription', payload)
-}
-
-export const onIPCStopSpeechTranscription = (payload: () => any) => {
-  ipc.on('main', 'stop-speech-transcription', payload)
-}

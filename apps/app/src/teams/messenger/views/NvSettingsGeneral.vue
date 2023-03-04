@@ -44,11 +44,12 @@
             <NvStack>
               <NvText type="label">Show Messenger window (for compatibility)</NvText>
               <NvText
-                >Applications sometimes block system-wide keyboard shortcuts. If the Messenger
-                window doesn't show with the shortcut above, use this one.
+                >Applications sometimes block system-wide keyboard shortcuts<br />
+                Use this shortcut if the Messenger window doesn't show with the shortcut above
               </NvText>
               <NvText type="caption"
-                >The Messenger window will not be focused when shown however
+                ><strong>NOTE:</strong> The Messenger window will not be focused when shown with
+                this shortcut
               </NvText>
             </NvStack>
             <NvKeybinding
@@ -79,7 +80,7 @@
           <NvDivider direction="horizontal" />
           <NvGroup justify="apart" no-wrap spacing="5">
             <NvStack>
-              <NvText type="label">Update Channel</NvText>
+              <NvText type="label">Update channel</NvText>
             </NvStack>
             <NvUpdateChannelSelect
               :modelValue="settingsStore.updateChannel"

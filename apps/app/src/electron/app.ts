@@ -15,6 +15,7 @@ import registerElectronUpdater from '@/modules/electron-updater/register'
 import registerElectronDebug from '@/modules/electron-debug/register'
 import registerElectronDisplay from '@/modules/electron-display/register'
 import registerElectronKeybinding from '@/modules/electron-keybinding/register'
+import registerElectronCache from '@/modules/electron-cache/register'
 
 const App = () => {
   const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -47,6 +48,7 @@ const App = () => {
     if (process.platform === 'win32') app.setAppUserModelId(app.name)
     app.commandLine.appendSwitch('disable-renderer-backgrounding')
     app.commandLine.appendSwitch('ignore-certificate-errors')
+    app.commandLine.appendSwitch('wm-window-animations-disabled')
     /* Fixes iohook. See: https://github.com/electron/electron/issues/18397 */
     app.allowRendererProcessReuse = false
 
@@ -127,6 +129,7 @@ const App = () => {
       exec('Start server', () => startAppServer()),
       exec('Register display', () => registerElectronDisplay()),
       exec('Register keybindings', () => registerElectronKeybinding()),
+      exec('Handle Cache', () => registerElectronCache()),
     ])
   }
 
