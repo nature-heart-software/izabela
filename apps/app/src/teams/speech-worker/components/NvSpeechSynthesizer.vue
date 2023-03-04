@@ -10,11 +10,13 @@ import {
   removeCommandFromMessage,
 } from '@/modules/izabela/utils'
 import { useSettingsStore } from '@/features/settings/store'
+import { io } from 'socket.io-client'
 
 const { ElectronTranslation } = window
 const speechStore = useSpeechStore()
 const settingsStore = useSettingsStore()
-onIPCSay(async (payload: string | IzabelaMessage) => {
+const socket = io(`ws://localhost:${process.env.VUE_APP_SERVER_WS_PORT}`, {})
+const onMessage = async (payload: string | IzabelaMessage) => {
   console.log('Saying something:', payload)
   let message = null
   if (typeof payload === 'string') {
@@ -63,5 +65,9 @@ onIPCSay(async (payload: string | IzabelaMessage) => {
     }
   }
   if (message) izabela.say(message)
+}
+socket.on('say', (e) => {
+  if (typeof e === 'string') onMessage(e)
 })
+onIPCSay(onMessage)
 </script>

@@ -1,9 +1,9 @@
 <template>
   <template v-if="settingsStore.$isReady">
-    <NvSpeechRecordingLogo v-if="settingsStore.enableSTTTS && speechRecognitionStore.recording" />
-    <NvSpeechSynthesizer />
-    <NvSpeechListener :key="speechListenerKey" />
-    <NvAudioInputUpdater />
+    <NvSpeechRecordingLogo v-if="settingsStore.enableSTTTS && speechRecognitionStore.recording"/>
+    <NvSpeechSynthesizer/>
+    <NvSpeechListener :key="speechListenerKey"/>
+    <NvAudioInputUpdater/>
   </template>
 </template>
 <style lang="scss">
@@ -18,11 +18,12 @@ body {
 import NvSpeechListener from '@/teams/speech-worker/components/NvSpeechListener.vue'
 import NvSpeechSynthesizer from '@/teams/speech-worker/components/NvSpeechSynthesizer.vue'
 import { useSettingsStore } from '@/features/settings/store'
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import hash from 'object-hash'
 import NvSpeechRecordingLogo from '@/teams/speech-worker/components/NvSpeechRecordingLogo.vue'
 import { useSpeechRecognitionStore } from '@/features/speech/store'
 import NvAudioInputUpdater from '@/teams/speech-worker/components/NvAudioInputUpdater.vue'
+import { socket } from '@/services'
 
 const speechRecognitionStore = useSpeechRecognitionStore()
 const settingsStore = useSettingsStore()
@@ -36,5 +37,16 @@ const speechListenerKey = computed(() =>
     settingsStore.speechInputLanguage,
     settingsStore.soxDevice,
   ]),
+)
+
+watch(
+  () => speechRecognitionStore.recording,
+  () => {
+    if (speechRecognitionStore.recording) {
+      socket.emit('speech:recording:start')
+    } else {
+      socket.emit('speech:recording:end')
+    }
+  },
 )
 </script>

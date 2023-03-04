@@ -26,14 +26,14 @@ export default () => {
 
   function playMessage(message: ReturnType<typeof IzabelaMessage>) {
     const socketPayload = message.getSocketPayload()
-    const onEnd = () => {
-      socket.emit('message:error', socketPayload)
+    const onEnd = (hasError?: boolean) => {
+      if (hasError) socket.emit('message:error', socketPayload)
       socket.emit('message:end', socketPayload)
       return endMessage()
     }
     currentlyPlayingMessage = message
-    message.on('ended', onEnd)
-    message.on('error', onEnd)
+    message.on('ended', () => onEnd())
+    message.on('error', () => onEnd(true))
     socket.emit('message:load', socketPayload)
     message
       .isReady()

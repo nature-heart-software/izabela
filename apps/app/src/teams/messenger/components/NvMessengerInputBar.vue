@@ -33,6 +33,7 @@ import { emitIPCSay } from '@/electron/events/renderer'
 import { useSpeechStore } from '@/features/speech/store'
 import { useSettingsStore } from '@/features/settings/store'
 import NvSpeechEngineInput from '@/features/speech/components/inputs/NvSpeechEngineInput.vue'
+import { socket } from '@/services'
 
 const { ElectronMessengerWindow } = window
 const messengerWindowStore = useMessengerWindowStore()
@@ -49,7 +50,7 @@ const onInputEsc = () => {
 
 const placeholder = computed(() => {
   if (speechStore.commands.length > 0) {
-    return `Type / to see available commands (${speechStore.commands.length})`
+    return `Type / to see available commands (${ speechStore.commands.length })`
   }
   return 'So, said the angel to the child who, divided, broke the knife..'
 })
@@ -63,10 +64,12 @@ const playMessage = () => {
 
 const onInputFocus = () => {
   messengerWindowStore.$patch({ isInputFocused: true })
+  socket.emit('input:focus')
 }
 
 const onInputBlur = () => {
   messengerWindowStore.$patch({ isInputFocused: false })
+  socket.emit('input:blur')
 }
 
 const onInputEnter = () => {
