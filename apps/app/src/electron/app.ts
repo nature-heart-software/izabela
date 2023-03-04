@@ -48,6 +48,7 @@ const App = () => {
     if (process.platform === 'win32') app.setAppUserModelId(app.name)
     app.commandLine.appendSwitch('disable-renderer-backgrounding')
     app.commandLine.appendSwitch('ignore-certificate-errors')
+    app.commandLine.appendSwitch('wm-window-animations-disabled')
     /* Fixes iohook. See: https://github.com/electron/electron/issues/18397 */
     app.allowRendererProcessReuse = false
 

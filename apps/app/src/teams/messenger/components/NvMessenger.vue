@@ -72,7 +72,9 @@ import NvMessengerLinksBar from '@/teams/messenger/components/NvMessengerLinksBa
 import NvMessengerHandleBar from '@/teams/messenger/components/NvMessengerHandleBar.vue'
 import NvMessengerNavigationBar from '@/teams/messenger/components/NvMessengerNavigationBar.vue'
 import { debounce } from 'lodash'
+// import gsap from 'gsap'
 
+// const messengerWindowStore = useMessengerWindowStore()
 const messengerStore = useMessengerStore()
 const props = defineProps({
   width: {
@@ -164,8 +166,24 @@ const onDrag = (event: any) => {
   savePosition(event)
   settingsPopover.update()
 }
-
+// watch(() => messengerWindowStore.isShown, (isShown) => {
+//   console.log(gsap.getProperty(messenger.value, 'y'))
+//   if (isShown) {
+//     gsap.to(messenger.value, {
+//       opacity: 1,
+//       duration: 0.2,
+//       transition: 'easeOutExpo',
+//     })
+//   } else {
+//     gsap.set(messenger.value, {
+//       opacity: 0,
+//     })
+//   }
+// })
 onMounted(() => {
+  // gsap.set(messenger.value, {
+  //   opacity: 0,
+  // })
   const moveableTargetEl = (moveableTarget.value as ComponentPublicInstance)
     .$el as HTMLDivElement | null
   if (moveableTargetEl) {
