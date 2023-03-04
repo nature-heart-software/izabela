@@ -12,7 +12,7 @@ export default () =>
     Array.from(files).forEach((f) => {
       stat(path.join(directory, f)).then((s) => {
         // if it hasn't been accessed in the last day, delete it
-        if (s.atimeMs < Date.now() - 1000 * 60 * 60 * 24 * 7) {
+        if (s.atimeMs < Date.now() - 1000 * 60 * 60 * 24 * 1) {
           rm(path.join(directory, f))
         }
       })
