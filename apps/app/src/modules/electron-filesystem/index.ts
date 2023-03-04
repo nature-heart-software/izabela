@@ -1,4 +1,4 @@
-import { copyFile, mkdir, readdir, readFile, stat, writeFile } from 'fs/promises'
+import { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } from 'fs/promises'
 import path from 'path'
 import { app, BrowserWindow, dialog } from 'electron'
 import { IzabelaMessagePayload } from '@/modules/izabela/types'
@@ -94,6 +94,17 @@ export const ElectronFilesystem = () => ({
       )
     }
     return Promise.resolve(null)
+  },
+  async deleteCachedAudio(id: string): Promise<boolean> {
+    const directory = path.join(app.getPath('temp'), pkg.productName, 'cache')
+    await mkdir(directory, { recursive: true })
+    const files = await readdir(directory)
+    const file = files.find((f) => f.startsWith(id))
+    if (file) {
+      await rm(path.join(directory, file))
+      return Promise.resolve(true)
+    }
+    return Promise.resolve(false)
   },
 })
 
