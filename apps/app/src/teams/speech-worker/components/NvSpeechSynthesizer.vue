@@ -15,7 +15,7 @@ import { io } from 'socket.io-client'
 const { ElectronTranslation } = window
 const speechStore = useSpeechStore()
 const settingsStore = useSettingsStore()
-const socket = io(`ws://localhost:${ process.env.VUE_APP_SERVER_WS_PORT }`, {})
+const socket = io(`ws://localhost:${process.env.VUE_APP_SERVER_WS_PORT}`, {})
 const onMessage = async (payload: string | IzabelaMessage) => {
   console.log('Saying something:', payload)
   let message = null
@@ -27,9 +27,9 @@ const onMessage = async (payload: string | IzabelaMessage) => {
     const cleanMessage = getCleanMessage(payload, engineCommands)
     const translatedMessage = settingsStore.enableTranslation
       ? await ElectronTranslation.translate(removeCommandFromMessage(payload), {
-        from: settingsStore.textInputLanguage || undefined,
-        to: settingsStore.textOutputLanguage || engine.getLanguageCode(voice),
-      })
+          from: settingsStore.textInputLanguage || undefined,
+          to: settingsStore.textOutputLanguage || engine.getLanguageCode(voice),
+        })
       : null
     console.log('Translated message:', translatedMessage)
     message = {
