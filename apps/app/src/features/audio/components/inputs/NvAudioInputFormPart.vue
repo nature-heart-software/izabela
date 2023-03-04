@@ -45,7 +45,7 @@
             <NvDivider direction="horizontal"/>
             <NvGroup justify="apart" no-wrap spacing="5">
               <NvStack>
-                <NvText type="label">Push-to-record Key</NvText>
+                <NvText type="label">Push-to-record key</NvText>
                 <NvText>Key to press in order to record speech</NvText>
                 <NvText type="caption">Release the key to transcribe speech</NvText>
               </NvStack>
