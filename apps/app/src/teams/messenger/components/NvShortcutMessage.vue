@@ -20,7 +20,7 @@
               @enter="() => play()"
             />
             <NvGroup noWrap>
-              <NvSpeechEngineSelect v-model="data.engine" class="w-1/3" size="sm" />
+              <NvSpeechEngineSelect v-model="data.engine" class="w-1/3" size="sm"/>
               <template v-if="engine">
                 <component
                   :is="engine.voiceSelectComponent"
@@ -31,7 +31,7 @@
                   size="sm"
                 />
               </template>
-              <NvKeybinding v-model="data.shortcut" class="w-1/3" multiple size="sm" />
+              <NvKeybinding v-model="data.shortcut" class="w-1/3" multiple size="sm"/>
             </NvGroup>
           </NvStack>
         </NvGroup>
@@ -46,7 +46,7 @@
             },
           ]"
         >
-          <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm" />
+          <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm"/>
         </NvContextMenu>
       </NvGroup>
       <div v-if="isPlaying" class="h-2 relative bg-gray-10">
@@ -68,6 +68,7 @@ import { Key } from '@/types/keybinds'
 import { usePlayMessage } from '@/features/messages/hooks'
 import NvSpeechEngineInput from '@/features/speech/components/inputs/NvSpeechEngineInput.vue'
 import { getCleanMessage, getMessageCommand } from '@/modules/izabela/utils'
+import hash from 'object-hash'
 
 const props = defineProps({
   id: {
@@ -75,7 +76,7 @@ const props = defineProps({
     required: true,
   },
 })
-
+const { ElectronFilesystem } = window
 const messagesStore = useMessagesStore()
 const settingsStore = useSettingsStore()
 const { shortcutMessages } = storeToRefs(messagesStore)
@@ -87,7 +88,7 @@ const data = reactive({
   selectedVoice: {} as Record<string, unknown>,
   shortcut: [] as Key[],
 })
-
+const hashedData = computed(() => hash([data.originalMessage, data.engine, data.selectedVoice[data.engine]]))
 const engine = computed(() => {
   if (!data.engine) return null
   return getEngineById(data.engine)
@@ -121,6 +122,9 @@ watch(
       voice,
       shortcut: data.shortcut,
       message: cleanMessage,
+      translatedMessage: null,
+      translatedFrom: null,
+      translatedTo: null,
       originalMessage: data.originalMessage,
       command: getMessageCommand(data.originalMessage),
     })
@@ -137,13 +141,15 @@ watch(
   },
   { immediate: true },
 )
-
+watch(() => hashedData.value, () => {
+  ElectronFilesystem.deleteCachedAudio(message.value?.id || props.id)
+}, { immediate: false })
 const playMessage = computed(() =>
   message.value
     ? {
-        ...message.value,
-        excludeFromHistory: true,
-      }
+      ...message.value,
+      excludeFromHistory: true,
+    }
     : undefined,
 )
 const { play, isPlaying, isLoading, progress } = usePlayMessage(playMessage)
