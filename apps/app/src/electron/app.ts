@@ -15,6 +15,7 @@ import registerElectronUpdater from '@/modules/electron-updater/register'
 import registerElectronDebug from '@/modules/electron-debug/register'
 import registerElectronDisplay from '@/modules/electron-display/register'
 import registerElectronKeybinding from '@/modules/electron-keybinding/register'
+import registerElectronCache from '@/modules/electron-cache/register'
 
 const App = () => {
   const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -127,6 +128,7 @@ const App = () => {
       exec('Start server', () => startAppServer()),
       exec('Register display', () => registerElectronDisplay()),
       exec('Register keybindings', () => registerElectronKeybinding()),
+      exec('Handle Cache', () => registerElectronCache()),
     ])
   }
 
