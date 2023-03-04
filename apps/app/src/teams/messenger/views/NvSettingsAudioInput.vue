@@ -14,7 +14,7 @@
         </NvCard>
         <div class="pl-8">
           <NvCard>
-            <NvAudioInputFormPart/>
+            <NvAudioInputFormPart />
           </NvCard>
         </div>
       </NvStack>
@@ -23,4 +23,5 @@
 </template>
 <script lang="ts" setup>
 import { NvCard, NvGroup, NvStack, NvText } from '@packages/ui'
-import NvAudioInputFormPart from '@/features/audio/components/inputs/NvAudioInputFormPart.vue'</script>
+import NvAudioInputFormPart from '@/features/audio/components/inputs/NvAudioInputFormPart.vue'
+</script>

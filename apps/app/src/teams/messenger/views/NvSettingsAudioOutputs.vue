@@ -17,34 +17,34 @@
                 <NvSwitch
                   :modelValue="settingsStore.playSpeechOnDefaultPlaybackDevice"
                   @update:modelValue="
-                      (value) =>
-                        settingsStore.$patch({
-                          playSpeechOnDefaultPlaybackDevice: value,
-                        })
-                    "
+                    (value) =>
+                      settingsStore.$patch({
+                        playSpeechOnDefaultPlaybackDevice: value,
+                      })
+                  "
                 />
               </NvGroup>
-              <NvDivider direction="horizontal"/>
+              <NvDivider direction="horizontal" />
               <NvFormItem label="Output devices">
-                <NvAudioOutputsSelect/>
+                <NvAudioOutputsSelect />
               </NvFormItem>
-              <NvDivider direction="horizontal"/>
+              <NvDivider direction="horizontal" />
 
               <NvGroup align="start" justify="apart" no-wrap>
                 <NvStack>
                   <NvText type="label">Install VB-Audio Virtual Cable</NvText>
                   <NvText
-                  >VB-Audio Virtual Cable creates a virtual audio cable that can be used as a
+                    >VB-Audio Virtual Cable creates a virtual audio cable that can be used as a
                     recording device for Izabela's audio in other applications
                   </NvText>
                   <NvText type="caption"
-                  >VB-Audio Virtual Cable must also be present in "Output devices"<br/>
+                    >VB-Audio Virtual Cable must also be present in "Output devices"<br />
                     A restart may be required after installation
                   </NvText>
                   <template v-if="isVirtualAudioCableInstalled">
                     <NvText type="caption">
                       <NvGroup>
-                        <NvIcon name="check-circle" size="3"/>
+                        <NvIcon name="check-circle" size="3" />
                         <span>Virtual audio cable found</span>
                       </NvGroup>
                     </NvText>
@@ -52,7 +52,7 @@
                   <template v-else>
                     <NvText type="caption">
                       <NvGroup>
-                        <NvIcon name="exclamation-triangle" size="3"/>
+                        <NvIcon name="exclamation-triangle" size="3" />
                         <span>Virtual audio cable not found</span>
                       </NvGroup>
                     </NvText>
@@ -62,10 +62,10 @@
                   <NvButton
                     :loading="isVirtualAudioCableInstalledFetching"
                     @click="
-                        ElectronResources.uninstallVirtualAudioCable()
-                          .then(refetchIsVirtualAudioCableInstalled)
-                          .catch(refetchIsVirtualAudioCableInstalled)
-                      "
+                      ElectronResources.uninstallVirtualAudioCable()
+                        .then(refetchIsVirtualAudioCableInstalled)
+                        .catch(refetchIsVirtualAudioCableInstalled)
+                    "
                   >
                     Uninstall
                   </NvButton>
@@ -74,10 +74,10 @@
                   <NvButton
                     :loading="isVirtualAudioCableInstalledFetching"
                     @click="
-                        ElectronResources.installVirtualAudioCable()
-                          .then(refetchIsVirtualAudioCableInstalled)
-                          .catch(refetchIsVirtualAudioCableInstalled)
-                      "
+                      ElectronResources.installVirtualAudioCable()
+                        .then(refetchIsVirtualAudioCableInstalled)
+                        .catch(refetchIsVirtualAudioCableInstalled)
+                    "
                   >
                     Install
                   </NvButton>

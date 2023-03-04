@@ -8,9 +8,9 @@
             <NvStack>
               <NvText type="label">Monitor</NvText>
             </NvStack>
-            <NvDisplaySelect/>
+            <NvDisplaySelect />
           </NvGroup>
-          <NvDivider direction="horizontal"/>
+          <NvDivider direction="horizontal" />
           <NvGroup justify="apart" no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Hide window after sending a message</NvText>
@@ -39,18 +39,17 @@
               "
             />
           </NvGroup>
-          <NvDivider direction="horizontal"/>
+          <NvDivider direction="horizontal" />
           <NvGroup align="start" justify="apart" no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Show Messenger window (for compatibility)</NvText>
               <NvText
-              >Applications sometimes block system-wide keyboard shortcuts<br/> Use this shortcut if
-                the Messenger
-                window doesn't show with the shortcut above
+                >Applications sometimes block system-wide keyboard shortcuts<br />
+                Use this shortcut if the Messenger window doesn't show with the shortcut above
               </NvText>
               <NvText type="caption"
-              ><strong>NOTE:</strong> The Messenger window will not be focused when shown with this
-                shortcut
+                ><strong>NOTE:</strong> The Messenger window will not be focused when shown with
+                this shortcut
               </NvText>
             </NvStack>
             <NvKeybinding
@@ -78,7 +77,7 @@
               @update:modelValue="(value) => settingsStore.$patch({ launchOnStartup: value })"
             />
           </NvGroup>
-          <NvDivider direction="horizontal"/>
+          <NvDivider direction="horizontal" />
           <NvGroup justify="apart" no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Update channel</NvText>
