@@ -8,24 +8,24 @@
       >
         <!-- Top -->
         <NvGroup :spacing="4">
-          <NvMessengerLinksBar />
+          <NvMessengerLinksBar/>
           <NvGroup :spacing="4" class="!flex-1">
             <div class="moveable-handle cursor-all-scroll !flex-1">
-              <NvMessengerHandleBar />
+              <NvMessengerHandleBar/>
             </div>
-            <NvMessengerNavigationBar />
+            <NvMessengerNavigationBar/>
           </NvGroup>
         </NvGroup>
 
         <!-- Middle -->
         <NvGroup :spacing="4" justify="between">
-          <NvMessengerAudioBar />
-          <NvMessengerMessageBar />
+          <NvMessengerAudioBar/>
+          <NvMessengerMessageBar/>
         </NvGroup>
 
         <!-- Bottom -->
         <NvGroup :spacing="4" grow>
-          <NvMessengerInputBar />
+          <NvMessengerInputBar/>
         </NvGroup>
       </div>
     </NvHitbox>
@@ -58,7 +58,15 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ComponentPublicInstance, computed, defineProps, onMounted, provide, ref, unref } from 'vue'
+import {
+  ComponentPublicInstance,
+  computed,
+  defineProps,
+  onMounted,
+  provide,
+  ref,
+  unref,
+} from 'vue'
 import Moveable from 'vue3-moveable'
 import { NvGroup } from '@packages/ui'
 import { RouteLocationRaw, useRouter } from 'vue-router'
@@ -72,7 +80,9 @@ import NvMessengerLinksBar from '@/teams/messenger/components/NvMessengerLinksBa
 import NvMessengerHandleBar from '@/teams/messenger/components/NvMessengerHandleBar.vue'
 import NvMessengerNavigationBar from '@/teams/messenger/components/NvMessengerNavigationBar.vue'
 import { debounce } from 'lodash'
+// import gsap from 'gsap'
 
+// const messengerWindowStore = useMessengerWindowStore()
 const messengerStore = useMessengerStore()
 const props = defineProps({
   width: {
@@ -164,17 +174,33 @@ const onDrag = (event: any) => {
   savePosition(event)
   settingsPopover.update()
 }
-
+// watch(() => messengerWindowStore.isShown, (isShown) => {
+//   console.log(gsap.getProperty(messenger.value, 'y'))
+//   if (isShown) {
+//     gsap.to(messenger.value, {
+//       opacity: 1,
+//       duration: 0.2,
+//       transition: 'easeOutExpo',
+//     })
+//   } else {
+//     gsap.set(messenger.value, {
+//       opacity: 0,
+//     })
+//   }
+// })
 onMounted(() => {
+  // gsap.set(messenger.value, {
+  //   opacity: 0,
+  // })
   const moveableTargetEl = (moveableTarget.value as ComponentPublicInstance)
     .$el as HTMLDivElement | null
   if (moveableTargetEl) {
-    if (props.width) moveableTargetEl.style.width = `${props.width}px`
-    if (props.minWidth) moveableTargetEl.style.minWidth = `${props.minWidth}px`
-    if (props.maxWidth) moveableTargetEl.style.maxWidth = `${props.maxWidth}px`
-    if (props.height) moveableTargetEl.style.height = `${props.height}px`
-    if (props.minHeight) moveableTargetEl.style.minHeight = `${props.minHeight}px`
-    if (props.maxHeight) moveableTargetEl.style.maxHeight = `${props.maxHeight}px`
+    if (props.width) moveableTargetEl.style.width = `${ props.width }px`
+    if (props.minWidth) moveableTargetEl.style.minWidth = `${ props.minWidth }px`
+    if (props.maxWidth) moveableTargetEl.style.maxWidth = `${ props.maxWidth }px`
+    if (props.height) moveableTargetEl.style.height = `${ props.height }px`
+    if (props.minHeight) moveableTargetEl.style.minHeight = `${ props.minHeight }px`
+    if (props.maxHeight) moveableTargetEl.style.maxHeight = `${ props.maxHeight }px`
     if (props.transform) moveableTargetEl.style.transform = props.transform
   }
   moveable.value.updateTarget()
@@ -187,8 +213,8 @@ onMounted(() => {
       moveable.value.request(
         'draggable',
         {
-          x: viewport.value.width / 2 - width / 2,
-          y: viewport.value.height - height - 60,
+          x: viewport.value.width / 2-width / 2,
+          y: viewport.value.height-height-60,
         },
         true,
       )
