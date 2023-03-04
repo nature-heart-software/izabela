@@ -77,12 +77,16 @@ const navigation = [
     name: 'Speech',
     children: [
       {
-        name: 'Engine',
+        name: 'Speech Engine',
         to: { name: 'settings-engine' },
       },
       {
-        name: 'Audio',
-        to: { name: 'settings-audio' },
+        name: 'Audio Ouputs',
+        to: { name: 'settings-audio-outputs' },
+      },
+      {
+        name: 'Audio Input',
+        to: { name: 'settings-audio-input' },
       },
       {
         name: 'Translation',

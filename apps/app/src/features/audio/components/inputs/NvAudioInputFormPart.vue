@@ -1,8 +1,13 @@
 <template>
   <NvStack spacing="5">
     <NvGoogleCloudCredentialsFormPart>
-      Izabela uses Google Cloud Speech for speech recognition which requires Google Cloud
-      Credentials to be imported
+      Izabela uses Google Cloud Speech for speech recognition which requires a
+      <a
+        href="https://developers.google.com/workspace/guides/create-credentials#service-account"
+        target="_blank"
+        >Google Cloud service account credentials</a
+      >
+      file to be imported
     </NvGoogleCloudCredentialsFormPart>
     <template v-if="!!googleCloudSpeechCredentialsPath">
       <NvStack spacing="5">
@@ -59,7 +64,7 @@
                 <NvStack>
                   <NvText type="label">Activation threshold</NvText>
                   <NvText>Minimum volume required to record speech (dB)</NvText>
-                  <NvText type="caption">A lower value activates the recording more easily </NvText>
+                  <NvText type="caption">A lower value activates the recording more easily</NvText>
                 </NvStack>
                 <NvNumberInput
                   :max="0"

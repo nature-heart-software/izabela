@@ -25,7 +25,7 @@
   <template v-if="getProperty('useLocalCredentials') || !speechStore.hasUniversalApiCredentials">
     <NvDivider direction="horizontal" />
     <NvStack spacing="5">
-      <NvFormItem label="Identity pool ID">
+      <NvFormItem label="Identity Pool ID">
         <NvInput
           :modelValue="getProperty('identityPoolId', true)"
           show-password

@@ -7,7 +7,7 @@
           <NvGroup no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Translation</NvText>
-              <NvText>Translate messages before speaking</NvText>
+              <NvText>Translate messages before generating speech</NvText>
             </NvStack>
           </NvGroup>
         </NvCard>
@@ -15,8 +15,13 @@
           <NvCard>
             <NvStack spacing="5">
               <NvGoogleCloudCredentialsFormPart>
-                Izabela uses Google Cloud Translation AI for translation which requires Google Cloud
-                Credentials to be imported
+                Izabela uses Google Cloud Translation AI for translation which requires a
+                <a
+                  href="https://developers.google.com/workspace/guides/create-credentials#service-account"
+                  target="_blank"
+                  >Google Cloud service account credentials</a
+                >
+                file to be imported
               </NvGoogleCloudCredentialsFormPart>
               <template v-if="googleCloudSpeechCredentialsPath">
                 <NvDivider direction="horizontal" />
