@@ -42,6 +42,12 @@ export default (() => {
           'message:start',
           'message:end',
           'message:error',
+          'window:focus',
+          'window:blur',
+          'input:focus',
+          'input:blur',
+          'speech:recording:start',
+          'speech:recording:end',
         ].forEach((event) => {
           socket.on(event, (message) => forwardEvent(event, message))
         })
