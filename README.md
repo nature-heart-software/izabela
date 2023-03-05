@@ -60,6 +60,7 @@ instead of
 fullscreen.
 
 You can press `Ctrl` + `Enter` (or `Esc` if the text input is focused) to close the window.
+Pressing `Enter` while the text input is focused and no text is present will also close the window.
 
 ## Support
 
