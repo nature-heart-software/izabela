@@ -106,6 +106,10 @@ const navigation = [
     name: 'Other',
     children: [
       {
+        name: 'Wiki',
+        to: { name: 'settings-wiki' },
+      },
+      {
         name: 'About',
         to: { name: 'settings-about' },
       },

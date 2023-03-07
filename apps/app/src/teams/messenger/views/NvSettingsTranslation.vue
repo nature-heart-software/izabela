@@ -17,7 +17,7 @@
               <NvGoogleCloudCredentialsFormPart>
                 Izabela uses Google Cloud Translation AI for translation which requires a
                 <a
-                  href="https://developers.google.com/workspace/guides/create-credentials#service-account"
+                  href="https://github.com/nature-heart-software/izabela/wiki/How-to-get-Google-Cloud-service-account-credentials"
                   target="_blank"
                   >Google Cloud service account credentials</a
                 >
