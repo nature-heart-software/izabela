@@ -66,32 +66,29 @@ export const ElectronMessengerWindow = () => {
   const focus = (context: 'mouse' | 'keyboard') =>
     new Promise((resolve, reject) => {
       messengerWindowStore?.$patch({ focusContext: context })
-      // Makes sure the context changed before the window is focused
-      setTimeout(() => {
-        const window = getWindow()
-        if (window) {
-          if (!isFocused) {
-            foregroundWindow = user32.GetForegroundWindow()
-            isFocused = true
-            // window.once('show', () => {
-            //   /* The focus needs to be delayed after the show() to actually focus properly... */
-            //   setTimeout(() => {
-            //     isFocused = true
-            //     window.focus() // Fixes issues with Chrome and input elements
-            //     resolve(true)
-            //   }, 250)
-            // })
+      const window = getWindow()
+      if (window) {
+        if (!isFocused) {
+          foregroundWindow = user32.GetForegroundWindow()
+          isFocused = true
+          // window.once('show', () => {
+          //   /* The focus needs to be delayed after the show() to actually focus properly... */
+          //   setTimeout(() => {
+          //     isFocused = true
+          //     window.focus() // Fixes issues with Chrome and input elements
+          //     resolve(true)
+          //   }, 250)
+          // })
 
-            /* order matters */
-            window.setFocusable(true) // Fixes alwaysOnTop going in the background sometimes for some reasons
-            window.setIgnoreMouseEvents(false)
-            window.show() // Fixes focus properly with Hardware Acceleration for some reasons
-            window.focus() // needed for immediate focus in case the window is already shown
-          }
-        } else {
-          reject()
+          /* order matters */
+          window.setFocusable(true) // Fixes alwaysOnTop going in the background sometimes for some reasons
+          window.setIgnoreMouseEvents(false)
+          window.show() // Fixes focus properly with Hardware Acceleration for some reasons
+          window.focus() // needed for immediate focus in case the window is already shown
         }
-      }, 100)
+      } else {
+        reject()
+      }
     })
 
   const blur = () =>
