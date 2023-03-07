@@ -74,14 +74,14 @@ the [Available engines](#available-engines) section.
 > **Note:** The Izabela engine is only available to "Supporter" members or above
 > on [Ko-fi](https://ko-fi.com/woowee/tiers).
 
-If you prefer configuring your credentials yourself, you can do so by following the guides in the [Guides](#guides)
-section (coming soon).
+If you prefer configuring your credentials yourself, you can do so by following the guides on the [Wiki](https://github.com/nature-heart-software/izabela/wiki)
+page.
 
 ## Available engines
 
 Here's a list of all the text-to-speech engines that are supported in Izabela:
 
-| Engine                     | Included with Universal Credentials | Sample                                                                                                               | Credits                                                                       |
+| Engine                     | Included with Universal credentials | Sample                                                                                                               | Credits                                                                       |
 | -------------------------- | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
 | Izabela (multiple engines) | Yes                                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/izabela-sample.mp3?raw=true)             | https://github.com/Weilbyte/tiktok-tts                                        |
 | Amazon Polly               | Yes                                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/amazon-polly-sample.mp3?raw=true)        | https://aws.amazon.com/polly/                                                 |
@@ -95,8 +95,7 @@ Here's a list of all the text-to-speech engines that are supported in Izabela:
 
 ## Guides
 
-- [How to use Izabela as audio input](https://github.com/nature-heart-software/izabela/blob/dev/guides/onboarding/how-to-use-as-audio-input.md)
-- [How to intercept websocket events](https://github.com/nature-heart-software/izabela/blob/dev/guides/onboarding/how-to-intercept-websocket-events.md)
+Find guides and API documentation on the [Wiki](https://github.com/nature-heart-software/izabela/wiki) page.
 
 ## Resources
 
