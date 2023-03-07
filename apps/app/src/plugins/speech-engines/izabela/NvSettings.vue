@@ -1,10 +1,10 @@
 <template>
   <NvAccessBlocker
     :allowed="speechStore.hasUniversalApiCredentials"
-    reason="Universal Credentials required"
+    reason="Universal credentials required"
   >
     <NvFormItem label="Voice">
-      <NvVoiceSelect />
+      <NvVoiceSelect/>
     </NvFormItem>
   </NvAccessBlocker>
 </template>
