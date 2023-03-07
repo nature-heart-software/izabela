@@ -11,11 +11,12 @@
               it.
             </NvText>
           </NvStack>
-          <a class="shrink-0" href="https://github.com/nature-heart-software/izabela/wiki"
-             target="_blank">
-            <NvButton>
-              Visit Wiki
-            </NvButton>
+          <a
+            class="shrink-0"
+            href="https://github.com/nature-heart-software/izabela/wiki"
+            target="_blank"
+          >
+            <NvButton> Visit Wiki </NvButton>
           </a>
         </NvGroup>
       </NvCard>
@@ -23,4 +24,5 @@
   </NvStack>
 </template>
 <script lang="ts" setup>
-import { NvButton, NvCard, NvGroup, NvStack, NvText } from '@packages/ui'</script>
+import { NvButton, NvCard, NvGroup, NvStack, NvText } from '@packages/ui'
+</script>
