@@ -17,7 +17,7 @@
           />
         </template>
       </NvTooltip>
-      <NvDivider class="h-3" direction="vertical"/>
+      <NvDivider class="h-3" direction="vertical" />
       <NvTooltip>
         <NvText>Speech engine</NvText>
         <template #reference>
@@ -47,7 +47,7 @@
           </template>
         </NvTooltip>
       </template>
-      <NvDivider class="h-3" direction="vertical"/>
+      <NvDivider class="h-3" direction="vertical" />
       <NvPopover :tippy-options="{ placement: 'top-start' }" size="sm">
         <div class="w-screen max-w-full">
           <NvStack spacing="4">
@@ -63,9 +63,9 @@
                 "
               />
             </NvGroup>
-            <NvDivider direction="horizontal"/>
+            <NvDivider direction="horizontal" />
             <NvFormItem label="Audio outputs">
-              <NvAudioOutputsSelect class="w-full"/>
+              <NvAudioOutputsSelect class="w-full" />
             </NvFormItem>
           </NvStack>
         </div>
@@ -74,7 +74,7 @@
             <NvText>Audio outputs</NvText>
             <template #reference>
               <NvButton data-v-step="audio-outputs-select" icon-name="direction" size="sm"
-              >Outputs ({{
+                >Outputs ({{
                   settingsStore.audioOutputs.length +
                   (settingsStore.playSpeechOnDefaultPlaybackDevice ? 1 : 0)
                 }})
@@ -105,17 +105,17 @@
               "
             >
               <NvStack spacing="4">
-                <NvDivider direction="horizontal"/>
+                <NvDivider direction="horizontal" />
                 <NvFormItem label="Speech recognition language">
-                  <NvSpeechInputLanguageSelect/>
+                  <NvSpeechInputLanguageSelect />
                 </NvFormItem>
-                <NvDivider direction="horizontal"/>
+                <NvDivider direction="horizontal" />
                 <NvFormItem label="Speech recognition strategy">
-                  <NvSpeechRecognitionStrategySelect/>
+                  <NvSpeechRecognitionStrategySelect />
                 </NvFormItem>
-                <NvDivider direction="horizontal"/>
+                <NvDivider direction="horizontal" />
                 <NvFormItem label="Recording device">
-                  <NvSoxAudioInputSelect class="!w-full"/>
+                  <NvSoxAudioInputSelect class="!w-full" />
                 </NvFormItem>
               </NvStack>
             </NvAccessBlocker>
@@ -126,7 +126,7 @@
             <NvText>Audio input</NvText>
             <template #reference>
               <NvButton data-v-step="audio-input-select" icon-name="direction" size="sm"
-              >Input
+                >Input
               </NvButton>
             </template>
           </NvTooltip>
@@ -154,12 +154,10 @@ import { useSettingsStore } from '@/features/settings/store'
 import SpeechEngineSelect from '@/features/speech/components/inputs/NvSpeechEngineSelect.vue'
 import NvAudioOutputsSelect from '@/features/audio/components/inputs/NvAudioOutputsSelect.vue'
 import NvSoxAudioInputSelect from '@/features/audio/components/inputs/NvSoxAudioInputSelect.vue'
-import NvSpeechInputLanguageSelect
-  from '@/features/speech/components/inputs/NvSpeechInputLanguageSelect.vue'
+import NvSpeechInputLanguageSelect from '@/features/speech/components/inputs/NvSpeechInputLanguageSelect.vue'
 import { inject } from 'vue'
 import { useRoute } from 'vue-router'
-import NvSpeechRecognitionStrategySelect
-  from '@/features/speech/components/inputs/NvSpeechRecognitionStrategySelect.vue'
+import NvSpeechRecognitionStrategySelect from '@/features/speech/components/inputs/NvSpeechRecognitionStrategySelect.vue'
 import { useGetGoogleCloudSpeechCredentialsPath } from '@/features/settings/hooks'
 
 const speechStore = useSpeechStore()
