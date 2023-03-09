@@ -14,109 +14,112 @@
         <div class="pl-8">
           <NvCard>
             <NvStack spacing="5">
-              <NvGoogleCloudCredentialsFormPart>
-                Izabela uses Google Cloud Translation AI for translation which requires a
-                <a
-                  href="https://github.com/nature-heart-software/izabela/wiki/How-to-get-Google-Cloud-service-account-credentials"
-                  target="_blank"
-                  >Google Cloud service account credentials</a
-                >
-                file to be imported
-              </NvGoogleCloudCredentialsFormPart>
-              <template v-if="googleCloudSpeechCredentialsPath">
+              <NvGroup justify="apart" no-wrap spacing="5">
+                <NvStack>
+                  <NvText type="label">Enable translation</NvText>
+                </NvStack>
+                <NvSwitch
+                  :modelValue="settingsStore.enableTranslation"
+                  class="shrink-0"
+                  @update:modelValue="(value) => settingsStore.$patch({ enableTranslation: value })"
+                />
+              </NvGroup>
+              <template v-if="settingsStore.enableTranslation">
                 <NvDivider direction="horizontal" />
                 <NvGroup justify="apart" no-wrap spacing="5">
                   <NvStack>
-                    <NvText type="label">Enable translation</NvText>
+                    <NvText type="label">Translation strategy</NvText>
                   </NvStack>
-                  <NvSwitch
-                    :modelValue="settingsStore.enableTranslation"
-                    class="shrink-0"
-                    @update:modelValue="
-                      (value) => settingsStore.$patch({ enableTranslation: value })
-                    "
-                  />
+                  <NvTranslationStrategySelect />
                 </NvGroup>
-                <template v-if="settingsStore.enableTranslation">
+                <template v-if="settingsStore.textTranslationStrategy === 'cloud-translation'">
                   <NvDivider direction="horizontal" />
-                  <NvGroup justify="apart" no-wrap spacing="5">
-                    <NvStack>
-                      <NvText type="label">Translation strategy</NvText>
-                    </NvStack>
-                    <NvTranslationStrategySelect />
-                  </NvGroup>
-                  <template v-if="settingsStore.textTranslationStrategy === 'cloud-translation'">
-                    <NvDivider direction="horizontal" />
-                    <NvGroup justify="apart" no-wrap spacing="5">
-                      <NvStack>
-                        <NvText type="label">From</NvText>
-                      </NvStack>
-                      <NvSelect
-                        :modelValue="settingsStore.textInputLanguage"
-                        :options="options"
-                        class="shrink-0"
-                        @update:modelValue="
-                          (value) => settingsStore.$patch({ textInputLanguage: value })
-                        "
-                      />
-                    </NvGroup>
-                    <NvDivider direction="horizontal" />
-                    <NvGroup justify="apart" no-wrap spacing="5">
-                      <NvStack>
-                        <NvText type="label">To</NvText>
-                      </NvStack>
-                      <NvSelect
-                        :modelValue="settingsStore.textOutputLanguage"
-                        :options="options"
-                        class="shrink-0"
-                        @update:modelValue="
-                          (value) => settingsStore.$patch({ textOutputLanguage: value })
-                        "
-                      />
-                    </NvGroup>
-                  </template>
-                  <template v-if="settingsStore.textTranslationStrategy === 'custom'">
-                    <NvDivider direction="horizontal" />
-                    <NvAccessBlocker
-                      :allowed="!!settingsStore.customTextTranslationEndpoint"
-                      reason="Endpoint and/or credentials required"
+                  <NvGoogleCloudCredentialsFormPart>
+                    Izabela uses Google Cloud Translation AI for translation which requires a
+                    <a
+                      href="https://github.com/nature-heart-software/izabela/wiki/How-to-get-Google-Cloud-service-account-credentials"
+                      target="_blank"
+                      >Google Cloud service account credentials</a
                     >
-                      <NvStack spacing="5">
-                        <NvGroup justify="apart" no-wrap spacing="5">
-                          <NvStack>
-                            <NvText type="label">From</NvText>
-                          </NvStack>
-                          <NvCustomTranslationFromSelect />
-                        </NvGroup>
-                        <NvDivider direction="horizontal" />
-                        <NvGroup justify="apart" no-wrap spacing="5">
-                          <NvStack>
-                            <NvText type="label">To</NvText>
-                          </NvStack>
-                          <NvCustomTranslationToSelect />
-                        </NvGroup>
-                      </NvStack>
-                    </NvAccessBlocker>
-                    <NvDivider direction="horizontal" />
-                    <NvFormItem label="API Endpoint">
-                      <NvInput
-                        :modelValue="settingsStore.customTextTranslationEndpoint"
-                        @update:modelValue="
-                          (value) => settingsStore.$patch({ customTextTranslationEndpoint: value })
-                        "
-                      />
-                    </NvFormItem>
-                    <NvDivider direction="horizontal" />
-                    <NvFormItem label="API Key">
-                      <NvInput
-                        :modelValue="decrypt(settingsStore.customTextTranslationApiKey)"
-                        @update:modelValue="
-                          (value) =>
-                            settingsStore.$patch({ customTextTranslationApiKey: encrypt(value) })
-                        "
-                      />
-                    </NvFormItem>
-                  </template>
+                    file to be imported
+                  </NvGoogleCloudCredentialsFormPart>
+                  <NvDivider direction="horizontal" />
+                  <NvAccessBlocker
+                    :allowed="!!googleCloudSpeechCredentialsPath"
+                    reason="Google Cloud credentials required"
+                  >
+                    <NvStack spacing="5">
+                      <NvGroup justify="apart" no-wrap spacing="5">
+                        <NvStack>
+                          <NvText type="label">From</NvText>
+                        </NvStack>
+                        <NvSelect
+                          :modelValue="settingsStore.textInputLanguage"
+                          :options="options"
+                          class="shrink-0"
+                          @update:modelValue="
+                            (value) => settingsStore.$patch({ textInputLanguage: value })
+                          "
+                        />
+                      </NvGroup>
+                      <NvDivider direction="horizontal" />
+                      <NvGroup justify="apart" no-wrap spacing="5">
+                        <NvStack>
+                          <NvText type="label">To</NvText>
+                        </NvStack>
+                        <NvSelect
+                          :modelValue="settingsStore.textOutputLanguage"
+                          :options="options"
+                          class="shrink-0"
+                          @update:modelValue="
+                            (value) => settingsStore.$patch({ textOutputLanguage: value })
+                          "
+                        />
+                      </NvGroup>
+                    </NvStack>
+                  </NvAccessBlocker>
+                </template>
+                <template v-if="settingsStore.textTranslationStrategy === 'custom'">
+                  <NvDivider direction="horizontal" />
+                  <NvAccessBlocker
+                    :allowed="!!settingsStore.customTextTranslationEndpoint"
+                    reason="Endpoint and/or credentials required"
+                  >
+                    <NvStack spacing="5">
+                      <NvGroup justify="apart" no-wrap spacing="5">
+                        <NvStack>
+                          <NvText type="label">From</NvText>
+                        </NvStack>
+                        <NvCustomTranslationFromSelect />
+                      </NvGroup>
+                      <NvDivider direction="horizontal" />
+                      <NvGroup justify="apart" no-wrap spacing="5">
+                        <NvStack>
+                          <NvText type="label">To</NvText>
+                        </NvStack>
+                        <NvCustomTranslationToSelect />
+                      </NvGroup>
+                    </NvStack>
+                  </NvAccessBlocker>
+                  <NvDivider direction="horizontal" />
+                  <NvFormItem label="API Endpoint">
+                    <NvInput
+                      :modelValue="settingsStore.customTextTranslationEndpoint"
+                      @update:modelValue="
+                        (value) => settingsStore.$patch({ customTextTranslationEndpoint: value })
+                      "
+                    />
+                  </NvFormItem>
+                  <NvDivider direction="horizontal" />
+                  <NvFormItem label="API Key">
+                    <NvInput
+                      :modelValue="decrypt(settingsStore.customTextTranslationApiKey)"
+                      @update:modelValue="
+                        (value) =>
+                          settingsStore.$patch({ customTextTranslationApiKey: encrypt(value) })
+                      "
+                    />
+                  </NvFormItem>
                 </template>
               </template>
             </NvStack>

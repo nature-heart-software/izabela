@@ -38,7 +38,7 @@
               :allowed="!!googleCloudSpeechCredentialsPath && settingsStore.enableTranslation"
               :reason="
                 settingsStore.enableTranslation
-                  ? 'Google Cloud Credentials required'
+                  ? 'Google Cloud credentials required'
                   : 'Translation needs to be enabled'
               "
             >
