@@ -4,6 +4,7 @@ import { ref } from 'vue'
 export const useDictionaryStore = defineStore(
   'dictionary',
   () => {
+    const enableDictionary = ref(false)
     const definitions = ref<[string, string][]>([
       ['wyd', 'what are you doing'],
       ['hbu', 'how about you'],
@@ -69,12 +70,13 @@ export const useDictionaryStore = defineStore(
     }
 
     return {
+      enableDictionary,
       definitions,
       translateText,
       updateDefinition: (index: number, definition: [string, string]) => {
         definitions.value.splice(index, 1, definition)
       },
-      addDefinition: (definition: (typeof definitions)['value'][number] = ['', '']) => {
+      addDefinition: (definition: typeof definitions['value'][number] = ['', '']) => {
         definitions.value.unshift(definition)
       },
       removeDefinition: (index: number) => {
