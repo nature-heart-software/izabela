@@ -87,6 +87,42 @@
               @update:modelValue="(value) => settingsStore.$patch({ updateChannel: value })"
             />
           </NvGroup>
+          <!--          <NvDivider direction="horizontal" />-->
+          <!--          <NvGroup justify="apart" no-wrap spacing="5">-->
+          <!--            <NvStack>-->
+          <!--              <NvText type="label">Enable background dim</NvText>-->
+          <!--            </NvStack>-->
+          <!--            <NvSwitch-->
+          <!--              :modelValue="settingsStore.enableBackgroundDim"-->
+          <!--              @update:modelValue="(value) => settingsStore.$patch({ enableBackgroundDim: value })"-->
+          <!--            />-->
+          <!--          </NvGroup>-->
+          <NvDivider direction="horizontal" />
+          <NvGroup justify="apart" no-wrap spacing="5">
+            <NvStack>
+              <NvText type="label">Background dim opacity</NvText>
+            </NvStack>
+            <NvGroup>
+              <NvRangeInput
+                :modelValue="settingsStore.backgroundDimOpacity"
+                max="100"
+                min="0"
+                step="1"
+                @update:modelValue="
+                  (value) => settingsStore.$patch({ backgroundDimOpacity: value })
+                "
+              />
+              <NvNumberInput
+                :modelValue="settingsStore.backgroundDimOpacity"
+                max="100"
+                min="0"
+                step="1"
+                @update:modelValue="
+                  (value) => settingsStore.$patch({ backgroundDimOpacity: value })
+                "
+              />
+            </NvGroup>
+          </NvGroup>
         </NvStack>
       </NvCard>
     </NvStack>
@@ -107,7 +143,16 @@
   </NvStack>
 </template>
 <script lang="ts" setup>
-import { NvCard, NvDivider, NvGroup, NvStack, NvSwitch, NvText } from '@packages/ui'
+import {
+  NvCard,
+  NvDivider,
+  NvGroup,
+  NvNumberInput,
+  NvRangeInput,
+  NvStack,
+  NvSwitch,
+  NvText,
+} from '@packages/ui'
 import { useSettingsStore } from '@/features/settings/store'
 import NvDisplaySelect from '@/features/display/components/inputs/DisplaySelect.vue'
 import NvKeybinding from '@/features/app/components/inputs/NvKeybinding.vue'

@@ -50,6 +50,8 @@ export const useSettingsStore = defineStore(
     const customTextTranslationApiKey = ref('')
     const customTextTranslationFrom = ref('')
     const customTextTranslationTo = ref('')
+    // const enableBackgroundDim = ref(true)
+    const backgroundDimOpacity = ref(50)
     const keybindings = ref<Record<string, Key[]>>({
       recordAudio: [
         {
@@ -119,6 +121,8 @@ export const useSettingsStore = defineStore(
       ],
     })
     return {
+      // enableBackgroundDim,
+      backgroundDimOpacity,
       preferredSavDir,
       playSpeechOnDefaultPlaybackDevice,
       audioOutputs,
