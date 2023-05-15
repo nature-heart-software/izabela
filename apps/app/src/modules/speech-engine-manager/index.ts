@@ -15,9 +15,7 @@ const SpeechEngineManager = () => {
       getPayload: (options) =>
         speechEngine.getPayload({
           ...options,
-          text: dictionaryStore.enableDictionary
-            ? dictionaryStore.translateText(options.text)
-            : options.text,
+          text: dictionaryStore.translateText(options.text),
         }),
     }
   }
