@@ -71,6 +71,7 @@ export const useDictionaryStore = defineStore(
       const flags = caseSensitive.value ? 'g' : 'gi'
       filteredDefinitions.value.forEach(([word, definition]) => {
         words.forEach((currentWord, i) => {
+          const exactMatchRegexExpression = `\\b${word}\\b`
           const boundaryMatchRegexExpression = `^${word}|${word}$`
           const exactMatchRegex = new RegExp(`\\b${word}\\b`, flags)
           const boundaryMatchRegex = new RegExp(`^${word}|${word}$`, flags)
@@ -80,7 +81,10 @@ export const useDictionaryStore = defineStore(
           ]
           if (word && (evaluations[0] || (!matchExactWord.value && evaluations[1]))) {
             words[i] = currentWord.replace(
-              new RegExp(evaluations[0] ? word : boundaryMatchRegexExpression, flags),
+              new RegExp(
+                evaluations[0] ? exactMatchRegexExpression : boundaryMatchRegexExpression,
+                flags,
+              ),
               definition,
             )
           }
