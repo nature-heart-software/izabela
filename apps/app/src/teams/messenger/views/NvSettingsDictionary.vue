@@ -28,6 +28,32 @@
               </NvGroup>
               <template v-if="dictionaryStore.enableDictionary">
                 <NvDivider direction="horizontal" />
+                <NvGroup justify="apart">
+                  <NvText type="label">Only match exact word</NvText>
+                  <NvSwitch
+                    :modelValue="dictionaryStore.matchExactWord"
+                    @update:modelValue="
+                      (value) =>
+                        dictionaryStore.$patch({
+                          matchExactWord: value,
+                        })
+                    "
+                  />
+                </NvGroup>
+                <NvDivider direction="horizontal" />
+                <NvGroup justify="apart">
+                  <NvText type="label">Case sensitive</NvText>
+                  <NvSwitch
+                    :modelValue="dictionaryStore.caseSensitive"
+                    @update:modelValue="
+                      (value) =>
+                        dictionaryStore.$patch({
+                          caseSensitive: value,
+                        })
+                    "
+                  />
+                </NvGroup>
+                <NvDivider direction="horizontal" />
                 <div>
                   <NvButton size="sm" @click="addDefinition()">Add definition</NvButton>
                 </div>
