@@ -38,7 +38,7 @@ export default (messagePayload: IzabelaMessagePayload) => {
   function on(event: IzabelaMessageEvent, callback: () => void): void {
     emitter.on(event, callback)
   }
-  
+
   function pause() {
     audio.pause()
   }
