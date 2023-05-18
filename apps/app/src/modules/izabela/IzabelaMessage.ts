@@ -24,6 +24,8 @@ export default (messagePayload: IzabelaMessagePayload) => {
   const audioDownloaded = Deferred()
   const audioLoaded = Deferred()
   const playingMessageStore = usePlayingMessageStore()
+  let audioElements: (HTMLAudioElement | null)[] = []
+  let cancelled = false
   if (!excludeFromHistory) {
     const messageStore = useMessagesStore()
     messageStore.$whenReady().then(() => {
@@ -38,7 +40,7 @@ export default (messagePayload: IzabelaMessagePayload) => {
   function on(event: IzabelaMessageEvent, callback: () => void): void {
     emitter.on(event, callback)
   }
-  
+
   function pause() {
     audio.pause()
   }
@@ -48,7 +50,9 @@ export default (messagePayload: IzabelaMessagePayload) => {
   }
 
   function cancel() {
+    cancelled = true
     audio.pause()
+    audioElements.forEach((audioEl) => audioEl?.pause())
     emitter.emit('ended')
   }
 
@@ -87,11 +91,13 @@ export default (messagePayload: IzabelaMessagePayload) => {
       }
       return null
     })
-      .then((audioElements: (HTMLAudioElement | null)[]) => {
+      .then((res: typeof audioElements) => {
+        if (cancelled) return
         if (!settingsStore.playSpeechOnDefaultPlaybackDevice) {
           audio.volume = 0
         }
         audio.play()
+        audioElements = res
         audioElements.forEach((audioEl) => audioEl && audioEl.play())
       })
       .catch(console.error)

@@ -61,6 +61,32 @@
               "
             />
           </NvGroup>
+          <NvDivider direction="horizontal" />
+          <NvGroup justify="apart" no-wrap spacing="5">
+            <NvStack>
+              <NvText type="label">Cancel playing message</NvText>
+            </NvStack>
+            <NvKeybinding
+              :modelValue="settingsStore.keybindings.cancelCurrentMessage"
+              multiple
+              @update:modelValue="
+                (value) => settingsStore.$patch({ keybindings: { cancelCurrentMessage: value } })
+              "
+            />
+          </NvGroup>
+          <NvDivider direction="horizontal" />
+          <NvGroup justify="apart" no-wrap spacing="5">
+            <NvStack>
+              <NvText type="label">Cancel playing and queued messages</NvText>
+            </NvStack>
+            <NvKeybinding
+              :modelValue="settingsStore.keybindings.cancelAllMessages"
+              multiple
+              @update:modelValue="
+                (value) => settingsStore.$patch({ keybindings: { cancelAllMessages: value } })
+              "
+            />
+          </NvGroup>
         </NvStack>
       </NvCard>
     </NvStack>

@@ -8,3 +8,11 @@ export const onIPCProcessError = (callback: (error: Error, process: string) => a
     )
   })
 }
+
+export const emitIPCCancelCurrentMessage = () => {
+  ipcMain.sendTo('speech-worker', 'cancel-current-message')
+}
+
+export const emitIPCCancelAllMessages = () => {
+  ipcMain.sendTo('speech-worker', 'cancel-all-messages')
+}
