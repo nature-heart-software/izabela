@@ -34,27 +34,7 @@
             </NvText>
           </NvStack>
         </NvGroup>
-        <NvContextMenu
-          :options="[
-            {
-              label: 'Download',
-              icon: 'download-alt',
-              onClick: () => {
-                downloadMessageLocally()
-              },
-            },
-            {
-              type: 'divider',
-            },
-            {
-              label: 'Delete',
-              icon: 'trash-alt',
-              onClick: () => {
-                messagesStore.removeHistoryMessage(id)
-              },
-            },
-          ]"
-        >
+        <NvContextMenu :options="contextMenuOptions">
           <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm" />
         </NvContextMenu>
       </NvGroup>
@@ -75,6 +55,7 @@ import IzabelaMessage from '@/modules/izabela/IzabelaMessage'
 import { UseTimeAgo } from '@vueuse/components'
 import { useDateFormat } from '@vueuse/core'
 import { usePlayMessage } from '@/features/messages/hooks'
+import { copyTextToClipboard } from '@/utils/text'
 
 const props = defineProps({
   id: {
@@ -95,7 +76,6 @@ const engine = computed(() => {
   return getEngineById(message.value.engine)
 })
 const formatedCreatedAt = useDateFormat(message.value?.createdAt, 'YYYYMMDDHHmmss')
-
 watch(
   () => playingMessageStore.progress,
   () => {
@@ -136,6 +116,42 @@ const downloadMessageLocally = async () => {
     downloading.value = false
   }
 }
+
+const contextMenuOptions = computed(() =>
+  [
+    {
+      label: 'Copy text',
+      icon: 'copy',
+      onClick: () => {
+        if (message.value?.originalMessage) copyTextToClipboard(message.value?.originalMessage)
+      },
+    },
+    message.value?.translatedMessage && {
+      label: 'Copy translation',
+      icon: 'copy',
+      onClick: () => {
+        if (message.value?.translatedMessage) copyTextToClipboard(message.value?.translatedMessage)
+      },
+    },
+    {
+      label: 'Download',
+      icon: 'download-alt',
+      onClick: () => {
+        downloadMessageLocally()
+      },
+    },
+    {
+      type: 'divider',
+    },
+    {
+      label: 'Delete',
+      icon: 'trash-alt',
+      onClick: () => {
+        messagesStore.removeHistoryMessage(props.id)
+      },
+    },
+  ].filter(Boolean),
+)
 
 const playMessage = computed(() =>
   message.value
