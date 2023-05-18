@@ -20,3 +20,15 @@ export const onIPCSay = (callback: (payload: IPCSayPayload) => any) => {
 export const emitIPCSay = (payload: IPCSayPayload) => {
   ipc.sendTo('speech-worker', 'say', payload)
 }
+
+export const onIPCCancelCurrentMessage = (callback: () => any) => {
+  processes.forEach((process) => {
+    ipc.on(process, 'cancel-current-message', callback)
+  })
+}
+
+export const onIPCCancelAllMessages = (callback: () => void) => {
+  processes.forEach((process) => {
+    ipc.on(process, 'cancel-all-messages', callback)
+  })
+}

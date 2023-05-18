@@ -1,7 +1,11 @@
 <script lang="ts" setup>
 import izabela from '@/modules/izabela'
 import type { IzabelaMessage } from '@/modules/izabela/types'
-import { onIPCSay } from '@/electron/events/renderer'
+import {
+  onIPCCancelAllMessages,
+  onIPCCancelCurrentMessage,
+  onIPCSay,
+} from '@/electron/events/renderer'
 import { useSpeechStore } from '@/features/speech/store'
 import { getEngineById } from '@/modules/speech-engine-manager'
 import {
@@ -70,4 +74,10 @@ socket.on('say', (e) => {
   if (typeof e === 'string') onMessage(e)
 })
 onIPCSay(onMessage)
+onIPCCancelCurrentMessage(() => {
+  izabela.endCurrentMessage()
+})
+onIPCCancelAllMessages(() => {
+  izabela.endAllMessages()
+})
 </script>

@@ -10,6 +10,7 @@ import { purify } from '@packages/toolbox'
 import { debounce } from 'lodash'
 import { IGlobalKeyDownMap, IGlobalKeyEvent, IGlobalKeyListener } from 'node-global-key-listener'
 import { gkl, handleShortcut, keybindingTriggered } from '@/modules/electron-keybinding/utils'
+import { emitIPCCancelAllMessages, emitIPCCancelCurrentMessage } from '@/electron/events/main'
 
 export default () =>
   app.whenReady().then(async () => {
@@ -18,6 +19,8 @@ export default () =>
     const multiKeysKeybindings = {
       toggleMessengerWindow: handleShortcut(() => electronMessengerWindow.toggleWindow('keyboard')),
       toggleMessengerWindowAlt: handleShortcut(() => electronMessengerWindow.toggleWindow('mouse')),
+      cancelCurrentMessage: handleShortcut(() => emitIPCCancelCurrentMessage()),
+      cancelAllMessages: handleShortcut(() => emitIPCCancelAllMessages()),
     }
     const registeredShortcuts: Record<string, string> = {}
     const registeredCallbacks: Record<
@@ -32,6 +35,23 @@ export default () =>
         }
       }
     }
+
+    const cancelCurrentMessageListener: IGlobalKeyListener = (e, down) => {
+      if (e.state === 'DOWN') {
+        if (keybindingTriggered(settingsStore.keybindings.cancelCurrentMessage)) {
+          multiKeysKeybindings.cancelCurrentMessage()
+        }
+      }
+    }
+
+    const cancelAllMessagesListener: IGlobalKeyListener = (e, down) => {
+      if (e.state === 'DOWN') {
+        if (keybindingTriggered(settingsStore.keybindings.cancelAllMessages)) {
+          multiKeysKeybindings.cancelAllMessages()
+        }
+      }
+    }
+
     const unregisterAllShortcuts = () => {
       gkl?.removeListener(toggleMessengerWindowListener)
       Object.keys(registeredShortcuts).forEach((key) => {
@@ -40,6 +60,8 @@ export default () =>
       })
       Object.keys(registeredCallbacks).forEach((key) => {
         gkl?.removeListener(registeredCallbacks[key])
+        gkl?.removeListener(cancelCurrentMessageListener)
+        gkl?.removeListener(cancelAllMessagesListener)
         delete registeredShortcuts[key]
       })
     }
@@ -50,6 +72,8 @@ export default () =>
         .join('+')
 
       gkl?.addListener(toggleMessengerWindowListener)
+      gkl?.addListener(cancelCurrentMessageListener)
+      gkl?.addListener(cancelAllMessagesListener)
       globalShortcut.register(keybinding, multiKeysKeybindings.toggleMessengerWindow)
       registeredShortcuts.toggleMessengerWindow = keybinding
     }
