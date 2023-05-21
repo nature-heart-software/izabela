@@ -4,7 +4,7 @@ import { computed, ref } from 'vue'
 export const useDictionaryStore = defineStore(
   'dictionary',
   () => {
-    const enableDictionary = ref(false)
+    const enableDictionary = ref(true)
     const matchExactWord = ref(true)
     const caseSensitive = ref(false)
     const definitions = ref<[string, string][]>([
@@ -103,7 +103,7 @@ export const useDictionaryStore = defineStore(
       updateDefinition: (index: number, definition: [string, string]) => {
         definitions.value.splice(index, 1, definition)
       },
-      addDefinition: (definition: (typeof definitions)['value'][number] = ['', '']) => {
+      addDefinition: (definition: typeof definitions['value'][number] = ['', '']) => {
         definitions.value.unshift(definition)
       },
       removeDefinition: (index: number) => {
