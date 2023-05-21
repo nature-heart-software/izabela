@@ -20,6 +20,32 @@
               @update:modelValue="(value) => settingsStore.$patch({ hideWindowOnMessage: value })"
             />
           </NvGroup>
+          <NvDivider direction="horizontal" />
+          <NvGroup justify="apart" no-wrap spacing="5">
+            <NvStack>
+              <NvText type="label">Background dim opacity</NvText>
+            </NvStack>
+            <NvGroup>
+              <NvRangeInput
+                :modelValue="settingsStore.backgroundDimOpacity"
+                max="100"
+                min="0"
+                step="1"
+                @update:modelValue="
+                  (value) => settingsStore.$patch({ backgroundDimOpacity: value })
+                "
+              />
+              <NvNumberInput
+                :modelValue="settingsStore.backgroundDimOpacity"
+                max="100"
+                min="0"
+                step="1"
+                @update:modelValue="
+                  (value) => settingsStore.$patch({ backgroundDimOpacity: value })
+                "
+              />
+            </NvGroup>
+          </NvGroup>
         </NvStack>
       </NvCard>
     </NvStack>
@@ -123,32 +149,6 @@
           <!--              @update:modelValue="(value) => settingsStore.$patch({ enableBackgroundDim: value })"-->
           <!--            />-->
           <!--          </NvGroup>-->
-          <NvDivider direction="horizontal" />
-          <NvGroup justify="apart" no-wrap spacing="5">
-            <NvStack>
-              <NvText type="label">Background dim opacity</NvText>
-            </NvStack>
-            <NvGroup>
-              <NvRangeInput
-                :modelValue="settingsStore.backgroundDimOpacity"
-                max="100"
-                min="0"
-                step="1"
-                @update:modelValue="
-                  (value) => settingsStore.$patch({ backgroundDimOpacity: value })
-                "
-              />
-              <NvNumberInput
-                :modelValue="settingsStore.backgroundDimOpacity"
-                max="100"
-                min="0"
-                step="1"
-                @update:modelValue="
-                  (value) => settingsStore.$patch({ backgroundDimOpacity: value })
-                "
-              />
-            </NvGroup>
-          </NvGroup>
         </NvStack>
       </NvCard>
     </NvStack>
