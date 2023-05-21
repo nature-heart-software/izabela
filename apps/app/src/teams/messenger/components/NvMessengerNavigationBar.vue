@@ -176,6 +176,11 @@ const steps = [
     placement: 'top',
   },
   {
+    target: '[data-v-step="dictionary-button"]',
+    content: 'You can provide the definition of some words to improve their pronunciation here.',
+    placement: 'top',
+  },
+  {
     target: '[data-v-step="message-shortcuts-button"]',
     content: 'You can bind messages to keyboard shortcuts here.',
     placement: 'top',
