@@ -70,9 +70,9 @@ export const useDictionaryStore = defineStore(
       const words = text.split(' ')
       const flags = caseSensitive.value ? 'g' : 'gi'
       filteredDefinitions.value.forEach(([word, definition]) => {
-        // const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-        const exactMatchRegexExpression = `\\b${word}\\b`
-        const boundaryMatchRegexExpression = `^${word}|${word}$`
+        const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        const exactMatchRegexExpression = `(?<![\\w:])${escapedWord}(?![\\w:])`
+        const boundaryMatchRegexExpression = `^${escapedWord}|${escapedWord}$`
         const exactMatchRegex = new RegExp(exactMatchRegexExpression, flags)
         const boundaryMatchRegex = new RegExp(boundaryMatchRegexExpression, flags)
         words.forEach((currentWord, i) => {
@@ -103,7 +103,7 @@ export const useDictionaryStore = defineStore(
       updateDefinition: (index: number, definition: [string, string]) => {
         definitions.value.splice(index, 1, definition)
       },
-      addDefinition: (definition: (typeof definitions)['value'][number] = ['', '']) => {
+      addDefinition: (definition: typeof definitions['value'][number] = ['', '']) => {
         definitions.value.unshift(definition)
       },
       removeDefinition: (index: number) => {
