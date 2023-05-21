@@ -4,7 +4,7 @@ import { computed, ref } from 'vue'
 export const useDictionaryStore = defineStore(
   'dictionary',
   () => {
-    const enableDictionary = ref(false)
+    const enableDictionary = ref(true)
     const matchExactWord = ref(true)
     const caseSensitive = ref(false)
     const definitions = ref<[string, string][]>([
@@ -70,11 +70,12 @@ export const useDictionaryStore = defineStore(
       const words = text.split(' ')
       const flags = caseSensitive.value ? 'g' : 'gi'
       filteredDefinitions.value.forEach(([word, definition]) => {
+        const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        const exactMatchRegexExpression = `(?<![\\w:])${escapedWord}(?![\\w:])`
+        const boundaryMatchRegexExpression = `^${escapedWord}|${escapedWord}$`
+        const exactMatchRegex = new RegExp(exactMatchRegexExpression, flags)
+        const boundaryMatchRegex = new RegExp(boundaryMatchRegexExpression, flags)
         words.forEach((currentWord, i) => {
-          const exactMatchRegexExpression = `\\b${word}\\b`
-          const boundaryMatchRegexExpression = `^${word}|${word}$`
-          const exactMatchRegex = new RegExp(`\\b${word}\\b`, flags)
-          const boundaryMatchRegex = new RegExp(`^${word}|${word}$`, flags)
           const evaluations = [
             exactMatchRegex.test(currentWord),
             boundaryMatchRegex.test(currentWord),
