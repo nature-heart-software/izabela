@@ -1,9 +1,12 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 export const useDictionaryStore = defineStore(
   'dictionary',
   () => {
+    const enableDictionary = ref(true)
+    const matchExactWord = ref(true)
+    const caseSensitive = ref(false)
     const definitions = ref<[string, string][]>([
       ['wyd', 'what are you doing'],
       ['hbu', 'how about you'],
@@ -59,16 +62,42 @@ export const useDictionaryStore = defineStore(
       ['ysk', 'you should know'],
       ['yt', 'YouTube'],
     ])
-
+    const filteredDefinitions = computed(() =>
+      definitions.value.filter((def) => Array.isArray(def)),
+    )
     const translateText = (text: string) => {
-      let newText = text
-      definitions.value.forEach(([word, definition]) => {
-        newText = newText.replace(new RegExp(`(\\b${word}\\b)`, 'gi'), definition)
+      if (!enableDictionary.value) return text
+      const words = text.split(' ')
+      const flags = caseSensitive.value ? 'g' : 'gi'
+      filteredDefinitions.value.forEach(([word, definition]) => {
+        const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        const exactMatchRegexExpression = `(?<![\\w:])${escapedWord}(?![\\w:])`
+        const boundaryMatchRegexExpression = `^${escapedWord}|${escapedWord}$`
+        const exactMatchRegex = new RegExp(exactMatchRegexExpression, flags)
+        const boundaryMatchRegex = new RegExp(boundaryMatchRegexExpression, flags)
+        words.forEach((currentWord, i) => {
+          const evaluations = [
+            exactMatchRegex.test(currentWord),
+            boundaryMatchRegex.test(currentWord),
+          ]
+          if (word && (evaluations[0] || (!matchExactWord.value && evaluations[1]))) {
+            words[i] = currentWord.replace(
+              new RegExp(
+                evaluations[0] ? exactMatchRegexExpression : boundaryMatchRegexExpression,
+                flags,
+              ),
+              definition,
+            )
+          }
+        })
       })
-      return newText
+      return words.join(' ')
     }
 
     return {
+      enableDictionary,
+      matchExactWord,
+      caseSensitive,
       definitions,
       translateText,
       updateDefinition: (index: number, definition: [string, string]) => {

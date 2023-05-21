@@ -1,25 +1,44 @@
 <template>
   <NvCard size="sm">
     <NvGroup noWrap>
-      <NvTooltip>
-        <NvText>Message mode</NvText>
+      <NvPopover :tippy-options="{ placement: 'top-end' }" size="sm">
+        <div class="w-screen max-w-full">
+          <NvStack spacing="4">
+            <NvFormItem label="Message mode">
+              <NvMessageModeSelect class="w-full" />
+            </NvFormItem>
+          </NvStack>
+        </div>
         <template #reference>
-          <NvGroup data-v-step="message-mode-buttons" noWrap>
-            <NvButton
-              :type="settingsStore.messageMode === 'sentence' && 'plain'"
-              size="sm"
-              @click="settingsStore.$patch({ messageMode: 'sentence' })"
-              >Sentence
-            </NvButton>
-            <NvButton
-              :type="settingsStore.messageMode === 'word' && 'plain'"
-              size="sm"
-              @click="settingsStore.$patch({ messageMode: 'word' })"
-              >Word
-            </NvButton>
-          </NvGroup>
+          <NvTooltip>
+            <NvText>Message mode</NvText>
+            <template #reference>
+              <NvButton data-v-step="message-mode-buttons" icon-name="direction" size="sm"
+                >Mode
+              </NvButton>
+            </template>
+          </NvTooltip>
         </template>
-      </NvTooltip>
+      </NvPopover>
+      <!--      <NvTooltip>-->
+      <!--        <NvText>Message mode</NvText>-->
+      <!--        <template #reference>-->
+      <!--          <NvGroup data-v-step="message-mode-buttons" noWrap>-->
+      <!--            <NvButton-->
+      <!--              :type="settingsStore.messageMode === 'sentence' && 'plain'"-->
+      <!--              size="sm"-->
+      <!--              @click="settingsStore.$patch({ messageMode: 'sentence' })"-->
+      <!--              >Sentence-->
+      <!--            </NvButton>-->
+      <!--            <NvButton-->
+      <!--              :type="settingsStore.messageMode === 'word' && 'plain'"-->
+      <!--              size="sm"-->
+      <!--              @click="settingsStore.$patch({ messageMode: 'word' })"-->
+      <!--              >Word-->
+      <!--            </NvButton>-->
+      <!--          </NvGroup>-->
+      <!--        </template>-->
+      <!--      </NvTooltip>-->
       <NvDivider class="h-3" direction="vertical" />
       <NvPopover :tippy-options="{ placement: 'top-end' }" size="sm">
         <div class="w-screen max-w-full">
@@ -38,7 +57,7 @@
               :allowed="!!googleCloudSpeechCredentialsPath && settingsStore.enableTranslation"
               :reason="
                 settingsStore.enableTranslation
-                  ? 'Google Cloud Credentials required'
+                  ? 'Google Cloud credentials required'
                   : 'Translation needs to be enabled'
               "
             >
@@ -86,6 +105,22 @@
           </NvTooltip>
         </template>
       </NvPopover>
+      <NvTooltip>
+        <NvText>Dictionary</NvText>
+        <template #reference>
+          <NvButton
+            :type="
+              route.name === 'settings-dictionary' && messengerContext.isViewShown.value
+                ? 'plain'
+                : 'default'
+            "
+            data-v-step="dictionary-button"
+            icon-name="books"
+            size="sm"
+            @click="messengerContext.navigateTo({ name: 'settings-dictionary' })"
+          />
+        </template>
+      </NvTooltip>
       <NvTooltip>
         <NvText>Message shortcuts</NvText>
         <template #reference>
@@ -144,6 +179,7 @@ import NvCustomTranslationFromSelect from '@/features/translation/components/inp
 import NvCustomTranslationToSelect from '@/features/translation/components/inputs/NvCustomTranslationToSelect.vue'
 import { useGetGoogleCloudSpeechCredentialsPath } from '@/features/settings/hooks'
 import NvTranslationStrategySelect from '@/features/translation/components/inputs/NvTranslationStrategySelect.vue'
+import NvMessageModeSelect from '@/features/messages/components/inputs/NvMessageModeSelect.vue'
 
 const settingsStore = useSettingsStore()
 const messengerContext = inject('messenger')

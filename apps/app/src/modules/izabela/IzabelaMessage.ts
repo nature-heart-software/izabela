@@ -19,11 +19,13 @@ export default (messagePayload: IzabelaMessagePayload) => {
     payload,
   } = messagePayload
   const id = existingId || uuid()
-  let audio: HTMLAudioElement
+  const audio = new Audio()
   const emitter = mitt()
   const audioDownloaded = Deferred()
   const audioLoaded = Deferred()
   const playingMessageStore = usePlayingMessageStore()
+  let audioElements: (HTMLAudioElement | null)[] = []
+  let cancelled = false
   if (!excludeFromHistory) {
     const messageStore = useMessagesStore()
     messageStore.$whenReady().then(() => {
@@ -37,6 +39,34 @@ export default (messagePayload: IzabelaMessagePayload) => {
 
   function on(event: IzabelaMessageEvent, callback: () => void): void {
     emitter.on(event, callback)
+  }
+
+  function pause() {
+    audio.pause()
+  }
+
+  function resume() {
+    audio.play()
+  }
+
+  function cancel() {
+    cancelled = true
+    audio.pause()
+    audioElements.forEach((audioEl) => audioEl?.pause())
+    playingMessageStore.$patch({
+      id: null,
+      isPlaying: false,
+      progress: 0,
+    })
+    emitter.emit('ended')
+  }
+
+  function togglePlay() {
+    if (audio.paused) {
+      audio.play()
+    } else {
+      audio.pause()
+    }
   }
 
   async function play() {
@@ -66,26 +96,13 @@ export default (messagePayload: IzabelaMessagePayload) => {
       }
       return null
     })
-      .then((audioElements: (HTMLAudioElement | null)[]) => {
+      .then((res: typeof audioElements) => {
+        if (cancelled) return
         if (!settingsStore.playSpeechOnDefaultPlaybackDevice) {
           audio.volume = 0
         }
-
-        audio.addEventListener('timeupdate', () => {
-          playingMessageStore.$patch({
-            progress: audio.currentTime / audio.duration || 0,
-          })
-        })
-        audio.addEventListener('ended', () => {
-          playingMessageStore.$patch({
-            isPlaying: false,
-          })
-        })
-        playingMessageStore.$patch({
-          id,
-          isPlaying: true,
-        })
         audio.play()
+        audioElements = res
         audioElements.forEach((audioEl) => audioEl && audioEl.play())
       })
       .catch(console.error)
@@ -142,6 +159,34 @@ export default (messagePayload: IzabelaMessagePayload) => {
   }
 
   function addEventListeners() {
+    audio.addEventListener('timeupdate', () => {
+      if (cancelled) return
+      playingMessageStore.$patch({
+        progress: audio.currentTime / audio.duration || 0,
+      })
+    })
+    audio.addEventListener('ended', () => {
+      if (cancelled) return
+      playingMessageStore.$patch({
+        id: null,
+        isPlaying: false,
+        progress: 0,
+      })
+    })
+    audio.addEventListener('play', () => {
+      if (cancelled) return
+      playingMessageStore.$patch({
+        id,
+        isPlaying: true,
+      })
+    })
+    audio.addEventListener('pause', () => {
+      if (cancelled) return
+      playingMessageStore.$patch({
+        id,
+        isPlaying: false,
+      })
+    })
     audio.addEventListener('canplaythrough', () => {
       emitter.emit('canplaythrough')
       audioLoaded.resolve(true)
@@ -159,7 +204,6 @@ export default (messagePayload: IzabelaMessagePayload) => {
   }
 
   if (!disableAutoplay) {
-    audio = new Audio()
     addEventListeners()
     downloadAudio()
       .then((blob) => {
@@ -174,6 +218,10 @@ export default (messagePayload: IzabelaMessagePayload) => {
     play,
     on,
     downloadAudio,
+    pause,
+    resume,
+    cancel,
+    togglePlay,
     getSocketPayload: () => {
       const { credentials: _, ...rest } = messagePayload
       return {

@@ -3,7 +3,7 @@
     <NvGoogleCloudCredentialsFormPart>
       Izabela uses Google Cloud Speech for speech recognition which requires a
       <a
-        href="https://developers.google.com/workspace/guides/create-credentials#service-account"
+        href="https://github.com/nature-heart-software/izabela/wiki/How-to-get-Google-Cloud-service-account-credentials"
         target="_blank"
         >Google Cloud service account credentials</a
       >
@@ -15,7 +15,9 @@
         <NvGroup align="start" justify="apart" no-wrap spacing="5">
           <NvStack>
             <NvText type="label">Enable speech-to-text-to-speech</NvText>
-            <NvText type="caption">This might prevent your device from going to sleep</NvText>
+            <NvText type="caption"
+              ><strong>NOTE:</strong> This might prevent your device from going to sleep
+            </NvText>
           </NvStack>
           <NvSwitch
             :modelValue="settingsStore.enableSTTTS"

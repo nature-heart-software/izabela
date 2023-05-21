@@ -50,6 +50,8 @@ export const useSettingsStore = defineStore(
     const customTextTranslationApiKey = ref('')
     const customTextTranslationFrom = ref('')
     const customTextTranslationTo = ref('')
+    // const enableBackgroundDim = ref(true)
+    const backgroundDimOpacity = ref(50)
     const keybindings = ref<Record<string, Key[]>>({
       recordAudio: [
         {
@@ -105,12 +107,64 @@ export const useSettingsStore = defineStore(
           metaKey: false,
         },
         {
-          key: 'Space',
-          code: 'Space',
-          keyCode: 32,
-          rawCode: 32,
+          key: 'ControlRight',
+          code: 'ControlRight',
+          keyCode: 17,
+          rawCode: 163,
           charCode: 0,
-          which: 32,
+          which: 17,
+          shiftKey: false,
+          altKey: false,
+          ctrlKey: true,
+          metaKey: false,
+        },
+      ],
+      cancelCurrentMessage: [
+        {
+          key: 'Control',
+          code: 'ControlLeft',
+          keyCode: 17,
+          rawCode: 162,
+          charCode: 0,
+          which: 17,
+          shiftKey: false,
+          altKey: false,
+          ctrlKey: true,
+          metaKey: false,
+        },
+        {
+          key: 'Delete',
+          code: 'Delete',
+          keyCode: 46,
+          rawCode: 46,
+          charCode: 0,
+          which: 46,
+          shiftKey: false,
+          altKey: false,
+          ctrlKey: true,
+          metaKey: false,
+        },
+      ],
+      cancelAllMessages: [
+        {
+          key: 'Control',
+          code: 'ControlLeft',
+          keyCode: 17,
+          rawCode: 162,
+          charCode: 0,
+          which: 17,
+          shiftKey: false,
+          altKey: false,
+          ctrlKey: true,
+          metaKey: false,
+        },
+        {
+          key: 'Backspace',
+          code: 'Backspace',
+          keyCode: 8,
+          rawCode: 8,
+          charCode: 0,
+          which: 8,
           shiftKey: false,
           altKey: false,
           ctrlKey: true,
@@ -119,6 +173,8 @@ export const useSettingsStore = defineStore(
       ],
     })
     return {
+      // enableBackgroundDim,
+      backgroundDimOpacity,
       preferredSavDir,
       playSpeechOnDefaultPlaybackDevice,
       audioOutputs,

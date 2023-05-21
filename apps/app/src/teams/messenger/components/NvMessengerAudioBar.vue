@@ -100,7 +100,7 @@
               :allowed="!!googleCloudSpeechCredentialsPath && settingsStore.enableSTTTS"
               :reason="
                 settingsStore.enableSTTTS
-                  ? 'Google Cloud Credentials required'
+                  ? 'Google Cloud credentials required'
                   : 'STTTS needs to be enabled'
               "
             >

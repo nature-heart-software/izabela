@@ -9,14 +9,14 @@ export default () =>
     const settingsStore = useSettingsStore()
     electronMessengerWindow.isReady().then(() => {
       electronMessengerWindow.setDisplay(settingsStore.display)
-      electronSpeechWorkerWindow.setDisplay(settingsStore.display)
+      electronSpeechWorkerWindow.setDisplay()
     })
 
     watch(
       () => settingsStore.display,
       () => {
         electronMessengerWindow.setDisplay(settingsStore.display)
-        electronSpeechWorkerWindow.setDisplay(settingsStore.display)
+        electronSpeechWorkerWindow.setDisplay()
       },
     )
 
@@ -24,7 +24,7 @@ export default () =>
     screenEvents.forEach((event) => {
       screen.on(event as any, () => {
         electronMessengerWindow.setDisplay(settingsStore.display)
-        electronSpeechWorkerWindow.setDisplay(settingsStore.display)
+        electronSpeechWorkerWindow.setDisplay()
       })
     })
   })

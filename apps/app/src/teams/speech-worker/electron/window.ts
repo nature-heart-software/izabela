@@ -3,10 +3,18 @@ import { ipcMain } from 'electron-postman'
 import path from 'path'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import electronSpeechWorkerWindow from '@/teams/speech-worker/modules/electron-speech-worker-window'
+import { getTopLeftWindow } from '@/electron/utils'
+import { windowHeight, windowWidth } from '@/teams/speech-worker/electron/const'
 
 let window: BrowserWindow
 const createWindow = async (name: string): Promise<BrowserWindow> => {
+  const topLeftDisplay = getTopLeftWindow()
+
   window = new BrowserWindow({
+    width: windowWidth,
+    height: windowHeight,
+    x: (topLeftDisplay?.bounds.x ?? 0) - windowWidth,
+    y: (topLeftDisplay?.bounds.y ?? 0) - windowHeight,
     show: true,
     transparent: true,
     frame: false,
@@ -21,9 +29,6 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
   })
 
   {
-    window.setSize(64, 64)
-    window.setPosition(24, 24)
-
     // https://github.com/electron/electron/issues/10078#issuecomment-331581160
     window.setAlwaysOnTop(true, 'screen-saver', 1)
     window.setVisibleOnAllWorkspaces(true)

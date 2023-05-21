@@ -12,6 +12,8 @@ import electronNativeSpeechRecognition from '@/teams/speech-worker/modules/elect
 import ElectronWindowManager from '@/modules/electron-window-manager'
 import { mapValues } from 'lodash'
 import { getTime } from '@/utils/time'
+import { windowHeight, windowWidth } from '@/teams/speech-worker/electron/const'
+import { getTopLeftWindow } from '@/electron/utils'
 
 export const ElectronSpeechWindow = () => {
   let registeredWindow: BrowserWindow | null = null
@@ -77,14 +79,30 @@ export const ElectronSpeechWindow = () => {
     }
   }
 
-  const setDisplay = (id?: Electron.Display['id'] | null) => {
+  const setDisplay = () => {
+    const window = getWindow()
+    if (window) {
+      const topLeftDisplay = getTopLeftWindow()
+      window.setPosition(
+        (topLeftDisplay?.bounds.x ?? 0) - windowWidth,
+        (topLeftDisplay?.bounds.y ?? 0) - windowHeight,
+      )
+    }
+  }
+
+  const show = () => {
     const window = getWindow()
     if (window) {
       const allDisplays = screen.getAllDisplays()
       const primaryDisplay = screen.getPrimaryDisplay()
-      const display = allDisplays.find((d) => d.id === id) || primaryDisplay
-      window.setBounds(mapValues(display.bounds, (v) => v + 24))
+      const display = allDisplays.find((d) => d.id === settingsStore?.display) || primaryDisplay
+      const displayBounds = mapValues(display.bounds, (v) => v + 24)
+      window.setPosition(displayBounds.x, displayBounds.y)
     }
+  }
+
+  const hide = () => {
+    setDisplay()
   }
 
   const addEventListeners = () => {
@@ -151,6 +169,12 @@ export const ElectronSpeechWindow = () => {
       restartNativeSpeechRecognition,
       { deep: true, immediate: true },
     )
+
+    watch(
+      () => speechRecognitionStore?.recording,
+      (recording) => (recording ? show() : hide()),
+      { immediate: true },
+    )
   })
 
   const start = (window: BrowserWindow) => {
@@ -164,6 +188,8 @@ export const ElectronSpeechWindow = () => {
     transcribeAudio,
     restartNativeSpeechRecognition,
     setDisplay,
+    show,
+    hide,
   }
 }
 

@@ -2,8 +2,8 @@
   <NvGroup align="start" justify="apart" no-wrap>
     <NvStack>
       <NvGroup>
-        <NvText type="label">Google Cloud Credentials</NvText>
-        <NvText> (required) </NvText>
+        <NvText type="label">Google Cloud credentials</NvText>
+        <NvText> (required)</NvText>
       </NvGroup>
       <NvText>
         <slot />

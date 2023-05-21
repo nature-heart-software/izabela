@@ -88,7 +88,12 @@ const onWindowBlur = () => {
 }
 
 watch(
-  () => messengerWindowStore.isFocused,
+  // Makes sure all conditions are met to focus or blur properly
+  () => [
+    messengerWindowStore.isFocused,
+    messengerWindowStore.focusContext,
+    messengerWindowStore.isShown,
+  ],
   () => {
     if (messengerWindowStore.isFocused) {
       onWindowFocus()
