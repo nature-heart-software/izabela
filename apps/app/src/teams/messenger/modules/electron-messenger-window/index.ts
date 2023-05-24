@@ -63,6 +63,14 @@ export const ElectronMessengerWindow = () => {
       resolve(true)
     })
 
+  const ensureNativeFocus = () => {
+    const window = getWindow()
+    if (window) {
+      const windowNativeHandle = getNativeWindowHandleInt(window)
+      user32.SetForegroundWindow(windowNativeHandle)
+    }
+  }
+
   const focus = (context: 'mouse' | 'keyboard') =>
     new Promise((resolve, reject) => {
       messengerWindowStore?.$patch({ focusContext: context })
@@ -70,6 +78,9 @@ export const ElectronMessengerWindow = () => {
       if (window) {
         if (!isFocused) {
           foregroundWindow = user32.GetForegroundWindow()
+          // to prevent shenanigans with some softwares (*coughs* League of Legends *coughs*)
+          // this makes sure to blur first with ffi-napi for safe measures
+          user32.SetForegroundWindow(0)
           isFocused = true
           // window.once('show', () => {
           //   /* The focus needs to be delayed after the show() to actually focus properly... */
@@ -85,6 +96,13 @@ export const ElectronMessengerWindow = () => {
           window.setIgnoreMouseEvents(false)
           window.show() // Fixes focus properly with Hardware Acceleration for some reasons
           window.focus() // needed for immediate focus in case the window is already shown
+
+          // In applications like League of Legends, the window doesn't always receive focus
+          // but we can force it manually once we're sure the window is shown 100%.
+          // Only possible with a timeout atm.
+          setTimeout(() => {
+            ensureNativeFocus()
+          }, 100)
         }
       } else {
         reject()
@@ -238,6 +256,7 @@ export const ElectronMessengerWindow = () => {
     start,
     setDisplay,
     isReady,
+    ensureNativeFocus,
   }
 }
 
