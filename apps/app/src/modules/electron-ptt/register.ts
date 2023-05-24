@@ -7,7 +7,6 @@ export default () =>
   app.whenReady().then(() => {
     const playingMessageStore = usePlayingMessageStore()
     robot.setKeyboardDelay(0)
-    console.log('robot', robot)
     watch(
       () => playingMessageStore.isPlaying,
       (isPlaying) => {
