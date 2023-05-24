@@ -25,6 +25,7 @@
   "dependencies": {
     "@apps/app-server": "^0.0.0",
     "@google-cloud/translate": "^7.1.1",
+    "@jitsi/robotjs": "^0.6.12",
     "@packages/native-keymap": "^3.3.2",
     "ffi-napi": "^4.0.3",
     "iohook": "^0.9.3",

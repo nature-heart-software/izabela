@@ -15,6 +15,7 @@ import registerElectronUpdater from '@/modules/electron-updater/register'
 import registerElectronDebug from '@/modules/electron-debug/register'
 import registerElectronDisplay from '@/modules/electron-display/register'
 import registerElectronKeybinding from '@/modules/electron-keybinding/register'
+import registerElectronPTT from '@/modules/electron-ptt/register'
 import registerElectronCache from '@/modules/electron-cache/register'
 
 const App = () => {
@@ -129,6 +130,7 @@ const App = () => {
       exec('Start server', () => startAppServer()),
       exec('Register display', () => registerElectronDisplay()),
       exec('Register keybindings', () => registerElectronKeybinding()),
+      exec('Register Press-to-Talk', () => registerElectronPTT()),
       exec('Handle Cache', () => registerElectronCache()),
     ])
   }
