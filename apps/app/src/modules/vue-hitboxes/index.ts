@@ -2,6 +2,7 @@ import ready from '@ryanmorr/ready'
 import { v4 as uuid } from 'uuid'
 import { throttle } from 'lodash'
 import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
+import { useDevicePixelRatio } from '@vueuse/core'
 
 export const hitboxClass = 'hitbox'
 
@@ -22,10 +23,17 @@ export const watchHitbox = (selector: string) => {
   ready(selector, (element: Element) => {
     const id = uuid()
     const hitboxesStore = useHitboxesStore()
+    const { pixelRatio } = useDevicePixelRatio()
     const updateHitboxes = throttle(() => {
       if (element) {
         const { x, y, width: w, height: h } = element.getBoundingClientRect()
-        hitboxesStore.addHitbox({ id, x, y, w, h })
+        hitboxesStore.addHitbox({
+          id,
+          x: x * pixelRatio.value,
+          y: y * pixelRatio.value,
+          w: w * pixelRatio.value,
+          h: h * pixelRatio.value,
+        })
       } else {
         hitboxesStore.removeHitbox(id)
       }
