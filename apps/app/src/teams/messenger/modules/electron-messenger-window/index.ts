@@ -200,7 +200,23 @@ export const ElectronMessengerWindow = () => {
       window.setBounds(display.bounds)
     }
   }
+  const zoomIn = () => {
+    const window = getWindow()
+    if (!window) return
+    window.webContents.zoomLevel += 0.5
+  }
 
+  const zoomOut = () => {
+    const window = getWindow()
+    if (!window) return
+    window.webContents.zoomLevel -= 0.5
+  }
+
+  const resetZoom = () => {
+    const window = getWindow()
+    if (!window) return
+    window.webContents.zoomLevel = 0
+  }
   const addEventListeners = () => {
     const window = getWindow()
     iohook.on('mousemove', throttle(onMouseMove, 150))
@@ -257,6 +273,9 @@ export const ElectronMessengerWindow = () => {
     setDisplay,
     isReady,
     ensureNativeFocus,
+    zoomIn,
+    zoomOut,
+    resetZoom,
   }
 }
 

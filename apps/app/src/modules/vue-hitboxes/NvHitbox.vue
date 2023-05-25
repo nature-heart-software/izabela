@@ -7,11 +7,17 @@
 import { v4 as uuid } from 'uuid'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { throttle } from 'lodash'
-import { useIntersectionObserver, useMutationObserver, useResizeObserver } from '@vueuse/core'
+import {
+  useDevicePixelRatio,
+  useIntersectionObserver,
+  useMutationObserver,
+  useResizeObserver,
+} from '@vueuse/core'
 import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
 
 const hitboxesStore = useHitboxesStore()
 
+const { pixelRatio } = useDevicePixelRatio()
 const componentRef = ref()
 const id = uuid()
 const hitboxes = ref({
@@ -33,10 +39,10 @@ const updateHitbox = throttle(
   () => {
     if (componentRef.value) {
       const bounds = componentRef.value.getBoundingClientRect()
-      hitboxes.value.x = bounds.x
-      hitboxes.value.y = bounds.y
-      hitboxes.value.w = bounds.width
-      hitboxes.value.h = bounds.height
+      hitboxes.value.x = bounds.x * pixelRatio.value
+      hitboxes.value.y = bounds.y * pixelRatio.value
+      hitboxes.value.w = bounds.width * pixelRatio.value
+      hitboxes.value.h = bounds.height * pixelRatio.value
     }
   },
   250,

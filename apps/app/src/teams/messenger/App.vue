@@ -37,9 +37,26 @@ import { useSettingsStore } from '@/features/settings/store'
 import { watch } from 'vue'
 import { socket } from '@/services'
 
+const { ElectronMessengerWindow } = window
 const messengerStore = useMessengerStore()
 const settingsStore = useSettingsStore()
 const messengerWindowStore = useMessengerWindowStore()
+
+window.addEventListener('keydown', (event) => {
+  const isCtrlOrCmdKey = event.ctrlKey || event.metaKey
+
+  if (isCtrlOrCmdKey && (event.key === '+' || event.key === '=')) {
+    ElectronMessengerWindow.zoomIn()
+  }
+
+  if (isCtrlOrCmdKey && (event.key === '-' || event.key === '_')) {
+    ElectronMessengerWindow.zoomOut()
+  }
+
+  if (isCtrlOrCmdKey && event.key === '0') {
+    ElectronMessengerWindow.resetZoom()
+  }
+})
 
 watch(
   () => messengerWindowStore.isFocused,

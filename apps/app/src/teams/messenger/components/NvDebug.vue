@@ -5,10 +5,10 @@
         :data-debug-hitbox-id="hitbox.id"
         :style="{
           position: 'absolute',
-          top: rem(hitbox.y),
-          left: rem(hitbox.x),
-          width: rem(hitbox.w),
-          height: rem(hitbox.h),
+          top: rem(hitbox.y / pixelRatio),
+          left: rem(hitbox.x / pixelRatio),
+          width: rem(hitbox.w / pixelRatio),
+          height: rem(hitbox.h / pixelRatio),
           border: '1px solid red',
           pointerEvents: 'none',
         }"
@@ -19,6 +19,8 @@
 <script lang="ts" setup>
 import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
 import { rem } from 'polished'
+import { useDevicePixelRatio } from '@vueuse/core'
 
+const { pixelRatio } = useDevicePixelRatio()
 const hitboxStore = useHitboxesStore()
 </script>
