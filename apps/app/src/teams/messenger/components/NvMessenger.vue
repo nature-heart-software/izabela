@@ -72,8 +72,8 @@ import NvMessengerLinksBar from '@/teams/messenger/components/NvMessengerLinksBa
 import NvMessengerHandleBar from '@/teams/messenger/components/NvMessengerHandleBar.vue'
 import NvMessengerNavigationBar from '@/teams/messenger/components/NvMessengerNavigationBar.vue'
 import { debounce } from 'lodash'
+import { useWindowSize } from '@vueuse/core'
 // import gsap from 'gsap'
-
 // const messengerWindowStore = useMessengerWindowStore()
 const messengerStore = useMessengerStore()
 const props = defineProps({
@@ -141,10 +141,18 @@ provide('messenger', {
   navigateTo,
   isViewShown,
 })
-
+const { width: windowWidth, height: windowHeight } = useWindowSize()
 const viewport = computed(() => ({
-  width: Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0),
-  height: Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0),
+  width: Math.max(
+    windowWidth.value,
+    document.documentElement.clientWidth || 0,
+    window.innerWidth || 0,
+  ),
+  height: Math.max(
+    windowHeight.value,
+    document.documentElement.clientHeight || 0,
+    window.innerHeight || 0,
+  ),
 }))
 
 const savePosition = debounce((event: any) => {

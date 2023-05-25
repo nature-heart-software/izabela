@@ -18,7 +18,9 @@ export default () =>
     const messagesStore = useMessagesStore()
     const multiKeysKeybindings = {
       toggleMessengerWindow: handleShortcut(() => electronMessengerWindow.toggleWindow('keyboard')),
-      toggleMessengerWindowAlt: handleShortcut(() => electronMessengerWindow.toggleWindow('mouse')),
+      toggleMessengerWindowAlt: handleShortcut(() =>
+        electronMessengerWindow.toggleWindow('keyboard'),
+      ),
       cancelCurrentMessage: handleShortcut(() => emitIPCCancelCurrentMessage()),
       cancelAllMessages: handleShortcut(() => emitIPCCancelAllMessages()),
     }
