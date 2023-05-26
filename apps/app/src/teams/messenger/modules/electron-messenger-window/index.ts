@@ -1,5 +1,5 @@
 import ElectronWindowManager from '@/modules/electron-window-manager'
-import iohook, { IOHookEvent } from '@/modules/node-iohook'
+import { mouse } from '@/modules/node-mouse'
 import { throttle } from 'lodash'
 import { Hitbox } from '@/modules/vue-hitboxes/types'
 import { BrowserWindow, screen, shell } from 'electron'
@@ -157,12 +157,12 @@ export const ElectronMessengerWindow = () => {
       }
     })
 
-  const onMouseMove = (event: IOHookEvent) => {
+  const onMouseMove = (mouseX = 0, mouseY = 0) => {
     if (!hitboxesStore) return
     const window = getWindow()
     if (window) {
       if (!window.isDestroyed() && window.isVisible()) {
-        const { x: mouseX = 0, y: mouseY = 0 } = event
+        // const { x: mouseX = 0, y: mouseY = 0 } = event
         const [windowX, windowY] = window.getPosition()
         const { hitboxes } = hitboxesStore
         const isWithinAnyHitboxes = hitboxes.some(({ x, y, w, h }: Hitbox) => {
@@ -219,7 +219,7 @@ export const ElectronMessengerWindow = () => {
   }
   const addEventListeners = () => {
     const window = getWindow()
-    iohook.on('mousemove', throttle(onMouseMove, 150))
+    mouse.on('move', throttle(onMouseMove, 150))
 
     if (window) {
       window.on('show', () => {
