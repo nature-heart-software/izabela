@@ -111,7 +111,6 @@ const App = () => {
         handleQuit(true)
       }
     })
-
     ;['SIGINT', 'SIGTERM', 'SIGQUIT'].forEach((signal) => {
       process.on(signal, () => {
         handleQuit(true)
