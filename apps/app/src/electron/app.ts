@@ -50,8 +50,6 @@ const App = () => {
     app.commandLine.appendSwitch('disable-renderer-backgrounding')
     app.commandLine.appendSwitch('ignore-certificate-errors')
     app.commandLine.appendSwitch('wm-window-animations-disabled')
-    /* Fixes iohook. See: https://github.com/electron/electron/issues/18397 */
-    app.allowRendererProcessReuse = false
 
     /* Disabling Hardware Acceleration does the following:
      * - fixes ui freeze in DevTools when unfocused

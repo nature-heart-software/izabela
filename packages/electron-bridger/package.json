@@ -15,11 +15,8 @@
   "files": [
     "./dist"
   ],
-  "peerDependencies": {
-    "electron": "12.x"
-  },
   "dependencies": {
-    "electron": "^12.2.3"
+    "electron": "20.3.8"
   },
   "devDependencies": {
     "microbundle": "^0.15.1",
