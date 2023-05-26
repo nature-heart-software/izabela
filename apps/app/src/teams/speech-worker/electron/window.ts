@@ -25,6 +25,7 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION as unknown as boolean,
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
       backgroundThrottling: false,
+      sandbox: false,
     },
   })
 
