@@ -16,6 +16,7 @@ import registerElectronDebug from '@/modules/electron-debug/register'
 import registerElectronDisplay from '@/modules/electron-display/register'
 import registerElectronKeybinding from '@/modules/electron-keybinding/register'
 import registerElectronCache from '@/modules/electron-cache/register'
+import { destroyWinMouse } from '@/modules/node-mouse'
 
 const App = () => {
   const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -70,6 +71,10 @@ const App = () => {
     return action()
   }
 
+  const onQuit = () => {
+    destroyWinMouse()
+  }
+
   function addEventListeners() {
     app.whenReady().then(() => {
       const credentialsDirPath = path.join(app.getPath('userData'), 'credentials')
@@ -94,25 +99,33 @@ const App = () => {
       if (BrowserWindow.getAllWindows().length === 0) createWindows()
     })
 
-    app.on('window-all-closed', () => {
-      if (process.platform !== 'darwin') {
+    const handleQuit = (quitApp = false) => {
+      onQuit()
+      if (quitApp) {
         app.quit()
       }
+    }
+
+    process.on('message', (data) => {
+      if (process.platform === 'win32' && data === 'graceful-exit') {
+        handleQuit(true)
+      }
+    })
+    ;['SIGINT', 'SIGTERM', 'SIGQUIT'].forEach((signal) => {
+      process.on(signal, () => {
+        handleQuit(true)
+      })
     })
 
-    if (isDevelopment) {
-      if (process.platform === 'win32') {
-        process.on('message', (data) => {
-          if (data === 'graceful-exit') {
-            app.quit()
-          }
-        })
-      } else {
-        process.on('SIGTERM', () => {
-          app.quit()
-        })
+    app.on('before-quit', () => {
+      handleQuit()
+    })
+
+    app.on('window-all-closed', () => {
+      if (process.platform !== 'darwin') {
+        handleQuit(true)
       }
-    }
+    })
   }
 
   function start() {
