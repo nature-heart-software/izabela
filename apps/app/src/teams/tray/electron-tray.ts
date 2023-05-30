@@ -14,6 +14,13 @@ const createTray = (): Promise<Tray> =>
       const allDisplays = screen.getAllDisplays()
       return Menu.buildFromTemplate([
         {
+          label: 'Restart',
+          click: () => {
+            app.relaunch()
+            app.exit()
+          },
+        },
+        {
           label: 'Settings',
           submenu: [
             {
@@ -37,14 +44,6 @@ const createTray = (): Promise<Tray> =>
               },
             },
           ],
-        },
-
-        {
-          label: 'Restart',
-          click: () => {
-            app.relaunch()
-            app.exit()
-          },
         },
         { type: 'separator' },
         { label: 'Exit', type: 'normal', role: 'quit' },
