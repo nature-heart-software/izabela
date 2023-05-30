@@ -8,6 +8,10 @@
     "lint": "standard",
     "test": "node test/parallel-destroy && node test/parallel-unref && node test/sequence-destroy && node test/sequence-unref"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kapetan/win-mouse.git"
+  },
   "keywords": [
     "track",
     "mouse",
