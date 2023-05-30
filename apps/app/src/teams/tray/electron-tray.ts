@@ -42,9 +42,9 @@ const createTray = (): Promise<Tray> =>
         {
           label: 'Restart',
           click: () => {
-            app.relaunch();
-            app.exit();
-          }
+            app.relaunch()
+            app.exit()
+          },
         },
         { type: 'separator' },
         { label: 'Exit', type: 'normal', role: 'quit' },
