@@ -19,6 +19,8 @@ import registerElectronCache from '@/modules/electron-cache/register'
 import { destroyWinMouse } from '@/modules/node-mouse'
 
 const App = () => {
+  const gotTheLock = app.requestSingleInstanceLock()
+  if (!gotTheLock) app.quit()
   const isDevelopment = process.env.NODE_ENV !== 'production'
   const createWindows = () =>
     app
