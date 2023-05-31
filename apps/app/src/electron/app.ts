@@ -16,6 +16,7 @@ import registerElectronDebug from '@/modules/electron-debug/register'
 import registerElectronDisplay from '@/modules/electron-display/register'
 import registerElectronKeybinding from '@/modules/electron-keybinding/register'
 import registerElectronCache from '@/modules/electron-cache/register'
+import { destroyWinMouse } from '@/modules/node-mouse'
 
 const App = () => {
   const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -49,8 +50,6 @@ const App = () => {
     app.commandLine.appendSwitch('disable-renderer-backgrounding')
     app.commandLine.appendSwitch('ignore-certificate-errors')
     app.commandLine.appendSwitch('wm-window-animations-disabled')
-    /* Fixes iohook. See: https://github.com/electron/electron/issues/18397 */
-    app.allowRendererProcessReuse = false
 
     /* Disabling Hardware Acceleration does the following:
      * - fixes ui freeze in DevTools when unfocused
@@ -68,6 +67,10 @@ const App = () => {
   function exec(description: string, action: () => any) {
     console.log(`[app]: ${description}`)
     return action()
+  }
+
+  const onQuit = () => {
+    destroyWinMouse()
   }
 
   function addEventListeners() {
@@ -94,25 +97,33 @@ const App = () => {
       if (BrowserWindow.getAllWindows().length === 0) createWindows()
     })
 
-    app.on('window-all-closed', () => {
-      if (process.platform !== 'darwin') {
+    const handleQuit = (quitApp = false) => {
+      onQuit()
+      if (quitApp) {
         app.quit()
       }
+    }
+
+    process.on('message', (data) => {
+      if (process.platform === 'win32' && data === 'graceful-exit') {
+        handleQuit(true)
+      }
+    })
+    ;['SIGINT', 'SIGTERM', 'SIGQUIT'].forEach((signal) => {
+      process.on(signal, () => {
+        handleQuit(true)
+      })
     })
 
-    if (isDevelopment) {
-      if (process.platform === 'win32') {
-        process.on('message', (data) => {
-          if (data === 'graceful-exit') {
-            app.quit()
-          }
-        })
-      } else {
-        process.on('SIGTERM', () => {
-          app.quit()
-        })
+    app.on('before-quit', () => {
+      handleQuit()
+    })
+
+    app.on('window-all-closed', () => {
+      if (process.platform !== 'darwin') {
+        handleQuit(true)
       }
-    }
+    })
   }
 
   function start() {

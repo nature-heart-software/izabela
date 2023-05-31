@@ -54,7 +54,7 @@ module.exports = defineConfig({
   pluginOptions: {
     electronBuilder: {
       externals: [
-        'iohook',
+        '@packages/win-mouse',
         '@izabela/app-server',
         '@google-cloud/speech',
         '@packages/native-keymap',
