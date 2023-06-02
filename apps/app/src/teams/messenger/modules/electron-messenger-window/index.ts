@@ -239,12 +239,12 @@ export const ElectronMessengerWindow = () => {
         messengerWindowStore.$patch({ isFocused: false })
       })
       window.on('close', (e) => {
-        e.preventDefault();
+        e.preventDefault()
         hide()
-      });
+      })
       window.on('minimize', () => {
         hide()
-      });
+      })
       window.webContents.setWindowOpenHandler(({ url }) => {
         shell.openExternal(url)
         return { action: 'deny' }
