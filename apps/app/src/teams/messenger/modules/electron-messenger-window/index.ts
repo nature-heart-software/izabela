@@ -238,6 +238,13 @@ export const ElectronMessengerWindow = () => {
         if (!messengerWindowStore) return
         messengerWindowStore.$patch({ isFocused: false })
       })
+      window.on('close', (e) => {
+        e.preventDefault();
+        hide()
+      });
+      window.on('minimize', () => {
+        hide()
+      });
       window.webContents.setWindowOpenHandler(({ url }) => {
         shell.openExternal(url)
         return { action: 'deny' }
