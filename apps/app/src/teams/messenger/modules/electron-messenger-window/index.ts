@@ -139,6 +139,7 @@ export const ElectronMessengerWindow = () => {
         blur()
           .then(() => {
             window.hide()
+            resolve(true)
           })
           .catch(reject)
       } else {

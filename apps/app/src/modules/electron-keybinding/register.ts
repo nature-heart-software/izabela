@@ -11,6 +11,7 @@ import { debounce } from 'lodash'
 import { IGlobalKeyDownMap, IGlobalKeyEvent, IGlobalKeyListener } from 'node-global-key-listener'
 import { gkl, handleShortcut, keybindingTriggered } from '@/modules/electron-keybinding/utils'
 import { emitIPCCancelAllMessages, emitIPCCancelCurrentMessage } from '@/electron/events/main'
+import electronOverlayWindow from '@/teams/overlay/modules/electron-overlay-window'
 
 export default () =>
   app.whenReady().then(async () => {
@@ -21,6 +22,7 @@ export default () =>
       toggleMessengerWindowAlt: handleShortcut(() =>
         electronMessengerWindow.toggleWindow('keyboard'),
       ),
+      toggleOverlayWindow: handleShortcut(() => electronOverlayWindow.toggleWindow()),
       cancelCurrentMessage: handleShortcut(() => emitIPCCancelCurrentMessage()),
       cancelAllMessages: handleShortcut(() => emitIPCCancelAllMessages()),
     }
@@ -34,6 +36,14 @@ export default () =>
       if (e.state === 'DOWN') {
         if (keybindingTriggered(settingsStore.keybindings.toggleMessengerWindowAlt)) {
           multiKeysKeybindings.toggleMessengerWindowAlt()
+        }
+      }
+    }
+
+    const toggleOverlayWindowListener: IGlobalKeyListener = (e, down) => {
+      if (e.state === 'DOWN') {
+        if (keybindingTriggered(settingsStore.keybindings.toggleOverlayWindow)) {
+          multiKeysKeybindings.toggleOverlayWindow()
         }
       }
     }
@@ -56,6 +66,7 @@ export default () =>
 
     const unregisterAllShortcuts = () => {
       gkl?.removeListener(toggleMessengerWindowListener)
+      gkl?.removeListener(toggleOverlayWindowListener)
       Object.keys(registeredShortcuts).forEach((key) => {
         globalShortcut.unregister(registeredShortcuts[key])
         delete registeredShortcuts[key]
@@ -74,6 +85,7 @@ export default () =>
         .join('+')
 
       gkl?.addListener(toggleMessengerWindowListener)
+      gkl?.addListener(toggleOverlayWindowListener)
       gkl?.addListener(cancelCurrentMessageListener)
       gkl?.addListener(cancelAllMessagesListener)
       globalShortcut.register(keybinding, multiKeysKeybindings.toggleMessengerWindow)

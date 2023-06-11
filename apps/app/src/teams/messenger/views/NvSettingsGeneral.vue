@@ -84,6 +84,20 @@
             />
           </NvGroup>
           <NvDivider direction="horizontal" />
+          <NvGroup align="start" justify="apart" no-wrap spacing="5">
+            <NvStack>
+              <NvText type="label">Show Overlay window</NvText>
+              <NvText>todo </NvText>
+            </NvStack>
+            <NvKeybinding
+              :modelValue="settingsStore.keybindings.toggleOverlayWindow"
+              multiple
+              @update:modelValue="
+                (value) => settingsStore.$patch({ keybindings: { toggleOverlayWindow: value } })
+              "
+            />
+          </NvGroup>
+          <NvDivider direction="horizontal" />
           <NvGroup justify="apart" no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Cancel playing message</NvText>
