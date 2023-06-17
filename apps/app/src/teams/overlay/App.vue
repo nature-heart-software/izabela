@@ -12,6 +12,10 @@ body {
 </style>
 <script lang="ts" setup>
 import { useSettingsStore } from '@/features/settings/store'
+import { onIPCOverlayInput } from '@/electron/events/renderer'
 
 const settingsStore = useSettingsStore()
+onIPCOverlayInput((event) => {
+  console.log(event)
+})
 </script>

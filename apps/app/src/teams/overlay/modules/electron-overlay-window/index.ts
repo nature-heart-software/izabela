@@ -4,6 +4,10 @@ import { BrowserWindow, screen } from 'electron'
 import { useSettingsStore } from '@/features/settings/store'
 import { Deferred } from '@packages/toolbox'
 import ffi from 'ffi-napi'
+import { gkl } from '@/modules/electron-keybinding/utils'
+import { IGlobalKeyEvent } from 'node-global-key-listener'
+import { emitIPCOverlayInput } from '@/electron/events/main'
+import keymap from '@packages/native-keymap'
 
 export const ElectronOverlayWindow = () => {
   let registeredWindow: BrowserWindow | null = null
@@ -23,7 +27,9 @@ export const ElectronOverlayWindow = () => {
       const window = getWindow()
       if (window) {
         window.hide()
-        user32.BlockInput(false)
+        process.nextTick(() => {
+          user32.BlockInput(false)
+        })
         resolve(true)
       } else {
         reject()
@@ -82,7 +88,33 @@ export const ElectronOverlayWindow = () => {
     window.webContents.zoomLevel = 0
   }
 
-  const addEventListeners = () => {}
+  const addEventListeners = () => {
+    gkl?.addListener((e: IGlobalKeyEvent, down) => {
+      if (
+        e.state === 'DOWN' &&
+        !((down['LEFT CTRL'] && !down['RIGHT ALT']) || down['RIGHT CTRL'])
+      ) {
+        const nativeKey = Object.values(keymap.getKeyMap()).find(
+          (k: any) => k.vkey === e.rawKey._nameRaw,
+        )
+        if (nativeKey) {
+          const hasShift = down['LEFT SHIFT'] || down['RIGHT SHIFT']
+          const hasRightAlt = down['RIGHT ALT']
+          const key =
+            hasRightAlt && hasShift
+              ? nativeKey.withShiftAltGr
+              : hasRightAlt
+              ? nativeKey.withAltGr
+              : hasShift
+              ? nativeKey.withShift
+              : nativeKey.value
+          if (key) {
+            emitIPCOverlayInput(key)
+          }
+        }
+      }
+    })
+  }
 
   const start = (window: BrowserWindow) => {
     const localSettingsStore = useSettingsStore()
