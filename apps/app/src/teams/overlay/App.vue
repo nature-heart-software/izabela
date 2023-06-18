@@ -1,5 +1,7 @@
 <template>
-  <template v-if="settingsStore.$isReady"></template>
+  <template v-if="settingsStore.$isReady">
+    <NvOverlayInput class="w-[720px] fixed bottom-[60px] left-1/2 transform -translate-x-1/2" />
+  </template>
 </template>
 <style lang="scss">
 body {
@@ -13,6 +15,7 @@ body {
 <script lang="ts" setup>
 import { useSettingsStore } from '@/features/settings/store'
 import { onIPCOverlayInput } from '@/electron/events/renderer'
+import NvOverlayInput from '@/teams/overlay/components/NvOverlayInput.vue'
 
 const settingsStore = useSettingsStore()
 onIPCOverlayInput((event) => {
