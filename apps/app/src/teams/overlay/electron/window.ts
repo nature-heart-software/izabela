@@ -7,7 +7,7 @@ import electronOverlayWindow from '@/teams/overlay/modules/electron-overlay-wind
 let window: BrowserWindow
 const createWindow = async (name: string): Promise<BrowserWindow> => {
   window = new BrowserWindow({
-    show: true,
+    show: false,
     fullscreen: true,
     transparent: true,
     frame: false,

@@ -8,7 +8,7 @@
       <NvCard class="min-w-0" size="sm">
         <NvGroup noWrap>
           <div
-            class="overlayInput border rounded px-5 h-8 text-2 flex items-center focused"
+            class="overlayInput border rounded px-5 h-8 text-2 flex items-center text-gray-90 focused font-semibold"
             tabindex="-1"
           >
             <!--.overlayInput-->
@@ -54,24 +54,24 @@
 import { NvCard, NvGroup } from '@packages/ui'
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useSettingsStore } from '@/features/settings/store'
-import { onIPCOverlayInput } from '@/electron/events/renderer'
+import {
+  emitIPCSay,
+  onIPCOverlayInputCharacter,
+  onIPCOverlayInputCommand,
+} from '@/electron/events/renderer'
 import { useElementSize } from '@vueuse/core'
 import { rem } from 'polished'
 
-const value = ref('')
-const placeholder = ref('')
+const { ElectronOverlayWindow } = window
+const placeholder = ref('So, said the angel to the child who, divided, broke the knife..')
 const carretIndex = ref(-1)
 const selection = ref([-1, -1])
 const settingsStore = useSettingsStore()
 
 const hasSelection = computed(() => selection.value[1] - selection.value[0] > 0)
 
-const keys = computed({
-  get: () => value.value.split(''),
-  set: (newValue) => {
-    value.value = newValue.join('')
-  },
-})
+const keys = ref([])
+const value = computed(() => keys.value.join(''))
 const keysRef = ref<Element[]>([])
 const blankSpaceRef = ref()
 const selectionValueRef = ref<HTMLInputElement>()
@@ -228,11 +228,18 @@ function selectAll() {
 }
 
 function validateMessage() {
-  console.log('validateMessage')
-  // this.$emit('keyup', { key: 'Enter' })
+  if (value.value) {
+    emitIPCSay(value.value)
+    keys.value = []
+    if (settingsStore.hideWindowOnMessage) {
+      ElectronOverlayWindow.hide()
+    }
+  } else {
+    ElectronOverlayWindow.hide()
+  }
 }
 
-const methods = {
+const commands = {
   delete: del,
   suppr,
   spaceLetter,
@@ -248,11 +255,16 @@ const methods = {
 }
 
 function addListeners() {
-  onIPCOverlayInput((key: keyof typeof methods) => {
-    if (methods[key]) {
-      methods[key]()
+  onIPCOverlayInputCharacter((key: keyof typeof commands) => {
+    if (commands[key]) {
+      commands[key]()
     } else {
       insertKey(key)
+    }
+  })
+  onIPCOverlayInputCommand(([command, ...args]) => {
+    if (commands[command as keyof typeof commands]) {
+      commands[command as keyof typeof commands](...args)
     }
   })
 }
@@ -317,7 +329,6 @@ watch(carretIndex, () => {
     z-index: 0;
     padding-right: 1px;
     letter-spacing: -1px;
-    //font-size: _(textSizes, base);
     display: inline-block;
 
     &.activeIndex {
@@ -328,25 +339,21 @@ watch(carretIndex, () => {
         right: 0;
         bottom: 0;
         width: 1px;
-        //background-color: _(colors, base-text-color);
-        background-color: black;
+        background-color: #2b2b2c;
         animation: caret 1s steps(1) infinite;
         z-index: 100000;
       }
     }
 
     &.inSelection {
-      //background-color: _(colors, primary);
+      background-color: #444444;
+      color: #ffffff;
     }
   }
 
   .overlayInput__placeholder {
-    //color: _(colors, grey-dark);
+    color: #bebebe;
     opacity: 0.7;
-  }
-
-  &.focused {
-    /*border: 2px solid green;*/
   }
 
   .overlayInput__wrapper {

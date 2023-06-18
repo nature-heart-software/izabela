@@ -1,17 +1,20 @@
 import ElectronWindowManager from '@/modules/electron-window-manager'
 import { throttle } from 'lodash'
-import { BrowserWindow, screen } from 'electron'
+import { BrowserWindow, screen, shell } from 'electron'
 import { useSettingsStore } from '@/features/settings/store'
 import { Deferred } from '@packages/toolbox'
 import ffi from 'ffi-napi'
-import { gkl } from '@/modules/electron-keybinding/utils'
+import { gkl, keybindingTriggered } from '@/modules/electron-keybinding/utils'
 import { IGlobalKeyEvent } from 'node-global-key-listener'
-import { emitIPCOverlayInput } from '@/electron/events/main'
+import { emitIPCOverlayInputCharacter, emitIPCOverlayInputCommand } from '@/electron/events/main'
 import keymap from '@packages/native-keymap'
+import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
+import { useOverlayWindowStore } from '@/teams/overlay/store'
 
 export const ElectronOverlayWindow = () => {
   let registeredWindow: BrowserWindow | null = null
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
+  let overlayWindowStore: ReturnType<typeof useOverlayWindowStore> | undefined
   const ready = Deferred<BrowserWindow>()
   const isReady = () => ready.promise
 
@@ -27,9 +30,9 @@ export const ElectronOverlayWindow = () => {
       const window = getWindow()
       if (window) {
         window.hide()
-        process.nextTick(() => {
+        setTimeout(() => {
           user32.BlockInput(false)
-        })
+        }, 200)
         resolve(true)
       } else {
         reject()
@@ -49,6 +52,7 @@ export const ElectronOverlayWindow = () => {
     })
 
   const toggleWindow = throttle(() => {
+    electronMessengerWindow.hide()
     const window = getWindow()
     if (window) {
       if (window.isVisible()) {
@@ -89,36 +93,97 @@ export const ElectronOverlayWindow = () => {
   }
 
   const addEventListeners = () => {
+    const window = getWindow()
     gkl?.addListener((e: IGlobalKeyEvent, down) => {
       if (
-        e.state === 'DOWN' &&
-        !((down['LEFT CTRL'] && !down['RIGHT ALT']) || down['RIGHT CTRL'])
+        settingsStore &&
+        !keybindingTriggered(settingsStore.keybindings.toggleOverlayWindow) &&
+        window?.isVisible()
       ) {
-        const nativeKey = Object.values(keymap.getKeyMap()).find(
-          (k: any) => k.vkey === e.rawKey._nameRaw,
-        )
-        if (nativeKey) {
-          const hasShift = down['LEFT SHIFT'] || down['RIGHT SHIFT']
-          const hasRightAlt = down['RIGHT ALT']
-          const key =
-            hasRightAlt && hasShift
-              ? nativeKey.withShiftAltGr
-              : hasRightAlt
-              ? nativeKey.withAltGr
-              : hasShift
-              ? nativeKey.withShift
-              : nativeKey.value
-          if (key) {
-            emitIPCOverlayInput(key)
+        if (
+          e.state === 'DOWN' &&
+          !((down['LEFT CTRL'] && !down['RIGHT ALT']) || down['RIGHT CTRL']) &&
+          e.name !== 'SPACE'
+        ) {
+          const nativeKey = Object.values(keymap.getKeyMap()).find(
+            (k: any) => k.vkey === e.rawKey._nameRaw,
+          )
+          if (nativeKey) {
+            const hasShift = down['LEFT SHIFT'] || down['RIGHT SHIFT']
+            const hasRightAlt = down['RIGHT ALT']
+            const key =
+              hasRightAlt && hasShift
+                ? nativeKey.withShiftAltGr
+                : hasRightAlt
+                ? nativeKey.withAltGr
+                : hasShift
+                ? nativeKey.withShift
+                : nativeKey.value
+            if (key) {
+              emitIPCOverlayInputCharacter(key)
+            }
+          }
+        }
+        if (e.state === 'DOWN' && e.name === 'ESCAPE') {
+          hide()
+        }
+        if (e.state === 'DOWN' && e.name === 'BACKSPACE') {
+          emitIPCOverlayInputCommand('delete')
+        }
+        if (e.state === 'DOWN' && e.name === 'DELETE') {
+          emitIPCOverlayInputCommand('suppr')
+        }
+        if (e.state === 'DOWN' && e.name === 'SPACE') {
+          emitIPCOverlayInputCommand('spaceLetter')
+        }
+        if (e.state === 'DOWN' && e.name === 'RETURN') {
+          emitIPCOverlayInputCommand('validateMessage')
+        }
+        if (e.state === 'DOWN' && e.name === 'A' && (down['LEFT CTRL'] || down['RIGHT CTRL'])) {
+          emitIPCOverlayInputCommand('selectAll')
+        }
+        if (e.state === 'DOWN' && e.name === 'X' && (down['LEFT CTRL'] || down['RIGHT CTRL'])) {
+          emitIPCOverlayInputCommand('cut')
+        }
+        if (e.state === 'DOWN' && e.name === 'C' && (down['LEFT CTRL'] || down['RIGHT CTRL'])) {
+          emitIPCOverlayInputCommand('copy')
+        }
+        if (e.state === 'DOWN' && e.name === 'V' && (down['LEFT CTRL'] || down['RIGHT CTRL'])) {
+          emitIPCOverlayInputCommand('paste')
+        }
+        if (e.state === 'DOWN' && e.name === 'LEFT ARROW') {
+          if (down['LEFT SHIFT'] || down['RIGHT SHIFT']) {
+            emitIPCOverlayInputCommand('moveSelectionLeft')
+          } else {
+            emitIPCOverlayInputCommand('moveCaretLeft')
+          }
+        }
+        if (e.state === 'DOWN' && e.name === 'RIGHT ARROW') {
+          if (down['LEFT SHIFT'] || down['RIGHT SHIFT']) {
+            emitIPCOverlayInputCommand('moveSelectionRight')
+          } else {
+            emitIPCOverlayInputCommand('moveCaretRight')
           }
         }
       }
     })
+
+    if (window) {
+      window.on('show', () => {
+        if (!overlayWindowStore) return
+        overlayWindowStore.$patch({ isShown: true })
+      })
+      window.on('hide', () => {
+        if (!overlayWindowStore) return
+        overlayWindowStore.$patch({ isShown: false })
+      })
+    }
   }
 
   const start = (window: BrowserWindow) => {
     const localSettingsStore = useSettingsStore()
     settingsStore = localSettingsStore
+    overlayWindowStore = useOverlayWindowStore()
     registeredWindow = window
     settingsStore.$whenReady().then(() => {
       setDisplay(localSettingsStore.display)

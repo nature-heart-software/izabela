@@ -29,6 +29,7 @@ declare global {
     ElectronDialog: typeof electronDialog
     ElectronFilesystem: typeof electronFilesystem
     ElectronMessengerWindow: typeof electronMessengerWindow
+    ElectronOverlayWindow: typeof electronOverlayWindow
     ElectronSpeechWorkerWindow: typeof electronSpeechWorkerWindow
     ElectronKeybinding: typeof electronKeybinding
     ElectronDisplay: typeof electronDisplay

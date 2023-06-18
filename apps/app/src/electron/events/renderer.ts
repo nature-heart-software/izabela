@@ -33,8 +33,14 @@ export const onIPCCancelAllMessages = (callback: () => void) => {
   })
 }
 
-export const onIPCOverlayInput = (callback: (key: any) => void) => {
+export const onIPCOverlayInputCharacter = (callback: (key: any) => void) => {
   processes.forEach((process) => {
-    ipc.on(process, 'overlay-input', callback)
+    ipc.on(process, 'overlay-input-character', callback)
+  })
+}
+
+export const onIPCOverlayInputCommand = (callback: (args: any[]) => void) => {
+  processes.forEach((process) => {
+    ipc.on(process, 'overlay-input-command', callback)
   })
 }

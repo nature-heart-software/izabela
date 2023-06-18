@@ -17,6 +17,10 @@ export const emitIPCCancelAllMessages = () => {
   ipcMain.sendTo('speech-worker', 'cancel-all-messages')
 }
 
-export const emitIPCOverlayInput = (character: string) => {
-  ipcMain.sendTo('overlay', 'overlay-input', character)
+export const emitIPCOverlayInputCharacter = (character: string) => {
+  ipcMain.sendTo('overlay', 'overlay-input-character', character)
+}
+
+export const emitIPCOverlayInputCommand = (command: string, args: any[] = []) => {
+  ipcMain.sendTo('overlay', 'overlay-input-command', [command, ...args])
 }
