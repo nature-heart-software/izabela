@@ -100,3 +100,14 @@ export const keybindingReleased = (keybinding: Key[]) => {
     )
     .some((v) => !v)
 }
+
+export const keybindingAllReleased = (keybinding: Key[]) => {
+  if (!keybinding.length) return true
+  return keybinding
+    .map(
+      (key) =>
+        keymap[key.code as keyof typeof keymap]?.vkey &&
+        !down[keymap[key.code as keyof typeof keymap]?.vkey],
+    )
+    .every(Boolean)
+}

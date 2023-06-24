@@ -4,14 +4,19 @@ import { BrowserWindow, screen, shell } from 'electron'
 import { useSettingsStore } from '@/features/settings/store'
 import { Deferred } from '@packages/toolbox'
 import ffi from 'ffi-napi'
-import { gkl, keybindingTriggered } from '@/modules/electron-keybinding/utils'
-import { IGlobalKeyEvent } from 'node-global-key-listener'
+import {
+  gkl,
+  keybindingAllReleased,
+  keybindingTriggered,
+} from '@/modules/electron-keybinding/utils'
+import { IGlobalKeyEvent, IGlobalKeyListener } from 'node-global-key-listener'
 import { emitIPCOverlayInputCharacter, emitIPCOverlayInputCommand } from '@/electron/events/main'
 import keymap from '@packages/native-keymap'
 import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
 import { useOverlayWindowStore } from '@/teams/overlay/store'
 
 export const ElectronOverlayWindow = () => {
+  let waitingToShow = false
   let registeredWindow: BrowserWindow | null = null
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
   let overlayWindowStore: ReturnType<typeof useOverlayWindowStore> | undefined
@@ -30,9 +35,10 @@ export const ElectronOverlayWindow = () => {
       const window = getWindow()
       if (window) {
         window.hide()
+        gkl?.removeListener(toggleOverlayWindowListener)
         setTimeout(() => {
           user32.BlockInput(false)
-        }, 200)
+        }, 100)
         resolve(true)
       } else {
         reject()
@@ -43,9 +49,28 @@ export const ElectronOverlayWindow = () => {
     new Promise((resolve, reject) => {
       const window = getWindow()
       if (window) {
-        user32.BlockInput(true)
-        window.showInactive()
-        resolve(true)
+        new Promise((r) => {
+          const callback = () => {
+            if (
+              settingsStore &&
+              keybindingAllReleased(settingsStore.keybindings.toggleOverlayWindow)
+            ) {
+              gkl?.removeListener(callback)
+              r(true)
+            }
+          }
+          gkl?.addListener(callback)
+        })
+          .then(() => {
+            gkl?.addListener(toggleOverlayWindowListener)
+            setTimeout(() => {
+              user32.BlockInput(true)
+            }, 100)
+            window.showInactive()
+            waitingToShow = false
+            resolve(true)
+          })
+          .catch(() => reject())
       } else {
         reject()
       }
@@ -57,12 +82,21 @@ export const ElectronOverlayWindow = () => {
     if (window) {
       if (window.isVisible()) {
         hide()
-      } else {
+      } else if (!waitingToShow) {
+        waitingToShow = true
         show()
       }
     }
     return Promise.resolve()
   }, 500)
+
+  function toggleOverlayWindowListener(e: Parameters<IGlobalKeyListener>[0]) {
+    if (settingsStore) {
+      if (keybindingTriggered(settingsStore.keybindings.toggleOverlayWindow)) {
+        toggleWindow()
+      }
+    }
+  }
 
   const setDisplay = (id?: Electron.Display['id'] | null) => {
     const window = getWindow()

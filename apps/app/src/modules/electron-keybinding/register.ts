@@ -80,7 +80,10 @@ export default () =>
     }
 
     const setToggleMessengerWindowKeybinding = () => {
-      const keybinding = settingsStore.keybindings.toggleMessengerWindow
+      const toggleMessengerWindowKeybinding = settingsStore.keybindings.toggleMessengerWindow
+        .map(({ key }: Key) => key)
+        .join('+')
+      const toggleOverlayWindowKeybinding = settingsStore.keybindings.toggleOverlayWindow
         .map(({ key }: Key) => key)
         .join('+')
 
@@ -88,8 +91,13 @@ export default () =>
       gkl?.addListener(toggleOverlayWindowListener)
       gkl?.addListener(cancelCurrentMessageListener)
       gkl?.addListener(cancelAllMessagesListener)
-      globalShortcut.register(keybinding, multiKeysKeybindings.toggleMessengerWindow)
-      registeredShortcuts.toggleMessengerWindow = keybinding
+      globalShortcut.register(
+        toggleMessengerWindowKeybinding,
+        multiKeysKeybindings.toggleMessengerWindow,
+      )
+      globalShortcut.register(toggleOverlayWindowKeybinding, () => null)
+      registeredShortcuts.toggleMessengerWindow = toggleMessengerWindowKeybinding
+      registeredShortcuts.toggleOverlayWindow = toggleOverlayWindowKeybinding
     }
 
     const setShortcutMessagesKeybindings = () => {
@@ -131,7 +139,11 @@ export default () =>
 
     registerAllShortcuts()
     watch(
-      () => [settingsStore.keybindings.toggleMessengerWindow, messagesStore.shortcutMessages],
+      () => [
+        settingsStore.keybindings.toggleMessengerWindow,
+        settingsStore.keybindings.toggleOverlayWindow,
+        messagesStore.shortcutMessages,
+      ],
       registerAllShortcuts,
       { deep: true },
     )
