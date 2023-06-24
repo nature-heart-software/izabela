@@ -62,7 +62,7 @@ import {
 import { useElementSize } from '@vueuse/core'
 import { rem } from 'polished'
 
-const { ElectronOverlayWindow } = window
+const { ElectronOverlayWindow, ElectronKeybinding } = window
 const placeholder = ref('So, said the angel to the child who, divided, broke the knife..')
 const carretIndex = ref(-1)
 const selection = ref([-1, -1])
@@ -128,6 +128,7 @@ function cut() {
 
 function copy() {
   if (hasSelection.value) {
+    ElectronKeybinding.copyToClipboard(selectionValueRef.value?.value || '')
     // Platform.commit('services/clipboard/copy', selectionValue.value)
     selectionValueRef.value?.select()
   }
@@ -139,6 +140,15 @@ function paste(text: any = '') {
     carretIndex.value += text.length
     selection.value = [carretIndex.value + text.length, carretIndex.value + text.length]
   } else {
+    ElectronKeybinding.readFromClipboard().then((clipboardContent: string) => {
+      if (clipboardContent) {
+        clipboardContent.split('').forEach((character: string) => {
+          insertKey(character)
+        })
+        carretIndex.value += text.length
+        selection.value = [carretIndex.value, carretIndex.value]
+      }
+    })
     // Platform.dispatch('services/clipboard/paste')
     //   .then((value: any) => {
     //     if (value) {
