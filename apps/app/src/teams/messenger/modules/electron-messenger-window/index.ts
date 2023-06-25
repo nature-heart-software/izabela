@@ -190,7 +190,7 @@ export const ElectronMessengerWindow = () => {
       }
     }
     return Promise.resolve()
-  }, 500)
+  }, 250)
 
   const setDisplay = (id?: Electron.Display['id'] | null) => {
     const window = getWindow()

@@ -70,8 +70,8 @@
             <NvStack>
               <NvText type="label">Show Messenger window (alternative)</NvText>
               <NvText
-                >If an application is preventing the window from showing with the shortcut above,
-                try this one
+                >If a background application is preventing the window from showing with the shortcut
+                above, try this one
               </NvText>
             </NvStack>
             <NvKeybinding
@@ -87,7 +87,13 @@
           <NvGroup align="start" justify="apart" no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Show Overlay window</NvText>
-              <NvText>todo </NvText>
+              <NvText
+                >Open a window that doesn't take focus away from a background application
+              </NvText>
+              <NvText type="caption"
+                ><strong>NOTE:</strong> Requires to run as administrator. Keyboard support is
+                limited.
+              </NvText>
             </NvStack>
             <NvKeybinding
               :modelValue="settingsStore.keybindings.toggleOverlayWindow"

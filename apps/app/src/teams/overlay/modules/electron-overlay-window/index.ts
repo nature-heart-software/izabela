@@ -88,7 +88,7 @@ export const ElectronOverlayWindow = () => {
       }
     }
     return Promise.resolve()
-  }, 500)
+  }, 250)
 
   function toggleOverlayWindowListener(e: Parameters<IGlobalKeyListener>[0]) {
     if (settingsStore) {
