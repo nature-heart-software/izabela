@@ -31,7 +31,7 @@ jobs:
     needs: [release]
     strategy:
       matrix:
-        os: [windows-latest]
+        os: [windows-2019]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -43,6 +43,11 @@ jobs:
           node-version: 16.x
           registry-url: 'https://npm.pkg.github.com'
           cache: 'yarn'
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
+        with:
+          vs-version: '16.11'
 
       - name: Set env variables
         shell: bash
