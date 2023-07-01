@@ -109,7 +109,7 @@ export const ElectronMessengerWindow = () => {
       }
     })
 
-  const blur = () =>
+  const blur = (returnFocus = true) =>
     new Promise((resolve, reject) => {
       const window = getWindow()
       if (window) {
@@ -121,8 +121,9 @@ export const ElectronMessengerWindow = () => {
           window.setIgnoreMouseEvents(true)
           window.setFocusable(false) // Fixes alwaysOnTop going in the background sometimes for some reasons
           if (foregroundWindow) {
-            if (foregroundWindow !== windowNativeHandle)
+            if (foregroundWindow !== windowNativeHandle && returnFocus) {
               user32.SetForegroundWindow(foregroundWindow)
+            }
             foregroundWindow = null
           }
         }
@@ -132,13 +133,14 @@ export const ElectronMessengerWindow = () => {
       }
     })
 
-  const hide = () =>
+  const hide = (returnFocus?: boolean) =>
     new Promise((resolve, reject) => {
       const window = getWindow()
       if (window) {
-        blur()
+        blur(returnFocus)
           .then(() => {
             window.hide()
+            resolve(true)
           })
           .catch(reject)
       } else {
@@ -189,7 +191,7 @@ export const ElectronMessengerWindow = () => {
       }
     }
     return Promise.resolve()
-  }, 500)
+  }, 250)
 
   const setDisplay = (id?: Electron.Display['id'] | null) => {
     const window = getWindow()
@@ -237,6 +239,13 @@ export const ElectronMessengerWindow = () => {
       window.on('blur', () => {
         if (!messengerWindowStore) return
         messengerWindowStore.$patch({ isFocused: false })
+      })
+      window.on('close', (e) => {
+        e.preventDefault()
+        hide()
+      })
+      window.on('minimize', () => {
+        hide()
       })
       window.webContents.setWindowOpenHandler(({ url }) => {
         shell.openExternal(url)

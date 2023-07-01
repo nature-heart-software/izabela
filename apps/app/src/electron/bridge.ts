@@ -8,12 +8,14 @@ import electronDisplay from '@/modules/electron-display'
 import electronResources from '@/modules/electron-resources'
 import electronSi from '@/modules/electron-si'
 import electronTranslation from '@/modules/electron-translation'
+import electronOverlayWindow from '@/teams/overlay/modules/electron-overlay-window'
 
 export const bridgeModules = () =>
   bridge.register([
     ['ElectronDialog', () => electronDialog],
     ['ElectronFilesystem', () => electronFilesystem],
     ['ElectronMessengerWindow', () => electronMessengerWindow],
+    ['ElectronOverlayWindow', () => electronOverlayWindow],
     ['ElectronSpeechWorkerWindow', () => electronSpeechWorkerWindow],
     ['ElectronKeybinding', () => electronKeybinding],
     ['ElectronDisplay', () => electronDisplay],
@@ -27,6 +29,7 @@ declare global {
     ElectronDialog: typeof electronDialog
     ElectronFilesystem: typeof electronFilesystem
     ElectronMessengerWindow: typeof electronMessengerWindow
+    ElectronOverlayWindow: typeof electronOverlayWindow
     ElectronSpeechWorkerWindow: typeof electronSpeechWorkerWindow
     ElectronKeybinding: typeof electronKeybinding
     ElectronDisplay: typeof electronDisplay

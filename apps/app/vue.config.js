@@ -21,6 +21,7 @@ module.exports = defineConfig({
   pages: {
     messenger: './src/teams/messenger/main.ts',
     'speech-worker': './src/teams/speech-worker/main.ts',
+    overlay: './src/teams/overlay/main.ts',
   },
   transpileDependencies: ['@izabela'],
   configureWebpack: {

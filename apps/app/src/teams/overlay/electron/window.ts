@@ -2,7 +2,7 @@ import { app, BrowserWindow, screen } from 'electron'
 import path from 'path'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import { ipcMain } from 'electron-postman'
-import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
+import electronOverlayWindow from '@/teams/overlay/modules/electron-overlay-window'
 
 let window: BrowserWindow
 const createWindow = async (name: string): Promise<BrowserWindow> => {
@@ -12,6 +12,7 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     transparent: true,
     frame: false,
     resizable: false,
+    focusable: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION as unknown as boolean,
@@ -25,14 +26,14 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     window.setBounds(primaryDisplay.bounds)
 
     // https://github.com/electron/electron/issues/10078#issuecomment-331581160
-    window.setAlwaysOnTop(true, 'screen-saver', 1)
+    window.setAlwaysOnTop(true)
     window.setVisibleOnAllWorkspaces(true)
     window.setFullScreenable(false)
-    window.setMenu(null)
+    window.setIgnoreMouseEvents(true)
   }
 
   window.once('ready-to-show', () => {
-    electronMessengerWindow.start(window)
+    electronOverlayWindow.start(window)
   })
 
   ipcMain.registerBrowserWindow(name, window)
