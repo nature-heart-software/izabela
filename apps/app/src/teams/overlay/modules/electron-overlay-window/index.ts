@@ -77,7 +77,7 @@ export const ElectronOverlayWindow = () => {
     })
 
   const toggleWindow = throttle(() => {
-    electronMessengerWindow.hide()
+    electronMessengerWindow.hide(false)
     const window = getWindow()
     if (window) {
       if (window.isVisible()) {
