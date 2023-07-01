@@ -28,6 +28,7 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     window.setAlwaysOnTop(true, 'screen-saver', 1)
     window.setVisibleOnAllWorkspaces(true)
     window.setFullScreenable(false)
+    window.setMenu(null)
   }
 
   window.once('ready-to-show', () => {
