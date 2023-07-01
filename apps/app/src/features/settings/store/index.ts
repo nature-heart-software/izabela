@@ -119,6 +119,32 @@ export const useSettingsStore = defineStore(
           metaKey: false,
         },
       ],
+      toggleOverlayWindow: [
+        {
+          key: 'Alt',
+          code: 'AltLeft',
+          keyCode: 18,
+          rawCode: 164,
+          charCode: 0,
+          which: 18,
+          shiftKey: false,
+          altKey: true,
+          ctrlKey: false,
+          metaKey: false,
+        },
+        {
+          key: 'Enter',
+          code: 'Enter',
+          keyCode: 13,
+          rawCode: 13,
+          charCode: 0,
+          which: 13,
+          shiftKey: false,
+          altKey: true,
+          ctrlKey: false,
+          metaKey: false,
+        },
+      ],
       cancelCurrentMessage: [
         {
           key: 'Control',

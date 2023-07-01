@@ -17,6 +17,7 @@ import registerElectronDisplay from '@/modules/electron-display/register'
 import registerElectronKeybinding from '@/modules/electron-keybinding/register'
 import registerElectronCache from '@/modules/electron-cache/register'
 import { destroyWinMouse } from '@/modules/node-mouse'
+import { createOverlayWindow } from '@/teams/overlay/electron/background'
 
 const App = () => {
   const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -26,6 +27,7 @@ const App = () => {
       .then(async () =>
         Promise.all([
           await ElectronWindowManager.registerInstance('messenger', createMessengerWindow),
+          await ElectronWindowManager.registerInstance('overlay', createOverlayWindow),
           await ElectronWindowManager.registerInstance('speech-worker', createSpeechWorkerWindow),
         ]),
       )
