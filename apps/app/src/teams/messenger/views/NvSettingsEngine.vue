@@ -1,12 +1,12 @@
 <template>
   <NvStack spacing="6">
     <NvStack>
-      <NvText type="subtitle">Engine</NvText>
+      <NvText type="subtitle">Speech engine</NvText>
       <NvStack spacing="4">
         <NvCard>
-          <NvGroup justify="apart" no-wrap spacing="5">
+          <NvGroup align="start" justify="apart" no-wrap spacing="5">
             <NvStack>
-              <NvText type="label">Speech Engine</NvText>
+              <NvText type="label">Speech engine</NvText>
               <NvText>Select the speech engine to use</NvText>
             </NvStack>
             <SpeechEngineSelect
@@ -43,15 +43,15 @@
       </NvStack>
     </NvStack>
     <NvStack>
-      <NvText type="subtitle">Universal Credentials</NvText>
+      <NvText type="subtitle">Universal credentials</NvText>
       <NvStack spacing="4">
         <NvCard>
           <NvStack spacing="5">
             <NvStack>
-              <NvText type="label">Universal Credentials</NvText>
+              <NvText type="label">Universal credentials</NvText>
               <NvText
-                >Gain access to every text-to-speech engine using a universal API key <br />You can
-                obtain a universal API key by being a
+                >Gain access to multiple text-to-speech engines using a universal API key <br />You
+                can obtain a universal API key by being a
                 <a href="https://ko-fi.com/woowee/tiers" target="_blank">Ko-fi supporter</a></NvText
               >
             </NvStack>

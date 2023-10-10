@@ -2,81 +2,68 @@
   <div></div>
 </template>
 <script lang="ts" setup>
-import { getTime } from '@/utils/time'
-import { blobToBase64 } from '@packages/toolbox'
 import { onBeforeUnmount } from 'vue'
-import { getMediaDeviceByLabel } from '@/utils/media-devices'
-import {
-  onIPCStartSpeechTranscription,
-  onIPCStopSpeechTranscription,
-} from '@/electron/events/renderer'
+import { getSoxMediaDeviceByIndex } from '@/utils/media-devices'
 import { useSettingsStore } from '@/features/settings/store'
+import hark from 'hark'
+import { useSpeechRecognitionStore } from '@/features/speech/store'
 
-const { ElectronSpeechWorkerWindow } = window
+let stream: MediaStream | null = null
+let speech: ReturnType<typeof hark> | null = null
 const settingsStore = useSettingsStore()
-const mediaDevice = await getMediaDeviceByLabel(settingsStore.audioInput)
-let audioChunks: Blob[] = []
+const speechRecognitionStore = useSpeechRecognitionStore()
+const mediaDevice = await getSoxMediaDeviceByIndex(settingsStore.soxDevice)
+const realTime = settingsStore.speechRecognitionStrategy === 'continuous'
 const sampleRate = 48000
-const stream = await navigator.mediaDevices.getUserMedia({
-  audio: {
-    deviceId: mediaDevice?.deviceId,
-    sampleRate,
-    sampleSize: 16,
-    channelCount: 1,
-  },
-  video: false,
-})
-let mediaRecorder: MediaRecorder | null = new MediaRecorder(stream)
-
-const onDataAvailable = (event: any) => {
-  audioChunks.push(event.data)
-}
-
-const onStop = () => {
-  const audioBlob = new Blob(audioChunks, { type: mediaRecorder?.mimeType })
-  audioChunks = []
-  blobToBase64(audioBlob).then((base64) => {
-    ElectronSpeechWorkerWindow.transcribeAudio({
-      content: (base64 as string).split(',').pop() || '',
+if (settingsStore.enableSTTTS) {
+  if (realTime) {
+    console.log('Starting web speech recognition...')
+  } else {
+    console.log('Starting push-to-record speech recognition...')
+  }
+  stream = await navigator.mediaDevices.getUserMedia({
+    audio: {
+      deviceId: mediaDevice?.deviceId,
       sampleRate,
-      encoding: 'WEBM_OPUS',
-    })
+      sampleSize: 16,
+      channelCount: 1,
+    },
+    video: false,
   })
 
-  // debug
-  // const audioUrl = URL.createObjectURL(audioBlob)
-  // const audio = new Audio(audioUrl)
-  // audio.play()
+  if (realTime) {
+    speech = hark(stream, {
+      threshold: settingsStore.audioInputSensibility,
+      interval: settingsStore.speechDetectionPolling,
+    })
+
+    speech.on('speaking', () => {
+      console.log('Started speaking')
+      speechRecognitionStore.$patch({
+        recording: true,
+      })
+    })
+
+    speech.on('stopped_speaking', () => {
+      console.log('Stopped speaking')
+      speechRecognitionStore.$patch({
+        recording: false,
+      })
+    })
+  }
 }
 
-mediaRecorder.addEventListener('dataavailable', onDataAvailable)
-mediaRecorder.addEventListener('stop', onStop)
-
-onIPCStartSpeechTranscription(() => {
-  if (mediaRecorder) {
-    console.log(`[${getTime()}] Starting web recording`)
-    mediaRecorder.start()
-  }
-})
-
-onIPCStopSpeechTranscription(() => {
-  if (mediaRecorder) {
-    console.log(`[${getTime()}] Stopping web recording`)
-    mediaRecorder.stop()
-  }
-})
-
 onBeforeUnmount(() => {
-  if (mediaRecorder?.state !== 'inactive') {
-    mediaRecorder?.stop()
-  }
-  mediaRecorder?.removeEventListener('dataavailable', onDataAvailable)
-  mediaRecorder?.removeEventListener('stop', onDataAvailable)
-  stream.getTracks().forEach((track) => {
+  stream?.getTracks().forEach((track) => {
     if (track.readyState === 'live') {
       track.stop()
     }
   })
-  mediaRecorder = null
+  speech?.stop()
+  if (realTime) {
+    console.log('Stopping web speech recognition...')
+  } else {
+    console.log('Stopping push-to-record speech recognition...')
+  }
 })
 </script>

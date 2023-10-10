@@ -2,7 +2,8 @@ import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
 import NvSettings from '@/teams/messenger/views/NvSettings.vue'
 import NvSettingsGeneral from '@/teams/messenger/views/NvSettingsGeneral.vue'
 import NvSettingsEngine from '@/teams/messenger/views/NvSettingsEngine.vue'
-import NvSettingsAudio from '@/teams/messenger/views/NvSettingsAudio.vue'
+import NvSettingsAudioInput from '@/teams/messenger/views/NvSettingsAudioInput.vue'
+import NvSettingsAudioOutputs from '@/teams/messenger/views/NvSettingsAudioOutputs.vue'
 import NvSettingsDictionary from '@/teams/messenger/views/NvSettingsDictionary.vue'
 import NvMessages from '@/teams/messenger/views/NvMessages.vue'
 import NvMessagesHistory from '@/teams/messenger/views/NvMessagesHistory.vue'
@@ -10,6 +11,8 @@ import NvMessagesShortcuts from '@/teams/messenger/views/NvMessagesShortcuts.vue
 import NvSettingsCommands from '@/teams/messenger/views/NvSettingsCommands.vue'
 import NvSettingsAbout from '@/teams/messenger/views/NvSettingsAbout.vue'
 import NvSettingsSupport from '@/teams/messenger/views/NvSettingsSupport.vue'
+import NvSettingsTranslation from '@/teams/messenger/views/NvSettingsTranslation.vue'
+import NvSettingsWiki from '@/teams/messenger/views/NvSettingsWiki.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -28,9 +31,19 @@ const routes: Array<RouteRecordRaw> = [
         component: NvSettingsEngine,
       },
       {
-        name: 'settings-audio',
-        path: 'audio',
-        component: NvSettingsAudio,
+        name: 'settings-audio-outputs',
+        path: 'audio-outputs',
+        component: NvSettingsAudioOutputs,
+      },
+      {
+        name: 'settings-audio-input',
+        path: 'audio-input',
+        component: NvSettingsAudioInput,
+      },
+      {
+        name: 'settings-translation',
+        path: 'translation',
+        component: NvSettingsTranslation,
       },
       {
         name: 'settings-dictionary',
@@ -41,6 +54,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'settings-commands',
         path: 'commands',
         component: NvSettingsCommands,
+      },
+      {
+        name: 'settings-wiki',
+        path: 'wiki',
+        component: NvSettingsWiki,
       },
       {
         name: 'settings-about',

@@ -27,13 +27,16 @@ who wants to communicate with text-to-speech and for that reason, you can see Iz
 ## Features
 
 - [x] Appears above any non-fullscreen application
-- [x] Multiple text-to-speech engines (Amazon Polly, Microsoft Azure, Google Cloud, IBM Watson, etc..)
+- [x] Multiple text-to-speech engines (Amazon Polly, Microsoft Azure, Google Cloud, IBM Watson,
+      etc..) - [see list](#available-engines)
 - [x] Multiple voices (per engine)
+- [x] Supports custom text-to-speech engines [(see example)](https://github.com/nature-heart-software/izabela/tree/dev/examples/custom-engine-api)
 - [x] Multiple audio outputs
 - [x] Supports audio inputs for speech-to-text-to-speech
 - [x] Keyboard shortcuts for quick messages
 - [x] Voice expressions (Microsoft Azure)
 - [x] Download messages to audio files
+- [x] Translate messages into any language
 - [x] Dictionary to translate abbreviations (ily -> I love you (💖))
 - [x] Local and remote servers to help you build your own text-to-speech implementations
 - [x] Local websocket server to retrieve messages (useful for streaming elements!)
@@ -57,6 +60,9 @@ using Izabela over games, I recommend setting your game to `borderless`, `window
 instead of
 fullscreen.
 
+You can press `Ctrl` + `Enter` (or `Esc` if the text input is focused) to close the window.
+Pressing `Enter` while the text input is focused and no text is present will also close the window.
+
 ## Support
 
 Credentials for the more advanced text-to-speech engines are not provided by default. If you don't want to bother
@@ -69,29 +75,28 @@ the [Available engines](#available-engines) section.
 > **Note:** The Izabela engine is only available to "Supporter" members or above
 > on [Ko-fi](https://ko-fi.com/woowee/tiers).
 
-If you prefer configuring your credentials yourself, you can do so by following the guides in the [Guides](#guides)
-section (coming soon).
+If you prefer configuring your credentials yourself, you can do so by following the guides on the [Wiki](https://github.com/nature-heart-software/izabela/wiki)
+page.
 
 ## Available engines
 
 Here's a list of all the text-to-speech engines that are supported in Izabela:
 
-| Engine                      | Credits                                                                       | Included with Universal Credentials |
-| --------------------------- | ----------------------------------------------------------------------------- | ----------------------------------- |
-| Izabela (multiple engines)  | https://github.com/Weilbyte/tiktok-tts                                        | Yes                                 |
-| Amazon Polly                | https://aws.amazon.com/polly/                                                 | Yes                                 |
-| Google Cloud Text-to-Speech | https://cloud.google.com/text-to-speech                                       | Yes                                 |
-| IBM Watson Text-to-Speech   | https://www.ibm.com/cloud/watson-text-to-speech                               | Yes                                 |
-| Microsoft Azure             | https://azure.microsoft.com/en-us/products/cognitive-services/text-to-speech/ | Yes                                 |
-| Say                         | https://github.com/Marak/say.js/                                              | Included by default                 |
-| Sam                         | https://github.com/discordier/sam                                             | Included by default                 |
-| Animalese                   | https://github.com/Acedio/animalese.js                                        | Included by default                 |
-| ElevenLabs                  | https://beta.elevenlabs.io/speech-synthesis                                   | No                                  |
+| Engine                     | Included with Universal credentials | Sample                                                                                                               | Credits                                                                       |
+| -------------------------- | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Izabela (multiple engines) | Yes                                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/izabela-sample.mp3?raw=true)             | https://github.com/Weilbyte/tiktok-tts                                        |
+| Amazon Polly               | Yes                                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/amazon-polly-sample.mp3?raw=true)        | https://aws.amazon.com/polly/                                                 |
+| Google Cloud TTS           | Yes                                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/google-cloud-tts-sample.mp3?raw=true)    | https://cloud.google.com/text-to-speech                                       |
+| IBM Watson TTS             | Yes                                 |                                                                                                                      | https://www.ibm.com/cloud/watson-text-to-speech                               |
+| Microsoft Azure TTS        | Yes                                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/microsoft-azure-tts-sample.mp3?raw=true) | https://azure.microsoft.com/en-us/products/cognitive-services/text-to-speech/ |
+| Say                        | Included by default                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/say-sample.mp3?raw=true)                 | https://github.com/Marak/say.js/                                              |
+| Sam                        | Included by default                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/sam-sample.mp3?raw=true)                 | https://github.com/discordier/sam / https://github.com/Imrane03/better-sam    |
+| Animalese                  | Included by default                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/animalese-sample.wav?raw=true)           | https://github.com/Acedio/animalese.js                                        |
+| ElevenLabs                 | No                                  | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/elevenlabs-sample.mp3?raw=true)          | https://beta.elevenlabs.io/speech-synthesis                                   |
 
 ## Guides
 
-- [How to use Izabela as audio input](https://github.com/nature-heart-software/izabela/blob/dev/guides/onboarding/how-to-use-as-audio-input.md)
-- [How to intercept websocket events](https://github.com/nature-heart-software/izabela/blob/dev/guides/onboarding/how-to-intercept-websocket-events.md)
+Find guides and API documentation on the [Wiki](https://github.com/nature-heart-software/izabela/wiki) page.
 
 ## Resources
 

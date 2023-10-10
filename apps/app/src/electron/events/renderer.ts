@@ -21,10 +21,26 @@ export const emitIPCSay = (payload: IPCSayPayload) => {
   ipc.sendTo('speech-worker', 'say', payload)
 }
 
-export const onIPCStartSpeechTranscription = (payload: () => any) => {
-  ipc.on('main', 'start-speech-transcription', payload)
+export const onIPCCancelCurrentMessage = (callback: () => any) => {
+  processes.forEach((process) => {
+    ipc.on(process, 'cancel-current-message', callback)
+  })
 }
 
-export const onIPCStopSpeechTranscription = (payload: () => any) => {
-  ipc.on('main', 'stop-speech-transcription', payload)
+export const onIPCCancelAllMessages = (callback: () => void) => {
+  processes.forEach((process) => {
+    ipc.on(process, 'cancel-all-messages', callback)
+  })
+}
+
+export const onIPCOverlayInputCharacter = (callback: (key: any) => void) => {
+  processes.forEach((process) => {
+    ipc.on(process, 'overlay-input-character', callback)
+  })
+}
+
+export const onIPCOverlayInputCommand = (callback: (args: any[]) => void) => {
+  processes.forEach((process) => {
+    ipc.on(process, 'overlay-input-command', callback)
+  })
 }

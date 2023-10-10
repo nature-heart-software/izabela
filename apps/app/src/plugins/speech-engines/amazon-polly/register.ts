@@ -22,17 +22,17 @@ registerEngine({
     const speechStore = useSpeechStore()
     return speechStore.hasUniversalApiCredentials || Object.values(getCredentials()).every(Boolean)
   },
-  getPayload(text, voice) {
+  getPayload({ text, translatedText, voice }) {
     return {
-      Text: text,
+      Text: translatedText || text,
       VoiceId: (voice || getSelectedVoice()).Id,
     }
   },
-  getLanguageCode() {
-    return getSelectedVoice().LanguageCode
+  getLanguageCode(voice) {
+    return (voice || getSelectedVoice()).LanguageCode
   },
   synthesizeSpeech({ credentials, payload }) {
-    return api().post<Blob>(
+    return api(getProperty('useLocalCredentials') ? 'local' : 'remote').post<Blob>(
       '/tts/amazon-polly/synthesize-speech',
       {
         credentials,

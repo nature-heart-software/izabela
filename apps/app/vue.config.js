@@ -21,6 +21,7 @@ module.exports = defineConfig({
   pages: {
     messenger: './src/teams/messenger/main.ts',
     'speech-worker': './src/teams/speech-worker/main.ts',
+    overlay: './src/teams/overlay/main.ts',
   },
   transpileDependencies: ['@izabela'],
   configureWebpack: {
@@ -54,7 +55,7 @@ module.exports = defineConfig({
   pluginOptions: {
     electronBuilder: {
       externals: [
-        'iohook',
+        '@packages/win-mouse',
         '@izabela/app-server',
         '@google-cloud/speech',
         '@packages/native-keymap',
@@ -102,8 +103,8 @@ module.exports = defineConfig({
         artifactName: '${name}-setup-${version}-${os}.${ext}',
         publish: ['github'],
         electronVersion: getElectronVersion(),
+        extraFiles: ['./resources/**'],
       },
-      extraResources: ['./resources/**'],
     },
   },
 })

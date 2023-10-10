@@ -9,7 +9,10 @@
     "build:deps": "yarn bootstrap && yarn lerna run build --scope  '{@packages/*,@apps/app-server}' --stream",
     "build:app": "yarn bootstrap && yarn lerna run build --scope '{@packages/*,@apps/app-server,izabela-next}' --stream",
     "patch": "yarn patch-package",
-    "postinstall": "yarn patch"
+    "postinstall": "yarn patch && electron-rebuild -f -w @packages/win-mouse"
+  },
+  "dependencies": {
+    "@packages/win-mouse": "^2.0.1"
   },
   "devDependencies": {
     "lerna": "^6.1.0",
@@ -55,17 +58,5 @@
     "trailingComma": "all",
     "arrowParens": "always",
     "endOfLine": "lf"
-  },
-  "iohook": {
-    "targets": [
-      "node-83",
-      "electron-87"
-    ],
-    "platforms": [
-      "win32"
-    ],
-    "arches": [
-      "x64"
-    ]
   }
 }

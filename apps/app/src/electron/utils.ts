@@ -1,7 +1,12 @@
 import path from 'path'
+import { screen } from 'electron'
+import { minBy } from 'lodash'
 
-export const { NODE_ENV } = process.env
+export const env = process.env.NODE_ENV
 export const EXTERNALS_DIR =
-  NODE_ENV === 'production'
-    ? path.join(process.resourcesPath, '/resources')
-    : path.join(ROOT_DIR, '/resources')
+  env === 'development' ? path.join(ROOT_DIR, '/resources') : process.resourcesPath
+
+export const getTopLeftWindow = () => {
+  const displays = screen.getAllDisplays()
+  return minBy(displays, (display) => display.bounds.y)
+}

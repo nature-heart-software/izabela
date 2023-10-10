@@ -19,3 +19,24 @@ export const getMediaDeviceByLabel = (
         .catch(() => resolve(null))
     }
   })
+
+export const soxMediaInputsFilter = (inputs: MediaDeviceInfo[]) =>
+  inputs.filter((d) => {
+    const defaultDevice = inputs.find((device) => device.deviceId === 'default')
+    return (
+      d.deviceId !== 'communications' &&
+      (defaultDevice?.label === d.label ? true : !defaultDevice?.label.includes(d.label))
+    )
+  })
+
+export const getSoxMediaDeviceByIndex = (index: number): Promise<MediaDeviceInfo | null> =>
+  new Promise((resolve) => {
+    navigator.mediaDevices
+      .enumerateDevices()
+      .then((devices) => {
+        const filteredDevices = soxMediaInputsFilter(devices)
+        const device = filteredDevices[index]
+        resolve(device || null)
+      })
+      .catch(() => resolve(null))
+  })

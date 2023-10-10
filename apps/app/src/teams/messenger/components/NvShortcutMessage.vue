@@ -68,6 +68,7 @@ import { Key } from '@/types/keybinds'
 import { usePlayMessage } from '@/features/messages/hooks'
 import NvSpeechEngineInput from '@/features/speech/components/inputs/NvSpeechEngineInput.vue'
 import { getCleanMessage, getMessageCommand } from '@/modules/izabela/utils'
+import hash from 'object-hash'
 
 const props = defineProps({
   id: {
@@ -75,7 +76,7 @@ const props = defineProps({
     required: true,
   },
 })
-
+const { ElectronFilesystem } = window
 const messagesStore = useMessagesStore()
 const settingsStore = useSettingsStore()
 const { shortcutMessages } = storeToRefs(messagesStore)
@@ -87,7 +88,9 @@ const data = reactive({
   selectedVoice: {} as Record<string, unknown>,
   shortcut: [] as Key[],
 })
-
+const hashedData = computed(() =>
+  hash([data.originalMessage, data.engine, data.selectedVoice[data.engine]]),
+)
 const engine = computed(() => {
   if (!data.engine) return null
   return getEngineById(data.engine)
@@ -121,6 +124,9 @@ watch(
       voice,
       shortcut: data.shortcut,
       message: cleanMessage,
+      translatedMessage: null,
+      translatedFrom: null,
+      translatedTo: null,
       originalMessage: data.originalMessage,
       command: getMessageCommand(data.originalMessage),
     })
@@ -137,7 +143,13 @@ watch(
   },
   { immediate: true },
 )
-
+watch(
+  () => hashedData.value,
+  () => {
+    ElectronFilesystem.deleteCachedAudio(message.value?.id || props.id)
+  },
+  { immediate: false },
+)
 const playMessage = computed(() =>
   message.value
     ? {

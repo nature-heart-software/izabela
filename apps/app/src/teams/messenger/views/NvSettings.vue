@@ -5,7 +5,12 @@
       <div></div>
       <NvCard class="inline-flex" size="sm">
         <div class="inline-flex space-x-2">
-          <NvButton icon-name="times" size="xs" type="plain" @click="$emit('close')" />
+          <NvTooltip>
+            <NvText>Close</NvText>
+            <template #reference>
+              <NvButton icon-name="times" size="xs" type="plain" @click="$emit('close')" />
+            </template>
+          </NvTooltip>
         </div>
       </NvCard>
     </div>
@@ -55,7 +60,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { NvButton, NvCard, NvStack, NvText } from '@packages/ui'
+import { NvButton, NvCard, NvStack, NvText, NvTooltip } from '@packages/ui'
 import { useRoute } from 'vue-router'
 
 const navigation = [
@@ -72,12 +77,20 @@ const navigation = [
     name: 'Speech',
     children: [
       {
-        name: 'Engine',
+        name: 'Speech Engine',
         to: { name: 'settings-engine' },
       },
       {
-        name: 'Audio',
-        to: { name: 'settings-audio' },
+        name: 'Audio Ouputs',
+        to: { name: 'settings-audio-outputs' },
+      },
+      {
+        name: 'Audio Input',
+        to: { name: 'settings-audio-input' },
+      },
+      {
+        name: 'Translation',
+        to: { name: 'settings-translation' },
       },
       {
         name: 'Dictionary',
@@ -92,6 +105,10 @@ const navigation = [
   {
     name: 'Other',
     children: [
+      {
+        name: 'Wiki',
+        to: { name: 'settings-wiki' },
+      },
       {
         name: 'About',
         to: { name: 'settings-about' },

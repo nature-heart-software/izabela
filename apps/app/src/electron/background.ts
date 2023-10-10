@@ -18,10 +18,13 @@ const fallback = async () => {
 
 ;(async () => {
   try {
+    const gotTheLock = app.requestSingleInstanceLock()
+    if (!gotTheLock) return app.quit()
     require('./plugins')
     require('./app').default.start().catch(fallback)
   } catch (e) {
     console.error(e)
     await fallback()
   }
+  return null
 })()

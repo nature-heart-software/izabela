@@ -4,8 +4,9 @@ import { Promise } from 'bluebird'
 import { getEngineById } from '@/modules/speech-engine-manager'
 import { getMediaDeviceByLabel } from '@/utils/media-devices'
 import { useSettingsStore } from '@/features/settings/store'
-import { Deferred } from '@packages/toolbox'
+import { blobToBase64, Deferred } from '@packages/toolbox'
 import { useMessagesStore, usePlayingMessageStore } from '@/features/messages/store'
+import objectHash from 'object-hash'
 import { IzabelaMessageEvent, IzabelaMessagePayload } from './types'
 
 export default (messagePayload: IzabelaMessagePayload) => {
@@ -18,11 +19,13 @@ export default (messagePayload: IzabelaMessagePayload) => {
     payload,
   } = messagePayload
   const id = existingId || uuid()
-  let audio: HTMLAudioElement
+  const audio = new Audio()
   const emitter = mitt()
   const audioDownloaded = Deferred()
   const audioLoaded = Deferred()
   const playingMessageStore = usePlayingMessageStore()
+  let audioElements: (HTMLAudioElement | null)[] = []
+  let cancelled = false
   if (!excludeFromHistory) {
     const messageStore = useMessagesStore()
     messageStore.$whenReady().then(() => {
@@ -30,8 +33,40 @@ export default (messagePayload: IzabelaMessagePayload) => {
     })
   }
 
+  function getCacheId() {
+    return `${id}-${objectHash(payload)}`
+  }
+
   function on(event: IzabelaMessageEvent, callback: () => void): void {
     emitter.on(event, callback)
+  }
+
+  function pause() {
+    audio.pause()
+  }
+
+  function resume() {
+    audio.play()
+  }
+
+  function cancel() {
+    cancelled = true
+    audio.pause()
+    audioElements.forEach((audioEl) => audioEl?.pause())
+    playingMessageStore.$patch({
+      id: null,
+      isPlaying: false,
+      progress: 0,
+    })
+    emitter.emit('ended')
+  }
+
+  function togglePlay() {
+    if (audio.paused) {
+      audio.play()
+    } else {
+      audio.pause()
+    }
   }
 
   async function play() {
@@ -61,26 +96,13 @@ export default (messagePayload: IzabelaMessagePayload) => {
       }
       return null
     })
-      .then((audioElements: (HTMLAudioElement | null)[]) => {
+      .then((res: typeof audioElements) => {
+        if (cancelled) return
         if (!settingsStore.playSpeechOnDefaultPlaybackDevice) {
           audio.volume = 0
         }
-
-        audio.addEventListener('timeupdate', () => {
-          playingMessageStore.$patch({
-            progress: audio.currentTime / audio.duration || 0,
-          })
-        })
-        audio.addEventListener('ended', () => {
-          playingMessageStore.$patch({
-            isPlaying: false,
-          })
-        })
-        playingMessageStore.$patch({
-          id,
-          isPlaying: true,
-        })
         audio.play()
+        audioElements = res
         audioElements.forEach((audioEl) => audioEl && audioEl.play())
       })
       .catch(console.error)
@@ -90,7 +112,19 @@ export default (messagePayload: IzabelaMessagePayload) => {
     return Promise.all([audioDownloaded.promise, audioLoaded.promise])
   }
 
-  function downloadAudio() {
+  async function downloadAudio() {
+    if (typeof window) {
+      const { ElectronFilesystem } = window
+      const cachedAudio = await ElectronFilesystem.getCachedAudio(getCacheId())
+      if (cachedAudio) {
+        const res = await fetch(cachedAudio)
+        const blob = await res.blob()
+        if (blob) {
+          audioDownloaded.resolve(true)
+          return Promise.resolve(blob)
+        }
+      }
+    }
     // TODO: change depending on engine
     const engine = getEngineById(engineName)
     if (!engine) return Promise.reject(new Error('Izabela Message: Selected engine was not found'))
@@ -101,8 +135,18 @@ export default (messagePayload: IzabelaMessagePayload) => {
       })
       .then((res) => {
         audioDownloaded.resolve(true)
-        return Promise.resolve('data' in res ? res.data : res)
+        const blob = 'data' in res ? res.data : res
+        cacheAudio(blob)
+        return Promise.resolve(blob)
       })
+  }
+
+  async function cacheAudio(blob: Blob) {
+    if (typeof window) {
+      const { ElectronFilesystem } = window
+      const base64 = await blobToBase64(blob)
+      if (base64) ElectronFilesystem.cacheAudio(getCacheId(), base64)
+    }
   }
 
   function loadAudio(blob: Blob) {
@@ -115,6 +159,34 @@ export default (messagePayload: IzabelaMessagePayload) => {
   }
 
   function addEventListeners() {
+    audio.addEventListener('timeupdate', () => {
+      if (cancelled) return
+      playingMessageStore.$patch({
+        progress: audio.currentTime / audio.duration || 0,
+      })
+    })
+    audio.addEventListener('ended', () => {
+      if (cancelled) return
+      playingMessageStore.$patch({
+        id: null,
+        isPlaying: false,
+        progress: 0,
+      })
+    })
+    audio.addEventListener('play', () => {
+      if (cancelled) return
+      playingMessageStore.$patch({
+        id,
+        isPlaying: true,
+      })
+    })
+    audio.addEventListener('pause', () => {
+      if (cancelled) return
+      playingMessageStore.$patch({
+        id,
+        isPlaying: false,
+      })
+    })
     audio.addEventListener('canplaythrough', () => {
       emitter.emit('canplaythrough')
       audioLoaded.resolve(true)
@@ -132,7 +204,6 @@ export default (messagePayload: IzabelaMessagePayload) => {
   }
 
   if (!disableAutoplay) {
-    audio = new Audio()
     addEventListeners()
     downloadAudio()
       .then((blob) => {
@@ -147,6 +218,10 @@ export default (messagePayload: IzabelaMessagePayload) => {
     play,
     on,
     downloadAudio,
+    pause,
+    resume,
+    cancel,
+    togglePlay,
     getSocketPayload: () => {
       const { credentials: _, ...rest } = messagePayload
       return {

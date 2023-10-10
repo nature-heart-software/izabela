@@ -6,14 +6,11 @@ import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, setProperty } from './store'
 
-
 function dataURItoBlob(dataURI: string) {
   // convert base64/URLEncoded data component to raw binary data held in a string
   let byteString
-  if (dataURI.split(',')[0].indexOf('base64') >= 0)
-    byteString = atob(dataURI.split(',')[1])
-  else
-    byteString = unescape(dataURI.split(',')[1])
+  if (dataURI.split(',')[0].indexOf('base64') >= 0) byteString = atob(dataURI.split(',')[1])
+  else byteString = unescape(dataURI.split(',')[1])
 
   // separate out the mime component
   const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
@@ -32,10 +29,10 @@ const getSelectedVoice = () => {
   const voice = getProperty('selectedVoice')
   return voice.name === 'Custom'
     ? {
-      ...voice,
-      pitch: getProperty('pitch'),
-      shortened: getProperty('shortened'),
-    }
+        ...voice,
+        pitch: getProperty('pitch'),
+        shortened: getProperty('shortened'),
+      }
     : voice
 }
 registerEngine({
@@ -46,9 +43,9 @@ registerEngine({
   getCredentials() {
     return {}
   },
-  getPayload(text, voice) {
+  getPayload({ text, translatedText, voice }) {
     return {
-      text,
+      text: translatedText || text,
       voice: voice || getSelectedVoice(),
     }
   },

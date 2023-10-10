@@ -31,10 +31,41 @@ import { ThemeProvider } from 'vue3-styled-components'
 import NvMessenger from '@/teams/messenger/components/NvMessenger.vue'
 import { tokens } from '@packages/ui'
 import NvBackground from '@/teams/messenger/components/NvBackground.vue'
-import { useMessengerStore } from '@/teams/messenger/store'
+import { useMessengerStore, useMessengerWindowStore } from '@/teams/messenger/store'
 import NvDebug from '@/teams/messenger/components/NvDebug.vue'
 import { useSettingsStore } from '@/features/settings/store'
+import { watch } from 'vue'
+import { socket } from '@/services'
 
+const { ElectronMessengerWindow } = window
 const messengerStore = useMessengerStore()
 const settingsStore = useSettingsStore()
+const messengerWindowStore = useMessengerWindowStore()
+
+window.addEventListener('keydown', (event) => {
+  const isCtrlOrCmdKey = event.ctrlKey || event.metaKey
+
+  if (isCtrlOrCmdKey && (event.key === '+' || event.key === '=')) {
+    ElectronMessengerWindow.zoomIn()
+  }
+
+  if (isCtrlOrCmdKey && (event.key === '-' || event.key === '_')) {
+    ElectronMessengerWindow.zoomOut()
+  }
+
+  if (isCtrlOrCmdKey && event.key === '0') {
+    ElectronMessengerWindow.resetZoom()
+  }
+})
+
+watch(
+  () => messengerWindowStore.isFocused,
+  () => {
+    if (messengerWindowStore.isFocused) {
+      socket.emit('window:focus')
+    } else {
+      socket.emit('window:blur')
+    }
+  },
+)
 </script>

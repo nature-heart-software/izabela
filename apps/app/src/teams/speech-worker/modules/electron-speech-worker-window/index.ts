@@ -1,24 +1,35 @@
 // see: https://tipsfordev.com/stream-audio-with-websocket-and-get-back-audio-transcription-obtained-with-google-speech-api
 import speech from '@google-cloud/speech'
-import path from 'path'
-// import iohook from 'iohook'
-import { app, BrowserWindow } from 'electron'
+import { BrowserWindow, screen } from 'electron'
 import { ipcMain } from 'electron-postman'
-import { DEFAULT_LANGUAGE_CODE } from '@/consts'
 import { createNotification } from '@/utils/electron-notification'
-import { useSettingsStore } from '@/features/settings/store'
-import { useSpeechStore } from '@/features/speech/store'
-import { Deferred } from '@packages/toolbox'
+import { useSpeechRecognitionStore, useSpeechStore } from '@/features/speech/store'
 import { gkl, keybindingReleased, keybindingTriggered } from '@/modules/electron-keybinding/utils'
+import { Deferred } from '@packages/toolbox'
+import { useSettingsStore } from '@/features/settings/store'
+import { watch } from 'vue'
+import electronNativeSpeechRecognition from '@/teams/speech-worker/modules/electron-native-speech-recognition'
+import ElectronWindowManager from '@/modules/electron-window-manager'
+import { mapValues } from 'lodash'
+import { getTime } from '@/utils/time'
+import { windowHeight, windowWidth } from '@/teams/speech-worker/electron/const'
+import { getTopLeftWindow } from '@/electron/utils'
 
 export const ElectronSpeechWindow = () => {
-  let deferredRecording: ReturnType<typeof Deferred> | null = null
   let registeredWindow: BrowserWindow | null = null
   const ready = Deferred<BrowserWindow>()
   const isReady = () => ready.promise
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
   let speechStore: ReturnType<typeof useSpeechStore> | undefined
+  let speechRecognitionStore: ReturnType<typeof useSpeechRecognitionStore> | undefined
+  let deferredRecording: ReturnType<typeof Deferred> | null = null
+  // eslint-disable-next-line prefer-const
+  let electronNativeSpeechRecognitionCallback: ReturnType<
+    typeof electronNativeSpeechRecognition
+  > | null = null
 
+  const getWindow = () =>
+    registeredWindow || ElectronWindowManager.getInstanceByName('speech-worker')?.window
   const onListeningError = () => {
     createNotification({
       body: "Sorry, I didn't catch that..\nCould you say that again please?",
@@ -35,16 +46,18 @@ export const ElectronSpeechWindow = () => {
     sampleRate: number
     encoding: any
   }) => {
-    if (!speechStore) return
+    if (!settingsStore) return
     try {
       const client = new speech.SpeechClient()
-      const engine = speechStore.currentSpeechEngine
 
       const request = {
         config: {
           encoding,
           sampleRateHertz: sampleRate,
-          languageCode: engine?.getLanguageCode() || DEFAULT_LANGUAGE_CODE,
+          languageCode: settingsStore.speechInputLanguage,
+          enableAutomaticPunctuation: true,
+          model: 'latest_long',
+          useEnhanced: true,
         },
         audio: {
           content,
@@ -66,73 +79,117 @@ export const ElectronSpeechWindow = () => {
     }
   }
 
-  const start = (window: BrowserWindow) => {
-    registeredWindow = window
-    ready.resolve(window)
+  const setDisplay = () => {
+    const window = getWindow()
+    if (window) {
+      const topLeftDisplay = getTopLeftWindow()
+      window.setPosition(
+        (topLeftDisplay?.bounds.x ?? 0) - windowWidth,
+        (topLeftDisplay?.bounds.y ?? 0) - windowHeight,
+      )
+    }
+  }
+
+  const show = () => {
+    const window = getWindow()
+    if (window) {
+      const allDisplays = screen.getAllDisplays()
+      const primaryDisplay = screen.getPrimaryDisplay()
+      const display = allDisplays.find((d) => d.id === settingsStore?.display) || primaryDisplay
+      const displayBounds = mapValues(display.bounds, (v) => v + 24)
+      window.setPosition(displayBounds.x, displayBounds.y)
+    }
+  }
+
+  const hide = () => {
+    setDisplay()
   }
 
   const addEventListeners = () => {
-    app.whenReady().then(() => {
-      const credentialsDirPath = path.join(app.getPath('userData'), 'credentials')
-      const googleCloudSpeechCredentialsFilePath = path.join(
-        credentialsDirPath,
-        'google-cloud-speech-credentials.json',
-      )
-      process.env.GOOGLE_APPLICATION_CREDENTIALS = googleCloudSpeechCredentialsFilePath
-    })
-
-    gkl.addListener((e, down) => {
-      if (!settingsStore) return
+    gkl?.addListener((e) => {
       if (
+        settingsStore &&
+        settingsStore.enableSTTTS &&
+        settingsStore.speechRecognitionStrategy === 'ptr' &&
         e.state === 'DOWN' &&
         !deferredRecording &&
-        keybindingTriggered(settingsStore.keybindings.recordAudio, down)
+        keybindingTriggered(settingsStore.keybindings.recordAudio)
       ) {
         deferredRecording = Deferred()
-        ipcMain.sendTo('speech-worker', 'start-speech-transcription')
+        console.log(`[${getTime()}] Starting recording`)
+        speechRecognitionStore?.$patch({
+          recording: true,
+        })
       }
     })
-    // iohook.on('keydown', (event) => {
-    //   if (!settingsStore) return
-    //   const keybinding = settingsStore.keybindings.recordAudio[0]
-    //   if (keybinding && keybinding.rawCode === event.rawcode && !deferredRecording) {
-    //     deferredRecording = Deferred()
-    //     ipcMain.sendTo('speech-worker', 'start-speech-transcription')
-    //   }
-    // })
 
-    gkl.addListener((e, down) => {
-      if (!settingsStore) return
+    gkl?.addListener((e) => {
       if (
+        settingsStore &&
+        settingsStore.enableSTTTS &&
+        settingsStore.speechRecognitionStrategy === 'ptr' &&
         e.state === 'UP' &&
         deferredRecording &&
-        keybindingReleased(settingsStore.keybindings.recordAudio, down)
+        keybindingReleased(settingsStore.keybindings.recordAudio)
       ) {
         deferredRecording.resolve(true)
         deferredRecording = null
-        ipcMain.sendTo('speech-worker', 'stop-speech-transcription')
+        console.log(`[${getTime()}] Stopping recording`)
+        speechRecognitionStore?.$patch({
+          recording: false,
+        })
       }
     })
-    // iohook.on('keyup', (event) => {
-    //   if (!settingsStore) return
-    //   const keybinding = settingsStore.keybindings.recordAudio[0]
-    //   if (keybinding && keybinding.rawCode === event.rawcode && deferredRecording) {
-    //     deferredRecording.resolve(true)
-    //     deferredRecording = null
-    //     ipcMain.sendTo('speech-worker', 'stop-speech-transcription')
-    //   }
-    // })
+  }
+  const restartNativeSpeechRecognition = () => {
+    if (electronNativeSpeechRecognitionCallback) {
+      electronNativeSpeechRecognitionCallback()
+    }
+    if (settingsStore?.enableSTTTS) {
+      electronNativeSpeechRecognitionCallback = electronNativeSpeechRecognition()
+    }
   }
 
   isReady().then(() => {
     settingsStore = useSettingsStore()
     speechStore = useSpeechStore()
-    addEventListeners()
+    speechRecognitionStore = useSpeechRecognitionStore()
+
+    watch(
+      () => [
+        settingsStore?.soxDevice,
+        settingsStore?.enableSTTTS,
+        settingsStore?.speechRecognitionStrategy,
+        settingsStore?.speechInputLanguage,
+        settingsStore?.soxPreRecordingChunks,
+        settingsStore?.soxPostRecordingChunks,
+        settingsStore?.speechProfanityFilter,
+        speechStore?.currentSpeechEngine,
+      ],
+      restartNativeSpeechRecognition,
+      { deep: true, immediate: true },
+    )
+
+    watch(
+      () => speechRecognitionStore?.recording,
+      (recording) => (recording ? show() : hide()),
+      { immediate: true },
+    )
   })
+
+  const start = (window: BrowserWindow) => {
+    registeredWindow = window
+    ready.resolve(window)
+    addEventListeners()
+  }
+
   return {
     start,
     transcribeAudio,
-    isReady,
+    restartNativeSpeechRecognition,
+    setDisplay,
+    show,
+    hide,
   }
 }
 

@@ -15,6 +15,9 @@ import registerElectronUpdater from '@/modules/electron-updater/register'
 import registerElectronDebug from '@/modules/electron-debug/register'
 import registerElectronDisplay from '@/modules/electron-display/register'
 import registerElectronKeybinding from '@/modules/electron-keybinding/register'
+import registerElectronCache from '@/modules/electron-cache/register'
+import { destroyWinMouse } from '@/modules/node-mouse'
+import { createOverlayWindow } from '@/teams/overlay/electron/background'
 
 const App = () => {
   const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -24,6 +27,7 @@ const App = () => {
       .then(async () =>
         Promise.all([
           await ElectronWindowManager.registerInstance('messenger', createMessengerWindow),
+          await ElectronWindowManager.registerInstance('overlay', createOverlayWindow),
           await ElectronWindowManager.registerInstance('speech-worker', createSpeechWorkerWindow),
         ]),
       )
@@ -47,8 +51,7 @@ const App = () => {
     if (process.platform === 'win32') app.setAppUserModelId(app.name)
     app.commandLine.appendSwitch('disable-renderer-backgrounding')
     app.commandLine.appendSwitch('ignore-certificate-errors')
-    /* Fixes iohook. See: https://github.com/electron/electron/issues/18397 */
-    app.allowRendererProcessReuse = false
+    app.commandLine.appendSwitch('wm-window-animations-disabled')
 
     /* Disabling Hardware Acceleration does the following:
      * - fixes ui freeze in DevTools when unfocused
@@ -68,7 +71,20 @@ const App = () => {
     return action()
   }
 
+  const onQuit = () => {
+    destroyWinMouse()
+  }
+
   function addEventListeners() {
+    app.whenReady().then(() => {
+      const credentialsDirPath = path.join(app.getPath('userData'), 'credentials')
+      const googleCloudSpeechCredentialsFilePath = path.join(
+        credentialsDirPath,
+        'google-cloud-speech-credentials.json',
+      )
+      process.env.GOOGLE_APPLICATION_CREDENTIALS = googleCloudSpeechCredentialsFilePath
+    })
+
     app.on('ready', async () => {
       if (isDevelopment && !process.env.IS_TEST) {
         try {
@@ -83,25 +99,33 @@ const App = () => {
       if (BrowserWindow.getAllWindows().length === 0) createWindows()
     })
 
-    app.on('window-all-closed', () => {
-      if (process.platform !== 'darwin') {
+    const handleQuit = (quitApp = false) => {
+      onQuit()
+      if (quitApp) {
         app.quit()
       }
+    }
+
+    process.on('message', (data) => {
+      if (process.platform === 'win32' && data === 'graceful-exit') {
+        handleQuit(true)
+      }
+    })
+    ;['SIGINT', 'SIGTERM', 'SIGQUIT'].forEach((signal) => {
+      process.on(signal, () => {
+        handleQuit(true)
+      })
     })
 
-    if (isDevelopment) {
-      if (process.platform === 'win32') {
-        process.on('message', (data) => {
-          if (data === 'graceful-exit') {
-            app.quit()
-          }
-        })
-      } else {
-        process.on('SIGTERM', () => {
-          app.quit()
-        })
+    app.on('before-quit', () => {
+      handleQuit()
+    })
+
+    app.on('window-all-closed', () => {
+      if (process.platform !== 'darwin') {
+        handleQuit(true)
       }
-    }
+    })
   }
 
   function start() {
@@ -118,6 +142,7 @@ const App = () => {
       exec('Start server', () => startAppServer()),
       exec('Register display', () => registerElectronDisplay()),
       exec('Register keybindings', () => registerElectronKeybinding()),
+      exec('Handle Cache', () => registerElectronCache()),
     ])
   }
 

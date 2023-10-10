@@ -8,3 +8,19 @@ export const onIPCProcessError = (callback: (error: Error, process: string) => a
     )
   })
 }
+
+export const emitIPCCancelCurrentMessage = () => {
+  ipcMain.sendTo('speech-worker', 'cancel-current-message')
+}
+
+export const emitIPCCancelAllMessages = () => {
+  ipcMain.sendTo('speech-worker', 'cancel-all-messages')
+}
+
+export const emitIPCOverlayInputCharacter = (character: string) => {
+  ipcMain.sendTo('overlay', 'overlay-input-character', character)
+}
+
+export const emitIPCOverlayInputCommand = (command: string, args: any[] = []) => {
+  ipcMain.sendTo('overlay', 'overlay-input-command', [command, ...args])
+}

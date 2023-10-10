@@ -20,6 +20,32 @@
               @update:modelValue="(value) => settingsStore.$patch({ hideWindowOnMessage: value })"
             />
           </NvGroup>
+          <NvDivider direction="horizontal" />
+          <NvGroup justify="apart" no-wrap spacing="5">
+            <NvStack>
+              <NvText type="label">Background dim opacity</NvText>
+            </NvStack>
+            <NvGroup>
+              <NvRangeInput
+                :modelValue="settingsStore.backgroundDimOpacity"
+                max="100"
+                min="0"
+                step="1"
+                @update:modelValue="
+                  (value) => settingsStore.$patch({ backgroundDimOpacity: value })
+                "
+              />
+              <NvNumberInput
+                :modelValue="settingsStore.backgroundDimOpacity"
+                max="100"
+                min="0"
+                step="1"
+                @update:modelValue="
+                  (value) => settingsStore.$patch({ backgroundDimOpacity: value })
+                "
+              />
+            </NvGroup>
+          </NvGroup>
         </NvStack>
       </NvCard>
     </NvStack>
@@ -42,13 +68,10 @@
           <NvDivider direction="horizontal" />
           <NvGroup align="start" justify="apart" no-wrap spacing="5">
             <NvStack>
-              <NvText type="label">Show Messenger window (for compatibility)</NvText>
+              <NvText type="label">Show Messenger window (alternative)</NvText>
               <NvText
-                >Applications sometimes block system-wide keyboard shortcuts. If the Messenger
-                window doesn't show with the shortcut above, use this one.
-              </NvText>
-              <NvText type="caption"
-                >The Messenger window will not be focused when shown however
+                >If a background application is preventing the window from showing with the shortcut
+                above, try this one
               </NvText>
             </NvStack>
             <NvKeybinding
@@ -57,6 +80,52 @@
               @update:modelValue="
                 (value) =>
                   settingsStore.$patch({ keybindings: { toggleMessengerWindowAlt: value } })
+              "
+            />
+          </NvGroup>
+          <NvDivider direction="horizontal" />
+          <NvGroup align="start" justify="apart" no-wrap spacing="5">
+            <NvStack>
+              <NvText type="label">Show Overlay window</NvText>
+              <NvText
+                >Open a window that doesn't take focus away from a background application
+              </NvText>
+              <NvText type="caption"
+                ><strong>NOTE:</strong> Requires to run as administrator. Keyboard support is
+                limited.
+              </NvText>
+            </NvStack>
+            <NvKeybinding
+              :modelValue="settingsStore.keybindings.toggleOverlayWindow"
+              multiple
+              @update:modelValue="
+                (value) => settingsStore.$patch({ keybindings: { toggleOverlayWindow: value } })
+              "
+            />
+          </NvGroup>
+          <NvDivider direction="horizontal" />
+          <NvGroup justify="apart" no-wrap spacing="5">
+            <NvStack>
+              <NvText type="label">Cancel playing message</NvText>
+            </NvStack>
+            <NvKeybinding
+              :modelValue="settingsStore.keybindings.cancelCurrentMessage"
+              multiple
+              @update:modelValue="
+                (value) => settingsStore.$patch({ keybindings: { cancelCurrentMessage: value } })
+              "
+            />
+          </NvGroup>
+          <NvDivider direction="horizontal" />
+          <NvGroup justify="apart" no-wrap spacing="5">
+            <NvStack>
+              <NvText type="label">Cancel playing and queued messages</NvText>
+            </NvStack>
+            <NvKeybinding
+              :modelValue="settingsStore.keybindings.cancelAllMessages"
+              multiple
+              @update:modelValue="
+                (value) => settingsStore.$patch({ keybindings: { cancelAllMessages: value } })
               "
             />
           </NvGroup>
@@ -79,13 +148,23 @@
           <NvDivider direction="horizontal" />
           <NvGroup justify="apart" no-wrap spacing="5">
             <NvStack>
-              <NvText type="label">Update Channel</NvText>
+              <NvText type="label">Update channel</NvText>
             </NvStack>
             <NvUpdateChannelSelect
               :modelValue="settingsStore.updateChannel"
               @update:modelValue="(value) => settingsStore.$patch({ updateChannel: value })"
             />
           </NvGroup>
+          <!--          <NvDivider direction="horizontal" />-->
+          <!--          <NvGroup justify="apart" no-wrap spacing="5">-->
+          <!--            <NvStack>-->
+          <!--              <NvText type="label">Enable background dim</NvText>-->
+          <!--            </NvStack>-->
+          <!--            <NvSwitch-->
+          <!--              :modelValue="settingsStore.enableBackgroundDim"-->
+          <!--              @update:modelValue="(value) => settingsStore.$patch({ enableBackgroundDim: value })"-->
+          <!--            />-->
+          <!--          </NvGroup>-->
         </NvStack>
       </NvCard>
     </NvStack>
@@ -106,7 +185,16 @@
   </NvStack>
 </template>
 <script lang="ts" setup>
-import { NvCard, NvDivider, NvGroup, NvStack, NvSwitch, NvText } from '@packages/ui'
+import {
+  NvCard,
+  NvDivider,
+  NvGroup,
+  NvNumberInput,
+  NvRangeInput,
+  NvStack,
+  NvSwitch,
+  NvText,
+} from '@packages/ui'
 import { useSettingsStore } from '@/features/settings/store'
 import NvDisplaySelect from '@/features/display/components/inputs/DisplaySelect.vue'
 import NvKeybinding from '@/features/app/components/inputs/NvKeybinding.vue'

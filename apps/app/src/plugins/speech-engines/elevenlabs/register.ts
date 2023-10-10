@@ -20,10 +20,10 @@ registerEngine({
   hasCredentials() {
     return Object.values(getCredentials()).every(Boolean)
   },
-  getPayload(text, v) {
+  getPayload({ text, translatedText, voice: v }) {
     const voice = v || getSelectedVoice()
     return {
-      text,
+      text: translatedText || text,
       voice,
       stability: getProperty('stability'),
       similarity_boost: getProperty('similarity_boost'),

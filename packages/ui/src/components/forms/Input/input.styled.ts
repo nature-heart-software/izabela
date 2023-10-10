@@ -54,6 +54,7 @@ export const StInput = styled('div', props)`
       outline: 0;
       border-color: ${() => colors.gray['20']};
       transition: ${() => transition.DEFAULT};
+      color: ${() => colors.gray['90']};
 
       &:hover {
         border-color: ${() => colors.gray['30']};

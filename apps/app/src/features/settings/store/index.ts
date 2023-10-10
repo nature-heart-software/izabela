@@ -33,6 +33,25 @@ export const useSettingsStore = defineStore(
     const hideWindowOnMessage = ref(false)
     const universalApiKey = ref<string>('')
     const universalApiEndpoint = ref<string>('')
+    const audioInputSensibility = ref(-50)
+    const soxPreRecordingChunks = ref(3)
+    const soxPostRecordingChunks = ref(3)
+    const soxDevice = ref(0)
+    const speechDetectionPolling = ref(40)
+    const enableSTTTS = ref(false)
+    const textInputLanguage = ref(null)
+    const textOutputLanguage = ref(null)
+    const speechInputLanguage = ref('en-US')
+    const enableTranslation = ref(false)
+    const speechProfanityFilter = ref(true)
+    const speechRecognitionStrategy = ref<'continuous' | 'ptr'>('ptr')
+    const textTranslationStrategy = ref<'cloud-translation' | 'custom'>('cloud-translation')
+    const customTextTranslationEndpoint = ref('')
+    const customTextTranslationApiKey = ref('')
+    const customTextTranslationFrom = ref('')
+    const customTextTranslationTo = ref('')
+    // const enableBackgroundDim = ref(true)
+    const backgroundDimOpacity = ref(50)
     const keybindings = ref<Record<string, Key[]>>({
       recordAudio: [
         {
@@ -88,12 +107,90 @@ export const useSettingsStore = defineStore(
           metaKey: false,
         },
         {
-          key: 'Space',
-          code: 'Space',
-          keyCode: 32,
-          rawCode: 32,
+          key: 'ControlRight',
+          code: 'ControlRight',
+          keyCode: 17,
+          rawCode: 163,
           charCode: 0,
-          which: 32,
+          which: 17,
+          shiftKey: false,
+          altKey: false,
+          ctrlKey: true,
+          metaKey: false,
+        },
+      ],
+      toggleOverlayWindow: [
+        {
+          key: 'Alt',
+          code: 'AltLeft',
+          keyCode: 18,
+          rawCode: 164,
+          charCode: 0,
+          which: 18,
+          shiftKey: false,
+          altKey: true,
+          ctrlKey: false,
+          metaKey: false,
+        },
+        {
+          key: 'Enter',
+          code: 'Enter',
+          keyCode: 13,
+          rawCode: 13,
+          charCode: 0,
+          which: 13,
+          shiftKey: false,
+          altKey: true,
+          ctrlKey: false,
+          metaKey: false,
+        },
+      ],
+      cancelCurrentMessage: [
+        {
+          key: 'Control',
+          code: 'ControlLeft',
+          keyCode: 17,
+          rawCode: 162,
+          charCode: 0,
+          which: 17,
+          shiftKey: false,
+          altKey: false,
+          ctrlKey: true,
+          metaKey: false,
+        },
+        {
+          key: 'Delete',
+          code: 'Delete',
+          keyCode: 46,
+          rawCode: 46,
+          charCode: 0,
+          which: 46,
+          shiftKey: false,
+          altKey: false,
+          ctrlKey: true,
+          metaKey: false,
+        },
+      ],
+      cancelAllMessages: [
+        {
+          key: 'Control',
+          code: 'ControlLeft',
+          keyCode: 17,
+          rawCode: 162,
+          charCode: 0,
+          which: 17,
+          shiftKey: false,
+          altKey: false,
+          ctrlKey: true,
+          metaKey: false,
+        },
+        {
+          key: 'Backspace',
+          code: 'Backspace',
+          keyCode: 8,
+          rawCode: 8,
+          charCode: 0,
+          which: 8,
           shiftKey: false,
           altKey: false,
           ctrlKey: true,
@@ -102,6 +199,8 @@ export const useSettingsStore = defineStore(
       ],
     })
     return {
+      // enableBackgroundDim,
+      backgroundDimOpacity,
       preferredSavDir,
       playSpeechOnDefaultPlaybackDevice,
       audioOutputs,
@@ -116,6 +215,23 @@ export const useSettingsStore = defineStore(
       hideWindowOnMessage,
       universalApiKey,
       universalApiEndpoint,
+      audioInputSensibility,
+      speechDetectionPolling,
+      enableSTTTS,
+      speechRecognitionStrategy,
+      soxDevice,
+      textInputLanguage,
+      textOutputLanguage,
+      speechInputLanguage,
+      enableTranslation,
+      textTranslationStrategy,
+      customTextTranslationEndpoint,
+      customTextTranslationApiKey,
+      customTextTranslationFrom,
+      customTextTranslationTo,
+      speechProfanityFilter,
+      soxPreRecordingChunks,
+      soxPostRecordingChunks,
     }
   },
   {

@@ -8,6 +8,7 @@
         :placeholder="placeholder"
         :voice="speechStore.currentSpeechEngine?.getSelectedVoice()"
         class="w-full"
+        data-v-step="messenger-text-input"
         size="lg"
         @blur="onInputBlur"
         @enter="onInputEnter"
@@ -15,7 +16,12 @@
         @focus="onInputFocus"
         @space="(e) => settingsStore.messageMode === 'word' && [playMessage(), e.preventDefault()]"
       />
-      <NvButton icon-name="message" size="lg" @click="playMessage()" />
+      <NvButton
+        data-v-step="messenger-text-input-submit"
+        icon-name="message"
+        size="lg"
+        @click="playMessage()"
+      />
     </NvGroup>
   </NvCard>
 </template>
@@ -27,6 +33,7 @@ import { emitIPCSay } from '@/electron/events/renderer'
 import { useSpeechStore } from '@/features/speech/store'
 import { useSettingsStore } from '@/features/settings/store'
 import NvSpeechEngineInput from '@/features/speech/components/inputs/NvSpeechEngineInput.vue'
+import { socket } from '@/services'
 
 const { ElectronMessengerWindow } = window
 const messengerWindowStore = useMessengerWindowStore()
@@ -57,17 +64,19 @@ const playMessage = () => {
 
 const onInputFocus = () => {
   messengerWindowStore.$patch({ isInputFocused: true })
+  socket.emit('input:focus')
 }
 
 const onInputBlur = () => {
   messengerWindowStore.$patch({ isInputFocused: false })
+  socket.emit('input:blur')
 }
 
 const onInputEnter = () => {
-  playMessage()
-  if (settingsStore.hideWindowOnMessage) {
+  if (settingsStore.hideWindowOnMessage || !inputValue.value) {
     ElectronMessengerWindow.hide()
   }
+  playMessage()
 }
 
 const onWindowFocus = () => {
@@ -79,7 +88,12 @@ const onWindowBlur = () => {
 }
 
 watch(
-  () => messengerWindowStore.isFocused,
+  // Makes sure all conditions are met to focus or blur properly
+  () => [
+    messengerWindowStore.isFocused,
+    messengerWindowStore.focusContext,
+    messengerWindowStore.isShown,
+  ],
   () => {
     if (messengerWindowStore.isFocused) {
       onWindowFocus()
