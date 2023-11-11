@@ -16,7 +16,7 @@
     "./dist"
   ],
   "dependencies": {
-    "electron": "20.3.8"
+    "electron": "22.3.25"
   },
   "devDependencies": {
     "microbundle": "^0.15.1",
