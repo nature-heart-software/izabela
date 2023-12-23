@@ -4,7 +4,7 @@
   "scripts": {
     "install:deps": "yarn && yarn build:deps",
     "bootstrap": "yarn lerna bootstrap --no-ci",
-    "dev": "yarn bootstrap && yarn lerna run serve --scope izabela-next --stream",
+    "dev": "yarn lerna run serve --scope izabela-next --stream",
     "build": "yarn install && yarn bootstrap && yarn lerna run build",
     "build:deps": "yarn bootstrap && yarn lerna run build --scope  '{@packages/*,@apps/app-server}' --stream",
     "build:app": "yarn bootstrap && yarn lerna run build --scope '{@packages/*,@apps/app-server,izabela-next}' --stream",
