@@ -114,6 +114,8 @@
                   <NvFormItem label="API Key">
                     <NvInput
                       :modelValue="decrypt(settingsStore.customTextTranslationApiKey)"
+                      show-password
+                      type="password"
                       @update:modelValue="
                         (value) =>
                           settingsStore.$patch({ customTextTranslationApiKey: encrypt(value) })
@@ -154,6 +156,7 @@ import { useQueryClient } from 'vue-query'
 import { watch } from 'vue'
 import { useGetCustomLanguagesQueryKey } from '@/features/translation/hooks/useGetCustomLanguagesQuery'
 import NvTranslationStrategySelect from '@/features/translation/components/inputs/NvTranslationStrategySelect.vue'
+import { getProperty, setProperty } from '@/plugins/speech-engines/microsoft-azure/store'
 
 const settingsStore = useSettingsStore()
 const isoCodes = getAll639_1()
