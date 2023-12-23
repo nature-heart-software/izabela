@@ -29,7 +29,7 @@
         </NvGroup>
       </NvFormItem>
       <NvDivider direction="horizontal"/>
-      <NvFormItem label="Clarity + Similarity Enhancement">
+      <NvFormItem label="Similarity">
         <NvGroup>
           <NvRangeInput
             :max="1"
@@ -52,6 +52,40 @@
           />
         </NvGroup>
       </NvFormItem>
+      <NvDivider direction="horizontal" />
+      <NvFormItem label="Style Exaggeration">
+        <NvGroup>
+          <NvRangeInput
+            :max="1"
+            :min="0"
+            :step="0.01"
+            class="!grow"
+            v-bind="{
+              modelValue: getProperty('style'),
+              'onUpdate:modelValue': (value) => setProperty('style', value),
+            }"
+          />
+          <NvNumberInput
+            :max="1"
+            :min="0"
+            :step="0.01"
+            v-bind="{
+              modelValue: getProperty('style'),
+              'onUpdate:modelValue': (value) => setProperty('style', value),
+            }"
+          />
+        </NvGroup>
+      </NvFormItem>
+      <NvDivider direction="horizontal" />
+      <NvGroup justify="apart" no-wrap spacing="5">
+        <NvStack>
+          <NvText type="label">Speaker Boost</NvText>
+        </NvStack>
+        <NvSwitch
+          :modelValue="getProperty('use_speaker_boost')"
+          @update:modelValue="(value) => setProperty('use_speaker_boost', value)"
+        />
+      </NvGroup>
     </NvStack>
   </NvAccessBlocker>
   <NvDivider direction="horizontal"/>
@@ -75,7 +109,7 @@ import {
   NvInput,
   NvNumberInput,
   NvRangeInput,
-  NvStack,
+  NvStack, NvSwitch, NvText,
 } from '@packages/ui'
 import NvVoiceSelect from './NvVoiceSelect'
 import { getProperty, setProperty } from './store'</script>

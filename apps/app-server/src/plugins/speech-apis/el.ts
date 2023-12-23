@@ -34,7 +34,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
     {
       body: {
         credentials: { apiKey },
-        payload: { text, voice, stability, similarity_boost },
+        payload: { text, voice, stability, similarity_boost, use_speaker_boost, style },
       },
     },
     res,
@@ -43,6 +43,8 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
       const settings = {
         stability,
         similarity_boost,
+        use_speaker_boost,
+        style,
       }
       const hashedSettings = hash({ ...settings, voice_id: voice.voice_id })
       if (settingsCache !== hashedSettings) {
