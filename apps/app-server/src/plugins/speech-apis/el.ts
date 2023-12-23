@@ -34,7 +34,14 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
     {
       body: {
         credentials: { apiKey },
-        payload: { text, voice, stability, similarity_boost, use_speaker_boost, style },
+        payload: {
+          text,
+          voice,
+          stability,
+          similarity_boost,
+          use_speaker_boost,
+          style,
+        },
       },
     },
     res,

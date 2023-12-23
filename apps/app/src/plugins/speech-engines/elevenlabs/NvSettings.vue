@@ -2,9 +2,9 @@
   <NvAccessBlocker :allowed="!!getProperty('apiKey', true)" reason="Credentials required">
     <NvStack spacing="5">
       <NvFormItem label="Voice">
-        <NvVoiceSelect/>
+        <NvVoiceSelect />
       </NvFormItem>
-      <NvDivider direction="horizontal"/>
+      <NvDivider direction="horizontal" />
       <NvFormItem label="Stability">
         <NvGroup>
           <NvRangeInput
@@ -28,7 +28,7 @@
           />
         </NvGroup>
       </NvFormItem>
-      <NvDivider direction="horizontal"/>
+      <NvDivider direction="horizontal" />
       <NvFormItem label="Similarity">
         <NvGroup>
           <NvRangeInput
@@ -88,7 +88,7 @@
       </NvGroup>
     </NvStack>
   </NvAccessBlocker>
-  <NvDivider direction="horizontal"/>
+  <NvDivider direction="horizontal" />
   <NvStack spacing="5">
     <NvFormItem label="API Key">
       <NvInput
@@ -109,7 +109,10 @@ import {
   NvInput,
   NvNumberInput,
   NvRangeInput,
-  NvStack, NvSwitch, NvText,
+  NvStack,
+  NvSwitch,
+  NvText,
 } from '@packages/ui'
 import NvVoiceSelect from './NvVoiceSelect'
-import { getProperty, setProperty } from './store'</script>
+import { getProperty, setProperty } from './store'
+</script>
