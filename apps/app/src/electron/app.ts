@@ -72,6 +72,10 @@ const App = () => {
   }
 
   const onQuit = () => {
+    /* fixes app.quit(): https://stackoverflow.com/a/75369483 */
+    ElectronWindowManager.getInstances().forEach(({ window }) => {
+      window.removeAllListeners()
+    })
     destroyWinMouse()
   }
 
