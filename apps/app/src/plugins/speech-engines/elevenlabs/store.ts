@@ -13,6 +13,7 @@ export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
     available_for_tiers: [],
     settings: null,
   },
+  model_id: undefined,
   stability: 0.5,
   similarity_boost: 0.75,
   style: 0,

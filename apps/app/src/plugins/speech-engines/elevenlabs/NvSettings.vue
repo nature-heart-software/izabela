@@ -1,6 +1,9 @@
 <template>
   <NvAccessBlocker :allowed="!!getProperty('apiKey', true)" reason="Credentials required">
     <NvStack spacing="5">
+      <NvFormItem label="Models">
+        <NvModelSelect placeholder="Select a model"/>
+      </NvFormItem>
       <NvFormItem label="Voice">
         <NvVoiceSelect/>
       </NvFormItem>
@@ -112,4 +115,6 @@ import {
   NvStack, NvSwitch, NvText,
 } from '@packages/ui'
 import NvVoiceSelect from './NvVoiceSelect'
-import { getProperty, setProperty } from './store'</script>
+import { getProperty, setProperty } from './store'
+import NvModelSelect from './NvModelSelect.vue'
+</script>
