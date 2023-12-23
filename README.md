@@ -101,3 +101,13 @@ Find guides and API documentation on the [Wiki](https://github.com/nature-heart-
 ## Resources
 
 - [Figma](https://www.figma.com/proto/U4A6IwSY8T4W2tm2agW92S/Izabela-v1.0.0?node-id=103%3A4&scaling=min-zoom&page-id=103%3A3&starting-point-node-id=103%3A4)
+
+## Development
+
+The project requires the following in order to run:
+- Node 16
+- Yarn
+- Python 3.10
+- Visual Studio Build Tools 2019 or higher
+  - Desktop development with C++
+  - Node.js build tools
