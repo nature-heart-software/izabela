@@ -5,7 +5,7 @@
         <div class="w-screen max-w-full">
           <NvStack spacing="4">
             <NvFormItem label="Message mode">
-              <NvMessageModeSelect class="w-full" />
+              <NvMessageModeSelect class="w-full"/>
             </NvFormItem>
           </NvStack>
         </div>
@@ -14,7 +14,7 @@
             <NvText>Message mode</NvText>
             <template #reference>
               <NvButton data-v-step="message-mode-buttons" icon-name="direction" size="sm"
-                >Mode
+              >Mode
               </NvButton>
             </template>
           </NvTooltip>
@@ -39,7 +39,7 @@
       <!--          </NvGroup>-->
       <!--        </template>-->
       <!--      </NvTooltip>-->
-      <NvDivider class="h-3" direction="vertical" />
+      <NvDivider class="h-3" direction="vertical"/>
       <NvPopover :tippy-options="{ placement: 'top-end' }" size="sm">
         <div class="w-screen max-w-full">
           <NvStack spacing="4">
@@ -54,27 +54,30 @@
               />
             </NvGroup>
             <NvAccessBlocker
-              :allowed="!!googleCloudSpeechCredentialsPath && settingsStore.enableTranslation"
-              :reason="
-                settingsStore.enableTranslation
-                  ? 'Google Cloud credentials required'
-                  : 'Translation needs to be enabled'
-              "
+              :allowed="settingsStore.enableTranslation"
+              reason="Translation needs to be enabled"
             >
               <NvStack spacing="4">
-                <NvDivider direction="horizontal" />
+                <NvDivider direction="horizontal"/>
                 <NvFormItem label="Translation strategy">
-                  <NvTranslationStrategySelect />
+                  <NvTranslationStrategySelect/>
                 </NvFormItem>
-                <NvDivider direction="horizontal" />
+                <NvDivider direction="horizontal"/>
                 <template v-if="settingsStore.textTranslationStrategy === 'cloud-translation'">
-                  <NvFormItem label="From">
-                    <NvTranslationFromSelect />
-                  </NvFormItem>
-                  <NvDivider direction="horizontal" />
-                  <NvFormItem label="To">
-                    <NvTranslationToSelect />
-                  </NvFormItem>
+                  <NvAccessBlocker
+                    :allowed="!!googleCloudSpeechCredentialsPath"
+                    reason="Google Cloud credentials required"
+                  >
+                    <NvStack spacing="4">
+                      <NvFormItem label="From">
+                        <NvTranslationFromSelect/>
+                      </NvFormItem>
+                      <NvDivider direction="horizontal"/>
+                      <NvFormItem label="To">
+                        <NvTranslationToSelect/>
+                      </NvFormItem>
+                    </NvStack>
+                  </NvAccessBlocker>
                 </template>
                 <template v-if="settingsStore.textTranslationStrategy === 'custom'">
                   <NvAccessBlocker
@@ -83,11 +86,11 @@
                   >
                     <NvStack spacing="4">
                       <NvFormItem label="From">
-                        <NvCustomTranslationFromSelect />
+                        <NvCustomTranslationFromSelect/>
                       </NvFormItem>
-                      <NvDivider direction="horizontal" />
+                      <NvDivider direction="horizontal"/>
                       <NvFormItem label="To">
-                        <NvCustomTranslationToSelect />
+                        <NvCustomTranslationToSelect/>
                       </NvFormItem>
                     </NvStack>
                   </NvAccessBlocker>
@@ -100,7 +103,7 @@
           <NvTooltip>
             <NvText>Translation</NvText>
             <template #reference>
-              <NvButton data-v-step="translation-button" icon-name="english-to-chinese" size="sm" />
+              <NvButton data-v-step="translation-button" icon-name="english-to-chinese" size="sm"/>
             </template>
           </NvTooltip>
         </template>
@@ -173,12 +176,17 @@ import {
 import { useSettingsStore } from '@/features/settings/store'
 import { inject } from 'vue'
 import { useRoute } from 'vue-router'
-import NvTranslationFromSelect from '@/features/translation/components/inputs/NvTranslationFromSelect.vue'
-import NvTranslationToSelect from '@/features/translation/components/inputs/NvTranslationToSelect.vue'
-import NvCustomTranslationFromSelect from '@/features/translation/components/inputs/NvCustomTranslationFromSelect.vue'
-import NvCustomTranslationToSelect from '@/features/translation/components/inputs/NvCustomTranslationToSelect.vue'
+import NvTranslationFromSelect
+  from '@/features/translation/components/inputs/NvTranslationFromSelect.vue'
+import NvTranslationToSelect
+  from '@/features/translation/components/inputs/NvTranslationToSelect.vue'
+import NvCustomTranslationFromSelect
+  from '@/features/translation/components/inputs/NvCustomTranslationFromSelect.vue'
+import NvCustomTranslationToSelect
+  from '@/features/translation/components/inputs/NvCustomTranslationToSelect.vue'
 import { useGetGoogleCloudSpeechCredentialsPath } from '@/features/settings/hooks'
-import NvTranslationStrategySelect from '@/features/translation/components/inputs/NvTranslationStrategySelect.vue'
+import NvTranslationStrategySelect
+  from '@/features/translation/components/inputs/NvTranslationStrategySelect.vue'
 import NvMessageModeSelect from '@/features/messages/components/inputs/NvMessageModeSelect.vue'
 
 const settingsStore = useSettingsStore()
