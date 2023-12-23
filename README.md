@@ -105,6 +105,7 @@ Find guides and API documentation on the [Wiki](https://github.com/nature-heart-
 ## Development
 
 The project requires the following in order to run:
+
 - Node 16
 - Yarn
 - Python 3.10
