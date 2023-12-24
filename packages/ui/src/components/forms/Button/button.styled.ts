@@ -131,11 +131,11 @@ export const StButton = styled('button', props)`
             }
 
             ${[
-          selected &&
-          `
+              selected &&
+                `
                     background-color: ${colors.gray['20']};
                 `,
-        ].filter(Boolean)}
+            ].filter(Boolean)}
         `,
       type === 'plain' &&
         `

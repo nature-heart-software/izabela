@@ -123,9 +123,15 @@
         </div>
         <template #reference>
           <NvTooltip>
-            <NvText>Audio input<template v-if="settingsStore.enableSTTTS"> - Running</template></NvText>
+            <NvText
+              >Audio input<template v-if="settingsStore.enableSTTTS"> - Running</template></NvText
+            >
             <template #reference>
-              <NvButton :type="settingsStore.enableSTTTS ? 'active' : 'default'" data-v-step="audio-input-select" icon-name="direction" size="sm"
+              <NvButton
+                :type="settingsStore.enableSTTTS ? 'active' : 'default'"
+                data-v-step="audio-input-select"
+                icon-name="direction"
+                size="sm"
                 >Input
               </NvButton>
             </template>
