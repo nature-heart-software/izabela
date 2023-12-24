@@ -54,12 +54,8 @@
               />
             </NvGroup>
             <NvAccessBlocker
-              :allowed="!!googleCloudSpeechCredentialsPath && settingsStore.enableTranslation"
-              :reason="
-                settingsStore.enableTranslation
-                  ? 'Google Cloud credentials required'
-                  : 'Translation needs to be enabled'
-              "
+              :allowed="settingsStore.enableTranslation"
+              reason="Translation needs to be enabled"
             >
               <NvStack spacing="4">
                 <NvDivider direction="horizontal" />
@@ -68,13 +64,20 @@
                 </NvFormItem>
                 <NvDivider direction="horizontal" />
                 <template v-if="settingsStore.textTranslationStrategy === 'cloud-translation'">
-                  <NvFormItem label="From">
-                    <NvTranslationFromSelect />
-                  </NvFormItem>
-                  <NvDivider direction="horizontal" />
-                  <NvFormItem label="To">
-                    <NvTranslationToSelect />
-                  </NvFormItem>
+                  <NvAccessBlocker
+                    :allowed="!!googleCloudSpeechCredentialsPath"
+                    reason="Google Cloud credentials required"
+                  >
+                    <NvStack spacing="4">
+                      <NvFormItem label="From">
+                        <NvTranslationFromSelect />
+                      </NvFormItem>
+                      <NvDivider direction="horizontal" />
+                      <NvFormItem label="To">
+                        <NvTranslationToSelect />
+                      </NvFormItem>
+                    </NvStack>
+                  </NvAccessBlocker>
                 </template>
                 <template v-if="settingsStore.textTranslationStrategy === 'custom'">
                   <NvAccessBlocker
@@ -98,9 +101,18 @@
         </div>
         <template #reference>
           <NvTooltip>
-            <NvText>Translation</NvText>
+            <NvText
+              >Translation<template v-if="settingsStore.enableTranslation">
+                - Running</template
+              ></NvText
+            >
             <template #reference>
-              <NvButton data-v-step="translation-button" icon-name="english-to-chinese" size="sm" />
+              <NvButton
+                :type="settingsStore.enableTranslation ? 'active' : 'default'"
+                data-v-step="translation-button"
+                icon-name="english-to-chinese"
+                size="sm"
+              />
             </template>
           </NvTooltip>
         </template>

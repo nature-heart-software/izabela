@@ -114,6 +114,8 @@
                   <NvFormItem label="API Key">
                     <NvInput
                       :modelValue="decrypt(settingsStore.customTextTranslationApiKey)"
+                      show-password
+                      type="password"
                       @update:modelValue="
                         (value) =>
                           settingsStore.$patch({ customTextTranslationApiKey: encrypt(value) })
