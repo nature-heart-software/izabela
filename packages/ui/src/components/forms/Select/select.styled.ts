@@ -135,6 +135,7 @@ export const StSelectOption = styled('div', {
   selected: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
   active: { type: Boolean, default: false },
+  readonly: { type: Boolean, default: false },
 })`
   cursor: pointer;
   display: flex;
@@ -147,8 +148,41 @@ export const StSelectOption = styled('div', {
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
-  ${({ disabled, selected, active }) =>
-    disabled
+  & > div {
+    position: relative;
+    z-index: 0;
+    max-width: 100%;
+    ${({readonly}) => readonly && `
+    &::before {
+        content: '';
+        z-index: -1;
+        position: absolute;
+        display: inline-flex;
+        inset: ${rem(-spacing['2'])};
+        background-color: ${colors.white};
+    }
+    `}
+  }
+  ${({ disabled, selected, active, readonly }) =>
+      readonly ? 
+          ` 
+          cursor: auto;
+            color: ${colors.gray['40']} !important;
+            position: relative;
+            z-index: 0;
+            &::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 0;
+                transform: translateY(-50%);
+                background-color: ${colors.gray['20']};
+                height: ${rem(1)};
+                width: 100%;
+                z-index: -1;
+            }
+          `
+          : (disabled
       ? `
           user-select: none;
           pointer-events: none;
@@ -173,5 +207,5 @@ export const StSelectOption = styled('div', {
           `
             : ''
         }
-      `}
+      `)}
 `

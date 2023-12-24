@@ -1,6 +1,8 @@
 <template>
   <StSelectOption v-bind="props">
-    <slot />
+    <div>
+      <slot />
+    </div>
   </StSelectOption>
 </template>
 <script lang="ts" setup>

@@ -28,10 +28,30 @@ const Template: Story = (args) => ({
       args,
       inputValue: ref(args.inputValue),
       options: ref(
-        voices.map((voice) => ({
-          value: voice,
-          label: voice.display_name,
-        })),
+          [
+            {
+              label: 'Some Category',
+              value: null,
+              children: [
+                {
+                  label: 'Option1',
+                  value: 'option1',
+                },
+                {
+                  label: 'Option2',
+                  value: 'option2',
+                },
+                {
+                  label: 'Option3',
+                  value: 'option3',
+                },
+              ]
+            },
+              ...voices.map((voice) => ({
+              value: voice,
+              label: voice.display_name,
+            })),
+          ]
       ),
     }
   },

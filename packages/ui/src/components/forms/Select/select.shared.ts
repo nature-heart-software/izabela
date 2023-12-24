@@ -14,9 +14,11 @@ export type Value = string | number | boolean | object | null | undefined
 export type Option = {
   id?: Exclude<Value, object>
   label: string
-  value: Value
+  value?: Value
   disabled?: boolean
+  readonly?: boolean
   attr?: Record<string, number | string>
+  children?: Omit<Option, 'children'>[]
 }
 
 export const selectProps = {
