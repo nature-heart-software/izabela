@@ -37,9 +37,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
     res,
   ) => {
     try {
-      const {
-        data: models,
-      } = await api.get('/models', {
+      const { data: models } = await api.get('/models', {
         headers: {
           'xi-api-key': apiKey,
         },
@@ -54,7 +52,15 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
     {
       body: {
         credentials: { apiKey },
-        payload: { text, voice, stability, similarity_boost, use_speaker_boost, style, model_id },
+        payload: {
+          text,
+          voice,
+          stability,
+          similarity_boost,
+          use_speaker_boost,
+          style,
+          model_id,
+        },
       },
     },
     res,
