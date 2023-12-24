@@ -152,7 +152,9 @@ export const StSelectOption = styled('div', {
     position: relative;
     z-index: 0;
     max-width: 100%;
-    ${({readonly}) => readonly && `
+    ${({ readonly }) =>
+      readonly &&
+      `
     &::before {
         content: '';
         z-index: -1;
@@ -164,8 +166,8 @@ export const StSelectOption = styled('div', {
     `}
   }
   ${({ disabled, selected, active, readonly }) =>
-      readonly ? 
-          ` 
+    readonly
+      ? ` 
           cursor: auto;
             color: ${colors.gray['40']} !important;
             position: relative;
@@ -182,13 +184,13 @@ export const StSelectOption = styled('div', {
                 z-index: -1;
             }
           `
-          : (disabled
-      ? `
+      : disabled
+        ? `
           user-select: none;
           pointer-events: none;
           color: ${colors.gray['40']} !important;
       `
-      : `
+        : `
         &:hover {
             background-color: ${colors.gray['10']} !important;
         }
@@ -207,5 +209,5 @@ export const StSelectOption = styled('div', {
           `
             : ''
         }
-      `)}
+      `}
 `
