@@ -101,9 +101,9 @@
         </div>
         <template #reference>
           <NvTooltip>
-            <NvText>Translation</NvText>
+            <NvText>Translation<template v-if="settingsStore.enableTranslation"> - Running</template></NvText>
             <template #reference>
-              <NvButton data-v-step="translation-button" icon-name="english-to-chinese" size="sm"/>
+              <NvButton :type="settingsStore.enableTranslation ? 'active' : 'default'" data-v-step="translation-button" icon-name="english-to-chinese" size="sm"/>
             </template>
           </NvTooltip>
         </template>

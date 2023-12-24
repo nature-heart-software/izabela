@@ -62,6 +62,7 @@ var _default = (0, _vite.defineConfig)({
     }
   },
   build: {
+    emptyOutDir: false,
     lib: {
       entry: (0, _path.resolve)(__dirname, 'src/main.ts'),
       name: 'main',

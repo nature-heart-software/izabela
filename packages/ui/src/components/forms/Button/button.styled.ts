@@ -114,6 +114,29 @@ export const StButton = styled('button', props)`
                 `,
             ].filter(Boolean)}
         `,
+      type === 'active' &&
+        `
+            background-color: ${colors.white};
+            border-color: ${colors.gray['100']};
+            &:hover {
+                background-color: ${colors.gray['10']};
+            }
+
+            &:active {
+                background-color: ${colors.gray['30']};
+            }
+
+            &:focus {
+                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${colors.gray['10']};
+            }
+
+            ${[
+          selected &&
+          `
+                    background-color: ${colors.gray['20']};
+                `,
+        ].filter(Boolean)}
+        `,
       type === 'plain' &&
         `
             color: ${colors.white};
