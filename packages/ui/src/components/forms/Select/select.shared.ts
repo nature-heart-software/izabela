@@ -17,6 +17,8 @@ export type Option = {
   value?: Value
   disabled?: boolean
   readonly?: boolean
+  category?: string
+  searchValue?: string
   attr?: Record<string, number | string>
   children?: Omit<Option, 'children'>[]
 }

@@ -76,6 +76,9 @@
         <div class="w-full text-ellipsis overflow-hidden">
           {{ item.label }}
         </div>
+        <template #after>
+          <slot name="optionAfter" :option="item" />
+        </template>
       </NvOption>
     </template>
     <template #fallback>
@@ -176,8 +179,9 @@ const { hasFocus, activate, deactivate } = useFocusTrap(inputWrapper, {
 const fuseOptions = computed<UseFuseOptions<typeof options.value[number]>>(
     () => ({
       fuseOptions: {
-        keys: ['label'],
+        keys: ['label', 'category', 'searchValue'],
         threshold: 0.3,
+        shouldSort: false,
       },
     }),
 )

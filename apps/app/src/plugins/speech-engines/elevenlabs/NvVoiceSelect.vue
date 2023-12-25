@@ -14,7 +14,9 @@
 import { computed, watch } from 'vue'
 import { useQueryClient } from 'vue-query'
 import { NvSelect } from '@packages/ui'
+import { groupOptions } from '@/utils/select'
 import { purify } from '@packages/toolbox'
+import { capitalize } from '@/utils/text'
 import { useListVoicesQuery } from './hooks'
 import { getVoiceName, LIST_VOICES_QUERY_KEY } from './shared'
 import { getProperty, setProperty } from './store'
@@ -31,10 +33,11 @@ const { data, isFetching } = useListVoicesQuery(computedParams, {
 })
 const voices = computed(() => data.value || [])
 const options = computed(() =>
-  voices.value.map((voice: any) => ({
+  groupOptions(voices.value.map((voice: any) => ({
     label: getVoiceName(voice),
     value: voice,
-  })),
+    category: capitalize(voice.category),
+  })), 'category'),
 )
 watch(
   () => getProperty('apiKey', true),

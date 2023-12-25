@@ -140,6 +140,7 @@ export const StSelectOption = styled('div', {
   cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   width: 100%;
   height: ${() => rem(spacing['7'])} !important;
   padding: 0 ${() => rem(spacing['5'])} !important;
@@ -148,7 +149,7 @@ export const StSelectOption = styled('div', {
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
-  & > div {
+  & .option__content {
     position: relative;
     z-index: 0;
     max-width: 100%;
@@ -162,6 +163,9 @@ export const StSelectOption = styled('div', {
         background-color: ${colors.white};
     }
     `}
+  }
+  & .option__after {
+    flex-shrink: 0;
   }
   ${({ disabled, selected, active, readonly }) =>
       readonly ? 

@@ -1,7 +1,10 @@
 <template>
   <StSelectOption v-bind="props">
-    <div>
+    <div class="option__content">
       <slot />
+    </div>
+    <div class="option__after">
+      <slot name="after" />
     </div>
   </StSelectOption>
 </template>

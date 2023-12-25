@@ -17,6 +17,7 @@ import { NvSelect } from '@packages/ui'
 import { purify } from '@packages/toolbox'
 import { orderBy } from 'lodash'
 import { useSpeechStore } from '@/features/speech/store'
+import { groupOptions } from '@/utils/select'
 import { useListVoicesQuery } from './hooks'
 import { getVoiceName, LIST_VOICES_QUERY_KEY } from './shared'
 import { getProperty, setProperty } from './store'
@@ -40,10 +41,11 @@ const { data, isFetching } = useListVoicesQuery({
 })
 const voices = computed(() => orderBy(data.value || [], 'display_name'))
 const options = computed(() =>
-  voices.value.map((voice) => ({
+  groupOptions(voices.value.map((voice) => ({
     label: getVoiceName(voice),
     value: voice,
-  })),
+    category: voice.category || 'Other',
+  })), 'category'),
 )
 watch(
   () => [getProperty('publicKey', true), getProperty('privateKey', true)],
