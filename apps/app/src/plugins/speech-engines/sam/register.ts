@@ -35,12 +35,12 @@ const getSelectedVoice = () => {
   const voice = getProperty('selectedVoice')
   return voice.name === 'Custom'
     ? {
-      ...voice,
-      speed: getProperty('speed'),
-      speech: getProperty('speech'),
-      throat: getProperty('throat'),
-      mouth: getProperty('mouth'),
-    }
+        ...voice,
+        speed: getProperty('speed'),
+        speech: getProperty('speech'),
+        throat: getProperty('throat'),
+        mouth: getProperty('mouth'),
+      }
     : voice
 }
 registerEngine({
@@ -66,20 +66,20 @@ registerEngine({
     const sam = new SamJs(payload.voice)
     const audioBuffer = sam.buf8(payload.text)
     const realBuffer = new Uint8Array(
-      4+ // "RIFF"
-      4+ // uint32 filesize
-      4+ // "WAVE"
-      4+ // "fmt "
-      4+ // uint32 fmt length
-      2+ // uint16 fmt
-      2+ // uint16 channels
-      4+ // uint32 sample rate
-      4+ // uint32 bytes per second
-      2+ // uint16 block align
-      2+ // uint16 bits per sample
-      4+ // "data"
-      4+ // uint32 chunk length
-      audioBuffer.length,
+      4 + // "RIFF"
+        4 + // uint32 filesize
+        4 + // "WAVE"
+        4 + // "fmt "
+        4 + // uint32 fmt length
+        2 + // uint16 fmt
+        2 + // uint16 channels
+        4 + // uint32 sample rate
+        4 + // uint32 bytes per second
+        2 + // uint16 block align
+        2 + // uint16 bits per sample
+        4 + // "data"
+        4 + // uint32 chunk length
+        audioBuffer.length,
     )
     let pos = 0
 
@@ -90,7 +90,7 @@ registerEngine({
 
     write(text2Uint8Array('RIFF')) // chunkID
 
-    write(Uint32ToUint8Array(audioBuffer.length+12+16+8-8)) // ChunkSize
+    write(Uint32ToUint8Array(audioBuffer.length + 12 + 16 + 8 - 8)) // ChunkSize
 
     write(text2Uint8Array('WAVE')) // riffType
     // format chunk

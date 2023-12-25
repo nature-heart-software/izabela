@@ -8,11 +8,16 @@
       ...$attrs,
     }"
   >
-    <template #optionAfter="{option}">
-      <NvButton v-if="!option.children"
-                :type="favoriteVoiceIds.includes(option.id) ? 'plain' : 'default'"
-                icon-name="heart" size="sm"
-                @mousedown.prevent.stop="setProperty('favoriteVoiceIds', xor(favoriteVoiceIds, [option.id]))"/>
+    <template #optionAfter="{ option }">
+      <NvButton
+        v-if="!option.children"
+        :type="favoriteVoiceIds.includes(option.id) ? 'plain' : 'default'"
+        icon-name="heart"
+        size="sm"
+        @mousedown.prevent.stop="
+          setProperty('favoriteVoiceIds', xor(favoriteVoiceIds, [option.id]))
+        "
+      />
     </template>
   </NvSelect>
 </template>
@@ -36,24 +41,24 @@ const getOptionFromVoice = (voice: any) => ({
 })
 
 const options = computed(() => {
-    const localOptions = [
-      { id: null, label: 'Default', value: null, category: 'Default' },
-      ...groupOptions(voices.value.map(getOptionFromVoice), 'category'),
-    ]
-    const favoriteVoiceIds = getProperty('favoriteVoiceIds')
-    if (favoriteVoiceIds) {
-      const favoriteVoices = voices.value.filter((voice: any) => favoriteVoiceIds.includes(getVoiceId(voice)))
-      if (favoriteVoices.length) {
-        localOptions.unshift({
-          label: 'Favorites',
-          children: favoriteVoices.map(getOptionFromVoice),
-        })
-      }
+  const localOptions = [
+    { id: null, label: 'Default', value: null, category: 'Default' },
+    ...groupOptions(voices.value.map(getOptionFromVoice), 'category'),
+  ]
+  const favoriteVoiceIds = getProperty('favoriteVoiceIds')
+  if (favoriteVoiceIds) {
+    const favoriteVoices = voices.value.filter((voice: any) =>
+      favoriteVoiceIds.includes(getVoiceId(voice)),
+    )
+    if (favoriteVoices.length) {
+      localOptions.unshift({
+        label: 'Favorites',
+        children: favoriteVoices.map(getOptionFromVoice),
+      })
     }
-    return localOptions
-  },
-)
+  }
+  return localOptions
+})
 
 const favoriteVoiceIds = computed<string[]>(() => getProperty('favoriteVoiceIds'))
-
 </script>
