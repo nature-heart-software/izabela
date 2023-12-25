@@ -29,10 +29,10 @@ const getSelectedVoice = () => {
   const voice = getProperty('selectedVoice')
   return voice.name === 'Custom'
     ? {
-      ...voice,
-      pitch: getProperty('pitch'),
-      shortened: getProperty('shortened'),
-    }
+        ...voice,
+        pitch: getProperty('pitch'),
+        shortened: getProperty('shortened'),
+      }
     : voice
 }
 registerEngine({
