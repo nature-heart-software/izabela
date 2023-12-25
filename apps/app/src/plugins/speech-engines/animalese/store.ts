@@ -7,4 +7,5 @@ export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
   },
   shortened: false,
   pitch: 1,
+  favoriteVoiceIds: [],
 })

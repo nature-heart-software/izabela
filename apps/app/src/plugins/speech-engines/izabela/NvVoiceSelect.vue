@@ -8,17 +8,26 @@
       ...$attrs,
     }"
     valueKey="name"
-  />
+  >
+    <template #optionAfter="{option}">
+      <NvButton v-if="!option.children"
+                :type="favoriteVoiceIds.includes(option.id) ? 'plain' : 'default'"
+                icon-name="heart" size="sm"
+                @mousedown.prevent.stop="setProperty('favoriteVoiceIds', xor(favoriteVoiceIds, [option.id]))"/>
+    </template>
+  </NvSelect>
 </template>
 <script lang="ts" setup>
 import { computed, watch } from 'vue'
 import { useQueryClient } from 'vue-query'
-import { NvSelect } from '@packages/ui'
+import { NvButton, NvSelect } from '@packages/ui'
 import { purify } from '@packages/toolbox'
 import { useSpeechStore } from '@/features/speech/store'
 import { groupOptions } from '@/utils/select'
+import { xor } from 'lodash'
+import { getVoiceCategory, getVoiceId, getVoiceName, LIST_VOICES_QUERY_KEY } from './shared'
 import { useListVoicesQuery } from './hooks'
-import { getVoiceName, LIST_VOICES_QUERY_KEY } from './shared'
+
 import { getProperty, setProperty } from './store'
 
 const queryClient = useQueryClient()
@@ -30,23 +39,39 @@ const canFetch = computed(() => speechStore.hasUniversalApiCredentials)
 const { data, isFetching } = useListVoicesQuery(computedParams, {
   enabled: canFetch,
 })
-const voices = computed(() => data.value || [])
-const options = computed(() => [
+const voices = computed(() => [
   {
+    id: null,
     label: 'Default',
     value: null,
+    category: 'Default',
+  }, ...data.value] || [])
+const getOptionFromVoice = (voice: any) => ({
+  id: getVoiceId(voice),
+  label: getVoiceName(voice),
+  value: voice,
+  category: getVoiceCategory(voice),
+})
+
+const options = computed(() => {
+    const localOptions = groupOptions(voices.value.map(getOptionFromVoice), 'category')
+    const favoriteVoiceIds = getProperty('favoriteVoiceIds')
+    if (favoriteVoiceIds) {
+      const favoriteVoices = voices.value.filter((voice: any) => favoriteVoiceIds.includes(getVoiceId(voice)))
+      if (favoriteVoices.length) {
+        localOptions.unshift({
+          label: 'Favorites',
+          children: favoriteVoices.map(getOptionFromVoice),
+        })
+      }
+    }
+    return localOptions
   },
-  ...groupOptions(voices.value.map((voice: any) => ({
-    label: getVoiceName(voice),
-    value: voice,
-    category: voice.category,
-  })), 'category'),
-])
+)
+
+const favoriteVoiceIds = computed<string[]>(() => getProperty('favoriteVoiceIds'))
 watch(
   () => canFetch.value,
   () => canFetch.value && queryClient.refetchQueries(LIST_VOICES_QUERY_KEY),
 )
-watch(options, () => {
-  console.log(options.value)
-})
 </script>
