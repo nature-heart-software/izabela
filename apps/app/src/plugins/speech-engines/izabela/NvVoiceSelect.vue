@@ -41,15 +41,15 @@ const { data, isFetching } = useListVoicesQuery(computedParams, {
 })
 const voices = computed(() => [
   {
-    id: null,
-    label: 'Default',
+    id: 'Default',
+    name: 'Default',
     value: null,
-    category: 'Default',
-  }, ...data.value] || [])
+    category: 'General',
+  }, ...(data.value || [])])
 const getOptionFromVoice = (voice: any) => ({
   id: getVoiceId(voice),
   label: getVoiceName(voice),
-  value: voice,
+  value: voice.name === 'Default' ? null : voice,
   category: getVoiceCategory(voice),
 })
 

@@ -3,7 +3,7 @@ export const ENGINE_NAME = 'Sam' as const
 
 export const getVoiceName = (voice: any) => voice.name
 export const getVoiceId = (voice: any) => voice.name
-export const getVoiceCategory = (voice: any) => 'Other'
+export const getVoiceCategory = (voice: any) => 'General'
 export const defaultVoice = {
   name: 'Default',
   speed: 72,

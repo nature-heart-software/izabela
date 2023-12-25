@@ -21,6 +21,7 @@ import { computed } from 'vue'
 import { NvButton, NvSelect } from '@packages/ui'
 import { xor } from 'lodash'
 import { groupOptions } from '@/utils/select'
+import { purify } from '@packages/toolbox'
 import { getProperty, setProperty } from './store'
 import { getVoiceCategory, getVoiceId, getVoiceName, voices as defaultVoices } from './shared'
 
@@ -28,7 +29,6 @@ import { getVoiceCategory, getVoiceId, getVoiceName, voices as defaultVoices } f
 const voices = computed(() => [
   {
     name: 'Custom',
-
   },
   ...defaultVoices,
 ])

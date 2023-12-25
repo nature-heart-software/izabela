@@ -20,26 +20,23 @@
 import { computed } from 'vue'
 import { NvButton, NvSelect } from '@packages/ui'
 import { sortBy, xor } from 'lodash'
-import { getVoiceCategory, getVoiceId, getVoiceName } from '@/plugins/speech-engines/say/shared'
-
 import { groupOptions } from '@/utils/select'
+import { getVoiceCategory, getVoiceId, getVoiceName } from './shared'
+
 import { useListVoicesQuery } from './hooks'
 import { getProperty, setProperty } from './store'
 
 const { data, isFetching } = useListVoicesQuery()
-const voices = computed(() => sortBy(data.value || []))
+const voices = computed(() => sortBy(['Default', ...(data.value || [])]))
 const getOptionFromVoice = (voice: any) => ({
   id: getVoiceId(voice),
   label: getVoiceName(voice),
-  value: voice,
+  value: voice === 'Default' ? null : voice,
   category: getVoiceCategory(voice),
 })
 
 const options = computed(() => {
-    const localOptions = [
-      { id: null, label: 'Default', value: null, category: 'Default' },
-      ...groupOptions(voices.value.map(getOptionFromVoice), 'category'),
-    ]
+    const localOptions = groupOptions(voices.value.map(getOptionFromVoice), 'category')
     const favoriteVoiceIds = getProperty('favoriteVoiceIds')
     if (favoriteVoiceIds) {
       const favoriteVoices = voices.value.filter((voice: any) => favoriteVoiceIds.includes(getVoiceId(voice)))

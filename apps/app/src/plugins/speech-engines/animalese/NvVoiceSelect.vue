@@ -27,7 +27,6 @@ import { defaultVoice, getVoiceCategory, getVoiceId, getVoiceName } from './shar
 
 const voices = computed(() => [{
   ...defaultVoice,
-  category: 'Default',
 },
   {
     name: 'Custom',
