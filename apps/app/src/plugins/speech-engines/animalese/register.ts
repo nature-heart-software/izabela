@@ -38,6 +38,7 @@ const getSelectedVoice = () => {
 registerEngine({
   id: ENGINE_ID,
   name: ENGINE_NAME,
+  category: 'local',
   getSelectedVoice,
   getVoiceName,
   getCredentials() {

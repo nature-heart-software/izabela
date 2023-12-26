@@ -6,7 +6,7 @@
     :valueKey="props.valueKey"
     :visible="hasFocus"
     :width="props.autocompleteWidth"
-    @select="(item) => handleValue(item.value)"
+    @select="(item) => !item.children && handleValue(item.value)"
   >
     <template #reference>
       <StSelect
@@ -23,7 +23,7 @@
                 <NvGroup :spacing="2" class="w-full">
                   <template
                     v-for="option in selectedOptions"
-                    :key="get(option.value, props.valueKey, option.value)"
+                    :key="get(option.value, props.valueKey) || option.value"
                   >
                     <NvTag
                       :title="option.label"
@@ -57,25 +57,29 @@
       </StSelect>
     </template>
     <template #default="{ active, item }">
-      <StSelectOption
+      <NvOption
         v-if="item"
         :active="active"
         :disabled="item.disabled"
+        :readonly="item.children"
         :selected="
           selectedValues.find(
             (v) =>
-              get(item.value, props.valueKey, item.value) ===
-              get(v, props.valueKey, v),
+              (get(item.value, props.valueKey) || item.value) ===
+              (get(v, props.valueKey) || v),
           )
         "
         :title="item.label"
         v-bind="item.attrs || {}"
-        @mousedown="handleValue(item.value)"
+        @mousedown="!item.children && handleValue(item.value)"
       >
         <div class="w-full text-ellipsis overflow-hidden">
           {{ item.label }}
         </div>
-      </StSelectOption>
+        <template #after="props">
+          <slot :option="item" name="optionAfter" v-bind="props" />
+        </template>
+      </NvOption>
     </template>
     <template #fallback>
       <StSelectOption
@@ -101,13 +105,19 @@ import {
   StSelectTagsWrapper,
   StSelectWrapper,
 } from './select.styled'
-import { selectProps as propsDefinition, Size, Value } from './select.shared'
+import {
+  Option,
+  selectProps as propsDefinition,
+  Size,
+  Value,
+} from './select.shared'
 import NvIcon from '@/components/typography/Icon/NvIcon.vue'
 import NvAutocomplete from '@/components/forms/Autocomplete/NvAutocomplete.vue'
 import NvTag from '@/components/forms/Tag/NvTag.vue'
 import NvGroup from '@/components/miscellaneous/Group/NvGroup.vue'
 import NvStack from '@/components/miscellaneous/Stack/NvStack.vue'
-import { get, omit } from 'lodash'
+import NvOption from './NvOption.vue'
+import { flatten, get, omit } from 'lodash'
 import { v4 as uuid } from 'uuid'
 
 const props = defineProps(propsDefinition)
@@ -126,10 +136,28 @@ const selectedValues = computed(() =>
 )
 
 const options = computed(() =>
-  props.options.map((option) => ({
-    id: get(option.value, props.valueKey, option.value) || uuid(),
-    ...option,
-  })),
+  flatten(
+    props.options.map((option) => {
+      if (option.children) {
+        const mappedChildren = option.children.map((o) => ({
+          id: get(o.value, props.valueKey) || o.value || uuid(),
+          ...o,
+        }))
+        return [
+          {
+            id: get(option.value, props.valueKey) || option.value || uuid(),
+            ...option,
+            children: mappedChildren,
+          },
+          ...mappedChildren,
+        ]
+      }
+      return {
+        id: get(option.value, props.valueKey) || option.value || uuid(),
+        ...option,
+      }
+    }),
+  ),
 )
 
 const selectedOptions = computed(() =>
@@ -156,18 +184,27 @@ const { hasFocus, activate, deactivate } = useFocusTrap(inputWrapper, {
     if (selectInput.value) selectInput.value.$el.blur()
   },
 })
-const fuseOptions = computed<UseFuseOptions<typeof options.value[number]>>(
+const fuseOptions = computed<UseFuseOptions<(typeof options.value)[number]>>(
   () => ({
     fuseOptions: {
-      keys: ['label'],
+      keys: ['label', 'category', 'searchValue'],
       threshold: 0.3,
+      shouldSort: false,
     },
   }),
 )
 const { results } = useFuse(search, options, fuseOptions)
 const searchResults = computed(() => {
   if (search.value) {
-    return results.value.map(({ item }) => item) || []
+    const filteredOptions = results.value.map(({ item }) => item) || []
+    return options.value.filter((option) => {
+      if ('children' in option) {
+        return filteredOptions.some((o) =>
+          (option.children as Option[]).find((c) => c.id === o.id),
+        )
+      }
+      return filteredOptions.some((o) => o.id === option.id)
+    })
   }
   return options.value || []
 })

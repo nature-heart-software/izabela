@@ -30,4 +30,5 @@ export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
     WordsPerMinute: '149',
   },
   useLocalCredentials: false,
+  favoriteVoiceIds: [],
 })

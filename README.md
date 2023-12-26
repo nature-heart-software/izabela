@@ -7,7 +7,7 @@
 </h1>
 
 <p align="center">
-  Your speech Assistant ✨
+  Your speech assistant ✨
 </p>
 
 <p align="center">
@@ -87,7 +87,7 @@ Here's a list of all the text-to-speech engines that are supported in Izabela:
 | Izabela (multiple engines) | Yes                                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/izabela-sample.mp3?raw=true)             | https://github.com/Weilbyte/tiktok-tts                                        |
 | Amazon Polly               | Yes                                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/amazon-polly-sample.mp3?raw=true)        | https://aws.amazon.com/polly/                                                 |
 | Google Cloud TTS           | Yes                                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/google-cloud-tts-sample.mp3?raw=true)    | https://cloud.google.com/text-to-speech                                       |
-| IBM Watson TTS             | Yes                                 |                                                                                                                      | https://www.ibm.com/cloud/watson-text-to-speech                               |
+| IBM Watson TTS             | Temporarily unavailable             |                                                                                                                      | https://www.ibm.com/cloud/watson-text-to-speech                               |
 | Microsoft Azure TTS        | Yes                                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/microsoft-azure-tts-sample.mp3?raw=true) | https://azure.microsoft.com/en-us/products/cognitive-services/text-to-speech/ |
 | Say                        | Included by default                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/say-sample.mp3?raw=true)                 | https://github.com/Marak/say.js/                                              |
 | Sam                        | Included by default                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/sam-sample.mp3?raw=true)                 | https://github.com/discordier/sam / https://github.com/Imrane03/better-sam    |
@@ -101,3 +101,14 @@ Find guides and API documentation on the [Wiki](https://github.com/nature-heart-
 ## Resources
 
 - [Figma](https://www.figma.com/proto/U4A6IwSY8T4W2tm2agW92S/Izabela-v1.0.0?node-id=103%3A4&scaling=min-zoom&page-id=103%3A3&starting-point-node-id=103%3A4)
+
+## Development
+
+The project requires the following in order to run:
+
+- Node 16
+- Yarn
+- Python 3.10
+- Visual Studio Build Tools 2019 or higher
+  - Desktop development with C++
+  - Node.js build tools

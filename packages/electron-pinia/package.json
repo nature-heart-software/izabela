@@ -36,7 +36,7 @@
   ],
   "dependencies": {
     "@packages/toolbox": "^0.0.0",
-    "electron": "20.3.8",
+    "electron": "22.3.25",
     "pinia": "^2.0.21",
     "vue": "^3.2.37",
     "electron-store": "^8.1.0",

@@ -82,19 +82,43 @@ export const StButton = styled('button', props)`
 
   ${({ align = '' }) => align && `justify-content: ${align};`}
   ${(props) => styleBySize(props)}
-  ${({ squared }) =>
+    ${({ squared }) =>
     squared &&
     `
         padding: 0;
         justify-content: center;
     `}
-  ${(props) => styleBySquared(props)}
-  ${({ type, selected }) =>
+    ${(props) => styleBySquared(props)}
+    ${({ type, selected }) =>
     [
       type === 'default' &&
         `
             background-color: ${colors.white};
             border-color: ${colors.gray['20']};
+            &:hover {
+                background-color: ${colors.gray['10']};
+            }
+
+            &:active {
+                background-color: ${colors.gray['30']};
+            }
+
+            &:focus {
+                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${colors.gray['10']};
+            }
+
+            ${[
+              selected &&
+                `
+                    background-color: ${colors.gray['20']};
+                `,
+            ].filter(Boolean)}
+        `,
+      type === 'active' &&
+        `
+            background-color: ${colors.white};
+            border-color: ${colors.gray['100']};
+            border-width: ${rem(2)};
             &:hover {
                 background-color: ${colors.gray['10']};
             }
@@ -189,7 +213,7 @@ export const StButton = styled('button', props)`
             ].filter(Boolean)}
         `,
     ].filter(Boolean)}
-  .nv-button__icon {
+    .nv-button__icon {
     pointer-events: none;
     ${({ squared }) => !squared && 'position: absolute;'}
     ${({ size, squared }) => !squared && iconStyleBySize(size)}

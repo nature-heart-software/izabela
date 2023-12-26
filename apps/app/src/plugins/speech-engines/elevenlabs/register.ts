@@ -14,6 +14,7 @@ const getSelectedVoice = () => getProperty('selectedVoice')
 registerEngine({
   id: ENGINE_ID,
   name: ENGINE_NAME,
+  category: 'cloud',
   getSelectedVoice,
   getVoiceName,
   getCredentials,
@@ -27,6 +28,9 @@ registerEngine({
       voice,
       stability: getProperty('stability'),
       similarity_boost: getProperty('similarity_boost'),
+      style: getProperty('style'),
+      use_speaker_boost: getProperty('use_speaker_boost'),
+      model_id: getProperty('model_id'),
     }
   },
   getLanguageCode() {

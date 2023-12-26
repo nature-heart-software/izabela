@@ -12,5 +12,6 @@ export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
     Name: 'Amy',
     SupportedEngines: ['neural', 'standard'],
   },
+  favoriteVoiceIds: [],
   useLocalCredentials: false,
 })

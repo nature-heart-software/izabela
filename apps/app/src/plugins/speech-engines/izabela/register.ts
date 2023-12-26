@@ -11,6 +11,7 @@ const getSelectedVoice = () => getProperty('selectedVoice')
 registerEngine({
   id: ENGINE_ID,
   name: ENGINE_NAME,
+  category: 'cloud',
   getSelectedVoice,
   getVoiceName,
   hasCredentials() {
