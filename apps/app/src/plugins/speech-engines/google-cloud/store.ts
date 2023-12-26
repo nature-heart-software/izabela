@@ -9,4 +9,5 @@ export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
     name: 'en-GB-Wavenet-A',
   },
   useLocalCredentials: false,
+  favoriteVoiceIds: [],
 })

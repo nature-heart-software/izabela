@@ -18,4 +18,5 @@ export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
   similarity_boost: 0.75,
   style: 0,
   use_speaker_boost: true,
+  favoriteVoiceIds: [],
 })

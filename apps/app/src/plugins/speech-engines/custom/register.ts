@@ -10,6 +10,7 @@ const getSelectedVoice = () => getProperty('selectedVoice')
 registerEngine({
   id: ENGINE_ID,
   name: ENGINE_NAME,
+  category: 'other',
   getSelectedVoice,
   getVoiceName,
   hasCredentials() {
@@ -33,7 +34,7 @@ registerEngine({
   synthesizeSpeech({ payload, credentials }) {
     const endpoint = getProperty('endpoint')
     return axios.post<Blob>(
-      `${endpoint.endsWith('/') ? endpoint.slice(0, -1) : endpoint}/synthesize-speech`,
+      `${ endpoint.endsWith('/') ? endpoint.slice(0, -1) : endpoint }/synthesize-speech`,
       {
         credentials,
         payload,

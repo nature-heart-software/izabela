@@ -5,4 +5,5 @@ export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
   selectedVoice: null,
   endpoint: '',
   apiKey: '',
+  favoriteVoiceIds: [],
 })
