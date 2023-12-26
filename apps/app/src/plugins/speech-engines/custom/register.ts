@@ -34,7 +34,7 @@ registerEngine({
   synthesizeSpeech({ payload, credentials }) {
     const endpoint = getProperty('endpoint')
     return axios.post<Blob>(
-      `${ endpoint.endsWith('/') ? endpoint.slice(0, -1) : endpoint }/synthesize-speech`,
+      `${endpoint.endsWith('/') ? endpoint.slice(0, -1) : endpoint}/synthesize-speech`,
       {
         credentials,
         payload,

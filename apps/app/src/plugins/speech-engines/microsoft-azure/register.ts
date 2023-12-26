@@ -33,7 +33,7 @@ registerEngine({
     let expression
     const commandString = newText.split(' ')[0] || ''
     if (commandString.startsWith('/')) {
-      const command = commands(voice).find(({ name }) => commandString.startsWith(`/${ name }`))
+      const command = commands(voice).find(({ name }) => commandString.startsWith(`/${name}`))
       newText = newText.replace(commandString, '')
       if (command) {
         expression = command.value
@@ -41,10 +41,10 @@ registerEngine({
     }
     const ssml = expression
       ? `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US"><voice name="${
-        voice.ShortName
-      }"><mstts:express-as style="${ expression }">${
-        translatedText || newText
-      }</mstts:express-as></voice></speak>`
+          voice.ShortName
+        }"><mstts:express-as style="${expression}">${
+          translatedText || newText
+        }</mstts:express-as></voice></speak>`
       : null
     return {
       ssml,
