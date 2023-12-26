@@ -61,6 +61,7 @@
           v-if="item"
           :active="active"
           :disabled="item.disabled"
+          :readonly="item.children"
           :selected="
           selectedValues.find(
             (v) =>
@@ -71,13 +72,12 @@
           :title="item.label"
           v-bind="item.attrs || {}"
           @mousedown="!item.children && handleValue(item.value)"
-          :readonly="item.children"
       >
         <div class="w-full text-ellipsis overflow-hidden">
           {{ item.label }}
         </div>
-        <template #after>
-          <slot name="optionAfter" :option="item" />
+        <template #after="props">
+          <slot :option="item" name="optionAfter" v-bind="props"/>
         </template>
       </NvOption>
     </template>
@@ -112,7 +112,7 @@ import NvTag from '@/components/forms/Tag/NvTag.vue'
 import NvGroup from '@/components/miscellaneous/Group/NvGroup.vue'
 import NvStack from '@/components/miscellaneous/Stack/NvStack.vue'
 import NvOption from './NvOption.vue'
-import { get, omit, flatten } from 'lodash'
+import { flatten, get, omit } from 'lodash'
 import { v4 as uuid } from 'uuid'
 
 const props = defineProps(propsDefinition)
@@ -138,10 +138,10 @@ const options = computed(() =>
           ...o,
         }))
         return [{
-            id: get(option.value, props.valueKey) || option.value || uuid(),
-            ...option,
-            children: mappedChildren,
-          },
+          id: get(option.value, props.valueKey) || option.value || uuid(),
+          ...option,
+          children: mappedChildren,
+        },
           ...mappedChildren,
         ]
       }
