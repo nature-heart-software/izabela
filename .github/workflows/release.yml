@@ -28,10 +28,10 @@ jobs:
           prerelease: ${{ contains(github.ref, 'rc') || contains(github.ref, 'beta') || contains(github.ref, 'alpha')}}
 
   deploy:
-    needs: [release]
+    needs: [ release ]
     strategy:
       matrix:
-        os: [windows-2019]
+        os: [ windows-2022 ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
