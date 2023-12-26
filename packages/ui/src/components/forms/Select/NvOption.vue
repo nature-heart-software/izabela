@@ -1,10 +1,10 @@
 <template>
   <StSelectOption ref="el" v-bind="props">
     <div class="option__content">
-      <slot/>
+      <slot />
     </div>
     <div class="option__after">
-      <slot :hover="isHover" name="after"/>
+      <slot :hover="isHover" name="after" />
     </div>
   </StSelectOption>
 </template>

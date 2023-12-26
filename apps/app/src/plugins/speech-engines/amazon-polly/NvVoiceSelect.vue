@@ -13,10 +13,14 @@
       <span v-show="(!option.children && hover) || favoriteVoiceIds.includes(option.id)">
         <NvButton
           :icon-name="favoriteVoiceIds.includes(option.id) ? 'times' : 'heart'"
-          :title="favoriteVoiceIds.includes(option.id) ? 'Remove from favorites' : 'Add to favorites'"
+          :title="
+            favoriteVoiceIds.includes(option.id) ? 'Remove from favorites' : 'Add to favorites'
+          "
           size="sm"
           type="default"
-          @mousedown.prevent.stop="setProperty('favoriteVoiceIds', xor(favoriteVoiceIds, [option.id]))"
+          @mousedown.prevent.stop="
+            setProperty('favoriteVoiceIds', xor(favoriteVoiceIds, [option.id]))
+          "
         />
       </span>
     </template>
