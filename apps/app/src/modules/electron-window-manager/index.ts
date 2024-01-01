@@ -1,9 +1,9 @@
-export type Instance = {
+export type ElectronWindowManagerInstance = {
   name: string
   window: Electron.BrowserWindow
 }
 export type Instances = {
-  [key: string]: Instance
+  [key: string]: ElectronWindowManagerInstance
 }
 
 const ElectronWindowManager = () => {
@@ -12,7 +12,7 @@ const ElectronWindowManager = () => {
   async function registerInstance(
     name: string,
     createWindow: (winName: string) => Promise<Electron.BrowserWindow>,
-  ): Promise<Instance> {
+  ): Promise<ElectronWindowManagerInstance> {
     const window = await createWindow(name)
     instances[name] = {
       name,
@@ -21,11 +21,11 @@ const ElectronWindowManager = () => {
     return instances[name]
   }
 
-  function getInstanceByName(name: string): Instance | undefined {
+  function getInstanceByName(name: string): ElectronWindowManagerInstance | undefined {
     return instances[name]
   }
 
-  function getInstances(): Instance[] {
+  function getInstances(): ElectronWindowManagerInstance[] {
     return Object.values(instances)
   }
 
