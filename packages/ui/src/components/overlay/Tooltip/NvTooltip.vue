@@ -1,9 +1,9 @@
 <template>
   <StTooltip ref="tooltip" v-bind="props">
     <tippy ref="tippyInstance" v-bind="tippyProps">
-      <slot name="reference"/>
+      <slot name="reference" />
       <template #content>
-        <slot/>
+        <slot />
       </template>
     </tippy>
   </StTooltip>
