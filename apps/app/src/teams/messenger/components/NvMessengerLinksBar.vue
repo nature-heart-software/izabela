@@ -22,7 +22,7 @@
       <NvTooltip>
         <NvText>Follow on Twitter</NvText>
         <template #reference>
-          <a href="https://twitter.com/wurielle" target="_blank">
+          <a href="https://twitter.com/joyfuldeceased" target="_blank">
             <span class="hidden">Twitter</span>
             <NvButton icon-name="twitter-alt" size="sm"/>
           </a>

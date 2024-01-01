@@ -1,6 +1,6 @@
 <template>
-  <StTooltip v-bind="props">
-    <tippy v-bind="tippyProps">
+  <StTooltip ref="tooltip" v-bind="props">
+    <tippy ref="tippyInstance" v-bind="tippyProps">
       <slot name="reference"/>
       <template #content>
         <slot/>
@@ -9,14 +9,15 @@
   </StTooltip>
 </template>
 <script lang="ts" setup>
-import { defineProps } from 'vue'
+import { defineProps, ref, watch } from 'vue'
 import { StTooltip } from './tooltip.styled'
 import { props as propsDefinition } from './tooltip.shared'
-import { Tippy } from 'vue-tippy'
+import { Tippy, TippyInstance, TippyOptions } from 'vue-tippy'
 import tokens from '@/styles/tokens'
+import { MaybeElement, useFocusWithin } from '@vueuse/core'
 
 const props = defineProps(propsDefinition)
-const tippyProps: typeof props['tippyOptions'] = {
+const tippyProps: TippyOptions = {
   trigger: 'mouseenter focus',
   delay: [250, 0],
   interactive: false,
@@ -26,5 +27,16 @@ const tippyProps: typeof props['tippyOptions'] = {
   theme: `tooltip`,
   maxWidth: 300,
   ...props.tippyOptions,
-}
+} as TippyOptions
+const tooltip = ref<MaybeElement>()
+const tippyInstance = ref<TippyInstance>()
+const { focused } = useFocusWithin(tooltip)
+watch(focused, (value) => {
+  const instance = tippyInstance.value
+  if (value) {
+    if (instance && 'disable' in instance) instance.disable()
+  } else {
+    if (instance && 'enable' in instance) instance.enable()
+  }
+})
 </script>
