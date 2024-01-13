@@ -60,8 +60,14 @@ const scrollToIndex: typeof virtualizer.value.scrollToIndex = (...args) => {
     return virtualizer.value.scrollToIndex(...args)
   })
 }
+const scrollToOffset: typeof virtualizer.value.scrollToOffset = (...args) => {
+  setTimeout(() => {
+    return virtualizer.value.scrollToOffset(...args)
+  })
+}
 defineExpose({
   scrollToIndex,
+  scrollToOffset,
 })
 onMounted(() => {
   setTimeout(() => {

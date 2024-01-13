@@ -16,6 +16,7 @@
           </template>
           <NvVirtualListContainer
               v-show="props.options.length > 0"
+              ref="autocompleteList"
               class="autocomplete__list"
           >
             <NvVirtualList
@@ -31,7 +32,7 @@
                   ),
               }"
                 @visible="onVisible"
-                @wheel="selection = null"
+                @wheel="onWheel"
             >
               <template #default="scope">
                 <slot
@@ -64,7 +65,10 @@ import { get } from 'lodash'
 import { Virtualizer } from '@tanstack/virtual-core'
 
 const props = defineProps(propsDefinition)
-const list = ref<undefined | { scrollToIndex: Virtualizer<Element, Element>['scrollToIndex'] }>()
+const list = ref<undefined | {
+  scrollToIndex: Virtualizer<Element, Element>['scrollToIndex'],
+  scrollToOffset: Virtualizer<Element, Element>['scrollToOffset']
+}>()
 const reference = ref()
 const autocomplete = ref()
 const selection = ref<number | null | undefined>(null)
@@ -73,19 +77,15 @@ const { width } = useElementSize(reference)
 const vLoading = ElLoadingDirective
 const loading = ref(true)
 const emit = defineEmits(['select'])
+const lastScrollPosition = ref(0)
+const autocompleteList = ref<HTMLDivElement>()
 
 watch(
     () => props.visible,
     (visible) => {
       if (!visible) loading.value = true
       selection.value = null
-    },
-)
-
-watch(
-    () => props.options,
-    () => {
-      selection.value = 0
+      updateLastScrollPosition(0)
     },
 )
 
@@ -103,6 +103,20 @@ const autocompleteWidth = computed(() => {
     return defaultWidth
   }
   return width.value
+})
+
+const updateLastScrollPosition = (value?: number) => {
+  lastScrollPosition.value = typeof value === 'number' ? value : autocompleteList.value?.scrollTop ?? 0
+}
+
+function onWheel(e: MouseEvent) {
+  selection.value = null
+  updateLastScrollPosition()
+}
+
+watch(() => props.options, () => {
+  selection.value = 0
+  list.value?.scrollToOffset(lastScrollPosition.value)
 })
 
 onKeyStroke('ArrowDown', (e) => {
