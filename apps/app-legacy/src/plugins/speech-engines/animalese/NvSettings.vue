@@ -1,8 +1,8 @@
 <template>
   <NvFormItem label="Voice">
-    <NvVoiceSelect/>
+    <NvVoiceSelect />
   </NvFormItem>
-  <NvDivider direction="horizontal"/>
+  <NvDivider direction="horizontal" />
   <NvAccessBlocker
     :allowed="getProperty('selectedVoice').name === 'Custom'"
     reason='Only available for the "Custom" voice'
@@ -16,19 +16,19 @@
             :step="0.1"
             class="!grow"
             v-bind="{
-            modelValue: getProperty('pitch'),
-            'onUpdate:modelValue': (value) => setProperty('pitch', value),
-          }"
+              modelValue: getProperty('pitch'),
+              'onUpdate:modelValue': (value) => setProperty('pitch', value),
+            }"
           />
           <NvNumberInput
             v-bind="{
-            modelValue: getProperty('pitch'),
-            'onUpdate:modelValue': (value) => setProperty('pitch', value),
-          }"
+              modelValue: getProperty('pitch'),
+              'onUpdate:modelValue': (value) => setProperty('pitch', value),
+            }"
           />
         </NvGroup>
       </NvFormItem>
-      <NvDivider direction="horizontal"/>
+      <NvDivider direction="horizontal" />
       <NvFormItem>
         <NvGroup justify="apart" no-wrap spacing="5">
           <NvStack>
@@ -56,4 +56,5 @@ import {
   NvText,
 } from '@packages/ui'
 import NvVoiceSelect from './NvVoiceSelect'
-import { getProperty, setProperty } from './store'</script>
+import { getProperty, setProperty } from './store'
+</script>

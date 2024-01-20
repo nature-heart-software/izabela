@@ -13,7 +13,7 @@
           </NvCard>
         </template>
         <template v-for="{ id } in messagesStore.history" :key="id">
-          <NvHistoryMessage :id="id"/>
+          <NvHistoryMessage :id="id" />
         </template>
       </NvStack>
     </NvStack>
@@ -31,16 +31,27 @@ const containerRef = ref()
 const messagesStore = useMessagesStore()
 const playingMessageStore = usePlayingMessageStore()
 
-watch(() => [messagesStore.history, containerRef, playingMessageStore.progress, playingMessageStore.isPlaying], () => {
-  if (autoScroll.value && containerRef.value) {
-    nextTick(() => {
-      containerRef.value.$el.scrollTop = containerRef.value.$el.scrollHeight
-    })
-  }
-}, { deep: true, immediate: true })
+watch(
+  () => [
+    messagesStore.history,
+    containerRef,
+    playingMessageStore.progress,
+    playingMessageStore.isPlaying,
+  ],
+  () => {
+    if (autoScroll.value && containerRef.value) {
+      nextTick(() => {
+        containerRef.value.$el.scrollTop = containerRef.value.$el.scrollHeight
+      })
+    }
+  },
+  { deep: true, immediate: true },
+)
 
 const onWheel = () => {
   const element = containerRef.value.$el
-  autoScroll.value = !!(element && element.scrollHeight-element.scrollTop === element.clientHeight)
+  autoScroll.value = !!(
+    element && element.scrollHeight - element.scrollTop === element.clientHeight
+  )
 }
 </script>
