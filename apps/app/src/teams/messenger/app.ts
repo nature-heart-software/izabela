@@ -19,6 +19,7 @@ const vueQueryPluginOptions: VueQueryPluginOptions = {
   },
 }
 
+
 const app = createApp(App)
   .use(router)
   .use(pinia)
@@ -27,3 +28,5 @@ const app = createApp(App)
   .use(VueJsTour)
 
 app.mount('#app')
+
+app.config.warnHandler = () => null
