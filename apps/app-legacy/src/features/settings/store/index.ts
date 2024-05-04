@@ -14,11 +14,11 @@ export const useSettingsStore = defineStore(
     const channel = version.includes('alpha')
       ? 'alpha'
       : // eslint-disable-next-line no-nested-ternary
-      version.includes('beta')
-      ? 'beta'
-      : version.includes('rc')
-      ? 'rc'
-      : 'latest'
+        version.includes('beta')
+        ? 'beta'
+        : version.includes('rc')
+          ? 'rc'
+          : 'latest'
 
     const preferredSavDir = ref<null | string>(null)
     const playSpeechOnDefaultPlaybackDevice = ref(true)

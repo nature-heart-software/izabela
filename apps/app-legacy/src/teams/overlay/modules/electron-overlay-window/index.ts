@@ -149,10 +149,10 @@ export const ElectronOverlayWindow = () => {
               hasRightAlt && hasShift
                 ? nativeKey.withShiftAltGr
                 : hasRightAlt
-                ? nativeKey.withAltGr
-                : hasShift
-                ? nativeKey.withShift
-                : nativeKey.value
+                  ? nativeKey.withAltGr
+                  : hasShift
+                    ? nativeKey.withShift
+                    : nativeKey.value
             if (key) {
               emitIPCOverlayInputCharacter(key)
             }
