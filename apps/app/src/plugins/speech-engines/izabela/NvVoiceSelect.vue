@@ -33,7 +33,7 @@ import { NvButton, NvSelect } from '@packages/ui'
 import { purify } from '@packages/toolbox'
 import { useSpeechStore } from '@/features/speech/store'
 import { groupOptions } from '@/utils/select'
-import { xor } from 'lodash'
+import xor from 'lodash/xor'
 import { getVoiceCategory, getVoiceId, getVoiceName, LIST_VOICES_QUERY_KEY } from './shared'
 import { useListVoicesQuery } from './hooks'
 

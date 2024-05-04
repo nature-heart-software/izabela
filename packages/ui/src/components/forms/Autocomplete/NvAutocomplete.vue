@@ -60,7 +60,7 @@ import { onKeyStroke, useElementSize } from '@vueuse/core'
 import { ElLoadingDirective } from 'element-plus'
 import NvVirtualList from '@/components/miscellaneous/VirtualList/NvVirtualList.vue'
 import NvVirtualListContainer from '@/components/miscellaneous/VirtualList/NvVirtualListContainer.vue'
-import { get } from 'lodash'
+import get from 'lodash/get'
 import { Virtualizer } from '@tanstack/virtual-core'
 
 const props = defineProps(propsDefinition)

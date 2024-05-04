@@ -32,8 +32,10 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
-    "src/**/*.vue",
-    "electron"
+    "src/**/*.vue"
+  ],
+  "exclude": [
+    "src/**/{electron,node}/**/*.ts"
   ],
   "references": [
     {

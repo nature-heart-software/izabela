@@ -1,6 +1,6 @@
 import ElectronWindowManager from '@/modules/electron-window-manager'
 import { mouse } from '@/modules/node-mouse'
-import { throttle } from 'lodash'
+import throttle from 'lodash/throttle'
 import { Hitbox } from '@/modules/vue-hitboxes/types'
 import { BrowserWindow, screen, shell } from 'electron'
 import { useMessengerStore, useMessengerWindowStore } from '@/teams/messenger/store'
@@ -168,8 +168,8 @@ export const ElectronMessengerWindow = () => {
         const [windowX, windowY] = window.getPosition()
         const { hitboxes } = hitboxesStore
         const isWithinAnyHitboxes = hitboxes.some(({ x, y, w, h }: Hitbox) => {
-          const isWithinXHitbox = mouseX >= windowX + x && mouseX <= windowX + x + w
-          const isWithinYHitbox = mouseY >= windowY + y && mouseY <= windowY + y + h
+          const isWithinXHitbox = mouseX >= windowX+x && mouseX <= windowX+x+w
+          const isWithinYHitbox = mouseY >= windowY+y && mouseY <= windowY+y+h
           return isWithinXHitbox && isWithinYHitbox
         })
         if (isWithinAnyHitboxes) {

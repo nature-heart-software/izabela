@@ -6,7 +6,7 @@
 <script lang="ts" setup>
 import { v4 as uuid } from 'uuid'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { throttle } from 'lodash'
+import throttle from 'lodash/throttle'
 import {
   useDevicePixelRatio,
   useIntersectionObserver,

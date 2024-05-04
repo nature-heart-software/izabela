@@ -44,7 +44,8 @@ import { NvAutocomplete, NvGroup, NvInput, NvOption, NvText } from '@packages/ui
 import { computed, defineEmits, defineExpose, defineProps, ref, watch } from 'vue'
 import { getEngineById } from '@/modules/speech-engine-manager'
 import { useFuse, UseFuseOptions } from '@vueuse/integrations/useFuse'
-import { orderBy, throttle } from 'lodash'
+import orderBy from 'lodash/orderBy'
+import throttle from 'lodash/throttle'
 import { useMessagesStore } from '@/features/messages/store'
 import { onKeyStroke } from '@vueuse/core'
 import { useSpeechStore } from '@/features/speech/store'
@@ -78,7 +79,7 @@ const commands = computed(
     [...(engine.value?.commands?.(props.voice) || []), ...speechStore.customCommands].map(
       (command) => ({
         ...command,
-        command: `/${command.value}`,
+        command: `/${ command.value }`,
       }),
     ) || [],
 )
@@ -121,7 +122,7 @@ const isAutocompleteVisible = computed(
 )
 
 const onAutocompleteSelect = (value: (typeof commands.value)[number]) => {
-  emit('update:modelValue', `${value.command} `)
+  emit('update:modelValue', `${ value.command } `)
   if (latestCommands.value.includes(value.command)) {
     latestCommands.value.splice(latestCommands.value.indexOf(value.command), 1)
   }
@@ -152,7 +153,7 @@ onKeyStroke('ArrowUp', () => {
   if (
     !isAutocompleteVisible.value &&
     isInputFocused.value &&
-    historyMessageIndex.value < messagesStore.history.length - 1
+    historyMessageIndex.value < messagesStore.history.length-1
   ) {
     historyMessageIndex.value += 1
   }

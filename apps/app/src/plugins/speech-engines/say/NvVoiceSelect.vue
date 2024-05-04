@@ -28,7 +28,8 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { NvButton, NvSelect } from '@packages/ui'
-import { sortBy, xor } from 'lodash'
+import sortBy from 'lodash/sortBy'
+import xor from 'lodash/xor'
 import { groupOptions } from '@/utils/select'
 import { getVoiceCategory, getVoiceId, getVoiceName } from './shared'
 
