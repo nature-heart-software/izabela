@@ -19,7 +19,6 @@ const vueQueryPluginOptions: VueQueryPluginOptions = {
   },
 }
 
-
 const app = createApp(App)
   .use(router)
   .use(pinia)
