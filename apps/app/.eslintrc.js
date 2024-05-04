@@ -20,8 +20,8 @@ module.exports = {
     'class-methods-use-this': 'off',
     'import/extensions': 'off',
     'import/no-unresolved': 'off',
-    'no-use-before-define': ['error', { functions: false }],
-    'no-unused-vars': ['warn', { ignoreRestSiblings: true }],
+    'no-use-before-define': ['error', {functions: false}],
+    'no-unused-vars': ['warn', {ignoreRestSiblings: true}],
   },
   overrides: [
     {

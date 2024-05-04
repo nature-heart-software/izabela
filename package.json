@@ -18,7 +18,8 @@
   "devDependencies": {
     "lerna": "^6.1.0",
     "npm-delay": "^1.0.4",
-    "patch-package": "^6.5.0"
+    "patch-package": "^6.5.0",
+    "tsconfig-paths": "^4.2.0"
   },
   "workspaces": [
     "apps/*",

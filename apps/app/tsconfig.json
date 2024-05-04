@@ -1,31 +1,43 @@
 {
   "compilerOptions": {
-    "target": "es2018",
-    "module": "esnext",
-    "strict": true,
-    "jsx": "preserve",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
+    "target": "ES2020",
     "useDefineForClassFields": true,
-    "sourceMap": true,
+    "module": "ESNext",
+    "lib": [
+      "ES2020",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "skipLibCheck": true,
     "baseUrl": ".",
-    "types": ["webpack-env", "mocha", "chai"],
     "paths": {
-      "@/*": ["src/*"],
-      "@root/*": ["./*"]
+      "@/*": [
+        "src/*"
+      ],
+      "@root/*": [
+        "./*"
+      ]
     },
-    "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
+    "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "preserve",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true
   },
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
-    "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "electron"
   ],
-  "exclude": ["node_modules"]
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
 }

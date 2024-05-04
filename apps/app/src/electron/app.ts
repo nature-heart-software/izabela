@@ -20,7 +20,7 @@ import { destroyWinMouse } from '@/modules/node-mouse'
 import { createOverlayWindow } from '@/teams/overlay/electron/background'
 
 const App = () => {
-  const isDevelopment = process.env.NODE_ENV !== 'production'
+  const isDevelopment = import.meta.env.DEV
   const createWindows = () =>
     app
       .whenReady()
@@ -40,9 +40,9 @@ const App = () => {
     app.whenReady().then(async () =>
       server.start({
         tempPath: path.join(app.getPath('userData'), 'temp'),
-        port: process.env.VUE_APP_SERVER_PORT,
+        port: import.meta.env.VITE_SERVER_PORT,
         ws: {
-          port: process.env.VUE_APP_SERVER_WS_PORT,
+          port: import.meta.env.VITE_SERVER_WS_PORT,
         },
       }),
     )
@@ -67,7 +67,7 @@ const App = () => {
   }
 
   function exec(description: string, action: () => any) {
-    console.log(`[app]: ${description}`)
+    console.log(`[app]: ${ description }`)
     return action()
   }
 
@@ -90,7 +90,7 @@ const App = () => {
     })
 
     app.on('ready', async () => {
-      if (isDevelopment && !process.env.IS_TEST) {
+      if (isDevelopment) {
         try {
           await installExtension(VUEJS3_DEVTOOLS)
         } catch (e) {
