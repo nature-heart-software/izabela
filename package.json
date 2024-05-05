@@ -12,13 +12,10 @@
     "patch": "yarn patch-package",
     "postinstall": "yarn patch && electron-rebuild -f -w @packages/win-mouse"
   },
-  "dependencies": {
-    "@packages/win-mouse": "^2.0.1"
-  },
   "devDependencies": {
-    "nx": "15.9.2",
     "lerna": "6.6.2",
     "npm-delay": "^1.0.4",
+    "nx": "15.9.2",
     "patch-package": "^6.5.0",
     "tsconfig-paths": "^4.2.0"
   },
@@ -61,5 +58,8 @@
     "trailingComma": "all",
     "arrowParens": "always",
     "endOfLine": "lf"
+  },
+  "dependencies": {
+    "typescript": "^5.4.5"
   }
 }
