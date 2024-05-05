@@ -2,7 +2,7 @@ import { app, BrowserWindow, protocol } from 'electron'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import path from 'path'
 import server from '@apps/app-server'
-import electronPiniaPlugin from '@packages/electron-pinia/dist/main'
+import { electronPiniaPlugin } from '@packages/electron-pinia/main'
 import { createApp, h } from 'vue'
 import { createPinia } from 'pinia'
 import createTray from '@/teams/tray/electron-tray'
@@ -33,7 +33,7 @@ const App = () => {
       )
 
   const registerElectronPinia = () => {
-    createApp(h({})).use(createPinia().use(electronPiniaPlugin()))
+    createApp(h({})).use(createPinia().use((electronPiniaPlugin.default || electronPiniaPlugin)()))
   }
 
   const startAppServer = async () =>

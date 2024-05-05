@@ -3,25 +3,33 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "build": "microbundle src/{main,renderer,preload}.ts --target=node",
-    "dev": "microbundle src/{main,renderer,preload}.ts --target=node watch"
+    "build": "microbundle src/{main,renderer,preload}.ts --target=node --format=esm,cjs  --sourcemap=false",
+    "dev": "microbundle src/{main,renderer,preload}.ts --target=node --format=esm,cjs  --sourcemap=false watch"
   },
   "exports": {
     ".": {
+      "node": "./dist/renderer.cjs",
+      "import": "./dist/renderer.js",
       "require": "./dist/renderer.cjs",
-      "default": "./dist/renderer.js"
+      "default": "./dist/renderer.cjs"
     },
     "./main": {
+      "node": "./dist/main.cjs",
+      "import": "./dist/main.js",
       "require": "./dist/main.cjs",
-      "default": "./dist/main.js"
+      "default": "./dist/main.cjs"
     },
     "./renderer": {
+      "node": "./dist/renderer.cjs",
+      "import": "./dist/renderer.js",
       "require": "./dist/renderer.cjs",
-      "default": "./dist/renderer.js"
+      "default": "./dist/renderer.cjs"
     },
     "./preload": {
+      "node": "./dist/preload.cjs",
+      "import": "./dist/preload.js",
       "require": "./dist/preload.cjs",
-      "default": "./dist/preload.js"
+      "default": "./dist/preload.cjs"
     },
     "./dist/": "./dist/"
   },
@@ -29,7 +37,6 @@
   "source": "src/renderer.ts",
   "main": "./dist/renderer.cjs",
   "module": "./dist/renderer.js",
-  "unpkg": "./dist/renderer.umd.js",
   "types": "./dist/renderer.d.ts",
   "files": [
     "./dist"

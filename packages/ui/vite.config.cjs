@@ -19,7 +19,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const pkg = require('./package.json');
 const packagesToOmit = ['element-plus'];
 const omitPackages = keys => keys.filter(key => !packagesToOmit.includes(key));
-const externalPackages = [...omitPackages(Object.keys(pkg.dependencies || {})), ...omitPackages(Object.keys(pkg.peerDependencies || {}))];
+const externalPackages = [...omitPackages(Object.keys(pkg.dependencies || {})), ...omitPackages(Object.keys(pkg.peerDependencies || {})), ...omitPackages(Object.keys(pkg.devDependencies || {}))];
 const externals = externalPackages.map(packageName => new RegExp(`^${packageName}(\/.*)?`));
 const mode = (() => {
   const args = process.argv;

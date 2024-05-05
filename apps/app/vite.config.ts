@@ -6,7 +6,7 @@ import path from 'path'
 
 const pkg = require('./package.json')
 
-export default defineConfig(() => {
+export default defineConfig(({ mode }) => {
     // console.log(process.env)
     const packagesToOmit = []
     const omitPackages = (keys: string[]) =>
@@ -14,6 +14,7 @@ export default defineConfig(() => {
     const externalPackages = [
       ...omitPackages(Object.keys(pkg.dependencies || {})),
       ...omitPackages(Object.keys(pkg.peerDependencies || {})),
+      ...(mode === 'development' ? omitPackages(Object.keys(pkg.devDependencies || {})) : []),
     ]
     const external = externalPackages.map(
       (packageName) => new RegExp(`^${ packageName }(/.*)?`),
@@ -36,6 +37,7 @@ export default defineConfig(() => {
     // }
     const plugins = () => [
       tsconfigPaths(),
+      // nodeResolve(),
       // EnvironmentPlugin({
       //   'PUBLIC_DIR': `"${ mode === 'developement' ? path.join(__dirname, 'public') : __dirname }"`,
       //   'ROOT_DIR': `"${ __dirname }"`,

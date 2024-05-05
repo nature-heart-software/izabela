@@ -4,13 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "microbundle --target=node",
-    "dev": "microbundle --target=node watch"
+    "build": "microbundle --target=node --format=esm,cjs  --sourcemap=false",
+    "dev": "microbundle --target=node --format=esm,cjs  --sourcemap=false watch"
   },
   "source": "src/main.ts",
   "main": "./dist/main.cjs",
   "module": "./dist/main.es.js",
-  "unpkg": "./dist/main.umd.js",
   "types": "./dist/main.d.ts",
   "files": [
     "./dist"
