@@ -51,7 +51,7 @@ const keymap = keyBy(
 const keymapByVKey = Object.fromEntries(
   entries(nativeKeymap.getKeyMap()).map(([code, value]) => [
     keyCodeMap[code] ||
-    ('vkey' in value ? (value as typeof value & { vkey: string }).vkey : undefined),
+      ('vkey' in value ? (value as typeof value & { vkey: string }).vkey : undefined),
     {
       ...value,
       code,
