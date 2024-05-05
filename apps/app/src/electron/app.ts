@@ -67,7 +67,7 @@ const App = () => {
   }
 
   function exec(description: string, action: () => any) {
-    console.log(`[app]: ${ description }`)
+    console.log(`[app]: ${description}`)
     return action()
   }
 
