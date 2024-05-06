@@ -1,10 +1,20 @@
 {
   "name": "@packages/electron-pinia",
-  "private": true,
   "version": "0.0.0",
-  "scripts": {
-    "build": "microbundle src/{main,renderer,preload}.ts --target=node --format=esm,cjs  --sourcemap=false",
-    "dev": "microbundle src/{main,renderer,preload}.ts --target=node --format=esm,cjs  --sourcemap=false watch"
+  "dependencies": {
+    "@packages/toolbox": "^0.0.0",
+    "electron": "22.3.25",
+    "electron-store": "^8.1.0",
+    "lodash": "^4.17.21",
+    "pinia": "^2.0.21",
+    "vue": "^3.2.37"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.184",
+    "microbundle": "^0.15.1",
+    "typescript": "^4.6.4",
+    "vite": "^3.0.7",
+    "vite-plugin-dts": "^1.4.1"
   },
   "exports": {
     ".": {
@@ -33,27 +43,17 @@
     },
     "./dist/": "./dist/"
   },
-  "type": "module",
-  "source": "src/renderer.ts",
-  "main": "./dist/renderer.cjs",
-  "module": "./dist/renderer.js",
-  "types": "./dist/renderer.d.ts",
   "files": [
     "./dist"
   ],
-  "dependencies": {
-    "@packages/toolbox": "^0.0.0",
-    "electron": "22.3.25",
-    "pinia": "^2.0.21",
-    "vue": "^3.2.37",
-    "electron-store": "^8.1.0",
-    "lodash": "^4.17.21"
+  "main": "./dist/renderer.cjs",
+  "module": "./dist/renderer.js",
+  "private": true,
+  "scripts": {
+    "build": "microbundle src/{main,renderer,preload}.ts --target=node --format=esm,cjs  --sourcemap=false",
+    "dev": "microbundle src/{main,renderer,preload}.ts --target=node --format=esm,cjs  --sourcemap=false watch"
   },
-  "devDependencies": {
-    "microbundle": "^0.15.1",
-    "typescript": "^4.6.4",
-    "vite": "^3.0.7",
-    "@types/lodash": "^4.14.184",
-    "vite-plugin-dts": "^1.4.1"
-  }
+  "source": "src/renderer.ts",
+  "type": "module",
+  "types": "./dist/renderer.d.ts"
 }

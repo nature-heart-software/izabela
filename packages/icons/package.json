@@ -1,20 +1,6 @@
 {
   "name": "@packages/icons",
-  "private": true,
   "version": "0.0.0",
-  "type": "module",
-  "sideEffects": false,
-  "files": [
-    "./dist"
-  ],
-  "main": "./dist/main.cjs",
-  "module": "./dist/main.js",
-  "types": "./dist/main.d.ts",
-  "scripts": {
-    "dev": "vite build --watch",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
   "devDependencies": {
     "@packages/generate-exports": "^0.0.0",
     "@types/node": "^12.20.24",
@@ -25,7 +11,21 @@
     "vue": "^3.2.37",
     "vue-tsc": "^0.38.4"
   },
+  "files": [
+    "./dist"
+  ],
+  "main": "./dist/main.cjs",
+  "module": "./dist/main.js",
   "peerDependencies": {
     "vue": "3x"
-  }
+  },
+  "private": true,
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "preview": "vite preview"
+  },
+  "sideEffects": false,
+  "type": "module",
+  "types": "./dist/main.d.ts"
 }

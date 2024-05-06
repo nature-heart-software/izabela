@@ -1,23 +1,10 @@
 {
   "name": "@packages/ui",
-  "private": true,
   "version": "0.0.0",
-  "type": "module",
-  "files": [
-    "./dist"
-  ],
-  "main": "./dist/main.cjs",
-  "module": "./dist/main.es.js",
-  "types": "./dist/main.d.ts",
-  "scripts": {
-    "dev": "vite build --watch --mode development",
-    "build": "vite build",
-    "preview": "vite preview",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
-  },
-  "peerDependencies": {
-    "vue": "3.x"
+  "dependencies": {
+    "@floating-ui/vue": "^0.2.1",
+    "@packages/icons": "^0.0.0",
+    "@packages/toolbox": "^0.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.18.10",
@@ -59,9 +46,22 @@
     "vue-tsc": "^0.38.4",
     "vue3-styled-components": "^1.2.1"
   },
-  "dependencies": {
-    "@floating-ui/vue": "^0.2.1",
-    "@packages/icons": "^0.0.0",
-    "@packages/toolbox": "^0.0.0"
-  }
+  "files": [
+    "./dist"
+  ],
+  "main": "./dist/main.cjs",
+  "module": "./dist/main.es.js",
+  "peerDependencies": {
+    "vue": "3.x"
+  },
+  "private": true,
+  "scripts": {
+    "build": "vite build",
+    "build-storybook": "storybook build",
+    "dev": "vite build --watch --mode development",
+    "preview": "vite preview",
+    "storybook": "storybook dev -p 6006"
+  },
+  "type": "module",
+  "types": "./dist/main.d.ts"
 }

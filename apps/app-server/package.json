@@ -1,21 +1,6 @@
 {
   "name": "@apps/app-server",
-  "private": true,
   "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "start": "node bin/generate-exports && nodemon ./dist/main.js --start-server",
-    "build": "node bin/generate-exports && microbundle --target=node --format=cjs --sourcemap=false",
-    "dev": "node bin/generate-exports && microbundle --target=node --format=cjs --sourcemap=false watch"
-  },
-  "source": "src/main.ts",
-  "main": "./dist/main.cjs",
-  "module": "./dist/main.cjs",
-  "unpkg": "./dist/main.umd.js",
-  "types": "./dist/main.d.ts",
-  "files": [
-    "./dist"
-  ],
   "dependencies": {
     "@aws-sdk/client-cognito-identity": "^3.87.0",
     "@aws-sdk/client-polly": "^3.87.0",
@@ -48,5 +33,20 @@
     "nodemon": "^2.0.15",
     "typescript": "^4.6.4",
     "vite": "^3.0.0"
-  }
+  },
+  "files": [
+    "./dist"
+  ],
+  "main": "./dist/main.cjs",
+  "module": "./dist/main.cjs",
+  "private": true,
+  "scripts": {
+    "build": "node bin/generate-exports && microbundle --target=node --format=cjs --sourcemap=false",
+    "dev": "node bin/generate-exports && microbundle --target=node --format=cjs --sourcemap=false watch",
+    "start": "node bin/generate-exports && nodemon ./dist/main.js --start-server"
+  },
+  "source": "src/main.ts",
+  "type": "module",
+  "types": "./dist/main.d.ts",
+  "unpkg": "./dist/main.umd.js"
 }

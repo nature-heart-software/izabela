@@ -7,7 +7,6 @@ import path from 'path'
 const pkg = require('./package.json')
 
 export default defineConfig(({ mode }) => {
-  // console.log(process.env)
   const packagesToOmit = []
   const omitPackages = (keys: string[]) => keys.filter((key) => !packagesToOmit.includes(key))
   const externalPackages = [
@@ -26,42 +25,29 @@ export default defineConfig(({ mode }) => {
   const rollupOptions = {
     external,
   }
-  // const define = {
-  //   'process.env.PUBLIC_DIR': JSON.stringify(mode === 'development' ? path.join(__dirname, 'public') : __dirname),
-  //   'process.env.ROOT_DIR': JSON.stringify(__dirname),
-  //   'process.env.ELECTRON_NODE_INTEGRATION': JSON.stringify(Number(false).toString()),
-  //   'process.env.VITE_DEV_SERVER_URL': JSON.stringify(mode === 'development' ? 'http://localhost:3000' : 'app://./'),
-  // }
   const plugins = () => [
     tsconfigPaths(),
-    // nodeResolve(),
-    // EnvironmentPlugin({
-    //   'PUBLIC_DIR': `"${ mode === 'developement' ? path.join(__dirname, 'public') : __dirname }"`,
-    //   'ROOT_DIR': `"${ __dirname }"`,
-    //   'ELECTRON_NODE_INTEGRATION': 'false',
-    // }),
   ]
   return {
     server: {
       port: 3000,
     },
     resolve,
+    build: {
+      rollupOptions: {
+        ...rollupOptions,
+        input: {
+          messenger: './src/teams/messenger/index.html',
+          'speech-worker': './src/teams/speech-worker/index.html',
+          overlay: './src/teams/overlay/index.html',
+        },
+      },
+    },
     plugins: [
       ...plugins(),
       vue(),
       electron({
         main: {
-          // onstart(ctx) {
-          //   ctx.startup(['.'], {
-          //     env: {
-          //       'PUBLIC_DIR': mode === 'development' ? path.join(__dirname, 'public') : __dirname,
-          //       'ROOT_DIR': __dirname,
-          //       'ELECTRON_NODE_INTEGRATION': Number(false).toString(),
-          //       'VITE_DEV_SERVER_URL': mode === 'development' ? 'http://localhost:3000' : 'app://./',
-          //     },
-          //   })
-          // },
-          // Shortcut of `build.lib.entry`.
           entry: 'src/electron/background.ts',
           vite: {
             resolve,
@@ -79,20 +65,6 @@ export default defineConfig(({ mode }) => {
               rollupOptions,
             },
             plugins: [...plugins()],
-          },
-        },
-        vite: {
-          resolve,
-          plugins: [...plugins()],
-          build: {
-            rollupOptions: {
-              ...rollupOptions,
-              input: {
-                messenger: './src/teams/messenger/index.html',
-                'speech-worker': './src/teams/speech-worker/index.html',
-                overlay: './src/teams/overlay/index.html',
-              },
-            },
           },
         },
       }),

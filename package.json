@@ -1,16 +1,7 @@
 {
   "name": "root",
-  "private": true,
-  "scripts": {
-    "install:deps": "yarn && yarn build:deps",
-    "bootstrap": "yarn lerna bootstrap --no-ci",
-    "dev": "yarn lerna run serve --scope izabela-next --stream",
-    "build": "yarn install && yarn bootstrap && yarn lerna run build",
-    "docker:build": "docker build -t izabela . && docker create --name dummy izabela && docker cp dummy:dist_electron dist_electron && docker rm -f dummy",
-    "build:deps": "yarn bootstrap && yarn lerna run build --scope  '{@packages/*,@apps/app-server}' --stream",
-    "build:app": "yarn bootstrap && yarn lerna run build --scope '{@packages/*,@apps/app-server,izabela-next}' --stream",
-    "patch": "yarn patch-package",
-    "postinstall": "yarn patch && electron-rebuild -f -w @packages/win-mouse"
+  "dependencies": {
+    "typescript": "^5.4.5"
   },
   "devDependencies": {
     "lerna": "6.6.2",
@@ -19,10 +10,15 @@
     "patch-package": "^6.5.0",
     "tsconfig-paths": "^4.2.0"
   },
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "prettier": {
+    "singleQuote": true,
+    "tabWidth": 2,
+    "semi": false,
+    "trailingComma": "all",
+    "arrowParens": "always",
+    "endOfLine": "lf"
+  },
+  "private": true,
   "release": {
     "branches": [
       "main",
@@ -51,15 +47,19 @@
       ]
     ]
   },
-  "prettier": {
-    "singleQuote": true,
-    "tabWidth": 2,
-    "semi": false,
-    "trailingComma": "all",
-    "arrowParens": "always",
-    "endOfLine": "lf"
+  "scripts": {
+    "bootstrap": "yarn lerna bootstrap --no-ci",
+    "build": "yarn install && yarn bootstrap && yarn lerna run build",
+    "build:app": "yarn bootstrap && yarn lerna run build --scope '{@packages/*,@apps/app-server,izabela-next}' --stream",
+    "build:deps": "yarn bootstrap && yarn lerna run build --scope  '{@packages/*,@apps/app-server}' --stream",
+    "dev": "yarn lerna run serve --scope izabela-next --stream",
+    "docker:build": "docker build -t izabela . && docker create --name dummy izabela && docker cp dummy:dist_electron dist_electron && docker rm -f dummy",
+    "install:deps": "yarn && yarn build:deps",
+    "patch": "yarn patch-package",
+    "postinstall": "yarn patch && electron-rebuild -f -w @packages/win-mouse"
   },
-  "dependencies": {
-    "typescript": "^5.4.5"
-  }
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
 }

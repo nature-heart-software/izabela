@@ -8,7 +8,7 @@ export const env = import.meta.env.MODE
 export const EXTERNALS_DIR =
   import.meta.env.DEV ? path.resolve('./resources') : process.resourcesPath
 
-export const PUBLIC_DIR = import.meta.env.DEV ? path.resolve('./public') : './'
+export const PUBLIC_DIR = import.meta.env.DEV ? path.resolve('./public') : path.resolve(__dirname, '../dist')
 export const getTopLeftWindow = () => {
   const displays = screen.getAllDisplays()
   return minBy(displays, (display) => display.bounds.y)
@@ -21,7 +21,7 @@ export function createProtocol(scheme: string, customProtocol: Protocol) {
       let pathName = new URL(request.url).pathname
       pathName = decodeURI(pathName) // Needed in case URL contains spaces
 
-      readFile(path.join(__dirname, pathName), (error, data) => {
+      readFile(path.join(__dirname, '../dist', pathName), (error, data) => {
         if (error) {
           console.error(
             `Failed to read ${ pathName } on ${ scheme } protocol`,

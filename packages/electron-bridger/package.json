@@ -1,19 +1,6 @@
 {
   "name": "@packages/electron-bridger",
-  "private": true,
   "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "build": "microbundle --target=node --format=esm,cjs  --sourcemap=false",
-    "dev": "microbundle --target=node --format=esm,cjs  --sourcemap=false watch"
-  },
-  "source": "src/main.ts",
-  "main": "./dist/main.cjs",
-  "module": "./dist/main.es.js",
-  "types": "./dist/main.d.ts",
-  "files": [
-    "./dist"
-  ],
   "dependencies": {
     "electron": "20.3.8"
   },
@@ -21,5 +8,18 @@
     "microbundle": "^0.15.1",
     "typescript": "^4.6.4",
     "vite": "^3.0.0"
-  }
+  },
+  "files": [
+    "./dist"
+  ],
+  "main": "./dist/main.cjs",
+  "module": "./dist/main.es.js",
+  "private": true,
+  "scripts": {
+    "build": "microbundle --target=node --format=esm,cjs  --sourcemap=false",
+    "dev": "microbundle --target=node --format=esm,cjs  --sourcemap=false watch"
+  },
+  "source": "src/main.ts",
+  "type": "module",
+  "types": "./dist/main.d.ts"
 }

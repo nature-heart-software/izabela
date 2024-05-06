@@ -1,27 +1,8 @@
 {
   "name": "izabela-next-legacy",
   "description": "Your speech assistant.",
-  "author": "Nature Heart Software",
-  "productName": "Izabela Next",
-  "repository": "https://github.com/nature-heart-software/izabela",
   "version": "6.6.6",
-  "private": true,
-  "scripts": {
-    "serve": "vue-cli-service electron:serve",
-    "build": "vue-cli-service electron:build -p never",
-    "test:unit": "vue-cli-service test:unit",
-    "test:e2e": "vue-cli-service test:e2e",
-    "lint": "vue-cli-service lint",
-    "electron:build": "vue-cli-service electron:build -p never",
-    "electron:serve": "vue-cli-service electron:serve",
-    "postinstall": "node bin/rebuild.js",
-    "postuninstall": "node bin/rebuild.js",
-    "storybook:build": "vue-cli-service storybook:build -c config/storybook",
-    "storybook:serve": "vue-cli-service storybook:serve -p 6006 -c config/storybook",
-    "generate:app-icon": "npx electron-icon-builder --input=./assets/app-icon.png --output=./build --flatten && npx electron-icon-builder --input=./assets/app-icon.png --output=./public --flatten",
-    "rebuild": "npx patch-package && electron-builder install-app-deps"
-  },
-  "main": "background.js",
+  "author": "Nature Heart Software",
   "dependencies": {
     "@apps/app-server": "^0.0.0",
     "@google-cloud/translate": "^7.1.1",
@@ -125,5 +106,24 @@
     "vuex": "^4.0.0",
     "webpack-bundle-analyzer": "^4.7.0",
     "webpack-notifier": "^1.15.0"
+  },
+  "main": "background.js",
+  "private": true,
+  "productName": "Izabela Next",
+  "repository": "https://github.com/nature-heart-software/izabela",
+  "scripts": {
+    "build": "vue-cli-service electron:build -p never",
+    "electron:build": "vue-cli-service electron:build -p never",
+    "electron:serve": "vue-cli-service electron:serve",
+    "generate:app-icon": "npx electron-icon-builder --input=./assets/app-icon.png --output=./build --flatten && npx electron-icon-builder --input=./assets/app-icon.png --output=./public --flatten",
+    "lint": "vue-cli-service lint",
+    "postinstall": "node bin/rebuild.js",
+    "postuninstall": "node bin/rebuild.js",
+    "rebuild": "npx patch-package && electron-builder install-app-deps",
+    "serve": "vue-cli-service electron:serve",
+    "storybook:build": "vue-cli-service storybook:build -c config/storybook",
+    "storybook:serve": "vue-cli-service storybook:serve -p 6006 -c config/storybook",
+    "test:e2e": "vue-cli-service test:e2e",
+    "test:unit": "vue-cli-service test:unit"
   }
 }

@@ -43,13 +43,20 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
 
   ipcMain.registerBrowserWindow(name, window)
 
+
+  ipcMain.registerBrowserWindow(name, window)
+
+  const filePath = `./src/teams/${ name }/index.html`
+
   if (import.meta.env.VITE_DEV_SERVER_URL) {
-    await window.loadURL(path.join(import.meta.env.VITE_DEV_SERVER_URL as string, `/src/teams/${ name }/index.html`))
+    await window.loadURL(path.join(import.meta.env.VITE_DEV_SERVER_URL as string, filePath))
     if (import.meta.env.DEV) window.webContents.openDevTools({ mode: 'undocked' })
   } else {
     createProtocol('app')
-    window.loadURL(`app://./${ name }.html`)
+    window.loadURL(`app://${ filePath }`)
   }
+
+  window.webContents.openDevTools({ mode: 'undocked' })
 
   return window
 }
