@@ -1,6 +1,7 @@
 {
   "name": "root",
   "dependencies": {
+    "syncpack": "^12.3.2",
     "typescript": "^5.4.5"
   },
   "devDependencies": {
