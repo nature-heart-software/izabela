@@ -8,7 +8,7 @@
     "debug": "^2.6.8"
   },
   "devDependencies": {
-    "standard": "^13.0.2"
+    "standard": "^14.3.4"
   },
   "homepage": "https://github.com/gillesdemey/node-record-lpcm16",
   "keywords": [

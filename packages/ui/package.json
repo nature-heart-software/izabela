@@ -3,14 +3,14 @@
   "version": "0.0.0",
   "dependencies": {
     "@floating-ui/vue": "^0.2.1",
-    "@packages/icons": "^0.0.0",
-    "@packages/toolbox": "^0.0.0"
+    "@packages/icons": "0.0.0",
+    "@packages/toolbox": "0.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.18.10",
     "@floating-ui/dom": "^1.0.1",
-    "@packages/vite-plugin-generate-exports": "^0.0.0",
-    "@packages/vite-plugin-generate-modules": "^0.0.0",
+    "@packages/vite-plugin-generate-exports": "0.0.0",
+    "@packages/vite-plugin-generate-modules": "0.0.0",
     "@storybook/addon-essentials": "7.0.0-beta.31",
     "@storybook/addon-interactions": "7.0.0-beta.31",
     "@storybook/addon-links": "7.0.0-beta.31",
@@ -20,12 +20,11 @@
     "@storybook/vue3-vite": "7.0.0-beta.31",
     "@tanstack/virtual-core": "3.0.0-beta.26",
     "@types/uuid": "^8.3.4",
-    "@vitejs/plugin-vue": "^3.0.0",
+    "@vitejs/plugin-vue": "^5.0.4",
     "@vueuse/core": "^9.2.0",
     "@vueuse/integrations": "^9.2.0",
     "@vueuse/motion": "^2.0.0-beta.12",
     "autoprefixer": "^10.4.8",
-    "babel-loader": "^8.2.5",
     "element-plus": "^1.2.0-beta.6",
     "focus-trap": "^7.0.0",
     "fuse.js": "^6.6.2",
@@ -36,14 +35,13 @@
     "sass": "^1.54.3",
     "storybook": "7.0.0-beta.31",
     "tailwindcss": "^3.1.8",
-    "typescript": "^4.6.4",
+    "typescript": "^5.4.5",
     "uuid": "^9.0.0",
-    "vite": "^3.0.0",
-    "vite-plugin-dts": "^1.4.1",
-    "vue": "^3.2.37",
-    "vue-loader": "^16.8.3",
+    "vite": "^5.2.0",
+    "vite-plugin-dts": "^1.7.1",
+    "vue": "^3.4.21",
     "vue-tippy": "^6.0.0-alpha.63",
-    "vue-tsc": "^0.38.4",
+    "vue-tsc": "^2.0.6",
     "vue3-styled-components": "^1.2.1"
   },
   "files": [
@@ -51,9 +49,6 @@
   ],
   "main": "./dist/main.cjs",
   "module": "./dist/main.es.js",
-  "peerDependencies": {
-    "vue": "3.x"
-  },
   "private": true,
   "scripts": {
     "build": "vite build",

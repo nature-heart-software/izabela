@@ -73,6 +73,10 @@ var _default = (0, _vite.defineConfig)({
       }[format]}`
     },
     rollupOptions: {
+      input: {
+        main: (0, _path.resolve)(__dirname, 'src/main.ts'),
+        nested: (0, _path.resolve)(__dirname, 'src/styles/tokens.ts')
+      },
       external: externals
     }
   }

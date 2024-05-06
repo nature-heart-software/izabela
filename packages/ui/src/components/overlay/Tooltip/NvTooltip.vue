@@ -1,9 +1,9 @@
 <template>
   <StTooltip ref="tooltip" v-bind="props">
     <tippy ref="tippyInstance" v-bind="tippyProps">
-      <slot name="reference" />
+      <slot name="reference"/>
       <template #content>
-        <slot />
+        <slot/>
       </template>
     </tippy>
   </StTooltip>
@@ -13,7 +13,7 @@ import { defineProps, ref, watch } from 'vue'
 import { StTooltip } from './tooltip.styled'
 import { props as propsDefinition } from './tooltip.shared'
 import { Tippy, TippyInstance, TippyOptions } from 'vue-tippy'
-import tokens from '@/styles/tokens'
+import { tokens } from '@/styles/tokens'
 import { MaybeElement, useFocusWithin } from '@vueuse/core'
 
 const props = defineProps(propsDefinition)

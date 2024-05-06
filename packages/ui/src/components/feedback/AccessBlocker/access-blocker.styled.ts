@@ -1,6 +1,6 @@
 /* eslint-disable */
 import styled from 'vue3-styled-components'
-import tokens from '@/styles/tokens'
+import { tokens } from '@/styles/tokens'
 import { props } from './access-blocker.shared'
 import { disabledItemBackgroundStyle } from '@/utils/css-in-js'
 
@@ -15,5 +15,5 @@ export const StAccessBlockerReason = styled('div', props)`
   right: 0;
   bottom: 0;
   z-index: 3000;
-  ${disabledItemBackgroundStyle}
+  ${ disabledItemBackgroundStyle }
 `

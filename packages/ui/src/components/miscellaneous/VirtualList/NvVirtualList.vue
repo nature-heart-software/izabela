@@ -34,7 +34,7 @@ import {
   props as propsDefinition,
 } from '@/components/miscellaneous/VirtualList/virtual-list.shared'
 import { rem } from 'polished'
-import tokens from '@/styles/tokens'
+import { tokens } from '@/styles/tokens'
 import { computed, onBeforeUnmount, onMounted } from 'vue'
 
 const emit = defineEmits(['visible', 'hidden', 'change'])

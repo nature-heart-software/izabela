@@ -96,7 +96,7 @@ import { computed, defineProps, onBeforeUnmount, ref } from 'vue'
 import { useFocusTrap } from '@vueuse/integrations/useFocusTrap'
 import { useFuse, UseFuseOptions } from '@vueuse/integrations/useFuse'
 import { onClickOutside, onKeyStroke } from '@vueuse/core'
-import tokens from '@/styles/tokens'
+import { tokens } from '@/styles/tokens'
 import {
   StSelect,
   StSelectIcon,

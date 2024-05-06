@@ -1,26 +1,26 @@
 <template>
   <StButton
-    v-loading="props.loading"
-    v-bind="{
+      v-loading="props.loading"
+      v-bind="{
       ...props,
       squared: props.squared || isVNodeEmpty($slots.default),
     }"
   >
     <span v-if="!isVNodeEmpty($slots.default)" ref="content">
-      <slot />
+      <slot/>
     </span>
     <NvIcon
-      v-if="props.iconName"
-      :name="props.iconName"
-      :size="iconSize"
-      class="nv-button__icon"
+        v-if="props.iconName"
+        :name="props.iconName"
+        :size="iconSize"
+        class="nv-button__icon"
     />
   </StButton>
 </template>
 <script lang="ts" setup>
 import { computed, defineProps } from 'vue'
 import { isVNodeEmpty } from '@/utils/vue'
-import tokens from '@/styles/tokens'
+import { tokens } from '@/styles/tokens'
 import { StButton } from './button.styled'
 import { props as propsDefinition, Size } from './button.shared'
 import NvIcon from '@/components/typography/Icon/NvIcon.vue'

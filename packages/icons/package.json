@@ -2,23 +2,20 @@
   "name": "@packages/icons",
   "version": "0.0.0",
   "devDependencies": {
-    "@packages/generate-exports": "^0.0.0",
+    "@packages/generate-exports": "0.0.0",
     "@types/node": "^12.20.24",
-    "@vitejs/plugin-vue": "^3.0.0",
-    "typescript": "^4.6.4",
-    "vite": "^3.0.0",
-    "vite-plugin-dts": "^1.4.1",
-    "vue": "^3.2.37",
-    "vue-tsc": "^0.38.4"
+    "@vitejs/plugin-vue": "^5.0.4",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.0",
+    "vite-plugin-dts": "^1.7.1",
+    "vue": "^3.4.21",
+    "vue-tsc": "^2.0.6"
   },
   "files": [
     "./dist"
   ],
   "main": "./dist/main.cjs",
   "module": "./dist/main.js",
-  "peerDependencies": {
-    "vue": "3x"
-  },
   "private": true,
   "scripts": {
     "build": "vite build",

@@ -5,8 +5,8 @@
     "vite-plugin-dts": "^1.7.1"
   },
   "devDependencies": {
-    "typescript": "^4.9.3",
-    "vite": "^4.0.0"
+    "typescript": "^5.4.5",
+    "vite": "^5.2.0"
   },
   "files": [
     "./dist"

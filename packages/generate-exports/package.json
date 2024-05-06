@@ -7,8 +7,8 @@
   },
   "devDependencies": {
     "microbundle": "^0.15.1",
-    "typescript": "^4.6.4",
-    "vite": "^3.0.0"
+    "typescript": "^5.4.5",
+    "vite": "^5.2.0"
   },
   "files": [
     "./dist"

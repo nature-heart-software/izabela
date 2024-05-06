@@ -2,19 +2,19 @@
   "name": "@packages/electron-pinia",
   "version": "0.0.0",
   "dependencies": {
-    "@packages/toolbox": "^0.0.0",
-    "electron": "22.3.25",
+    "@packages/toolbox": "0.0.0",
+    "electron": "20.3.8",
     "electron-store": "^8.1.0",
     "lodash": "^4.17.21",
     "pinia": "^2.0.21",
-    "vue": "^3.2.37"
+    "vue": "^3.4.21"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.184",
     "microbundle": "^0.15.1",
-    "typescript": "^4.6.4",
-    "vite": "^3.0.7",
-    "vite-plugin-dts": "^1.4.1"
+    "typescript": "^5.4.5",
+    "vite": "^5.2.0",
+    "vite-plugin-dts": "^1.7.1"
   },
   "exports": {
     ".": {
