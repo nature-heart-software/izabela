@@ -9,7 +9,7 @@ createApp(h({})).use(pinia)
 
 export const definePluginStore = <S extends Record<any, any>>(id: string, state: S) => {
   const usePluginStore = defineStore(
-    `plugin-${ id }`,
+    `plugin-${id}`,
     () => {
       const pluginState = ref<Record<any, any>>(state)
       return {

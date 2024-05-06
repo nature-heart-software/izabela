@@ -25,9 +25,7 @@ export default defineConfig(({ mode }) => {
   const rollupOptions = {
     external,
   }
-  const plugins = () => [
-    tsconfigPaths(),
-  ]
+  const plugins = () => [tsconfigPaths()]
   return {
     server: {
       port: 3000,
