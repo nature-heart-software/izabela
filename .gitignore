@@ -4,6 +4,7 @@ node_modules
 temp
 .parcel-cache
 playground
+*.timestamp*
 
 # local env files
 .env.local

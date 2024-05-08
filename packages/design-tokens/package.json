@@ -1,17 +1,13 @@
 {
-  "name": "@packages/generate-exports",
+  "name": "@packages/design-tokens",
+  "private": true,
   "version": "0.0.0",
-  "files": [
-    "./dist"
-  ],
+  "type": "module",
   "main": "./dist/main.cjs",
   "module": "./dist/main.js",
-  "private": true,
+  "types": "./dist/main.d.ts",
   "scripts": {
     "dev": "vite build --watch --mode development",
     "build": "vite build"
-  },
-  "source": "src/main.ts",
-  "type": "module",
-  "types": "./dist/main.d.ts"
+  }
 }

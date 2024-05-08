@@ -1,21 +1,6 @@
 {
   "name": "@packages/electron-pinia",
   "version": "0.0.0",
-  "dependencies": {
-    "@packages/toolbox": "0.0.0",
-    "electron": "20.3.8",
-    "electron-store": "^8.1.0",
-    "lodash": "^4.17.21",
-    "pinia": "^2.0.21",
-    "vue": "^3.4.21"
-  },
-  "devDependencies": {
-    "@types/lodash": "^4.14.184",
-    "microbundle": "^0.15.1",
-    "typescript": "^5.4.5",
-    "vite": "^5.2.0",
-    "vite-plugin-dts": "^1.7.1"
-  },
   "exports": {
     ".": {
       "node": "./dist/renderer.cjs",
@@ -50,8 +35,11 @@
   "module": "./dist/renderer.js",
   "private": true,
   "scripts": {
-    "build": "microbundle src/{main,renderer,preload}.ts --target=node --format=esm,cjs  --sourcemap=false",
-    "dev": "microbundle src/{main,renderer,preload}.ts --target=node --format=esm,cjs  --sourcemap=false watch"
+    "dev": "vite build --watch --mode development",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@packages/toolbox": "*"
   },
   "source": "src/renderer.ts",
   "type": "module",
