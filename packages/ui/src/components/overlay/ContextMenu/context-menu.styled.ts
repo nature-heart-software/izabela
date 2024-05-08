@@ -9,13 +9,13 @@ import { rem } from 'polished'
 const { boxShadow, colors, borderWidth } = tokens
 
 export const StContextMenu = styled('div', props)`
-  ${ () => injectGlobal`
+  ${() => injectGlobal`
     [data-theme="context-menu"] {
-      box-shadow: ${ boxShadow.lg } !important;
-      border-color: ${ colors.gray['20'] } !important;
-      border-width: ${ rem(borderWidth.DEFAULT) };
+      box-shadow: ${boxShadow.lg} !important;
+      border-color: ${colors.gray['20']} !important;
+      border-width: ${rem(borderWidth.DEFAULT)};
       background-color: white;
-      ${ borderRadiusStyleBySize('md') }
-      min-width: ${ rem(150) };
-    }` }
+      ${borderRadiusStyleBySize('md')}
+      min-width: ${rem(150)};
+    }`}
 `

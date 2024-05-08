@@ -4,69 +4,69 @@ import { tokens } from '@/styles/tokens'
 import { props, Props, Size } from './button.shared'
 import { CSSObject } from '@/types/css-in-js'
 import {
-    borderRadiusStyleBySize,
-    fontSizeStyle,
-    horizontalPaddingStyleBySize,
-    horizontalPaddingWithIconStyleBySize,
-    iconStyleBySize,
+  borderRadiusStyleBySize,
+  fontSizeStyle,
+  horizontalPaddingStyleBySize,
+  horizontalPaddingWithIconStyleBySize,
+  iconStyleBySize,
 } from '@/utils/css-in-js'
 import { rem } from 'polished'
 
 const { spacing, borderWidth, fontSize, colors, transition, boxShadow } = tokens
 
 const styleBySize = ({ size, iconName }: Props) => {
-    const horizontalPadding = (
-        iconName
-            ? horizontalPaddingWithIconStyleBySize
-            : horizontalPaddingStyleBySize
-    )(size)
-    const borderRadius = borderRadiusStyleBySize(size)
-    const styles: Record<Size, CSSObject> = {
-        xs: {
-            ...fontSizeStyle(fontSize['1']),
-            ...borderRadius,
-            ...horizontalPadding,
-            height: rem(spacing['5']),
-        },
-        sm: {
-            ...fontSizeStyle(fontSize['1']),
-            ...borderRadius,
-            ...horizontalPadding,
-            height: rem(spacing['6']),
-        },
-        md: {
-            ...fontSizeStyle(fontSize['1']),
-            ...borderRadius,
-            ...horizontalPadding,
-            height: rem(spacing['7']),
-        },
-        lg: {
-            ...fontSizeStyle(fontSize['2']),
-            ...borderRadius,
-            ...horizontalPadding,
-            height: rem(spacing['8']),
-        },
-    }
-    return styles[size]
+  const horizontalPadding = (
+    iconName
+      ? horizontalPaddingWithIconStyleBySize
+      : horizontalPaddingStyleBySize
+  )(size)
+  const borderRadius = borderRadiusStyleBySize(size)
+  const styles: Record<Size, CSSObject> = {
+    xs: {
+      ...fontSizeStyle(fontSize['1']),
+      ...borderRadius,
+      ...horizontalPadding,
+      height: rem(spacing['5']),
+    },
+    sm: {
+      ...fontSizeStyle(fontSize['1']),
+      ...borderRadius,
+      ...horizontalPadding,
+      height: rem(spacing['6']),
+    },
+    md: {
+      ...fontSizeStyle(fontSize['1']),
+      ...borderRadius,
+      ...horizontalPadding,
+      height: rem(spacing['7']),
+    },
+    lg: {
+      ...fontSizeStyle(fontSize['2']),
+      ...borderRadius,
+      ...horizontalPadding,
+      height: rem(spacing['8']),
+    },
+  }
+  return styles[size]
 }
 
 const styleBySquared = ({ squared, size }: Props) => {
-    const styles: Record<Size, CSSObject> = {
-        xs: {
-            width: (squared && rem(spacing['5'])) || '',
-        },
-        sm: {
-            width: (squared && rem(spacing['6'])) || '',
-        },
-        md: {
-            width: (squared && rem(spacing['7'])) || '',
-        },
-        lg: {
-            width: (squared && rem(spacing['8'])) || '',
-        },
-    }
+  const styles: Record<Size, CSSObject> = {
+    xs: {
+      width: (squared && rem(spacing['5'])) || '',
+    },
+    sm: {
+      width: (squared && rem(spacing['6'])) || '',
+    },
+    md: {
+      width: (squared && rem(spacing['7'])) || '',
+    },
+    lg: {
+      width: (squared && rem(spacing['8'])) || '',
+    },
+  }
 
-    return styles[size]
+  return styles[size]
 }
 
 export const StButton = styled('button', props)`
@@ -75,147 +75,147 @@ export const StButton = styled('button', props)`
   display: inline-flex;
   align-items: center;
   font-weight: 600;
-  border-width: ${ () => rem(borderWidth.DEFAULT) };
+  border-width: ${() => rem(borderWidth.DEFAULT)};
   outline: 0;
-  transition: ${ () => transition.DEFAULT };
+  transition: ${() => transition.DEFAULT};
   overflow: hidden;
 
-  ${ ({ align = '' }) => align && `justify-content: ${ align };` }
-  ${ (props) => styleBySize(props) }
-    ${ ({ squared }) =>
+  ${({ align = '' }) => align && `justify-content: ${align};`}
+  ${(props) => styleBySize(props)}
+    ${({ squared }) =>
     squared &&
     `
         padding: 0;
         justify-content: center;
-    ` }
-    ${ (props) => styleBySquared(props) }
-    ${ ({ type, selected }) =>
+    `}
+    ${(props) => styleBySquared(props)}
+    ${({ type, selected }) =>
     [
-        type === 'default' &&
+      type === 'default' &&
         `
-            background-color: ${ colors.white };
-            border-color: ${ colors.gray['20'] };
+            background-color: ${colors.white};
+            border-color: ${colors.gray['20']};
             &:hover {
-                background-color: ${ colors.gray['10'] };
+                background-color: ${colors.gray['10']};
             }
 
             &:active {
-                background-color: ${ colors.gray['30'] };
+                background-color: ${colors.gray['30']};
             }
 
             &:focus {
-                box-shadow: 0 0 0 ${ rem(borderWidth.lg) } ${ colors.gray['10'] };
+                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${colors.gray['10']};
             }
 
-            ${ [
-            selected &&
-            `
-                    background-color: ${ colors.gray['20'] };
+            ${[
+              selected &&
+                `
+                    background-color: ${colors.gray['20']};
                 `,
-        ].filter(Boolean) }
+            ].filter(Boolean)}
         `,
-        type === 'active' &&
+      type === 'active' &&
         `
-            background-color: ${ colors.white };
-            border-color: ${ colors.gray['100'] };
-            border-width: ${ rem(2) };
+            background-color: ${colors.white};
+            border-color: ${colors.gray['100']};
+            border-width: ${rem(2)};
             &:hover {
-                background-color: ${ colors.gray['10'] };
+                background-color: ${colors.gray['10']};
             }
 
             &:active {
-                background-color: ${ colors.gray['30'] };
+                background-color: ${colors.gray['30']};
             }
 
             &:focus {
-                box-shadow: 0 0 0 ${ rem(borderWidth.lg) } ${ colors.gray['10'] };
+                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${colors.gray['10']};
             }
 
-            ${ [
-            selected &&
-            `
-                    background-color: ${ colors.gray['20'] };
+            ${[
+              selected &&
+                `
+                    background-color: ${colors.gray['20']};
                 `,
-        ].filter(Boolean) }
+            ].filter(Boolean)}
         `,
-        type === 'plain' &&
+      type === 'plain' &&
         `
-            color: ${ colors.white };
-            background-color: ${ colors.gray['100'] };
-            border-color: ${ colors.gray['100'] };
+            color: ${colors.white};
+            background-color: ${colors.gray['100']};
+            border-color: ${colors.gray['100']};
             &:hover {
-                border-color: ${ colors.gray['90'] };
-                background-color: ${ colors.gray['90'] };
+                border-color: ${colors.gray['90']};
+                background-color: ${colors.gray['90']};
             }
 
             &:active {
-                border-color: ${ colors.gray['70'] };
-                background-color: ${ colors.gray['70'] };
+                border-color: ${colors.gray['70']};
+                background-color: ${colors.gray['70']};
             }
 
             &:focus {
-                box-shadow: 0 0 0 ${ rem(borderWidth.lg) } ${ colors.gray['70'] };
+                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${colors.gray['70']};
             }
 
-            ${ [
-            selected &&
-            `
-                    border-color: ${ colors.gray['80'] };
-                    background-color: ${ colors.gray['80'] };
+            ${[
+              selected &&
+                `
+                    border-color: ${colors.gray['80']};
+                    background-color: ${colors.gray['80']};
                 `,
-        ].filter(Boolean) }
+            ].filter(Boolean)}
         `,
-        type === 'ghost' &&
-        `
-            background-color: transparent;
-            border-color: transparent;
-            &:hover {
-                background-color: ${ colors.gray['10'] };
-            }
-
-            &:active {
-                background-color: ${ colors.gray['30'] };
-            }
-
-            &:focus {
-                box-shadow: 0 0 0 ${ rem(borderWidth.lg) } ${ colors.gray['10'] };
-            }
-
-            ${ [
-            selected &&
-            `
-                    background-color: ${ colors.gray['20'] };
-                `,
-        ].filter(Boolean) }
-        `,
-        type === 'ghost-alt' &&
+      type === 'ghost' &&
         `
             background-color: transparent;
             border-color: transparent;
             &:hover {
-                background-color: ${ colors.gray['20'] };
+                background-color: ${colors.gray['10']};
             }
 
             &:active {
-                background-color: ${ colors.gray['30'] };
+                background-color: ${colors.gray['30']};
             }
 
             &:focus {
-                box-shadow: 0 0 0 ${ rem(borderWidth.lg) } ${ colors.gray['10'] };
+                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${colors.gray['10']};
             }
 
-            ${ [
-            selected &&
-            `
-                    box-shadow: ${ boxShadow.DEFAULT };
-                    background-color: ${ colors.gray['0'] };
+            ${[
+              selected &&
+                `
+                    background-color: ${colors.gray['20']};
                 `,
-        ].filter(Boolean) }
+            ].filter(Boolean)}
         `,
-    ].filter(Boolean) }
+      type === 'ghost-alt' &&
+        `
+            background-color: transparent;
+            border-color: transparent;
+            &:hover {
+                background-color: ${colors.gray['20']};
+            }
+
+            &:active {
+                background-color: ${colors.gray['30']};
+            }
+
+            &:focus {
+                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${colors.gray['10']};
+            }
+
+            ${[
+              selected &&
+                `
+                    box-shadow: ${boxShadow.DEFAULT};
+                    background-color: ${colors.gray['0']};
+                `,
+            ].filter(Boolean)}
+        `,
+    ].filter(Boolean)}
     .nv-button__icon {
     pointer-events: none;
-    ${ ({ squared }) => !squared && 'position: absolute;' }
-    ${ ({ size, squared }) => !squared && iconStyleBySize(size) }
+    ${({ squared }) => !squared && 'position: absolute;'}
+    ${({ size, squared }) => !squared && iconStyleBySize(size)}
   }
 `

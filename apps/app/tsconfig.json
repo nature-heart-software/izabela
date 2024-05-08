@@ -3,15 +3,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "src/*"
-      ],
-      "@root/*": [
-        "./*"
-      ]
+      "@/*": ["src/*"],
+      "@root/*": ["./*"]
     }
   },
-  "exclude": [
-    "src/**/{electron,node}/**/*.ts"
-  ]
+  "exclude": ["src/**/{electron,node}/**/*.ts"]
 }

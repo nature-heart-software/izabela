@@ -1,6 +1,6 @@
 // @ts-check
 
 /** @type {import("syncpack").RcFile} */
-const config = {};
+const config = {}
 
-module.exports = config;
+module.exports = config
