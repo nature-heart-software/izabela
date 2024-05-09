@@ -3,7 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 import dts from 'vite-plugin-dts'
 import { generateExportsPlugin } from '@packages/vite-plugin-generate-exports'
-import { getRootExternal } from '../../utils/vite'
+import { getFileName, getFormats, getRootExternal } from '../../utils/vite'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -26,15 +26,8 @@ export default defineConfig(({ mode }) => ({
     build: {
         lib: {
             entry: resolve(__dirname, 'src/main.ts'),
-            name: 'main',
-            formats: ['cjs', 'es'],
-            fileName: (format) =>
-                `main.${
-                    {
-                        cjs: 'cjs',
-                        es: 'js',
-                    }[format]
-                }`,
+            formats: getFormats(),
+            fileName: (...args) => getFileName(...args),
         },
         rollupOptions: {
             external: [
