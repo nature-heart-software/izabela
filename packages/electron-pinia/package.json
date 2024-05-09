@@ -1,6 +1,9 @@
 {
   "name": "@packages/electron-pinia",
   "version": "0.0.0",
+  "dependencies": {
+    "@packages/toolbox": "*"
+  },
   "exports": {
     ".": {
       "node": "./dist/renderer.cjs",
@@ -35,11 +38,8 @@
   "module": "./dist/renderer.js",
   "private": true,
   "scripts": {
-    "dev": "vite build --watch --mode development",
-    "build": "vite build"
-  },
-  "dependencies": {
-    "@packages/toolbox": "*"
+    "build": "vite build",
+    "dev": "vite build --watch --mode development"
   },
   "source": "src/renderer.ts",
   "type": "module",

@@ -1,6 +1,9 @@
 {
   "name": "@packages/vite-plugin-generate-exports",
   "version": "0.0.0",
+  "dependencies": {
+    "@packages/generate-exports": "*"
+  },
   "files": [
     "./dist"
   ],
@@ -8,11 +11,8 @@
   "module": "./dist/main.js",
   "private": true,
   "scripts": {
-    "dev": "vite build --watch --mode development",
-    "build": "vite build"
-  },
-  "dependencies": {
-    "@packages/generate-exports": "*"
+    "build": "vite build",
+    "dev": "vite build --watch --mode development"
   },
   "source": "src/main.ts",
   "type": "module",

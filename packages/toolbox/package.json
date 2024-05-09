@@ -1,6 +1,9 @@
 {
   "name": "@packages/toolbox",
   "version": "0.0.0",
+  "dependencies": {
+    "@packages/vite-plugin-generate-exports": "*"
+  },
   "files": [
     "./dist"
   ],
@@ -11,9 +14,6 @@
     "build": "vite build",
     "dev": "vite build --watch --mode development",
     "preview": "vite preview"
-  },
-  "dependencies": {
-    "@packages/vite-plugin-generate-exports": "*"
   },
   "type": "module",
   "types": "./dist/main.d.ts"

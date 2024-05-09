@@ -8,8 +8,8 @@
   "module": "./dist/main.js",
   "private": true,
   "scripts": {
-    "dev": "vite build --watch --mode development",
-    "build": "vite build"
+    "build": "vite build",
+    "dev": "vite build --watch --mode development"
   },
   "source": "src/main.ts",
   "type": "module",

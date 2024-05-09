@@ -47,6 +47,5 @@
   },
   "source": "src/main.ts",
   "type": "module",
-  "types": "./dist/main.d.ts",
-  "unpkg": "./dist/main.umd.js"
+  "types": "./dist/main.d.ts"
 }
