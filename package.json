@@ -124,7 +124,7 @@
     "vue": "^3.4.21",
     "vue-query": "^1.22.3",
     "vue-router": "^4.0.14",
-    "vue-tippy": "^6.0.0-alpha.63",
+    "vue-tippy": "^6.0.0-alpha.54",
     "vue-tsc": "^2.0.6",
     "vue3-moveable": "^0.11.2",
     "vue3-styled-components": "^1.2.1"

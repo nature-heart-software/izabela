@@ -19,7 +19,8 @@
     "@packages/electron-bridger": "0.0.0",
     "@packages/electron-pinia": "0.0.0",
     "@packages/toolbox": "0.0.0",
-    "@packages/ui": "0.0.0"
+    "@packages/ui": "0.0.0",
+    "electron": "20.3.8"
   },
   "main": "dist-electron/background.js",
   "private": true,
