@@ -174,7 +174,7 @@
     "docker:build": "docker build -t izabela . && docker create --name dummy izabela && docker cp dummy:dist_electron dist_electron && docker rm -f dummy",
     "install:deps": "yarn install && yarn build:deps",
     "patch": "yarn patch-package",
-    "postinstall": "yarn patch && electron-rebuild -f -w @packages/win-mouse"
+    "postinstall": "yarn patch && electron-rebuild -f -o @packages/win-mouse"
   },
   "workspaces": [
     "apps/*",
