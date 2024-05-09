@@ -18,19 +18,19 @@ const fallback = async (...args: unknown[]) => {
     }
 
 ;(async () => {
-    // try {
-    //   const gotTheLock = app.requestSingleInstanceLock()
-    //   if (!gotTheLock) {
-    //     console.log('App is already running, check the system tray.')
-    //     return app.quit()
-    //   }
-    import('./plugins')
-        .then(() => import('./app'))
-        .then((module) => module.default.start())
-    //     .catch(fallback)
-    // } catch (e) {
-    //   console.error(e)
-    //   await fallback()
-    // }
+    try {
+        const gotTheLock = app.requestSingleInstanceLock()
+        if (!gotTheLock) {
+            console.log('App is already running, check the system tray.')
+            return app.quit()
+        }
+        import('./plugins')
+            .then(() => import('./app'))
+            .then((module) => module.default.start())
+            .catch(fallback)
+    } catch (e) {
+        console.error(e)
+        await fallback()
+    }
     return null
 })()
