@@ -9,8 +9,8 @@
   "private": true,
   "scripts": {
     "build": "vite build",
-    "dev": "vite",
-    "preview": "vite preview"
+    "build:prod": "yarn build",
+    "dev": "vite build --watch --mode development"
   },
   "type": "module",
   "types": "./dist/animalese.d.ts"

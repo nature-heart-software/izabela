@@ -12,8 +12,8 @@
   "private": true,
   "scripts": {
     "build": "vite build",
-    "dev": "vite build --watch",
-    "preview": "vite preview"
+    "build:prod": "tsc && yarn build",
+    "dev": "vite build --watch --mode development"
   },
   "sideEffects": false,
   "type": "module",
