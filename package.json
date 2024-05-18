@@ -168,8 +168,8 @@
   },
   "scripts": {
     "build": "yarn install && yarn lerna run build",
-    "build:app": "yarn lerna run build --scope '{@packages/*,@apps/app-server,izabela-next}' --stream",
-    "build:deps": "yarn lerna run build --scope  '{@packages/*,@apps/app-server}' --stream",
+    "build:app": "yarn lerna run build --scope izabela-next --stream",
+    "build:deps": "yarn lerna run build --scope '{@packages/*,@apps/app-server}' --stream",
     "build:prod": "yarn lerna run build:prod --stream",
     "dev": "yarn lerna run dev --scope izabela-next --stream",
     "docker:build": "docker build -t izabela . && docker create --name dummy izabela && docker cp dummy:dist_electron dist_electron && docker rm -f dummy",

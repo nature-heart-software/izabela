@@ -30,4 +30,8 @@ COPY ./ ./
 
 COPY ./lerna.json.prod ./lerna.json
 
-RUN npm run build
+RUN yarn install
+
+RUN yarn build:deps
+
+RUN yarn build:app
