@@ -13,7 +13,7 @@ import { defineProps, ref, watch } from 'vue'
 import { StTooltip } from './tooltip.styled'
 import { props as propsDefinition } from './tooltip.shared'
 import { Tippy, TippyInstance, TippyOptions } from 'vue-tippy'
-import tokens from '@/styles/tokens'
+import { tokens } from '@/styles/tokens'
 import { MaybeElement, useFocusWithin } from '@vueuse/core'
 
 const props = defineProps(propsDefinition)

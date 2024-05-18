@@ -2,7 +2,7 @@
 import styled from 'vue3-styled-components'
 import { defaultWidth, props, Props, Size } from './autocomplete.shared'
 import { rem } from 'polished'
-import tokens from '@/styles/tokens'
+import { tokens } from '@/styles/tokens'
 import { borderRadiusStyleBySize } from '@/utils/css-in-js'
 import { CSSObject } from '@/types/css-in-js'
 

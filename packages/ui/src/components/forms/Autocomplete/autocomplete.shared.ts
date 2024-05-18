@@ -1,9 +1,9 @@
 import { ExtractPropTypes, PropType } from 'vue'
-import tokens from '@/styles/tokens'
+import { tokens } from '@/styles/tokens'
 import { ComputePositionConfig } from '@floating-ui/vue'
 
 export const sizeValues = ['sm', 'md', 'lg'] as const
-export type Size = typeof sizeValues[number]
+export type Size = (typeof sizeValues)[number]
 export const defaultWidth = 300 as const
 
 export const props = {

@@ -1,11 +1,11 @@
-const { tailwindTheme } = require('@packages/ui/dist/main.cjs')
+const {tailwindTheme} = require('@packages/design-tokens')
 
 module.exports = {
-  content: ['./src/**/*.{vue,html,js,ts,scss}'],
-  theme: {
-    extend: {
-      ...tailwindTheme,
+    content: ['./src/**/*.{vue,html,js,ts,scss}'],
+    theme: {
+        extend: {
+            ...tailwindTheme,
+        },
     },
-  },
-  plugins: [],
+    plugins: [],
 }

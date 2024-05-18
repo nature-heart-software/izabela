@@ -8,9 +8,10 @@ import { gkl, keybindingReleased, keybindingTriggered } from '@/modules/electron
 import { Deferred } from '@packages/toolbox'
 import { useSettingsStore } from '@/features/settings/store'
 import { watch } from 'vue'
-import electronNativeSpeechRecognition from '@/teams/speech-worker/modules/electron-native-speech-recognition'
+import electronNativeSpeechRecognition
+  from '@/teams/speech-worker/modules/electron-native-speech-recognition'
 import ElectronWindowManager from '@/modules/electron-window-manager'
-import { mapValues } from 'lodash'
+import mapValues from 'lodash/mapValues'
 import { getTime } from '@/utils/time'
 import { windowHeight, windowWidth } from '@/teams/speech-worker/electron/const'
 import { getTopLeftWindow } from '@/electron/utils'
@@ -38,10 +39,10 @@ export const ElectronSpeechWindow = () => {
   }
 
   const transcribeAudio = async ({
-    content,
-    sampleRate,
-    encoding,
-  }: {
+                                   content,
+                                   sampleRate,
+                                   encoding,
+                                 }: {
     content: string
     sampleRate: number
     encoding: any
@@ -84,8 +85,8 @@ export const ElectronSpeechWindow = () => {
     if (window) {
       const topLeftDisplay = getTopLeftWindow()
       window.setPosition(
-        (topLeftDisplay?.bounds.x ?? 0) - windowWidth,
-        (topLeftDisplay?.bounds.y ?? 0) - windowHeight,
+        (topLeftDisplay?.bounds.x ?? 0)-windowWidth,
+        (topLeftDisplay?.bounds.y ?? 0)-windowHeight,
       )
     }
   }
@@ -96,7 +97,7 @@ export const ElectronSpeechWindow = () => {
       const allDisplays = screen.getAllDisplays()
       const primaryDisplay = screen.getPrimaryDisplay()
       const display = allDisplays.find((d) => d.id === settingsStore?.display) || primaryDisplay
-      const displayBounds = mapValues(display.bounds, (v) => v + 24)
+      const displayBounds = mapValues(display.bounds, (v) => v+24)
       window.setPosition(displayBounds.x, displayBounds.y)
     }
   }
@@ -116,7 +117,7 @@ export const ElectronSpeechWindow = () => {
         keybindingTriggered(settingsStore.keybindings.recordAudio)
       ) {
         deferredRecording = Deferred()
-        console.log(`[${getTime()}] Starting recording`)
+        console.log(`[${ getTime() }] Starting recording`)
         speechRecognitionStore?.$patch({
           recording: true,
         })
@@ -134,7 +135,7 @@ export const ElectronSpeechWindow = () => {
       ) {
         deferredRecording.resolve(true)
         deferredRecording = null
-        console.log(`[${getTime()}] Stopping recording`)
+        console.log(`[${ getTime() }] Stopping recording`)
         speechRecognitionStore?.$patch({
           recording: false,
         })

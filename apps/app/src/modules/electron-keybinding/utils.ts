@@ -1,7 +1,9 @@
 import nativeKeymap from '@packages/native-keymap'
 import { Key } from '@/types/keybinds'
 import { GlobalKeyboardListener, IGlobalKeyEvent } from 'node-global-key-listener'
-import { entries, keyBy, map } from 'lodash'
+import entries from 'lodash/entries'
+import keyBy from 'lodash/keyBy'
+import map from 'lodash/map'
 
 export const gkl = typeof window === 'undefined' ? new GlobalKeyboardListener() : undefined
 

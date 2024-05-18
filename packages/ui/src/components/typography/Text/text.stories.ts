@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import tokens from '@/styles/tokens'
+import { tokens } from '@/styles/tokens'
 import { Story } from '@storybook/vue3'
 import { props, typeValues } from '@/components/typography/Text/text.shared'
 import { NvText } from '@/components'

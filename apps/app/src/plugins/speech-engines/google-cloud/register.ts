@@ -1,5 +1,5 @@
 import { api } from '@/services'
-import { pick } from 'lodash'
+import pick from 'lodash/pick'
 import { registerEngine } from '@/modules/speech-engine-manager'
 import { useSpeechStore } from '@/features/speech/store'
 import NvVoiceSelect from './NvVoiceSelect.vue'

@@ -1,6 +1,6 @@
 import ElectronWindowManager from '@/modules/electron-window-manager'
-import { throttle } from 'lodash'
-import { BrowserWindow, screen, shell } from 'electron'
+import throttle from 'lodash/throttle'
+import { BrowserWindow, screen } from 'electron'
 import { useSettingsStore } from '@/features/settings/store'
 import { Deferred } from '@packages/toolbox'
 import ffi from 'ffi-napi'
@@ -149,10 +149,10 @@ export const ElectronOverlayWindow = () => {
               hasRightAlt && hasShift
                 ? nativeKey.withShiftAltGr
                 : hasRightAlt
-                ? nativeKey.withAltGr
-                : hasShift
-                ? nativeKey.withShift
-                : nativeKey.value
+                  ? nativeKey.withAltGr
+                  : hasShift
+                    ? nativeKey.withShift
+                    : nativeKey.value
             if (key) {
               emitIPCOverlayInputCharacter(key)
             }

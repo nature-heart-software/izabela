@@ -1,6 +1,6 @@
 import ready from '@ryanmorr/ready'
 import { v4 as uuid } from 'uuid'
-import { throttle } from 'lodash'
+import throttle from 'lodash/throttle'
 import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
 import { useDevicePixelRatio } from '@vueuse/core'
 

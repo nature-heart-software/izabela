@@ -3,7 +3,7 @@ import styled, { injectGlobal } from 'vue3-styled-components'
 import { props } from './tooltip.shared'
 import { borderRadiusStyleBySize } from '@/utils/css-in-js'
 
-import tokens from '@/styles/tokens'
+import { tokens } from '@/styles/tokens'
 import { rem } from 'polished'
 
 const { boxShadow, colors, borderWidth, spacing } = tokens

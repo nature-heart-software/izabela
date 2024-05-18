@@ -2,7 +2,7 @@ import { app, BrowserWindow, protocol } from 'electron'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import path from 'path'
 import server from '@apps/app-server'
-import electronPiniaPlugin from '@packages/electron-pinia/dist/main'
+import { electronPiniaPlugin } from '@packages/electron-pinia/main'
 import { createApp, h } from 'vue'
 import { createPinia } from 'pinia'
 import createTray from '@/teams/tray/electron-tray'
@@ -20,7 +20,7 @@ import { destroyWinMouse } from '@/modules/node-mouse'
 import { createOverlayWindow } from '@/teams/overlay/electron/background'
 
 const App = () => {
-  const isDevelopment = process.env.NODE_ENV !== 'production'
+  const isDevelopment = import.meta.env.DEV
   const createWindows = () =>
     app
       .whenReady()
@@ -33,16 +33,16 @@ const App = () => {
       )
 
   const registerElectronPinia = () => {
-    createApp(h({})).use(createPinia().use(electronPiniaPlugin()))
+    createApp(h({})).use(createPinia().use((electronPiniaPlugin.default || electronPiniaPlugin)()))
   }
 
   const startAppServer = async () =>
     app.whenReady().then(async () =>
       server.start({
         tempPath: path.join(app.getPath('userData'), 'temp'),
-        port: process.env.VUE_APP_SERVER_PORT,
+        port: import.meta.env.VITE_SERVER_PORT,
         ws: {
-          port: process.env.VUE_APP_SERVER_WS_PORT,
+          port: import.meta.env.VITE_SERVER_WS_PORT,
         },
       }),
     )
@@ -90,7 +90,7 @@ const App = () => {
     })
 
     app.on('ready', async () => {
-      if (isDevelopment && !process.env.IS_TEST) {
+      if (isDevelopment) {
         try {
           await installExtension(VUEJS3_DEVTOOLS)
         } catch (e) {

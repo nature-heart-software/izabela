@@ -1,29 +1,20 @@
 {
   "name": "@packages/toolbox",
-  "private": true,
   "version": "0.0.0",
-  "type": "module",
+  "dependencies": {
+    "@packages/vite-plugin-generate-exports": "*"
+  },
   "files": [
     "./dist"
   ],
   "main": "./dist/main.cjs",
-  "module": "./dist/main.es.js",
-  "types": "./dist/main.d.ts",
+  "module": "./dist/main.js",
+  "private": true,
   "scripts": {
-    "dev": "vite build --watch --mode development",
     "build": "vite build",
-    "preview": "vite preview"
+    "build:prod": "tsc && yarn build",
+    "dev": "vite build --watch --mode development"
   },
-  "peerDependencies": {
-    "vue": "3.x"
-  },
-  "devDependencies": {
-    "@ungap/structured-clone": "^1.0.1",
-    "@packages/vite-plugin-generate-exports": "^0.0.0",
-    "vite-plugin-dts": "^1.5.0",
-    "@vitejs/plugin-vue": "^3.1.0",
-    "typescript": "^4.6.4",
-    "vite": "^3.1.0",
-    "vue-tsc": "^0.40.4"
-  }
+  "type": "module",
+  "types": "./dist/main.d.ts"
 }

@@ -8,7 +8,7 @@
 </template>
 <script lang="ts" setup>
 import { computed, defineProps } from 'vue'
-import tokens from '@/styles/tokens'
+import { tokens } from '@/styles/tokens'
 import { props as propsDefinition } from './icon.shared'
 import * as Icons from '@packages/icons'
 

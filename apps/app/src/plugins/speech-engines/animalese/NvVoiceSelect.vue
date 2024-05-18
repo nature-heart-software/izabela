@@ -28,7 +28,7 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { NvButton, NvSelect } from '@packages/ui'
-import { xor } from 'lodash'
+import xor from 'lodash/xor'
 import { groupOptions } from '@/utils/select'
 import { getProperty, setProperty } from './store'
 import { defaultVoice, getVoiceCategory, getVoiceId, getVoiceName } from './shared'

@@ -1,6 +1,6 @@
 import { ExtractPropTypes, PropType } from 'vue'
 import { Properties } from 'csstype'
-import tokens from '@/styles/tokens'
+import { tokens } from '@/styles/tokens'
 
 export const typeValues = [
   'caption',
@@ -10,7 +10,7 @@ export const typeValues = [
   'subtitle',
   'title',
 ] as const
-export type Type = typeof typeValues[number]
+export type Type = (typeof typeValues)[number]
 
 export const props = {
   size: {

@@ -5,7 +5,7 @@
 import { NvSelect } from '@packages/ui'
 import { computed } from 'vue'
 import { useSpeechEngineManager } from '@/modules/speech-engine-manager'
-import { orderBy } from 'lodash'
+import orderBy from 'lodash/orderBy'
 import { groupOptions } from '@/utils/select'
 import { capitalize } from '@/utils/text'
 

@@ -1,4 +1,4 @@
-import tokens from '@/styles/tokens'
+import { tokens } from '@/styles/tokens'
 import { ExtractPropTypes, PropType } from 'vue'
 
 export const props = {

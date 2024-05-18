@@ -4,7 +4,7 @@ import { props, Props, Size } from './popover.shared'
 import { borderRadiusStyleBySize, paddingStyleBySize } from '@/utils/css-in-js'
 import { CSSObject } from '@/types/css-in-js'
 
-import tokens from '@/styles/tokens'
+import { tokens } from '@/styles/tokens'
 import { rem } from 'polished'
 
 const { boxShadow, colors, borderWidth } = tokens

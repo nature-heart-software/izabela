@@ -96,7 +96,7 @@ import { computed, defineProps, onBeforeUnmount, ref } from 'vue'
 import { useFocusTrap } from '@vueuse/integrations/useFocusTrap'
 import { useFuse, UseFuseOptions } from '@vueuse/integrations/useFuse'
 import { onClickOutside, onKeyStroke } from '@vueuse/core'
-import tokens from '@/styles/tokens'
+import { tokens } from '@/styles/tokens'
 import {
   StSelect,
   StSelectIcon,
@@ -117,7 +117,9 @@ import NvTag from '@/components/forms/Tag/NvTag.vue'
 import NvGroup from '@/components/miscellaneous/Group/NvGroup.vue'
 import NvStack from '@/components/miscellaneous/Stack/NvStack.vue'
 import NvOption from './NvOption.vue'
-import { flatten, get, omit } from 'lodash'
+import flatten from 'lodash/flatten'
+import get from 'lodash/get'
+import omit from 'lodash/omit'
 import { v4 as uuid } from 'uuid'
 
 const props = defineProps(propsDefinition)

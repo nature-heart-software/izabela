@@ -1,5 +1,5 @@
 /* High priority plugins */
-import '@packages/electron-pinia/dist/preload'
+import '@packages/electron-pinia/preload'
 import '@/modules/electron-log/preload'
 /* Other plugins */
 import { ipcRenderer } from 'electron-postman'

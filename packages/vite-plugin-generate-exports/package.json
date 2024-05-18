@@ -1,27 +1,21 @@
 {
   "name": "@packages/vite-plugin-generate-exports",
-  "private": true,
   "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "build": "microbundle --target=node",
-    "dev": "microbundle --target=node watch"
+  "dependencies": {
+    "@packages/generate-exports": "*"
   },
-  "source": "src/main.ts",
-  "main": "./dist/main.cjs",
-  "module": "./dist/main.es.js",
-  "unpkg": "./dist/main.umd.js",
-  "types": "./dist/main.d.ts",
   "files": [
     "./dist"
   ],
-  "dependencies": {
-    "@packages/generate-exports": "^0.0.0"
+  "main": "./dist/main.cjs",
+  "module": "./dist/main.js",
+  "private": true,
+  "scripts": {
+    "build": "vite build",
+    "build:prod": "tsc && yarn build",
+    "dev": "vite build --watch --mode development"
   },
-  "devDependencies": {
-    "microbundle": "^0.15.1",
-    "typescript": "^4.6.4",
-    "vite": "^3.0.0",
-    "vite-plugin-dts": "^1.4.1"
-  }
+  "source": "src/main.ts",
+  "type": "module",
+  "types": "./dist/main.d.ts"
 }

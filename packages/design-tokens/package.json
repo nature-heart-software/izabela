@@ -1,0 +1,14 @@
+{
+  "name": "@packages/design-tokens",
+  "version": "0.0.0",
+  "main": "./dist/main.cjs",
+  "module": "./dist/main.js",
+  "private": true,
+  "scripts": {
+    "build": "vite build",
+    "build:prod": "tsc && yarn build",
+    "dev": "vite build --watch --mode development"
+  },
+  "type": "module",
+  "types": "./dist/main.d.ts"
+}

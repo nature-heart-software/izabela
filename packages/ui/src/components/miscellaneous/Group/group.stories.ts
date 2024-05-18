@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { Story } from '@storybook/vue3'
-import tokens from '@/styles/tokens'
+import { tokens } from '@/styles/tokens'
 import { NvButton, NvGroup } from '@/components'
 
 import {

@@ -1,6 +1,6 @@
 /* eslint-disable */
 import styled from 'vue3-styled-components'
-import tokens from '@/styles/tokens'
+import { tokens } from '@/styles/tokens'
 import { props } from './group.shared'
 import { rem } from 'polished'
 
@@ -27,10 +27,10 @@ export const StGroup = styled('div', props)`
     direction === 'column' && grow
       ? 'stretch'
       : direction === 'column'
-      ? justify === 'apart'
-        ? POSITIONS['left']
-        : POSITIONS[justify]
-      : align};
+        ? justify === 'apart'
+          ? POSITIONS['left']
+          : POSITIONS[justify]
+        : align};
   gap: ${({ spacing: spacingKey }) => rem(spacing[spacingKey])};
 
   & > * {
