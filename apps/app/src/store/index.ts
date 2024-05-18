@@ -7,7 +7,10 @@ export const pinia = createPinia().use(electronPiniaPlugin())
 /* ensures pinia is always available */
 createApp(h({})).use(pinia)
 
-export const definePluginStore = <S extends Record<any, any>>(id: string, state: S) => {
+export const definePluginStore = <S extends Record<any, any>>(
+  id: string,
+  state: S,
+) => {
   const usePluginStore = defineStore(
     `plugin-${id}`,
     () => {

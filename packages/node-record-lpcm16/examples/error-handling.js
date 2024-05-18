@@ -8,11 +8,12 @@ const file = fs.createWriteStream('test.wav', { encoding: 'binary' })
 // this will throw synchronously when the recorder does not exist
 const recording = recorder.record({
   recorder: 'sox',
-  device: 'does-not-exist'
+  device: 'does-not-exist',
 })
 
-recording.stream()
-  .on('error', err => {
+recording
+  .stream()
+  .on('error', (err) => {
     console.error('recoder threw an erorr:', err)
   })
   .pipe(file)

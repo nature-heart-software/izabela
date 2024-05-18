@@ -1,13 +1,19 @@
 import nativeKeymap from '@packages/native-keymap'
 import { Key } from '@/types/keybinds'
-import { GlobalKeyboardListener, IGlobalKeyEvent } from 'node-global-key-listener'
+import {
+  GlobalKeyboardListener,
+  IGlobalKeyEvent,
+} from 'node-global-key-listener'
 import entries from 'lodash/entries'
 import keyBy from 'lodash/keyBy'
 import map from 'lodash/map'
 
-export const gkl = typeof window === 'undefined' ? new GlobalKeyboardListener() : undefined
+export const gkl =
+  typeof window === 'undefined' ? new GlobalKeyboardListener() : undefined
 
-export const down: Partial<Record<IGlobalKeyEvent['rawKey']['_nameRaw'], boolean>> = {}
+export const down: Partial<
+  Record<IGlobalKeyEvent['rawKey']['_nameRaw'], boolean>
+> = {}
 
 // Makes sure down is reset when a shortcut is triggered
 export const handleShortcut = <C extends (...args: any[]) => void>(c: C) => {
@@ -51,14 +57,18 @@ const keymap = keyBy(
 const keymapByVKey = Object.fromEntries(
   entries(nativeKeymap.getKeyMap()).map(([code, value]) => [
     keyCodeMap[code] ||
-      ('vkey' in value ? (value as typeof value & { vkey: string }).vkey : undefined),
+      ('vkey' in value
+        ? (value as typeof value & { vkey: string }).vkey
+        : undefined),
     {
       ...value,
       code,
       // fixes vkey where ShiftLeft in native-keymap is VK_SHIFT but in gkl it's Vk_LSHIFT, etc.
       vkey:
         keyCodeMap[code] ||
-        ('vkey' in value ? (value as typeof value & { vkey: string }).vkey : undefined),
+        ('vkey' in value
+          ? (value as typeof value & { vkey: string }).vkey
+          : undefined),
     },
   ]),
 )

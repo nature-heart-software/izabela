@@ -4,17 +4,24 @@
     :options="options"
     v-bind="{
       modelValue: getProperty('selectedVoice'),
-      'onUpdate:modelValue': (value) => setProperty('selectedVoice', purify(value)),
+      'onUpdate:modelValue': (value) =>
+        setProperty('selectedVoice', purify(value)),
       ...$attrs,
     }"
     valueKey="name"
   >
     <template #optionAfter="{ option, hover }">
-      <span v-show="(!option.children && hover) || favoriteVoiceIds.includes(option.id)">
+      <span
+        v-show="
+          (!option.children && hover) || favoriteVoiceIds.includes(option.id)
+        "
+      >
         <NvButton
           :icon-name="favoriteVoiceIds.includes(option.id) ? 'times' : 'heart'"
           :title="
-            favoriteVoiceIds.includes(option.id) ? 'Remove from favorites' : 'Add to favorites'
+            favoriteVoiceIds.includes(option.id)
+              ? 'Remove from favorites'
+              : 'Add to favorites'
           "
           size="sm"
           type="default"
@@ -33,7 +40,12 @@ import { NvButton, NvSelect } from '@packages/ui'
 import { groupOptions } from '@/utils/select'
 import xor from 'lodash/xor'
 import { purify } from '@packages/toolbox'
-import { getVoiceCategory, getVoiceId, getVoiceName, LIST_VOICES_QUERY_KEY } from './shared'
+import {
+  getVoiceCategory,
+  getVoiceId,
+  getVoiceName,
+  LIST_VOICES_QUERY_KEY,
+} from './shared'
 import { useListVoicesQuery } from './hooks'
 
 import { getProperty, setProperty } from './store'
@@ -58,7 +70,10 @@ const getOptionFromVoice = (voice: any) => ({
 })
 
 const options = computed(() => {
-  const localOptions = groupOptions(voices.value.map(getOptionFromVoice), 'category')
+  const localOptions = groupOptions(
+    voices.value.map(getOptionFromVoice),
+    'category',
+  )
   const favoriteVoiceIds = getProperty('favoriteVoiceIds')
   if (favoriteVoiceIds) {
     const favoriteVoices = voices.value.filter((voice: any) =>
@@ -74,9 +89,15 @@ const options = computed(() => {
   return localOptions
 })
 
-const favoriteVoiceIds = computed<string[]>(() => getProperty('favoriteVoiceIds'))
+const favoriteVoiceIds = computed<string[]>(() =>
+  getProperty('favoriteVoiceIds'),
+)
 watch(
-  () => [canFetch.value, computedParams.value.credentials, computedParams.value.endpoint],
+  () => [
+    canFetch.value,
+    computedParams.value.credentials,
+    computedParams.value.endpoint,
+  ],
   () => canFetch.value && queryClient.refetchQueries(LIST_VOICES_QUERY_KEY),
   {
     deep: true,

@@ -21,11 +21,18 @@ registerEngine({
   getCredentials,
   hasCredentials() {
     const speechStore = useSpeechStore()
-    return speechStore.hasUniversalApiCredentials || Object.values(getCredentials()).every(Boolean)
+    return (
+      speechStore.hasUniversalApiCredentials ||
+      Object.values(getCredentials()).every(Boolean)
+    )
   },
   getPayload({ text, translatedText, voice: v }) {
     const selectedVoice = getSelectedVoice()
-    const voice: any = pick(v || selectedVoice, ['name', 'ssmlGender', 'languageCode'])
+    const voice: any = pick(v || selectedVoice, [
+      'name',
+      'ssmlGender',
+      'languageCode',
+    ])
     // eslint-disable-next-line prefer-destructuring
     voice.languageCode = selectedVoice.languageCodes[0]
     return {
@@ -43,7 +50,9 @@ registerEngine({
     return (voice || getSelectedVoice()).languageCodes[0]
   },
   synthesizeSpeech({ credentials, payload }) {
-    return api(getProperty('useLocalCredentials') ? 'local' : 'remote').post<Blob>(
+    return api(
+      getProperty('useLocalCredentials') ? 'local' : 'remote',
+    ).post<Blob>(
       '/tts/google-cloud/synthesize-speech',
       {
         credentials,

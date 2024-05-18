@@ -35,7 +35,7 @@ export default () => {
   }[] = []
 
   const onRecorderError = (err: Error) => {
-    console.error(`Audio recording error ${ err }`)
+    console.error(`Audio recording error ${err}`)
   }
 
   function recorderCleanup() {
@@ -67,7 +67,7 @@ export default () => {
       .on('data', onRecognizeStreamData)
 
     function onRecognizeStreamError(err: Error) {
-      console.error(`API request error ${ err }`)
+      console.error(`API request error ${err}`)
       deferredMessage.resolve('')
     }
 
@@ -119,20 +119,28 @@ export default () => {
       const pendingMessage = pendingMessages.find((m) => m.id === id)
       if (pendingMessage) {
         const index = pendingMessages.indexOf(pendingMessage)
-        if (pendingMessages[index-1]) {
-          pendingMessages[index-1].message.then(() => {
+        if (pendingMessages[index - 1]) {
+          pendingMessages[index - 1].message.then(() => {
             if (messageWithoutProfanityFilter)
-              ipcMain.sendTo('speech-worker', 'say', messageWithoutProfanityFilter)
+              ipcMain.sendTo(
+                'speech-worker',
+                'say',
+                messageWithoutProfanityFilter,
+              )
             pendingMessages.splice(pendingMessages.indexOf(pendingMessage), 1)
           })
           // if previous stream failed because nothing was recognized, resolve it
-          if (!pendingMessages[index-1].currentTranscript) {
-            pendingMessages[index-1].resolve('')
-            pendingMessages.splice(index-1, 1)
+          if (!pendingMessages[index - 1].currentTranscript) {
+            pendingMessages[index - 1].resolve('')
+            pendingMessages.splice(index - 1, 1)
           }
         } else {
           if (messageWithoutProfanityFilter)
-            ipcMain.sendTo('speech-worker', 'say', messageWithoutProfanityFilter)
+            ipcMain.sendTo(
+              'speech-worker',
+              'say',
+              messageWithoutProfanityFilter,
+            )
           pendingMessages.splice(pendingMessages.indexOf(pendingMessage), 1)
         }
       }
@@ -154,13 +162,16 @@ export default () => {
 
   function stopStream() {
     audioInput = []
-    pendingMessages[pendingMessages.length-1]?.end()
+    pendingMessages[pendingMessages.length - 1]?.end()
     // endOnNextChunk = true
   }
 
   const audioInputStreamTransform = new Writable({
     write(chunk, _encoding, next) {
-      audioInput = [...takeRight(audioInput, settingsStore.soxPreRecordingChunks), chunk]
+      audioInput = [
+        ...takeRight(audioInput, settingsStore.soxPreRecordingChunks),
+        chunk,
+      ]
       next()
     },
     final() {

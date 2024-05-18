@@ -1,6 +1,6 @@
 const path = require('path')
 
-function load (recorderName) {
+function load(recorderName) {
   try {
     const recoderPath = path.resolve(__dirname, recorderName)
     return require(recoderPath)
@@ -14,5 +14,5 @@ function load (recorderName) {
 }
 
 module.exports = {
-  load
+  load,
 }

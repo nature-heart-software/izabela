@@ -6,7 +6,7 @@ const { spawn } = require('child_process')
 const recorders = require('./recorders')
 
 class Recording {
-  constructor (options = {}) {
+  constructor(options = {}) {
     const defaults = {
       sampleRate: 16000,
       channels: 1,
@@ -30,19 +30,22 @@ class Recording {
 
     this.cmd = cmd
     this.args = args
-    this.cmdOptions = Object.assign({ encoding: 'binary', stdio: 'pipe' }, spawnOptions)
+    this.cmdOptions = Object.assign(
+      { encoding: 'binary', stdio: 'pipe' },
+      spawnOptions,
+    )
 
     debug(`Started recording`)
     debug(this.options)
 
-    const command = ` ${this.cmd} ${this.args.join(' ')}`;
-    debug(command);
-    console.log('Running SOX', command);
+    const command = ` ${this.cmd} ${this.args.join(' ')}`
+    debug(command)
+    console.log('Running SOX', command)
 
     return this.start()
   }
 
-  start () {
+  start() {
     const { cmd, args, cmdOptions } = this
 
     const cp = spawn(cmd, args, cmdOptions)
@@ -52,19 +55,21 @@ class Recording {
     this.process = cp // expose child process
     this._stream = rec // expose output stream
 
-    cp.on('close', code => {
+    cp.on('close', (code) => {
       if (code === 0) return
-      rec.emit('error', `${this.cmd} has exited with error code ${code}.
+      rec.emit(
+        'error',
+        `${this.cmd} has exited with error code ${code}.
 
-Enable debugging with the environment variable DEBUG=record.`
+Enable debugging with the environment variable DEBUG=record.`,
       )
     })
 
-    err.on('data', chunk => {
+    err.on('data', (chunk) => {
       debug(`STDERR: ${chunk}`)
     })
 
-    rec.on('data', chunk => {
+    rec.on('data', (chunk) => {
       debug(`Recording ${chunk.length} bytes`)
     })
 
@@ -75,13 +80,13 @@ Enable debugging with the environment variable DEBUG=record.`
     return this
   }
 
-  stop () {
+  stop() {
     assert(this.process, 'Recording not yet started')
 
     this.process.kill()
   }
 
-  pause () {
+  pause() {
     assert(this.process, 'Recording not yet started')
 
     this.process.kill('SIGSTOP')
@@ -89,7 +94,7 @@ Enable debugging with the environment variable DEBUG=record.`
     debug('Paused recording')
   }
 
-  resume () {
+  resume() {
     assert(this.process, 'Recording not yet started')
 
     this.process.kill('SIGCONT')
@@ -97,13 +102,13 @@ Enable debugging with the environment variable DEBUG=record.`
     debug('Resumed recording')
   }
 
-  isPaused () {
+  isPaused() {
     assert(this.process, 'Recording not yet started')
 
     return this._stream.isPaused()
   }
 
-  stream () {
+  stream() {
     assert(this._stream, 'Recording not yet started')
 
     return this._stream
@@ -111,5 +116,5 @@ Enable debugging with the environment variable DEBUG=record.`
 }
 
 module.exports = {
-  record: (...args) => new Recording(...args)
+  record: (...args) => new Recording(...args),
 }

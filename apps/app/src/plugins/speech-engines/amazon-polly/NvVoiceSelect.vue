@@ -4,17 +4,24 @@
     :options="options"
     v-bind="{
       modelValue: getProperty('selectedVoice'),
-      'onUpdate:modelValue': (value) => setProperty('selectedVoice', purify(value)),
+      'onUpdate:modelValue': (value) =>
+        setProperty('selectedVoice', purify(value)),
       ...$attrs,
     }"
     valueKey="Id"
   >
     <template #optionAfter="{ option, hover }">
-      <span v-show="(!option.children && hover) || favoriteVoiceIds.includes(option.id)">
+      <span
+        v-show="
+          (!option.children && hover) || favoriteVoiceIds.includes(option.id)
+        "
+      >
         <NvButton
           :icon-name="favoriteVoiceIds.includes(option.id) ? 'times' : 'heart'"
           :title="
-            favoriteVoiceIds.includes(option.id) ? 'Remove from favorites' : 'Add to favorites'
+            favoriteVoiceIds.includes(option.id)
+              ? 'Remove from favorites'
+              : 'Add to favorites'
           "
           size="sm"
           type="default"
@@ -36,7 +43,12 @@ import { NvButton, NvSelect } from '@packages/ui'
 import { useSpeechStore } from '@/features/speech/store'
 import { groupOptions } from '@/utils/select'
 import { useListVoicesQuery } from './hooks'
-import { getVoiceCategory, getVoiceId, getVoiceName, LIST_VOICES_QUERY_KEY } from './shared'
+import {
+  getVoiceCategory,
+  getVoiceId,
+  getVoiceName,
+  LIST_VOICES_QUERY_KEY,
+} from './shared'
 import { getProperty, setProperty } from './store'
 
 const queryClient = useQueryClient()
@@ -57,7 +69,9 @@ const canFetch = computed(
 const { data, isFetching } = useListVoicesQuery(computedParams, {
   enabled: canFetch,
 })
-const voices = computed(() => orderBy(data.value || [], ['LanguageCode', 'Name']))
+const voices = computed(() =>
+  orderBy(data.value || [], ['LanguageCode', 'Name']),
+)
 const getOptionFromVoice = (voice: any) => ({
   id: getVoiceId(voice),
   label: getVoiceName(voice),
@@ -66,7 +80,10 @@ const getOptionFromVoice = (voice: any) => ({
 })
 
 const options = computed(() => {
-  const localOptions = groupOptions(voices.value.map(getOptionFromVoice), 'category')
+  const localOptions = groupOptions(
+    voices.value.map(getOptionFromVoice),
+    'category',
+  )
   const favoriteVoiceIds = getProperty('favoriteVoiceIds')
   if (favoriteVoiceIds) {
     const favoriteVoices = voices.value.filter((voice: any) =>
@@ -82,7 +99,9 @@ const options = computed(() => {
   return localOptions
 })
 
-const favoriteVoiceIds = computed<string[]>(() => getProperty('favoriteVoiceIds'))
+const favoriteVoiceIds = computed<string[]>(() =>
+  getProperty('favoriteVoiceIds'),
+)
 
 watch(
   () => [getProperty('identityPoolId', true), getProperty('region')],

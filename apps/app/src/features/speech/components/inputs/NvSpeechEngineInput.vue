@@ -40,8 +40,21 @@
   </NvAutocomplete>
 </template>
 <script lang="ts" setup>
-import { NvAutocomplete, NvGroup, NvInput, NvOption, NvText } from '@packages/ui'
-import { computed, defineEmits, defineExpose, defineProps, ref, watch } from 'vue'
+import {
+  NvAutocomplete,
+  NvGroup,
+  NvInput,
+  NvOption,
+  NvText,
+} from '@packages/ui'
+import {
+  computed,
+  defineEmits,
+  defineExpose,
+  defineProps,
+  ref,
+  watch,
+} from 'vue'
 import { getEngineById } from '@/modules/speech-engine-manager'
 import { useFuse, UseFuseOptions } from '@vueuse/integrations/useFuse'
 import orderBy from 'lodash/orderBy'
@@ -76,23 +89,26 @@ const engine = computed(() => {
 
 const commands = computed(
   () =>
-    [...(engine.value?.commands?.(props.voice) || []), ...speechStore.customCommands].map(
-      (command) => ({
-        ...command,
-        command: `/${ command.value }`,
-      }),
-    ) || [],
+    [
+      ...(engine.value?.commands?.(props.voice) || []),
+      ...speechStore.customCommands,
+    ].map((command) => ({
+      ...command,
+      command: `/${command.value}`,
+    })) || [],
 )
 
 const inputValue = computed(() => props.modelValue)
 const isInputFocused = ref(false)
 const latestCommands = ref<string[]>([])
-const fuseOptions = computed<UseFuseOptions<(typeof commands.value)[number]>>(() => ({
-  fuseOptions: {
-    keys: ['command'],
-    threshold: 0.3,
-  },
-}))
+const fuseOptions = computed<UseFuseOptions<(typeof commands.value)[number]>>(
+  () => ({
+    fuseOptions: {
+      keys: ['command'],
+      threshold: 0.3,
+    },
+  }),
+)
 
 const { results } = useFuse(inputValue, commands, fuseOptions)
 const autocompleteValues = computed(() => {
@@ -122,7 +138,7 @@ const isAutocompleteVisible = computed(
 )
 
 const onAutocompleteSelect = (value: (typeof commands.value)[number]) => {
-  emit('update:modelValue', `${ value.command } `)
+  emit('update:modelValue', `${value.command} `)
   if (latestCommands.value.includes(value.command)) {
     latestCommands.value.splice(latestCommands.value.indexOf(value.command), 1)
   }
@@ -137,8 +153,12 @@ const onInputTab = (e: KeyboardEvent) => {
 }
 
 watch(historyMessageIndex, () => {
-  const historyMessage = messagesStore.reversedHistory[historyMessageIndex.value]
-  emit('update:modelValue', historyMessage?.originalMessage || historyMessage?.message || '')
+  const historyMessage =
+    messagesStore.reversedHistory[historyMessageIndex.value]
+  emit(
+    'update:modelValue',
+    historyMessage?.originalMessage || historyMessage?.message || '',
+  )
 })
 
 watch(
@@ -153,14 +173,18 @@ onKeyStroke('ArrowUp', () => {
   if (
     !isAutocompleteVisible.value &&
     isInputFocused.value &&
-    historyMessageIndex.value < messagesStore.history.length-1
+    historyMessageIndex.value < messagesStore.history.length - 1
   ) {
     historyMessageIndex.value += 1
   }
 })
 
 onKeyStroke('ArrowDown', () => {
-  if (!isAutocompleteVisible.value && isInputFocused.value && historyMessageIndex.value > -1) {
+  if (
+    !isAutocompleteVisible.value &&
+    isInputFocused.value &&
+    historyMessageIndex.value > -1
+  ) {
     historyMessageIndex.value -= 1
   }
 })

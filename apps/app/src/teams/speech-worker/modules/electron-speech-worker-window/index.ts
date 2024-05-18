@@ -3,13 +3,19 @@ import speech from '@google-cloud/speech'
 import { BrowserWindow, screen } from 'electron'
 import { ipcMain } from 'electron-postman'
 import { createNotification } from '@/utils/electron-notification'
-import { useSpeechRecognitionStore, useSpeechStore } from '@/features/speech/store'
-import { gkl, keybindingReleased, keybindingTriggered } from '@/modules/electron-keybinding/utils'
+import {
+  useSpeechRecognitionStore,
+  useSpeechStore,
+} from '@/features/speech/store'
+import {
+  gkl,
+  keybindingReleased,
+  keybindingTriggered,
+} from '@/modules/electron-keybinding/utils'
 import { Deferred } from '@packages/toolbox'
 import { useSettingsStore } from '@/features/settings/store'
 import { watch } from 'vue'
-import electronNativeSpeechRecognition
-  from '@/teams/speech-worker/modules/electron-native-speech-recognition'
+import electronNativeSpeechRecognition from '@/teams/speech-worker/modules/electron-native-speech-recognition'
 import ElectronWindowManager from '@/modules/electron-window-manager'
 import mapValues from 'lodash/mapValues'
 import { getTime } from '@/utils/time'
@@ -22,7 +28,9 @@ export const ElectronSpeechWindow = () => {
   const isReady = () => ready.promise
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
   let speechStore: ReturnType<typeof useSpeechStore> | undefined
-  let speechRecognitionStore: ReturnType<typeof useSpeechRecognitionStore> | undefined
+  let speechRecognitionStore:
+    | ReturnType<typeof useSpeechRecognitionStore>
+    | undefined
   let deferredRecording: ReturnType<typeof Deferred> | null = null
   // eslint-disable-next-line prefer-const
   let electronNativeSpeechRecognitionCallback: ReturnType<
@@ -30,7 +38,8 @@ export const ElectronSpeechWindow = () => {
   > | null = null
 
   const getWindow = () =>
-    registeredWindow || ElectronWindowManager.getInstanceByName('speech-worker')?.window
+    registeredWindow ||
+    ElectronWindowManager.getInstanceByName('speech-worker')?.window
   const onListeningError = () => {
     createNotification({
       body: "Sorry, I didn't catch that..\nCould you say that again please?",
@@ -39,10 +48,10 @@ export const ElectronSpeechWindow = () => {
   }
 
   const transcribeAudio = async ({
-                                   content,
-                                   sampleRate,
-                                   encoding,
-                                 }: {
+    content,
+    sampleRate,
+    encoding,
+  }: {
     content: string
     sampleRate: number
     encoding: any
@@ -85,8 +94,8 @@ export const ElectronSpeechWindow = () => {
     if (window) {
       const topLeftDisplay = getTopLeftWindow()
       window.setPosition(
-        (topLeftDisplay?.bounds.x ?? 0)-windowWidth,
-        (topLeftDisplay?.bounds.y ?? 0)-windowHeight,
+        (topLeftDisplay?.bounds.x ?? 0) - windowWidth,
+        (topLeftDisplay?.bounds.y ?? 0) - windowHeight,
       )
     }
   }
@@ -96,8 +105,10 @@ export const ElectronSpeechWindow = () => {
     if (window) {
       const allDisplays = screen.getAllDisplays()
       const primaryDisplay = screen.getPrimaryDisplay()
-      const display = allDisplays.find((d) => d.id === settingsStore?.display) || primaryDisplay
-      const displayBounds = mapValues(display.bounds, (v) => v+24)
+      const display =
+        allDisplays.find((d) => d.id === settingsStore?.display) ||
+        primaryDisplay
+      const displayBounds = mapValues(display.bounds, (v) => v + 24)
       window.setPosition(displayBounds.x, displayBounds.y)
     }
   }
@@ -117,7 +128,7 @@ export const ElectronSpeechWindow = () => {
         keybindingTriggered(settingsStore.keybindings.recordAudio)
       ) {
         deferredRecording = Deferred()
-        console.log(`[${ getTime() }] Starting recording`)
+        console.log(`[${getTime()}] Starting recording`)
         speechRecognitionStore?.$patch({
           recording: true,
         })
@@ -135,7 +146,7 @@ export const ElectronSpeechWindow = () => {
       ) {
         deferredRecording.resolve(true)
         deferredRecording = null
-        console.log(`[${ getTime() }] Stopping recording`)
+        console.log(`[${getTime()}] Stopping recording`)
         speechRecognitionStore?.$patch({
           recording: false,
         })
@@ -147,7 +158,8 @@ export const ElectronSpeechWindow = () => {
       electronNativeSpeechRecognitionCallback()
     }
     if (settingsStore?.enableSTTTS) {
-      electronNativeSpeechRecognitionCallback = electronNativeSpeechRecognition()
+      electronNativeSpeechRecognitionCallback =
+        electronNativeSpeechRecognition()
     }
   }
 

@@ -9,11 +9,9 @@ const recFile = fs.createWriteStream('test.rec.wav', { encoding: 'binary' })
 const sox = recorder.record({ recorder: 'sox' })
 const rec = recorder.record({ recorder: 'rec' })
 
-sox.stream()
-  .pipe(soxFile)
+sox.stream().pipe(soxFile)
 
-rec.stream()
-  .pipe(recFile)
+rec.stream().pipe(recFile)
 
 // Stop recording after three seconds
 setTimeout(() => {

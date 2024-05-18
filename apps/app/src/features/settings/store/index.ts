@@ -14,7 +14,7 @@ export const useSettingsStore = defineStore(
     const channel = version.includes('alpha')
       ? 'alpha'
       : // eslint-disable-next-line no-nested-ternary
-      version.includes('beta')
+        version.includes('beta')
         ? 'beta'
         : version.includes('rc')
           ? 'rc'
@@ -45,7 +45,9 @@ export const useSettingsStore = defineStore(
     const enableTranslation = ref(false)
     const speechProfanityFilter = ref(true)
     const speechRecognitionStrategy = ref<'continuous' | 'ptr'>('ptr')
-    const textTranslationStrategy = ref<'cloud-translation' | 'custom'>('cloud-translation')
+    const textTranslationStrategy = ref<'cloud-translation' | 'custom'>(
+      'cloud-translation',
+    )
     const customTextTranslationEndpoint = ref('')
     const customTextTranslationApiKey = ref('')
     const customTextTranslationFrom = ref('')

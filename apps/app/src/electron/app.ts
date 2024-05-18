@@ -26,14 +26,25 @@ const App = () => {
       .whenReady()
       .then(async () =>
         Promise.all([
-          await ElectronWindowManager.registerInstance('messenger', createMessengerWindow),
-          await ElectronWindowManager.registerInstance('overlay', createOverlayWindow),
-          await ElectronWindowManager.registerInstance('speech-worker', createSpeechWorkerWindow),
+          await ElectronWindowManager.registerInstance(
+            'messenger',
+            createMessengerWindow,
+          ),
+          await ElectronWindowManager.registerInstance(
+            'overlay',
+            createOverlayWindow,
+          ),
+          await ElectronWindowManager.registerInstance(
+            'speech-worker',
+            createSpeechWorkerWindow,
+          ),
         ]),
       )
 
   const registerElectronPinia = () => {
-    createApp(h({})).use(createPinia().use((electronPiniaPlugin.default || electronPiniaPlugin)()))
+    createApp(h({})).use(
+      createPinia().use((electronPiniaPlugin.default || electronPiniaPlugin)()),
+    )
   }
 
   const startAppServer = async () =>
@@ -81,12 +92,16 @@ const App = () => {
 
   function addEventListeners() {
     app.whenReady().then(() => {
-      const credentialsDirPath = path.join(app.getPath('userData'), 'credentials')
+      const credentialsDirPath = path.join(
+        app.getPath('userData'),
+        'credentials',
+      )
       const googleCloudSpeechCredentialsFilePath = path.join(
         credentialsDirPath,
         'google-cloud-speech-credentials.json',
       )
-      process.env.GOOGLE_APPLICATION_CREDENTIALS = googleCloudSpeechCredentialsFilePath
+      process.env.GOOGLE_APPLICATION_CREDENTIALS =
+        googleCloudSpeechCredentialsFilePath
     })
 
     app.on('ready', async () => {
@@ -94,7 +109,10 @@ const App = () => {
         try {
           await installExtension(VUEJS3_DEVTOOLS)
         } catch (e) {
-          console.error('Vue Devtools failed to install:', (e as Error).toString())
+          console.error(
+            'Vue Devtools failed to install:',
+            (e as Error).toString(),
+          )
         }
       }
     })

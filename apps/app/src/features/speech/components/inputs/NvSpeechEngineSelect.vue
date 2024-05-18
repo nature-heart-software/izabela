@@ -14,7 +14,9 @@ const options = computed(() =>
   groupOptions(
     orderBy(
       engines.value.map((engine) => {
-        const disabled = engine.hasCredentials ? !engine.hasCredentials() : false
+        const disabled = engine.hasCredentials
+          ? !engine.hasCredentials()
+          : false
         return {
           disabled,
           label: engine.name,
