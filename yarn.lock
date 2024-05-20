@@ -9926,6 +9926,12 @@ gcp-metadata@^5.0.0:
     gaxios "^5.0.0"
     json-bigint "^1.0.0"
 
+"gelectron@https://github.com/hiitiger/goverlay/tarball/3ca1f040b180dc6ce84baca093c6f726748461ad":
+  version "1.0.1"
+  resolved "https://github.com/hiitiger/goverlay/tarball/3ca1f040b180dc6ce84baca093c6f726748461ad#6bd079e610152cb7fdd84744a660292112e0d3b3"
+  dependencies:
+    node-addon-api "^4.1.0"
+
 generic-names@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/generic-names/-/generic-names-4.0.0.tgz#0bd8a2fd23fe8ea16cbd0a279acd69c06933d9a3"
@@ -13325,6 +13331,11 @@ node-addon-api@^3.0.0, node-addon-api@^3.1.0, node-addon-api@^3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-3.2.1.tgz#81325e0a2117789c0128dab65e7e38f07ceba161"
   integrity sha512-mmcei9JghVNDYydghQmeDX8KoAm0FAiYyIcUt/N4nhyAipB17pllZQDOJD2fotxABnt4Mdz+dKTO7eftLg4d0A==
+
+node-addon-api@^4.1.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-4.3.0.tgz#52a1a0b475193e0928e98e0426a0d1254782b77f"
+  integrity sha512-73sE9+3UaLYYFmDsFZnqCInzPyh3MqIwZO9cw58yIqAZhONrrabrYyYe3TuIqtIiOuTXVhsGau8hcrhhwSsDIQ==
 
 node-api-version@^0.1.4:
   version "0.1.4"

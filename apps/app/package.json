@@ -7,6 +7,7 @@
     "@apps/app-server": "0.0.0",
     "@packages/native-keymap": "3.3.2",
     "@packages/win-mouse": "2.0.1",
+    "@packages/electron-game-overlay": "0.0.0",
     "ffi-napi": "^4.0.3",
     "node-abi": "^3.40.0",
     "node-global-key-listener": "^0.1.1",

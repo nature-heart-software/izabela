@@ -1,19 +1,15 @@
 <template>
   <div ref="componentRef" :data-hitbox-id="id">
-    <slot />
+    <slot/>
   </div>
 </template>
 <script lang="ts" setup>
 import { v4 as uuid } from 'uuid'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import throttle from 'lodash/throttle'
-import {
-  useDevicePixelRatio,
-  useIntersectionObserver,
-  useMutationObserver,
-  useResizeObserver,
-} from '@vueuse/core'
+import { useDevicePixelRatio, useIntersectionObserver, useMutationObserver, useResizeObserver } from '@vueuse/core'
 import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
+import { isGameOverlay } from '@/consts.ts'
 
 const hitboxesStore = useHitboxesStore()
 
@@ -28,6 +24,7 @@ const hitboxes = ref({
   h: 0,
 })
 const onHitboxUpdate = () => {
+  if (isGameOverlay) return
   // console.log('hitbox update', hitboxes.value, componentRef.value)
   if (componentRef.value) {
     hitboxesStore.addHitbox({ ...hitboxes.value })
@@ -36,17 +33,18 @@ const onHitboxUpdate = () => {
   }
 }
 const updateHitbox = throttle(
-  () => {
-    if (componentRef.value) {
-      const bounds = componentRef.value.getBoundingClientRect()
-      hitboxes.value.x = bounds.x * pixelRatio.value
-      hitboxes.value.y = bounds.y * pixelRatio.value
-      hitboxes.value.w = bounds.width * pixelRatio.value
-      hitboxes.value.h = bounds.height * pixelRatio.value
-    }
-  },
-  250,
-  { leading: true, trailing: true },
+    () => {
+      if (isGameOverlay) return
+      if (componentRef.value) {
+        const bounds = componentRef.value.getBoundingClientRect()
+        hitboxes.value.x = bounds.x * pixelRatio.value
+        hitboxes.value.y = bounds.y * pixelRatio.value
+        hitboxes.value.w = bounds.width * pixelRatio.value
+        hitboxes.value.h = bounds.height * pixelRatio.value
+      }
+    },
+    250,
+    { leading: true, trailing: true },
 )
 
 useIntersectionObserver(componentRef, updateHitbox)
@@ -54,6 +52,7 @@ useMutationObserver(componentRef, updateHitbox, { attributes: true })
 useResizeObserver(componentRef, updateHitbox)
 
 onBeforeUnmount(() => {
+  if (isGameOverlay) return
   hitboxesStore.removeHitbox(hitboxes.value.id)
 })
 onMounted(() => {

@@ -1,16 +1,16 @@
 <template>
   <ThemeProvider :theme="tokens">
-    <NvBackground />
+    <NvBackground/>
     <div class="h-0">
       <div id="router-overlay"></div>
       <NvMessenger
-        v-if="messengerStore.$isReady"
-        :min-width="768"
-        :transform="messengerStore.position.transform"
-        class="w-full h-full"
+          v-if="messengerStore.$isReady"
+          :min-width="768"
+          :transform="messengerStore.position.transform"
+          class="w-full h-full"
       />
     </div>
-    <NvDebug v-if="settingsStore.debugMode" />
+    <NvDebug v-if="settingsStore.debugMode"/>
   </ThemeProvider>
 </template>
 <style lang="scss">
@@ -59,13 +59,13 @@ window.addEventListener('keydown', (event) => {
 })
 
 watch(
-  () => messengerWindowStore.isFocused,
-  () => {
-    if (messengerWindowStore.isFocused) {
-      socket.emit('window:focus')
-    } else {
-      socket.emit('window:blur')
-    }
-  },
+    () => messengerWindowStore.isFocused,
+    () => {
+      if (messengerWindowStore.isFocused) {
+        socket.emit('window:focus')
+      } else {
+        socket.emit('window:blur')
+      }
+    },
 )
 </script>

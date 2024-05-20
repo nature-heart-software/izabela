@@ -1,18 +1,26 @@
-import { app, BrowserWindow, screen } from 'electron'
+import { app, BrowserWindow } from 'electron'
 import path from 'path'
 import { createProtocol } from '@/electron/utils'
 import { ipcMain } from 'electron-postman'
-import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
+import gameOverlay from '@/electron/game-overlay'
 
 let window: BrowserWindow
 const createWindow = async (name: string): Promise<BrowserWindow> => {
-    window = new BrowserWindow({
-        show: false,
-        fullscreen: true,
-        transparent: true,
+    const filePath = `./src/teams/messenger/index.html`
+    const url = (import.meta.env.VITE_DEV_SERVER_URL ? path.join(import.meta.env.VITE_DEV_SERVER_URL as string, filePath) : `app://${ filePath }`)+'?game-overlay'
+    const overlayDebug = import.meta.env.DEV ? false : false
+
+    window = gameOverlay.createWindow(name, {
+        x: 0,
+        y: 0,
+        height: 1080,
+        width: 1920,
         frame: false,
+        show: overlayDebug,
+        transparent: true,
         resizable: false,
         webPreferences: {
+            offscreen: !overlayDebug,
             preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: Boolean(
                 Number(import.meta.env.VITE_ELECTRON_NODE_INTEGRATION),
@@ -22,26 +30,8 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
         },
     })
 
-    {
-        const primaryDisplay = screen.getPrimaryDisplay()
-        window.setBounds(primaryDisplay.bounds)
-
-        // https://github.com/electron/electron/issues/10078#issuecomment-331581160
-        window.setAlwaysOnTop(true, 'screen-saver', 1)
-        window.setVisibleOnAllWorkspaces(true)
-        window.setFullScreenable(false)
-        window.setMenu(null)
-    }
-
-    window.once('ready-to-show', () => {
-        electronMessengerWindow.start(window)
-    })
-
     ipcMain.registerBrowserWindow(name, window)
 
-    const filePath = `./src/teams/${ name }/index.html`
-
-    const url = import.meta.env.VITE_DEV_SERVER_URL ? path.join(import.meta.env.VITE_DEV_SERVER_URL as string, filePath) : `app://${ filePath }`
     if (import.meta.env.VITE_DEV_SERVER_URL) {
         await window.loadURL(url)
         if (import.meta.env.DEV)
@@ -49,6 +39,15 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     } else {
         createProtocol('app')
         window.loadURL(url)
+    }
+
+    if (!overlayDebug) {
+        gameOverlay.addOverlayWindow(
+            name,
+            window,
+            0,
+            0,
+        )
     }
 
     return window

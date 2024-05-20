@@ -11,30 +11,30 @@ import electronTranslation from '@/modules/electron-translation'
 import electronOverlayWindow from '@/teams/overlay/modules/electron-overlay-window'
 
 export const bridgeModules = () =>
-  bridge.register([
-    ['ElectronDialog', () => electronDialog],
-    ['ElectronFilesystem', () => electronFilesystem],
-    ['ElectronMessengerWindow', () => electronMessengerWindow],
-    ['ElectronOverlayWindow', () => electronOverlayWindow],
-    ['ElectronSpeechWorkerWindow', () => electronSpeechWorkerWindow],
-    ['ElectronKeybinding', () => electronKeybinding],
-    ['ElectronDisplay', () => electronDisplay],
-    ['ElectronResources', () => electronResources],
-    ['ElectronSI', () => electronSi],
-    ['ElectronTranslation', () => electronTranslation],
-  ])
+    bridge.register([
+        ['ElectronDialog', () => electronDialog],
+        ['ElectronFilesystem', () => electronFilesystem],
+        ['ElectronMessengerWindow', () => electronMessengerWindow],
+        ['ElectronOverlayWindow', () => electronOverlayWindow],
+        ['ElectronSpeechWorkerWindow', () => electronSpeechWorkerWindow],
+        ['ElectronKeybinding', () => electronKeybinding],
+        ['ElectronDisplay', () => electronDisplay],
+        ['ElectronResources', () => electronResources],
+        ['ElectronSI', () => electronSi],
+        ['ElectronTranslation', () => electronTranslation],
+    ])
 
 declare global {
-  interface Window {
-    ElectronDialog: typeof electronDialog
-    ElectronFilesystem: typeof electronFilesystem
-    ElectronMessengerWindow: typeof electronMessengerWindow
-    ElectronOverlayWindow: typeof electronOverlayWindow
-    ElectronSpeechWorkerWindow: typeof electronSpeechWorkerWindow
-    ElectronKeybinding: typeof electronKeybinding
-    ElectronDisplay: typeof electronDisplay
-    ElectronResources: typeof electronResources
-    ElectronSI: typeof electronSi
-    ElectronTranslation: typeof electronTranslation
-  }
+    interface Window {
+        ElectronDialog: typeof electronDialog
+        ElectronFilesystem: typeof electronFilesystem
+        ElectronMessengerWindow: typeof electronMessengerWindow
+        ElectronOverlayWindow: typeof electronOverlayWindow
+        ElectronSpeechWorkerWindow: typeof electronSpeechWorkerWindow
+        ElectronKeybinding: typeof electronKeybinding
+        ElectronDisplay: typeof electronDisplay
+        ElectronResources: typeof electronResources
+        ElectronSI: typeof electronSi
+        ElectronTranslation: typeof electronTranslation
+    }
 }

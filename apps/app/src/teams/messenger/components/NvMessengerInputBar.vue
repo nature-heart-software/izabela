@@ -2,25 +2,25 @@
   <NvCard size="sm">
     <NvGroup noWrap>
       <NvSpeechEngineInput
-        ref="messengerInput"
-        v-model="inputValue"
-        :engine="speechStore.selectedSpeechEngine"
-        :placeholder="placeholder"
-        :voice="speechStore.currentSpeechEngine?.getSelectedVoice()"
-        class="w-full"
-        data-v-step="messenger-text-input"
-        size="lg"
-        @blur="onInputBlur"
-        @enter="onInputEnter"
-        @esc="onInputEsc"
-        @focus="onInputFocus"
-        @space="(e) => settingsStore.messageMode === 'word' && [playMessage(), e.preventDefault()]"
+          ref="messengerInput"
+          v-model="inputValue"
+          :engine="speechStore.selectedSpeechEngine"
+          :placeholder="placeholder"
+          :voice="speechStore.currentSpeechEngine?.getSelectedVoice()"
+          class="w-full"
+          data-v-step="messenger-text-input"
+          size="lg"
+          @blur="onInputBlur"
+          @enter="onInputEnter"
+          @esc="onInputEsc"
+          @focus="onInputFocus"
+          @space="(e) => settingsStore.messageMode === 'word' && [playMessage(), e.preventDefault()]"
       />
       <NvButton
-        data-v-step="messenger-text-input-submit"
-        icon-name="message"
-        size="lg"
-        @click="playMessage()"
+          data-v-step="messenger-text-input-submit"
+          icon-name="message"
+          size="lg"
+          @click="playMessage()"
       />
     </NvGroup>
   </NvCard>
@@ -34,6 +34,7 @@ import { useSpeechStore } from '@/features/speech/store'
 import { useSettingsStore } from '@/features/settings/store'
 import NvSpeechEngineInput from '@/features/speech/components/inputs/NvSpeechEngineInput.vue'
 import { socket } from '@/services'
+import { isGameOverlay } from '@/consts.ts'
 
 const { ElectronMessengerWindow } = window
 const messengerWindowStore = useMessengerWindowStore()
@@ -50,7 +51,7 @@ const onInputEsc = () => {
 
 const placeholder = computed(() => {
   if (speechStore.commands.length > 0) {
-    return `Type / to see available commands (${speechStore.commands.length})`
+    return `Type / to see available commands (${ speechStore.commands.length })`
   }
   return 'So, said the angel to the child who, divided, broke the knife..'
 })
@@ -86,20 +87,28 @@ const onWindowFocus = () => {
 const onWindowBlur = () => {
   if (inputRef.value) inputRef.value.blur()
 }
-
+if (isGameOverlay) {
+  window.focus()
+  window.addEventListener('focus', () => {
+    inputRef.value.focus()
+  })
+  window.addEventListener('blur', () => {
+    inputRef.value.blur()
+  })
+}
 watch(
-  // Makes sure all conditions are met to focus or blur properly
-  () => [
-    messengerWindowStore.isFocused,
-    messengerWindowStore.focusContext,
-    messengerWindowStore.isShown,
-  ],
-  () => {
-    if (messengerWindowStore.isFocused) {
-      onWindowFocus()
-    } else {
-      onWindowBlur()
-    }
-  },
+    // Makes sure all conditions are met to focus or blur properly
+    () => [
+      messengerWindowStore.isFocused,
+      messengerWindowStore.focusContext,
+      messengerWindowStore.isShown,
+    ],
+    () => {
+      if (messengerWindowStore.isFocused) {
+        onWindowFocus()
+      } else {
+        onWindowBlur()
+      }
+    },
 )
 </script>
