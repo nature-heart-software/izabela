@@ -3,7 +3,7 @@
     v-show="displayOffscreenFocusFix"
     id="offscreen-focus-fix"
     :style="{
-      zIndex: 999999999
+      zIndex: 999999999,
     }"
     class="fixed inset-0 pointer-events-auto"
     @click="displayOffscreenFocusFix = false"
@@ -40,7 +40,10 @@ import { ThemeProvider } from 'vue3-styled-components'
 import NvMessenger from '@/teams/messenger/components/NvMessenger.vue'
 import { tokens } from '@packages/ui'
 import NvBackground from '@/teams/messenger/components/NvBackground.vue'
-import { useMessengerStore, useMessengerWindowStore } from '@/teams/messenger/store'
+import {
+  useMessengerStore,
+  useMessengerWindowStore,
+} from '@/teams/messenger/store'
 import NvDebug from '@/teams/messenger/components/NvDebug.vue'
 import { useSettingsStore } from '@/features/settings/store'
 import { ref, watch } from 'vue'
