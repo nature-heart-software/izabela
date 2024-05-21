@@ -27,19 +27,19 @@ const App = () => {
             .whenReady()
             .then(async () =>
                 Promise.all([
-                    await ElectronWindowManager.registerInstance(
+                    ElectronWindowManager.registerInstance(
                         'messenger',
                         createMessengerWindow,
                     ),
-                    await ElectronWindowManager.registerInstance(
+                    ElectronWindowManager.registerInstance(
                         'overlay',
                         createOverlayWindow,
                     ),
-                    await ElectronWindowManager.registerInstance(
+                    ElectronWindowManager.registerInstance(
                         'speech-worker',
                         createSpeechWorkerWindow,
                     ),
-                    await ElectronWindowManager.registerInstance(
+                    ElectronWindowManager.registerInstance(
                         'messenger-game-overlay',
                         createMessengerGameOverlayWindow,
                     ),

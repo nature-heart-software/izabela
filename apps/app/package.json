@@ -5,6 +5,7 @@
   "author": "Nature Heart Software",
   "dependencies": {
     "@apps/app-server": "0.0.0",
+    "@nut-tree-fork/nut-js": "^4.2.1",
     "@packages/native-keymap": "3.3.2",
     "@packages/win-mouse": "2.0.1",
     "@packages/electron-game-overlay": "0.0.0",

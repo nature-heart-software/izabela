@@ -2,25 +2,25 @@
   <NvCard size="sm">
     <NvGroup noWrap>
       <NvSpeechEngineInput
-          ref="messengerInput"
-          v-model="inputValue"
-          :engine="speechStore.selectedSpeechEngine"
-          :placeholder="placeholder"
-          :voice="speechStore.currentSpeechEngine?.getSelectedVoice()"
-          class="w-full"
-          data-v-step="messenger-text-input"
-          size="lg"
-          @blur="onInputBlur"
-          @enter="onInputEnter"
-          @esc="onInputEsc"
-          @focus="onInputFocus"
-          @space="(e) => settingsStore.messageMode === 'word' && [playMessage(), e.preventDefault()]"
+        ref="messengerInput"
+        v-model="inputValue"
+        :engine="speechStore.selectedSpeechEngine"
+        :placeholder="placeholder"
+        :voice="speechStore.currentSpeechEngine?.getSelectedVoice()"
+        class="w-full"
+        data-v-step="messenger-text-input"
+        size="lg"
+        @blur="onInputBlur"
+        @enter="onInputEnter"
+        @esc="onInputEsc"
+        @focus="onInputFocus"
+        @space="(e) => settingsStore.messageMode === 'word' && [playMessage(), e.preventDefault()]"
       />
       <NvButton
-          data-v-step="messenger-text-input-submit"
-          icon-name="message"
-          size="lg"
-          @click="playMessage()"
+        data-v-step="messenger-text-input-submit"
+        icon-name="message"
+        size="lg"
+        @click="playMessage()"
       />
     </NvGroup>
   </NvCard>
@@ -88,27 +88,29 @@ const onWindowBlur = () => {
   if (inputRef.value) inputRef.value.blur()
 }
 if (isGameOverlay) {
-  window.focus()
   window.addEventListener('focus', () => {
     inputRef.value.focus()
   })
   window.addEventListener('blur', () => {
     inputRef.value.blur()
   })
+  document.querySelector('#offscreen-focus-fix')?.addEventListener('click', (e) => {
+    inputRef.value.focus()
+  })
 }
 watch(
-    // Makes sure all conditions are met to focus or blur properly
-    () => [
-      messengerWindowStore.isFocused,
-      messengerWindowStore.focusContext,
-      messengerWindowStore.isShown,
-    ],
-    () => {
-      if (messengerWindowStore.isFocused) {
-        onWindowFocus()
-      } else {
-        onWindowBlur()
-      }
-    },
+  // Makes sure all conditions are met to focus or blur properly
+  () => [
+    messengerWindowStore.isFocused,
+    messengerWindowStore.focusContext,
+    messengerWindowStore.isShown,
+  ],
+  () => {
+    if (messengerWindowStore.isFocused) {
+      onWindowFocus()
+    } else {
+      onWindowBlur()
+    }
+  },
 )
 </script>
