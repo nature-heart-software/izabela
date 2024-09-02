@@ -4,6 +4,8 @@ import ffi from 'ffi-napi'
 import { Key } from '@/types/keybinds'
 import { findLast, findLastIndex, forEach, isNumber } from 'lodash'
 import { getKeyMap, IWindowsKeyMapping } from '@packages/native-keymap'
+import { IGlobalKeyListener } from 'node-global-key-listener'
+import { gkl } from '@/modules/electron-keybinding/utils'
 
 export default (() => {
   const modifierCodes = {
@@ -210,6 +212,7 @@ export default (() => {
   }
 
   let hkId = 111111
+  const callbacks: Record<string, IGlobalKeyListener> = {}
   const commands: Record<string, number> = {}
 
   const winapi = new ffi.Library('User32', {
@@ -272,11 +275,12 @@ export default (() => {
   }
   const getAccelerator = (keys: Key[]) => keys.map((k) => k.code).join('+')
   return {
-    register(
-      keys: Key[],
-      // key: keyof typeof keyCodes,
-    ) {
+    register(keys: Key[], callback?: IGlobalKeyListener) {
       const accelerator = getAccelerator(keys)
+      if (callback) {
+        callbacks[accelerator] = callback
+        gkl?.addListener(callback)
+      }
       const key = getKey(keys)
       if (key === undefined) console.log(`Invalid key specified for ("${accelerator}")`)
       const modifiers = getModifiers(keys)
@@ -302,6 +306,11 @@ export default (() => {
           ? keysOrAccelerator
           : getAccelerator(keysOrAccelerator)
       const id = commands[accelerator]
+      const callback = callbacks[accelerator]
+      if (callback) {
+        gkl?.removeListener(callback)
+        delete callbacks[accelerator]
+      }
       if (!id) return
       if (winapi.UnregisterHotKey(0, id)) {
         delete commands[accelerator]
@@ -312,6 +321,10 @@ export default (() => {
         if (winapi.UnregisterHotKey(0, id)) {
           delete commands[accelerator]
         }
+      })
+      forEach(callbacks, (callback, accelerator) => {
+        gkl?.addListener(callback)
+        delete callbacks[accelerator]
       })
     },
   }

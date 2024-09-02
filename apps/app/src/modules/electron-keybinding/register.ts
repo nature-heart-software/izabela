@@ -137,7 +137,7 @@ export default () =>
         gkl?.addListener(callback)
         // registerElectronShortcut(accelerator, () => null)
 
-        nodeGlobalShortcuts.register(shortcut)
+        nodeGlobalShortcuts.register(shortcut, callback)
         registeredShortcuts[accelerator] = accelerator
       })
       messagesStore.shortcutMessages.forEach((message) => {
