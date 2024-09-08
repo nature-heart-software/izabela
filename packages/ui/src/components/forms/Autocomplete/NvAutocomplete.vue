@@ -12,7 +12,11 @@
             mainAxis: tokens.spacing['4']
           }
         }"
-        @open-change="(open) => emit('openChange', open)"
+        @open-change="(details) => emit('openChange', details)"
+        @escape-key-down="(details) => emit('escapeKeyDown', details)"
+        @focus-outside="(details) => emit('focusOutside', details)"
+        @interact-outside="(details) => emit('interactOutside', details)"
+        @pointer-down-outside="(details) => emit('pointerDownOutside', details)"
     >
       <Popover.Trigger ref="reference" asChild class="inline-flex w-full" @blur.prevent>
         <slot name="reference"/>
@@ -100,7 +104,7 @@ const { width } = useElementSize(reference)
 const vLoading = ElLoadingDirective
 const loading = ref(true)
 const positioner = ref()
-const emit = defineEmits(['select', 'positionerChange', 'openChange'])
+const emit = defineEmits(['select', 'positionerChange', 'openChange', 'escapeKeyDown', 'focusOutside', 'interactOutside', 'pointerDownOutside'])
 
 watch(positioner, (positioner) => {
   emit('positionerChange', positioner)

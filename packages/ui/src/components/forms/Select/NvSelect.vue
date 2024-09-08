@@ -9,9 +9,9 @@
       @positioner-change="($event) => {
         autocomplete = $event
       }"
-      @open-change="() => {
-        hasAutocompleteTransitioned = true
-      }"
+      @pointer-down-outside="blurInput"
+      @focus-outside="blurInput"
+      @interact-outside="blurInput"
   >
     <template #reference>
       <StSelect
@@ -187,29 +187,19 @@ const inputWrapper = ref()
 const autocomplete = ref()
 const { hasFocus, activate, deactivate } = useFocusTrap(inputWrapper, {
   returnFocusOnDeactivate: false,
+  allowOutsideClick: true,
   onDeactivate() {
     if (selectInput.value) selectInput.value.$el.blur()
   },
 })
 
 const isAutocompleteVisible = ref(false)
-const hasAutocompleteTransitioned = ref(true)
-const isManualBlur = ref(false)
-/* Don't change anything in this lol */
-watch(() => [hasFocus.value, hasAutocompleteTransitioned.value], ([hasFocus]) => {
-  if (hasFocus && !isAutocompleteVisible.value) {
+
+watch(() => hasFocus.value, (value) => {
+  if (value) {
     isAutocompleteVisible.value = true
-    hasAutocompleteTransitioned.value = false
-  }
-  if (!hasFocus && hasAutocompleteTransitioned.value) {
-    isAutocompleteVisible.value = false
-  }
-  if (!hasFocus && isManualBlur.value) {
-    isManualBlur.value = false
-    isAutocompleteVisible.value = false
   }
 })
-
 
 const fuseOptions = computed<UseFuseOptions<(typeof options.value)[number]>>(
     () => ({
@@ -279,12 +269,9 @@ const handleValue = (value: Value) => {
 const blurInput = () => {
   search.value = ''
   deactivate()
+  isAutocompleteVisible.value = false
 }
 onKeyStroke('Escape', blurInput)
-onKeyStroke('Tab', () => {
-  isManualBlur.value = true
-  blurInput()
-})
-onClickOutside(autocomplete, blurInput)
+onKeyStroke('Tab', blurInput)
 onBeforeUnmount(blurInput)
 </script>
