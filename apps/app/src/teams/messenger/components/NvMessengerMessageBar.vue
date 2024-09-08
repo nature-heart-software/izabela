@@ -1,11 +1,11 @@
 <template>
   <NvCard size="sm">
     <NvGroup noWrap>
-      <NvPopover :tippy-options="{ placement: 'top-end' }" size="sm">
+      <NvPopover placement="top-end" size="sm">
         <div class="w-screen max-w-full">
           <NvStack spacing="4">
             <NvFormItem label="Message mode">
-              <NvMessageModeSelect class="w-full" />
+              <NvMessageModeSelect class="w-full"/>
             </NvFormItem>
           </NvStack>
         </div>
@@ -14,7 +14,7 @@
             <NvText>Message mode</NvText>
             <template #reference>
               <NvButton data-v-step="message-mode-buttons" icon-name="direction" size="sm"
-                >Mode
+              >Mode
               </NvButton>
             </template>
           </NvTooltip>
@@ -39,8 +39,8 @@
       <!--          </NvGroup>-->
       <!--        </template>-->
       <!--      </NvTooltip>-->
-      <NvDivider class="h-3" direction="vertical" />
-      <NvPopover :tippy-options="{ placement: 'top-end' }" size="sm">
+      <NvDivider class="h-3" direction="vertical"/>
+      <NvPopover placement="top-end" size="sm">
         <div class="w-screen max-w-full">
           <NvStack spacing="4">
             <NvGroup justify="apart" no-wrap>
@@ -48,49 +48,49 @@
                 <NvText type="label">Enable translation</NvText>
               </NvStack>
               <NvSwitch
-                :modelValue="settingsStore.enableTranslation"
-                class="shrink-0"
-                @update:modelValue="(value) => settingsStore.$patch({ enableTranslation: value })"
+                  :modelValue="settingsStore.enableTranslation"
+                  class="shrink-0"
+                  @update:modelValue="(value) => settingsStore.$patch({ enableTranslation: value })"
               />
             </NvGroup>
             <NvAccessBlocker
-              :allowed="settingsStore.enableTranslation"
-              reason="Translation needs to be enabled"
+                :allowed="settingsStore.enableTranslation"
+                reason="Translation needs to be enabled"
             >
               <NvStack spacing="4">
-                <NvDivider direction="horizontal" />
+                <NvDivider direction="horizontal"/>
                 <NvFormItem label="Translation strategy">
-                  <NvTranslationStrategySelect />
+                  <NvTranslationStrategySelect/>
                 </NvFormItem>
-                <NvDivider direction="horizontal" />
+                <NvDivider direction="horizontal"/>
                 <template v-if="settingsStore.textTranslationStrategy === 'cloud-translation'">
                   <NvAccessBlocker
-                    :allowed="!!googleCloudSpeechCredentialsPath"
-                    reason="Google Cloud credentials required"
+                      :allowed="!!googleCloudSpeechCredentialsPath"
+                      reason="Google Cloud credentials required"
                   >
                     <NvStack spacing="4">
                       <NvFormItem label="From">
-                        <NvTranslationFromSelect />
+                        <NvTranslationFromSelect/>
                       </NvFormItem>
-                      <NvDivider direction="horizontal" />
+                      <NvDivider direction="horizontal"/>
                       <NvFormItem label="To">
-                        <NvTranslationToSelect />
+                        <NvTranslationToSelect/>
                       </NvFormItem>
                     </NvStack>
                   </NvAccessBlocker>
                 </template>
                 <template v-if="settingsStore.textTranslationStrategy === 'custom'">
                   <NvAccessBlocker
-                    :allowed="!!settingsStore.customTextTranslationEndpoint"
-                    reason="Endpoint and/or credentials required"
+                      :allowed="!!settingsStore.customTextTranslationEndpoint"
+                      reason="Endpoint and/or credentials required"
                   >
                     <NvStack spacing="4">
                       <NvFormItem label="From">
-                        <NvCustomTranslationFromSelect />
+                        <NvCustomTranslationFromSelect/>
                       </NvFormItem>
-                      <NvDivider direction="horizontal" />
+                      <NvDivider direction="horizontal"/>
                       <NvFormItem label="To">
-                        <NvCustomTranslationToSelect />
+                        <NvCustomTranslationToSelect/>
                       </NvFormItem>
                     </NvStack>
                   </NvAccessBlocker>
@@ -102,16 +102,19 @@
         <template #reference>
           <NvTooltip>
             <NvText
-              >Translation<template v-if="settingsStore.enableTranslation">
-                - Running</template
-              ></NvText
+            >Translation
+              <template v-if="settingsStore.enableTranslation">
+                - Running
+              </template
+              >
+            </NvText
             >
             <template #reference>
               <NvButton
-                :type="settingsStore.enableTranslation ? 'active' : 'default'"
-                data-v-step="translation-button"
-                icon-name="english-to-chinese"
-                size="sm"
+                  :type="settingsStore.enableTranslation ? 'active' : 'default'"
+                  data-v-step="translation-button"
+                  icon-name="english-to-chinese"
+                  size="sm"
               />
             </template>
           </NvTooltip>
@@ -121,15 +124,15 @@
         <NvText>Dictionary</NvText>
         <template #reference>
           <NvButton
-            :type="
+              :type="
               route.name === 'settings-dictionary' && messengerContext.isViewShown.value
                 ? 'plain'
                 : 'default'
             "
-            data-v-step="dictionary-button"
-            icon-name="books"
-            size="sm"
-            @click="messengerContext.navigateTo({ name: 'settings-dictionary' })"
+              data-v-step="dictionary-button"
+              icon-name="books"
+              size="sm"
+              @click="messengerContext.navigateTo({ name: 'settings-dictionary' })"
           />
         </template>
       </NvTooltip>
@@ -137,15 +140,15 @@
         <NvText>Message shortcuts</NvText>
         <template #reference>
           <NvButton
-            :type="
+              :type="
               route.name === 'messages-shortcuts' && messengerContext.isViewShown.value
                 ? 'plain'
                 : 'default'
             "
-            data-v-step="message-shortcuts-button"
-            icon-name="keyboard-alt"
-            size="sm"
-            @click="messengerContext.navigateTo({ name: 'messages-shortcuts' })"
+              data-v-step="message-shortcuts-button"
+              icon-name="keyboard-alt"
+              size="sm"
+              @click="messengerContext.navigateTo({ name: 'messages-shortcuts' })"
           />
         </template>
       </NvTooltip>
@@ -153,15 +156,15 @@
         <NvText>Message history</NvText>
         <template #reference>
           <NvButton
-            :type="
+              :type="
               route.name === 'messages-history' && messengerContext.isViewShown.value
                 ? 'plain'
                 : 'default'
             "
-            data-v-step="message-history-button"
-            icon-name="history"
-            size="sm"
-            @click="messengerContext.navigateTo({ name: 'messages-history' })"
+              data-v-step="message-history-button"
+              icon-name="history"
+              size="sm"
+              @click="messengerContext.navigateTo({ name: 'messages-history' })"
           />
         </template>
       </NvTooltip>

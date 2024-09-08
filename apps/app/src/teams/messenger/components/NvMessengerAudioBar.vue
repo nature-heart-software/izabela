@@ -5,30 +5,30 @@
         <NvText>Speech settings</NvText>
         <template #reference>
           <NvButton
-            :type="
+              :type="
               route.name === 'settings-engine' && messengerContext.isViewShown.value
                 ? 'plain'
                 : 'default'
             "
-            data-v-step="speech-settings-button"
-            icon-name="users-alt"
-            size="sm"
-            @click="messengerContext.navigateTo({ name: 'settings-engine' })"
+              data-v-step="speech-settings-button"
+              icon-name="users-alt"
+              size="sm"
+              @click="messengerContext.navigateTo({ name: 'settings-engine' })"
           />
         </template>
       </NvTooltip>
-      <NvDivider class="h-3" direction="vertical" />
+      <NvDivider class="h-3" direction="vertical"/>
       <NvTooltip>
         <NvText>Speech engine</NvText>
         <template #reference>
           <SpeechEngineSelect
-            :modelValue="speechStore.selectedSpeechEngine"
-            class="w-13"
-            data-v-step="engine-select"
-            icon-name="direction"
-            placeholder="Speech Engine"
-            size="sm"
-            @update:modelValue="(value) => settingsStore.$patch({ selectedSpeechEngine: value })"
+              :modelValue="speechStore.selectedSpeechEngine"
+              class="w-13"
+              data-v-step="engine-select"
+              icon-name="direction"
+              placeholder="Speech Engine"
+              size="sm"
+              @update:modelValue="(value) => settingsStore.$patch({ selectedSpeechEngine: value })"
           />
         </template>
       </NvTooltip>
@@ -37,25 +37,25 @@
           <NvText>Speech engine voice</NvText>
           <template #reference>
             <component
-              :is="speechStore.currentSpeechEngine.voiceSelectComponent"
-              v-if="speechStore.currentSpeechEngine.voiceSelectComponent"
-              class="w-13"
-              data-v-step="engine-voice-select"
-              placeholder="Speech Voice"
-              size="sm"
+                :is="speechStore.currentSpeechEngine.voiceSelectComponent"
+                v-if="speechStore.currentSpeechEngine.voiceSelectComponent"
+                class="w-13"
+                data-v-step="engine-voice-select"
+                placeholder="Speech Voice"
+                size="sm"
             />
           </template>
         </NvTooltip>
       </template>
-      <NvDivider class="h-3" direction="vertical" />
-      <NvPopover :tippy-options="{ placement: 'top-start' }" size="sm">
+      <NvDivider class="h-3" direction="vertical"/>
+      <NvPopover placement="top-start" size="sm">
         <div class="w-screen max-w-full">
           <NvStack spacing="4">
             <NvGroup justify="apart" no-wrap>
               <NvText type="label">Play on default playback device</NvText>
               <NvSwitch
-                :modelValue="settingsStore.playSpeechOnDefaultPlaybackDevice"
-                @update:modelValue="
+                  :modelValue="settingsStore.playSpeechOnDefaultPlaybackDevice"
+                  @update:modelValue="
                   (value) =>
                     settingsStore.$patch({
                       playSpeechOnDefaultPlaybackDevice: value,
@@ -63,9 +63,9 @@
                 "
               />
             </NvGroup>
-            <NvDivider direction="horizontal" />
+            <NvDivider direction="horizontal"/>
             <NvFormItem label="Audio outputs">
-              <NvAudioOutputsSelect class="w-full" />
+              <NvAudioOutputsSelect class="w-full"/>
             </NvFormItem>
           </NvStack>
         </div>
@@ -74,8 +74,8 @@
             <NvText>Audio outputs</NvText>
             <template #reference>
               <NvButton data-v-step="audio-outputs-select" icon-name="direction" size="sm"
-                >Outputs ({{
-                  settingsStore.audioOutputs.length +
+              >Outputs ({{
+                  settingsStore.audioOutputs.length+
                   (settingsStore.playSpeechOnDefaultPlaybackDevice ? 1 : 0)
                 }})
               </NvButton>
@@ -83,7 +83,7 @@
           </NvTooltip>
         </template>
       </NvPopover>
-      <NvPopover :tippy-options="{ placement: 'top-start' }" size="sm">
+      <NvPopover placement="top-start" size="sm">
         <div class="w-screen max-w-full">
           <NvStack spacing="4">
             <NvGroup justify="apart" no-wrap>
@@ -91,31 +91,31 @@
                 <NvText type="label">Enable speech-to-text-to-speech</NvText>
               </NvStack>
               <NvSwitch
-                :modelValue="settingsStore.enableSTTTS"
-                class="shrink-0"
-                @update:modelValue="(value) => settingsStore.$patch({ enableSTTTS: value })"
+                  :modelValue="settingsStore.enableSTTTS"
+                  class="shrink-0"
+                  @update:modelValue="(value) => settingsStore.$patch({ enableSTTTS: value })"
               />
             </NvGroup>
             <NvAccessBlocker
-              :allowed="!!googleCloudSpeechCredentialsPath && settingsStore.enableSTTTS"
-              :reason="
+                :allowed="!!googleCloudSpeechCredentialsPath && settingsStore.enableSTTTS"
+                :reason="
                 settingsStore.enableSTTTS
                   ? 'Google Cloud credentials required'
                   : 'STTTS needs to be enabled'
               "
             >
               <NvStack spacing="4">
-                <NvDivider direction="horizontal" />
+                <NvDivider direction="horizontal"/>
                 <NvFormItem label="Speech recognition language">
-                  <NvSpeechInputLanguageSelect />
+                  <NvSpeechInputLanguageSelect/>
                 </NvFormItem>
-                <NvDivider direction="horizontal" />
+                <NvDivider direction="horizontal"/>
                 <NvFormItem label="Speech recognition strategy">
-                  <NvSpeechRecognitionStrategySelect />
+                  <NvSpeechRecognitionStrategySelect/>
                 </NvFormItem>
-                <NvDivider direction="horizontal" />
+                <NvDivider direction="horizontal"/>
                 <NvFormItem label="Recording device">
-                  <NvSoxAudioInputSelect class="!w-full" />
+                  <NvSoxAudioInputSelect class="!w-full"/>
                 </NvFormItem>
               </NvStack>
             </NvAccessBlocker>
@@ -124,15 +124,17 @@
         <template #reference>
           <NvTooltip>
             <NvText
-              >Audio input<template v-if="settingsStore.enableSTTTS"> - Running</template></NvText
+            >Audio input
+              <template v-if="settingsStore.enableSTTTS"> - Running</template>
+            </NvText
             >
             <template #reference>
               <NvButton
-                :type="settingsStore.enableSTTTS ? 'active' : 'default'"
-                data-v-step="audio-input-select"
-                icon-name="direction"
-                size="sm"
-                >Input
+                  :type="settingsStore.enableSTTTS ? 'active' : 'default'"
+                  data-v-step="audio-input-select"
+                  icon-name="direction"
+                  size="sm"
+              >Input
               </NvButton>
             </template>
           </NvTooltip>
@@ -163,7 +165,8 @@ import NvSoxAudioInputSelect from '@/features/audio/components/inputs/NvSoxAudio
 import NvSpeechInputLanguageSelect from '@/features/speech/components/inputs/NvSpeechInputLanguageSelect.vue'
 import { inject } from 'vue'
 import { useRoute } from 'vue-router'
-import NvSpeechRecognitionStrategySelect from '@/features/speech/components/inputs/NvSpeechRecognitionStrategySelect.vue'
+import NvSpeechRecognitionStrategySelect
+  from '@/features/speech/components/inputs/NvSpeechRecognitionStrategySelect.vue'
 import { useGetGoogleCloudSpeechCredentialsPath } from '@/features/settings/hooks'
 
 const speechStore = useSpeechStore()

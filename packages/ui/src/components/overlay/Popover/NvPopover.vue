@@ -3,7 +3,7 @@
       v-model:open="open"
       :autoFocus="false"
       :positioning="{
-        placement: 'bottom-start',
+        placement: props.placement,
         flip: true,
         overflowPadding: tokens.spacing['3'],
         offset: {
