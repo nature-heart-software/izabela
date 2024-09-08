@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { Story } from '@storybook/vue3'
+import { StoryFn } from '@storybook/vue3'
 import NvRangeInput from './NvRangeInput.vue'
 
 export default {
@@ -9,7 +9,7 @@ export default {
     },
 }
 
-const Template: Story = (args) => ({
+const Template: StoryFn = (args) => ({
     components: { NvRangeInput },
     setup() {
         return {

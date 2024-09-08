@@ -1,43 +1,43 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { ref } from 'vue'
-import { Story } from '@storybook/vue3'
+import { StoryFn } from '@storybook/vue3'
 import NvTable from './NvTable.vue'
 import NvTableColumn from './NvTableColumn.vue'
 
 export default {
-  title: 'Table',
+    title: 'Table',
 }
 
-const Template: Story = (args) => ({
-  components: { NvTable, NvTableColumn },
-  setup() {
-    return {
-      data: ref([
-        {
-          date: '2016-05-03',
-          name: 'Tom',
-          address: 'No. 189, Grove St, Los Angeles',
-        },
-        {
-          date: '2016-05-02',
-          name: 'Tom',
-          address: 'No. 189, Grove St, Los Angeles',
-        },
-        {
-          date: '2016-05-04',
-          name: 'Tom',
-          address: 'No. 189, Grove St, Los Angeles',
-        },
-        {
-          date: '2016-05-01',
-          name: 'Tom',
-          address: 'No. 189, Grove St, Los Angeles',
-        },
-      ]),
-      ...args,
-    }
-  },
-  template: `
+const Template: StoryFn = (args) => ({
+    components: { NvTable, NvTableColumn },
+    setup() {
+        return {
+            data: ref([
+                {
+                    date: '2016-05-03',
+                    name: 'Tom',
+                    address: 'No. 189, Grove St, Los Angeles',
+                },
+                {
+                    date: '2016-05-02',
+                    name: 'Tom',
+                    address: 'No. 189, Grove St, Los Angeles',
+                },
+                {
+                    date: '2016-05-04',
+                    name: 'Tom',
+                    address: 'No. 189, Grove St, Los Angeles',
+                },
+                {
+                    date: '2016-05-01',
+                    name: 'Tom',
+                    address: 'No. 189, Grove St, Los Angeles',
+                },
+            ]),
+            ...args,
+        }
+    },
+    template: `
       <NvTable
           style="width: 100%"
           :data="data"

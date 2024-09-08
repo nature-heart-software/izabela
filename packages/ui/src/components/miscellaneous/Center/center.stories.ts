@@ -1,27 +1,27 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { Story } from '@storybook/vue3'
+import { StoryFn } from '@storybook/vue3'
 import { NvButton, NvCenter } from '@/components'
 import { props } from './center.shared'
 
 export default {
-  title: 'Center',
-  component: NvCenter,
-  argTypes: {
-    inline: {
-      defaultValue: props.inline.default,
-      control: 'boolean',
+    title: 'Center',
+    component: NvCenter,
+    argTypes: {
+        inline: {
+            defaultValue: props.inline.default,
+            control: 'boolean',
+        },
     },
-  },
 }
 
-const Template: Story = (args) => ({
-  components: { NvCenter, NvButton },
-  setup() {
-    return {
-      args,
-    }
-  },
-  template: `
+const Template: StoryFn = (args) => ({
+    components: { NvCenter, NvButton },
+    setup() {
+        return {
+            args,
+        }
+    },
+    template: `
       <NvCenter v-bind="args" class="bg-gray-10" :style="{height: '200px'}">
       <NvButton>centered</NvButton>
       </NvCenter>`,
@@ -30,14 +30,14 @@ const Template: Story = (args) => ({
 export const Default = Template.bind({})
 Default.args = {}
 
-const InlineTemplate: Story = (args) => ({
-  components: { NvCenter, NvButton },
-  setup() {
-    return {
-      args,
-    }
-  },
-  template: `
+const InlineTemplate: StoryFn = (args) => ({
+    components: { NvCenter, NvButton },
+    setup() {
+        return {
+            args,
+        }
+    },
+    template: `
       <NvCenter v-bind="args">
       <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -57,5 +57,5 @@ const InlineTemplate: Story = (args) => ({
 })
 export const Inline = InlineTemplate.bind({})
 Inline.args = {
-  inline: true,
+    inline: true,
 }

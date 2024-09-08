@@ -1,31 +1,31 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { Story } from '@storybook/vue3'
+import { StoryFn } from '@storybook/vue3'
 import { NvButton, NvCenter, NvPopover, NvText } from '@/components'
 import { props, sizeValues } from './popover.shared'
 
 export default {
-  title: 'Popover',
-  argTypes: {
-    content: {
-      defaultValue: 'hello world',
-      control: 'text',
+    title: 'Popover',
+    argTypes: {
+        content: {
+            defaultValue: 'hello world',
+            control: 'text',
+        },
+        size: {
+            defaultValue: props.size.default,
+            control: 'inline-radio',
+            options: sizeValues,
+        },
     },
-    size: {
-      defaultValue: props.size.default,
-      control: 'inline-radio',
-      options: sizeValues,
-    },
-  },
 }
 
-const Template: Story = (args) => ({
-  components: { NvPopover, NvButton, NvText, NvCenter },
-  setup() {
-    return {
-      args,
-    }
-  },
-  template: `
+const Template: StoryFn = (args) => ({
+    components: { NvPopover, NvButton, NvText, NvCenter },
+    setup() {
+        return {
+            args,
+        }
+    },
+    template: `
       <NvCenter>
       <NvPopover v-bind="args">
         <NvText>
