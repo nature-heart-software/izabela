@@ -4,24 +4,24 @@ import { NvButton, NvCenter } from '@/components'
 import { props } from './center.shared'
 
 export default {
-    title: 'Center',
-    component: NvCenter,
-    argTypes: {
-        inline: {
-            defaultValue: props.inline.default,
-            control: 'boolean',
-        },
+  title: 'Center',
+  component: NvCenter,
+  argTypes: {
+    inline: {
+      defaultValue: props.inline.default,
+      control: 'boolean',
     },
+  },
 }
 
 const Template: StoryFn = (args) => ({
-    components: { NvCenter, NvButton },
-    setup() {
-        return {
-            args,
-        }
-    },
-    template: `
+  components: { NvCenter, NvButton },
+  setup() {
+    return {
+      args,
+    }
+  },
+  template: `
       <NvCenter v-bind="args" class="bg-gray-10" :style="{height: '200px'}">
       <NvButton>centered</NvButton>
       </NvCenter>`,
@@ -31,13 +31,13 @@ export const Default = Template.bind({})
 Default.args = {}
 
 const InlineTemplate: StoryFn = (args) => ({
-    components: { NvCenter, NvButton },
-    setup() {
-        return {
-            args,
-        }
-    },
-    template: `
+  components: { NvCenter, NvButton },
+  setup() {
+    return {
+      args,
+    }
+  },
+  template: `
       <NvCenter v-bind="args">
       <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -57,5 +57,5 @@ const InlineTemplate: StoryFn = (args) => ({
 })
 export const Inline = InlineTemplate.bind({})
 Inline.args = {
-    inline: true,
+  inline: true,
 }

@@ -6,26 +6,26 @@ import voices from '@/mocks/voices.json'
 import { props, sizeValues } from './autocomplete.shared'
 
 export default {
-    title: 'Autocomplete',
-    argTypes: {
-        size: {
-            defaultValue: props.size.default,
-            control: 'inline-radio',
-            options: sizeValues,
-        },
+  title: 'Autocomplete',
+  argTypes: {
+    size: {
+      defaultValue: props.size.default,
+      control: 'inline-radio',
+      options: sizeValues,
     },
+  },
 }
 
 const Template: StoryFn = (args) => ({
-    components: { NvAutocomplete, NvInput },
-    setup() {
-        return {
-            inputValue: ref(),
-            data: ref(voices),
-            args,
-        }
-    },
-    template: `
+  components: { NvAutocomplete, NvInput },
+  setup() {
+    return {
+      inputValue: ref(),
+      data: ref(voices),
+      args,
+    }
+  },
+  template: `
       <NvAutocomplete v-bind="args" :data="data" valueKey="voicemodel_uuid">
       <template #reference>
         <NvInput v-model="inputValue" class="w-full"/>
@@ -41,6 +41,6 @@ const Template: StoryFn = (args) => ({
 
 export const Default = Template.bind({})
 Default.args = {
-    autoScrollValue: '42b79bb6-0b41-44dd-9824-e840d336c343',
-    visible: true,
+  autoScrollValue: '42b79bb6-0b41-44dd-9824-e840d336c343',
+  visible: true,
 }

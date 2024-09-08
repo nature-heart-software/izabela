@@ -3,24 +3,24 @@ import { StoryFn } from '@storybook/vue3'
 import { NvButton, NvCenter, NvText, NvTooltip } from '@/components'
 
 export default {
-    components: { NvTooltip },
-    title: 'Tooltip',
-    argTypes: {
-        content: {
-            defaultValue: 'hello world',
-            control: 'text',
-        },
+  components: { NvTooltip },
+  title: 'Tooltip',
+  argTypes: {
+    content: {
+      defaultValue: 'hello world',
+      control: 'text',
     },
+  },
 }
 
 const Template: StoryFn = (args) => ({
-    components: { NvTooltip, NvButton, NvText, NvCenter },
-    setup() {
-        return {
-            args,
-        }
-    },
-    template: `
+  components: { NvTooltip, NvButton, NvText, NvCenter },
+  setup() {
+    return {
+      args,
+    }
+  },
+  template: `
       <NvCenter>
       <NvTooltip v-bind="args">
         <NvText>
