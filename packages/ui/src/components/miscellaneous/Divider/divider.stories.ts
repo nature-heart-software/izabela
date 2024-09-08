@@ -1,30 +1,30 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import {
-    Direction,
-    directionValues,
+  Direction,
+  directionValues,
 } from '@/components/miscellaneous/Divider/divider.shared'
 import { StoryFn } from '@storybook/vue3'
 import { NvDivider } from '@/components'
 
 export default {
-    title: 'Divider',
-    argTypes: {
-        direction: {
-            defaultValue: 'horizontal' as Direction,
-            options: directionValues,
-            control: 'inline-radio',
-        },
+  title: 'Divider',
+  argTypes: {
+    direction: {
+      defaultValue: 'horizontal' as Direction,
+      options: directionValues,
+      control: 'inline-radio',
     },
+  },
 }
 
 const Template: StoryFn = (args) => ({
-    components: { NvDivider },
-    setup() {
-        return {
-            args,
-        }
-    },
-    template: `
+  components: { NvDivider },
+  setup() {
+    return {
+      args,
+    }
+  },
+  template: `
       <NvDivider v-bind="args"/>
     `,
 })
@@ -34,6 +34,6 @@ Default.args = {}
 
 export const Vertical = Template.bind({})
 Vertical.args = {
-    direction: 'vertical',
-    class: 'h-64',
+  direction: 'vertical',
+  class: 'h-64',
 }

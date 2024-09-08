@@ -5,19 +5,19 @@ import { ref } from 'vue'
 import voices from '@/mocks/voices.json'
 
 export default {
-    title: 'VirtualList',
+  title: 'VirtualList',
 }
 
 const Template: StoryFn = (args) => ({
-    components: { NvVirtualList, NvVirtualListContainer },
-    setup() {
-        return {
-            inputValue: ref(),
-            data: ref(voices),
-            args,
-        }
-    },
-    template: `
+  components: { NvVirtualList, NvVirtualListContainer },
+  setup() {
+    return {
+      inputValue: ref(),
+      data: ref(voices),
+      args,
+    }
+  },
+  template: `
       <NvVirtualListContainer :style="{
      height: '200px',
      overflowY: 'auto',

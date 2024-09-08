@@ -4,23 +4,23 @@ import { NvCard, NvText } from '@/components'
 import NvAccessBlocker from './NvAccessBlocker.vue'
 
 export default {
-    title: 'AccessBlocker',
-    argTypes: {
-        reason: {
-            defaultValue: 'Not enough hats.',
-            control: 'textarea',
-        },
+  title: 'AccessBlocker',
+  argTypes: {
+    reason: {
+      defaultValue: 'Not enough hats.',
+      control: 'textarea',
     },
+  },
 }
 
 const Template: StoryFn = (args) => ({
-    components: { NvAccessBlocker, NvCard, NvText },
-    setup() {
-        return {
-            args,
-        }
-    },
-    template: `
+  components: { NvAccessBlocker, NvCard, NvText },
+  setup() {
+    return {
+      args,
+    }
+  },
+  template: `
       <NvCard>
       <NvAccessBlocker v-bind="args">
         <NvText>
@@ -35,5 +35,5 @@ const Template: StoryFn = (args) => ({
 
 export const Default = Template.bind({})
 Default.args = {
-    allowed: false,
+  allowed: false,
 }

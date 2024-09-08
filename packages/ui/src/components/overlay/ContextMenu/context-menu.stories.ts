@@ -1,25 +1,25 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { StoryFn } from '@storybook/vue3'
 import {
-    NvButton,
-    NvCenter,
-    NvContextMenu,
-    NvOption,
-    NvText,
+  NvButton,
+  NvCenter,
+  NvContextMenu,
+  NvOption,
+  NvText,
 } from '@/components'
 
 export default {
-    title: 'ContextMenu',
+  title: 'ContextMenu',
 }
 
 const Template: StoryFn = (args) => ({
-    components: { NvContextMenu, NvButton, NvText, NvCenter, NvOption },
-    setup() {
-        return {
-            args,
-        }
-    },
-    template: `
+  components: { NvContextMenu, NvButton, NvText, NvCenter, NvOption },
+  setup() {
+    return {
+      args,
+    }
+  },
+  template: `
       <NvCenter>
       <NvContextMenu v-bind="args">
         <NvOption>

@@ -1,62 +1,71 @@
 <template>
   <div>
     <Popover.Root
-        :autoFocus="false"
-        :open="props.visible"
-        :portalled="true"
-        :positioning="{
-          placement: props.placement,
-          flip: true,
-          overflowPadding: tokens.spacing['3'],
-          offset: {
-            mainAxis: tokens.spacing['4']
-          }
-        }"
-        @open-change="(open) => emit('openChange', open)"
+      :autoFocus="false"
+      :open="props.visible"
+      :portalled="true"
+      :positioning="{
+        placement: props.placement,
+        flip: true,
+        overflowPadding: tokens.spacing['3'],
+        offset: {
+          mainAxis: tokens.spacing['4'],
+        },
+      }"
+      @open-change="(open) => emit('openChange', open)"
     >
-      <Popover.Trigger ref="reference" asChild class="inline-flex w-full" @blur.prevent>
-        <slot name="reference"/>
+      <Popover.Trigger
+        ref="reference"
+        asChild
+        class="inline-flex w-full"
+        @blur.prevent
+      >
+        <slot name="reference" />
       </Popover.Trigger>
       <Teleport to="body">
         <Popover.Positioner ref="positioner" :style="{ zIndex: 9999 }">
           <Popover.Content :hidden="false" asChild>
-            <div @click.stop.prevent @mouseup.stop.prevent @mousedown.prevent.stop>
+            <div
+              @click.stop.prevent
+              @mouseup.stop.prevent
+              @mousedown.prevent.stop
+            >
               <Transition>
                 <StAutocomplete
-                    v-show="props.visible"
-                    class="autocomplete"
-                    v-bind="{ ...props, width: autocompleteWidth }"
+                  v-show="props.visible"
+                  class="autocomplete"
+                  v-bind="{ ...props, width: autocompleteWidth }"
                 >
                   <template v-if="props.options.length === 0">
-                    <slot name="fallback"/>
+                    <slot name="fallback" />
                   </template>
                   <NvVirtualListContainer
-                      v-show="props.options.length > 0"
-                      class="autocomplete__list"
+                    v-show="props.options.length > 0"
+                    class="autocomplete__list"
                   >
                     <NvVirtualList
-                        ref="list"
-                        :count="props.options.length"
-                        :estimateSize="() => props.estimateSize"
-                        :options="{
-                getItemKey: (index) =>
-                  get(
-                    props.options[index],
-                    props.valueKey,
-                    props.options[index],
-                  ),
-              }"
-                        @visible="onVisible"
-                        @wheel="selection = null"
+                      ref="list"
+                      :count="props.options.length"
+                      :estimateSize="() => props.estimateSize"
+                      :options="{
+                        getItemKey: (index) =>
+                          get(
+                            props.options[index],
+                            props.valueKey,
+                            props.options[index],
+                          ),
+                      }"
+                      @visible="onVisible"
+                      @wheel="selection = null"
                     >
                       <template #default="scope">
                         <slot
-                            name="default"
-                            v-bind="{
-                    ...scope,
-                    active: selection === scope.index,
-                    item: props.options[scope.index],
-                  }"
+                          name="default"
+                          v-bind="{
+                            ...scope,
+                            active: selection === scope.index,
+                            item: props.options[scope.index],
+                          }"
                         />
                       </template>
                     </NvVirtualList>
@@ -72,12 +81,7 @@
 </template>
 <script lang="ts" setup>
 import { Popover } from '@ark-ui/vue'
-import {
-  computed,
-  defineProps,
-  ref,
-  watch,
-} from 'vue'
+import { computed, defineProps, ref, watch } from 'vue'
 import { StAutocomplete } from './autocomplete.styled'
 import { defaultWidth, props as propsDefinition } from './autocomplete.shared'
 import { tokens } from '@/styles/tokens'
@@ -90,7 +94,7 @@ import { Virtualizer } from '@tanstack/virtual-core'
 
 const props = defineProps(propsDefinition)
 const list = ref<
-    undefined | { scrollToIndex: Virtualizer<Element, Element>['scrollToIndex'] }
+  undefined | { scrollToIndex: Virtualizer<Element, Element>['scrollToIndex'] }
 >()
 const reference = ref()
 const autocomplete = ref()
@@ -107,18 +111,18 @@ watch(positioner, (positioner) => {
 })
 
 watch(
-    () => props.visible,
-    (visible) => {
-      if (!visible) loading.value = true
-      selection.value = null
-    },
+  () => props.visible,
+  (visible) => {
+    if (!visible) loading.value = true
+    selection.value = null
+  },
 )
 
 watch(
-    () => props.options,
-    () => {
-      selection.value = 0
-    },
+  () => props.options,
+  () => {
+    selection.value = 0
+  },
 )
 
 watch(selection, (selection) => {
@@ -144,7 +148,7 @@ onKeyStroke('ArrowDown', (e) => {
     selection.value = props.autoScrollIndex || 0
     return
   }
-  if (selection.value === props.options.length-1) {
+  if (selection.value === props.options.length - 1) {
     selection.value = 0
   } else {
     selection.value += 1
@@ -159,7 +163,7 @@ onKeyStroke('ArrowUp', (e) => {
     return
   }
   if (selection.value === 0) {
-    selection.value = props.options.length-1
+    selection.value = props.options.length - 1
   } else {
     selection.value -= 1
   }
@@ -173,9 +177,9 @@ onKeyStroke('Enter', (e) => {
 
 onKeyStroke('Tab', (e) => {
   if (
-      !props.visible ||
-      typeof selection.value !== 'number' ||
-      !props.selectOnTab
+    !props.visible ||
+    typeof selection.value !== 'number' ||
+    !props.selectOnTab
   )
     return
   e.preventDefault()

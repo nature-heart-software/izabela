@@ -5,33 +5,33 @@ import { props, sizeValues } from './number-input.shared'
 import { NvNumberInput } from '@/components'
 
 export default {
-    title: 'Number Input',
-    argTypes: {
-        content: {
-            defaultValue: 0,
-            control: 'number',
-        },
-        placeholder: {
-            defaultValue: 'Enter some text...',
-            control: 'text',
-        },
-        size: {
-            defaultValue: props.size.default,
-            control: 'inline-radio',
-            options: sizeValues,
-        },
+  title: 'Number Input',
+  argTypes: {
+    content: {
+      defaultValue: 0,
+      control: 'number',
     },
+    placeholder: {
+      defaultValue: 'Enter some text...',
+      control: 'text',
+    },
+    size: {
+      defaultValue: props.size.default,
+      control: 'inline-radio',
+      options: sizeValues,
+    },
+  },
 }
 
 const Template: StoryFn = (args) => ({
-    components: { NvNumberInput },
-    setup() {
-        return {
-            args,
-            inputValue: ref(args.content),
-        }
-    },
-    template: `
+  components: { NvNumberInput },
+  setup() {
+    return {
+      args,
+      inputValue: ref(args.content),
+    }
+  },
+  template: `
       <NvNumberInput v-model="inputValue" v-bind="args"/>
     `,
 })
