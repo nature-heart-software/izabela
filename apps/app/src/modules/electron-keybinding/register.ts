@@ -19,6 +19,7 @@ import {
   emitIPCCancelCurrentMessage,
 } from '@/electron/events/main'
 import electronOverlayWindow from '@/teams/overlay/modules/electron-overlay-window'
+import nodeGlobalShortcuts from '@/modules/node-global-shortcuts'
 
 export default () =>
   app.whenReady().then(async () => {
@@ -144,7 +145,7 @@ export default () =>
       shortcuts.gkl.forEach(([shortcut, callback]) => {
         const accelerator = getAccelerator(shortcut)
         gkl?.removeListener(callback)
-        unregisterElectronShortcut(accelerator)
+        nodeGlobalShortcuts.unregister(shortcut)
         delete registeredShortcuts[accelerator]
       })
       Object.entries(registeredShortcuts).forEach(([accelerator]) => {
@@ -153,7 +154,7 @@ export default () =>
       })
       Object.entries(registeredCallbacks).forEach(([accelerator, callback]) => {
         gkl?.removeListener(callback)
-        unregisterElectronShortcut(accelerator)
+        nodeGlobalShortcuts.unregister(accelerator)
         delete registeredShortcuts[accelerator]
       })
     }
@@ -169,7 +170,9 @@ export default () =>
       shortcuts.gkl.forEach(([shortcut, callback]) => {
         const accelerator = getAccelerator(shortcut)
         gkl?.addListener(callback)
-        registerElectronShortcut(accelerator, () => null)
+        // registerElectronShortcut(accelerator, () => null)
+
+        nodeGlobalShortcuts.register(shortcut, callback)
         registeredShortcuts[accelerator] = accelerator
       })
       messagesStore.shortcutMessages.forEach((message) => {
@@ -186,7 +189,9 @@ export default () =>
           },
         )
         gkl?.addListener(registeredCallbacks[accelerator])
-        registerElectronShortcut(accelerator, () => null)
+        // registerElectronShortcut(accelerator, () => null)
+
+        nodeGlobalShortcuts.register(message.shortcut)
         registeredShortcuts[accelerator] = accelerator
       })
     }, 500)
