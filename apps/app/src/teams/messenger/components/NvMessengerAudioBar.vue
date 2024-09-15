@@ -27,6 +27,7 @@
               data-v-step="engine-select"
               icon-name="direction"
               placeholder="Speech Engine"
+              placement="top-start"
               size="sm"
               @update:modelValue="(value) => settingsStore.$patch({ selectedSpeechEngine: value })"
           />
@@ -42,6 +43,7 @@
                 class="w-13"
                 data-v-step="engine-voice-select"
                 placeholder="Speech Voice"
+                placement="top-start"
                 size="sm"
             />
           </template>

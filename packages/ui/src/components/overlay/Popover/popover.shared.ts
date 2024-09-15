@@ -7,7 +7,7 @@ export type Size = typeof sizeValues[number]
 export const props = {
     placement: {
         type: String as PropType<ComputePositionConfig['placement']>,
-        default: 'bottom-start',
+        default: 'bottom-end',
     },
     size: {
         type: String as PropType<Size>,
