@@ -41,7 +41,7 @@ registerEngine({
       },
       voice,
       audioConfig: {
-        audioEncoding: 'MP3',
+        audioEncoding: 'LINEAR16',
         volumeGainDb: 0,
       },
     }
