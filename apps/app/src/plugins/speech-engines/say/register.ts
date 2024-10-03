@@ -8,34 +8,35 @@ import { getProperty, setProperty } from './store'
 
 const getSelectedVoice = () => getProperty('selectedVoice')
 registerEngine({
-  id: ENGINE_ID,
-  name: ENGINE_NAME,
-  category: 'local',
-  getSelectedVoice,
-  getVoiceName,
-  getCredentials() {
-    return {}
-  },
-  getPayload({ text, translatedText, voice }) {
-    return {
-      text: translatedText || text,
-      voice: voice || getSelectedVoice(),
-    }
-  },
-  getLanguageCode() {
-    return DEFAULT_LANGUAGE_CODE
-  },
-  synthesizeSpeech({ credentials, payload }) {
-    return api('local').post<Blob>(
-      '/tts/say/synthesize-speech',
-      {
-        credentials,
-        payload,
-      },
-      { responseType: 'blob' },
-    )
-  },
-  voiceSelectComponent: NvVoiceSelect,
-  settingsComponent: NvSettings,
-  store: { setProperty, getProperty },
+    id: ENGINE_ID,
+    name: ENGINE_NAME,
+    category: 'local',
+    getSelectedVoice,
+    getVoiceName,
+    getCredentials() {
+        return {}
+    },
+    getPayload({ text, translatedText, voice }) {
+        return {
+            text: translatedText || text,
+            voice: voice || getSelectedVoice(),
+            speed: getProperty('speed') / 100,
+        }
+    },
+    getLanguageCode() {
+        return DEFAULT_LANGUAGE_CODE
+    },
+    synthesizeSpeech({ credentials, payload }) {
+        return api('local').post<Blob>(
+            '/tts/say/synthesize-speech',
+            {
+                credentials,
+                payload,
+            },
+            { responseType: 'blob' },
+        )
+    },
+    voiceSelectComponent: NvVoiceSelect,
+    settingsComponent: NvSettings,
+    store: { setProperty, getProperty },
 })
