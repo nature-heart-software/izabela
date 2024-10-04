@@ -1,29 +1,45 @@
 <template>
-  <StPopover v-bind="props">
-    <tippy v-bind="tippyProps">
-      <slot name="reference" />
-      <template #content>
-        <slot />
-      </template>
-    </tippy>
-  </StPopover>
+  <Popover.Root
+      v-model:open="open"
+      :autoFocus="false"
+      :positioning="{
+        placement: props.placement,
+        flip: true,
+        overflowPadding: tokens.spacing['3'],
+        offset: {
+          mainAxis: tokens.spacing['4']
+        }
+      }"
+      asChild
+      portalled
+  >
+    <StPopover v-bind="props">
+      <Popover.Trigger asChild>
+        <slot name="reference"/>
+      </Popover.Trigger>
+      <Teleport to="body">
+        <Popover.Positioner>
+          <Popover.Content :hidden="false">
+            <Transition>
+              <Card v-if="open" :size="props.size" :style="{ maxWidth: rem(300) }">
+                <slot/>
+              </Card>
+            </Transition>
+          </Popover.Content>
+        </Popover.Positioner>
+      </Teleport>
+    </StPopover>
+  </Popover.Root>
 </template>
 <script lang="ts" setup>
-import { defineProps } from 'vue'
+import { defineProps, ref } from 'vue'
 import { StPopover } from './popover.styled'
 import { props as propsDefinition } from './popover.shared'
-import { Tippy } from 'vue-tippy'
 import { tokens } from '@/styles/tokens'
+import { Popover } from '@ark-ui/vue'
+import Card from '@/components/display/Card/NvCard.vue'
+import { rem } from 'polished'
 
+const open = ref(false)
 const props = defineProps(propsDefinition)
-const tippyProps: (typeof props)['tippyOptions'] = {
-  trigger: 'click',
-  interactive: true,
-  placement: 'bottom-start',
-  offset: [0, tokens.spacing['4']],
-  appendTo: () => document.body,
-  theme: `popover-${props.size}`,
-  maxWidth: 300,
-  ...props.tippyOptions,
-}
 </script>

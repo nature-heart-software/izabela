@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { ref } from 'vue'
-import { Story } from '@storybook/vue3'
+import { StoryFn } from '@storybook/vue3'
 import NvTable from './NvTable.vue'
 import NvTableColumn from './NvTableColumn.vue'
 
@@ -8,7 +8,7 @@ export default {
   title: 'Table',
 }
 
-const Template: Story = (args) => ({
+const Template: StoryFn = (args) => ({
   components: { NvTable, NvTableColumn },
   setup() {
     return {

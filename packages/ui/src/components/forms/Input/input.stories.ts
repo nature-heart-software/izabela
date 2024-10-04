@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { ref } from 'vue'
-import { Story } from '@storybook/vue3'
+import { StoryFn } from '@storybook/vue3'
 import { props, sizeValues } from './input.shared'
 import { NvInput } from '@/components'
 
@@ -23,7 +23,7 @@ export default {
   },
 }
 
-const Template: Story = (args) => ({
+const Template: StoryFn = (args) => ({
   components: { NvInput },
   setup() {
     return {

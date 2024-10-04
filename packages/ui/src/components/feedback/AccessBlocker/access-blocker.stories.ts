@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { Story } from '@storybook/vue3'
+import { StoryFn } from '@storybook/vue3'
 import { NvCard, NvText } from '@/components'
 import NvAccessBlocker from './NvAccessBlocker.vue'
 
@@ -13,7 +13,7 @@ export default {
   },
 }
 
-const Template: Story = (args) => ({
+const Template: StoryFn = (args) => ({
   components: { NvAccessBlocker, NvCard, NvText },
   setup() {
     return {

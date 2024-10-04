@@ -6,7 +6,8 @@
         <template #reference>
           <NvButton
             :type="
-              route.name === 'settings-engine' && messengerContext.isViewShown.value
+              route.name === 'settings-engine' &&
+              messengerContext.isViewShown.value
                 ? 'plain'
                 : 'default'
             "
@@ -27,8 +28,11 @@
             data-v-step="engine-select"
             icon-name="direction"
             placeholder="Speech Engine"
+            placement="top-start"
             size="sm"
-            @update:modelValue="(value) => settingsStore.$patch({ selectedSpeechEngine: value })"
+            @update:modelValue="
+              (value) => settingsStore.$patch({ selectedSpeechEngine: value })
+            "
           />
         </template>
       </NvTooltip>
@@ -42,13 +46,14 @@
               class="w-13"
               data-v-step="engine-voice-select"
               placeholder="Speech Voice"
+              placement="top-start"
               size="sm"
             />
           </template>
         </NvTooltip>
       </template>
       <NvDivider class="h-3" direction="vertical" />
-      <NvPopover :tippy-options="{ placement: 'top-start' }" size="sm">
+      <NvPopover placement="top-start" size="sm">
         <div class="w-screen max-w-full">
           <NvStack spacing="4">
             <NvGroup justify="apart" no-wrap>
@@ -73,7 +78,10 @@
           <NvTooltip>
             <NvText>Audio outputs</NvText>
             <template #reference>
-              <NvButton data-v-step="audio-outputs-select" icon-name="direction" size="sm"
+              <NvButton
+                data-v-step="audio-outputs-select"
+                icon-name="direction"
+                size="sm"
                 >Outputs ({{
                   settingsStore.audioOutputs.length +
                   (settingsStore.playSpeechOnDefaultPlaybackDevice ? 1 : 0)
@@ -83,7 +91,7 @@
           </NvTooltip>
         </template>
       </NvPopover>
-      <NvPopover :tippy-options="{ placement: 'top-start' }" size="sm">
+      <NvPopover placement="top-start" size="sm">
         <div class="w-screen max-w-full">
           <NvStack spacing="4">
             <NvGroup justify="apart" no-wrap>
@@ -93,11 +101,15 @@
               <NvSwitch
                 :modelValue="settingsStore.enableSTTTS"
                 class="shrink-0"
-                @update:modelValue="(value) => settingsStore.$patch({ enableSTTTS: value })"
+                @update:modelValue="
+                  (value) => settingsStore.$patch({ enableSTTTS: value })
+                "
               />
             </NvGroup>
             <NvAccessBlocker
-              :allowed="!!googleCloudSpeechCredentialsPath && settingsStore.enableSTTTS"
+              :allowed="
+                !!googleCloudSpeechCredentialsPath && settingsStore.enableSTTTS
+              "
               :reason="
                 settingsStore.enableSTTTS
                   ? 'Google Cloud credentials required'
@@ -124,8 +136,9 @@
         <template #reference>
           <NvTooltip>
             <NvText
-              >Audio input<template v-if="settingsStore.enableSTTTS"> - Running</template></NvText
-            >
+              >Audio input
+              <template v-if="settingsStore.enableSTTTS"> - Running</template>
+            </NvText>
             <template #reference>
               <NvButton
                 :type="settingsStore.enableSTTTS ? 'active' : 'default'"
@@ -170,5 +183,6 @@ const speechStore = useSpeechStore()
 const settingsStore = useSettingsStore()
 const messengerContext = inject('messenger')
 const route = useRoute()
-const { data: googleCloudSpeechCredentialsPath } = useGetGoogleCloudSpeechCredentialsPath()
+const { data: googleCloudSpeechCredentialsPath } =
+  useGetGoogleCloudSpeechCredentialsPath()
 </script>

@@ -24,7 +24,7 @@ export const props = {
   },
   placement: {
     type: String as PropType<ComputePositionConfig['placement']>,
-    default: 'bottom-start',
+    default: 'bottom-end',
   },
   visible: {
     type: Boolean,
