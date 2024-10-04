@@ -1,10 +1,10 @@
 <template>
   <div>
     <Popover.Root
-      :autoFocus="false"
-      :open="props.visible"
-      :portalled="true"
-      :positioning="{
+        :autoFocus="false"
+        :open="props.visible"
+        :portalled="true"
+        :positioning="{
         placement: props.placement,
         flip: true,
         overflowPadding: tokens.spacing['3'],
@@ -12,46 +12,46 @@
           mainAxis: tokens.spacing['4'],
         },
       }"
-      @open-change="(details) => emit('openChange', details)"
-      @escape-key-down="(details) => emit('escapeKeyDown', details)"
-      @focus-outside="(details) => emit('focusOutside', details)"
-      @interact-outside="(details) => emit('interactOutside', details)"
-      @pointer-down-outside="(details) => emit('pointerDownOutside', details)"
+        @open-change="(details) => emit('openChange', details)"
+        @escape-key-down="(details) => emit('escapeKeyDown', details)"
+        @focus-outside="(details) => emit('focusOutside', details)"
+        @interact-outside="(details) => emit('interactOutside', details)"
+        @pointer-down-outside="(details) => emit('pointerDownOutside', details)"
     >
       <Popover.Trigger
-        ref="reference"
-        asChild
-        class="inline-flex w-full"
-        @blur.prevent
+          ref="reference"
+          asChild
+          class="inline-flex w-full"
+          @blur.prevent
       >
-        <slot name="reference" />
+        <slot name="reference"/>
       </Popover.Trigger>
-      <Teleport to="body">
+      <Teleport :to="portalTarget" defer>
         <Popover.Positioner ref="positioner" :style="{ zIndex: 9999 }">
           <Popover.Content :hidden="false" asChild>
             <div
-              @click.stop.prevent
-              @mouseup.stop.prevent
-              @mousedown.prevent.stop
+                @click.stop.prevent
+                @mouseup.stop.prevent
+                @mousedown.prevent.stop
             >
               <Transition>
                 <StAutocomplete
-                  v-if="props.visible"
-                  class="autocomplete"
-                  v-bind="{ ...props, width: autocompleteWidth }"
+                    v-if="props.visible"
+                    class="autocomplete"
+                    v-bind="{ ...props, width: autocompleteWidth }"
                 >
                   <template v-if="props.options.length === 0">
-                    <slot name="fallback" />
+                    <slot name="fallback"/>
                   </template>
                   <NvVirtualListContainer
-                    v-show="props.options.length > 0"
-                    class="autocomplete__list"
+                      v-show="props.options.length > 0"
+                      class="autocomplete__list"
                   >
                     <NvVirtualList
-                      ref="list"
-                      :count="props.options.length"
-                      :estimateSize="() => props.estimateSize"
-                      :options="{
+                        ref="list"
+                        :count="props.options.length"
+                        :estimateSize="() => props.estimateSize"
+                        :options="{
                         getItemKey: (index) =>
                           get(
                             props.options[index],
@@ -59,13 +59,13 @@
                             props.options[index],
                           ),
                       }"
-                      @visible="onVisible"
-                      @wheel="selection = null"
+                        @visible="onVisible"
+                        @wheel="selection = null"
                     >
                       <template #default="scope">
                         <slot
-                          name="default"
-                          v-bind="{
+                            name="default"
+                            v-bind="{
                             ...scope,
                             active: selection === scope.index,
                             item: props.options[scope.index],
@@ -95,10 +95,11 @@ import NvVirtualList from '@/components/miscellaneous/VirtualList/NvVirtualList.
 import NvVirtualListContainer from '@/components/miscellaneous/VirtualList/NvVirtualListContainer.vue'
 import get from 'lodash/get'
 import { Virtualizer } from '@tanstack/virtual-core'
+import { inject } from 'vue'
 
 const props = defineProps(propsDefinition)
 const list = ref<
-  undefined | { scrollToIndex: Virtualizer<Element, Element>['scrollToIndex'] }
+    undefined | { scrollToIndex: Virtualizer<Element, Element>['scrollToIndex'] }
 >()
 const reference = ref()
 const autocomplete = ref()
@@ -123,18 +124,18 @@ watch(positioner, (positioner) => {
 })
 
 watch(
-  () => props.visible,
-  (visible) => {
-    if (!visible) loading.value = true
-    selection.value = null
-  },
+    () => props.visible,
+    (visible) => {
+      if (!visible) loading.value = true
+      selection.value = null
+    },
 )
 
 watch(
-  () => props.options,
-  () => {
-    selection.value = 0
-  },
+    () => props.options,
+    () => {
+      selection.value = 0
+    },
 )
 
 watch(selection, (selection) => {
@@ -160,7 +161,7 @@ onKeyStroke('ArrowDown', (e) => {
     selection.value = props.autoScrollIndex || 0
     return
   }
-  if (selection.value === props.options.length - 1) {
+  if (selection.value === props.options.length-1) {
     selection.value = 0
   } else {
     selection.value += 1
@@ -175,7 +176,7 @@ onKeyStroke('ArrowUp', (e) => {
     return
   }
   if (selection.value === 0) {
-    selection.value = props.options.length - 1
+    selection.value = props.options.length-1
   } else {
     selection.value -= 1
   }
@@ -189,9 +190,9 @@ onKeyStroke('Enter', (e) => {
 
 onKeyStroke('Tab', (e) => {
   if (
-    !props.visible ||
-    typeof selection.value !== 'number' ||
-    !props.selectOnTab
+      !props.visible ||
+      typeof selection.value !== 'number' ||
+      !props.selectOnTab
   )
     return
   e.preventDefault()
@@ -202,4 +203,6 @@ const onVisible = () => {
   selection.value = props.autoScrollIndex
   loading.value = false
 }
+
+const portalTarget = inject('portal-target') || 'body'
 </script>
