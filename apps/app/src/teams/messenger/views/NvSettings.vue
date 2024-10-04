@@ -8,7 +8,12 @@
           <NvTooltip>
             <NvText>Close</NvText>
             <template #reference>
-              <NvButton icon-name="times" size="xs" type="plain" @click="$emit('close')"/>
+              <NvButton
+                icon-name="times"
+                size="xs"
+                type="plain"
+                @click="$emit('close')"
+              />
             </template>
           </NvTooltip>
         </div>
@@ -26,14 +31,20 @@
                     {{ category.name }}
                   </NvText>
                   <NvStack spacing="2">
-                    <template v-for="entry in category.children" :key="entry.name">
-                      <router-link :to="entry.to || { name: 'settings' }" class="w-full">
+                    <template
+                      v-for="entry in category.children"
+                      :key="entry.name"
+                    >
+                      <router-link
+                        :to="entry.to || { name: 'settings' }"
+                        class="w-full"
+                      >
                         <NvButton
-                            :selected="currentRoute.name === entry.to?.name"
-                            class="w-full"
-                            size="sm"
-                            type="ghost-alt"
-                        >{{ entry.name }}
+                          :selected="currentRoute.name === entry.to?.name"
+                          class="w-full"
+                          size="sm"
+                          type="ghost-alt"
+                          >{{ entry.name }}
                         </NvButton>
                       </router-link>
                     </template>
@@ -47,8 +58,11 @@
               <!-- View -->
               <router-view v-slot="{ Component }">
                 <Transition class="transition">
-                  <div :key="Component" class="absolute inset-0 overflow-y-auto">
-                    <component :is="Component"/>
+                  <div
+                    :key="Component"
+                    class="absolute inset-0 overflow-y-auto"
+                  >
+                    <component :is="Component" />
                   </div>
                 </Transition>
               </router-view>
@@ -65,9 +79,8 @@ import { useRoute } from 'vue-router'
 import { v4 as uuid } from 'uuid'
 import { provide } from 'vue'
 
-const id = `_${ uuid() }`
-provide('portal-target', `#${ id }`)
-
+const id = `_${uuid()}`
+provide('portal-target', `#${id}`)
 
 const navigation = [
   {
