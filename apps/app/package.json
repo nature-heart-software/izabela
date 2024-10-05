@@ -30,7 +30,7 @@
     "build": "vite build && yarn electron:build",
     "build:prod": "vue-tsc && yarn build",
     "dev": "vite",
-    "electron:build": "electron-builder --config electron-builder.config.js",
+    "electron:build": "electron-builder --config electron-builder.config.js --publish never",
     "generate:app-icon": "npx electron-icon-builder --input=./assets/app-icon.png --output=./build --flatten && npx electron-icon-builder --input=./assets/app-icon.png --output=./public --flatten",
     "lint": "vue-tsc",
     "postinstall": "node bin/rebuild.js",
