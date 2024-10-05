@@ -190,6 +190,7 @@ const autocomplete = ref()
 const { hasFocus, activate, deactivate } = useFocusTrap(inputWrapper, {
   returnFocusOnDeactivate: false,
   allowOutsideClick: true,
+  preventScroll: true,
   onDeactivate() {
     if (selectInput.value) selectInput.value.$el.blur()
   },
