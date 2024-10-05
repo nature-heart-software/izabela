@@ -17,4 +17,6 @@ export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
   },
   useLocalCredentials: false,
   favoriteVoiceIds: [],
+  ratePercentage: 0,
+  pitchPercentage: 0,
 })

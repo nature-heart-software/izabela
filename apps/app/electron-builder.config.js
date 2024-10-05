@@ -37,7 +37,6 @@ module.exports = {
   // eslint-disable-next-line no-template-curly-in-string
   artifactName: '${name}-setup-${version}-${os}.${ext}',
   publish: ['github'],
-  publishAutoUpdate: false,
   electronVersion: getElectronVersion(),
   extraFiles: ['./resources/**'],
 }

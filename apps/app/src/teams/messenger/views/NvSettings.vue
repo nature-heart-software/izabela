@@ -54,18 +54,20 @@
             </NvStack>
           </div>
           <div class="settings__content flex-1 pl-4">
-            <div :id="id" class="h-full relative">
-              <!-- View -->
-              <router-view v-slot="{ Component }">
-                <Transition class="transition">
-                  <div
-                    :key="Component"
-                    class="absolute inset-0 overflow-y-auto"
-                  >
-                    <component :is="Component" />
-                  </div>
-                </Transition>
-              </router-view>
+            <div :id="id" class="h-full relative overflow-hidden">
+              <div class="h-full relative">
+                <!-- View -->
+                <router-view v-slot="{ Component }">
+                  <Transition class="transition">
+                    <div
+                      :key="Component"
+                      class="absolute inset-0 overflow-y-auto"
+                    >
+                      <component :is="Component" />
+                    </div>
+                  </Transition>
+                </router-view>
+              </div>
             </div>
           </div>
         </div>
