@@ -68,6 +68,7 @@ jobs:
           NODE_OPTIONS: '--max_old_space_size=4096'
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           VUE_APP_ENCRYPTION_KEY: ${{ secrets.APP_ENCRYPTION_KEY }}
+          VITE_APP_ENCRYPTION_KEY: ${{ secrets.APP_ENCRYPTION_KEY }}
         with:
           cmd: build
 

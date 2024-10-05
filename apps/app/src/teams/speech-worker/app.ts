@@ -8,3 +8,5 @@ const app = createApp(App)
 app.use(pinia).use(VueQueryPlugin)
 
 app.mount('#app')
+
+app.config.warnHandler = () => null

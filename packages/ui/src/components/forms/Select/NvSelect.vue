@@ -1,12 +1,19 @@
 <template>
   <NvAutocomplete
-    ref="autocomplete"
     :autoScrollIndex="autoScrollIndex"
     :options="searchResults"
     :valueKey="props.valueKey"
-    :visible="hasFocus"
+    :visible="isAutocompleteVisible"
     :width="props.autocompleteWidth"
     @select="(item) => !item.children && handleValue(item.value)"
+    @positioner-change="
+      ($event) => {
+        autocomplete = $event
+      }
+    "
+    @pointer-down-outside="blurInput"
+    @focus-outside="blurInput"
+    @interact-outside="blurInput"
   >
     <template #reference>
       <StSelect
@@ -92,11 +99,11 @@
   </NvAutocomplete>
 </template>
 <script lang="ts" setup>
-import { computed, defineProps, onBeforeUnmount, ref } from 'vue'
+import { computed, defineProps, onBeforeUnmount, ref, watch } from 'vue'
 import { useFocusTrap } from '@vueuse/integrations/useFocusTrap'
 import { useFuse, UseFuseOptions } from '@vueuse/integrations/useFuse'
 import { onClickOutside, onKeyStroke } from '@vueuse/core'
-import tokens from '@/styles/tokens'
+import { tokens } from '@/styles/tokens'
 import {
   StSelect,
   StSelectIcon,
@@ -117,7 +124,9 @@ import NvTag from '@/components/forms/Tag/NvTag.vue'
 import NvGroup from '@/components/miscellaneous/Group/NvGroup.vue'
 import NvStack from '@/components/miscellaneous/Stack/NvStack.vue'
 import NvOption from './NvOption.vue'
-import { flatten, get, omit } from 'lodash'
+import flatten from 'lodash/flatten'
+import get from 'lodash/get'
+import omit from 'lodash/omit'
 import { v4 as uuid } from 'uuid'
 
 const props = defineProps(propsDefinition)
@@ -180,10 +189,23 @@ const inputWrapper = ref()
 const autocomplete = ref()
 const { hasFocus, activate, deactivate } = useFocusTrap(inputWrapper, {
   returnFocusOnDeactivate: false,
+  allowOutsideClick: true,
   onDeactivate() {
     if (selectInput.value) selectInput.value.$el.blur()
   },
 })
+
+const isAutocompleteVisible = ref(false)
+
+watch(
+  () => hasFocus.value,
+  (value) => {
+    if (value) {
+      isAutocompleteVisible.value = true
+    }
+  },
+)
+
 const fuseOptions = computed<UseFuseOptions<(typeof options.value)[number]>>(
   () => ({
     fuseOptions: {
@@ -252,9 +274,9 @@ const handleValue = (value: Value) => {
 const blurInput = () => {
   search.value = ''
   deactivate()
+  isAutocompleteVisible.value = false
 }
 onKeyStroke('Escape', blurInput)
 onKeyStroke('Tab', blurInput)
-onClickOutside(autocomplete, blurInput)
 onBeforeUnmount(blurInput)
 </script>

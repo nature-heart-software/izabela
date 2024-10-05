@@ -1,21 +1,16 @@
 {
   "name": "@packages/native-keymap",
-  "version": "3.3.2",
   "description": "Get OS key mapping",
+  "version": "3.3.2",
+  "author": "Microsoft Corporation",
+  "bugs": "https://github.com/Microsoft/node-native-keymap/issues",
+  "homepage": "https://github.com/Microsoft/node-native-keymap#readme",
+  "license": "MIT",
   "main": "index.js",
-  "typings": "index.d.ts",
+  "repository": "Microsoft/node-native-keymap.git",
   "scripts": {
     "install": "",
     "test": "node test/test.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Microsoft/node-native-keymap.git"
-  },
-  "author": "Microsoft Corporation",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/Microsoft/node-native-keymap/issues"
-  },
-  "homepage": "https://github.com/Microsoft/node-native-keymap#readme"
+  "typings": "index.d.ts"
 }

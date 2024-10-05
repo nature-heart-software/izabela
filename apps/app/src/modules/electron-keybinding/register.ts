@@ -7,10 +7,17 @@ import { Key } from '@/types/keybinds'
 import { ipcMain } from 'electron-postman'
 import { IzabelaMessage } from '@/modules/izabela/types'
 import { purify } from '@packages/toolbox'
-import { debounce } from 'lodash'
+import debounce from 'lodash/debounce'
 import { IGlobalKeyEvent, IGlobalKeyListener } from 'node-global-key-listener'
-import { gkl, handleShortcut, keybindingTriggered } from '@/modules/electron-keybinding/utils'
-import { emitIPCCancelAllMessages, emitIPCCancelCurrentMessage } from '@/electron/events/main'
+import {
+  gkl,
+  handleShortcut,
+  keybindingTriggered,
+} from '@/modules/electron-keybinding/utils'
+import {
+  emitIPCCancelAllMessages,
+  emitIPCCancelCurrentMessage,
+} from '@/electron/events/main'
 import electronOverlayWindow from '@/teams/overlay/modules/electron-overlay-window'
 
 export default () =>
@@ -18,30 +25,44 @@ export default () =>
     const settingsStore = useSettingsStore()
     const messagesStore = useMessagesStore()
     const multiKeysKeybindings = {
-      toggleMessengerWindow: handleShortcut(() => electronMessengerWindow.toggleWindow('keyboard')),
+      toggleMessengerWindow: handleShortcut(() =>
+        electronMessengerWindow.toggleWindow('keyboard'),
+      ),
       toggleMessengerWindowAlt: handleShortcut(() =>
         electronMessengerWindow.toggleWindow('keyboard'),
       ),
-      toggleOverlayWindow: handleShortcut(() => electronOverlayWindow.toggleWindow()),
+      toggleOverlayWindow: handleShortcut(() =>
+        electronOverlayWindow.toggleWindow(),
+      ),
       cancelCurrentMessage: handleShortcut(() => emitIPCCancelCurrentMessage()),
       cancelAllMessages: handleShortcut(() => emitIPCCancelAllMessages()),
     }
     const registeredShortcuts: Record<string, string> = {}
     const registeredCallbacks: Record<string, IGlobalKeyListener> = {}
-    const getAccelerator = (shortcut: Key[]) => shortcut.map(({ key }: Key) => key).join('+')
-    const registerElectronShortcut = (accelerator: string, callback: () => void) => {
+    const getAccelerator = (shortcut: Key[]) =>
+      shortcut.map(({ key }: Key) => key).join('+')
+    const registerElectronShortcut = (
+      accelerator: string,
+      callback: () => void,
+    ) => {
       try {
         globalShortcut.register(accelerator, callback)
         console.log('[electron-shortcuts] Registered shortcut', accelerator)
       } catch (e: any) {
-        console.log("[electron-shortcuts] Couldn't register shortcut", accelerator)
+        console.log(
+          "[electron-shortcuts] Couldn't register shortcut",
+          accelerator,
+        )
       }
     }
     const unregisterElectronShortcut = (accelerator: string) => {
       try {
         globalShortcut.unregister(accelerator)
       } catch (e: any) {
-        console.log("[electron-shortcuts] Couldn't unregister shortcut", accelerator)
+        console.log(
+          "[electron-shortcuts] Couldn't unregister shortcut",
+          accelerator,
+        )
       }
     }
     const getShortcuts: () => {
@@ -59,7 +80,11 @@ export default () =>
           settingsStore.keybindings.toggleMessengerWindowAlt,
           (e) => {
             if (e.state === 'DOWN') {
-              if (keybindingTriggered(settingsStore.keybindings.toggleMessengerWindowAlt)) {
+              if (
+                keybindingTriggered(
+                  settingsStore.keybindings.toggleMessengerWindowAlt,
+                )
+              ) {
                 multiKeysKeybindings.toggleMessengerWindowAlt()
               }
             }
@@ -69,7 +94,11 @@ export default () =>
           settingsStore.keybindings.toggleOverlayWindow,
           (e) => {
             if (e.state === 'DOWN') {
-              if (keybindingTriggered(settingsStore.keybindings.toggleOverlayWindow)) {
+              if (
+                keybindingTriggered(
+                  settingsStore.keybindings.toggleOverlayWindow,
+                )
+              ) {
                 multiKeysKeybindings.toggleOverlayWindow()
               }
             }
@@ -79,7 +108,11 @@ export default () =>
           settingsStore.keybindings.cancelCurrentMessage,
           (e) => {
             if (e.state === 'DOWN') {
-              if (keybindingTriggered(settingsStore.keybindings.cancelCurrentMessage)) {
+              if (
+                keybindingTriggered(
+                  settingsStore.keybindings.cancelCurrentMessage,
+                )
+              ) {
                 multiKeysKeybindings.cancelCurrentMessage()
               }
             }
@@ -89,7 +122,9 @@ export default () =>
           settingsStore.keybindings.cancelAllMessages,
           (e) => {
             if (e.state === 'DOWN') {
-              if (keybindingTriggered(settingsStore.keybindings.cancelAllMessages)) {
+              if (
+                keybindingTriggered(settingsStore.keybindings.cancelAllMessages)
+              ) {
                 multiKeysKeybindings.cancelAllMessages()
               }
             }
@@ -139,15 +174,17 @@ export default () =>
       })
       messagesStore.shortcutMessages.forEach((message) => {
         const accelerator = getAccelerator(message.shortcut)
-        registeredCallbacks[accelerator] = handleShortcut((e: IGlobalKeyEvent) => {
-          if (e.state === 'DOWN' && keybindingTriggered(message.shortcut)) {
-            const payload: IzabelaMessage = {
-              ...message,
-              excludeFromHistory: true,
+        registeredCallbacks[accelerator] = handleShortcut(
+          (e: IGlobalKeyEvent) => {
+            if (e.state === 'DOWN' && keybindingTriggered(message.shortcut)) {
+              const payload: IzabelaMessage = {
+                ...message,
+                excludeFromHistory: true,
+              }
+              ipcMain.sendTo('speech-worker', 'say', purify(payload))
             }
-            ipcMain.sendTo('speech-worker', 'say', purify(payload))
-          }
-        })
+          },
+        )
         gkl?.addListener(registeredCallbacks[accelerator])
         registerElectronShortcut(accelerator, () => null)
         registeredShortcuts[accelerator] = accelerator
@@ -155,7 +192,11 @@ export default () =>
     }, 500)
 
     registerAllShortcuts()
-    watch(() => [settingsStore.keybindings, messagesStore.shortcutMessages], registerAllShortcuts, {
-      deep: true,
-    })
+    watch(
+      () => [settingsStore.keybindings, messagesStore.shortcutMessages],
+      registerAllShortcuts,
+      {
+        deep: true,
+      },
+    )
   })

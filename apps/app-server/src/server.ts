@@ -3,7 +3,7 @@ import bodyParser from 'body-parser'
 import cors from 'cors'
 import logger from 'morgan'
 import path from 'path'
-import { defaultsDeep } from 'lodash'
+import defaultsDeep from 'lodash/defaultsDeep'
 import * as plugins from './plugins'
 import websocket from './websocket'
 

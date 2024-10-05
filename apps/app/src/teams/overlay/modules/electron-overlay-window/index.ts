@@ -1,6 +1,6 @@
 import ElectronWindowManager from '@/modules/electron-window-manager'
-import { throttle } from 'lodash'
-import { BrowserWindow, screen, shell } from 'electron'
+import throttle from 'lodash/throttle'
+import { BrowserWindow, screen } from 'electron'
 import { useSettingsStore } from '@/features/settings/store'
 import { Deferred } from '@packages/toolbox'
 import ffi from 'ffi-napi'
@@ -10,7 +10,10 @@ import {
   keybindingTriggered,
 } from '@/modules/electron-keybinding/utils'
 import { IGlobalKeyEvent, IGlobalKeyListener } from 'node-global-key-listener'
-import { emitIPCOverlayInputCharacter, emitIPCOverlayInputCommand } from '@/electron/events/main'
+import {
+  emitIPCOverlayInputCharacter,
+  emitIPCOverlayInputCommand,
+} from '@/electron/events/main'
 import keymap from '@packages/native-keymap'
 import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
 import { useOverlayWindowStore } from '@/teams/overlay/store'
@@ -28,7 +31,8 @@ export const ElectronOverlayWindow = () => {
   })
 
   const getWindow = () =>
-    registeredWindow || ElectronWindowManager.getInstanceByName('messenger')?.window
+    registeredWindow ||
+    ElectronWindowManager.getInstanceByName('messenger')?.window
 
   const hide = () =>
     new Promise((resolve, reject) => {
@@ -53,7 +57,9 @@ export const ElectronOverlayWindow = () => {
           const callback = () => {
             if (
               settingsStore &&
-              keybindingAllReleased(settingsStore.keybindings.toggleOverlayWindow)
+              keybindingAllReleased(
+                settingsStore.keybindings.toggleOverlayWindow,
+              )
             ) {
               gkl?.removeListener(callback)
               r(true)
@@ -149,10 +155,10 @@ export const ElectronOverlayWindow = () => {
               hasRightAlt && hasShift
                 ? nativeKey.withShiftAltGr
                 : hasRightAlt
-                ? nativeKey.withAltGr
-                : hasShift
-                ? nativeKey.withShift
-                : nativeKey.value
+                  ? nativeKey.withAltGr
+                  : hasShift
+                    ? nativeKey.withShift
+                    : nativeKey.value
             if (key) {
               emitIPCOverlayInputCharacter(key)
             }
@@ -173,16 +179,32 @@ export const ElectronOverlayWindow = () => {
         if (e.state === 'DOWN' && e.name === 'RETURN') {
           emitIPCOverlayInputCommand('validateMessage')
         }
-        if (e.state === 'DOWN' && e.name === 'A' && (down['LEFT CTRL'] || down['RIGHT CTRL'])) {
+        if (
+          e.state === 'DOWN' &&
+          e.name === 'A' &&
+          (down['LEFT CTRL'] || down['RIGHT CTRL'])
+        ) {
           emitIPCOverlayInputCommand('selectAll')
         }
-        if (e.state === 'DOWN' && e.name === 'X' && (down['LEFT CTRL'] || down['RIGHT CTRL'])) {
+        if (
+          e.state === 'DOWN' &&
+          e.name === 'X' &&
+          (down['LEFT CTRL'] || down['RIGHT CTRL'])
+        ) {
           emitIPCOverlayInputCommand('cut')
         }
-        if (e.state === 'DOWN' && e.name === 'C' && (down['LEFT CTRL'] || down['RIGHT CTRL'])) {
+        if (
+          e.state === 'DOWN' &&
+          e.name === 'C' &&
+          (down['LEFT CTRL'] || down['RIGHT CTRL'])
+        ) {
           emitIPCOverlayInputCommand('copy')
         }
-        if (e.state === 'DOWN' && e.name === 'V' && (down['LEFT CTRL'] || down['RIGHT CTRL'])) {
+        if (
+          e.state === 'DOWN' &&
+          e.name === 'V' &&
+          (down['LEFT CTRL'] || down['RIGHT CTRL'])
+        ) {
           emitIPCOverlayInputCommand('paste')
         }
         if (e.state === 'DOWN' && e.name === 'LEFT ARROW') {

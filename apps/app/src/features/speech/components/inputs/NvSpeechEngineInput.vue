@@ -10,23 +10,29 @@
     @select="onAutocompleteSelect"
   >
     <template #reference>
-      <NvInput
-        ref="inputRef"
-        :modelValue="props.modelValue"
-        v-bind="$attrs"
-        @blur="onInputBlur"
-        @focus="onInputFocus"
-        @update:modelValue="(value) => emit('update:modelValue', value)"
-        @keydown.tab.prevent="onInputTab"
-        @keydown.enter="onInputEnter"
-        @keydown.space="onInputSpace"
-        @keydown.esc.prevent="onInputEsc"
-        @keydown.up.prevent
-        @keydown.down.prevent
-      />
+      <div>
+        <NvInput
+          ref="inputRef"
+          :modelValue="props.modelValue"
+          v-bind="$attrs"
+          @blur="onInputBlur"
+          @focus="onInputFocus"
+          @update:modelValue="(value) => emit('update:modelValue', value)"
+          @keydown.tab.prevent="onInputTab"
+          @keydown.enter="onInputEnter"
+          @keydown.space="onInputSpace"
+          @keydown.esc.prevent="onInputEsc"
+          @keydown.up.prevent
+          @keydown.down.prevent
+        />
+      </div>
     </template>
     <template #default="{ item, active }">
-      <NvOption v-if="item" :active="active">
+      <NvOption
+        v-if="item"
+        :active="active"
+        @mousedown="onAutocompleteSelect(item)"
+      >
         <NvGroup>
           <NvText type="label">
             {{ item.command }}
@@ -40,11 +46,25 @@
   </NvAutocomplete>
 </template>
 <script lang="ts" setup>
-import { NvAutocomplete, NvGroup, NvInput, NvOption, NvText } from '@packages/ui'
-import { computed, defineEmits, defineExpose, defineProps, ref, watch } from 'vue'
+import {
+  NvAutocomplete,
+  NvGroup,
+  NvInput,
+  NvOption,
+  NvText,
+} from '@packages/ui'
+import {
+  computed,
+  defineEmits,
+  defineExpose,
+  defineProps,
+  ref,
+  watch,
+} from 'vue'
 import { getEngineById } from '@/modules/speech-engine-manager'
 import { useFuse, UseFuseOptions } from '@vueuse/integrations/useFuse'
-import { orderBy, throttle } from 'lodash'
+import orderBy from 'lodash/orderBy'
+import throttle from 'lodash/throttle'
 import { useMessagesStore } from '@/features/messages/store'
 import { onKeyStroke } from '@vueuse/core'
 import { useSpeechStore } from '@/features/speech/store'
@@ -75,23 +95,26 @@ const engine = computed(() => {
 
 const commands = computed(
   () =>
-    [...(engine.value?.commands?.(props.voice) || []), ...speechStore.customCommands].map(
-      (command) => ({
-        ...command,
-        command: `/${command.value}`,
-      }),
-    ) || [],
+    [
+      ...(engine.value?.commands?.(props.voice) || []),
+      ...speechStore.customCommands,
+    ].map((command) => ({
+      ...command,
+      command: `/${command.value}`,
+    })) || [],
 )
 
 const inputValue = computed(() => props.modelValue)
 const isInputFocused = ref(false)
 const latestCommands = ref<string[]>([])
-const fuseOptions = computed<UseFuseOptions<(typeof commands.value)[number]>>(() => ({
-  fuseOptions: {
-    keys: ['command'],
-    threshold: 0.3,
-  },
-}))
+const fuseOptions = computed<UseFuseOptions<(typeof commands.value)[number]>>(
+  () => ({
+    fuseOptions: {
+      keys: ['command'],
+      threshold: 0.3,
+    },
+  }),
+)
 
 const { results } = useFuse(inputValue, commands, fuseOptions)
 const autocompleteValues = computed(() => {
@@ -136,8 +159,12 @@ const onInputTab = (e: KeyboardEvent) => {
 }
 
 watch(historyMessageIndex, () => {
-  const historyMessage = messagesStore.reversedHistory[historyMessageIndex.value]
-  emit('update:modelValue', historyMessage?.originalMessage || historyMessage?.message || '')
+  const historyMessage =
+    messagesStore.reversedHistory[historyMessageIndex.value]
+  emit(
+    'update:modelValue',
+    historyMessage?.originalMessage || historyMessage?.message || '',
+  )
 })
 
 watch(
@@ -159,7 +186,11 @@ onKeyStroke('ArrowUp', () => {
 })
 
 onKeyStroke('ArrowDown', () => {
-  if (!isAutocompleteVisible.value && isInputFocused.value && historyMessageIndex.value > -1) {
+  if (
+    !isAutocompleteVisible.value &&
+    isInputFocused.value &&
+    historyMessageIndex.value > -1
+  ) {
     historyMessageIndex.value -= 1
   }
 })

@@ -27,3 +27,5 @@ const app = createApp(App)
   .use(VueJsTour)
 
 app.mount('#app')
+
+app.config.warnHandler = () => null

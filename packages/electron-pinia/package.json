@@ -1,52 +1,48 @@
 {
   "name": "@packages/electron-pinia",
-  "private": true,
   "version": "0.0.0",
-  "scripts": {
-    "build": "microbundle src/{main,renderer,preload}.ts --target=node",
-    "dev": "microbundle src/{main,renderer,preload}.ts --target=node watch"
+  "dependencies": {
+    "@packages/toolbox": "*"
   },
   "exports": {
     ".": {
+      "node": "./dist/renderer.cjs",
+      "import": "./dist/renderer.js",
       "require": "./dist/renderer.cjs",
-      "default": "./dist/renderer.js"
+      "default": "./dist/renderer.cjs"
     },
     "./main": {
+      "node": "./dist/main.cjs",
+      "import": "./dist/main.js",
       "require": "./dist/main.cjs",
-      "default": "./dist/main.js"
+      "default": "./dist/main.cjs"
     },
     "./renderer": {
+      "node": "./dist/renderer.cjs",
+      "import": "./dist/renderer.js",
       "require": "./dist/renderer.cjs",
-      "default": "./dist/renderer.js"
+      "default": "./dist/renderer.cjs"
     },
     "./preload": {
+      "node": "./dist/preload.cjs",
+      "import": "./dist/preload.js",
       "require": "./dist/preload.cjs",
-      "default": "./dist/preload.js"
+      "default": "./dist/preload.cjs"
     },
     "./dist/": "./dist/"
   },
-  "type": "module",
-  "source": "src/renderer.ts",
-  "main": "./dist/renderer.cjs",
-  "module": "./dist/renderer.js",
-  "unpkg": "./dist/renderer.umd.js",
-  "types": "./dist/renderer.d.ts",
   "files": [
     "./dist"
   ],
-  "dependencies": {
-    "@packages/toolbox": "^0.0.0",
-    "electron": "22.3.25",
-    "pinia": "^2.0.21",
-    "vue": "^3.2.37",
-    "electron-store": "^8.1.0",
-    "lodash": "^4.17.21"
+  "main": "./dist/renderer.cjs",
+  "module": "./dist/renderer.js",
+  "private": true,
+  "scripts": {
+    "build": "vite build",
+    "build:prod": "tsc && yarn build",
+    "dev": "vite build --watch --mode development"
   },
-  "devDependencies": {
-    "microbundle": "^0.15.1",
-    "typescript": "^4.6.4",
-    "vite": "^3.0.7",
-    "@types/lodash": "^4.14.184",
-    "vite-plugin-dts": "^1.4.1"
-  }
+  "source": "src/renderer.ts",
+  "type": "module",
+  "types": "./dist/renderer.d.ts"
 }

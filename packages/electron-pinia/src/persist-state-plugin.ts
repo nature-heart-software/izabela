@@ -5,6 +5,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import type ElectronStore from 'electron-store'
 
 import {
+  ELECTRON_STORAGE_NAME,
   IPC_EVENT_STORE_DELETE,
   IPC_EVENT_STORE_GET,
   IPC_EVENT_STORE_SET,
@@ -12,8 +13,14 @@ import {
 import { Deferred, purify } from '@packages/toolbox'
 import { isMain } from './electron'
 
+const electronStore =
+  isMain &&
+  new (require('electron-store'))({
+    name: ELECTRON_STORAGE_NAME,
+  })
+
 function getStorage(): ElectronStore {
-  return isMain ? global.ElectronPiniaStorage : window.ElectronPiniaStorage
+  return isMain ? electronStore : window.ElectronPiniaStorage
 }
 
 const storageSetState = isMain // debounce to prevent too many writes to the disk
@@ -21,7 +28,7 @@ const storageSetState = isMain // debounce to prevent too many writes to the dis
   : (name: string, state: any) => getStorage().set(name, state)
 
 if (isMain) {
-  const { ipcMain } = global
+  const { ipcMain } = require('electron')
   ipcMain.handle(IPC_EVENT_STORE_GET, (_, { name }) => {
     const storage = getStorage()
     return storage.get(name)

@@ -2,7 +2,7 @@ import { app, BrowserWindow, protocol } from 'electron'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import path from 'path'
 import server from '@apps/app-server'
-import electronPiniaPlugin from '@packages/electron-pinia/dist/main'
+import { electronPiniaPlugin } from '@packages/electron-pinia/main'
 import { createApp, h } from 'vue'
 import { createPinia } from 'pinia'
 import createTray from '@/teams/tray/electron-tray'
@@ -20,29 +20,40 @@ import { destroyWinMouse } from '@/modules/node-mouse'
 import { createOverlayWindow } from '@/teams/overlay/electron/background'
 
 const App = () => {
-  const isDevelopment = process.env.NODE_ENV !== 'production'
+  const isDevelopment = import.meta.env.DEV
   const createWindows = () =>
     app
       .whenReady()
       .then(async () =>
         Promise.all([
-          await ElectronWindowManager.registerInstance('messenger', createMessengerWindow),
-          await ElectronWindowManager.registerInstance('overlay', createOverlayWindow),
-          await ElectronWindowManager.registerInstance('speech-worker', createSpeechWorkerWindow),
+          await ElectronWindowManager.registerInstance(
+            'messenger',
+            createMessengerWindow,
+          ),
+          await ElectronWindowManager.registerInstance(
+            'overlay',
+            createOverlayWindow,
+          ),
+          await ElectronWindowManager.registerInstance(
+            'speech-worker',
+            createSpeechWorkerWindow,
+          ),
         ]),
       )
 
   const registerElectronPinia = () => {
-    createApp(h({})).use(createPinia().use(electronPiniaPlugin()))
+    createApp(h({})).use(
+      createPinia().use((electronPiniaPlugin.default || electronPiniaPlugin)()),
+    )
   }
 
   const startAppServer = async () =>
     app.whenReady().then(async () =>
       server.start({
         tempPath: path.join(app.getPath('userData'), 'temp'),
-        port: process.env.VUE_APP_SERVER_PORT,
+        port: import.meta.env.VITE_SERVER_PORT,
         ws: {
-          port: process.env.VUE_APP_SERVER_WS_PORT,
+          port: import.meta.env.VITE_SERVER_WS_PORT,
         },
       }),
     )
@@ -81,20 +92,27 @@ const App = () => {
 
   function addEventListeners() {
     app.whenReady().then(() => {
-      const credentialsDirPath = path.join(app.getPath('userData'), 'credentials')
+      const credentialsDirPath = path.join(
+        app.getPath('userData'),
+        'credentials',
+      )
       const googleCloudSpeechCredentialsFilePath = path.join(
         credentialsDirPath,
         'google-cloud-speech-credentials.json',
       )
-      process.env.GOOGLE_APPLICATION_CREDENTIALS = googleCloudSpeechCredentialsFilePath
+      process.env.GOOGLE_APPLICATION_CREDENTIALS =
+        googleCloudSpeechCredentialsFilePath
     })
 
     app.on('ready', async () => {
-      if (isDevelopment && !process.env.IS_TEST) {
+      if (isDevelopment) {
         try {
           await installExtension(VUEJS3_DEVTOOLS)
         } catch (e) {
-          console.error('Vue Devtools failed to install:', (e as Error).toString())
+          console.error(
+            'Vue Devtools failed to install:',
+            (e as Error).toString(),
+          )
         }
       }
     })

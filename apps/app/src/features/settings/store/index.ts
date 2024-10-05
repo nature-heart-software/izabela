@@ -14,11 +14,11 @@ export const useSettingsStore = defineStore(
     const channel = version.includes('alpha')
       ? 'alpha'
       : // eslint-disable-next-line no-nested-ternary
-      version.includes('beta')
-      ? 'beta'
-      : version.includes('rc')
-      ? 'rc'
-      : 'latest'
+        version.includes('beta')
+        ? 'beta'
+        : version.includes('rc')
+          ? 'rc'
+          : 'latest'
 
     const preferredSavDir = ref<null | string>(null)
     const playSpeechOnDefaultPlaybackDevice = ref(true)
@@ -27,7 +27,7 @@ export const useSettingsStore = defineStore(
     const selectedSpeechEngine = ref<SpeechEngine['id']>(ENGINE_ID)
     const updateChannel = ref(channel)
     const launchOnStartup = ref(true)
-    const debugMode = ref(process.env.NODE_ENV === 'development')
+    const debugMode = ref(import.meta.env.MODE === 'development')
     const messageMode = ref<'sentence' | 'word'>('sentence')
     const display = ref<Electron.Display['id'] | null>(null)
     const hideWindowOnMessage = ref(false)
@@ -45,7 +45,9 @@ export const useSettingsStore = defineStore(
     const enableTranslation = ref(false)
     const speechProfanityFilter = ref(true)
     const speechRecognitionStrategy = ref<'continuous' | 'ptr'>('ptr')
-    const textTranslationStrategy = ref<'cloud-translation' | 'custom'>('cloud-translation')
+    const textTranslationStrategy = ref<'cloud-translation' | 'custom'>(
+      'cloud-translation',
+    )
     const customTextTranslationEndpoint = ref('')
     const customTextTranslationApiKey = ref('')
     const customTextTranslationFrom = ref('')

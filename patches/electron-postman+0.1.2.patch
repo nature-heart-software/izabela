@@ -1,0 +1,13 @@
+diff --git a/node_modules/electron-postman/src/ipcMain.js b/node_modules/electron-postman/src/ipcMain.js
+index 33f5825..930d017 100644
+--- a/node_modules/electron-postman/src/ipcMain.js
++++ b/node_modules/electron-postman/src/ipcMain.js
+@@ -44,7 +44,7 @@ function registerBrowserWindow(windowName, browserWindow) {
+   browserWindow.on('closed', () => {
+     unregisterWindow(windowName);
+   });
+-  browserWindow.webContents.once('did-finish-load', () => {
++  browserWindow.webContents.on('did-finish-load', () => {
+     broadcastWindowId(windowName, webContentsId);
+     registeredWindows.set(windowName, webContentsId);
+ 

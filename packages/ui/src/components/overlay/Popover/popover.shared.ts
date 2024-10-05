@@ -1,13 +1,13 @@
 import { ExtractPropTypes, PropType } from 'vue'
-import { TippyOptions } from 'vue-tippy'
+import { ComputePositionConfig } from '@floating-ui/vue'
 
 export const sizeValues = ['sm', 'md', 'lg'] as const
-export type Size = typeof sizeValues[number]
+export type Size = (typeof sizeValues)[number]
 
 export const props = {
-  tippyOptions: {
-    type: Object as PropType<TippyOptions>,
-    default: () => ({}),
+  placement: {
+    type: String as PropType<ComputePositionConfig['placement']>,
+    default: 'bottom-end',
   },
   size: {
     type: String as PropType<Size>,

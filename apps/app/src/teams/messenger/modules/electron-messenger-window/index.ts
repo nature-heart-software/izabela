@@ -1,9 +1,12 @@
 import ElectronWindowManager from '@/modules/electron-window-manager'
 import { mouse } from '@/modules/node-mouse'
-import { throttle } from 'lodash'
+import throttle from 'lodash/throttle'
 import { Hitbox } from '@/modules/vue-hitboxes/types'
 import { BrowserWindow, screen, shell } from 'electron'
-import { useMessengerStore, useMessengerWindowStore } from '@/teams/messenger/store'
+import {
+  useMessengerStore,
+  useMessengerWindowStore,
+} from '@/teams/messenger/store'
 import { useSettingsStore } from '@/features/settings/store'
 import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
 import { Deferred } from '@packages/toolbox'
@@ -22,7 +25,9 @@ export const ElectronMessengerWindow = () => {
   let hitboxesStore: ReturnType<typeof useHitboxesStore> | undefined
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
   let messengerStore: ReturnType<typeof useMessengerStore> | undefined
-  let messengerWindowStore: ReturnType<typeof useMessengerWindowStore> | undefined
+  let messengerWindowStore:
+    | ReturnType<typeof useMessengerWindowStore>
+    | undefined
   const ready = Deferred<BrowserWindow>()
   const isReady = () => ready.promise
   let foregroundWindow: string | number | null = null
@@ -43,18 +48,25 @@ export const ElectronMessengerWindow = () => {
     BringWindowToTop: ['bool', ['long']],
     SwitchToThisWindow: ['void', ['long', 'bool']],
     GetWindowThreadProcessId: ['int', ['long', 'int']],
-    SetWindowPos: ['bool', ['long', 'long', 'int', 'int', 'int', 'int', 'uint']],
+    SetWindowPos: [
+      'bool',
+      ['long', 'long', 'int', 'int', 'int', 'int', 'uint'],
+    ],
   })
 
   const getWindow = () =>
-    registeredWindow || ElectronWindowManager.getInstanceByName('messenger')?.window
+    registeredWindow ||
+    ElectronWindowManager.getInstanceByName('messenger')?.window
 
   const openDevTools = () =>
     new Promise((resolve) => {
       const instances = ElectronWindowManager.getInstances()
       instances.forEach((instance) => {
         const { window } = instance
-        if (window.webContents.devToolsWebContents && window.webContents.isDevToolsOpened()) {
+        if (
+          window.webContents.devToolsWebContents &&
+          window.webContents.isDevToolsOpened()
+        ) {
           window.webContents.devToolsWebContents.focus()
         } else {
           window.webContents.openDevTools({ mode: 'undocked' })
@@ -167,11 +179,15 @@ export const ElectronMessengerWindow = () => {
         // const { x: mouseX = 0, y: mouseY = 0 } = event
         const [windowX, windowY] = window.getPosition()
         const { hitboxes } = hitboxesStore
-        const isWithinAnyHitboxes = hitboxes.some(({ x, y, w, h }: Hitbox) => {
-          const isWithinXHitbox = mouseX >= windowX + x && mouseX <= windowX + x + w
-          const isWithinYHitbox = mouseY >= windowY + y && mouseY <= windowY + y + h
-          return isWithinXHitbox && isWithinYHitbox
-        })
+        const isWithinAnyHitboxes = hitboxes
+          .filter(({ w, h }) => w && h)
+          .some(({ x, y, w, h }: Hitbox) => {
+            const isWithinXHitbox =
+              mouseX >= windowX + x && mouseX <= windowX + x + w
+            const isWithinYHitbox =
+              mouseY >= windowY + y && mouseY <= windowY + y + h
+            return isWithinXHitbox && isWithinYHitbox
+          })
         if (isWithinAnyHitboxes) {
           focus('mouse')
         } else {

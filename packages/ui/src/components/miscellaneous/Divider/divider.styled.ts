@@ -1,6 +1,6 @@
 /* eslint-disable */
 import styled from 'vue3-styled-components'
-import tokens from '@/styles/tokens'
+import { tokens } from '@/styles/tokens'
 import { props } from './divider.shared'
 import { rem } from 'polished'
 

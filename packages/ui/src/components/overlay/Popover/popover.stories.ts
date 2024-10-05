@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { Story } from '@storybook/vue3'
+import { StoryFn } from '@storybook/vue3'
 import { NvButton, NvCenter, NvPopover, NvText } from '@/components'
 import { props, sizeValues } from './popover.shared'
 
@@ -18,7 +18,7 @@ export default {
   },
 }
 
-const Template: Story = (args) => ({
+const Template: StoryFn = (args) => ({
   components: { NvPopover, NvButton, NvText, NvCenter },
   setup() {
     return {

@@ -2,12 +2,11 @@ import { RequestHandler } from 'express'
 import axios from 'axios'
 import { handleError } from '../../utils/requests'
 import path from 'path'
-import izabelaServer from '../../server'
 import { v4 as uuid } from 'uuid'
 import fs from 'fs'
 import util from 'util'
 
-const plugin: Izabela.Server.Plugin = ({ app }) => {
+const plugin: Izabela.Server.Plugin = ({ app, config }) => {
   const listVoicesHandler: RequestHandler = async (
     {
       body: {
@@ -37,10 +36,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
     },
     res,
   ) => {
-    const outputFile = path.join(
-      izabelaServer.getConfig().tempPath,
-      uuid() + '.mp3',
-    )
+    const outputFile = path.join(config?.tempPath || '', uuid() + '.wav')
     try {
       fs.mkdirSync(path.parse(outputFile).dir, { recursive: true })
       fs.writeFileSync(outputFile, '')
@@ -58,7 +54,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
 
       res.writeHead(200, {
         'Content-Length': total,
-        'Content-Type': 'audio/mp3',
+        'Content-Type': 'audio/wav',
       })
       const stream = fs.createReadStream(outputFile).pipe(res)
       stream.on('finish', () => {

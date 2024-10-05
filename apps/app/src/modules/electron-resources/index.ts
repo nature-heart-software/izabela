@@ -8,7 +8,9 @@ import { Deferred } from '@packages/toolbox'
 
 const VBCResourceExePath = path.join(
   EXTERNALS_DIR,
-  process.arch === 'x64' ? '/vbc/VBCABLE_Setup_x64.exe' : '/vbc/VBCABLE_Setup.exe',
+  process.arch === 'x64'
+    ? '/vbc/VBCABLE_Setup_x64.exe'
+    : '/vbc/VBCABLE_Setup.exe',
 )
 
 export const ElectronResources = () => {
@@ -34,10 +36,16 @@ export const ElectronResources = () => {
           (device) => device.manufacturer === 'VB-Audio Software',
         )
         if (!vbcDevices.length) {
-          sudo.exec(`${VBCResourceExePath} -i -h`, getSudoOptions(), (error, stdout, stderr) => {
-            if (error) return deferred.reject(error)
-            deferred.resolve(true)
-          })
+          sudo.exec(
+            `${JSON.stringify(VBCResourceExePath)} -i -h`,
+            getSudoOptions(),
+            (error) => {
+              if (error) {
+                return deferred.reject(error)
+              }
+              deferred.resolve(true)
+            },
+          )
         }
         return deferred.promise
       })
@@ -50,10 +58,16 @@ export const ElectronResources = () => {
           (device) => device.manufacturer === 'VB-Audio Software',
         )
         if (vbcDevices.length) {
-          sudo.exec(`${VBCResourceExePath} -u -h`, getSudoOptions(), (error, stdout, stderr) => {
-            if (error) return deferred.reject(error)
-            deferred.resolve(true)
-          })
+          sudo.exec(
+            `${JSON.stringify(VBCResourceExePath)} -u -h`,
+            getSudoOptions(),
+            (error) => {
+              if (error) {
+                return deferred.reject(error)
+              }
+              deferred.resolve(true)
+            },
+          )
         }
         return deferred.promise
       })

@@ -3,7 +3,7 @@ import {
   Direction,
   directionValues,
 } from '@/components/miscellaneous/Divider/divider.shared'
-import { Story } from '@storybook/vue3'
+import { StoryFn } from '@storybook/vue3'
 import { NvDivider } from '@/components'
 
 export default {
@@ -17,7 +17,7 @@ export default {
   },
 }
 
-const Template: Story = (args) => ({
+const Template: StoryFn = (args) => ({
   components: { NvDivider },
   setup() {
     return {

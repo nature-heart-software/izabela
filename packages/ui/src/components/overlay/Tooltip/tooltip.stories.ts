@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { Story } from '@storybook/vue3'
+import { StoryFn } from '@storybook/vue3'
 import { NvButton, NvCenter, NvText, NvTooltip } from '@/components'
 
 export default {
@@ -13,7 +13,7 @@ export default {
   },
 }
 
-const Template: Story = (args) => ({
+const Template: StoryFn = (args) => ({
   components: { NvTooltip, NvButton, NvText, NvCenter },
   setup() {
     return {

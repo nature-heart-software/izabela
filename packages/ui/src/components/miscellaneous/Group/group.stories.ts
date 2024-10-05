@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { Story } from '@storybook/vue3'
-import tokens from '@/styles/tokens'
+import { StoryFn } from '@storybook/vue3'
+import { tokens } from '@/styles/tokens'
 import { NvButton, NvGroup } from '@/components'
 
 import {
@@ -46,7 +46,7 @@ export default {
   },
 }
 
-const Template: Story = (args) => ({
+const Template: StoryFn = (args) => ({
   components: { NvGroup, NvButton },
   setup() {
     return {

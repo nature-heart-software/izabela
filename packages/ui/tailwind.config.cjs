@@ -1,12 +1,12 @@
 /** @type {import('tailwindcss').Config} */
-const tokens = require('./src/styles/tokens.cjs').default
+const {tailwindTheme} = require('@packages/design-tokens')
 module.exports = {
     content: [
         "./src/**/*.{vue,js,ts,jsx,tsx}",
     ],
     theme: {
         extend: {
-            ...tokens,
+            ...tailwindTheme,
         },
     },
     plugins: [],

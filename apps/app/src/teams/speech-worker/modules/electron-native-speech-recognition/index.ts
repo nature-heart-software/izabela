@@ -6,7 +6,7 @@ import path from 'path'
 import { EXTERNALS_DIR } from '@/electron/utils'
 import { ipcMain } from 'electron-postman'
 import { useSettingsStore } from '@/features/settings/store'
-import { takeRight } from 'lodash'
+import takeRight from 'lodash/takeRight'
 import { watch } from 'vue'
 import { useSpeechRecognitionStore } from '@/features/speech/store'
 import { Deferred } from '@packages/toolbox'
@@ -122,7 +122,11 @@ export default () => {
         if (pendingMessages[index - 1]) {
           pendingMessages[index - 1].message.then(() => {
             if (messageWithoutProfanityFilter)
-              ipcMain.sendTo('speech-worker', 'say', messageWithoutProfanityFilter)
+              ipcMain.sendTo(
+                'speech-worker',
+                'say',
+                messageWithoutProfanityFilter,
+              )
             pendingMessages.splice(pendingMessages.indexOf(pendingMessage), 1)
           })
           // if previous stream failed because nothing was recognized, resolve it
@@ -132,7 +136,11 @@ export default () => {
           }
         } else {
           if (messageWithoutProfanityFilter)
-            ipcMain.sendTo('speech-worker', 'say', messageWithoutProfanityFilter)
+            ipcMain.sendTo(
+              'speech-worker',
+              'say',
+              messageWithoutProfanityFilter,
+            )
           pendingMessages.splice(pendingMessages.indexOf(pendingMessage), 1)
         }
       }
@@ -160,7 +168,10 @@ export default () => {
 
   const audioInputStreamTransform = new Writable({
     write(chunk, _encoding, next) {
-      audioInput = [...takeRight(audioInput, settingsStore.soxPreRecordingChunks), chunk]
+      audioInput = [
+        ...takeRight(audioInput, settingsStore.soxPreRecordingChunks),
+        chunk,
+      ]
       next()
     },
     final() {

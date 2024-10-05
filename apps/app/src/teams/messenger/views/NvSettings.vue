@@ -8,7 +8,12 @@
           <NvTooltip>
             <NvText>Close</NvText>
             <template #reference>
-              <NvButton icon-name="times" size="xs" type="plain" @click="$emit('close')" />
+              <NvButton
+                icon-name="times"
+                size="xs"
+                type="plain"
+                @click="$emit('close')"
+              />
             </template>
           </NvTooltip>
         </div>
@@ -26,8 +31,14 @@
                     {{ category.name }}
                   </NvText>
                   <NvStack spacing="2">
-                    <template v-for="entry in category.children" :key="entry.name">
-                      <router-link :to="entry.to || { name: 'settings' }" class="w-full">
+                    <template
+                      v-for="entry in category.children"
+                      :key="entry.name"
+                    >
+                      <router-link
+                        :to="entry.to || { name: 'settings' }"
+                        class="w-full"
+                      >
                         <NvButton
                           :selected="currentRoute.name === entry.to?.name"
                           class="w-full"
@@ -43,11 +54,14 @@
             </NvStack>
           </div>
           <div class="settings__content flex-1 pl-4">
-            <div class="h-full relative">
+            <div :id="id" class="h-full relative">
               <!-- View -->
               <router-view v-slot="{ Component }">
                 <Transition class="transition">
-                  <div :key="Component" class="absolute inset-0 overflow-y-auto">
+                  <div
+                    :key="Component"
+                    class="absolute inset-0 overflow-y-auto"
+                  >
                     <component :is="Component" />
                   </div>
                 </Transition>
@@ -62,6 +76,11 @@
 <script lang="ts" setup>
 import { NvButton, NvCard, NvStack, NvText, NvTooltip } from '@packages/ui'
 import { useRoute } from 'vue-router'
+import { v4 as uuid } from 'uuid'
+import { provide } from 'vue'
+
+const id = `_${uuid()}`
+provide('portal-target', `#${id}`)
 
 const navigation = [
   {

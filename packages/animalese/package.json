@@ -1,24 +1,17 @@
 {
   "name": "@packages/animalese",
-  "private": true,
   "version": "0.0.0",
-  "type": "module",
   "files": [
     "./dist"
   ],
   "main": "./dist/main.cjs",
-  "module": "./dist/main.es.js",
-  "types": "./dist/animalese.d.ts",
+  "module": "./dist/main.js",
+  "private": true,
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+    "build": "vite build",
+    "build:prod": "yarn build",
+    "dev": "vite build --watch --mode development"
   },
-  "devDependencies": {
-    "typescript": "^4.9.3",
-    "vite": "^4.0.0"
-  },
-  "dependencies": {
-    "vite-plugin-dts": "^1.7.1"
-  }
+  "type": "module",
+  "types": "./dist/animalese.d.ts"
 }

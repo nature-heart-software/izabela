@@ -58,7 +58,15 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ComponentPublicInstance, computed, defineProps, onMounted, provide, ref, unref } from 'vue'
+import {
+  ComponentPublicInstance,
+  computed,
+  defineProps,
+  onMounted,
+  provide,
+  ref,
+  unref,
+} from 'vue'
 import Moveable from 'vue3-moveable'
 import { NvGroup } from '@packages/ui'
 import { RouteLocationRaw, useRouter } from 'vue-router'
@@ -71,7 +79,7 @@ import NvMessengerMessageBar from '@/teams/messenger/components/NvMessengerMessa
 import NvMessengerLinksBar from '@/teams/messenger/components/NvMessengerLinksBar.vue'
 import NvMessengerHandleBar from '@/teams/messenger/components/NvMessengerHandleBar.vue'
 import NvMessengerNavigationBar from '@/teams/messenger/components/NvMessengerNavigationBar.vue'
-import { debounce } from 'lodash'
+import debounce from 'lodash/debounce'
 import { useWindowSize } from '@vueuse/core'
 // import gsap from 'gsap'
 // const messengerWindowStore = useMessengerWindowStore()
@@ -199,8 +207,10 @@ onMounted(() => {
     if (props.minWidth) moveableTargetEl.style.minWidth = `${props.minWidth}px`
     if (props.maxWidth) moveableTargetEl.style.maxWidth = `${props.maxWidth}px`
     if (props.height) moveableTargetEl.style.height = `${props.height}px`
-    if (props.minHeight) moveableTargetEl.style.minHeight = `${props.minHeight}px`
-    if (props.maxHeight) moveableTargetEl.style.maxHeight = `${props.maxHeight}px`
+    if (props.minHeight)
+      moveableTargetEl.style.minHeight = `${props.minHeight}px`
+    if (props.maxHeight)
+      moveableTargetEl.style.maxHeight = `${props.maxHeight}px`
     if (props.transform) moveableTargetEl.style.transform = props.transform
   }
   moveable.value.updateTarget()

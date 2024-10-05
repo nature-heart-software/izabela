@@ -4,7 +4,6 @@ export const isPreload = !!(
 )
 export const isMain = !isRenderer && !isPreload
 
-export const ipcMain =
-  isMain && typeof global !== 'undefined' ? global.ipcMain : null
+export const ipcMain = isMain ? require('electron').ipcMain : null
 export const ipcRenderer =
   isRenderer && typeof window !== 'undefined' ? window.ElectronPinia : null

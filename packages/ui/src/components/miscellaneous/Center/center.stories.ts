@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { Story } from '@storybook/vue3'
+import { StoryFn } from '@storybook/vue3'
 import { NvButton, NvCenter } from '@/components'
 import { props } from './center.shared'
 
@@ -14,7 +14,7 @@ export default {
   },
 }
 
-const Template: Story = (args) => ({
+const Template: StoryFn = (args) => ({
   components: { NvCenter, NvButton },
   setup() {
     return {
@@ -30,7 +30,7 @@ const Template: Story = (args) => ({
 export const Default = Template.bind({})
 Default.args = {}
 
-const InlineTemplate: Story = (args) => ({
+const InlineTemplate: StoryFn = (args) => ({
   components: { NvCenter, NvButton },
   setup() {
     return {

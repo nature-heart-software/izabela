@@ -1,5 +1,3 @@
-import './main-env'
-import { plugin } from './plugin'
 import background from './background'
 import 'pinia'
 import { PluginCustomProperties } from './types'
@@ -18,4 +16,3 @@ declare module 'pinia' {
 }
 
 export { plugin as electronPiniaPlugin } from './plugin'
-export default plugin

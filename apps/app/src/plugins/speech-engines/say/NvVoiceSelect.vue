@@ -9,11 +9,17 @@
     }"
   >
     <template #optionAfter="{ option, hover }">
-      <span v-show="(!option.children && hover) || favoriteVoiceIds.includes(option.id)">
+      <span
+        v-show="
+          (!option.children && hover) || favoriteVoiceIds.includes(option.id)
+        "
+      >
         <NvButton
           :icon-name="favoriteVoiceIds.includes(option.id) ? 'times' : 'heart'"
           :title="
-            favoriteVoiceIds.includes(option.id) ? 'Remove from favorites' : 'Add to favorites'
+            favoriteVoiceIds.includes(option.id)
+              ? 'Remove from favorites'
+              : 'Add to favorites'
           "
           size="sm"
           type="default"
@@ -28,7 +34,8 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { NvButton, NvSelect } from '@packages/ui'
-import { sortBy, xor } from 'lodash'
+import sortBy from 'lodash/sortBy'
+import xor from 'lodash/xor'
 import { groupOptions } from '@/utils/select'
 import { getVoiceCategory, getVoiceId, getVoiceName } from './shared'
 
@@ -45,7 +52,10 @@ const getOptionFromVoice = (voice: any) => ({
 })
 
 const options = computed(() => {
-  const localOptions = groupOptions(voices.value.map(getOptionFromVoice), 'category')
+  const localOptions = groupOptions(
+    voices.value.map(getOptionFromVoice),
+    'category',
+  )
   const favoriteVoiceIds = getProperty('favoriteVoiceIds')
   if (favoriteVoiceIds) {
     const favoriteVoices = voices.value.filter((voice: any) =>
@@ -61,5 +71,7 @@ const options = computed(() => {
   return localOptions
 })
 
-const favoriteVoiceIds = computed<string[]>(() => getProperty('favoriteVoiceIds'))
+const favoriteVoiceIds = computed<string[]>(() =>
+  getProperty('favoriteVoiceIds'),
+)
 </script>

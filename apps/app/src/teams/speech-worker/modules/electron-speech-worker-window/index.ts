@@ -3,14 +3,21 @@ import speech from '@google-cloud/speech'
 import { BrowserWindow, screen } from 'electron'
 import { ipcMain } from 'electron-postman'
 import { createNotification } from '@/utils/electron-notification'
-import { useSpeechRecognitionStore, useSpeechStore } from '@/features/speech/store'
-import { gkl, keybindingReleased, keybindingTriggered } from '@/modules/electron-keybinding/utils'
+import {
+  useSpeechRecognitionStore,
+  useSpeechStore,
+} from '@/features/speech/store'
+import {
+  gkl,
+  keybindingReleased,
+  keybindingTriggered,
+} from '@/modules/electron-keybinding/utils'
 import { Deferred } from '@packages/toolbox'
 import { useSettingsStore } from '@/features/settings/store'
 import { watch } from 'vue'
 import electronNativeSpeechRecognition from '@/teams/speech-worker/modules/electron-native-speech-recognition'
 import ElectronWindowManager from '@/modules/electron-window-manager'
-import { mapValues } from 'lodash'
+import mapValues from 'lodash/mapValues'
 import { getTime } from '@/utils/time'
 import { windowHeight, windowWidth } from '@/teams/speech-worker/electron/const'
 import { getTopLeftWindow } from '@/electron/utils'
@@ -21,7 +28,9 @@ export const ElectronSpeechWindow = () => {
   const isReady = () => ready.promise
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
   let speechStore: ReturnType<typeof useSpeechStore> | undefined
-  let speechRecognitionStore: ReturnType<typeof useSpeechRecognitionStore> | undefined
+  let speechRecognitionStore:
+    | ReturnType<typeof useSpeechRecognitionStore>
+    | undefined
   let deferredRecording: ReturnType<typeof Deferred> | null = null
   // eslint-disable-next-line prefer-const
   let electronNativeSpeechRecognitionCallback: ReturnType<
@@ -29,7 +38,8 @@ export const ElectronSpeechWindow = () => {
   > | null = null
 
   const getWindow = () =>
-    registeredWindow || ElectronWindowManager.getInstanceByName('speech-worker')?.window
+    registeredWindow ||
+    ElectronWindowManager.getInstanceByName('speech-worker')?.window
   const onListeningError = () => {
     createNotification({
       body: "Sorry, I didn't catch that..\nCould you say that again please?",
@@ -95,7 +105,9 @@ export const ElectronSpeechWindow = () => {
     if (window) {
       const allDisplays = screen.getAllDisplays()
       const primaryDisplay = screen.getPrimaryDisplay()
-      const display = allDisplays.find((d) => d.id === settingsStore?.display) || primaryDisplay
+      const display =
+        allDisplays.find((d) => d.id === settingsStore?.display) ||
+        primaryDisplay
       const displayBounds = mapValues(display.bounds, (v) => v + 24)
       window.setPosition(displayBounds.x, displayBounds.y)
     }
@@ -146,7 +158,8 @@ export const ElectronSpeechWindow = () => {
       electronNativeSpeechRecognitionCallback()
     }
     if (settingsStore?.enableSTTTS) {
-      electronNativeSpeechRecognitionCallback = electronNativeSpeechRecognition()
+      electronNativeSpeechRecognitionCallback =
+        electronNativeSpeechRecognition()
     }
   }
 

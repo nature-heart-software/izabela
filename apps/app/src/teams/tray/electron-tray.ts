@@ -3,12 +3,13 @@ import path from 'path'
 import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
 import { watch } from 'vue'
 import { useSettingsStore } from '@/features/settings/store'
+import { PUBLIC_DIR } from '@/electron/utils.ts'
 
 let tray: Tray
 const createTray = (): Promise<Tray> =>
   app.whenReady().then(() => {
     const settingsStore = useSettingsStore()
-    tray = new Tray(path.join(__static, 'icons/256x256.png'))
+    tray = new Tray(path.join(PUBLIC_DIR, 'icons/256x256.png'))
     const getContextMenu = () => {
       const primaryDisplay = screen.getPrimaryDisplay()
       const allDisplays = screen.getAllDisplays()

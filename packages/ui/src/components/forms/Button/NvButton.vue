@@ -20,7 +20,7 @@
 <script lang="ts" setup>
 import { computed, defineProps } from 'vue'
 import { isVNodeEmpty } from '@/utils/vue'
-import tokens from '@/styles/tokens'
+import { tokens } from '@/styles/tokens'
 import { StButton } from './button.styled'
 import { props as propsDefinition, Size } from './button.shared'
 import NvIcon from '@/components/typography/Icon/NvIcon.vue'

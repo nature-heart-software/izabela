@@ -7,7 +7,7 @@ import 'element-plus/lib/components/loading/style/css'
 import { injectGlobal } from 'vue3-styled-components'
 import { rem } from 'polished'
 import { disabledItemBackgroundStyle } from '@/utils/css-in-js'
-import tokens from './tokens'
+import { tokens } from './tokens'
 
 const { spacing, colors, transition } = tokens
 // eslint-disable-next-line no-unused-expressions

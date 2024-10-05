@@ -1,6 +1,6 @@
 import { ExtractPropTypes, PropType } from 'vue'
 
-import tokens from '@/styles/tokens'
+import { tokens } from '@/styles/tokens'
 
 export const justifyValues = [
   'left',
@@ -9,11 +9,11 @@ export const justifyValues = [
   'apart',
   'around',
 ] as const
-export type Justify = typeof justifyValues[number]
+export type Justify = (typeof justifyValues)[number]
 export const alignValues = ['stretch', 'center', 'start', 'end'] as const
-export type Align = typeof alignValues[number]
+export type Align = (typeof alignValues)[number]
 export const directionValues = ['row', 'column'] as const
-export type Direction = typeof directionValues[number]
+export type Direction = (typeof directionValues)[number]
 
 export const props = {
   justify: {

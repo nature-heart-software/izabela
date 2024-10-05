@@ -1,10 +1,10 @@
 import { rem, rgba } from 'polished'
-import tokens from '@/styles/tokens'
+import { tokens } from '@/styles/tokens'
 import { CSSObject } from '@/types/css-in-js'
 
 const { borderRadius, spacing } = tokens
 export const sizeValues = ['xs', 'sm', 'md', 'lg'] as const
-export type Size = typeof sizeValues[number]
+export type Size = (typeof sizeValues)[number]
 
 type Value = number | string
 type FontSizeProperty = 'lineHeight' | 'letterSpacing'
@@ -23,8 +23,8 @@ export const lineHeight = (tailwindFontSize: TailwindFontSize) =>
   typeof tailwindFontSize === 'number' || typeof tailwindFontSize === 'string'
     ? 1
     : typeof tailwindFontSize[1]?.lineHeight === 'string'
-    ? rem(tailwindFontSize[1]?.lineHeight)
-    : tailwindFontSize[1]?.lineHeight || 1
+      ? rem(tailwindFontSize[1]?.lineHeight)
+      : tailwindFontSize[1]?.lineHeight || 1
 
 export const letterSpacing = (tailwindFontSize: TailwindFontSize) =>
   typeof tailwindFontSize === 'number' || typeof tailwindFontSize === 'string'

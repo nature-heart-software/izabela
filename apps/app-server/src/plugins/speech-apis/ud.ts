@@ -1,13 +1,12 @@
 import { RequestHandler } from 'express'
 import { handleError } from '../../utils/requests'
-import izabelaServer from '../../server'
 import { v4 as uuid } from 'uuid'
 import fs from 'fs'
 import util from 'util'
 import path from 'path'
 import axios, { AxiosResponse } from 'axios'
 
-const plugin: Izabela.Server.Plugin = ({ app }) => {
+const plugin: Izabela.Server.Plugin = ({ app, config }) => {
   const listVoicesHandler: RequestHandler = async (
     { body: { payload: { mode } = { mode: 'tts-all' } } },
     res,
@@ -35,10 +34,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
     },
     res,
   ) => {
-    const outputFile = path.join(
-      izabelaServer.getConfig().tempPath,
-      uuid() + '.mp3',
-    )
+    const outputFile = path.join(config?.tempPath || '', uuid() + '.mp3')
     try {
       fs.mkdirSync(path.parse(outputFile).dir, { recursive: true })
       fs.writeFileSync(outputFile, '')
