@@ -15,12 +15,8 @@
         "url": {
           "raw": "http://localhost:3000/list-voices",
           "protocol": "http",
-          "host": [
-            "localhost:3000"
-          ],
-          "path": [
-            "list-voices"
-          ],
+          "host": ["localhost:3000"],
+          "path": ["list-voices"],
           "query": [],
           "variable": []
         },
@@ -46,12 +42,8 @@
         "url": {
           "raw": "http://localhost:3000/synthesize-speech",
           "protocol": "http",
-          "host": [
-            "localhost:3000"
-          ],
-          "path": [
-            "synthesize-speech"
-          ],
+          "host": ["localhost:3000"],
+          "path": ["synthesize-speech"],
           "query": [],
           "variable": []
         },
