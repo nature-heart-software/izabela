@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Custom Engine Api",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
