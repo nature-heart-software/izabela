@@ -12,6 +12,7 @@ import {
   useIntersectionObserver,
   useMutationObserver,
   useResizeObserver,
+  useEventListener,
 } from '@vueuse/core'
 import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
 
@@ -52,10 +53,12 @@ const updateHitbox = throttle(
 useIntersectionObserver(componentRef, updateHitbox)
 useMutationObserver(componentRef, updateHitbox, { attributes: true })
 useResizeObserver(componentRef, updateHitbox)
-
+useEventListener('resize', updateHitbox)
+useEventListener('focus', updateHitbox)
 onBeforeUnmount(() => {
   hitboxesStore.removeHitbox(hitboxes.value.id)
 })
+
 onMounted(() => {
   updateHitbox()
 })

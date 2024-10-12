@@ -1,0 +1,28 @@
+meta {
+  name: Synthesize Speech
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:3000/synthesize-speech
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "credentials": {
+      "apiKey": ""
+    },
+    "payload": {
+      "text": "Hello world, programmed to work and not to feel.",
+      "voice": {
+        "id": "Microsoft Hazel Desktop",
+        "name": "Microsoft Hazel Desktop",
+        "category": "Say",
+        "languageCode": "en-US"
+      }
+    }
+  }
+}

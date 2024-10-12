@@ -1,0 +1,19 @@
+meta {
+  name: List Voices
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:3000/list-voices
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "credentials": {
+      "apiKey": ""
+    }
+  }
+}
