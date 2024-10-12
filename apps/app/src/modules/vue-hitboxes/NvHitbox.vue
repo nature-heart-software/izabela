@@ -1,6 +1,6 @@
 <template>
   <div ref="componentRef" :data-hitbox-id="id">
-    <slot />
+    <slot/>
   </div>
 </template>
 <script lang="ts" setup>
@@ -12,6 +12,7 @@ import {
   useIntersectionObserver,
   useMutationObserver,
   useResizeObserver,
+  useEventListener,
 } from '@vueuse/core'
 import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
 
@@ -36,26 +37,27 @@ const onHitboxUpdate = () => {
   }
 }
 const updateHitbox = throttle(
-  () => {
-    if (componentRef.value) {
-      const bounds = componentRef.value.getBoundingClientRect()
-      hitboxes.value.x = bounds.x * pixelRatio.value
-      hitboxes.value.y = bounds.y * pixelRatio.value
-      hitboxes.value.w = bounds.width * pixelRatio.value
-      hitboxes.value.h = bounds.height * pixelRatio.value
-    }
-  },
-  250,
-  { leading: true, trailing: true },
+    () => {
+      if (componentRef.value) {
+        const bounds = componentRef.value.getBoundingClientRect()
+        hitboxes.value.x = bounds.x * pixelRatio.value
+        hitboxes.value.y = bounds.y * pixelRatio.value
+        hitboxes.value.w = bounds.width * pixelRatio.value
+        hitboxes.value.h = bounds.height * pixelRatio.value
+      }
+    },
+    250,
+    { leading: true, trailing: true },
 )
 
 useIntersectionObserver(componentRef, updateHitbox)
 useMutationObserver(componentRef, updateHitbox, { attributes: true })
 useResizeObserver(componentRef, updateHitbox)
-
+useEventListener('resize', updateHitbox)
 onBeforeUnmount(() => {
   hitboxesStore.removeHitbox(hitboxes.value.id)
 })
+
 onMounted(() => {
   updateHitbox()
 })
