@@ -13,7 +13,7 @@ export const decrypt = (valueToDecrypt: string) => {
       valueToDecrypt,
       import.meta.env.VITE_APP_ENCRYPTION_KEY || '',
     )
-    bytes.toString(CryptoJS.enc.Utf8)
+    result = bytes.toString(CryptoJS.enc.Utf8)
   } catch (e) {
     console.warn('Could not decrypt value.')
   }
