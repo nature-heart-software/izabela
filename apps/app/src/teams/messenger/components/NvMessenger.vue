@@ -66,6 +66,7 @@ import {
   provide,
   ref,
   unref,
+  watch,
 } from 'vue'
 import Moveable from 'vue3-moveable'
 import { NvGroup } from '@packages/ui'
@@ -80,7 +81,8 @@ import NvMessengerLinksBar from '@/teams/messenger/components/NvMessengerLinksBa
 import NvMessengerHandleBar from '@/teams/messenger/components/NvMessengerHandleBar.vue'
 import NvMessengerNavigationBar from '@/teams/messenger/components/NvMessengerNavigationBar.vue'
 import debounce from 'lodash/debounce'
-import { useWindowSize } from '@vueuse/core'
+import { useElementSize, useEventListener, useWindowSize } from '@vueuse/core'
+import throttle from 'lodash/throttle'
 // import gsap from 'gsap'
 // const messengerWindowStore = useMessengerWindowStore()
 const messengerStore = useMessengerStore()
@@ -196,6 +198,81 @@ const onDrag = (event: any) => {
 //     })
 //   }
 // })
+const previousWindowSize = ref<{ width: number; height: number }>({
+  width: viewport.value.width,
+  height: viewport.value.height,
+})
+
+function parseTransform(transform: string | null) {
+  if (!transform) {
+    return { x: 0, y: 0 }
+  }
+  const translateRegex =
+    /translate\((-?\d+(\.\d+)?)(px)?,\s*(-?\d+(\.\d+)?)(px)?\)/
+  const match = translateRegex.exec(transform)
+  if (match) {
+    const x = parseFloat(match[1])
+    const y = parseFloat(match[4])
+    return { x, y }
+  }
+  return { x: 0, y: 0 }
+}
+
+const { width: moveableTargetWidth, height: moveableTargetHeight } =
+  useElementSize(moveableTarget)
+
+function convertScreenPosition() {
+  const { width: previousWindowWidth, height: previousWindowHeight } =
+    previousWindowSize.value
+  const currentWindowWidth = viewport.value.width
+  const currentWindowHeight = viewport.value.height
+  if (
+    previousWindowWidth !== currentWindowWidth ||
+    previousWindowHeight !== currentWindowHeight
+  ) {
+    const { x: currentXValue, y: currentYValue } = parseTransform(
+      props.transform,
+    )
+    const currentCenteredXValue = currentXValue + moveableTargetWidth.value / 2
+    const currentCenteredYValue = currentYValue + moveableTargetHeight.value / 2
+    const previousCenteredXPercentage =
+      currentCenteredXValue / previousWindowWidth
+    const previousCenteredYPercentage =
+      currentCenteredYValue / previousWindowHeight
+    const newXValue =
+      currentWindowWidth * previousCenteredXPercentage -
+      moveableTargetWidth.value / 2
+    const newYValue =
+      currentWindowHeight * previousCenteredYPercentage -
+      moveableTargetHeight.value / 2
+
+    setTimeout(() => {
+      if (moveable.value) {
+        moveable.value.request(
+          'draggable',
+          {
+            x: newXValue,
+            y: newYValue,
+          },
+          true,
+        )
+      }
+
+      previousWindowSize.value = {
+        width: currentWindowWidth,
+        height: currentWindowHeight,
+      }
+    }, 1000)
+  }
+}
+
+useEventListener(
+  'resize',
+  throttle(() => {
+    convertScreenPosition()
+  }, 500),
+)
+
 onMounted(() => {
   // gsap.set(messenger.value, {
   //   opacity: 0,
