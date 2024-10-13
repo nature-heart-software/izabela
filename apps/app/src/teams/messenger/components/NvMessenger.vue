@@ -2,58 +2,58 @@
   <div class="messengerWrapper">
     <NvHitbox id="moveable" ref="moveableTarget" class="inline-flex">
       <div
-          ref="messenger"
-          class="messenger bg-gray-10/95 rounded grid p-4 gap-4 grid-rows-3 grid-rows-none min-w-[768px]"
-          data-v-step="messenger-window"
+        ref="messenger"
+        class="messenger bg-gray-10/95 rounded grid p-4 gap-4 grid-rows-3 grid-rows-none min-w-[768px]"
+        data-v-step="messenger-window"
       >
         <!-- Top -->
         <NvGroup :spacing="4">
-          <NvMessengerLinksBar/>
+          <NvMessengerLinksBar />
           <NvGroup :spacing="4" class="!flex-1">
             <div class="moveable-handle cursor-all-scroll !flex-1">
-              <NvMessengerHandleBar/>
+              <NvMessengerHandleBar />
             </div>
-            <NvMessengerNavigationBar/>
+            <NvMessengerNavigationBar />
           </NvGroup>
         </NvGroup>
 
         <!-- Middle -->
         <NvGroup :spacing="4" justify="between">
-          <NvMessengerAudioBar/>
-          <NvMessengerMessageBar/>
+          <NvMessengerAudioBar />
+          <NvMessengerMessageBar />
         </NvGroup>
 
         <!-- Bottom -->
         <NvGroup :spacing="4" grow>
-          <NvMessengerInputBar/>
+          <NvMessengerInputBar />
         </NvGroup>
       </div>
     </NvHitbox>
     <Moveable
-        ref="moveable"
-        :bounds="{
+      ref="moveable"
+      :bounds="{
         left: 12,
         right: viewport.width - 12,
         top: 12,
         bottom: viewport.height - 12,
       }"
-        :dragTarget="doc.querySelector('.moveable-handle')"
-        :draggable="true"
-        :elementGuidelines="[doc.querySelector('body')]"
-        :preventClickEventOnDrag="false"
-        :resizable="false"
-        :rotatable="false"
-        :scalable="false"
-        :snapDirections="{
+      :dragTarget="doc.querySelector('.moveable-handle')"
+      :draggable="true"
+      :elementGuidelines="[doc.querySelector('body')]"
+      :preventClickEventOnDrag="false"
+      :resizable="false"
+      :rotatable="false"
+      :scalable="false"
+      :snapDirections="{
         center: true,
         middle: true,
       }"
-        :snapThreshold="16"
-        :snappable="true"
-        :verticalGuidelines="[viewport.width / 2]"
-        className="opacity-0"
-        target="#moveable"
-        @drag="onDrag"
+      :snapThreshold="16"
+      :snappable="true"
+      :verticalGuidelines="[viewport.width / 2]"
+      className="opacity-0"
+      target="#moveable"
+      @drag="onDrag"
     />
   </div>
 </template>
@@ -65,7 +65,8 @@ import {
   onMounted,
   provide,
   ref,
-  unref, watch,
+  unref,
+  watch,
 } from 'vue'
 import Moveable from 'vue3-moveable'
 import { NvGroup } from '@packages/ui'
@@ -132,10 +133,10 @@ const settingsPopover = useRouterViewPopover({
 const router = useRouter()
 const navigateTo = (location: RouteLocationRaw) => {
   if (
-      unref(settingsPopover.popover.value?.state)?.isShown &&
-      typeof location === 'object' &&
-      'name' in location &&
-      router.currentRoute.value.name === location.name
+    unref(settingsPopover.popover.value?.state)?.isShown &&
+    typeof location === 'object' &&
+    'name' in location &&
+    router.currentRoute.value.name === location.name
   ) {
     settingsPopover.popover.value?.hide()
     return
@@ -153,14 +154,14 @@ provide('messenger', {
 const { width: windowWidth, height: windowHeight } = useWindowSize()
 const viewport = computed(() => ({
   width: Math.max(
-      windowWidth.value,
-      document.documentElement.clientWidth || 0,
-      window.innerWidth || 0,
+    windowWidth.value,
+    document.documentElement.clientWidth || 0,
+    window.innerWidth || 0,
   ),
   height: Math.max(
-      windowHeight.value,
-      document.documentElement.clientHeight || 0,
-      window.innerHeight || 0,
+    windowHeight.value,
+    document.documentElement.clientHeight || 0,
+    window.innerHeight || 0,
   ),
 }))
 
@@ -197,7 +198,7 @@ const onDrag = (event: any) => {
 //     })
 //   }
 // })
-const previousWindowSize = ref<{ width: number, height: number }>({
+const previousWindowSize = ref<{ width: number; height: number }>({
   width: viewport.value.width,
   height: viewport.value.height,
 })
@@ -206,7 +207,8 @@ function parseTransform(transform: string | null) {
   if (!transform) {
     return { x: 0, y: 0 }
   }
-  const translateRegex = /translate\((-?\d+(\.\d+)?)(px)?,\s*(-?\d+(\.\d+)?)(px)?\)/
+  const translateRegex =
+    /translate\((-?\d+(\.\d+)?)(px)?,\s*(-?\d+(\.\d+)?)(px)?\)/
   const match = translateRegex.exec(transform)
   if (match) {
     const x = parseFloat(match[1])
@@ -216,30 +218,43 @@ function parseTransform(transform: string | null) {
   return { x: 0, y: 0 }
 }
 
-const { width: moveableTargetWidth, height: moveableTargetHeight } = useElementSize(moveableTarget)
+const { width: moveableTargetWidth, height: moveableTargetHeight } =
+  useElementSize(moveableTarget)
 
 function convertScreenPosition() {
-  const { width: previousWindowWidth, height: previousWindowHeight } = previousWindowSize.value
+  const { width: previousWindowWidth, height: previousWindowHeight } =
+    previousWindowSize.value
   const currentWindowWidth = viewport.value.width
   const currentWindowHeight = viewport.value.height
-  if (previousWindowWidth !== currentWindowWidth || previousWindowHeight !== currentWindowHeight) {
-    const { x: currentXValue, y: currentYValue } = parseTransform(props.transform)
-    const currentCenteredXValue = currentXValue+moveableTargetWidth.value / 2
-    const currentCenteredYValue = currentYValue+moveableTargetHeight.value / 2
-    const previousCenteredXPercentage = currentCenteredXValue / previousWindowWidth
-    const previousCenteredYPercentage = currentCenteredYValue / previousWindowHeight
-    const newXValue = currentWindowWidth * previousCenteredXPercentage-moveableTargetWidth.value / 2
-    const newYValue = currentWindowHeight * previousCenteredYPercentage-moveableTargetHeight.value / 2
+  if (
+    previousWindowWidth !== currentWindowWidth ||
+    previousWindowHeight !== currentWindowHeight
+  ) {
+    const { x: currentXValue, y: currentYValue } = parseTransform(
+      props.transform,
+    )
+    const currentCenteredXValue = currentXValue + moveableTargetWidth.value / 2
+    const currentCenteredYValue = currentYValue + moveableTargetHeight.value / 2
+    const previousCenteredXPercentage =
+      currentCenteredXValue / previousWindowWidth
+    const previousCenteredYPercentage =
+      currentCenteredYValue / previousWindowHeight
+    const newXValue =
+      currentWindowWidth * previousCenteredXPercentage -
+      moveableTargetWidth.value / 2
+    const newYValue =
+      currentWindowHeight * previousCenteredYPercentage -
+      moveableTargetHeight.value / 2
 
     setTimeout(() => {
       if (moveable.value) {
         moveable.value.request(
-            'draggable',
-            {
-              x: newXValue,
-              y: newYValue,
-            },
-            true,
+          'draggable',
+          {
+            x: newXValue,
+            y: newYValue,
+          },
+          true,
         )
       }
 
@@ -251,26 +266,28 @@ function convertScreenPosition() {
   }
 }
 
-
-useEventListener('resize', throttle(() => {
-  convertScreenPosition()
-}, 500))
+useEventListener(
+  'resize',
+  throttle(() => {
+    convertScreenPosition()
+  }, 500),
+)
 
 onMounted(() => {
   // gsap.set(messenger.value, {
   //   opacity: 0,
   // })
   const moveableTargetEl = (moveableTarget.value as ComponentPublicInstance)
-      .$el as HTMLDivElement | null
+    .$el as HTMLDivElement | null
   if (moveableTargetEl) {
-    if (props.width) moveableTargetEl.style.width = `${ props.width }px`
-    if (props.minWidth) moveableTargetEl.style.minWidth = `${ props.minWidth }px`
-    if (props.maxWidth) moveableTargetEl.style.maxWidth = `${ props.maxWidth }px`
-    if (props.height) moveableTargetEl.style.height = `${ props.height }px`
+    if (props.width) moveableTargetEl.style.width = `${props.width}px`
+    if (props.minWidth) moveableTargetEl.style.minWidth = `${props.minWidth}px`
+    if (props.maxWidth) moveableTargetEl.style.maxWidth = `${props.maxWidth}px`
+    if (props.height) moveableTargetEl.style.height = `${props.height}px`
     if (props.minHeight)
-      moveableTargetEl.style.minHeight = `${ props.minHeight }px`
+      moveableTargetEl.style.minHeight = `${props.minHeight}px`
     if (props.maxHeight)
-      moveableTargetEl.style.maxHeight = `${ props.maxHeight }px`
+      moveableTargetEl.style.maxHeight = `${props.maxHeight}px`
     if (props.transform) moveableTargetEl.style.transform = props.transform
   }
   moveable.value.updateTarget()
@@ -281,12 +298,12 @@ onMounted(() => {
       if (!rect) return
       const { width, height } = rect
       moveable.value.request(
-          'draggable',
-          {
-            x: viewport.value.width / 2-width / 2,
-            y: viewport.value.height-height-60,
-          },
-          true,
+        'draggable',
+        {
+          x: viewport.value.width / 2 - width / 2,
+          y: viewport.value.height - height - 60,
+        },
+        true,
       )
     }
     /* This fixes focus on focusable elements. Focus won't work unless
