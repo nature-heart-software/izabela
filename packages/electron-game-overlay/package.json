@@ -8,11 +8,9 @@
   "module": "./dist/index.js",
   "private": true,
   "scripts": {
-    "build": "node ./bin/build && vite build",
-    "build:prod": "tsc && yarn build",
-    "dev": "vite build --watch --mode development"
+    "build": "node ./bin/build"
   },
   "source": "src/main.ts",
   "type": "module",
-  "types": "./dist/main.d.ts"
+  "types": "./dist/index.d.ts"
 }

@@ -6121,12 +6121,12 @@
   dependencies:
     vue-demi "*"
 
-"@xan105/error@^1.7.1":
+"@xan105/error@^1.6.1", "@xan105/error@^1.7.1":
   version "1.7.1"
   resolved "https://registry.yarnpkg.com/@xan105/error/-/error-1.7.1.tgz#d417e839cef7d79df4594943553d3d5b14f26bfa"
   integrity sha512-FYIUYijbmg62L9QQ5BsR14DuZatAJJvwo10yzuEDEsu8L0FAa4DZivWFAf66nYjEiSz50SFGtMxWSyG+y/ZGGw==
 
-"@xan105/ffi@^1.3.0":
+"@xan105/ffi@^1.0.0":
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/@xan105/ffi/-/ffi-1.3.0.tgz#5c30f83d1c44a2953d66bb96e38da7cc1dccda65"
   integrity sha512-BkawqB9haCJ8qkGY4nUOQBWA4ZzH/BDvwQ8YrQllq4n0PV52bJSVfCYQl3Rerjss7Ig9PPMMoW6ndo2nId1CIA==
@@ -6134,7 +6134,7 @@
     "@xan105/error" "^1.7.1"
     "@xan105/is" "^2.10.0"
 
-"@xan105/is@^2.10.0":
+"@xan105/is@^2.10.0", "@xan105/is@^2.8.2":
   version "2.10.1"
   resolved "https://registry.yarnpkg.com/@xan105/is/-/is-2.10.1.tgz#475c83b0fa6e5b22379612a84547b8d125c0a8cc"
   integrity sha512-FKgDE2tSyJwvf+zIeAsN/f8l94CYhhu5LtkLhv/gYX1i5DnfGdCys0N+mxxTb1qMhWPw+ekHGcwflv0x8ATPJQ==
@@ -13708,7 +13708,7 @@ klona@2.0.6:
   resolved "https://registry.yarnpkg.com/klona/-/klona-2.0.6.tgz#85bffbf819c03b2f53270412420a4555ef882e22"
   integrity sha512-dhG34DXATL5hSxJbIexCft8FChFXtmskoZYnoPWjXQuebWYCNkVeV3KkGegCK9CP1oswI/vQibS2GY7Em/sJJA==
 
-koffi@^2.9.1:
+koffi@^2.6.1:
   version "2.9.1"
   resolved "https://registry.yarnpkg.com/koffi/-/koffi-2.9.1.tgz#22781e3f72a05937ddcf6c458c175da0ab9cc40c"
   integrity sha512-LXYOzaiUB8XK7EwbG0tgzhajEr3FLS2RB9oHYbTOiWRQQO+Rgft3xSvd5TFlM3wQ6DMMQG41lvUR5gLgdyWIsA==
@@ -20501,16 +20501,16 @@ wordwrap@^1.0.0:
   resolved "https://registry.npmjs.org/wordwrap/-/wordwrap-1.0.0.tgz"
   integrity sha512-gvVzJFlPycKc5dZN4yPkP8w7Dc37BtP1yczEneOb4uq34pXZcvrtRTmWV8W+Ume+XCxKgbjM+nevkyFPMybd4Q==
 
-wql-process-monitor@^3.0.1:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/wql-process-monitor/-/wql-process-monitor-3.0.2.tgz#1514d2c51c7bec25590f212e6a4e8dba18bfa90c"
-  integrity sha512-atXBJ5sgKjuev/MaFgzBBnvCFHpbQsjwBkL2qBLpzAXnh5KShfvpgwDdXUad/z6HFzfM04s+9Tb90BuQGdxepQ==
+wql-process-monitor@3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/wql-process-monitor/-/wql-process-monitor-3.0.1.tgz#a06255da101ef8537e2562f8dc58b5fae2a67b19"
+  integrity sha512-/sutSMgAuM+uwuG91LdKykQc8BLVw6/xE7gYkuV8oZQaQygzP0KHGONt435Sc3Ne4TLE5wmFPKz5jwXeime6mw==
   dependencies:
-    "@xan105/error" "^1.7.1"
-    "@xan105/ffi" "^1.3.0"
-    "@xan105/is" "^2.10.0"
+    "@xan105/error" "^1.6.1"
+    "@xan105/ffi" "^1.0.0"
+    "@xan105/is" "^2.8.2"
     emittery "^1.0.1"
-    koffi "^2.9.1"
+    koffi "^2.6.1"
 
 "wrap-ansi-cjs@npm:wrap-ansi@^7.0.0", wrap-ansi@^7.0.0:
   version "7.0.0"
