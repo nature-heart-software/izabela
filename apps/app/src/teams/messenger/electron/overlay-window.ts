@@ -31,6 +31,7 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     },
   })
   window.setSize(1920, 1080)
+  window.webContents.setFrameRate(240)
   ipcMain.registerBrowserWindow(name, window)
 
   if (import.meta.env.VITE_DEV_SERVER_URL) {

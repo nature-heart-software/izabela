@@ -5,7 +5,7 @@
     :style="{
       zIndex: 999999999
     }"
-    class="fixed inset-0 pointer-events-auto"
+    class="fixed inset-0 pointer-events-auto cursor-none"
     @click="displayOffscreenFocusFix = false"
   />
   <ThemeProvider :theme="tokens">

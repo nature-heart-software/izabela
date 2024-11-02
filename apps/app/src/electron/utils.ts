@@ -1,5 +1,5 @@
 import * as path from 'path'
-import { protocol, Protocol, screen } from 'electron'
+import { app, protocol, Protocol, screen } from 'electron'
 import minBy from 'lodash/minBy'
 import { readFile } from 'fs'
 import { URL } from 'url'
@@ -27,7 +27,7 @@ export function createProtocol(scheme: string, customProtocol: Protocol) {
       readFile(path.join(__dirname, '../dist', pathName), (error, data) => {
         if (error) {
           console.error(
-            `Failed to read ${pathName} on ${scheme} protocol`,
+            `Failed to read ${ pathName } on ${ scheme } protocol`,
             error,
           )
         }
@@ -52,4 +52,27 @@ export function createProtocol(scheme: string, customProtocol: Protocol) {
       })
     },
   )
+}
+
+export const onExit = (callback: () => void) => {
+  process.on('message', (data) => {
+    if (process.platform === 'win32' && data === 'graceful-exit') {
+      callback()
+    }
+  })
+  ;['SIGINT', 'SIGTERM', 'SIGQUIT'].forEach((signal) => {
+    process.on(signal, () => {
+      callback()
+    })
+  })
+
+  app.on('before-quit', () => {
+    callback()
+  })
+
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+      callback()
+    }
+  })
 }
