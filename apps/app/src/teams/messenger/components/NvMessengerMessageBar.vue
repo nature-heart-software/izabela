@@ -1,7 +1,7 @@
 <template>
   <NvCard size="sm">
     <NvGroup noWrap>
-      <NvPopover :tippy-options="{ placement: 'top-end' }" size="sm">
+      <NvPopover placement="top-end" size="sm">
         <div class="w-screen max-w-full">
           <NvStack spacing="4">
             <NvFormItem label="Message mode">
@@ -13,7 +13,10 @@
           <NvTooltip>
             <NvText>Message mode</NvText>
             <template #reference>
-              <NvButton data-v-step="message-mode-buttons" icon-name="direction" size="sm"
+              <NvButton
+                data-v-step="message-mode-buttons"
+                icon-name="direction"
+                size="sm"
                 >Mode
               </NvButton>
             </template>
@@ -40,7 +43,7 @@
       <!--        </template>-->
       <!--      </NvTooltip>-->
       <NvDivider class="h-3" direction="vertical" />
-      <NvPopover :tippy-options="{ placement: 'top-end' }" size="sm">
+      <NvPopover placement="top-end" size="sm">
         <div class="w-screen max-w-full">
           <NvStack spacing="4">
             <NvGroup justify="apart" no-wrap>
@@ -50,7 +53,9 @@
               <NvSwitch
                 :modelValue="settingsStore.enableTranslation"
                 class="shrink-0"
-                @update:modelValue="(value) => settingsStore.$patch({ enableTranslation: value })"
+                @update:modelValue="
+                  (value) => settingsStore.$patch({ enableTranslation: value })
+                "
               />
             </NvGroup>
             <NvAccessBlocker
@@ -63,7 +68,12 @@
                   <NvTranslationStrategySelect />
                 </NvFormItem>
                 <NvDivider direction="horizontal" />
-                <template v-if="settingsStore.textTranslationStrategy === 'cloud-translation'">
+                <template
+                  v-if="
+                    settingsStore.textTranslationStrategy ===
+                    'cloud-translation'
+                  "
+                >
                   <NvAccessBlocker
                     :allowed="!!googleCloudSpeechCredentialsPath"
                     reason="Google Cloud credentials required"
@@ -79,7 +89,9 @@
                     </NvStack>
                   </NvAccessBlocker>
                 </template>
-                <template v-if="settingsStore.textTranslationStrategy === 'custom'">
+                <template
+                  v-if="settingsStore.textTranslationStrategy === 'custom'"
+                >
                   <NvAccessBlocker
                     :allowed="!!settingsStore.customTextTranslationEndpoint"
                     reason="Endpoint and/or credentials required"
@@ -102,10 +114,11 @@
         <template #reference>
           <NvTooltip>
             <NvText
-              >Translation<template v-if="settingsStore.enableTranslation">
-                - Running</template
-              ></NvText
-            >
+              >Translation
+              <template v-if="settingsStore.enableTranslation">
+                - Running
+              </template>
+            </NvText>
             <template #reference>
               <NvButton
                 :type="settingsStore.enableTranslation ? 'active' : 'default'"
@@ -122,14 +135,17 @@
         <template #reference>
           <NvButton
             :type="
-              route.name === 'settings-dictionary' && messengerContext.isViewShown.value
+              route.name === 'settings-dictionary' &&
+              messengerContext.isViewShown.value
                 ? 'plain'
                 : 'default'
             "
             data-v-step="dictionary-button"
             icon-name="books"
             size="sm"
-            @click="messengerContext.navigateTo({ name: 'settings-dictionary' })"
+            @click="
+              messengerContext.navigateTo({ name: 'settings-dictionary' })
+            "
           />
         </template>
       </NvTooltip>
@@ -138,7 +154,8 @@
         <template #reference>
           <NvButton
             :type="
-              route.name === 'messages-shortcuts' && messengerContext.isViewShown.value
+              route.name === 'messages-shortcuts' &&
+              messengerContext.isViewShown.value
                 ? 'plain'
                 : 'default'
             "
@@ -154,7 +171,8 @@
         <template #reference>
           <NvButton
             :type="
-              route.name === 'messages-history' && messengerContext.isViewShown.value
+              route.name === 'messages-history' &&
+              messengerContext.isViewShown.value
                 ? 'plain'
                 : 'default'
             "
@@ -196,5 +214,6 @@ import NvMessageModeSelect from '@/features/messages/components/inputs/NvMessage
 const settingsStore = useSettingsStore()
 const messengerContext = inject('messenger')
 const route = useRoute()
-const { data: googleCloudSpeechCredentialsPath } = useGetGoogleCloudSpeechCredentialsPath()
+const { data: googleCloudSpeechCredentialsPath } =
+  useGetGoogleCloudSpeechCredentialsPath()
 </script>

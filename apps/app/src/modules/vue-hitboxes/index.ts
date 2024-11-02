@@ -8,17 +8,21 @@ import { isGameOverlay } from '@/consts.ts'
 export const hitboxClass = 'hitbox'
 
 const onElementChange = (element: Element, callback: () => any) => {
-    const resizeObserver = new ResizeObserver(callback)
-    const intersectionObserver = new IntersectionObserver(callback)
-    const mutationObserver = new MutationObserver(callback)
-    resizeObserver.observe(element)
-    intersectionObserver.observe(element)
-    mutationObserver.observe(element, { attributes: true })
-    return () => {
-        resizeObserver.unobserve(element)
-        intersectionObserver.unobserve(element)
-        mutationObserver.disconnect()
-    }
+  const resizeObserver = new ResizeObserver(callback)
+  const intersectionObserver = new IntersectionObserver(callback)
+  const mutationObserver = new MutationObserver(callback)
+  resizeObserver.observe(element)
+  intersectionObserver.observe(element)
+  mutationObserver.observe(element, { attributes: true })
+  window.addEventListener('resize', callback)
+  window.addEventListener('focus', callback)
+  return () => {
+    resizeObserver.unobserve(element)
+    intersectionObserver.unobserve(element)
+    mutationObserver.disconnect()
+    window.removeEventListener('resize', callback)
+    window.removeEventListener('focus', callback)
+  }
 }
 export const watchHitbox = (selector: string) => {
     if (isGameOverlay) return

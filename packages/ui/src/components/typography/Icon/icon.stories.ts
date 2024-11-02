@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { tokens } from '@/styles/tokens'
-import { Story } from '@storybook/vue3'
+import { StoryFn } from '@storybook/vue3'
 import { props } from './icon.shared'
 import * as Icons from '@packages/icons'
 import { NvIcon } from '@/components'
@@ -21,7 +21,7 @@ export default {
   },
 }
 
-const Template: Story = (args) => ({
+const Template: StoryFn = (args) => ({
   components: { NvIcon },
   setup() {
     return {

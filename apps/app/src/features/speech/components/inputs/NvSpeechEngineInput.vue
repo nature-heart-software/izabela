@@ -10,23 +10,29 @@
     @select="onAutocompleteSelect"
   >
     <template #reference>
-      <NvInput
-        ref="inputRef"
-        :modelValue="props.modelValue"
-        v-bind="$attrs"
-        @blur="onInputBlur"
-        @focus="onInputFocus"
-        @update:modelValue="(value) => emit('update:modelValue', value)"
-        @keydown.tab.prevent="onInputTab"
-        @keydown.enter="onInputEnter"
-        @keydown.space="onInputSpace"
-        @keydown.esc.prevent="onInputEsc"
-        @keydown.up.prevent
-        @keydown.down.prevent
-      />
+      <div>
+        <NvInput
+          ref="inputRef"
+          :modelValue="props.modelValue"
+          v-bind="$attrs"
+          @blur="onInputBlur"
+          @focus="onInputFocus"
+          @update:modelValue="(value) => emit('update:modelValue', value)"
+          @keydown.tab.prevent="onInputTab"
+          @keydown.enter="onInputEnter"
+          @keydown.space="onInputSpace"
+          @keydown.esc.prevent="onInputEsc"
+          @keydown.up.prevent
+          @keydown.down.prevent
+        />
+      </div>
     </template>
     <template #default="{ item, active }">
-      <NvOption v-if="item" :active="active">
+      <NvOption
+        v-if="item"
+        :active="active"
+        @mousedown="onAutocompleteSelect(item)"
+      >
         <NvGroup>
           <NvText type="label">
             {{ item.command }}

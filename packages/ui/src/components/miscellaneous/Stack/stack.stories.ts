@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { Story } from '@storybook/vue3'
+import { StoryFn } from '@storybook/vue3'
 import { tokens } from '@/styles/tokens'
 import { alignValues, justifyValues, props } from './stack.shared'
 import { NvButton, NvStack } from '@/components'
@@ -26,7 +26,7 @@ export default {
   },
 }
 
-const Template: Story = (args) => ({
+const Template: StoryFn = (args) => ({
   components: { NvStack, NvButton },
   setup() {
     return {

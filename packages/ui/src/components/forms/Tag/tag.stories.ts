@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { Story } from '@storybook/vue3'
+import { StoryFn } from '@storybook/vue3'
 import { NvTag } from '@/components'
 import { props } from '@/components/forms/Tag/tag.shared'
 
@@ -14,7 +14,7 @@ export default {
   },
 }
 
-const Template: Story = (args) => ({
+const Template: StoryFn = (args) => ({
   components: { NvTag },
   setup() {
     return {

@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { Story } from '@storybook/vue3'
+import { StoryFn } from '@storybook/vue3'
 import {
   NvButton,
   NvCenter,
@@ -12,7 +12,7 @@ export default {
   title: 'ContextMenu',
 }
 
-const Template: Story = (args) => ({
+const Template: StoryFn = (args) => ({
   components: { NvContextMenu, NvButton, NvText, NvCenter, NvOption },
   setup() {
     return {

@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { ref } from 'vue'
-import { Story } from '@storybook/vue3'
+import { StoryFn } from '@storybook/vue3'
 import { NvCenter, NvSelect } from '@/components'
 import { selectProps, sizeValues } from './select.shared'
 import voices from '@/mocks/voices.json'
@@ -21,7 +21,7 @@ export default {
   },
 }
 
-const Template: Story = (args) => ({
+const Template: StoryFn = (args) => ({
   components: { NvSelect, NvCenter },
   setup() {
     return {

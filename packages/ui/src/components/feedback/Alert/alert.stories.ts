@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { Story } from '@storybook/vue3'
+import { StoryFn } from '@storybook/vue3'
 import { props, typeValues } from '@/components/feedback/Alert/alert.shared'
 import { sizeValues } from '@/utils/css-in-js'
 import { NvAlert } from '@/components'
@@ -24,7 +24,7 @@ export default {
   },
 }
 
-const Template: Story = (args) => ({
+const Template: StoryFn = (args) => ({
   components: { NvAlert },
   setup() {
     return {

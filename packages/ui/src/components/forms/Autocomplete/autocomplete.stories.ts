@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { Story } from '@storybook/vue3'
+import { StoryFn } from '@storybook/vue3'
 import { NvAutocomplete, NvInput } from '@/components'
 import { ref } from 'vue'
 import voices from '@/mocks/voices.json'
@@ -16,7 +16,7 @@ export default {
   },
 }
 
-const Template: Story = (args) => ({
+const Template: StoryFn = (args) => ({
   components: { NvAutocomplete, NvInput },
   setup() {
     return {

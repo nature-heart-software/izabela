@@ -7,7 +7,13 @@
 import { v4 as uuid } from 'uuid'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import throttle from 'lodash/throttle'
-import { useDevicePixelRatio, useIntersectionObserver, useMutationObserver, useResizeObserver } from '@vueuse/core'
+import {
+  useDevicePixelRatio,
+  useIntersectionObserver,
+  useMutationObserver,
+  useResizeObserver,
+  useEventListener,
+} from '@vueuse/core'
 import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
 import { isGameOverlay } from '@/consts.ts'
 
@@ -50,11 +56,13 @@ const updateHitbox = throttle(
 useIntersectionObserver(componentRef, updateHitbox)
 useMutationObserver(componentRef, updateHitbox, { attributes: true })
 useResizeObserver(componentRef, updateHitbox)
-
+useEventListener('resize', updateHitbox)
+useEventListener('focus', updateHitbox)
 onBeforeUnmount(() => {
   if (isGameOverlay) return
   hitboxesStore.removeHitbox(hitboxes.value.id)
 })
+
 onMounted(() => {
   updateHitbox()
 })

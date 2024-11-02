@@ -35,7 +35,8 @@ export const StAutocompleteReferenceWrapper = styled('div', props)`
 `
 
 export const StAutocomplete = styled('div', props)`
-  width: ${({ width = defaultWidth }) => rem(width)};
+  min-width: ${({ width = defaultWidth }) => rem(width)};
+  width: var(--reference-width);
   border-width: ${() => rem(tokens.borderWidth.DEFAULT)};
   border-style: solid;
   box-shadow: ${() => boxShadow.lg} !important;

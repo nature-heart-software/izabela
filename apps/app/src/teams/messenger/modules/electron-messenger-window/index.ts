@@ -168,29 +168,31 @@ export const ElectronMessengerWindow = () => {
             }
         })
 
-    const onMouseMove = (mouseX = 0, mouseY = 0) => {
-        if (!hitboxesStore) return
-        const window = getWindow()
-        if (window) {
-            if (!window.isDestroyed() && window.isVisible()) {
-                // const { x: mouseX = 0, y: mouseY = 0 } = event
-                const [windowX, windowY] = window.getPosition()
-                const { hitboxes } = hitboxesStore
-                const isWithinAnyHitboxes = hitboxes.some(({ x, y, w, h }: Hitbox) => {
-                    const isWithinXHitbox =
-                        mouseX >= windowX+x && mouseX <= windowX+x+w
-                    const isWithinYHitbox =
-                        mouseY >= windowY+y && mouseY <= windowY+y+h
-                    return isWithinXHitbox && isWithinYHitbox
-                })
-                if (isWithinAnyHitboxes) {
-                    focus('mouse')
-                } else {
-                    blur()
-                }
-            }
+  const onMouseMove = (mouseX = 0, mouseY = 0) => {
+    if (!hitboxesStore) return
+    const window = getWindow()
+    if (window) {
+      if (!window.isDestroyed() && window.isVisible()) {
+        // const { x: mouseX = 0, y: mouseY = 0 } = event
+        const [windowX, windowY] = window.getPosition()
+        const { hitboxes } = hitboxesStore
+        const isWithinAnyHitboxes = hitboxes
+          .filter(({ w, h }) => w && h)
+          .some(({ x, y, w, h }: Hitbox) => {
+            const isWithinXHitbox =
+              mouseX >= windowX + x && mouseX <= windowX + x + w
+            const isWithinYHitbox =
+              mouseY >= windowY + y && mouseY <= windowY + y + h
+            return isWithinXHitbox && isWithinYHitbox
+          })
+        if (isWithinAnyHitboxes) {
+          focus('mouse')
+        } else {
+          blur()
         }
+      }
     }
+  }
 
     const toggleWindow = throttle((context: 'mouse' | 'keyboard') => {
         const window = getWindow()

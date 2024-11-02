@@ -18,6 +18,9 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
       const {
         data: { voices },
       } = await api.get('/voices', {
+        params: {
+          show_legacy: true,
+        },
         headers: {
           'xi-api-key': apiKey,
         },

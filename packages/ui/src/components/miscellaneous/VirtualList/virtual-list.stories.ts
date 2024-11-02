@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { Story } from '@storybook/vue3'
+import { StoryFn } from '@storybook/vue3'
 import { NvVirtualList, NvVirtualListContainer } from '@/components'
 import { ref } from 'vue'
 import voices from '@/mocks/voices.json'
@@ -8,7 +8,7 @@ export default {
   title: 'VirtualList',
 }
 
-const Template: Story = (args) => ({
+const Template: StoryFn = (args) => ({
   components: { NvVirtualList, NvVirtualListContainer },
   setup() {
     return {

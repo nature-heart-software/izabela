@@ -1,0 +1,63 @@
+{
+  "info": {
+    "name": "Custom Engine Api",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "List Voices",
+      "event": [],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "auth": null,
+        "description": "",
+        "url": {
+          "raw": "http://localhost:3000/list-voices",
+          "protocol": "http",
+          "host": ["localhost:3000"],
+          "path": ["list-voices"],
+          "query": [],
+          "variable": []
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"credentials\": {\n    \"apiKey\": \"\"\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Synthesize Speech",
+      "event": [],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "auth": null,
+        "description": "",
+        "url": {
+          "raw": "http://localhost:3000/synthesize-speech",
+          "protocol": "http",
+          "host": ["localhost:3000"],
+          "path": ["synthesize-speech"],
+          "query": [],
+          "variable": []
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"credentials\": {\n    \"apiKey\": \"\"\n  },\n  \"payload\": {\n    \"text\": \"Hello world, programmed to work and not to feel.\",\n    \"voice\": {\n      \"id\": \"Microsoft Hazel Desktop\",\n      \"name\": \"Microsoft Hazel Desktop\",\n      \"category\": \"Say\",\n      \"languageCode\": \"en-US\"\n    }\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "variable": []
+}

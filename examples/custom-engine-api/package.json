@@ -7,7 +7,9 @@
     "start": "nodemon index.js"
   },
   "dependencies": {
-    "express": "^4.19.2",
+    "body-parser": "^1.20.0",
+    "cors": "^2.8.5",
+    "express": "^4.20.0",
     "nodemon": "^2.0.20",
     "say": "^0.16.0"
   }

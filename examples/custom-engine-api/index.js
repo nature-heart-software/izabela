@@ -1,6 +1,5 @@
 const express = require('express')
 const app = express()
-const port = 3000
 const pkg = require('./package.json')
 const say = require('say')
 const cors = require('cors')
@@ -25,7 +24,6 @@ app.post('/list-voices', async (req, res) => {
         },
       },
     } = req
-    console.log(req.body)
     const voices = await new Promise((resolve, reject) => {
       say.getInstalledVoices((err, voices) => {
         if (err) return reject(err)
@@ -63,7 +61,6 @@ app.post('/synthesize-speech', async (req, res) => {
         },
       },
     } = req
-    console.log(req.body)
     const outputFile = path.join(__dirname, 'example.mp3')
     fs.mkdirSync(path.parse(outputFile).dir, { recursive: true })
     fs.writeFileSync(outputFile, '')
@@ -89,7 +86,7 @@ app.post('/synthesize-speech', async (req, res) => {
   }
 })
 
-app.listen(port, () => {
+app.listen(ENDPOINT_PORT, () => {
   console.log(
     `[${pkg.name}] API endpoint: ${ENDPOINT_BASE_URL}${
       ENDPOINT_PORT ? `:${ENDPOINT_PORT}` : ''

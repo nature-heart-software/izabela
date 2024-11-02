@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { tokens } from '@/styles/tokens'
-import { Story } from '@storybook/vue3'
+import { StoryFn } from '@storybook/vue3'
 import { props, typeValues } from '@/components/typography/Text/text.shared'
 import { NvText } from '@/components'
 
@@ -28,7 +28,7 @@ export default {
   },
 }
 
-const Template: Story = (args) => ({
+const Template: StoryFn = (args) => ({
   components: { NvText },
   setup() {
     return {

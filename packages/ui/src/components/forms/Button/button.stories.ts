@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { Story } from '@storybook/vue3'
+import { StoryFn } from '@storybook/vue3'
 import { props, sizeValues, typeValues } from './button.shared'
 import { NvButton } from '@/components'
 
@@ -40,7 +40,7 @@ export default {
   },
 }
 
-const Template: Story = (args) => ({
+const Template: StoryFn = (args) => ({
   components: { NvButton },
   setup() {
     return {
