@@ -8,7 +8,7 @@
   "module": "./dist/index.js",
   "private": true,
   "scripts": {
-    "build": "vite build",
+    "build": "node ./bin/build && vite build",
     "build:prod": "tsc && yarn build",
     "dev": "vite build --watch --mode development"
   },
