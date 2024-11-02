@@ -26,5 +26,7 @@ const onBackgroundClick = () => {
     emitIPCGameOverlayStopIntercept()
   }
 }
-const isBackgroundShown = computed(() => isGameOverlay || messengerWindowStore.isInputFocused)
+const isBackgroundShown = computed(
+  () => isGameOverlay || messengerWindowStore.isInputFocused,
+)
 </script>

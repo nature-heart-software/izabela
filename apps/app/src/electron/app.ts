@@ -7,7 +7,10 @@ import { createApp, h } from 'vue'
 import { createPinia } from 'pinia'
 import createTray from '@/teams/tray/electron-tray'
 import ElectronWindowManager from '@/modules/electron-window-manager'
-import { createMessengerGameOverlayWindow, createMessengerWindow } from '@/teams/messenger/electron/background'
+import {
+  createMessengerGameOverlayWindow,
+  createMessengerWindow,
+} from '@/teams/messenger/electron/background'
 import { createSpeechWorkerWindow } from '@/teams/speech-worker/electron/background'
 import { bridgeModules } from '@/electron/bridge'
 import registerElectronStartup from '@/modules/electron-startup/register'

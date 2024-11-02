@@ -14,7 +14,13 @@
         @enter="onInputEnter"
         @esc="onInputEsc"
         @focus="onInputFocus"
-        @space="(e) => settingsStore.messageMode === 'word' && [playMessage(), e.preventDefault()]"
+        @space="
+          (e) =>
+            settingsStore.messageMode === 'word' && [
+              playMessage(),
+              e.preventDefault(),
+            ]
+        "
       />
       <NvButton
         data-v-step="messenger-text-input-submit"
@@ -51,7 +57,7 @@ const onInputEsc = () => {
 
 const placeholder = computed(() => {
   if (speechStore.commands.length > 0) {
-    return `Type / to see available commands (${ speechStore.commands.length })`
+    return `Type / to see available commands (${speechStore.commands.length})`
   }
   return 'So, said the angel to the child who, divided, broke the knife..'
 })
@@ -81,7 +87,8 @@ const onInputEnter = () => {
 }
 
 const onWindowFocus = () => {
-  if (inputRef.value && messengerWindowStore.focusContext === 'keyboard') inputRef.value.focus()
+  if (inputRef.value && messengerWindowStore.focusContext === 'keyboard')
+    inputRef.value.focus()
 }
 
 const onWindowBlur = () => {
@@ -94,9 +101,11 @@ if (isGameOverlay) {
   window.addEventListener('blur', () => {
     inputRef.value.blur()
   })
-  document.querySelector('#offscreen-focus-fix')?.addEventListener('click', (e) => {
-    inputRef.value.focus()
-  })
+  document
+    .querySelector('#offscreen-focus-fix')
+    ?.addEventListener('click', (e) => {
+      inputRef.value.focus()
+    })
 }
 watch(
   // Makes sure all conditions are met to focus or blur properly

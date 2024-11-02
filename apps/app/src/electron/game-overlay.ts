@@ -1,5 +1,8 @@
 import { app, BrowserWindow, screen, shell } from 'electron'
-import { onIPCGameOverlayStartIntercept, onIPCGameOverlayStopIntercept } from '@/electron/events/main.ts'
+import {
+  onIPCGameOverlayStartIntercept,
+  onIPCGameOverlayStopIntercept,
+} from '@/electron/events/main.ts'
 import { mouse, Point } from '@nut-tree-fork/nut-js'
 import path from 'path'
 import { EXTERNALS_DIR } from '@/electron/utils.ts'
@@ -84,9 +87,7 @@ class GameOverlay {
     captionHeight: number = 0,
     transparent: boolean = false,
   ) {
-    const display = screen.getDisplayNearestPoint(
-      screen.getCursorScreenPoint(),
-    )
+    const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint())
 
     this.Overlay!.addWindow(window.id, {
       name,
@@ -116,27 +117,24 @@ class GameOverlay {
       dragBorderWidth: Math.floor(dragBorder),
     })
 
-    window.webContents.on(
-      'paint',
-      (_, __, image: Electron.NativeImage) => {
-        if (this.markQuit) {
-          return
-        }
-        this.Overlay!.sendFrameBuffer(
-          window.id,
-          image.getBitmap(),
-          image.getSize().width,
-          image.getSize().height,
-        )
-      },
-    )
+    window.webContents.on('paint', (_, __, image: Electron.NativeImage) => {
+      if (this.markQuit) {
+        return
+      }
+      this.Overlay!.sendFrameBuffer(
+        window.id,
+        image.getBitmap(),
+        image.getSize().width,
+        image.getSize().height,
+      )
+    })
 
     window.on('ready-to-show', () => {
       window.focusOnWebView()
     })
 
     window.on('resize', () => {
-      console.log(`${ name } resizing`)
+      console.log(`${name} resizing`)
       this.Overlay!.sendWindowBounds(window.id, {
         rect: {
           x: window.getBounds().x,
