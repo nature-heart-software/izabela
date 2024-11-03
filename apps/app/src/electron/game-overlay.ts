@@ -46,6 +46,14 @@ class GameOverlay {
         ])
 
         this.Overlay!.setEventCallback((event: string, payload: any) => {
+            if (event === 'graphics.window.event.resize') {
+                const focusWin = this.windows.get('messenger-game-overlay')
+                if (focusWin) {
+                    const { width, height } = payload
+                    focusWin.setSize(width, height)
+                }
+
+            }
             if (event === 'game.input') {
                 const window = BrowserWindow.fromId(payload.windowId)
                 if (window) {
