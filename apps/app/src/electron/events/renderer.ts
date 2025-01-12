@@ -3,7 +3,10 @@ import { IzabelaMessage } from '@/modules/izabela/types'
 
 const { ipc } = window
 
-export const emitIPCProcessError = (payload: { name: string; message: string }) => {
+export const emitIPCProcessError = (payload: {
+  name: string
+  message: string
+}) => {
   processes.forEach((process) => {
     ipc.sendTo(process, 'error', payload)
   })
@@ -54,7 +57,9 @@ export const onIPCOverlayInputCommand = (callback: (args: any[]) => void) => {
   })
 }
 
-export const onIPCGameOverlayResize = (callback: (size: { width: number, height: number }) => void) => {
+export const onIPCGameOverlayResize = (
+  callback: (size: { width: number; height: number }) => void,
+) => {
   processes.forEach((process) => {
     ipc.on(process, 'resize', callback)
   })

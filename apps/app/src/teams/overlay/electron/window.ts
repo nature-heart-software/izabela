@@ -50,7 +50,7 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     }
   })
 
-  const filePath = `./src/teams/${ name }/index.html`
+  const filePath = `./src/teams/${name}/index.html`
 
   if (import.meta.env.VITE_DEV_SERVER_URL) {
     await window.loadURL(
@@ -58,7 +58,7 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     )
   } else {
     createProtocol('app')
-    window.loadURL(`app://${ filePath }`)
+    window.loadURL(`app://${filePath}`)
   }
 
   return window
