@@ -232,9 +232,12 @@ class GameOverlay {
         this.injectByPID(pid)
       }
     }, 1000)
-    setTimeout(() => {
-      clearInterval(interval)
-    }, 5 * 60 * 1000)
+    setTimeout(
+      () => {
+        clearInterval(interval)
+      },
+      5 * 60 * 1000,
+    )
   }
 
   public injectByPID(pid: number) {
