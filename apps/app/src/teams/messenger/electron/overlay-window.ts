@@ -10,7 +10,7 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
   const url =
     (import.meta.env.VITE_DEV_SERVER_URL
       ? path.join(import.meta.env.VITE_DEV_SERVER_URL as string, filePath)
-      : `app://${ filePath }`)+'?game-overlay'
+      : `app://${filePath}`) + '?game-overlay'
   const overlayDebug = import.meta.env.DEV ? false : false
 
   window = gameOverlay.createWindow(name, {

@@ -79,12 +79,12 @@ class GameOverlay {
           const { top, left, right, bottom } = Window.getByPid(
             payload.pid,
           ).getDimensions()
-          const width = right-left
-          const height = bottom-top
+          const width = right - left
+          const height = bottom - top
 
           mouse.getPosition().then(async (initialPosition) => {
             await mouse.setPosition(
-              new Point(left+width / 2, top+height / 2),
+              new Point(left + width / 2, top + height / 2),
             )
             await mouse.leftClick()
             await mouse.setPosition(initialPosition)
@@ -242,7 +242,7 @@ class GameOverlay {
     for (const window of this.Overlay.getTopWindows()) {
       if (window.processId === pid) {
         console.log(
-          `--------------------\n injecting ${ JSON.stringify(window) }`,
+          `--------------------\n injecting ${JSON.stringify(window)}`,
         )
         this.Overlay.injectProcess(window)
       }

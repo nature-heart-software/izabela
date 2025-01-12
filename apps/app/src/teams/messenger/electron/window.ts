@@ -39,7 +39,7 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
 
   ipcMain.registerBrowserWindow(name, window)
 
-  const filePath = `./src/teams/${ name }/index.html`
+  const filePath = `./src/teams/${name}/index.html`
 
   window.webContents.once('did-finish-load', () => {
     if (import.meta.env.DEV) {
@@ -49,7 +49,9 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     }
   })
 
-  const url = import.meta.env.VITE_DEV_SERVER_URL ? path.join(import.meta.env.VITE_DEV_SERVER_URL as string, filePath) : `app://${ filePath }`
+  const url = import.meta.env.VITE_DEV_SERVER_URL
+    ? path.join(import.meta.env.VITE_DEV_SERVER_URL as string, filePath)
+    : `app://${filePath}`
   if (import.meta.env.VITE_DEV_SERVER_URL) {
     await window.loadURL(url)
   } else {
