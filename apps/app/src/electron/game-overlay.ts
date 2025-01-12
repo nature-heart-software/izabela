@@ -1,5 +1,6 @@
 import { app, BrowserWindow, screen, shell } from 'electron'
 import {
+  emitIPCGameOverlayResize,
   onIPCGameOverlayStartIntercept,
   onIPCGameOverlayStopIntercept,
 } from '@/electron/events/main.ts'
@@ -46,12 +47,12 @@ class GameOverlay {
     ])
 
     this.Overlay!.setEventCallback((event: string, payload: any) => {
-      if (event === 'graphics.window.event.resize') {
-        const focusWin = this.windows.get('messenger-game-overlay')
-        if (focusWin) {
-          const { width, height } = payload
-          focusWin.setSize(width, height)
-        }
+      if (['graphics.window.event.resize', 'graphics.window'].includes(event)) {
+        const { width, height } = payload
+        emitIPCGameOverlayResize({
+          width,
+          height,
+        })
       }
       if (event === 'game.input') {
         const window = BrowserWindow.fromId(payload.windowId)
@@ -69,19 +70,17 @@ class GameOverlay {
       if (event === 'game.input.intercept' && payload.intercepting) {
         const focusWin = this.windows.get('messenger-game-overlay')
         if (focusWin) {
-          console.log(payload)
           focusWin.blurWebView()
           focusWin.focusOnWebView()
           const { top, left, right, bottom } = Window.getByPid(
             payload.pid,
           ).getDimensions()
-          const width = right - left
-          const height = bottom - top
-          // focusWin.setSize(width, height)
+          const width = right-left
+          const height = bottom-top
 
           mouse.getPosition().then(async (initialPosition) => {
             await mouse.setPosition(
-              new Point(left + width / 2, top + height / 2),
+              new Point(left+width / 2, top+height / 2),
             )
             await mouse.leftClick()
             await mouse.setPosition(initialPosition)
@@ -145,7 +144,6 @@ class GameOverlay {
     })
 
     window.on('resize', () => {
-      console.log(`${name} resizing`)
       this.Overlay!.sendWindowBounds(window.id, {
         rect: {
           x: window.getBounds().x,
@@ -224,7 +222,7 @@ class GameOverlay {
     for (const window of this.Overlay.getTopWindows()) {
       if (window.processId === pid) {
         console.log(
-          `--------------------\n injecting ${JSON.stringify(window)}`,
+          `--------------------\n injecting ${ JSON.stringify(window) }`,
         )
         this.Overlay.injectProcess(window)
       }
