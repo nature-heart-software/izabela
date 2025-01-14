@@ -6,11 +6,6 @@ import gameOverlay from '@/electron/game-overlay'
 
 let window: BrowserWindow
 const createWindow = async (name: string): Promise<BrowserWindow> => {
-  const filePath = `./src/teams/messenger/index.html`
-  const url =
-    (import.meta.env.VITE_DEV_SERVER_URL
-      ? path.join(import.meta.env.VITE_DEV_SERVER_URL as string, filePath)
-      : `app://${filePath}`) + '?game-overlay'
   const overlayDebug = import.meta.env.DEV ? false : false
 
   window = gameOverlay.createWindow(name, {
@@ -39,21 +34,20 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
 
   window.webContents.once('did-finish-load', () => {
     if (import.meta.env.DEV) {
-      setTimeout(() => {
-        window.webContents.openDevTools({ mode: 'detach' })
-      }, 300)
+      window.webContents.openDevTools({ mode: 'detach' })
     }
   })
 
+  const filePath = `./src/teams/messenger/index.html?game-overlay`
   if (import.meta.env.VITE_DEV_SERVER_URL) {
-    await window.loadURL(url)
+    await window.loadURL(path.join(import.meta.env.VITE_DEV_SERVER_URL as string, filePath))
   } else {
     createProtocol('app')
-    window.loadURL(url)
+    await window.loadURL(`app://${ filePath }`)
   }
 
   if (!overlayDebug) {
-    gameOverlay.addOverlayWindow(name, window, 0, 0)
+    gameOverlay.isReady().then(() => gameOverlay.addOverlayWindow(name, window, 0, 0))
   }
 
   return window
