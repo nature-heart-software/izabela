@@ -235,9 +235,12 @@ class GameOverlay {
         this.injectByProcess(processInfo)
       }
     }, 1000)
-    setTimeout(() => {
-      clearInterval(interval)
-    }, 5 * 60 * 1000)
+    setTimeout(
+      () => {
+        clearInterval(interval)
+      },
+      5 * 60 * 1000,
+    )
   }
 
   public injectByProcess(processInfo: ProcessInfo) {
