@@ -12,9 +12,9 @@ import { Window } from 'win-control'
 import { Deferred } from '@packages/toolbox'
 
 type ProcessInfo = {
-  process: string,
-  pid: number,
-  filepath: string,
+  process: string
+  pid: number
+  filepath: string
   user: string
 }
 
@@ -33,8 +33,7 @@ class GameOverlay {
   private markQuit = false
   private scaleFactor = 1.0
 
-  constructor() {
-  }
+  constructor() {}
 
   public isReady = () => ready.promise
 
@@ -85,12 +84,12 @@ class GameOverlay {
           const { top, left, right, bottom } = Window.getByPid(
             payload.pid,
           ).getDimensions()
-          const width = right-left
-          const height = bottom-top
+          const width = right - left
+          const height = bottom - top
 
           mouse.getPosition().then(async (initialPosition) => {
             await mouse.setPosition(
-              new Point(left+width / 2, top+height / 2),
+              new Point(left + width / 2, top + height / 2),
             )
             await mouse.leftClick()
             await mouse.setPosition(initialPosition)
@@ -251,7 +250,7 @@ class GameOverlay {
     for (const window of this.Overlay.getTopWindows()) {
       if (window.processId === processInfo.pid) {
         console.log(
-          `--------------------\n injecting ${ JSON.stringify(window) }`,
+          `--------------------\n injecting ${JSON.stringify(window)}`,
         )
         this.Overlay.injectProcess(window)
         this.hookedProcesses.push(processInfo)
@@ -260,34 +259,33 @@ class GameOverlay {
   }
 
   public start() {
-    return import('@packages/electron-game-overlay')
-      .then((Overlay) => {
-        this.Overlay = Overlay.default
-        this.scaleFactor = screen.getDisplayNearestPoint({
-          x: 0,
-          y: 0,
-        }).scaleFactor
+    return import('@packages/electron-game-overlay').then((Overlay) => {
+      this.Overlay = Overlay.default
+      this.scaleFactor = screen.getDisplayNearestPoint({
+        x: 0,
+        y: 0,
+      }).scaleFactor
 
-        this.startOverlay()
+      this.startOverlay()
 
-        const child = fork(path.join(EXTERNALS_DIR, 'detect-game.js'))
+      const child = fork(path.join(EXTERNALS_DIR, 'detect-game.js'))
 
-        child.on('message', (processInfo: ProcessEvent) => {
-          if (processInfo.type === 'game-detection') {
-            this.injectByProcessOnceFocused(processInfo.payload)
-          }
-        })
-
-        onIPCGameOverlayStartIntercept(() => {
-          this.startIntercept()
-        })
-
-        onIPCGameOverlayStopIntercept(() => {
-          this.stopIntercept()
-        })
-
-        return ready.resolve(true)
+      child.on('message', (processInfo: ProcessEvent) => {
+        if (processInfo.type === 'game-detection') {
+          this.injectByProcessOnceFocused(processInfo.payload)
+        }
       })
+
+      onIPCGameOverlayStartIntercept(() => {
+        this.startIntercept()
+      })
+
+      onIPCGameOverlayStopIntercept(() => {
+        this.stopIntercept()
+      })
+
+      return ready.resolve(true)
+    })
   }
 
   public quit() {
