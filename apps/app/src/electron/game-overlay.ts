@@ -28,6 +28,7 @@ const ready = Deferred()
 class GameOverlay {
   public Overlay: any = null
   public hookedProcesses: ProcessInfo[] = []
+  public intercepting = false
   private windows: Map<string, Electron.BrowserWindow> = new Map()
   private markQuit = false
   private scaleFactor = 1.0
@@ -72,6 +73,9 @@ class GameOverlay {
             window.webContents.sendInputEvent(intpuEvent)
           }
         }
+      }
+      if (event === 'game.input.intercept') {
+        this.intercepting = payload.intercepting
       }
       if (event === 'game.input.intercept' && payload.intercepting) {
         const focusWin = this.windows.get('messenger-game-overlay')

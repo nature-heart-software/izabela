@@ -85,9 +85,7 @@ export const ElectronMessengerWindow = () => {
   }
 
   const focus = (context: 'mouse' | 'keyboard') =>
-    new Promise((resolve, reject) => {
-      console.log(Window.getForeground().getPid(), gameOverlay.hookedProcesses)
-
+    new Promise((_, reject) => {
       messengerWindowStore?.$patch({ focusContext: context })
       const window = getWindow()
       if (window) {
@@ -201,6 +199,16 @@ export const ElectronMessengerWindow = () => {
   }
 
   const toggleWindow = throttle((context: 'mouse' | 'keyboard') => {
+    const foregroundWindowPid = Window.getForeground()?.getPid()
+    const hookedProcess = gameOverlay.hookedProcesses.find((process) => process.pid === foregroundWindowPid)
+    if (hookedProcess && !gameOverlay.intercepting) {
+      gameOverlay.startIntercept()
+      return
+    }
+    if (hookedProcess && gameOverlay.intercepting) {
+      gameOverlay.stopIntercept()
+      return
+    }
     const window = getWindow()
     if (window) {
       if (window.isVisible()) {
