@@ -33,8 +33,7 @@ class GameOverlay {
   private markQuit = false
   private scaleFactor = 1.0
 
-  constructor() {
-  }
+  constructor() {}
 
   public isReady = () => ready.promise
 
@@ -86,12 +85,12 @@ class GameOverlay {
           const { top, left, right, bottom } = Window.getByPid(
             payload.pid,
           ).getDimensions()
-          const width = right-left
-          const height = bottom-top
+          const width = right - left
+          const height = bottom - top
 
           mouse.getPosition().then(async (initialPosition) => {
             await mouse.setPosition(
-              new Point(left+width / 2, top+height / 2),
+              new Point(left + width / 2, top + height / 2),
             )
             await mouse.leftClick()
             await mouse.setPosition(initialPosition)
@@ -252,7 +251,7 @@ class GameOverlay {
     for (const window of this.Overlay.getTopWindows()) {
       if (window.processId === processInfo.pid) {
         console.log(
-          `--------------------\n injecting ${ JSON.stringify(window) }`,
+          `--------------------\n injecting ${JSON.stringify(window)}`,
         )
         this.Overlay.injectProcess(window)
         this.hookedProcesses.push(processInfo)
@@ -289,8 +288,14 @@ class GameOverlay {
           }
         }
         if (processInfo.type === 'process-deletion') {
-          if (this.hookedProcesses.find((process) => process.pid === processInfo.payload.pid)) {
-            this.hookedProcesses = this.hookedProcesses.filter((process) => process.pid !== processInfo.payload.pid)
+          if (
+            this.hookedProcesses.find(
+              (process) => process.pid === processInfo.payload.pid,
+            )
+          ) {
+            this.hookedProcesses = this.hookedProcesses.filter(
+              (process) => process.pid !== processInfo.payload.pid,
+            )
           }
         }
       })
