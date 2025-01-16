@@ -1,6 +1,4 @@
-const { getProcessInfo } = require('windows-tlist')
 const wqlImport = import('wql-process-monitor')
-
 
 function send(...args) {
   process.send(...args)
@@ -10,37 +8,29 @@ wqlImport.then((wql) => {
   const { subscribe } = wql
   return subscribe({
     creation: true,
-    deletion: false,
+    deletion: true,
     bin: {
       filter: ['cmd.exe', 'tlist.exe', 'conhost.exe'],
     },
   })
 })
   .then((processMonitor) => {
-
+    // require('windows-tlist').getProcessInfo(pid).then(console.log)
     processMonitor.on('creation', ([process, pid, filepath, user]) => {
-
-      console.log(`[game-detection]: process creation - ${process}::${pid}(${user}) ["${filepath}"]`)
-      // getProcessInfo(pid)
-      //   .then(processInfo => {
-      const isGame = [
-        // processInfo.modules.find(module => module.path.includes('d3d')),
-        // processInfo.modules.find(module => module.path.includes('dxgi')),
-        // processInfo.modules.find(module => module.path.includes('steamapps')),
-        filepath.includes('steamapps'),
-        filepath.includes('demo.exe'),
-      ].some(Boolean)
-      if (isGame) {
-        console.log('[game-detection]: Game launched', filepath)
-        send({
-          type: 'game-detection',
-          payload: {
-            process, pid, filepath, user,
-          },
-        })
-        // getProcessInfo(pid).then(console.log)
-      }
-      // })
+      send({
+        type: 'process-creation',
+        payload: {
+          process, pid, filepath, user,
+        },
+      })
+    })
+    processMonitor.on('deletion', ([process, pid, filepath, user]) => {
+      send({
+        type: 'process-deletion',
+        payload: {
+          process, pid, filepath, user,
+        },
+      })
     })
   })
 
