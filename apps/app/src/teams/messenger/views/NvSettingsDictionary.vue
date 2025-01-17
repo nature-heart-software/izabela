@@ -93,16 +93,7 @@
   </NvStack>
 </template>
 <script lang="ts" setup>
-import {
-  NvButton,
-  NvCard,
-  NvDivider,
-  NvGroup,
-  NvInput,
-  NvStack,
-  NvSwitch,
-  NvText,
-} from '@packages/ui'
+import { NvButton, NvCard, NvDivider, NvGroup, NvInput, NvStack, NvSwitch, NvText } from '@packages/ui'
 import { useDictionaryStore } from '@/features/dictionary/store'
 import { storeToRefs } from 'pinia'
 

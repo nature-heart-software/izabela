@@ -44,7 +44,7 @@
                           class="w-full"
                           size="sm"
                           type="ghost-alt"
-                          >{{ entry.name }}
+                        >{{ entry.name }}
                         </NvButton>
                       </router-link>
                     </template>
@@ -81,8 +81,8 @@ import { useRoute } from 'vue-router'
 import { v4 as uuid } from 'uuid'
 import { provide } from 'vue'
 
-const id = `_${uuid()}`
-provide('portal-target', `#${id}`)
+const id = `_${ uuid() }`
+provide('portal-target', `#${ id }`)
 
 const navigation = [
   {
@@ -91,6 +91,10 @@ const navigation = [
       {
         name: 'General',
         to: { name: 'settings-general' },
+      },
+      {
+        name: 'Game Overlay',
+        to: { name: 'settings-game-overlay' },
       },
     ],
   },

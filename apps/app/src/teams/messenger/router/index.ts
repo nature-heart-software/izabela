@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
 import NvSettings from '@/teams/messenger/views/NvSettings.vue'
 import NvSettingsGeneral from '@/teams/messenger/views/NvSettingsGeneral.vue'
+import NvSettingsGameOverlay from '@/teams/messenger/views/NvSettingsGameOverlay.vue'
 import NvSettingsEngine from '@/teams/messenger/views/NvSettingsEngine.vue'
 import NvSettingsAudioInput from '@/teams/messenger/views/NvSettingsAudioInput.vue'
 import NvSettingsAudioOutputs from '@/teams/messenger/views/NvSettingsAudioOutputs.vue'
@@ -24,6 +25,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'settings-general',
         path: 'general',
         component: NvSettingsGeneral,
+      },
+      {
+        name: 'settings-game-overlay',
+        path: 'game-overlay',
+        component: NvSettingsGameOverlay,
       },
       {
         name: 'settings-engine',

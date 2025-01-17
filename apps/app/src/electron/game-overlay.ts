@@ -10,6 +10,8 @@ import { EXTERNALS_DIR } from '@/electron/utils.ts'
 import { fork } from 'child_process'
 import { Window } from 'win-control'
 import { Deferred } from '@packages/toolbox'
+import { useGameOverlayStore } from '@/features/game-overlay/store'
+import { onWatcherCleanup, watch } from 'vue'
 
 type ProcessInfo = {
   process: string
@@ -261,7 +263,8 @@ class GameOverlay {
   }
 
   public start() {
-    return import('@packages/electron-game-overlay').then((Overlay) => {
+    const gameOverlayStore = useGameOverlayStore()
+    return Promise.all([import('@packages/electron-game-overlay'), gameOverlayStore.$whenReady()]).then(([Overlay]) => {
       this.Overlay = Overlay.default
       this.scaleFactor = screen.getDisplayNearestPoint({
         x: 0,
@@ -270,29 +273,35 @@ class GameOverlay {
 
       this.startOverlay()
 
-      const child = fork(path.join(EXTERNALS_DIR, 'detect-game.js'))
 
-      child.on('message', (processInfo: ProcessEvent) => {
-        if (processInfo.type === 'process-creation') {
-          const { filepath } = processInfo.payload
-          // console.log(`[game-detection]: process creation - ${process}::${pid}(${user}) ["${filepath}"]`)
-          const isGame = [
-            // processInfo.modules.find(module => module.path.includes('d3d')),
-            // processInfo.modules.find(module => module.path.includes('dxgi')),
-            // processInfo.modules.find(module => module.path.includes('steamapps')),
-            filepath.includes('steamapps'),
-            filepath.includes('demo.exe'),
-          ].some(Boolean)
-          if (isGame) {
-            console.log('[game-overlay]: Game launched', filepath)
-            this.injectByProcessOnceFocused(processInfo.payload)
+      watch(() => [gameOverlayStore.enableGameOverlay, gameOverlayStore.allowlist, gameOverlayStore.denylist], () => {
+        if (!gameOverlayStore.enableGameOverlay) return
+        console.log('[game-overlay] Creating process watcher process')
+        const child = fork(path.join(EXTERNALS_DIR, 'detect-game.js'))
+        child.on('message', (processInfo: ProcessEvent) => {
+          if (processInfo.type === 'process-creation') {
+            const { filepath } = processInfo.payload
+            const isGame = gameOverlayStore.allowlist
+                .some((path) => path.length && filepath.includes(path))
+              && gameOverlayStore.denylist.every((path) => !(path.length && filepath.includes(path)))
+            if (isGame) {
+              console.log('[game-overlay]: Game launched', filepath)
+              // require('windows-tlist').getProcessInfo(processInfo.payload.pid).then(({ modules }: any) => console.log(modules.map(({ path }: any) => path.substring(path.lastIndexOf('\\')+1))))
+              this.injectByProcessOnceFocused(processInfo.payload)
+            }
           }
-        }
-        if (processInfo.type === 'process-deletion') {
-          if (this.hookedProcesses.find((process) => process.pid === processInfo.payload.pid)) {
-            this.hookedProcesses = this.hookedProcesses.filter((process) => process.pid !== processInfo.payload.pid)
+          if (processInfo.type === 'process-deletion') {
+            if (this.hookedProcesses.find((process) => process.pid === processInfo.payload.pid)) {
+              this.hookedProcesses = this.hookedProcesses.filter((process) => process.pid !== processInfo.payload.pid)
+            }
           }
-        }
+        })
+        onWatcherCleanup(() => {
+          child.kill()
+        })
+      }, {
+        deep: true,
+        immediate: true,
       })
 
       onIPCGameOverlayStartIntercept(() => {
