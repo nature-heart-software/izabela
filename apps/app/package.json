@@ -10,6 +10,7 @@
     "@packages/native-keymap": "3.3.2",
     "@packages/win-mouse": "2.0.1",
     "ffi-napi": "^4.0.3",
+    "micromatch": "^4.0.5",
     "node-abi": "^3.40.0",
     "node-global-key-listener": "^0.1.1",
     "node-record-lpcm16": "1.0.1",

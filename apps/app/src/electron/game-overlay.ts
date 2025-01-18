@@ -12,6 +12,7 @@ import { Window } from 'win-control'
 import { Deferred } from '@packages/toolbox'
 import { useGameOverlayStore } from '@/features/game-overlay/store'
 import { onWatcherCleanup, watch } from 'vue'
+import micromatch from 'micromatch'
 
 type ProcessInfo = {
   process: string
@@ -281,9 +282,8 @@ class GameOverlay {
         child.on('message', (processInfo: ProcessEvent) => {
           if (processInfo.type === 'process-creation') {
             const { filepath } = processInfo.payload
-            const isGame = gameOverlayStore.allowlist
-                .some((path) => path.length && filepath.includes(path))
-              && gameOverlayStore.denylist.every((path) => !(path.length && filepath.includes(path)))
+            const isGame = micromatch.isMatch(filepath, gameOverlayStore.allowlist.filter(Boolean))
+              && !micromatch.isMatch(filepath, gameOverlayStore.denylist.filter(Boolean))
             if (isGame) {
               console.log('[game-overlay]: Game launched', filepath)
               // require('windows-tlist').getProcessInfo(processInfo.payload.pid).then(({ modules }: any) => console.log(modules.map(({ path }: any) => path.substring(path.lastIndexOf('\\')+1))))
