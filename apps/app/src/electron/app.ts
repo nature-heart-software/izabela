@@ -27,22 +27,25 @@ const App = () => {
   const createWindows = () =>
     app
       .whenReady()
-      .then(() => ElectronWindowManager.registerInstance(
-        'messenger',
-        createMessengerWindow,
-      ))
-      .then(() => ElectronWindowManager.registerInstance(
-        'overlay',
-        createOverlayWindow,
-      ))
-      .then(() => ElectronWindowManager.registerInstance(
-        'speech-worker',
-        createSpeechWorkerWindow,
-      ))
-      .then(() => ElectronWindowManager.registerInstance(
-        'messenger-game-overlay',
-        createMessengerGameOverlayWindow,
-      ))
+      .then(async () => Promise.all([
+        ElectronWindowManager.registerInstance(
+          'messenger',
+          createMessengerWindow,
+        ),
+        ElectronWindowManager.registerInstance(
+          'overlay',
+          createOverlayWindow,
+        ),
+        ElectronWindowManager.registerInstance(
+          'speech-worker',
+          createSpeechWorkerWindow,
+        ),
+        ElectronWindowManager.registerInstance(
+          'messenger-game-overlay',
+          createMessengerGameOverlayWindow,
+        ),
+      ]))
+
 
   const registerElectronPinia = () => {
     createApp(h({})).use(

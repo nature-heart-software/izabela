@@ -9,7 +9,6 @@ import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
 import { Deferred } from '@packages/toolbox'
 import ffi from 'ffi-napi'
 import { getNativeWindowHandleInt } from '@/utils/electron-window'
-import { Window } from 'win-control'
 import gameOverlay from '@/electron/game-overlay.ts'
 
 export const ElectronMessengerWindow = () => {
@@ -21,6 +20,7 @@ export const ElectronMessengerWindow = () => {
   // let lastKeypressTime = 0
   // const doubleKeypressDelta = 500
   let registeredWindow: BrowserWindow | null = null
+  let WinControl: any | null = null
   let hitboxesStore: ReturnType<typeof useHitboxesStore> | undefined
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
   let messengerStore: ReturnType<typeof useMessengerStore> | undefined
@@ -199,7 +199,7 @@ export const ElectronMessengerWindow = () => {
   }
 
   const toggleWindow = throttle((context: 'mouse' | 'keyboard') => {
-    const foregroundWindowPid = Window.getForeground()?.getPid()
+    const foregroundWindowPid = WinControl?.getForeground()?.getPid()
     const hookedProcess = gameOverlay.hookedProcesses.find((process) => process.pid === foregroundWindowPid)
     if (hookedProcess && !gameOverlay.intercepting) {
       gameOverlay.startIntercept()
@@ -293,6 +293,7 @@ export const ElectronMessengerWindow = () => {
       setDisplay(localSettingsStore.display)
     })
     ready.resolve(window)
+    import('win-control').then((module) => WinControl = module)
   }
 
   isReady().then(() => {

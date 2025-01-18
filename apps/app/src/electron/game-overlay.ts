@@ -8,7 +8,6 @@ import { mouse, Point } from '@nut-tree-fork/nut-js'
 import path from 'path'
 import { EXTERNALS_DIR } from '@/electron/utils.ts'
 import { fork } from 'child_process'
-import { Window } from 'win-control'
 import { Deferred } from '@packages/toolbox'
 import { useGameOverlayStore } from '@/features/game-overlay/store'
 import { onWatcherCleanup, watch } from 'vue'
@@ -30,6 +29,7 @@ type ProcessEvent = {
 const ready = Deferred()
 
 class GameOverlay {
+  public WinControl: any = null
   public Overlay: any = null
   public hookedProcesses: ProcessInfo[] = []
   public intercepting = false
@@ -86,7 +86,7 @@ class GameOverlay {
         if (focusWin) {
           focusWin.blurWebView()
           focusWin.focusOnWebView()
-          const { top, left, right, bottom } = Window.getByPid(
+          const { top, left, right, bottom } = this.WinControl.getByPid(
             payload.pid,
           ).getDimensions()
           const width = right-left
@@ -236,7 +236,7 @@ class GameOverlay {
     let timeout: ReturnType<typeof setTimeout>
     let interval: ReturnType<typeof setInterval>
     interval = setInterval(() => {
-      const foregroundWindow = Window.getForeground()
+      const foregroundWindow = this.WinControl.getForeground()
       if (pid === foregroundWindow?.getPid()) {
         clearInterval(interval)
         clearTimeout(timeout)
@@ -266,7 +266,9 @@ class GameOverlay {
   public start() {
     const databasesStore = useDatabasesStore()
     const gameOverlayStore = useGameOverlayStore()
-    return Promise.all([import('@packages/electron-game-overlay'), gameOverlayStore.$whenReady()]).then(([Overlay]) => {
+    /* Importing win-control in preload breaks reload so we import it dynamically on start instead */
+    return Promise.all([import('@packages/electron-game-overlay'), import('win-control'), gameOverlayStore.$whenReady()]).then(([Overlay, WinControl]) => {
+      this.WinControl = WinControl
       this.Overlay = Overlay.default
       this.scaleFactor = screen.getDisplayNearestPoint({
         x: 0,
