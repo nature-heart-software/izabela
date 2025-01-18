@@ -58,7 +58,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ComponentPublicInstance, computed, defineProps, onMounted, provide, ref, unref, watch } from 'vue'
+import { ComponentPublicInstance, computed, onMounted, provide, ref, unref, watch } from 'vue'
 import Moveable from 'vue3-moveable'
 import { NvGroup } from '@packages/ui'
 import { RouteLocationRaw, useRouter } from 'vue-router'

@@ -59,7 +59,7 @@
 import { NvButton, NvCard, NvContextMenu, NvGroup, NvStack } from '@packages/ui'
 import { useMessagesStore } from '@/features/messages/store'
 import { storeToRefs } from 'pinia'
-import { computed, defineProps, reactive, ref, watch } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { getEngineById } from '@/modules/speech-engine-manager'
 import NvSpeechEngineSelect from '@/features/speech/components/inputs/NvSpeechEngineSelect.vue'
 import { useSettingsStore } from '@/features/settings/store'
@@ -153,9 +153,9 @@ watch(
 const playMessage = computed(() =>
   message.value
     ? {
-        ...message.value,
-        excludeFromHistory: true,
-      }
+      ...message.value,
+      excludeFromHistory: true,
+    }
     : undefined,
 )
 const { play, isPlaying, isLoading, progress } = usePlayMessage(playMessage)

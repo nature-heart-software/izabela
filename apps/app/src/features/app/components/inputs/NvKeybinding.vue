@@ -4,7 +4,7 @@
       class="pointer-events-none"
       title="Press Esc to cancel. Hold to remove"
       v-bind="$attrs"
-      >Listening...
+    >Listening...
     </NvButton>
   </template>
   <template v-else>
@@ -13,7 +13,7 @@
 </template>
 <script lang="ts" setup>
 import { NvButton } from '@packages/ui'
-import { computed, defineEmits, defineProps, PropType, Ref, ref, shallowRef, watch } from 'vue'
+import { computed, PropType, Ref, ref, shallowRef, watch } from 'vue'
 import { useEventListener } from '@vueuse/core'
 import { Key } from '@/types/keybinds'
 

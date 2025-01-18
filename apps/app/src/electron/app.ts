@@ -1,5 +1,5 @@
 import { app, BrowserWindow, protocol } from 'electron'
-import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
+import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import path from 'path'
 import server from '@apps/app-server'
 import { electronPiniaPlugin } from '@packages/electron-pinia/main'
@@ -120,7 +120,7 @@ const App = () => {
     app.on('ready', async () => {
       if (isDevelopment) {
         try {
-          await installExtension(VUEJS3_DEVTOOLS)
+          await ((installExtension as any).default as typeof installExtension)(VUEJS_DEVTOOLS)
         } catch (e) {
           console.error(
             'Vue Devtools failed to install:',
