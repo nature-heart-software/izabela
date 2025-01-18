@@ -122,7 +122,9 @@ const App = () => {
     app.on('ready', async () => {
       if (isDevelopment) {
         try {
-          await ((installExtension as any).default as typeof installExtension)(VUEJS_DEVTOOLS)
+          await ((installExtension as any).default as typeof installExtension)(
+            VUEJS_DEVTOOLS,
+          )
         } catch (e) {
           console.error(
             'Vue Devtools failed to install:',
