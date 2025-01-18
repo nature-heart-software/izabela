@@ -36,8 +36,7 @@ class GameOverlay {
   private markQuit = false
   private scaleFactor = 1.0
 
-  constructor() {
-  }
+  constructor() {}
 
   public isReady = () => ready.promise
 
@@ -89,12 +88,12 @@ class GameOverlay {
           const { top, left, right, bottom } = Window.getByPid(
             payload.pid,
           ).getDimensions()
-          const width = right-left
-          const height = bottom-top
+          const width = right - left
+          const height = bottom - top
 
           mouse.getPosition().then(async (initialPosition) => {
             await mouse.setPosition(
-              new Point(left+width / 2, top+height / 2),
+              new Point(left + width / 2, top + height / 2),
             )
             await mouse.leftClick()
             await mouse.setPosition(initialPosition)
@@ -255,7 +254,7 @@ class GameOverlay {
     for (const window of this.Overlay.getTopWindows()) {
       if (window.processId === processInfo.pid) {
         console.log(
-          `--------------------\n injecting ${ JSON.stringify(window) }`,
+          `--------------------\n injecting ${JSON.stringify(window)}`,
         )
         this.Overlay.injectProcess(window)
         this.hookedProcesses.push(processInfo)
@@ -265,7 +264,10 @@ class GameOverlay {
 
   public start() {
     const gameOverlayStore = useGameOverlayStore()
-    return Promise.all([import('@packages/electron-game-overlay'), gameOverlayStore.$whenReady()]).then(([Overlay]) => {
+    return Promise.all([
+      import('@packages/electron-game-overlay'),
+      gameOverlayStore.$whenReady(),
+    ]).then(([Overlay]) => {
       this.Overlay = Overlay.default
       this.scaleFactor = screen.getDisplayNearestPoint({
         x: 0,
@@ -274,35 +276,55 @@ class GameOverlay {
 
       this.startOverlay()
 
-
-      watch(() => [gameOverlayStore.enableGameOverlay, gameOverlayStore.allowlist, gameOverlayStore.denylist], () => {
-        if (!gameOverlayStore.enableGameOverlay) return
-        console.log('[game-overlay] Creating process watcher process')
-        const child = fork(path.join(EXTERNALS_DIR, 'detect-game.js'))
-        child.on('message', (processInfo: ProcessEvent) => {
-          if (processInfo.type === 'process-creation') {
-            const { filepath } = processInfo.payload
-            const isGame = micromatch.isMatch(filepath, gameOverlayStore.allowlist.filter(Boolean))
-              && !micromatch.isMatch(filepath, gameOverlayStore.denylist.filter(Boolean))
-            if (isGame) {
-              console.log('[game-overlay]: Game launched', filepath)
-              // require('windows-tlist').getProcessInfo(processInfo.payload.pid).then(({ modules }: any) => console.log(modules.map(({ path }: any) => path.substring(path.lastIndexOf('\\')+1))))
-              this.injectByProcessOnceFocused(processInfo.payload)
+      watch(
+        () => [
+          gameOverlayStore.enableGameOverlay,
+          gameOverlayStore.allowlist,
+          gameOverlayStore.denylist,
+        ],
+        () => {
+          if (!gameOverlayStore.enableGameOverlay) return
+          console.log('[game-overlay] Creating process watcher process')
+          const child = fork(path.join(EXTERNALS_DIR, 'detect-game.js'))
+          child.on('message', (processInfo: ProcessEvent) => {
+            if (processInfo.type === 'process-creation') {
+              const { filepath } = processInfo.payload
+              const isGame =
+                micromatch.isMatch(
+                  filepath,
+                  gameOverlayStore.allowlist.filter(Boolean),
+                ) &&
+                !micromatch.isMatch(
+                  filepath,
+                  gameOverlayStore.denylist.filter(Boolean),
+                )
+              if (isGame) {
+                console.log('[game-overlay]: Game launched', filepath)
+                // require('windows-tlist').getProcessInfo(processInfo.payload.pid).then(({ modules }: any) => console.log(modules.map(({ path }: any) => path.substring(path.lastIndexOf('\\')+1))))
+                this.injectByProcessOnceFocused(processInfo.payload)
+              }
             }
-          }
-          if (processInfo.type === 'process-deletion') {
-            if (this.hookedProcesses.find((process) => process.pid === processInfo.payload.pid)) {
-              this.hookedProcesses = this.hookedProcesses.filter((process) => process.pid !== processInfo.payload.pid)
+            if (processInfo.type === 'process-deletion') {
+              if (
+                this.hookedProcesses.find(
+                  (process) => process.pid === processInfo.payload.pid,
+                )
+              ) {
+                this.hookedProcesses = this.hookedProcesses.filter(
+                  (process) => process.pid !== processInfo.payload.pid,
+                )
+              }
             }
-          }
-        })
-        onWatcherCleanup(() => {
-          child.kill()
-        })
-      }, {
-        deep: true,
-        immediate: true,
-      })
+          })
+          onWatcherCleanup(() => {
+            child.kill()
+          })
+        },
+        {
+          deep: true,
+          immediate: true,
+        },
+      )
 
       onIPCGameOverlayStartIntercept(() => {
         this.startIntercept()
