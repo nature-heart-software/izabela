@@ -1,8 +1,8 @@
 diff --git a/node_modules/vite-plugin-electron/dist/index.js b/node_modules/vite-plugin-electron/dist/index.js
-index 146870c..80e3d72 100644
+index 146870c..34d7bc6 100644
 --- a/node_modules/vite-plugin-electron/dist/index.js
 +++ b/node_modules/vite-plugin-electron/dist/index.js
-@@ -123,10 +123,14 @@ function resolvePackageJson(root = process.cwd()) {
+@@ -123,10 +123,15 @@ function resolvePackageJson(root = process.cwd()) {
    }
  }
  function treeKillSync(pid) {
@@ -16,16 +16,17 @@ index 146870c..80e3d72 100644
 +    } else {
 +      killTree(pidTree({ pid, ppid: process.pid }));
 +    }
-+  } catch (e) {
++  } catch (error) {
++    console.error("An error occurred:", error.message);
 +    console.log (`Couldn\`t kill task ${pid}`)
    }
  }
  function pidTree(tree) {
 diff --git a/node_modules/vite-plugin-electron/dist/index.mjs b/node_modules/vite-plugin-electron/dist/index.mjs
-index b7ffad9..6cdcb8f 100644
+index b7ffad9..266c46a 100644
 --- a/node_modules/vite-plugin-electron/dist/index.mjs
 +++ b/node_modules/vite-plugin-electron/dist/index.mjs
-@@ -99,10 +99,14 @@ function resolvePackageJson(root = process.cwd()) {
+@@ -99,10 +99,15 @@ function resolvePackageJson(root = process.cwd()) {
    }
  }
  function treeKillSync(pid) {
@@ -39,7 +40,8 @@ index b7ffad9..6cdcb8f 100644
 +    } else {
 +      killTree(pidTree({ pid, ppid: process.pid }));
 +    }
-+  } catch (e) {
++  } catch (error) {
++    console.error("An error occurred:", error.message);
 +    console.log (`Couldn\`t kill task ${pid}`)
    }
  }

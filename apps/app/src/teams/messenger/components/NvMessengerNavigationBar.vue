@@ -57,7 +57,7 @@
         :style="{
           color: 'white',
         }"
-        >{{ steps[step.currentStep].content }}
+      >{{ steps[step.currentStep].content }}
       </NvText>
     </template>
     <template #actions="scope">
@@ -73,7 +73,7 @@
                 scope.endTour()
               }
             "
-            >Close
+          >Close
           </NvButton>
           <NvButton
             v-if="step > 0 && step !== steps.length - 1"
@@ -84,7 +84,7 @@
                 scope.prevStep()
               }
             "
-            >Previous
+          >Previous
           </NvButton>
           <NvButton
             v-if="step !== steps.length - 1"
@@ -95,7 +95,7 @@
                 scope.nextStep()
               }
             "
-            >Next
+          >Next
           </NvButton>
         </NvGroup>
       </NvGroup>
@@ -114,7 +114,7 @@ const { ElectronMessengerWindow } = window
 const route = useRoute()
 
 const hide = () => {
-  ElectronMessengerWindow.hide()
+  ElectronMessengerWindow.toggleWindow()
 }
 const tour = ref(null)
 const step = ref(0)
@@ -208,9 +208,9 @@ const steps = [
   },
   {
     target: '[data-v-step="messenger-window"]',
-    content: `Finally, you can toggle the window by pressing ${settingsStore.keybindings.toggleMessengerWindow
-      .map((k) => `[${k.key}]`)
-      .join(' + ')}. If the text input is focused, you can also press [Esc] to close the window.`,
+    content: `Finally, you can toggle the window by pressing ${ settingsStore.keybindings.toggleMessengerWindow
+      .map((k) => `[${ k.key }]`)
+      .join(' + ') }. If the text input is focused, you can also press [Esc] to close the window.`,
     placement: 'top',
   },
 ]

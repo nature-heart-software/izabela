@@ -270,7 +270,7 @@ class GameOverlay {
       import('win-control'),
       gameOverlayStore.$whenReady(),
     ]).then(([Overlay, WinControl]) => {
-      this.WinControl = WinControl
+      this.WinControl = WinControl.Window
       this.Overlay = Overlay.default
       this.scaleFactor = screen.getDisplayNearestPoint({
         x: 0,

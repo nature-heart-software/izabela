@@ -3,10 +3,7 @@ import { mouse } from '@/modules/node-mouse'
 import throttle from 'lodash/throttle'
 import { Hitbox } from '@/modules/vue-hitboxes/types'
 import { BrowserWindow, screen, shell } from 'electron'
-import {
-  useMessengerStore,
-  useMessengerWindowStore,
-} from '@/teams/messenger/store'
+import { useMessengerStore, useMessengerWindowStore } from '@/teams/messenger/store'
 import { useSettingsStore } from '@/features/settings/store'
 import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
 import { Deferred } from '@packages/toolbox'
@@ -187,9 +184,9 @@ export const ElectronMessengerWindow = () => {
           .filter(({ w, h }) => w && h)
           .some(({ x, y, w, h }: Hitbox) => {
             const isWithinXHitbox =
-              mouseX >= windowX + x && mouseX <= windowX + x + w
+              mouseX >= windowX+x && mouseX <= windowX+x+w
             const isWithinYHitbox =
-              mouseY >= windowY + y && mouseY <= windowY + y + h
+              mouseY >= windowY+y && mouseY <= windowY+y+h
             return isWithinXHitbox && isWithinYHitbox
           })
         if (isWithinAnyHitboxes) {
@@ -298,7 +295,7 @@ export const ElectronMessengerWindow = () => {
       setDisplay(localSettingsStore.display)
     })
     ready.resolve(window)
-    import('win-control').then((module) => (WinControl = module))
+    import('win-control').then((module) => WinControl = module.Window)
   }
 
   isReady().then(() => {
