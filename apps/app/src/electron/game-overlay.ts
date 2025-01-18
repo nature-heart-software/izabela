@@ -37,7 +37,8 @@ class GameOverlay {
   private markQuit = false
   private scaleFactor = 1.0
 
-  constructor() {}
+  constructor() {
+  }
 
   public isReady = () => ready.promise
 
@@ -48,13 +49,13 @@ class GameOverlay {
   public startOverlay() {
     console.log(`[game-overlay] Starting overlay...`)
     this.Overlay!.start()
-    this.Overlay!.setHotkeys([
-      {
-        name: 'overlay.hotkey.toggleInputIntercept',
-        keyCode: 113,
-        modifiers: { ctrl: true },
-      },
-    ])
+    // this.Overlay!.setHotkeys([
+    //   {
+    //     name: 'overlay.hotkey.toggleInputIntercept',
+    //     keyCode: 113,
+    //     modifiers: { ctrl: true },
+    //   },
+    // ])
 
     this.Overlay!.setEventCallback((event: string, payload: any) => {
       if (['graphics.window.event.resize', 'graphics.window'].includes(event)) {
@@ -88,12 +89,12 @@ class GameOverlay {
           const { top, left, right, bottom } = this.WinControl.getByPid(
             payload.pid,
           ).getDimensions()
-          const width = right - left
-          const height = bottom - top
+          const width = right-left
+          const height = bottom-top
 
           mouse.getPosition().then(async (initialPosition) => {
             await mouse.setPosition(
-              new Point(left + width / 2, top + height / 2),
+              new Point(left+width / 2, top+height / 2),
             )
             await mouse.leftClick()
             await mouse.setPosition(initialPosition)
@@ -253,7 +254,7 @@ class GameOverlay {
   public injectByProcess(processInfo: ProcessInfo) {
     for (const window of this.Overlay.getTopWindows()) {
       if (window.processId === processInfo.pid) {
-        console.log(`[game-overlay] Injecting ${JSON.stringify(window)}`)
+        console.log(`[game-overlay] Injecting ${ JSON.stringify(window) }`)
         this.Overlay.injectProcess(window)
         this.hookedProcesses.push(processInfo)
       }
