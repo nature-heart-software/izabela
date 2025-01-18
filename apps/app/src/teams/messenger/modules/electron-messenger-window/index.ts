@@ -69,7 +69,7 @@ export const ElectronMessengerWindow = () => {
           window.webContents.devToolsWebContents.focus()
         } else {
           setTimeout(() => {
-            window.webContents.openDevTools({ mode: 'detach' })
+            window.webContents.openDevTools({ mode: 'undocked' })
           }, 300)
         }
       })

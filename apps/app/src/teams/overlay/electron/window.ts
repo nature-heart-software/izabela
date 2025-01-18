@@ -42,7 +42,7 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
 
   window.webContents.once('did-finish-load', () => {
     if (import.meta.env.DEV) {
-      window.webContents.openDevTools({ mode: 'detach' })
+      window.webContents.openDevTools({ mode: 'undocked' })
     }
   })
 

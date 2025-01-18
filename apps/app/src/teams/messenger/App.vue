@@ -40,15 +40,15 @@ import { ThemeProvider } from 'vue3-styled-components'
 import NvMessenger from '@/teams/messenger/components/NvMessenger.vue'
 import { tokens } from '@packages/ui'
 import NvBackground from '@/teams/messenger/components/NvBackground.vue'
-import {
-  useMessengerStore,
-  useMessengerWindowStore,
-} from '@/teams/messenger/store'
+import { useMessengerStore, useMessengerWindowStore } from '@/teams/messenger/store'
 import NvDebug from '@/teams/messenger/components/NvDebug.vue'
 import { useSettingsStore } from '@/features/settings/store'
 import { ref, watch } from 'vue'
 import { socket } from '@/services'
 import { isGameOverlay } from '@/consts.ts'
+import { useDatabasesStore } from '@/features/databases/store'
+import takeRight from 'lodash/takeRight'
+import pkg from '@root/package.json'
 
 const { ElectronMessengerWindow } = window
 const messengerStore = useMessengerStore()
@@ -76,6 +76,24 @@ if (isGameOverlay) {
   window.addEventListener('blur', () => {
     displayOffscreenFocusFix.value = true
   })
+}
+
+const databasesStore = useDatabasesStore()
+
+if (!isGameOverlay) {
+  databasesStore.$whenReady()
+    .then(() => {
+      const repository = takeRight(pkg.repository.split('/'), 2).join('/')
+      databasesStore.databases.forEach(database => {
+        fetch(`https://raw.githubusercontent.com/${ repository }/refs/heads/dev/databases/${ database }.json`)
+          .then((res) => {
+            return res.json()
+          })
+          .then((data) => {
+            databasesStore.setDatabaseData(database, data)
+          })
+      })
+    })
 }
 
 watch(

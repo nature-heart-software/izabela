@@ -13,6 +13,7 @@ import { Deferred } from '@packages/toolbox'
 import { useGameOverlayStore } from '@/features/game-overlay/store'
 import { onWatcherCleanup, watch } from 'vue'
 import micromatch from 'micromatch'
+import { useDatabasesStore } from '@/features/databases/store'
 
 type ProcessInfo = {
   process: string
@@ -46,7 +47,7 @@ class GameOverlay {
   }
 
   public startOverlay() {
-    console.log(`starting overlay...`)
+    console.log(`[game-overlay] Starting overlay...`)
     this.Overlay!.start()
     this.Overlay!.setHotkeys([
       {
@@ -57,7 +58,6 @@ class GameOverlay {
     ])
 
     this.Overlay!.setEventCallback((event: string, payload: any) => {
-      console.log(event, payload)
       if (['graphics.window.event.resize', 'graphics.window'].includes(event)) {
         const { width, height } = payload
         emitIPCGameOverlayResize({
@@ -255,7 +255,7 @@ class GameOverlay {
     for (const window of this.Overlay.getTopWindows()) {
       if (window.processId === processInfo.pid) {
         console.log(
-          `--------------------\n injecting ${ JSON.stringify(window) }`,
+          `[game-overlay] Injecting ${ JSON.stringify(window) }`,
         )
         this.Overlay.injectProcess(window)
         this.hookedProcesses.push(processInfo)
@@ -264,6 +264,7 @@ class GameOverlay {
   }
 
   public start() {
+    const databasesStore = useDatabasesStore()
     const gameOverlayStore = useGameOverlayStore()
     return Promise.all([import('@packages/electron-game-overlay'), gameOverlayStore.$whenReady()]).then(([Overlay]) => {
       this.Overlay = Overlay.default
@@ -275,15 +276,15 @@ class GameOverlay {
       this.startOverlay()
 
 
-      watch(() => [gameOverlayStore.enableGameOverlay, gameOverlayStore.allowlist, gameOverlayStore.denylist], () => {
+      watch(() => [gameOverlayStore.enableGameOverlay, gameOverlayStore.allowlist, gameOverlayStore.denylist, databasesStore.data], () => {
         if (!gameOverlayStore.enableGameOverlay) return
         console.log('[game-overlay] Creating process watcher process')
         const child = fork(path.join(EXTERNALS_DIR, 'detect-game.js'))
         child.on('message', (processInfo: ProcessEvent) => {
           if (processInfo.type === 'process-creation') {
             const { filepath } = processInfo.payload
-            const isGame = micromatch.isMatch(filepath, gameOverlayStore.allowlist.filter(Boolean))
-              && !micromatch.isMatch(filepath, gameOverlayStore.denylist.filter(Boolean))
+            const isGame = micromatch.isMatch(filepath, [...gameOverlayStore.allowlist, ...(databasesStore.data['game-overlay-allowlist'] || [])].filter(Boolean))
+              && !micromatch.isMatch(filepath, [...gameOverlayStore.denylist, ...(databasesStore.data['game-overlay-denylist'] || [])].filter(Boolean))
             if (isGame) {
               console.log('[game-overlay]: Game launched', filepath)
               // require('windows-tlist').getProcessInfo(processInfo.payload.pid).then(({ modules }: any) => console.log(modules.map(({ path }: any) => path.substring(path.lastIndexOf('\\')+1))))

@@ -1,0 +1,46 @@
+diff --git a/node_modules/vite-plugin-electron/dist/index.js b/node_modules/vite-plugin-electron/dist/index.js
+index 146870c..80e3d72 100644
+--- a/node_modules/vite-plugin-electron/dist/index.js
++++ b/node_modules/vite-plugin-electron/dist/index.js
+@@ -123,10 +123,14 @@ function resolvePackageJson(root = process.cwd()) {
+   }
+ }
+ function treeKillSync(pid) {
+-  if (process.platform === "win32") {
+-    cp.execSync(`taskkill /pid ${pid} /T /F`);
+-  } else {
+-    killTree(pidTree({ pid, ppid: process.pid }));
++  try {
++    if (process.platform === "win32") {
++      cp.execSync(`taskkill /pid ${pid} /T /F`);
++    } else {
++      killTree(pidTree({ pid, ppid: process.pid }));
++    }
++  } catch (e) {
++    console.log (`Couldn\`t kill task ${pid}`)
+   }
+ }
+ function pidTree(tree) {
+diff --git a/node_modules/vite-plugin-electron/dist/index.mjs b/node_modules/vite-plugin-electron/dist/index.mjs
+index b7ffad9..6cdcb8f 100644
+--- a/node_modules/vite-plugin-electron/dist/index.mjs
++++ b/node_modules/vite-plugin-electron/dist/index.mjs
+@@ -99,10 +99,14 @@ function resolvePackageJson(root = process.cwd()) {
+   }
+ }
+ function treeKillSync(pid) {
+-  if (process.platform === "win32") {
+-    cp.execSync(`taskkill /pid ${pid} /T /F`);
+-  } else {
+-    killTree(pidTree({ pid, ppid: process.pid }));
++  try {
++    if (process.platform === "win32") {
++      cp.execSync(`taskkill /pid ${pid} /T /F`);
++    } else {
++      killTree(pidTree({ pid, ppid: process.pid }));
++    }
++  } catch (e) {
++    console.log (`Couldn\`t kill task ${pid}`)
+   }
+ }
+ function pidTree(tree) {

@@ -48,6 +48,13 @@
                       />
                     </NvGroup>
                   </template>
+                  <template v-for="(path, i) in gameOverlayAllowlistData" :key="i">
+                    <NvGroup class="w-full" grow>
+                      <NvInput
+                        :modelValue="path"
+                      />
+                    </NvGroup>
+                  </template>
                 </NvStack>
               </NvCard>
               <NvCard>
@@ -86,8 +93,11 @@
 import { NvButton, NvCard, NvDivider, NvGroup, NvInput, NvStack, NvSwitch, NvText } from '@packages/ui'
 import { storeToRefs } from 'pinia'
 import { useGameOverlayStore } from '@/features/game-overlay/store'
+import { useDatabasesStore } from '@/features/databases/store'
+import { computed } from 'vue'
 
 const gameOverlayStore = useGameOverlayStore()
+const databasesStore = useDatabasesStore()
 const {
   addToAllowlist,
   removeFromAllowlist,
@@ -97,4 +107,6 @@ const {
   updateDenylistItem,
 } = gameOverlayStore
 const { allowlist, denylist } = storeToRefs(gameOverlayStore)
+const { data } = storeToRefs(databasesStore)
+const gameOverlayAllowlistData = computed(() => data.value['game-overlay-allowlist'] || [])
 </script>
