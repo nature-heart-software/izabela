@@ -29,7 +29,6 @@ export const onIPCSay = (callback: (payload: IPCSayPayload) => any) => {
 }
 
 export const emitIPCSay = (payload: IPCSayPayload) => {
-  console.log(ipc, payload)
   ipc.sendTo('speech-worker', 'say', payload)
 }
 
