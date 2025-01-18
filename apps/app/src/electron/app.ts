@@ -7,7 +7,10 @@ import { createApp, h } from 'vue'
 import { createPinia } from 'pinia'
 import createTray from '@/teams/tray/electron-tray'
 import ElectronWindowManager from '@/modules/electron-window-manager'
-import { createMessengerGameOverlayWindow, createMessengerWindow } from '@/teams/messenger/electron/background'
+import {
+  createMessengerGameOverlayWindow,
+  createMessengerWindow,
+} from '@/teams/messenger/electron/background'
 import { createSpeechWorkerWindow } from '@/teams/speech-worker/electron/background'
 import { bridgeModules } from '@/electron/bridge'
 import registerElectronStartup from '@/modules/electron-startup/register'
@@ -27,25 +30,26 @@ const App = () => {
   const createWindows = () =>
     app
       .whenReady()
-      .then(async () => Promise.all([
-        ElectronWindowManager.registerInstance(
-          'messenger',
-          createMessengerWindow,
-        ),
-        ElectronWindowManager.registerInstance(
-          'overlay',
-          createOverlayWindow,
-        ),
-        ElectronWindowManager.registerInstance(
-          'speech-worker',
-          createSpeechWorkerWindow,
-        ),
-        ElectronWindowManager.registerInstance(
-          'messenger-game-overlay',
-          createMessengerGameOverlayWindow,
-        ),
-      ]))
-
+      .then(async () =>
+        Promise.all([
+          ElectronWindowManager.registerInstance(
+            'messenger',
+            createMessengerWindow,
+          ),
+          ElectronWindowManager.registerInstance(
+            'overlay',
+            createOverlayWindow,
+          ),
+          ElectronWindowManager.registerInstance(
+            'speech-worker',
+            createSpeechWorkerWindow,
+          ),
+          ElectronWindowManager.registerInstance(
+            'messenger-game-overlay',
+            createMessengerGameOverlayWindow,
+          ),
+        ]),
+      )
 
   const registerElectronPinia = () => {
     createApp(h({})).use(
@@ -54,9 +58,7 @@ const App = () => {
   }
 
   const startGameOverlay = async () =>
-    app.whenReady().then(() =>
-      gameOverlay.start(),
-    )
+    app.whenReady().then(() => gameOverlay.start())
 
   const startAppServer = async () =>
     app.whenReady().then(async () =>
@@ -89,7 +91,7 @@ const App = () => {
   }
 
   function exec(description: string, action: () => any) {
-    console.log(`[app]: ${ description }`)
+    console.log(`[app]: ${description}`)
     return action()
   }
 
@@ -164,7 +166,10 @@ const App = () => {
 
     app.on('web-contents-created', (_, webContents) => {
       webContents.on('preload-error', (_, preloadPath, error) => {
-        console.error(`Preload script error:\nPath: ${ preloadPath }\nError:`, error)
+        console.error(
+          `Preload script error:\nPath: ${preloadPath}\nError:`,
+          error,
+        )
       })
     })
   }
