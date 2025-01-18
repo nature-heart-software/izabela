@@ -22,6 +22,8 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
       sandbox: false,
     },
   })
+  ipcMain.registerBrowserWindow(name, window)
+  window.webContents.setMaxListeners(Infinity)
 
   {
     const primaryDisplay = screen.getPrimaryDisplay()
@@ -38,7 +40,6 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     electronOverlayWindow.start(window)
   })
 
-  ipcMain.registerBrowserWindow(name, window)
 
   window.webContents.once('did-finish-load', () => {
     if (import.meta.env.DEV) {

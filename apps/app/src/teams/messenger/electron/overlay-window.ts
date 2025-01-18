@@ -28,6 +28,7 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
       sandbox: false,
     },
   })
+  window.webContents.setMaxListeners(Infinity)
   window.setSize(1920, 1080)
   window.webContents.setFrameRate(240)
   ipcMain.registerBrowserWindow(name, window)

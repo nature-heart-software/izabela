@@ -29,6 +29,8 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
       sandbox: false,
     },
   })
+  ipcMain.registerBrowserWindow(name, window)
+  window.webContents.setMaxListeners(Infinity)
 
   {
     // https://github.com/electron/electron/issues/10078#issuecomment-331581160
@@ -42,8 +44,6 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
   window.once('ready-to-show', () => {
     electronSpeechWorkerWindow.start(window)
   })
-
-  ipcMain.registerBrowserWindow(name, window)
 
   window.webContents.once('did-finish-load', () => {
     if (import.meta.env.DEV) {
