@@ -16,15 +16,9 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
         res,
     ) => {
         try {
-            const {
-                data: { voices },
-            } = await api.get('/voices', {
-                params: {
-                    show_legacy: true,
-                },
-                headers: {
-                    'xi-api-key': apiKey,
-                },
+            const client = new ElevenLabsClient({ apiKey })
+            const { voices } = await client.voices.getAll({
+                show_legacy: true,
             })
             res.status(200).json(voices)
         } catch (e: any) {
@@ -41,11 +35,8 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
         res,
     ) => {
         try {
-            const { data: models } = await api.get('/models', {
-                headers: {
-                    'xi-api-key': apiKey,
-                },
-            })
+            const client = new ElevenLabsClient({ apiKey })
+            const models = await client.models.getAll()
             res.status(200).json(models)
         } catch (e: any) {
             handleError(res, 'Internal server error', e.message, 500)
