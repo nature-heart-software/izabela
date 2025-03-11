@@ -1,90 +1,90 @@
 <template>
   <NvFormItem label="Voice">
-    <NvVoiceSelect />
+    <NvVoiceSelect/>
   </NvFormItem>
-  <NvDivider direction="horizontal" />
+  <NvDivider direction="horizontal"/>
   <NvAccessBlocker
-    :allowed="getProperty('selectedVoice').name === 'Custom'"
-    reason='Only available for the "Custom" voice'
+      :allowed="getProperty('selectedVoice').name === 'Custom'"
+      reason='Only available for the "Custom" voice'
   >
     <NvStack spacing="5">
       <NvFormItem label="Pitch">
         <NvGroup>
           <NvRangeInput
-            :max="255"
-            :min="0"
-            class="!grow"
-            v-bind="{
-              modelValue: getProperty('speech'),
-              'onUpdate:modelValue': (value) => setProperty('speech', value),
+              :max="255"
+              :min="0"
+              class="!grow"
+              v-bind="{
+              modelValue: getProperty('pitch'),
+              'onUpdate:modelValue': (value) => setProperty('pitch', value),
             }"
           />
           <NvNumberInput
-            :max="255"
-            :min="0"
-            v-bind="{
-              modelValue: getProperty('speech'),
-              'onUpdate:modelValue': (value) => setProperty('speech', value),
+              :max="255"
+              :min="0"
+              v-bind="{
+              modelValue: getProperty('pitch'),
+              'onUpdate:modelValue': (value) => setProperty('pitch', value),
             }"
           />
         </NvGroup>
       </NvFormItem>
-      <NvDivider direction="horizontal" />
+      <NvDivider direction="horizontal"/>
       <NvFormItem label="Speed">
         <NvGroup>
           <NvRangeInput
-            :max="255"
-            :min="0"
-            class="!grow"
-            v-bind="{
+              :max="255"
+              :min="0"
+              class="!grow"
+              v-bind="{
               modelValue: getProperty('speed'),
               'onUpdate:modelValue': (value) => setProperty('speed', value),
             }"
           />
           <NvNumberInput
-            :max="255"
-            :min="0"
-            v-bind="{
+              :max="255"
+              :min="0"
+              v-bind="{
               modelValue: getProperty('speed'),
               'onUpdate:modelValue': (value) => setProperty('speed', value),
             }"
           />
         </NvGroup>
       </NvFormItem>
-      <NvDivider direction="horizontal" />
+      <NvDivider direction="horizontal"/>
       <NvFormItem label="Mouth">
         <NvGroup>
           <NvRangeInput
-            :max="255"
-            :min="0"
-            class="!grow"
-            v-bind="{
+              :max="255"
+              :min="0"
+              class="!grow"
+              v-bind="{
               modelValue: getProperty('mouth'),
               'onUpdate:modelValue': (value) => setProperty('mouth', value),
             }"
           />
           <NvNumberInput
-            v-bind="{
+              v-bind="{
               modelValue: getProperty('mouth'),
               'onUpdate:modelValue': (value) => setProperty('mouth', value),
             }"
           />
         </NvGroup>
       </NvFormItem>
-      <NvDivider direction="horizontal" />
+      <NvDivider direction="horizontal"/>
       <NvFormItem label="Throat">
         <NvGroup>
           <NvRangeInput
-            :max="255"
-            :min="0"
-            class="!grow"
-            v-bind="{
+              :max="255"
+              :min="0"
+              class="!grow"
+              v-bind="{
               modelValue: getProperty('throat'),
               'onUpdate:modelValue': (value) => setProperty('throat', value),
             }"
           />
           <NvNumberInput
-            v-bind="{
+              v-bind="{
               modelValue: getProperty('throat'),
               'onUpdate:modelValue': (value) => setProperty('throat', value),
             }"
