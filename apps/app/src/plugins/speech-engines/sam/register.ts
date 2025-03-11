@@ -37,7 +37,7 @@ const getSelectedVoice = () => {
     ? {
         ...voice,
         speed: getProperty('speed'),
-        speech: getProperty('speech'),
+        pitch: getProperty('pitch'),
         throat: getProperty('throat'),
         mouth: getProperty('mouth'),
       }
@@ -63,6 +63,7 @@ registerEngine({
     return DEFAULT_LANGUAGE_CODE
   },
   synthesizeSpeech({ payload }) {
+    console.log(payload.voice)
     const sam = new SamJs(payload.voice)
     const audioBuffer = sam.buf8(payload.text)
     const realBuffer = new Uint8Array(
