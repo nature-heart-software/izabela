@@ -27,14 +27,21 @@ type ProcessEvent = {
 
 const ready = Deferred()
 
+
+/* List of games to look into:
+* Games that don't work: Killing Floor 2
+* Games that crash: Marvel Rivals
+* Games that could have issues: FragPunk (fixed for now), Haste
+* */
 class GameOverlay {
     public WinControl: any = null
     public Overlay: any = null
-    public hookedProcesses: ProcessInfo[] = []
+    public detectedProcesses: ProcessInfo[] = []
     public intercepting = false
     private windows: Map<string, Electron.BrowserWindow> = new Map()
     private markQuit = false
     private scaleFactor = 1.0
+    private hookedProcesses: Record<number, boolean> = {}
 
     constructor() {
     }
@@ -57,6 +64,8 @@ class GameOverlay {
         // ])
 
         this.Overlay!.setEventCallback((event: string, payload: any) => {
+            if (import.meta.env.DEV) console.log(event, payload)
+            if (event === 'graphics.fps') this.hookedProcesses[payload.pid] = true
             if (['graphics.window.event.resize', 'graphics.window'].includes(event)) {
                 const { width, height } = payload
                 emitIPCGameOverlayResize({
@@ -77,9 +86,16 @@ class GameOverlay {
                     }
                 }
             }
+
             if (event === 'game.input.intercept') {
                 this.intercepting = payload.intercepting
             }
+
+            /* This handles game crashes */
+            if (event === 'graphics.window.event.focus' && !payload.focuses) {
+                this.intercepting = false
+            }
+
             if (event === 'game.input.intercept' && payload.intercepting) {
                 const focusWin = this.windows.get('messenger-game-overlay')
                 if (focusWin) {
@@ -250,12 +266,33 @@ class GameOverlay {
         )
     }
 
+    /* Some games needs to be hooked quickly for the overlay to work so favor this method. E.g. FragPunk */
+    public injectByProcessOnceCreated(processInfo: ProcessInfo) {
+        const { pid } = processInfo
+        let timeout: ReturnType<typeof setTimeout>
+        let interval: ReturnType<typeof setInterval>
+        interval = setInterval(() => {
+            const foregroundWindows = this.Overlay.getTopWindows()
+            if (foregroundWindows.find((window: any) => window.processId === pid)) {
+                clearInterval(interval)
+                clearTimeout(timeout)
+                this.injectByProcess(processInfo)
+            }
+        }, 1000)
+        setTimeout(
+            () => {
+                clearInterval(interval)
+            },
+            5 * 60 * 1000,
+        )
+    }
+
     public injectByProcess(processInfo: ProcessInfo) {
         for (const window of this.Overlay.getTopWindows()) {
             if (window.processId === processInfo.pid) {
                 console.log(`[game-overlay] Injecting ${ JSON.stringify(window) }`)
                 this.Overlay.injectProcess(window)
-                this.hookedProcesses.push(processInfo)
+                this.detectedProcesses.push(processInfo)
             }
         }
     }
@@ -311,22 +348,15 @@ class GameOverlay {
                                 if (isGame) {
                                     console.log('[game-overlay]: Game launched', filepath)
                                     // require('windows-tlist').getProcessInfo(processInfo.payload.pid).then(({ modules }: any) => console.log(modules.map(({ path }: any) => path.substring(path.lastIndexOf('\\')+1))))
-                                    this.injectByProcessOnceFocused(processInfo.payload)
+                                    this.injectByProcessOnceCreated(processInfo.payload)
                                 }
                             }
                             if (processInfo.type === 'process-deletion') {
-                                if (
-                                    this.hookedProcesses.find(
-                                        (process) => process.pid === processInfo.payload.pid,
-                                    )
-                                ) {
-                                    this.hookedProcesses = this.hookedProcesses.filter(
-                                        (process) => process.pid !== processInfo.payload.pid,
-                                    )
-                                }
+                                this.removeProcess(processInfo.payload.pid)
                             }
                         })
                         onWatcherCleanup(() => {
+                            console.log('[game-overlay] Destroying process watcher process')
                             child.kill()
                         })
                     } catch (e) {
@@ -361,6 +391,7 @@ class GameOverlay {
     }
 
     public startIntercept() {
+        console.log('[game-overlay] startIntercept')
         this.Overlay!.sendCommand({
             command: 'input.intercept',
             intercept: true,
@@ -368,6 +399,7 @@ class GameOverlay {
     }
 
     public stopIntercept() {
+        console.log('[game-overlay] stopIntercept')
         this.Overlay!.sendCommand({
             command: 'input.intercept',
             intercept: false,
@@ -402,6 +434,17 @@ class GameOverlay {
         }
 
         return window
+    }
+
+    public isProcessHooked(pid: number) {
+        return !!this.hookedProcesses[pid]
+    }
+
+    private removeProcess(pid: number) {
+        this.detectedProcesses = this.detectedProcesses.filter(
+            (process) => process.pid !== pid,
+        )
+        delete this.hookedProcesses[pid]
     }
 }
 

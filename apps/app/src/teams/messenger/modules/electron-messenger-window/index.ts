@@ -203,14 +203,12 @@ export const ElectronMessengerWindow = () => {
 
   const toggleWindow = throttle((context: 'mouse' | 'keyboard') => {
     const foregroundWindowPid = WinControl?.getForeground()?.getPid()
-    const hookedProcess = gameOverlay.hookedProcesses.find(
-      (process) => process.pid === foregroundWindowPid,
-    )
-    if (hookedProcess && !gameOverlay.intercepting) {
+    const isProcessHooked = gameOverlay.isProcessHooked(foregroundWindowPid)
+    if (isProcessHooked && !gameOverlay.intercepting) {
       gameOverlay.startIntercept()
       return
     }
-    if (hookedProcess && gameOverlay.intercepting) {
+    if (isProcessHooked && gameOverlay.intercepting) {
       gameOverlay.stopIntercept()
       return
     }
