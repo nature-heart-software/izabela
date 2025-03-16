@@ -1,30 +1,15 @@
-import { app, screen, BrowserWindow } from 'electron'
+import { app, BrowserWindow, screen } from 'electron'
 import path from 'path'
-import { createProtocol } from '@/electron/utils'
+import { createProtocol, getLargestMonitorSize } from '@/electron/utils'
 import { ipcMain } from 'electron-postman'
 import gameOverlay from '@/electron/game-overlay'
-
-const getLargestMonitorSize = () => {
-    const displays = screen.getAllDisplays()
-    let width = 0
-    let height = 0
-
-    displays.forEach(display => {
-        const { size } = display
-        if (size.width > width) width = size.width
-        if (size.height > height) height = size.height
-    })
-
-    return { width, height }
-}
 
 let window: BrowserWindow
 const createWindow = async (name: string): Promise<BrowserWindow> => {
     const overlayDebug = import.meta.env.DEV ? false : false
-
-
+    
     const { width, height } = getLargestMonitorSize()
-    console.log(width, height)
+
     window = gameOverlay.createWindow(name, {
         x: 0,
         y: 0,
