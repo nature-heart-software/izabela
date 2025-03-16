@@ -11,6 +11,7 @@ import { useGameOverlayStore } from '@/features/game-overlay/store'
 import { onWatcherCleanup, watch } from 'vue'
 import micromatch from 'micromatch'
 import { useDatabasesStore } from '@/features/databases/store'
+import path from 'path'
 
 type ProcessInfo = {
     process: string
@@ -288,7 +289,7 @@ class GameOverlay {
                     if (!gameOverlayStore.enableGameOverlay) return
                     console.log('[game-overlay] Creating process watcher process')
                     try {
-                        const child = fork(require.resolve('process-watcher'))
+                        const child = fork(import.meta.env.DEV ? require.resolve('@packages/process-watcher') : path.join(process.resourcesPath, 'app.asar.unpacked', 'node_modules', '@packages', 'process-watcher'))
                         child.on('message', (processInfo: ProcessEvent) => {
                             if (processInfo.type === 'process-creation') {
                                 const { filepath } = processInfo.payload
