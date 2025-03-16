@@ -8,39 +8,39 @@
             <NvStack>
               <NvText type="label">Monitor</NvText>
             </NvStack>
-            <NvDisplaySelect />
+            <NvDisplaySelect/>
           </NvGroup>
-          <NvDivider direction="horizontal" />
+          <NvDivider direction="horizontal"/>
           <NvGroup justify="apart" no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Hide window after sending a message</NvText>
             </NvStack>
             <NvSwitch
-              :modelValue="settingsStore.hideWindowOnMessage"
-              @update:modelValue="(value) => settingsStore.$patch({ hideWindowOnMessage: value })"
+                :modelValue="settingsStore.hideWindowOnMessage"
+                @update:modelValue="(value) => settingsStore.$patch({ hideWindowOnMessage: value })"
             />
           </NvGroup>
-          <NvDivider direction="horizontal" />
+          <NvDivider direction="horizontal"/>
           <NvGroup justify="apart" no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Background dim opacity</NvText>
             </NvStack>
             <NvGroup>
               <NvRangeInput
-                :modelValue="settingsStore.backgroundDimOpacity"
-                max="100"
-                min="0"
-                step="1"
-                @update:modelValue="
+                  :modelValue="settingsStore.backgroundDimOpacity"
+                  max="100"
+                  min="0"
+                  step="1"
+                  @update:modelValue="
                   (value) => settingsStore.$patch({ backgroundDimOpacity: value })
                 "
               />
               <NvNumberInput
-                :modelValue="settingsStore.backgroundDimOpacity"
-                max="100"
-                min="0"
-                step="1"
-                @update:modelValue="
+                  :modelValue="settingsStore.backgroundDimOpacity"
+                  max="100"
+                  min="0"
+                  step="1"
+                  @update:modelValue="
                   (value) => settingsStore.$patch({ backgroundDimOpacity: value })
                 "
               />
@@ -58,73 +58,73 @@
               <NvText type="label">Show Messenger window</NvText>
             </NvStack>
             <NvKeybinding
-              :modelValue="settingsStore.keybindings.toggleMessengerWindow"
-              multiple
-              @update:modelValue="
+                :modelValue="settingsStore.keybindings.toggleMessengerWindow"
+                multiple
+                @update:modelValue="
                 (value) => settingsStore.$patch({ keybindings: { toggleMessengerWindow: value } })
               "
             />
           </NvGroup>
-          <NvDivider direction="horizontal" />
+          <NvDivider direction="horizontal"/>
           <NvGroup align="start" justify="apart" no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Show Messenger window (alternative)</NvText>
               <NvText
-                >If a background application is preventing the window from showing with the shortcut
+              >If a background application is preventing the window from showing with the shortcut
                 above, try this one
               </NvText>
             </NvStack>
             <NvKeybinding
-              :modelValue="settingsStore.keybindings.toggleMessengerWindowAlt"
-              multiple
-              @update:modelValue="
+                :modelValue="settingsStore.keybindings.toggleMessengerWindowAlt"
+                multiple
+                @update:modelValue="
                 (value) =>
                   settingsStore.$patch({ keybindings: { toggleMessengerWindowAlt: value } })
               "
             />
           </NvGroup>
-          <NvDivider direction="horizontal" />
+          <NvDivider direction="horizontal"/>
           <NvGroup align="start" justify="apart" no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Show Overlay window</NvText>
               <NvText
-                >Open a window that doesn't take focus away from a background application
+              >Open a window that doesn't take focus away from a background application
               </NvText>
               <NvText type="caption"
-                ><strong>NOTE:</strong> Requires to run as administrator. Keyboard support is
+              ><strong>NOTE:</strong> Requires to run as administrator. Keyboard support is
                 limited.
               </NvText>
             </NvStack>
             <NvKeybinding
-              :modelValue="settingsStore.keybindings.toggleOverlayWindow"
-              multiple
-              @update:modelValue="
+                :modelValue="settingsStore.keybindings.toggleOverlayWindow"
+                multiple
+                @update:modelValue="
                 (value) => settingsStore.$patch({ keybindings: { toggleOverlayWindow: value } })
               "
             />
           </NvGroup>
-          <NvDivider direction="horizontal" />
+          <NvDivider direction="horizontal"/>
           <NvGroup justify="apart" no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Cancel playing message</NvText>
             </NvStack>
             <NvKeybinding
-              :modelValue="settingsStore.keybindings.cancelCurrentMessage"
-              multiple
-              @update:modelValue="
+                :modelValue="settingsStore.keybindings.cancelCurrentMessage"
+                multiple
+                @update:modelValue="
                 (value) => settingsStore.$patch({ keybindings: { cancelCurrentMessage: value } })
               "
             />
           </NvGroup>
-          <NvDivider direction="horizontal" />
+          <NvDivider direction="horizontal"/>
           <NvGroup justify="apart" no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Cancel playing and queued messages</NvText>
             </NvStack>
             <NvKeybinding
-              :modelValue="settingsStore.keybindings.cancelAllMessages"
-              multiple
-              @update:modelValue="
+                :modelValue="settingsStore.keybindings.cancelAllMessages"
+                multiple
+                @update:modelValue="
                 (value) => settingsStore.$patch({ keybindings: { cancelAllMessages: value } })
               "
             />
@@ -138,21 +138,31 @@
         <NvStack spacing="5">
           <NvGroup justify="apart" no-wrap spacing="5">
             <NvStack>
+              <NvText type="label">Run as Administrator</NvText>
+            </NvStack>
+            <NvSwitch
+                :modelValue="settingsStore.runAsAdmin"
+                @update:modelValue="(value) => settingsStore.$patch({ runAsAdmin: value })"
+            />
+          </NvGroup>
+          <NvDivider direction="horizontal"/>
+          <NvGroup justify="apart" no-wrap spacing="5">
+            <NvStack>
               <NvText type="label">Launch on startup</NvText>
             </NvStack>
             <NvSwitch
-              :modelValue="settingsStore.launchOnStartup"
-              @update:modelValue="(value) => settingsStore.$patch({ launchOnStartup: value })"
+                :modelValue="settingsStore.launchOnStartup"
+                @update:modelValue="(value) => settingsStore.$patch({ launchOnStartup: value })"
             />
           </NvGroup>
-          <NvDivider direction="horizontal" />
+          <NvDivider direction="horizontal"/>
           <NvGroup justify="apart" no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Update channel</NvText>
             </NvStack>
             <NvUpdateChannelSelect
-              :modelValue="settingsStore.updateChannel"
-              @update:modelValue="(value) => settingsStore.$patch({ updateChannel: value })"
+                :modelValue="settingsStore.updateChannel"
+                @update:modelValue="(value) => settingsStore.$patch({ updateChannel: value })"
             />
           </NvGroup>
           <!--          <NvDivider direction="horizontal" />-->
@@ -176,8 +186,8 @@
             <NvText type="label">Debug mode</NvText>
           </NvStack>
           <NvSwitch
-            :modelValue="settingsStore.debugMode"
-            @update:modelValue="(value) => settingsStore.$patch({ debugMode: value })"
+              :modelValue="settingsStore.debugMode"
+              @update:modelValue="(value) => settingsStore.$patch({ debugMode: value })"
           />
         </NvGroup>
       </NvCard>
