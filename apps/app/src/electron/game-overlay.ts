@@ -349,6 +349,7 @@ class GameOverlay {
                                     console.log('[game-overlay]: Game launched', filepath)
                                     // require('windows-tlist').getProcessInfo(processInfo.payload.pid).then(({ modules }: any) => console.log(modules.map(({ path }: any) => path.substring(path.lastIndexOf('\\')+1))))
                                     this.injectByProcessOnceCreated(processInfo.payload)
+                                    // this.injectByProcessOnceFocused(processInfo.payload)
                                 }
                             }
                             if (processInfo.type === 'process-deletion') {
