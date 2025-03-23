@@ -9,27 +9,11 @@
               <NvGroup justify="apart">
                 <NvText type="label">Enable Game Overlay</NvText>
                 <NvSwitch
-                  :modelValue="gameOverlayStore.enableGameOverlay"
-                  @update:modelValue="
+                    :modelValue="gameOverlayStore.enableGameOverlay"
+                    @update:modelValue="
                     (value) => {
                       if (value) {
-                        confirm({
-                          title: 'Action required',
-                          description: `This feature requires Administrator rights to function properly. Enabling this feature will also enable &quot;Run as Administrator&quot; and a restart will be required. Do you want to continue?`,
-                          actions: [
-                            {
-                              type: 'cancel',
-                              label: 'Cancel',
-                            },
-                            {
-                              buttonProps: {
-                                type: 'plain',
-                              },
-                              type: 'confirm',
-                              label: 'Confirm',
-                            },
-                          ],
-                        }).then(({ type, close }) => {
+                        confirmAdmin().then(({ type, close }) => {
                           if (type === 'confirm') {
                             gameOverlayStore.$patch({
                               enableGameOverlay: value,
@@ -48,8 +32,9 @@
                 />
               </NvGroup>
               <NvText
-                >Open an overlay instead of a window whenever a game is
-                focused</NvText
+              >Open an overlay instead of a window whenever a game is
+                focused
+              </NvText
               >
             </NvStack>
           </NvGroup>
@@ -60,36 +45,37 @@
               <NvCard>
                 <NvStack spacing="5">
                   <NvText type="label">Allowlist</NvText>
-                  <NvDivider direction="horizontal" />
+                  <NvDivider direction="horizontal"/>
                   <div>
                     <NvButton size="sm" @click="addToAllowlist('')"
-                      >Add path</NvButton
+                    >Add path
+                    </NvButton
                     >
                   </div>
-                  <NvDivider v-if="allowlist.length" direction="horizontal" />
+                  <NvDivider v-if="allowlist.length" direction="horizontal"/>
                   <template v-for="(path, i) in allowlist" :key="i">
                     <NvGroup class="w-full" grow>
                       <NvInput
-                        :modelValue="path"
-                        @update:modelValue="
+                          :modelValue="path"
+                          @update:modelValue="
                           (value) => updateAllowlistItem(i, value)
                         "
                       />
                       <NvButton
-                        class="!grow-0"
-                        icon-name="times"
-                        size="xs"
-                        type="plain"
-                        @click="removeFromAllowlist(i)"
+                          class="!grow-0"
+                          icon-name="times"
+                          size="xs"
+                          type="plain"
+                          @click="removeFromAllowlist(i)"
                       />
                     </NvGroup>
                   </template>
                   <template
-                    v-for="(path, i) in gameOverlayAllowlistData"
-                    :key="i"
+                      v-for="(path, i) in gameOverlayAllowlistData"
+                      :key="i"
                   >
                     <NvGroup class="w-full" grow>
-                      <NvInput :modelValue="path" />
+                      <NvInput :modelValue="path"/>
                     </NvGroup>
                   </template>
                 </NvStack>
@@ -97,27 +83,28 @@
               <NvCard>
                 <NvStack spacing="5">
                   <NvText type="label">Denylist</NvText>
-                  <NvDivider direction="horizontal" />
+                  <NvDivider direction="horizontal"/>
                   <div>
                     <NvButton size="sm" @click="addToDenylist('')"
-                      >Add path</NvButton
+                    >Add path
+                    </NvButton
                     >
                   </div>
-                  <NvDivider v-if="denylist.length" direction="horizontal" />
+                  <NvDivider v-if="denylist.length" direction="horizontal"/>
                   <template v-for="(path, i) in denylist" :key="i">
                     <NvGroup class="w-full" grow>
                       <NvInput
-                        :modelValue="path"
-                        @update:modelValue="
+                          :modelValue="path"
+                          @update:modelValue="
                           (value) => updateDenylistItem(i, value)
                         "
                       />
                       <NvButton
-                        class="!grow-0"
-                        icon-name="times"
-                        size="xs"
-                        type="plain"
-                        @click="removeFromDenylist(i)"
+                          class="!grow-0"
+                          icon-name="times"
+                          size="xs"
+                          type="plain"
+                          @click="removeFromDenylist(i)"
                       />
                     </NvGroup>
                   </template>
@@ -147,6 +134,7 @@ import { useDatabasesStore } from '@/features/databases/store'
 import { computed } from 'vue'
 import { useConfirmStore } from '@/store/use-confirm-store.ts'
 import { useSettingsStore } from '@/features/settings/store'
+import { useConfirmAdmin } from '@/hooks/use-confirm-admin.ts'
 
 const gameOverlayStore = useGameOverlayStore()
 const databasesStore = useDatabasesStore()
@@ -161,8 +149,9 @@ const {
 const { allowlist, denylist } = storeToRefs(gameOverlayStore)
 const { data } = storeToRefs(databasesStore)
 const gameOverlayAllowlistData = computed(
-  () => data.value['game-overlay-allowlist'] || [],
+    () => data.value['game-overlay-allowlist'] || [],
 )
-const { confirm } = useConfirmStore()
+
+const confirmAdmin = useConfirmAdmin()
 const settingsStore = useSettingsStore()
 </script>
