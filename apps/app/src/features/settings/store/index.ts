@@ -213,6 +213,7 @@ export const useSettingsStore = defineStore(
                 gameOverlayStore.$patch({
                     enableGameOverlay: false,
                 })
+                enableOverlayWindow.value = false
             }
         })
 
