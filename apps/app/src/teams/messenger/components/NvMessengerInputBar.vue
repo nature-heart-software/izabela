@@ -2,19 +2,19 @@
   <NvCard size="sm">
     <NvGroup noWrap>
       <NvSpeechEngineInput
-        ref="messengerInput"
-        v-model="inputValue"
-        :engine="speechStore.selectedSpeechEngine"
-        :placeholder="placeholder"
-        :voice="speechStore.currentSpeechEngine?.getSelectedVoice()"
-        class="w-full"
-        data-v-step="messenger-text-input"
-        size="lg"
-        @blur="onInputBlur"
-        @enter="onInputEnter"
-        @esc="onInputEsc"
-        @focus="onInputFocus"
-        @space="
+          ref="messengerInput"
+          v-model="inputValue"
+          :engine="speechStore.selectedSpeechEngine"
+          :placeholder="placeholder"
+          :voice="speechStore.currentSpeechEngine?.getSelectedVoice()"
+          class="w-full"
+          data-v-step="messenger-text-input"
+          size="lg"
+          @blur="onInputBlur"
+          @enter="onInputEnter"
+          @esc="onInputEsc"
+          @focus="onInputFocus"
+          @space="
           (e) =>
             settingsStore.messageMode === 'word' && [
               playMessage(),
@@ -23,10 +23,10 @@
         "
       />
       <NvButton
-        data-v-step="messenger-text-input-submit"
-        icon-name="message"
-        size="lg"
-        @click="playMessage()"
+          data-v-step="messenger-text-input-submit"
+          icon-name="message"
+          size="lg"
+          @click="playMessage()"
       />
     </NvGroup>
   </NvCard>
@@ -35,7 +35,7 @@
 import { NvButton, NvCard, NvGroup } from '@packages/ui'
 import { computed, ref, watch } from 'vue'
 import { useMessengerWindowStore } from '@/teams/messenger/store'
-import { emitIPCSay } from '@/electron/events/renderer'
+import { emitIPCGameOverlayStopIntercept, emitIPCSay } from '@/electron/events/renderer'
 import { useSpeechStore } from '@/features/speech/store'
 import { useSettingsStore } from '@/features/settings/store'
 import NvSpeechEngineInput from '@/features/speech/components/inputs/NvSpeechEngineInput.vue'
@@ -53,11 +53,14 @@ const inputRef = computed(() => messengerInput.value?.input)
 
 const onInputEsc = () => {
   ElectronMessengerWindow.hide()
+  if (isGameOverlay) {
+    emitIPCGameOverlayStopIntercept()
+  }
 }
 
 const placeholder = computed(() => {
   if (speechStore.commands.length > 0) {
-    return `Type / to see available commands (${speechStore.commands.length})`
+    return `Type / to see available commands (${ speechStore.commands.length })`
   }
   return 'So, said the angel to the child who, divided, broke the knife..'
 })
@@ -82,6 +85,9 @@ const onInputBlur = () => {
 const onInputEnter = () => {
   if (settingsStore.hideWindowOnMessage || !inputValue.value) {
     ElectronMessengerWindow.hide()
+    if (isGameOverlay) {
+      emitIPCGameOverlayStopIntercept()
+    }
   }
   playMessage()
 }
@@ -102,24 +108,24 @@ if (isGameOverlay) {
     inputRef.value.blur()
   })
   document
-    .querySelector('#offscreen-focus-fix')
-    ?.addEventListener('click', (e) => {
-      inputRef.value.focus()
-    })
+      .querySelector('#offscreen-focus-fix')
+      ?.addEventListener('click', (e) => {
+        inputRef.value.focus()
+      })
 }
 watch(
-  // Makes sure all conditions are met to focus or blur properly
-  () => [
-    messengerWindowStore.isFocused,
-    messengerWindowStore.focusContext,
-    messengerWindowStore.isShown,
-  ],
-  () => {
-    if (messengerWindowStore.isFocused) {
-      onWindowFocus()
-    } else {
-      onWindowBlur()
-    }
-  },
+    // Makes sure all conditions are met to focus or blur properly
+    () => [
+      messengerWindowStore.isFocused,
+      messengerWindowStore.focusContext,
+      messengerWindowStore.isShown,
+    ],
+    () => {
+      if (messengerWindowStore.isFocused) {
+        onWindowFocus()
+      } else {
+        onWindowBlur()
+      }
+    },
 )
 </script>
