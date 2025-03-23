@@ -2,11 +2,11 @@
   <Transition>
     <NvHitbox v-if="isBackgroundShown" class="absolute inset-0">
       <div
-          :style="{
+        :style="{
           opacity: settingsStore.backgroundDimOpacity / 100,
         }"
-          class="w-full h-full bg-black relative z-0"
-          @click="onBackgroundClick"
+        class="w-full h-full bg-black relative z-0"
+        @click="onBackgroundClick"
       ></div>
     </NvHitbox>
   </Transition>
@@ -27,6 +27,6 @@ const onBackgroundClick = () => {
   }
 }
 const isBackgroundShown = computed(
-    () => isGameOverlay || messengerWindowStore.isInputFocused,
+  () => isGameOverlay || messengerWindowStore.isInputFocused,
 )
 </script>
