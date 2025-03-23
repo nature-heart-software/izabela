@@ -1,17 +1,17 @@
 <template>
-  <NvStack spacing="6">
+  <NvStack :spacing="6">
     <NvStack>
       <NvText type="subtitle">General</NvText>
       <NvCard>
-        <NvStack spacing="5">
-          <NvGroup justify="apart" no-wrap spacing="5">
+        <NvStack :spacing="5">
+          <NvGroup :spacing="5" justify="apart" no-wrap>
             <NvStack>
               <NvText type="label">Monitor</NvText>
             </NvStack>
             <NvDisplaySelect/>
           </NvGroup>
           <NvDivider direction="horizontal"/>
-          <NvGroup justify="apart" no-wrap spacing="5">
+          <NvGroup :spacing="5" justify="apart" no-wrap>
             <NvStack>
               <NvText type="label">Hide window after sending a message</NvText>
             </NvStack>
@@ -23,7 +23,7 @@
             />
           </NvGroup>
           <NvDivider direction="horizontal"/>
-          <NvGroup justify="apart" no-wrap spacing="5">
+          <NvGroup :spacing="5" justify="apart" no-wrap>
             <NvStack>
               <NvText type="label">Background dim opacity</NvText>
             </NvStack>
@@ -56,8 +56,8 @@
     <NvStack>
       <NvText type="subtitle">Shortcuts</NvText>
       <NvCard>
-        <NvStack spacing="5">
-          <NvGroup justify="apart" no-wrap spacing="5">
+        <NvStack :spacing="5">
+          <NvGroup :spacing="5" justify="apart" no-wrap>
             <NvStack>
               <NvText type="label">Show Messenger window</NvText>
             </NvStack>
@@ -73,7 +73,7 @@
             />
           </NvGroup>
           <NvDivider direction="horizontal"/>
-          <NvGroup align="start" justify="apart" no-wrap spacing="5">
+          <NvGroup :spacing="5" align="start" justify="apart" no-wrap>
             <NvStack>
               <NvText type="label">Show Messenger window (alternative)</NvText>
               <NvText
@@ -93,7 +93,7 @@
             />
           </NvGroup>
           <NvDivider direction="horizontal"/>
-          <NvGroup align="start" justify="apart" no-wrap spacing="5">
+          <NvGroup :spacing="5" align="start" justify="apart" no-wrap>
             <NvStack>
               <NvText type="label">Enable Overlay window</NvText>
               <NvText
@@ -124,7 +124,7 @@
           </NvGroup>
           <template v-if="settingsStore.enableOverlayWindow">
             <NvDivider direction="horizontal"/>
-            <NvGroup class="pl-6" justify="apart" no-wrap spacing="5">
+            <NvGroup :spacing="5" class="pl-6" justify="apart" no-wrap>
               <NvStack>
                 <NvText type="label">Show Overlay window</NvText>
               </NvStack>
@@ -141,7 +141,7 @@
             </NvGroup>
           </template>
           <NvDivider direction="horizontal"/>
-          <NvGroup justify="apart" no-wrap spacing="5">
+          <NvGroup :spacing="5" justify="apart" no-wrap>
             <NvStack>
               <NvText type="label">Cancel playing message</NvText>
             </NvStack>
@@ -157,7 +157,7 @@
             />
           </NvGroup>
           <NvDivider direction="horizontal"/>
-          <NvGroup justify="apart" no-wrap spacing="5">
+          <NvGroup :spacing="5" justify="apart" no-wrap>
             <NvStack>
               <NvText type="label">Cancel playing and queued messages</NvText>
             </NvStack>
@@ -178,8 +178,8 @@
     <NvStack>
       <NvText type="subtitle">Application</NvText>
       <NvCard>
-        <NvStack spacing="5">
-          <NvGroup justify="apart" no-wrap spacing="5">
+        <NvStack :spacing="5">
+          <NvGroup :spacing="5" justify="apart" no-wrap>
             <NvStack>
               <NvText type="label">Run as Administrator</NvText>
             </NvStack>
@@ -197,7 +197,7 @@
             />
           </NvGroup>
           <NvDivider direction="horizontal"/>
-          <NvGroup justify="apart" no-wrap spacing="5">
+          <NvGroup :spacing="5" justify="apart" no-wrap>
             <NvStack>
               <NvText type="label">Launch on startup</NvText>
             </NvStack>
@@ -209,17 +209,33 @@
             />
           </NvGroup>
           <NvDivider direction="horizontal"/>
-          <NvGroup justify="apart" no-wrap spacing="5">
+          <NvGroup :spacing="5" justify="apart" no-wrap>
             <NvStack>
-              <NvText type="label">Update channel</NvText>
+              <NvText type="label">Enable Auto-update</NvText>
             </NvStack>
-            <NvUpdateChannelSelect
-                :modelValue="settingsStore.updateChannel"
+            <NvSwitch
+                :modelValue="settingsStore.enableAutoUpdate"
                 @update:modelValue="
-                (value) => settingsStore.$patch({ updateChannel: value })
+                (value) => settingsStore.$patch({
+                  enableAutoUpdate: value
+                })
               "
             />
           </NvGroup>
+          <template v-if="settingsStore.enableAutoUpdate">
+            <NvDivider direction="horizontal"/>
+            <NvGroup :spacing="5" class="pl-6" justify="apart" no-wrap>
+              <NvStack>
+                <NvText type="label">Update channel</NvText>
+              </NvStack>
+              <NvUpdateChannelSelect
+                  :modelValue="settingsStore.updateChannel"
+                  @update:modelValue="
+                (value) => settingsStore.$patch({ updateChannel: value })
+              "
+              />
+            </NvGroup>
+          </template>
           <!--          <NvDivider direction="horizontal" />-->
           <!--          <NvGroup justify="apart" no-wrap spacing="5">-->
           <!--            <NvStack>-->
@@ -236,7 +252,7 @@
     <NvStack>
       <NvText type="subtitle">Development</NvText>
       <NvCard>
-        <NvGroup justify="apart" no-wrap spacing="5">
+        <NvGroup :spacing="5" justify="apart" no-wrap>
           <NvStack>
             <NvText type="label">Debug mode</NvText>
           </NvStack>

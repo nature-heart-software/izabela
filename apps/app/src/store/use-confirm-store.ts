@@ -5,51 +5,53 @@ import { Deferred } from '@packages/toolbox'
 import { v4 as uuid } from 'uuid'
 
 export type StoreDialog = {
-  id: string
-  title?: string
-  description?: string
-  remove: () => void
-  close: () => void
-  deferred: ReturnType<typeof Deferred>
-  dialogProps?: Partial<InstanceType<typeof NvDialog>['$props']>
-  actions: {
-    type: string
-    label: string
-    buttonProps?: Partial<InstanceType<typeof NvButton>['$props']>
-  }[]
+    id: string
+    title?: string
+    description?: string
+    remove: () => void
+    close: () => void
+    deferred: ReturnType<typeof Deferred>
+    dialogProps?: Partial<InstanceType<typeof NvDialog>['$props']>
+    actions: {
+        type: string
+        label: string
+        buttonProps?: Partial<InstanceType<typeof NvButton>['$props']>
+    }[]
 }
 
 export const useConfirmStore = defineStore('confirm', () => {
-  const instances = ref<StoreDialog[]>([])
-  return {
-    instances,
-    confirm(
-      options: Pick<
-        StoreDialog,
-        'dialogProps' | 'actions' | 'title' | 'description'
-      >,
-    ) {
-      const deferredPromise = Deferred<{
-        type: string
-        dialog: StoreDialog
-      }>()
-      const id = uuid()
-      instances.value.push({
-        id,
-        deferred: deferredPromise as any,
-        remove() {
-          const index = instances.value.findIndex(
-            (instance) => instance.id === id,
-          )
-          instances.value.splice(index, 1, {
-            ...instances.value[index],
-          })
-        },
-        close() {},
-        ...options,
-      })
+    const instances = ref<StoreDialog[]>([])
+    return {
+        instances,
+        confirm(
+            options: Pick<
+                StoreDialog,
+                'dialogProps' | 'actions' | 'title' | 'description'
+            >,
+        ) {
+            const deferredPromise = Deferred<{
+                type: string
+                instance: StoreDialog
+                close: () => void
+            }>()
+            const id = uuid()
+            instances.value.push({
+                id,
+                deferred: deferredPromise as any,
+                remove() {
+                    const index = instances.value.findIndex(
+                        (instance) => instance.id === id,
+                    )
+                    instances.value.splice(index, 1, {
+                        ...instances.value[index],
+                    })
+                },
+                close() {
+                },
+                ...options,
+            })
 
-      return deferredPromise.promise
-    },
-  }
+            return deferredPromise.promise
+        },
+    }
 })

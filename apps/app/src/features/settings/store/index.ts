@@ -21,6 +21,7 @@ export const useSettingsStore = defineStore(
                     ? 'rc'
                     : 'latest'
 
+        const enableAutoUpdate = ref(true)
         const enableOverlayWindow = ref(false)
         const preferredSavDir = ref<null | string>(null)
         const playSpeechOnDefaultPlaybackDevice = ref(true)
@@ -221,6 +222,7 @@ export const useSettingsStore = defineStore(
         }
 
         return {
+            enableAutoUpdate,
             enableRunAsAdmin,
             disableRunAsAdmin,
             enableOverlayWindow,
