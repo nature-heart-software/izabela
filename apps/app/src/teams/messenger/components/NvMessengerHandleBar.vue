@@ -17,7 +17,7 @@
           </NvTooltip>
         </template>
       </NvGroup>
-      <template v-if="messengerStateStore.markForRestart">
+      <template v-if="messengerStateStore.markForRestart && !isGameOverlay">
         <NvMarkForRestartMessage/>
       </template>
     </NvGroup>
@@ -28,6 +28,7 @@ import { NvButton, NvCard, NvGroup, NvText, NvTooltip } from '@packages/ui'
 import { useSettingsStore } from '@/features/settings/store'
 import { useMessengerStateStore } from '@/teams/messenger/store'
 import NvMarkForRestartMessage from '@/teams/messenger/components/NvMarkForRestartMessage.vue'
+import { isGameOverlay } from '@/consts.ts'
 
 const settingsStore = useSettingsStore()
 const { ElectronMessengerWindow } = window

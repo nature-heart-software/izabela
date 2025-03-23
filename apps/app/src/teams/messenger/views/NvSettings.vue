@@ -4,7 +4,7 @@
       <!-- Top -->
       <div class="flex justify-between space-x-4">
         <div class="grow">
-          <template v-if="messengerStateStore.markForRestart">
+          <template v-if="messengerStateStore.markForRestart && !isGameOverlay">
             <NvCard class="settings__message pl-2" size="xs">
               <div class="pl-4">
                 <NvMarkForRestartMessage/>
@@ -97,6 +97,7 @@ import { provide } from 'vue'
 import { useConfirmStore } from '@/store/use-confirm-store.ts'
 import { useMessengerStateStore } from '@/teams/messenger/store'
 import NvMarkForRestartMessage from '@/teams/messenger/components/NvMarkForRestartMessage.vue'
+import { isGameOverlay } from '@/consts.ts'
 
 const id = `_${ uuid() }`
 provide('portal-target', `#${ id }`)
