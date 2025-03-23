@@ -3,17 +3,17 @@ import { StoryFn } from '@storybook/vue3'
 import { NvButton, NvCenter, NvDialog, NvText, NvGroup } from '@/components'
 
 export default {
-    title: 'Dialog',
+  title: 'Dialog',
 }
 
 const Template: StoryFn = (args) => ({
-    components: { NvDialog, NvButton, NvText, NvCenter, NvGroup },
-    setup() {
-        return {
-            args,
-        }
-    },
-    template: `
+  components: { NvDialog, NvButton, NvText, NvCenter, NvGroup },
+  setup() {
+    return {
+      args,
+    }
+  },
+  template: `
       <NvCenter>
       <NvDialog v-bind="args">
         <template #title>
