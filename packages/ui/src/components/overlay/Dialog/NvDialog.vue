@@ -1,10 +1,10 @@
 <template>
   <StDialogRoot v-bind="props">
     <StDialogTrigger>
-      <slot name="reference"/>
+      <slot name="reference" />
     </StDialogTrigger>
     <Teleport :to="props.portalTarget">
-      <StDialogBackdrop/>
+      <StDialogBackdrop />
       <StDialogPositioner>
         <StDialogContent>
           <NvCard>
@@ -12,19 +12,19 @@
               <NvGroup justify="between">
                 <StDialogTitle asChild>
                   <NvText type="title">
-                    <slot name="title"/>
+                    <slot name="title" />
                   </NvText>
                 </StDialogTitle>
                 <StDialogCloseTrigger>
-                  <NvButton icon-name="times" size="xs" squared type="plain"/>
+                  <NvButton icon-name="times" size="xs" squared type="plain" />
                 </StDialogCloseTrigger>
               </NvGroup>
               <StDialogDescription v-if="$slots.description">
                 <NvText>
-                  <slot name="description"/>
+                  <slot name="description" />
                 </NvText>
               </StDialogDescription>
-              <slot name="footer"/>
+              <slot name="footer" />
             </NvStack>
           </NvCard>
         </StDialogContent>

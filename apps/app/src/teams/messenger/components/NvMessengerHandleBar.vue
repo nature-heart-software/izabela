@@ -6,19 +6,23 @@
           <NvTooltip>
             <NvText>Reload page</NvText>
             <template #reference>
-              <NvButton icon-name="redo" size="sm" @click="reload"/>
+              <NvButton icon-name="redo" size="sm" @click="reload" />
             </template>
           </NvTooltip>
           <NvTooltip>
             <NvText>Open console</NvText>
             <template #reference>
-              <NvButton icon-name="brackets-curly" size="sm" @click="openDevTools"/>
+              <NvButton
+                icon-name="brackets-curly"
+                size="sm"
+                @click="openDevTools"
+              />
             </template>
           </NvTooltip>
         </template>
       </NvGroup>
       <template v-if="messengerStateStore.markForRestart">
-        <NvMarkForRestartMessage/>
+        <NvMarkForRestartMessage />
       </template>
     </NvGroup>
   </NvCard>
