@@ -1,9 +1,9 @@
 <template>
   <NvDialog
-    v-model:open="open"
-    :portal-target="props.portalTarget"
-    v-bind="props.instance.dialogProps"
-    @close="props.instance.close"
+      v-model:open="open"
+      :portal-target="props.portalTarget"
+      v-bind="props.instance.dialogProps"
+      @close="props.instance.close"
   >
     <template #title>
       {{ props.instance.title }}
@@ -15,8 +15,8 @@
       <NvGroup justify="right">
         <template v-for="action in props.instance.actions">
           <NvButton
-            v-bind="action.buttonProps"
-            @click="
+              v-bind="action.buttonProps"
+              @click="
               props.instance.deferred.resolve({
                 type: action.type,
                 dialog: props.instance,
@@ -34,7 +34,7 @@
 <script lang="ts" setup>
 import { ref, PropType } from 'vue'
 import { NvButton, NvDialog, NvGroup } from '@packages/ui'
-import { useConfirmStore, StoreDialog } from '@/store/use-confirm-store'
+import { StoreDialog } from '@/store/use-confirm-store'
 
 const props = defineProps({
   instance: {
@@ -47,5 +47,4 @@ const props = defineProps({
 })
 
 const open = ref(true)
-const { instances } = useConfirmStore()
 </script>

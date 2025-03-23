@@ -1,11 +1,10 @@
 import pkg from '@root/package.json'
 // eslint-disable-next-line import/no-cycle
 import { defineStore } from 'pinia'
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { SpeechEngine } from '@/modules/speech-engine-manager/types'
 import { Key } from '@/types/keybinds'
 import { ENGINE_ID } from '@/plugins/speech-engines/say/shared'
-import { useGameOverlayStore } from '@/features/game-overlay/store'
 import { useMessengerStateStore } from '@/teams/messenger/store'
 
 export const useSettingsStore = defineStore(
@@ -206,16 +205,6 @@ export const useSettingsStore = defineStore(
         })
 
         const messengerStateStore = useMessengerStateStore()
-
-        watch(runAsAdmin, (value) => {
-            if (!value) {
-                const gameOverlayStore = useGameOverlayStore()
-                gameOverlayStore.$patch({
-                    enableGameOverlay: false,
-                })
-                enableOverlayWindow.value = false
-            }
-        })
 
         const enableRunAsAdmin = () => {
             runAsAdmin.value = true
