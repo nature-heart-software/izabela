@@ -3,7 +3,12 @@ import defaults from 'lodash/defaults'
 import cloneDeep from 'lodash/cloneDeep'
 import type ElectronStore from 'electron-store'
 
-import { ELECTRON_STORAGE_NAME, IPC_EVENT_STORE_DELETE, IPC_EVENT_STORE_GET, IPC_EVENT_STORE_SET } from './consts'
+import {
+  ELECTRON_STORAGE_NAME,
+  IPC_EVENT_STORE_DELETE,
+  IPC_EVENT_STORE_GET,
+  IPC_EVENT_STORE_SET,
+} from './consts'
 import { Deferred, purify } from '@packages/toolbox'
 import { isMain } from './electron'
 
@@ -13,15 +18,19 @@ function getElectronStore(name: string) {
   if (!electronStores[name]) {
     let defaults
     try {
-      const electronPiniaDefaultFile = require('path').join(require('electron').app.getPath('userData'), `${ ELECTRON_STORAGE_NAME }.json`)
-      const globalDefaults: Record<string, any> = require(electronPiniaDefaultFile)
+      const electronPiniaDefaultFile = require('path').join(
+        require('electron').app.getPath('userData'),
+        `${ELECTRON_STORAGE_NAME}.json`,
+      )
+      const globalDefaults: Record<string, any> = require(
+        electronPiniaDefaultFile,
+      )
       if (globalDefaults) {
         defaults = {
           [name]: globalDefaults[name],
         }
       }
-    } catch (e) {
-    }
+    } catch (e) {}
     electronStores[name] = new (require('electron-store'))({
       name,
       defaults,
@@ -36,7 +45,8 @@ function getStorage(name: string): ElectronStore {
 }
 
 const storageGetState = (name: string) => getStorage(name).get(name)
-const storageSetState = (name: string, state: any) => getStorage(name).set(name, state)
+const storageSetState = (name: string, state: any) =>
+  getStorage(name).set(name, state)
 const storageDelete = (name: string) => getStorage(name).delete(name)
 
 if (isMain) {
@@ -68,7 +78,7 @@ export const persistStatePlugin = ({ store }: Parameters<PiniaPlugin>[0]) => {
   }
 
   function getStorageName(storeId: PiniaPluginContext['store']['$id']) {
-    return `${ ELECTRON_STORAGE_NAME }-${ storeId }`
+    return `${ELECTRON_STORAGE_NAME}-${storeId}`
   }
 
   async function loadInitialState() {
