@@ -323,7 +323,7 @@ class GameOverlay {
                 ],
                 () => {
                     if (!gameOverlayStore.enableGameOverlay) return
-                    console.log('[game-overlay] Creating process watcher process')
+                    console.log('[game-overlay] Creating process-watcher process')<
                     try {
                         const child = fork(
                             import.meta.env.DEV
@@ -334,10 +334,10 @@ class GameOverlay {
                                     'node_modules',
                                     '@packages',
                                     'process-watcher',
-                                ),
-                        )
+                                ), [], {
+                                stdio: ["inherit", "pipe", "pipe", "ipc"],
+                            })
                         child.on('message', (processInfo: ProcessEvent) => {
-                            console.log(processInfo)
                             if (processInfo.type === 'process-creation') {
                                 const { filepath } = processInfo.payload
                                 const isGame =
@@ -366,16 +366,26 @@ class GameOverlay {
                                 this.removeProcess(processInfo.payload.pid)
                             }
                         })
-                        child.on('error', (error: Error) => {
-                            console.error(error)
+
+                        child.stdout?.on("data", (data) => {
+                            console.log(`[process-watcher] STDOUT: ${ data.toString() }`)
                         })
+
+                        child.stderr?.on("data", (data) => {
+                            console.error(`[process-watcher] STDERR: ${ data.toString() }`)
+                        })
+
+                        child.on("exit", (code, signal) => {
+                            console.log(`[process-watcher] Process exited with code: ${ code }, signal: ${ signal }`)
+                        })
+
                         onWatcherCleanup(() => {
-                            console.log('[game-overlay] Destroying process watcher process')
+                            console.log('[game-overlay] Destroying process-watcher process')
                             child.kill()
                         })
                     } catch (e) {
-                        console.error(
-                            `[game-overlay] Couldn't create process watcher process`,
+                        console.log(
+                            `[game-overlay] Couldn't create process-watcher process`, e,
                         )
                     }
                 },
