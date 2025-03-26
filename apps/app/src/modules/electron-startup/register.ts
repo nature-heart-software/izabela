@@ -5,6 +5,7 @@ import { exec } from 'child_process'
 import { Deferred } from '@packages/toolbox'
 
 function restartAsAdmin() {
+    const deferred = Deferred()
     if (process.platform === 'win32') {
         const appPath = process.execPath
         console.log(appPath)
@@ -15,12 +16,15 @@ function restartAsAdmin() {
                     app.quit()
                 } else {
                     console.error('Failed to restart as admin:', error)
+                    deferred.resolve(true)
                 }
             },
         )
     } else {
         console.warn('Admin restart is only implemented for Windows.')
+        deferred.resolve(true)
     }
+    return deferred.promise
 }
 
 function isRunningAsAdmin(): boolean {
@@ -55,6 +59,9 @@ export default () =>
                 setLaunchOnStartup(settingsStore.launchOnStartup)
                 if (import.meta.env.PROD && settingsStore.runAsAdmin && !isRunningAsAdmin()) {
                     restartAsAdmin()
+                        .then(() => {
+                            deferred.resolve(true)
+                        })
                 } else {
                     deferred.resolve(true)
                 }

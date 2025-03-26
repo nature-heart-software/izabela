@@ -323,7 +323,7 @@ class GameOverlay {
                 ],
                 () => {
                     if (!gameOverlayStore.enableGameOverlay) return
-                    console.log('[game-overlay] Creating process-watcher process')<
+                    console.log('[game-overlay] Creating process-watcher process')
                     try {
                         const child = fork(
                             import.meta.env.DEV
