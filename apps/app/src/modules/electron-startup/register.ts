@@ -3,6 +3,7 @@ import { useSettingsStore } from '@/features/settings/store'
 import { app } from 'electron'
 import { exec } from 'child_process'
 import { Deferred } from '@packages/toolbox'
+import { isRunningAsAdmin } from '@/electron/utils.ts'
 
 function restartAsAdmin() {
     const deferred = Deferred()
@@ -25,19 +26,6 @@ function restartAsAdmin() {
         deferred.resolve(true)
     }
     return deferred.promise
-}
-
-function isRunningAsAdmin(): boolean {
-    if (process.platform === 'win32') {
-        try {
-            const execSync = require('child_process').execSync
-            execSync('net session', { stdio: 'ignore' })
-            return true
-        } catch {
-            return false
-        }
-    }
-    return process.getuid?.() === 0
 }
 
 const setLaunchOnStartup = (launchOnStartup: boolean) => {

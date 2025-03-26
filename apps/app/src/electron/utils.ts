@@ -3,6 +3,7 @@ import { app, protocol, Protocol, screen } from 'electron'
 import minBy from 'lodash/minBy'
 import { readFile } from 'fs'
 import { URL } from 'url'
+import { execSync } from 'child_process'
 
 export const env = import.meta.env.MODE
 export const EXTERNALS_DIR = import.meta.env.DEV
@@ -52,6 +53,18 @@ export function createProtocol(scheme: string, customProtocol: Protocol) {
             })
         },
     )
+}
+
+export function isRunningAsAdmin(): boolean {
+    if (process.platform === 'win32') {
+        try {
+            execSync('net session', { stdio: 'ignore' })
+            return true
+        } catch {
+            return false
+        }
+    }
+    return process.getuid?.() === 0
 }
 
 export const onExit = (callback: () => void) => {
