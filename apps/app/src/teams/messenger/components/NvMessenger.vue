@@ -3,7 +3,7 @@
     <NvHitbox id="moveable" ref="moveableTarget" class="inline-flex">
       <div
         ref="messenger"
-        class="messenger bg-gray-10/95 rounded grid p-4 gap-4 grid-rows-3 grid-rows-none min-w-[768px]"
+        class="messenger bg-gray-10/95 rounded grid p-4 gap-4 grid-rows-3 grid-rows-none w-[768px]"
         data-v-step="messenger-window"
       >
         <!-- Top -->

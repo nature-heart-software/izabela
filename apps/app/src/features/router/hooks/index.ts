@@ -32,17 +32,49 @@ export const useRouterViewPopover = ({
       appendTo: () => document.querySelector('#router-overlay') || document.body,
       maxWidth: 'none',
       offset: [0, tokens.spacing['4']],
-      onShow(instance) {
-        setTimeout(() => {
-          instance.popperInstance?.update()
-        })
-      },
-
-      onShown(instance) {
-        instance.popperInstance?.update()
-      },
+      placement: 'top-start',
       hideOnClick: false,
       ...popoverOptions,
+      onShow(instance) {
+        instance.popperInstance?.update()
+        return popoverOptions?.onShow?.(instance)
+      },
+      onShown(instance) {
+        instance.popperInstance?.update()
+        return popoverOptions?.onShown?.(instance)
+      },
+      onCreate(instance) {
+        instance.popperInstance?.update()
+        return popoverOptions?.onCreate?.(instance)
+      },
+      onHidden(instance) {
+        instance.popperInstance?.update()
+        return popoverOptions?.onHidden?.(instance)
+      },
+      onMount(instance) {
+        instance.popperInstance?.update()
+        return popoverOptions?.onMount?.(instance)
+      },
+      onClickOutside(instance, event) {
+        instance.popperInstance?.update()
+        return popoverOptions?.onClickOutside?.(instance, event)
+      },
+      onHide(instance) {
+        instance.popperInstance?.update()
+        return popoverOptions?.onHide?.(instance)
+      },
+      onTrigger(instance, event) {
+        instance.popperInstance?.update()
+        return popoverOptions?.onTrigger?.(instance, event)
+      },
+      onDestroy(instance) {
+        instance.popperInstance?.update()
+        return popoverOptions?.onDestroy?.(instance)
+      },
+      onUntrigger(instance, event) {
+        instance.popperInstance?.update()
+        return popoverOptions?.onUntrigger?.(instance, event)
+      },
     })
   }
   return {
