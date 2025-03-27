@@ -81,6 +81,7 @@
     "fuse.js": "^6.6.2",
     "gelectron": "https://github.com/hiitiger/goverlay/tarball/3ca1f040b180dc6ce84baca093c6f726748461ad",
     "globby": "^11.1.0",
+    "gsap": "^3.11.5",
     "hark": "^1.2.3",
     "ibm-watson": "^7.0.0",
     "lerna": "^6.6.2",
