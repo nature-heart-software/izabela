@@ -100,7 +100,6 @@ export default () =>
                                     settingsStore.keybindings.toggleOverlayWindow,
                                 )
                             ) {
-                                console.log('oh no')
                                 multiKeysKeybindings.toggleOverlayWindow()
                             }
                         }

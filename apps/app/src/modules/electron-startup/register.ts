@@ -9,7 +9,6 @@ function restartAsAdmin() {
     const deferred = Deferred()
     if (process.platform === 'win32') {
         const appPath = process.execPath
-        console.log(appPath)
         exec(
             `powershell -Command "Start-Process -FilePath '${ appPath.replace(/'/g, "''") }' -Verb RunAs"`,
             (error) => {
