@@ -1,16 +1,22 @@
 <template>
   <div
-      id="settings"
-      class="settings relative bg-gray-10/95 rounded p-4 overflow-hidden"
+    id="settings"
+    class="settings relative bg-gray-10/95 rounded p-4 overflow-hidden"
   >
     <div class="flex flex-col space-y-4 h-full">
       <!-- Top -->
       <div class="flex justify-between space-x-4">
         <div class="grow">
-          <template v-if="messengerStateStore.markForRestart && !isGameOverlay && !info?.isRunningAsAdmin">
+          <template
+            v-if="
+              messengerStateStore.markForRestart &&
+              !isGameOverlay &&
+              !info?.isRunningAsAdmin
+            "
+          >
             <NvCard class="settings__message pl-2" size="xs">
               <div class="pl-4">
-                <NvMarkForRestartMessage/>
+                <NvMarkForRestartMessage />
               </div>
             </NvCard>
           </template>
@@ -21,10 +27,10 @@
               <NvText>Close</NvText>
               <template #reference>
                 <NvButton
-                    icon-name="times"
-                    size="xs"
-                    type="plain"
-                    @click="$emit('close')"
+                  icon-name="times"
+                  size="xs"
+                  type="plain"
+                  @click="$emit('close')"
                 />
               </template>
             </NvTooltip>
@@ -44,19 +50,19 @@
                     </NvText>
                     <NvStack spacing="2">
                       <template
-                          v-for="entry in category.children"
-                          :key="entry.name"
+                        v-for="entry in category.children"
+                        :key="entry.name"
                       >
                         <router-link
-                            :to="entry.to || { name: 'settings' }"
-                            class="w-full"
+                          :to="entry.to || { name: 'settings' }"
+                          class="w-full"
                         >
                           <NvButton
-                              :selected="currentRoute.name === entry.to?.name"
-                              class="w-full"
-                              size="sm"
-                              type="ghost-alt"
-                          >{{ entry.name }}
+                            :selected="currentRoute.name === entry.to?.name"
+                            class="w-full"
+                            size="sm"
+                            type="ghost-alt"
+                            >{{ entry.name }}
                           </NvButton>
                         </router-link>
                       </template>
@@ -72,10 +78,10 @@
                   <router-view v-slot="{ Component }">
                     <Transition class="transition">
                       <div
-                          :key="Component"
-                          class="absolute inset-0 overflow-y-auto"
+                        :key="Component"
+                        class="absolute inset-0 overflow-y-auto"
                       >
-                        <component :is="Component"/>
+                        <component :is="Component" />
                       </div>
                     </Transition>
                   </router-view>
@@ -87,30 +93,24 @@
       </div>
     </div>
     <template v-for="instance in instances">
-      <NvStoreDialog :instance="instance" portal-target="#settings"/>
+      <NvStoreDialog :instance="instance" portal-target="#settings" />
     </template>
   </div>
 </template>
 <script lang="ts" setup>
-import {
-  NvButton,
-  NvCard,
-  NvStack,
-  NvText,
-  NvTooltip,
-} from '@packages/ui'
+import { NvButton, NvCard, NvStack, NvText, NvTooltip } from '@packages/ui'
 import NvStoreDialog from '@/teams/messenger/components/NvStoreDialog.vue'
 import { useRoute } from 'vue-router'
 import { v4 as uuid } from 'uuid'
-import { provide} from 'vue'
+import { provide } from 'vue'
 import { useConfirmStore } from '@/store/use-confirm-store.ts'
 import { useMessengerStateStore } from '@/teams/messenger/store'
 import NvMarkForRestartMessage from '@/teams/messenger/components/NvMarkForRestartMessage.vue'
 import { isGameOverlay } from '@/consts.ts'
 import { useGetAppInfoQuery } from '@/features/app/queries.ts'
 
-const id = `_${ uuid() }`
-provide('portal-target', `#${ id }`)
+const id = `_${uuid()}`
+provide('portal-target', `#${id}`)
 
 const navigation = [
   {
