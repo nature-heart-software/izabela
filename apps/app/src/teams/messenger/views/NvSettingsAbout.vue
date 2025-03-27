@@ -18,13 +18,7 @@
 </template>
 <script lang="ts" setup>
 import { NvCard, NvDivider, NvGroup, NvStack, NvText } from '@packages/ui'
-import { onMounted, ref } from 'vue'
+import { useGetAppInfoQuery } from '@/features/app/queries.ts'
 
-const { ElectronSI } = window
-const info = ref<Awaited<ReturnType<typeof ElectronSI.getInfo>>>()
-onMounted(() => {
-  ElectronSI.getInfo().then((data) => {
-    info.value = data
-  })
-})
+const { data: info } = useGetAppInfoQuery()
 </script>

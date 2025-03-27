@@ -29,7 +29,7 @@ import { useSettingsStore } from '@/features/settings/store'
 import { useMessengerStateStore } from '@/teams/messenger/store'
 import NvMarkForRestartMessage from '@/teams/messenger/components/NvMarkForRestartMessage.vue'
 import { isGameOverlay } from '@/consts.ts'
-import { onMounted, ref } from 'vue'
+import { useGetAppInfoQuery } from '@/features/app/queries.ts'
 
 const settingsStore = useSettingsStore()
 const { ElectronMessengerWindow } = window
@@ -42,11 +42,5 @@ const reload = () => {
 }
 const messengerStateStore = useMessengerStateStore()
 
-const { ElectronSI } = window
-const info = ref<Awaited<ReturnType<typeof ElectronSI.getInfo>>>()
-onMounted(() => {
-  ElectronSI.getInfo().then((data) => {
-    info.value = data
-  })
-})
+const { data: info } = useGetAppInfoQuery()
 </script>

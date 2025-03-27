@@ -98,17 +98,16 @@ import {
   NvStack,
   NvText,
   NvTooltip,
-  NvGroup,
-  NvIcon,
 } from '@packages/ui'
 import NvStoreDialog from '@/teams/messenger/components/NvStoreDialog.vue'
 import { useRoute } from 'vue-router'
 import { v4 as uuid } from 'uuid'
-import { onMounted, provide, ref } from 'vue'
+import { provide} from 'vue'
 import { useConfirmStore } from '@/store/use-confirm-store.ts'
 import { useMessengerStateStore } from '@/teams/messenger/store'
 import NvMarkForRestartMessage from '@/teams/messenger/components/NvMarkForRestartMessage.vue'
 import { isGameOverlay } from '@/consts.ts'
+import { useGetAppInfoQuery } from '@/features/app/queries.ts'
 
 const id = `_${ uuid() }`
 provide('portal-target', `#${ id }`)
@@ -174,13 +173,8 @@ const navigation = [
 const currentRoute = useRoute()
 const { instances } = useConfirmStore()
 const messengerStateStore = useMessengerStateStore()
-const { ElectronSI } = window
-const info = ref<Awaited<ReturnType<typeof ElectronSI.getInfo>>>()
-onMounted(() => {
-  ElectronSI.getInfo().then((data) => {
-    info.value = data
-  })
-})
+
+const { data: info } = useGetAppInfoQuery()
 </script>
 <style lang="scss" scoped>
 .settings {
