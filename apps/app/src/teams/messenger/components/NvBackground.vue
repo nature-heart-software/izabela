@@ -1,14 +1,22 @@
 <template>
-  <div ref="background" :style="{
-    willChange: 'opacity',
-}" class="absolute inset-0 opacity-0 pointer-events-none">
+  <div
+    ref="background"
+    :style="{
+      willChange: 'opacity',
+    }"
+    class="absolute inset-0 opacity-0 pointer-events-none"
+  >
     <div
-        :style="{
-          opacity: settingsStore.backgroundDimOpacity / 100,
-        }"
-        class="w-full h-full bg-black"
+      :style="{
+        opacity: settingsStore.backgroundDimOpacity / 100,
+      }"
+      class="w-full h-full bg-black"
     >
-      <NvHitbox v-if="isBackgroundShown" class="w-full h-full pointer-events-auto" @click="onBackgroundClick"/>
+      <NvHitbox
+        v-if="isBackgroundShown"
+        class="w-full h-full pointer-events-auto"
+        @click="onBackgroundClick"
+      />
     </div>
   </div>
 </template>
@@ -31,20 +39,19 @@ const onBackgroundClick = () => {
 }
 
 const isBackgroundShown = computed(
-    () => isGameOverlay || messengerWindowStore.isInputFocused,
+  () => isGameOverlay || messengerWindowStore.isInputFocused,
 )
 
 watch(isBackgroundShown, (newValue) => {
   gsap.to(background.value, {
     opacity: Number(newValue),
-    duration: .3,
+    duration: 0.3,
     ease: 'power3.out',
-
   })
 })
 
 onMounted(() => {
-  window.addEventListener("blur", () => {
+  window.addEventListener('blur', () => {
     gsap.set(background.value, {
       opacity: 0,
       overwrite: true,
