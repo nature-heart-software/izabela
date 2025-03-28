@@ -5,6 +5,7 @@ import { ref } from 'vue'
 import { SpeechEngine } from '@/modules/speech-engine-manager/types'
 import { Key } from '@/types/keybinds'
 import { ENGINE_ID } from '@/plugins/speech-engines/say/shared'
+import { useMessengerStateStore } from '@/teams/messenger/store'
 
 export const useSettingsStore = defineStore(
   'settings',
@@ -20,6 +21,8 @@ export const useSettingsStore = defineStore(
           ? 'rc'
           : 'latest'
 
+    const enableAutoUpdate = ref(true)
+    const enableOverlayWindow = ref(false)
     const preferredSavDir = ref<null | string>(null)
     const playSpeechOnDefaultPlaybackDevice = ref(true)
     const audioOutputs = ref<MediaDeviceInfo['label'][]>([])
@@ -27,6 +30,7 @@ export const useSettingsStore = defineStore(
     const selectedSpeechEngine = ref<SpeechEngine['id']>(ENGINE_ID)
     const updateChannel = ref(channel)
     const launchOnStartup = ref(true)
+    const runAsAdmin = ref(false)
     const debugMode = ref(import.meta.env.MODE === 'development')
     const messageMode = ref<'sentence' | 'word'>('sentence')
     const display = ref<Electron.Display['id'] | null>(null)
@@ -200,7 +204,28 @@ export const useSettingsStore = defineStore(
         },
       ],
     })
+
+    const messengerStateStore = useMessengerStateStore()
+
+    const enableRunAsAdmin = () => {
+      runAsAdmin.value = true
+      messengerStateStore.$patch({
+        markForRestart: true,
+      })
+    }
+
+    const disableRunAsAdmin = () => {
+      runAsAdmin.value = false
+      messengerStateStore.$patch({
+        markForRestart: false,
+      })
+    }
+
     return {
+      enableAutoUpdate,
+      enableRunAsAdmin,
+      disableRunAsAdmin,
+      enableOverlayWindow,
       // enableBackgroundDim,
       backgroundDimOpacity,
       preferredSavDir,
@@ -210,6 +235,7 @@ export const useSettingsStore = defineStore(
       selectedSpeechEngine,
       updateChannel,
       launchOnStartup,
+      runAsAdmin,
       debugMode,
       messageMode,
       display,

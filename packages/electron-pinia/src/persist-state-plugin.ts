@@ -1,5 +1,4 @@
 import { PiniaPlugin, PiniaPluginContext } from 'pinia'
-import debounce from 'lodash/debounce'
 import defaults from 'lodash/defaults'
 import cloneDeep from 'lodash/cloneDeep'
 import type ElectronStore from 'electron-store'
@@ -13,52 +12,73 @@ import {
 import { Deferred, purify } from '@packages/toolbox'
 import { isMain } from './electron'
 
-const electronStore =
-  isMain &&
-  new (require('electron-store'))({
-    name: ELECTRON_STORAGE_NAME,
-  })
+let electronStores: any = {}
 
-function getStorage(): ElectronStore {
-  return isMain ? electronStore : window.ElectronPiniaStorage
+function getElectronStore(name: string) {
+  if (!electronStores[name]) {
+    let defaults
+    try {
+      const electronPiniaDefaultFile = require('path').join(
+        require('electron').app.getPath('userData'),
+        `${ELECTRON_STORAGE_NAME}.json`,
+      )
+      const globalDefaults: Record<string, any> = require(
+        electronPiniaDefaultFile,
+      )
+      if (globalDefaults) {
+        defaults = {
+          [name]: globalDefaults[name],
+        }
+      }
+    } catch (e) {}
+    electronStores[name] = new (require('electron-store'))({
+      name,
+      defaults,
+      cwd: ELECTRON_STORAGE_NAME,
+    })
+  }
+  return electronStores[name]
 }
 
-const storageSetState = isMain // debounce to prevent too many writes to the disk
-  ? debounce((name: string, state: any) => getStorage().set(name, state), 1000)
-  : (name: string, state: any) => getStorage().set(name, state)
+function getStorage(name: string): ElectronStore {
+  return isMain ? getElectronStore(name) : window.ElectronPiniaStorage
+}
+
+const storageGetState = (name: string) => getStorage(name).get(name)
+const storageSetState = (name: string, state: any) =>
+  getStorage(name).set(name, state)
+const storageDelete = (name: string) => getStorage(name).delete(name)
 
 if (isMain) {
   const { ipcMain } = require('electron')
   ipcMain.handle(IPC_EVENT_STORE_GET, (_, { name }) => {
-    const storage = getStorage()
-    return storage.get(name)
+    return storageGetState(name)
   })
   ipcMain.on(IPC_EVENT_STORE_SET, (_, { name, state }) => {
     storageSetState(name, state)
     return true
   })
   ipcMain.on(IPC_EVENT_STORE_DELETE, (_, { name }) => {
-    const storage = getStorage()
-    storage.delete(name)
+    storageDelete(name)
     return true
   })
 }
 
 export const persistStatePlugin = ({ store }: Parameters<PiniaPlugin>[0]) => {
   const deferredIsReady = Deferred<boolean>()
-  const storage = getStorage()
+  const storage = getStorage(getStorageName(store.$id))
 
-  const setState = debounce((state: any) => {
+  const setState = (state: any) => {
     const sanitizedState = purify(state)
     storageSetState(getStorageName(store.$id), sanitizedState)
-  }, 1000)
+  }
 
   async function getState() {
     return (await storage.get(getStorageName(store.$id))) || {}
   }
 
   function getStorageName(storeId: PiniaPluginContext['store']['$id']) {
-    return `electron-pinia-${storeId}`
+    return `${ELECTRON_STORAGE_NAME}-${storeId}`
   }
 
   async function loadInitialState() {

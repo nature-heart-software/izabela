@@ -1,0 +1,16 @@
+{
+  "name": "@packages/electron-game-overlay",
+  "version": "0.0.0",
+  "files": [
+    "./dist"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "private": true,
+  "scripts": {
+    "build": "node ./bin/build"
+  },
+  "source": "src/main.ts",
+  "type": "module",
+  "types": "./dist/index.d.ts"
+}

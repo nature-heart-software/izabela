@@ -12,7 +12,8 @@
         <template #reference>
           <NvButton
             :type="
-              route.name?.startsWith('messages') && messengerContext.isViewShown.value
+              route.name?.startsWith('messages') &&
+              messengerContext.isViewShown.value
                 ? 'plain'
                 : 'default'
             "
@@ -28,7 +29,8 @@
         <template #reference>
           <NvButton
             :type="
-              route.name?.startsWith('settings') && messengerContext.isViewShown.value
+              route.name?.startsWith('settings') &&
+              messengerContext.isViewShown.value
                 ? 'plain'
                 : 'default'
             "
@@ -107,6 +109,8 @@ import { NvButton, NvCard, NvGroup, NvText, NvTooltip } from '@packages/ui'
 import { inject, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useSettingsStore } from '@/features/settings/store'
+import { isGameOverlay } from '@/consts.ts'
+import { emitIPCGameOverlayStopIntercept } from '@/electron/events/renderer.ts'
 
 const settingsStore = useSettingsStore()
 const messengerContext = inject('messenger')
@@ -115,6 +119,9 @@ const route = useRoute()
 
 const hide = () => {
   ElectronMessengerWindow.hide()
+  if (isGameOverlay) {
+    emitIPCGameOverlayStopIntercept()
+  }
 }
 const tour = ref(null)
 const step = ref(0)
@@ -143,7 +150,8 @@ const steps = [
   },
   {
     target: '[data-v-step="engine-voice-select"]',
-    content: 'You can select a different voice supported by the selected speech engine here.',
+    content:
+      'You can select a different voice supported by the selected speech engine here.',
     placement: 'top',
   },
   {
@@ -172,12 +180,14 @@ const steps = [
   },
   {
     target: '[data-v-step="translation-button"]',
-    content: 'You can enable translation to translate messages before sending them here.',
+    content:
+      'You can enable translation to translate messages before sending them here.',
     placement: 'top',
   },
   {
     target: '[data-v-step="dictionary-button"]',
-    content: 'You can provide the definition of some words to improve their pronunciation here.',
+    content:
+      'You can provide the definition of some words to improve their pronunciation here.',
     placement: 'top',
   },
   {
@@ -210,7 +220,9 @@ const steps = [
     target: '[data-v-step="messenger-window"]',
     content: `Finally, you can toggle the window by pressing ${settingsStore.keybindings.toggleMessengerWindow
       .map((k) => `[${k.key}]`)
-      .join(' + ')}. If the text input is focused, you can also press [Esc] to close the window.`,
+      .join(
+        ' + ',
+      )}. If the text input is focused, you can also press [Esc] to close the window.`,
     placement: 'top',
   },
 ]

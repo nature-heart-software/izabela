@@ -3,7 +3,7 @@
     <NvHitbox id="moveable" ref="moveableTarget" class="inline-flex">
       <div
         ref="messenger"
-        class="messenger bg-gray-10/95 rounded grid p-4 gap-4 grid-rows-3 grid-rows-none min-w-[768px]"
+        class="messenger bg-gray-10/95 rounded grid p-4 gap-4 grid-rows-3 grid-rows-none w-[768px]"
         data-v-step="messenger-window"
       >
         <!-- Top -->
@@ -58,16 +58,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {
-  ComponentPublicInstance,
-  computed,
-  defineProps,
-  onMounted,
-  provide,
-  ref,
-  unref,
-  watch,
-} from 'vue'
+import { ComponentPublicInstance, computed, onMounted, provide, ref, unref, watch } from 'vue'
 import Moveable from 'vue3-moveable'
 import { NvGroup } from '@packages/ui'
 import { RouteLocationRaw, useRouter } from 'vue-router'
@@ -83,6 +74,7 @@ import NvMessengerNavigationBar from '@/teams/messenger/components/NvMessengerNa
 import debounce from 'lodash/debounce'
 import { useElementSize, useEventListener, useWindowSize } from '@vueuse/core'
 import throttle from 'lodash/throttle'
+import { isGameOverlay } from '@/consts.ts'
 // import gsap from 'gsap'
 // const messengerWindowStore = useMessengerWindowStore()
 const messengerStore = useMessengerStore()
@@ -120,7 +112,7 @@ const props = defineProps({
 const messenger = ref()
 
 const moveable = ref()
-const moveableTarget = ref()
+const moveableTarget = ref<ComponentPublicInstance>()
 
 const doc = document
 const settingsPopover = useRouterViewPopover({
@@ -151,20 +143,29 @@ provide('messenger', {
   navigateTo,
   isViewShown,
 })
-const { width: windowWidth, height: windowHeight } = useWindowSize()
-const viewport = computed(() => ({
-  width: Math.max(
-    windowWidth.value,
-    document.documentElement.clientWidth || 0,
-    window.innerWidth || 0,
-  ),
-  height: Math.max(
-    windowHeight.value,
-    document.documentElement.clientHeight || 0,
-    window.innerHeight || 0,
-  ),
-}))
 
+const { width: windowWidth, height: windowHeight } = useWindowSize()
+// TODO: refactor to use only app dimensions
+// Note: Game overlay can only be resized using body for now
+const { width: appWidth, height: appHeight } = useElementSize(
+  ref(document.getElementById('app')),
+)
+const viewport = computed(() => ({
+  width: isGameOverlay
+    ? appWidth.value
+    : Math.max(
+      windowWidth.value,
+      document.documentElement.clientWidth || 0,
+      window.innerWidth || 0,
+    ),
+  height: isGameOverlay
+    ? appHeight.value
+    : Math.max(
+      windowHeight.value,
+      document.documentElement.clientHeight || 0,
+      window.innerHeight || 0,
+    ),
+}))
 const savePosition = debounce((event: any) => {
   const { width, height, translate, transform } = event
 
@@ -181,7 +182,9 @@ const savePosition = debounce((event: any) => {
 const onDrag = (event: any) => {
   const { target, transform } = event
   target.style.transform = transform
-  savePosition(event)
+  if (!isGameOverlay) {
+    savePosition(event)
+  }
   settingsPopover.update()
 }
 // watch(() => messengerWindowStore.isShown, (isShown) => {
@@ -235,17 +238,17 @@ function convertScreenPosition() {
     const { x: currentXValue, y: currentYValue } = parseTransform(
       props.transform,
     )
-    const currentCenteredXValue = currentXValue + moveableTargetWidth.value / 2
-    const currentCenteredYValue = currentYValue + moveableTargetHeight.value / 2
+    const currentCenteredXValue = currentXValue+moveableTargetWidth.value / 2
+    const currentCenteredYValue = currentYValue+moveableTargetHeight.value / 2
     const previousCenteredXPercentage =
       currentCenteredXValue / previousWindowWidth
     const previousCenteredYPercentage =
       currentCenteredYValue / previousWindowHeight
     const newXValue =
-      currentWindowWidth * previousCenteredXPercentage -
+      currentWindowWidth * previousCenteredXPercentage-
       moveableTargetWidth.value / 2
     const newYValue =
-      currentWindowHeight * previousCenteredYPercentage -
+      currentWindowHeight * previousCenteredYPercentage-
       moveableTargetHeight.value / 2
     if (convertScreenPositionTimeout) clearTimeout(convertScreenPositionTimeout)
     convertScreenPositionTimeout = setTimeout(() => {
@@ -269,6 +272,30 @@ function convertScreenPosition() {
   }
 }
 
+let setGameOverlayMessengerPositionTimeout = null
+
+function setGameOverlayMessengerPosition() {
+  const currentWindowWidth = viewport.value.width
+  const currentWindowHeight = viewport.value.height
+  const newXValue = currentWindowWidth / 2-moveableTargetWidth.value / 2
+  const newYValue = currentWindowHeight-moveableTargetHeight.value
+  if (setGameOverlayMessengerPositionTimeout)
+    clearTimeout(setGameOverlayMessengerPositionTimeout)
+  setGameOverlayMessengerPositionTimeout = setTimeout(() => {
+    if (moveable.value) {
+      moveable.value.request(
+        'draggable',
+        {
+          x: newXValue,
+          y: newYValue,
+        },
+        true,
+      )
+    }
+    setGameOverlayMessengerPositionTimeout = null
+  }, 1000)
+}
+
 useEventListener(
   'resize',
   throttle(() => {
@@ -276,21 +303,26 @@ useEventListener(
   }, 500),
 )
 
+watch([appWidth, appHeight], () => {
+  if (isGameOverlay) {
+    setGameOverlayMessengerPosition()
+  }
+})
+
 onMounted(() => {
   // gsap.set(messenger.value, {
   //   opacity: 0,
   // })
-  const moveableTargetEl = (moveableTarget.value as ComponentPublicInstance)
-    .$el as HTMLDivElement | null
+  const moveableTargetEl = moveableTarget.value?.$el as HTMLDivElement | null
   if (moveableTargetEl) {
-    if (props.width) moveableTargetEl.style.width = `${props.width}px`
-    if (props.minWidth) moveableTargetEl.style.minWidth = `${props.minWidth}px`
-    if (props.maxWidth) moveableTargetEl.style.maxWidth = `${props.maxWidth}px`
-    if (props.height) moveableTargetEl.style.height = `${props.height}px`
+    if (props.width) moveableTargetEl.style.width = `${ props.width }px`
+    if (props.minWidth) moveableTargetEl.style.minWidth = `${ props.minWidth }px`
+    if (props.maxWidth) moveableTargetEl.style.maxWidth = `${ props.maxWidth }px`
+    if (props.height) moveableTargetEl.style.height = `${ props.height }px`
     if (props.minHeight)
-      moveableTargetEl.style.minHeight = `${props.minHeight}px`
+      moveableTargetEl.style.minHeight = `${ props.minHeight }px`
     if (props.maxHeight)
-      moveableTargetEl.style.maxHeight = `${props.maxHeight}px`
+      moveableTargetEl.style.maxHeight = `${ props.maxHeight }px`
     if (props.transform) moveableTargetEl.style.transform = props.transform
   }
   moveable.value.updateTarget()
@@ -303,8 +335,8 @@ onMounted(() => {
       moveable.value.request(
         'draggable',
         {
-          x: viewport.value.width / 2 - width / 2,
-          y: viewport.value.height - height - 60,
+          x: viewport.value.width / 2-width / 2,
+          y: viewport.value.height-height-60,
         },
         true,
       )
