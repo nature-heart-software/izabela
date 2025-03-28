@@ -1,9 +1,9 @@
 <template>
   <NvDialog
-      v-model:open="open"
-      :portal-target="props.portalTarget"
-      v-bind="props.instance.dialogProps"
-      @close="props.instance.close"
+    v-model:open="open"
+    :portal-target="props.portalTarget"
+    v-bind="props.instance.dialogProps"
+    @close="props.instance.close"
   >
     <template #title>
       {{ props.instance.title }}
@@ -15,8 +15,8 @@
       <NvGroup justify="right">
         <template v-for="action in props.instance.actions">
           <NvButton
-              v-bind="action.buttonProps"
-              @click="
+            v-bind="action.buttonProps"
+            @click="
               props.instance.deferred.resolve({
                 type: action.type,
                 dialog: props.instance,

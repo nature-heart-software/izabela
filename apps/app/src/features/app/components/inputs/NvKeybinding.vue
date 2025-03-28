@@ -4,11 +4,13 @@
       class="pointer-events-none"
       title="Press Esc to cancel. Hold to remove"
       v-bind="$attrs"
-    >Listening...
+      >Listening...
     </NvButton>
   </template>
   <template v-else>
-    <NvButton v-bind="$attrs" @click="isListeningToKeys = true">{{ readableKeybinding }}</NvButton>
+    <NvButton v-bind="$attrs" @click="isListeningToKeys = true">{{
+      readableKeybinding
+    }}</NvButton>
   </template>
 </template>
 <script lang="ts" setup>
@@ -86,7 +88,17 @@ useEventListener(document, 'keyup', (e) => {
 
 const keybinding: Ref<Key[]> = computed(() =>
   Object.values(listenedKeys.value).map(
-    ({ code, keyCode, which, key, shiftKey, altKey, ctrlKey, metaKey, charCode }) => ({
+    ({
+      code,
+      keyCode,
+      which,
+      key,
+      shiftKey,
+      altKey,
+      ctrlKey,
+      metaKey,
+      charCode,
+    }) => ({
       key: keyAliases[code] || key,
       code,
       keyCode,

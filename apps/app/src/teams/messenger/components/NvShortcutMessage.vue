@@ -20,7 +20,11 @@
               @enter="() => play()"
             />
             <NvGroup noWrap>
-              <NvSpeechEngineSelect v-model="data.engine" class="w-1/3" size="sm" />
+              <NvSpeechEngineSelect
+                v-model="data.engine"
+                class="w-1/3"
+                size="sm"
+              />
               <template v-if="engine">
                 <component
                   :is="engine.voiceSelectComponent"
@@ -31,7 +35,12 @@
                   size="sm"
                 />
               </template>
-              <NvKeybinding v-model="data.shortcut" class="w-1/3" multiple size="sm" />
+              <NvKeybinding
+                v-model="data.shortcut"
+                class="w-1/3"
+                multiple
+                size="sm"
+              />
             </NvGroup>
           </NvStack>
         </NvGroup>
@@ -50,7 +59,10 @@
         </NvContextMenu>
       </NvGroup>
       <div v-if="isPlaying" class="h-2 relative bg-gray-10">
-        <div :style="{ width: `${progress * 100}%` }" class="h-full bg-black"></div>
+        <div
+          :style="{ width: `${progress * 100}%` }"
+          class="h-full bg-black"
+        ></div>
       </div>
     </NvStack>
   </NvCard>
@@ -80,7 +92,9 @@ const { ElectronFilesystem } = window
 const messagesStore = useMessagesStore()
 const settingsStore = useSettingsStore()
 const { shortcutMessages } = storeToRefs(messagesStore)
-const message = computed(() => shortcutMessages.value.find((m) => m.id === props.id))
+const message = computed(() =>
+  shortcutMessages.value.find((m) => m.id === props.id),
+)
 const isDataProvided = ref(false)
 const data = reactive({
   originalMessage: '',
@@ -101,7 +115,8 @@ watch(
   () => {
     if (!isDataProvided.value) {
       if (message.value) isDataProvided.value = true
-      const engineId = message.value?.engine || settingsStore.selectedSpeechEngine
+      const engineId =
+        message.value?.engine || settingsStore.selectedSpeechEngine
       data.engine = engineId
       data.selectedVoice[engineId] = message.value?.voice
       data.shortcut = message.value?.shortcut || ([] as Key[])
@@ -153,9 +168,9 @@ watch(
 const playMessage = computed(() =>
   message.value
     ? {
-      ...message.value,
-      excludeFromHistory: true,
-    }
+        ...message.value,
+        excludeFromHistory: true,
+      }
     : undefined,
 )
 const { play, isPlaying, isLoading, progress } = usePlayMessage(playMessage)

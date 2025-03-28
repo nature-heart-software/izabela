@@ -25,27 +25,27 @@ const onElementChange = (element: Element, callback: () => any) => {
   }
 }
 export const watchHitbox = (selector: string) => {
-    if (isGameOverlay) return
-    ready(selector, (element: Element) => {
-        const id = uuid()
-        const hitboxesStore = useHitboxesStore()
-        const { pixelRatio } = useDevicePixelRatio()
-        const updateHitboxes = throttle(() => {
-            if (element) {
-                const { x, y, width: w, height: h } = element.getBoundingClientRect()
-                hitboxesStore.addHitbox({
-                    id,
-                    x: x * pixelRatio.value,
-                    y: y * pixelRatio.value,
-                    w: w * pixelRatio.value,
-                    h: h * pixelRatio.value,
-                })
-            } else {
-                hitboxesStore.removeHitbox(id)
-            }
-        }, 250)
-        onElementChange(element, updateHitboxes)
-    })
+  if (isGameOverlay) return
+  ready(selector, (element: Element) => {
+    const id = uuid()
+    const hitboxesStore = useHitboxesStore()
+    const { pixelRatio } = useDevicePixelRatio()
+    const updateHitboxes = throttle(() => {
+      if (element) {
+        const { x, y, width: w, height: h } = element.getBoundingClientRect()
+        hitboxesStore.addHitbox({
+          id,
+          x: x * pixelRatio.value,
+          y: y * pixelRatio.value,
+          w: w * pixelRatio.value,
+          h: h * pixelRatio.value,
+        })
+      } else {
+        hitboxesStore.removeHitbox(id)
+      }
+    }, 250)
+    onElementChange(element, updateHitboxes)
+  })
 }
 
-watchHitbox(`.${ hitboxClass }`)
+watchHitbox(`.${hitboxClass}`)

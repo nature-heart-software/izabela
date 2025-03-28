@@ -7,7 +7,10 @@
           <NvGroup no-wrap spacing="5">
             <NvStack>
               <NvText type="label">Dictionary</NvText>
-              <NvText>Provide the definition of a word to improve its pronunciation</NvText>
+              <NvText
+                >Provide the definition of a word to improve its
+                pronunciation</NvText
+              >
             </NvStack>
           </NvGroup>
         </NvCard>
@@ -55,25 +58,36 @@
                 </NvGroup>
                 <NvDivider direction="horizontal" />
                 <div>
-                  <NvButton size="sm" @click="addDefinition()">Add definition</NvButton>
+                  <NvButton size="sm" @click="addDefinition()"
+                    >Add definition</NvButton
+                  >
                 </div>
                 <NvDivider direction="horizontal" />
                 <NvGroup class="w-full" grow no-wrap>
                   <NvText class="w-1/2" type="label">Word</NvText>
                   <NvDivider class="!grow-0 h-5" direction="vertical" />
                   <NvText class="w-1/2" type="label">Definition</NvText>
-                  <NvButton class="!grow-0 invisible" icon-name="times" size="xs" type="plain" />
+                  <NvButton
+                    class="!grow-0 invisible"
+                    icon-name="times"
+                    size="xs"
+                    type="plain"
+                  />
                 </NvGroup>
                 <template v-for="(definition, i) in definitions" :key="i">
                   <NvGroup class="w-full" grow>
                     <NvInput
                       :modelValue="definition[0]"
-                      @update:modelValue="(value) => updateDefinition(i, [value, definition[1]])"
+                      @update:modelValue="
+                        (value) => updateDefinition(i, [value, definition[1]])
+                      "
                     />
                     <NvDivider class="!grow-0 h-5" direction="vertical" />
                     <NvInput
                       :modelValue="definition[1]"
-                      @update:modelValue="(value) => updateDefinition(i, [definition[0], value])"
+                      @update:modelValue="
+                        (value) => updateDefinition(i, [definition[0], value])
+                      "
                     />
                     <NvButton
                       class="!grow-0"
@@ -93,7 +107,16 @@
   </NvStack>
 </template>
 <script lang="ts" setup>
-import { NvButton, NvCard, NvDivider, NvGroup, NvInput, NvStack, NvSwitch, NvText } from '@packages/ui'
+import {
+  NvButton,
+  NvCard,
+  NvDivider,
+  NvGroup,
+  NvInput,
+  NvStack,
+  NvSwitch,
+  NvText,
+} from '@packages/ui'
 import { useDictionaryStore } from '@/features/dictionary/store'
 import { storeToRefs } from 'pinia'
 

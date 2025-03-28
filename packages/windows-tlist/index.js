@@ -39,107 +39,120 @@ var path = require('path')
  * @return {Promise<ProcessInfo>} Information on the process.
  */
 function getProcessInfo(pid) {
-    if (!pid) {
-        pid = 'tlist.exe'
-    }
-    else {
-        pid = parseInt(pid, 10)
-    }
+  if (!pid) {
+    pid = 'tlist.exe'
+  } else {
+    pid = parseInt(pid, 10)
+  }
 
-    return new Promise(promiseBody)
+  return new Promise(promiseBody)
 
-    function promiseBody(resolve, reject) {
-        exec('"' + path.join(__dirname, 'tlist.exe') + '" "' + pid + '"', afterExec)
+  function promiseBody(resolve, reject) {
+    exec('"' + path.join(__dirname, 'tlist.exe') + '" "' + pid + '"', afterExec)
 
-        function afterExec(err, stdout, stderr) {
-            var opt = 'gim',
-                rex = {
-                    modules: new RegExp('^\\s*([0-9\\.]+?)\\s+(\\w+?)\\s+([0-9a-fx]+?)\\s+(.*?)\\s*$', opt),
-                    threads: new RegExp('^\\s*(.*?)\\s+Win32StartAddr\\s*:\\s*(.*?)\\s+LastErr\\s*:\\s*(.*?)\\s+State\\s*:\\s*(.*?)\\s*$', opt),
-                    workingDirectory: new RegExp('^\\s*CWD\\s*:\\s*(.*?)\\s*$', opt),
-                    command: new RegExp('^\\s*CmdLine\\s*:\\s*(.*?)\\s*$', opt),
-                    virtualMemory: new RegExp('^\\s*VirtualSize\\s*:\\s*([0-9]+)\\s*KB\\s+PeakVirtualSize\\s*:\\s*([0-9]+)\\s*KB\\s*$', opt),
-                    workingMemory: new RegExp('^\\s*WorkingSetSize\\s*:\\s*([0-9]+)\\s*KB\\s+PeakWorkingSetSize\\s*:\\s*([0-9]+)\\s*KB\\s*$', opt),
-                    threadCount: new RegExp('^\\s*NumberOfThreads\\s*:\\s*([0-9]+)\\s*$', opt),
-                },
-                match,
-                res = {
-                    modules: [],
-                    threads: [],
-                    workingDirectory: '',
-                    command: '',
-                    virtualMemory: {
-                        current: 0,
-                        peak: 0,
-                    },
-                    workingMemory: {
-                        current: 0,
-                        peak: 0,
-                    },
-                    threadCount: 0,
-                }
-
-            if (err) {
-                reject(err)
-                return
-            }
-
-            // Modules
-            while (match = rex.modules.exec(stdout)) {
-                res.modules.push({
-                    version: match && match[1] || '',
-                    _attributes: match && match[2] || '',
-                    address: match && match[3] || '0x0',
-                    path: match && match[4] || '',
-                })
-            }
-
-            // Thread status
-            while (match = rex.threads.exec(stdout)) {
-                res.threads.push({
-                    id: parseInt(match && match[1] || '0', 10),
-                    startAddress: match && match[2] || '0x0',
-                    lastError: match && match[3] || '0x0',
-                    state: (match && match[4] || 'unknown').toLowerCase(),
-                })
-            }
-
-            // CWD
-            match = rex.workingDirectory.exec(stdout)
-            res.workingDirectory = match && match[1] || res.workingDirectory
-
-            // Cmd Line
-            match = rex.command.exec(stdout)
-            res.command = match && match[1] || ''
-
-            // Virtual Memory
-            match = rex.virtualMemory.exec(stdout)
-            res.virtualMemory = {
-                current: parseInt(match && match[1] || '0', 10),
-                peak: parseInt(match && match[2] || '0', 10),
-            }
-
-            // Working Memory
-            match = rex.workingMemory.exec(stdout)
-            res.workingMemory = {
-                current: parseInt(match && match[1] || '0', 10),
-                peak: parseInt(match && match[2] || '0', 10),
-            }
-
-            // Thread Count
-            match = rex.threadCount.exec(stdout)
-            res.threadCount = parseInt(match && match[1] || '0', 10)
-
-            resolve(res)
+    function afterExec(err, stdout, stderr) {
+      var opt = 'gim',
+        rex = {
+          modules: new RegExp(
+            '^\\s*([0-9\\.]+?)\\s+(\\w+?)\\s+([0-9a-fx]+?)\\s+(.*?)\\s*$',
+            opt,
+          ),
+          threads: new RegExp(
+            '^\\s*(.*?)\\s+Win32StartAddr\\s*:\\s*(.*?)\\s+LastErr\\s*:\\s*(.*?)\\s+State\\s*:\\s*(.*?)\\s*$',
+            opt,
+          ),
+          workingDirectory: new RegExp('^\\s*CWD\\s*:\\s*(.*?)\\s*$', opt),
+          command: new RegExp('^\\s*CmdLine\\s*:\\s*(.*?)\\s*$', opt),
+          virtualMemory: new RegExp(
+            '^\\s*VirtualSize\\s*:\\s*([0-9]+)\\s*KB\\s+PeakVirtualSize\\s*:\\s*([0-9]+)\\s*KB\\s*$',
+            opt,
+          ),
+          workingMemory: new RegExp(
+            '^\\s*WorkingSetSize\\s*:\\s*([0-9]+)\\s*KB\\s+PeakWorkingSetSize\\s*:\\s*([0-9]+)\\s*KB\\s*$',
+            opt,
+          ),
+          threadCount: new RegExp(
+            '^\\s*NumberOfThreads\\s*:\\s*([0-9]+)\\s*$',
+            opt,
+          ),
+        },
+        match,
+        res = {
+          modules: [],
+          threads: [],
+          workingDirectory: '',
+          command: '',
+          virtualMemory: {
+            current: 0,
+            peak: 0,
+          },
+          workingMemory: {
+            current: 0,
+            peak: 0,
+          },
+          threadCount: 0,
         }
+
+      if (err) {
+        reject(err)
+        return
+      }
+
+      // Modules
+      while ((match = rex.modules.exec(stdout))) {
+        res.modules.push({
+          version: (match && match[1]) || '',
+          _attributes: (match && match[2]) || '',
+          address: (match && match[3]) || '0x0',
+          path: (match && match[4]) || '',
+        })
+      }
+
+      // Thread status
+      while ((match = rex.threads.exec(stdout))) {
+        res.threads.push({
+          id: parseInt((match && match[1]) || '0', 10),
+          startAddress: (match && match[2]) || '0x0',
+          lastError: (match && match[3]) || '0x0',
+          state: ((match && match[4]) || 'unknown').toLowerCase(),
+        })
+      }
+
+      // CWD
+      match = rex.workingDirectory.exec(stdout)
+      res.workingDirectory = (match && match[1]) || res.workingDirectory
+
+      // Cmd Line
+      match = rex.command.exec(stdout)
+      res.command = (match && match[1]) || ''
+
+      // Virtual Memory
+      match = rex.virtualMemory.exec(stdout)
+      res.virtualMemory = {
+        current: parseInt((match && match[1]) || '0', 10),
+        peak: parseInt((match && match[2]) || '0', 10),
+      }
+
+      // Working Memory
+      match = rex.workingMemory.exec(stdout)
+      res.workingMemory = {
+        current: parseInt((match && match[1]) || '0', 10),
+        peak: parseInt((match && match[2]) || '0', 10),
+      }
+
+      // Thread Count
+      match = rex.threadCount.exec(stdout)
+      res.threadCount = parseInt((match && match[1]) || '0', 10)
+
+      resolve(res)
     }
+  }
 }
 
 module.exports = {
-
-    /**
+  /**
    * @param {number} pid - The process ID to report on. If empty, will report on tlist itself.
    * @return {Promise<ProcessInfo>} Information on the process.
    */
-    getProcessInfo: getProcessInfo,
+  getProcessInfo: getProcessInfo,
 }

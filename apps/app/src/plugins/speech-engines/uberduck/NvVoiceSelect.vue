@@ -1,31 +1,32 @@
 <template>
   <NvSelect
-      v-loading="isFetching"
-      :options="options"
-      v-bind="{
+    v-loading="isFetching"
+    :options="options"
+    v-bind="{
       modelValue: getProperty('selectedVoice'),
       'onUpdate:modelValue': (value) =>
         setProperty('selectedVoice', purify(value)),
       ...$attrs,
     }"
-      valueKey="voicemodel_uuid"
+    valueKey="voicemodel_uuid"
   >
     <template #optionAfter="{ option, hover }">
       <span
-          v-show="
-          (!option.children && (hover || isGameOverlay)) || favoriteVoiceIds.includes(option.id)
+        v-show="
+          (!option.children && (hover || isGameOverlay)) ||
+          favoriteVoiceIds.includes(option.id)
         "
       >
         <NvButton
-            :icon-name="favoriteVoiceIds.includes(option.id) ? 'times' : 'heart'"
-            :title="
+          :icon-name="favoriteVoiceIds.includes(option.id) ? 'times' : 'heart'"
+          :title="
             favoriteVoiceIds.includes(option.id)
               ? 'Remove from favorites'
               : 'Add to favorites'
           "
-            size="sm"
-            type="default"
-            @mousedown.prevent.stop="
+          size="sm"
+          type="default"
+          @mousedown.prevent.stop="
             setProperty('favoriteVoiceIds', xor(favoriteVoiceIds, [option.id]))
           "
         />
@@ -62,9 +63,9 @@ const computedParams = computed(() => ({
 }))
 const speechStore = useSpeechStore()
 const canFetch = computed(
-    () =>
-        speechStore.hasUniversalApiCredentials ||
-        Object.values(computedParams.value.credentials).every(Boolean),
+  () =>
+    speechStore.hasUniversalApiCredentials ||
+    Object.values(computedParams.value.credentials).every(Boolean),
 )
 const { data, isFetching } = useListVoicesQuery({
   enabled: canFetch,
@@ -79,13 +80,13 @@ const getOptionFromVoice = (voice: any) => ({
 
 const options = computed(() => {
   const localOptions = groupOptions(
-      voices.value.map(getOptionFromVoice),
-      'category',
+    voices.value.map(getOptionFromVoice),
+    'category',
   )
   const favoriteVoiceIds = getProperty('favoriteVoiceIds')
   if (favoriteVoiceIds) {
     const favoriteVoices = voices.value.filter((voice: any) =>
-        favoriteVoiceIds.includes(getVoiceId(voice)),
+      favoriteVoiceIds.includes(getVoiceId(voice)),
     )
     if (favoriteVoices.length) {
       localOptions.unshift({
@@ -98,11 +99,11 @@ const options = computed(() => {
 })
 
 const favoriteVoiceIds = computed<string[]>(() =>
-    getProperty('favoriteVoiceIds'),
+  getProperty('favoriteVoiceIds'),
 )
 
 watch(
-    () => [getProperty('publicKey', true), getProperty('privateKey', true)],
-    () => canFetch.value && queryClient.refetchQueries(LIST_VOICES_QUERY_KEY),
+  () => [getProperty('publicKey', true), getProperty('privateKey', true)],
+  () => canFetch.value && queryClient.refetchQueries(LIST_VOICES_QUERY_KEY),
 )
 </script>

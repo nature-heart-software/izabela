@@ -1,25 +1,25 @@
 <template>
   <button
-      v-show="displayOffscreenFocusFix"
-      id="offscreen-focus-fix"
-      :style="{
+    v-show="displayOffscreenFocusFix"
+    id="offscreen-focus-fix"
+    :style="{
       zIndex: 999999999,
     }"
-      class="fixed inset-0 pointer-events-auto cursor-none"
-      @click="displayOffscreenFocusFix = false"
+    class="fixed inset-0 pointer-events-auto cursor-none"
+    @click="displayOffscreenFocusFix = false"
   />
   <ThemeProvider :theme="tokens">
-    <NvBackground/>
+    <NvBackground />
     <div class="h-0">
       <div id="router-overlay"></div>
       <NvMessenger
-          v-if="messengerStore.$isReady"
-          :min-width="768"
-          :transform="messengerStore.position.transform"
-          class="w-full h-full"
+        v-if="messengerStore.$isReady"
+        :min-width="768"
+        :transform="messengerStore.position.transform"
+        class="w-full h-full"
       />
     </div>
-    <NvDebug v-if="!isGameOverlay && settingsStore.debugMode"/>
+    <NvDebug v-if="!isGameOverlay && settingsStore.debugMode" />
   </ThemeProvider>
 </template>
 <style lang="scss">
@@ -40,7 +40,10 @@ import { ThemeProvider } from 'vue3-styled-components'
 import NvMessenger from '@/teams/messenger/components/NvMessenger.vue'
 import { tokens } from '@packages/ui'
 import NvBackground from '@/teams/messenger/components/NvBackground.vue'
-import { useMessengerStore, useMessengerWindowStore } from '@/teams/messenger/store'
+import {
+  useMessengerStore,
+  useMessengerWindowStore,
+} from '@/teams/messenger/store'
 import NvDebug from '@/teams/messenger/components/NvDebug.vue'
 import { useSettingsStore } from '@/features/settings/store'
 import { ref, watch } from 'vue'
@@ -83,44 +86,48 @@ if (isGameOverlay) {
 const databasesStore = useDatabasesStore()
 
 if (!isGameOverlay) {
-  databasesStore.$whenReady()
-      .then(() => {
-        const repository = takeRight(pkg.repository.split('/'), 2).join('/')
-        databasesStore.databases.forEach(database => {
-          fetch(`https://raw.githubusercontent.com/${ repository }/refs/heads/dev/databases/${ database }.json`)
-              .then((res) => {
-                return res.json()
-              })
-              .then((data) => {
-                databasesStore.setDatabaseData(database, data)
-              })
+  databasesStore.$whenReady().then(() => {
+    const repository = takeRight(pkg.repository.split('/'), 2).join('/')
+    databasesStore.databases.forEach((database) => {
+      fetch(
+        `https://raw.githubusercontent.com/${repository}/refs/heads/dev/databases/${database}.json`,
+      )
+        .then((res) => {
+          return res.json()
         })
-      })
+        .then((data) => {
+          databasesStore.setDatabaseData(database, data)
+        })
+    })
+  })
 }
 
 /* Need to wait for the stores to be ready before resetting states
  **/
-watch(() => settingsStore.runAsAdmin, (value) => {
-  if ([settingsStore.$isReady, gameOverlayStore.$isReady].every(Boolean)) {
-    if (!value) {
-      settingsStore.$patch({
-        enableOverlayWindow: false,
-      })
-      gameOverlayStore.$patch({
-        enableGameOverlay: false,
-      })
+watch(
+  () => settingsStore.runAsAdmin,
+  (value) => {
+    if ([settingsStore.$isReady, gameOverlayStore.$isReady].every(Boolean)) {
+      if (!value) {
+        settingsStore.$patch({
+          enableOverlayWindow: false,
+        })
+        gameOverlayStore.$patch({
+          enableGameOverlay: false,
+        })
+      }
     }
-  }
-})
+  },
+)
 
 watch(
-    () => messengerWindowStore.isFocused,
-    () => {
-      if (messengerWindowStore.isFocused) {
-        socket.emit('window:focus')
-      } else {
-        socket.emit('window:blur')
-      }
-    },
+  () => messengerWindowStore.isFocused,
+  () => {
+    if (messengerWindowStore.isFocused) {
+      socket.emit('window:focus')
+    } else {
+      socket.emit('window:blur')
+    }
+  },
 )
 </script>

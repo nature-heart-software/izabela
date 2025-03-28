@@ -9,8 +9,8 @@
               <NvGroup justify="apart">
                 <NvText type="label">Enable Game Overlay</NvText>
                 <NvSwitch
-                    :modelValue="gameOverlayStore.enableGameOverlay"
-                    @update:modelValue="
+                  :modelValue="gameOverlayStore.enableGameOverlay"
+                  @update:modelValue="
                     (value) => {
                       if (value) {
                         confirmAdmin().then(({ type, close }) => {
@@ -32,10 +32,8 @@
                 />
               </NvGroup>
               <NvText
-              >Open an overlay instead of a window whenever a game is
-                focused
-              </NvText
-              >
+                >Open an overlay instead of a window whenever a game is focused
+              </NvText>
             </NvStack>
           </NvGroup>
         </NvCard>
@@ -45,37 +43,36 @@
               <NvCard>
                 <NvStack spacing="5">
                   <NvText type="label">Allowlist</NvText>
-                  <NvDivider direction="horizontal"/>
+                  <NvDivider direction="horizontal" />
                   <div>
                     <NvButton size="sm" @click="addToAllowlist('')"
-                    >Add path
-                    </NvButton
-                    >
+                      >Add path
+                    </NvButton>
                   </div>
-                  <NvDivider v-if="allowlist.length" direction="horizontal"/>
+                  <NvDivider v-if="allowlist.length" direction="horizontal" />
                   <template v-for="(path, i) in allowlist" :key="i">
                     <NvGroup class="w-full" grow>
                       <NvInput
-                          :modelValue="path"
-                          @update:modelValue="
+                        :modelValue="path"
+                        @update:modelValue="
                           (value) => updateAllowlistItem(i, value)
                         "
                       />
                       <NvButton
-                          class="!grow-0"
-                          icon-name="times"
-                          size="xs"
-                          type="plain"
-                          @click="removeFromAllowlist(i)"
+                        class="!grow-0"
+                        icon-name="times"
+                        size="xs"
+                        type="plain"
+                        @click="removeFromAllowlist(i)"
                       />
                     </NvGroup>
                   </template>
                   <template
-                      v-for="(path, i) in gameOverlayAllowlistData"
-                      :key="i"
+                    v-for="(path, i) in gameOverlayAllowlistData"
+                    :key="i"
                   >
                     <NvGroup class="w-full" grow>
-                      <NvInput :modelValue="path"/>
+                      <NvInput :modelValue="path" />
                     </NvGroup>
                   </template>
                 </NvStack>
@@ -83,28 +80,27 @@
               <NvCard>
                 <NvStack spacing="5">
                   <NvText type="label">Denylist</NvText>
-                  <NvDivider direction="horizontal"/>
+                  <NvDivider direction="horizontal" />
                   <div>
                     <NvButton size="sm" @click="addToDenylist('')"
-                    >Add path
-                    </NvButton
-                    >
+                      >Add path
+                    </NvButton>
                   </div>
-                  <NvDivider v-if="denylist.length" direction="horizontal"/>
+                  <NvDivider v-if="denylist.length" direction="horizontal" />
                   <template v-for="(path, i) in denylist" :key="i">
                     <NvGroup class="w-full" grow>
                       <NvInput
-                          :modelValue="path"
-                          @update:modelValue="
+                        :modelValue="path"
+                        @update:modelValue="
                           (value) => updateDenylistItem(i, value)
                         "
                       />
                       <NvButton
-                          class="!grow-0"
-                          icon-name="times"
-                          size="xs"
-                          type="plain"
-                          @click="removeFromDenylist(i)"
+                        class="!grow-0"
+                        icon-name="times"
+                        size="xs"
+                        type="plain"
+                        @click="removeFromDenylist(i)"
                       />
                     </NvGroup>
                   </template>
@@ -149,7 +145,7 @@ const {
 const { allowlist, denylist } = storeToRefs(gameOverlayStore)
 const { data } = storeToRefs(databasesStore)
 const gameOverlayAllowlistData = computed(
-    () => data.value['game-overlay-allowlist'] || [],
+  () => data.value['game-overlay-allowlist'] || [],
 )
 
 const confirmAdmin = useConfirmAdmin()

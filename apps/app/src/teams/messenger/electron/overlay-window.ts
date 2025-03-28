@@ -6,63 +6,67 @@ import gameOverlay from '@/electron/game-overlay'
 
 let window: BrowserWindow
 const createWindow = async (name: string): Promise<BrowserWindow> => {
-    const overlayDebug = import.meta.env.DEV ? false : false
+  const overlayDebug = import.meta.env.DEV ? false : false
 
+  const { width, height } = getLargestMonitorSize()
+
+  window = gameOverlay.createWindow(name, {
+    x: 0,
+    y: 0,
+    height,
+    width,
+    frame: false,
+    show: overlayDebug,
+    transparent: true,
+    resizable: false,
+    enableLargerThanScreen: true,
+    webPreferences: {
+      offscreen: !overlayDebug,
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: Boolean(
+        Number(import.meta.env.VITE_ELECTRON_NODE_INTEGRATION),
+      ),
+      contextIsolation: !Number(import.meta.env.VITE_ELECTRON_NODE_INTEGRATION),
+      sandbox: false,
+    },
+  })
+  window.webContents.setMaxListeners(Infinity)
+  window.setSize(width, height)
+  window.webContents.setFrameRate(240)
+  ipcMain.registerBrowserWindow(name, window)
+
+  screen.on('display-metrics-changed', () => {
     const { width, height } = getLargestMonitorSize()
-
-    window = gameOverlay.createWindow(name, {
-        x: 0,
-        y: 0,
-        height,
-        width,
-        frame: false,
-        show: overlayDebug,
-        transparent: true,
-        resizable: false,
-        enableLargerThanScreen: true,
-        webPreferences: {
-            offscreen: !overlayDebug,
-            preload: path.join(__dirname, 'preload.js'),
-            nodeIntegration: Boolean(
-                Number(import.meta.env.VITE_ELECTRON_NODE_INTEGRATION),
-            ),
-            contextIsolation: !Number(import.meta.env.VITE_ELECTRON_NODE_INTEGRATION),
-            sandbox: false,
-        },
+    window.setBounds({
+      x: 0,
+      y: 0,
+      width,
+      height,
     })
-    window.webContents.setMaxListeners(Infinity)
     window.setSize(width, height)
-    window.webContents.setFrameRate(240)
-    ipcMain.registerBrowserWindow(name, window)
+  })
 
-    screen.on('display-metrics-changed', () => {
-        const { width, height } = getLargestMonitorSize()
-        window.setBounds({
-            x: 0,
-            y: 0,
-            width,
-            height,
-        })
-        window.setSize(width, height)
-    })
+  if (import.meta.env.DEV) {
+    window.webContents.openDevTools({ mode: 'undocked' })
+  }
 
-    if (import.meta.env.DEV) {
-        window.webContents.openDevTools({ mode: 'undocked' })
-    }
+  const filePath = `./src/teams/messenger/index.html?game-overlay`
+  if (import.meta.env.VITE_DEV_SERVER_URL) {
+    await window.loadURL(
+      path.join(import.meta.env.VITE_DEV_SERVER_URL as string, filePath),
+    )
+  } else {
+    createProtocol('app')
+    await window.loadURL(`app://${filePath}`)
+  }
 
-    const filePath = `./src/teams/messenger/index.html?game-overlay`
-    if (import.meta.env.VITE_DEV_SERVER_URL) {
-        await window.loadURL(path.join(import.meta.env.VITE_DEV_SERVER_URL as string, filePath))
-    } else {
-        createProtocol('app')
-        await window.loadURL(`app://${ filePath }`)
-    }
+  if (!overlayDebug) {
+    gameOverlay
+      .isReady()
+      .then(() => gameOverlay.addOverlayWindow(name, window, 0, 0))
+  }
 
-    if (!overlayDebug) {
-        gameOverlay.isReady().then(() => gameOverlay.addOverlayWindow(name, window, 0, 0))
-    }
-
-    return window
+  return window
 }
 
 export default createWindow
