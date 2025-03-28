@@ -7,7 +7,7 @@ import gameOverlay from '@/electron/game-overlay'
 let window: BrowserWindow
 const createWindow = async (name: string): Promise<BrowserWindow> => {
     const overlayDebug = import.meta.env.DEV ? false : false
-    
+
     const { width, height } = getLargestMonitorSize()
 
     window = gameOverlay.createWindow(name, {
@@ -46,11 +46,9 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
         window.setSize(width, height)
     })
 
-    window.webContents.once('did-finish-load', () => {
-        if (import.meta.env.DEV) {
-            window.webContents.openDevTools({ mode: 'undocked' })
-        }
-    })
+    if (import.meta.env.DEV) {
+        window.webContents.openDevTools({ mode: 'undocked' })
+    }
 
     const filePath = `./src/teams/messenger/index.html?game-overlay`
     if (import.meta.env.VITE_DEV_SERVER_URL) {

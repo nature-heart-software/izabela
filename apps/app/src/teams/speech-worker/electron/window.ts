@@ -7,61 +7,59 @@ import { windowHeight, windowWidth } from '@/teams/speech-worker/electron/const'
 
 let window: BrowserWindow
 const createWindow = async (name: string): Promise<BrowserWindow> => {
-  const topLeftDisplay = getTopLeftWindow()
+    const topLeftDisplay = getTopLeftWindow()
 
-  window = new BrowserWindow({
-    width: windowWidth,
-    height: windowHeight,
-    x: (topLeftDisplay?.bounds.x ?? 0)-windowWidth,
-    y: (topLeftDisplay?.bounds.y ?? 0)-windowHeight,
-    show: true,
-    transparent: true,
-    frame: false,
-    focusable: false,
-    resizable: false,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-      nodeIntegration: Boolean(
-        Number(import.meta.env.VITE_ELECTRON_NODE_INTEGRATION),
-      ),
-      contextIsolation: !Number(import.meta.env.VITE_ELECTRON_NODE_INTEGRATION),
-      backgroundThrottling: false,
-      sandbox: false,
-    },
-  })
-  ipcMain.registerBrowserWindow(name, window)
-  window.webContents.setMaxListeners(Infinity)
+    window = new BrowserWindow({
+        width: windowWidth,
+        height: windowHeight,
+        x: (topLeftDisplay?.bounds.x ?? 0)-windowWidth,
+        y: (topLeftDisplay?.bounds.y ?? 0)-windowHeight,
+        show: true,
+        transparent: true,
+        frame: false,
+        focusable: false,
+        resizable: false,
+        webPreferences: {
+            preload: path.join(__dirname, 'preload.js'),
+            nodeIntegration: Boolean(
+                Number(import.meta.env.VITE_ELECTRON_NODE_INTEGRATION),
+            ),
+            contextIsolation: !Number(import.meta.env.VITE_ELECTRON_NODE_INTEGRATION),
+            backgroundThrottling: false,
+            sandbox: false,
+        },
+    })
+    ipcMain.registerBrowserWindow(name, window)
+    window.webContents.setMaxListeners(Infinity)
 
-  {
-    // https://github.com/electron/electron/issues/10078#issuecomment-331581160
-    window.setAlwaysOnTop(true, 'screen-saver', 1)
-    window.setVisibleOnAllWorkspaces(true)
-    window.setFullScreenable(false)
+    {
+        // https://github.com/electron/electron/issues/10078#issuecomment-331581160
+        window.setAlwaysOnTop(true, 'screen-saver', 1)
+        window.setVisibleOnAllWorkspaces(true)
+        window.setFullScreenable(false)
 
-    window.webContents.setBackgroundThrottling(false)
-  }
-
-  window.once('ready-to-show', () => {
-    electronSpeechWorkerWindow.start(window)
-  })
-
-  window.webContents.once('did-finish-load', () => {
-    if (import.meta.env.DEV) {
-      window.webContents.openDevTools({ mode: 'undocked' })
+        window.webContents.setBackgroundThrottling(false)
     }
-  })
 
-  const filePath = `./src/teams/${ name }/index.html`
-  if (import.meta.env.VITE_DEV_SERVER_URL) {
-    await window.loadURL(
-      path.join(import.meta.env.VITE_DEV_SERVER_URL as string, filePath),
-    )
-  } else {
-    createProtocol('app')
-    await window.loadURL(`app://${ filePath }`)
-  }
+    window.once('ready-to-show', () => {
+        electronSpeechWorkerWindow.start(window)
+    })
 
-  return window
+    if (import.meta.env.DEV) {
+        window.webContents.openDevTools({ mode: 'undocked' })
+    }
+
+    const filePath = `./src/teams/${ name }/index.html`
+    if (import.meta.env.VITE_DEV_SERVER_URL) {
+        await window.loadURL(
+            path.join(import.meta.env.VITE_DEV_SERVER_URL as string, filePath),
+        )
+    } else {
+        createProtocol('app')
+        await window.loadURL(`app://${ filePath }`)
+    }
+
+    return window
 }
 
 export default createWindow

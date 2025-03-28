@@ -40,11 +40,9 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     })
 
 
-    window.webContents.once('did-finish-load', () => {
-        if (import.meta.env.DEV) {
-            window.webContents.openDevTools({ mode: 'undocked' })
-        }
-    })
+    if (import.meta.env.DEV) {
+        window.webContents.openDevTools({ mode: 'undocked' })
+    }
 
     const filePath = `./src/teams/${ name }/index.html`
     if (import.meta.env.VITE_DEV_SERVER_URL) {
