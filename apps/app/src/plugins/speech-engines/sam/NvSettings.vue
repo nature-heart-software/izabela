@@ -15,16 +15,16 @@
             :min="0"
             class="!grow"
             v-bind="{
-              modelValue: getProperty('speech'),
-              'onUpdate:modelValue': (value) => setProperty('speech', value),
+              modelValue: getProperty('pitch'),
+              'onUpdate:modelValue': (value) => setProperty('pitch', value),
             }"
           />
           <NvNumberInput
             :max="255"
             :min="0"
             v-bind="{
-              modelValue: getProperty('speech'),
-              'onUpdate:modelValue': (value) => setProperty('speech', value),
+              modelValue: getProperty('pitch'),
+              'onUpdate:modelValue': (value) => setProperty('pitch', value),
             }"
           />
         </NvGroup>
