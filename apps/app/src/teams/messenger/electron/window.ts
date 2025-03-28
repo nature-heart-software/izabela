@@ -21,6 +21,8 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
       sandbox: false,
     },
   })
+  ipcMain.registerBrowserWindow(name, window)
+  window.webContents.setMaxListeners(Infinity)
 
   {
     const primaryDisplay = screen.getPrimaryDisplay()
@@ -37,19 +39,18 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     electronMessengerWindow.start(window)
   })
 
-  ipcMain.registerBrowserWindow(name, window)
+  if (import.meta.env.DEV) {
+    window.webContents.openDevTools({ mode: 'undocked' })
+  }
 
   const filePath = `./src/teams/${name}/index.html`
-
   if (import.meta.env.VITE_DEV_SERVER_URL) {
     await window.loadURL(
       path.join(import.meta.env.VITE_DEV_SERVER_URL as string, filePath),
     )
-    if (import.meta.env.DEV)
-      window.webContents.openDevTools({ mode: 'undocked' })
   } else {
     createProtocol('app')
-    window.loadURL(`app://${filePath}`)
+    await window.loadURL(`app://${filePath}`)
   }
 
   return window

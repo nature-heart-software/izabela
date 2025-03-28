@@ -15,6 +15,7 @@ import {
   useEventListener,
 } from '@vueuse/core'
 import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
+import { isGameOverlay } from '@/consts.ts'
 
 const hitboxesStore = useHitboxesStore()
 
@@ -29,6 +30,7 @@ const hitboxes = ref({
   h: 0,
 })
 const onHitboxUpdate = () => {
+  if (isGameOverlay) return
   // console.log('hitbox update', hitboxes.value, componentRef.value)
   if (componentRef.value) {
     hitboxesStore.addHitbox({ ...hitboxes.value })
@@ -38,6 +40,7 @@ const onHitboxUpdate = () => {
 }
 const updateHitbox = throttle(
   () => {
+    if (isGameOverlay) return
     if (componentRef.value) {
       const bounds = componentRef.value.getBoundingClientRect()
       hitboxes.value.x = bounds.x * pixelRatio.value
@@ -56,6 +59,7 @@ useResizeObserver(componentRef, updateHitbox)
 useEventListener('resize', updateHitbox)
 useEventListener('focus', updateHitbox)
 onBeforeUnmount(() => {
+  if (isGameOverlay) return
   hitboxesStore.removeHitbox(hitboxes.value.id)
 })
 

@@ -59,6 +59,7 @@ export default defineConfig(({ mode }) => {
           vite: {
             resolve,
             build: {
+              emptyOutDir: mode === 'production',
               rollupOptions,
             },
             plugins: [...plugins()],

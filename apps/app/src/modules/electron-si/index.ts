@@ -1,9 +1,11 @@
+import { isRunningAsAdmin } from '@/electron/utils'
 import { app } from 'electron'
 import nodeAbi from 'node-abi'
 
 export const ElectronSI = () => ({
   getInfo: () =>
     Promise.resolve({
+      isRunningAsAdmin: isRunningAsAdmin(),
       version: app.getVersion(),
       os: process.platform,
       osVersion: process.getSystemVersion(),

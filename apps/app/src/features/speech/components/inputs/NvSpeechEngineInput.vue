@@ -53,14 +53,7 @@ import {
   NvOption,
   NvText,
 } from '@packages/ui'
-import {
-  computed,
-  defineEmits,
-  defineExpose,
-  defineProps,
-  ref,
-  watch,
-} from 'vue'
+import { computed, ref, watch } from 'vue'
 import { getEngineById } from '@/modules/speech-engine-manager'
 import { useFuse, UseFuseOptions } from '@vueuse/integrations/useFuse'
 import orderBy from 'lodash/orderBy'

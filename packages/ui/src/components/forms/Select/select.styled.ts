@@ -149,10 +149,12 @@ export const StSelectOption = styled('div', {
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
+
   & .option__content {
     position: relative;
     z-index: 0;
-    max-width: 100%;
+    min-width: 0;
+    flex-grow: 1;
     ${({ readonly }) =>
       readonly &&
       `
@@ -166,9 +168,15 @@ export const StSelectOption = styled('div', {
     }
     `}
   }
+
   & .option__after {
     flex-shrink: 0;
+
+    & > * {
+      margin-left: ${() => rem(spacing['3'])};
+    }
   }
+
   ${({ disabled, selected, active, readonly }) =>
     readonly
       ? ` 

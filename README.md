@@ -30,7 +30,8 @@ who wants to communicate with text-to-speech and for that reason, you can see Iz
 - [x] Multiple text-to-speech engines (Amazon Polly, Microsoft Azure, Google Cloud, IBM Watson,
       etc..) - [see list](#available-engines)
 - [x] Multiple voices (per engine)
-- [x] Supports custom text-to-speech engines [(see example)](https://github.com/nature-heart-software/izabela/tree/dev/examples/custom-engine-api)
+- [x] Supports custom text-to-speech
+      engines [(see example)](https://github.com/nature-heart-software/izabela/tree/dev/examples/custom-engine-api)
 - [x] Multiple audio outputs
 - [x] Supports audio inputs for speech-to-text-to-speech
 - [x] Keyboard shortcuts for quick messages
@@ -75,7 +76,8 @@ the [Available engines](#available-engines) section.
 > **Note:** The Izabela engine is only available to "Supporter" members or above
 > on [Ko-fi](https://ko-fi.com/woowee/tiers).
 
-If you prefer configuring your credentials yourself, you can do so by following the guides on the [Wiki](https://github.com/nature-heart-software/izabela/wiki)
+If you prefer configuring your credentials yourself, you can do so by following the guides on
+the [Wiki](https://github.com/nature-heart-software/izabela/wiki)
 page.
 
 ## Available engines
@@ -112,3 +114,4 @@ The project requires the following in order to run:
 - Visual Studio Build Tools 2019 or higher
   - Desktop development with C++
   - Node.js build tools
+- CMake

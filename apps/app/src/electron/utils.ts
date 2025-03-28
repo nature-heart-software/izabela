@@ -1,8 +1,9 @@
 import * as path from 'path'
-import { protocol, Protocol, screen } from 'electron'
+import { app, protocol, Protocol, screen } from 'electron'
 import minBy from 'lodash/minBy'
 import { readFile } from 'fs'
 import { URL } from 'url'
+import { execSync } from 'child_process'
 
 export const env = import.meta.env.MODE
 export const EXTERNALS_DIR = import.meta.env.DEV
@@ -52,4 +53,53 @@ export function createProtocol(scheme: string, customProtocol: Protocol) {
       })
     },
   )
+}
+
+export function isRunningAsAdmin(): boolean {
+  if (process.platform === 'win32') {
+    try {
+      execSync('net session', { stdio: 'ignore' })
+      return true
+    } catch {
+      return false
+    }
+  }
+  return process.getuid?.() === 0
+}
+
+export const onExit = (callback: () => void) => {
+  process.on('message', (data) => {
+    if (process.platform === 'win32' && data === 'graceful-exit') {
+      callback()
+    }
+  })
+  ;['SIGINT', 'SIGTERM', 'SIGQUIT'].forEach((signal) => {
+    process.on(signal, () => {
+      callback()
+    })
+  })
+
+  app.on('before-quit', () => {
+    callback()
+  })
+
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+      callback()
+    }
+  })
+}
+
+export const getLargestMonitorSize = () => {
+  const displays = screen.getAllDisplays()
+  let width = 0
+  let height = 0
+
+  displays.forEach((display) => {
+    const { size } = display
+    if (size.width > width) width = size.width
+    if (size.height > height) height = size.height
+  })
+
+  return { width, height }
 }

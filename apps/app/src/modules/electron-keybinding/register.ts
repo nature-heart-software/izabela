@@ -95,6 +95,7 @@ export default () =>
           (e) => {
             if (e.state === 'DOWN') {
               if (
+                settingsStore?.enableOverlayWindow &&
                 keybindingTriggered(
                   settingsStore.keybindings.toggleOverlayWindow,
                 )

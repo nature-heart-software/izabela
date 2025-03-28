@@ -6,7 +6,7 @@ export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
     ...defaultVoice,
   },
   speed: 72,
-  speech: 64,
+  pitch: 64,
   throat: 128,
   mouth: 128,
   favoriteVoiceIds: [],

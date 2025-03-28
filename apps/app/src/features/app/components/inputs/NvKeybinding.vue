@@ -8,12 +8,14 @@
     </NvButton>
   </template>
   <template v-else>
-    <NvButton v-bind="$attrs" @click="isListeningToKeys = true">{{ readableKeybinding }}</NvButton>
+    <NvButton v-bind="$attrs" @click="isListeningToKeys = true">{{
+      readableKeybinding
+    }}</NvButton>
   </template>
 </template>
 <script lang="ts" setup>
 import { NvButton } from '@packages/ui'
-import { computed, defineEmits, defineProps, PropType, Ref, ref, shallowRef, watch } from 'vue'
+import { computed, PropType, Ref, ref, shallowRef, watch } from 'vue'
 import { useEventListener } from '@vueuse/core'
 import { Key } from '@/types/keybinds'
 
@@ -86,7 +88,17 @@ useEventListener(document, 'keyup', (e) => {
 
 const keybinding: Ref<Key[]> = computed(() =>
   Object.values(listenedKeys.value).map(
-    ({ code, keyCode, which, key, shiftKey, altKey, ctrlKey, metaKey, charCode }) => ({
+    ({
+      code,
+      keyCode,
+      which,
+      key,
+      shiftKey,
+      altKey,
+      ctrlKey,
+      metaKey,
+      charCode,
+    }) => ({
       key: keyAliases[code] || key,
       code,
       keyCode,

@@ -9,7 +9,7 @@ import {
   keybindingAllReleased,
   keybindingTriggered,
 } from '@/modules/electron-keybinding/utils'
-import { IGlobalKeyEvent, IGlobalKeyListener } from 'node-global-key-listener'
+import { IGlobalKeyEvent } from 'node-global-key-listener'
 import {
   emitIPCOverlayInputCharacter,
   emitIPCOverlayInputCommand,
@@ -96,7 +96,7 @@ export const ElectronOverlayWindow = () => {
     return Promise.resolve()
   }, 250)
 
-  function toggleOverlayWindowListener(e: Parameters<IGlobalKeyListener>[0]) {
+  function toggleOverlayWindowListener() {
     if (settingsStore) {
       if (keybindingTriggered(settingsStore.keybindings.toggleOverlayWindow)) {
         toggleWindow()

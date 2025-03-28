@@ -39,4 +39,13 @@ module.exports = {
   publish: ['github'],
   electronVersion: getElectronVersion(),
   extraFiles: ['./resources/**'],
+  asarUnpack: [
+    'node_modules/@packages/process-watcher/**/*',
+    'node_modules/wql-process-monitor/**/*',
+    'node_modules/@xan105/error/**/*',
+    'node_modules/@xan105/ffi/**/*',
+    'node_modules/@xan105/is/**/*',
+    'node_modules/emittery/**/*',
+    'node_modules/koffi/**/*',
+  ],
 }

@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid'
 import throttle from 'lodash/throttle'
 import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
 import { useDevicePixelRatio } from '@vueuse/core'
+import { isGameOverlay } from '@/consts.ts'
 
 export const hitboxClass = 'hitbox'
 
@@ -24,6 +25,7 @@ const onElementChange = (element: Element, callback: () => any) => {
   }
 }
 export const watchHitbox = (selector: string) => {
+  if (isGameOverlay) return
   ready(selector, (element: Element) => {
     const id = uuid()
     const hitboxesStore = useHitboxesStore()

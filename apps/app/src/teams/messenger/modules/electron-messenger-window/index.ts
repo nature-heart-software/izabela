@@ -2,7 +2,8 @@ import ElectronWindowManager from '@/modules/electron-window-manager'
 import { mouse } from '@/modules/node-mouse'
 import throttle from 'lodash/throttle'
 import { Hitbox } from '@/modules/vue-hitboxes/types'
-import { BrowserWindow, screen, shell } from 'electron'
+import { app, BrowserWindow, screen, shell } from 'electron'
+
 import {
   useMessengerStore,
   useMessengerWindowStore,
@@ -12,6 +13,8 @@ import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
 import { Deferred } from '@packages/toolbox'
 import ffi from 'ffi-napi'
 import { getNativeWindowHandleInt } from '@/utils/electron-window'
+import gameOverlay from '@/electron/game-overlay.ts'
+import ref from 'ref-napi'
 
 export const ElectronMessengerWindow = () => {
   /* use isFocused as source of truth instead of window.isFocused() as in some instances
@@ -22,6 +25,7 @@ export const ElectronMessengerWindow = () => {
   // let lastKeypressTime = 0
   // const doubleKeypressDelta = 500
   let registeredWindow: BrowserWindow | null = null
+  let WinControl: any | null = null
   let hitboxesStore: ReturnType<typeof useHitboxesStore> | undefined
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
   let messengerStore: ReturnType<typeof useMessengerStore> | undefined
@@ -47,7 +51,7 @@ export const ElectronMessengerWindow = () => {
     GetTopWindow: ['long', ['long']],
     BringWindowToTop: ['bool', ['long']],
     SwitchToThisWindow: ['void', ['long', 'bool']],
-    GetWindowThreadProcessId: ['int', ['long', 'int']],
+    GetWindowThreadProcessId: ['int', ['long', 'pointer']],
     SetWindowPos: [
       'bool',
       ['long', 'long', 'int', 'int', 'int', 'int', 'uint'],
@@ -69,7 +73,9 @@ export const ElectronMessengerWindow = () => {
         ) {
           window.webContents.devToolsWebContents.focus()
         } else {
-          window.webContents.openDevTools({ mode: 'undocked' })
+          setTimeout(() => {
+            window.webContents.openDevTools({ mode: 'undocked' })
+          }, 300)
         }
       })
       resolve(true)
@@ -79,12 +85,15 @@ export const ElectronMessengerWindow = () => {
     const window = getWindow()
     if (window) {
       const windowNativeHandle = getNativeWindowHandleInt(window)
-      user32.SetForegroundWindow(windowNativeHandle)
+      const processIdRef = ref.alloc('int')
+      user32.GetWindowThreadProcessId(windowNativeHandle, processIdRef)
+      const processId = processIdRef.deref()
+      WinControl.getByPid(processId).setForeground()
     }
   }
 
   const focus = (context: 'mouse' | 'keyboard') =>
-    new Promise((resolve, reject) => {
+    new Promise((_, reject) => {
       messengerWindowStore?.$patch({ focusContext: context })
       const window = getWindow()
       if (window) {
@@ -198,6 +207,16 @@ export const ElectronMessengerWindow = () => {
   }
 
   const toggleWindow = throttle((context: 'mouse' | 'keyboard') => {
+    const foregroundWindowPid = WinControl?.getForeground()?.getPid()
+    const isProcessHooked = gameOverlay.isProcessHooked(foregroundWindowPid)
+    if (isProcessHooked && !gameOverlay.intercepting) {
+      gameOverlay.startIntercept()
+      return
+    }
+    if (isProcessHooked && gameOverlay.intercepting) {
+      gameOverlay.stopIntercept()
+      return
+    }
     const window = getWindow()
     if (window) {
       if (window.isVisible()) {
@@ -235,6 +254,7 @@ export const ElectronMessengerWindow = () => {
     if (!window) return
     window.webContents.zoomLevel = 0
   }
+
   const addEventListeners = () => {
     const window = getWindow()
     mouse.on('move', throttle(onMouseMove, 150))
@@ -281,11 +301,17 @@ export const ElectronMessengerWindow = () => {
       setDisplay(localSettingsStore.display)
     })
     ready.resolve(window)
+    WinControl = require('win-control').Window
   }
 
   isReady().then(() => {
     addEventListeners()
   })
+
+  const restart = () => {
+    app.relaunch()
+    app.exit()
+  }
 
   return {
     openDevTools,
@@ -301,6 +327,7 @@ export const ElectronMessengerWindow = () => {
     zoomIn,
     zoomOut,
     resetZoom,
+    restart,
   }
 }
 

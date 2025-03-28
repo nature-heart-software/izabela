@@ -1,6 +1,7 @@
 import { RequestHandler } from 'express'
 import axios from 'axios'
 import { handleError } from '../../utils/requests'
+import { ElevenLabsClient } from 'elevenlabs'
 
 const plugin: Izabela.Server.Plugin = ({ app }) => {
   const api = axios.create({
@@ -15,15 +16,9 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
     res,
   ) => {
     try {
-      const {
-        data: { voices },
-      } = await api.get('/voices', {
-        params: {
-          show_legacy: true,
-        },
-        headers: {
-          'xi-api-key': apiKey,
-        },
+      const client = new ElevenLabsClient({ apiKey })
+      const { voices } = await client.voices.getAll({
+        show_legacy: true,
       })
       res.status(200).json(voices)
     } catch (e: any) {
@@ -40,11 +35,8 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
     res,
   ) => {
     try {
-      const { data: models } = await api.get('/models', {
-        headers: {
-          'xi-api-key': apiKey,
-        },
-      })
+      const client = new ElevenLabsClient({ apiKey })
+      const models = await client.models.getAll()
       res.status(200).json(models)
     } catch (e: any) {
       handleError(res, 'Internal server error', e.message, 500)
@@ -69,26 +61,18 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
     res,
   ) => {
     try {
-      const voice_settings = {
-        stability,
-        similarity_boost,
-        use_speaker_boost,
-        style,
-      }
-      const { data } = await api.post(
-        `/text-to-speech/${voice.voice_id}/stream`,
-        { model_id, text, voice_settings },
-        {
-          headers: {
-            'xi-api-key': apiKey,
-          },
-          responseType: 'stream',
+      const client = new ElevenLabsClient({ apiKey })
+      const stream = await client.textToSpeech.convertAsStream(voice.voice_id, {
+        text,
+        model_id,
+        voice_settings: {
+          stability,
+          similarity_boost,
+          use_speaker_boost,
+          style,
         },
-      )
-      res.writeHead(200, {
-        'Content-Type': 'audio/mpeg',
       })
-      const stream = data.pipe(res)
+      stream.pipe(res)
       stream.on('finish', () => {})
     } catch (e: any) {
       handleError(res, 'Internal server error', e.message, 500)

@@ -42,3 +42,10 @@ export const useMessengerWindowStore = defineStore(
     },
   },
 )
+
+export const useMessengerStateStore = defineStore('messenger-state', () => {
+  const markForRestart = ref(false)
+  return {
+    markForRestart,
+  }
+})

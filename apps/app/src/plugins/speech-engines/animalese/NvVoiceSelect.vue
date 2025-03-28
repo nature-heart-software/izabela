@@ -11,7 +11,8 @@
     <template #optionAfter="{ option, hover }">
       <span
         v-show="
-          (!option.children && hover) || favoriteVoiceIds.includes(option.id)
+          (!option.children && (hover || isGameOverlay)) ||
+          favoriteVoiceIds.includes(option.id)
         "
       >
         <NvButton
@@ -43,6 +44,7 @@ import {
   getVoiceId,
   getVoiceName,
 } from './shared'
+import { isGameOverlay } from '@/consts.ts'
 
 const voices = computed(() => [
   {
