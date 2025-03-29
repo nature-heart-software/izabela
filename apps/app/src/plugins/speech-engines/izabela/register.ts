@@ -9,39 +9,40 @@ import { getProperty, setProperty } from './store'
 
 const getSelectedVoice = () => getProperty('selectedVoice')
 registerEngine({
-    id: ENGINE_ID,
-    name: ENGINE_NAME,
-    category: 'cloud',
-    getSelectedVoice,
-    getVoiceName,
-    hasCredentials() {
-        const speechStore = useSpeechStore()
-        return speechStore.hasUniversalApiCredentials
-    },
-    getCredentials() {
-        return {}
-    },
-    getPayload({ text, translatedText, voice: v }) {
-        const voice = v || getSelectedVoice()
-        return {
-            text: translatedText || text,
-            voice,
-        }
-    },
-    getLanguageCode() {
-        return DEFAULT_LANGUAGE_CODE
-    },
-    synthesizeSpeech({ payload }) {
-        return api().post<Blob>(
-            '/tts/izabela/synthesize-speech',
-            {
-                payload,
-            },
-            { responseType: 'blob' },
-        )
-            .then((res) => res.data)
-    },
-    voiceSelectComponent: NvVoiceSelect,
-    settingsComponent: NvSettings,
-    store: { setProperty, getProperty },
+  id: ENGINE_ID,
+  name: ENGINE_NAME,
+  category: 'cloud',
+  getSelectedVoice,
+  getVoiceName,
+  hasCredentials() {
+    const speechStore = useSpeechStore()
+    return speechStore.hasUniversalApiCredentials
+  },
+  getCredentials() {
+    return {}
+  },
+  getPayload({ text, translatedText, voice: v }) {
+    const voice = v || getSelectedVoice()
+    return {
+      text: translatedText || text,
+      voice,
+    }
+  },
+  getLanguageCode() {
+    return DEFAULT_LANGUAGE_CODE
+  },
+  synthesizeSpeech({ payload }) {
+    return api()
+      .post<Blob>(
+        '/tts/izabela/synthesize-speech',
+        {
+          payload,
+        },
+        { responseType: 'blob' },
+      )
+      .then((res) => res.data)
+  },
+  voiceSelectComponent: NvVoiceSelect,
+  settingsComponent: NvSettings,
+  store: { setProperty, getProperty },
 })
