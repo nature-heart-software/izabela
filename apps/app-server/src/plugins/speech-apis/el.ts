@@ -70,8 +70,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
         },
       })
       stream.pipe(res)
-      stream.on('finish', () => {
-      })
+      stream.on('finish', () => {})
     } catch (e: any) {
       handleError(res, 'Internal server error', e.message, 500)
     }
@@ -80,7 +79,10 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
   app.post('/api/tts/elevenlabs/list-voices', listVoicesHandler)
   app.post('/api/tts/elevenlabs/list-models', listModelsHandler)
   app.post('/api/tts/elevenlabs/synthesize-speech', synthesizeSpeechHandler)
-  app.post('/api/tts/elevenlabs/synthesize-speech/stream', synthesizeSpeechHandler)
+  app.post(
+    '/api/tts/elevenlabs/synthesize-speech/stream',
+    synthesizeSpeechHandler,
+  )
 }
 
 export default plugin

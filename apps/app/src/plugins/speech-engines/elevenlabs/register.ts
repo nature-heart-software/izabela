@@ -5,7 +5,10 @@ import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, setProperty } from './store'
-import { axiosBlobResponseToBlob, axiosStreamResponseToMediaSource } from '@/utils/fetch.ts'
+import {
+  axiosBlobResponseToBlob,
+  axiosStreamResponseToMediaSource,
+} from '@/utils/fetch.ts'
 
 const getCredentials = () => ({
   apiKey: getProperty('apiKey', true),
@@ -45,11 +48,15 @@ registerEngine({
     }
     if (stream) {
       return api('local')
-        .post('/tts/elevenlabs/synthesize-speech/stream', apiPayload, { responseType: 'stream' })
+        .post('/tts/elevenlabs/synthesize-speech/stream', apiPayload, {
+          responseType: 'stream',
+        })
         .then(axiosStreamResponseToMediaSource)
     }
     return api('local')
-      .post('/tts/elevenlabs/synthesize-speech', apiPayload, { responseType: 'blob' })
+      .post('/tts/elevenlabs/synthesize-speech', apiPayload, {
+        responseType: 'blob',
+      })
       .then(axiosBlobResponseToBlob)
   },
   voiceSelectComponent: NvVoiceSelect,

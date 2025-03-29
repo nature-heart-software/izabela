@@ -71,7 +71,9 @@ export default () => {
     return message
   }
 
-  function say(messagePayload: IzabelaMessagePayload): ReturnType<typeof IzabelaMessage> {
+  function say(
+    messagePayload: IzabelaMessagePayload,
+  ): ReturnType<typeof IzabelaMessage> {
     const message = createMessage(messagePayload)
     if (currentlyPlayingMessage) {
       return queueMessage(message)

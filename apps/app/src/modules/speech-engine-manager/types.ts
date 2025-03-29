@@ -20,7 +20,7 @@ export interface SpeechEngine {
   }) => Payload
   synthesizeSpeech: (context: {
     credentials: Credentials
-    payload: Payload;
+    payload: Payload
   }) => Promise<Blob | MediaSource>
   hasCredentials?: () => boolean
   voiceSelectComponent: Component

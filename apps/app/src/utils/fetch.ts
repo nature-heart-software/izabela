@@ -4,7 +4,9 @@ export function axiosBlobResponseToBlob(response: AxiosResponse<Blob>): Blob {
   return response.data
 }
 
-export function axiosStreamResponseToMediaSource(response: AxiosResponse<ReadableStream>): MediaSource {
+export function axiosStreamResponseToMediaSource(
+  response: AxiosResponse<ReadableStream>,
+): MediaSource {
   const mediaSource = new MediaSource()
 
   mediaSource.addEventListener('sourceopen', async () => {

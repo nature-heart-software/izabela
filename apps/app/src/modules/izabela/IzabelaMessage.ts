@@ -5,7 +5,10 @@ import { getEngineById } from '@/modules/speech-engine-manager'
 import { getMediaDeviceByLabel } from '@/utils/media-devices'
 import { useSettingsStore } from '@/features/settings/store'
 import { blobToBase64, Deferred } from '@packages/toolbox'
-import { useMessagesStore, usePlayingMessageStore } from '@/features/messages/store'
+import {
+  useMessagesStore,
+  usePlayingMessageStore,
+} from '@/features/messages/store'
 import objectHash from 'object-hash'
 import { IzabelaMessageEvent, IzabelaMessagePayload } from './types'
 
@@ -34,7 +37,7 @@ export default (messagePayload: IzabelaMessagePayload) => {
   }
 
   function getCacheId() {
-    return `${ id }-${ objectHash(payload) }`
+    return `${id}-${objectHash(payload)}`
   }
 
   function on(event: IzabelaMessageEvent, callback: () => void): void {
