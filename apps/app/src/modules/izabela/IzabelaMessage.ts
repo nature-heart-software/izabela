@@ -5,10 +5,7 @@ import { getEngineById } from '@/modules/speech-engine-manager'
 import { getMediaDeviceByLabel } from '@/utils/media-devices'
 import { useSettingsStore } from '@/features/settings/store'
 import { blobToBase64, Deferred } from '@packages/toolbox'
-import {
-  useMessagesStore,
-  usePlayingMessageStore,
-} from '@/features/messages/store'
+import { useMessagesStore, usePlayingMessageStore } from '@/features/messages/store'
 import objectHash from 'object-hash'
 import { IzabelaMessageEvent, IzabelaMessagePayload } from './types'
 
@@ -37,7 +34,7 @@ export default (messagePayload: IzabelaMessagePayload) => {
   }
 
   function getCacheId() {
-    return `${id}-${objectHash(payload)}`
+    return `${ id }-${ objectHash(payload) }`
   }
 
   function on(event: IzabelaMessageEvent, callback: () => void): void {
@@ -115,7 +112,7 @@ export default (messagePayload: IzabelaMessagePayload) => {
     return Promise.all([audioDownloaded.promise, audioLoaded.promise])
   }
 
-  async function downloadAudio() {
+  async function downloadAudio(): Promise<Blob | MediaSource> {
     if (typeof window) {
       const { ElectronFilesystem } = window
       const cachedAudio = await ElectronFilesystem.getCachedAudio(getCacheId())
@@ -128,7 +125,6 @@ export default (messagePayload: IzabelaMessagePayload) => {
         }
       }
     }
-    // TODO: change depending on engine
     const engine = getEngineById(engineName)
     if (!engine)
       return Promise.reject(
@@ -156,7 +152,7 @@ export default (messagePayload: IzabelaMessagePayload) => {
           ElectronFilesystem.cacheAudio(getCacheId(), base64)
         }
       } else if (data instanceof MediaSource) {
-        throw 'need to implement this first'
+        // throw 'need to implement this first'
         // data.addEventListener('sourceopen', () => {
         //   // At this point, the MediaSource is ready to accept data
         //
@@ -173,6 +169,10 @@ export default (messagePayload: IzabelaMessagePayload) => {
         // });
       }
     }
+  }
+
+  async function downloadAudioAndBlobify(): Promise<Blob> {
+    return downloadAudio()
   }
 
   function loadAudio(blob: Blob | MediaSource) {
@@ -246,6 +246,7 @@ export default (messagePayload: IzabelaMessagePayload) => {
     play,
     on,
     downloadAudio,
+    downloadAudioAndBlobify,
     pause,
     resume,
     cancel,

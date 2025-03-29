@@ -1,12 +1,8 @@
 import { RequestHandler } from 'express'
-import axios from 'axios'
 import { handleError } from '../../utils/requests'
 import { ElevenLabsClient } from 'elevenlabs'
 
 const plugin: Izabela.Server.Plugin = ({ app }) => {
-  const api = axios.create({
-    baseURL: 'https://api.elevenlabs.io/v1',
-  })
   const listVoicesHandler: RequestHandler = async (
     {
       body: {
@@ -61,6 +57,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
     res,
   ) => {
     try {
+      res.setHeader('Content-Type', 'audio/mpeg')
       const client = new ElevenLabsClient({ apiKey })
       const stream = await client.textToSpeech.convertAsStream(voice.voice_id, {
         text,
@@ -73,14 +70,17 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
         },
       })
       stream.pipe(res)
-      stream.on('finish', () => {})
+      stream.on('finish', () => {
+      })
     } catch (e: any) {
       handleError(res, 'Internal server error', e.message, 500)
     }
   }
+
   app.post('/api/tts/elevenlabs/list-voices', listVoicesHandler)
   app.post('/api/tts/elevenlabs/list-models', listModelsHandler)
   app.post('/api/tts/elevenlabs/synthesize-speech', synthesizeSpeechHandler)
+  app.post('/api/tts/elevenlabs/synthesize-speech/stream', synthesizeSpeechHandler)
 }
 
 export default plugin

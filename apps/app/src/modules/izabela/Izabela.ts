@@ -36,8 +36,14 @@ export default () => {
       onMessageEnd()
     }
     currentlyPlayingMessage = message
-    message.on('ended', () => onEnd())
-    message.on('error', () => onEnd(true))
+    message.on('ended', () => {
+      console.log('ooooooooooooooo ended')
+      onEnd()
+    })
+    message.on('error', () => {
+      console.log('ooooooooooooooo error')
+      onEnd(true)
+    })
     socket.emit('message:load', socketPayload)
     message
       .isReady()

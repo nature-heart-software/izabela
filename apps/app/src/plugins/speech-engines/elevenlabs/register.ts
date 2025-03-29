@@ -5,6 +5,7 @@ import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, setProperty } from './store'
+import { axiosBlobResponseToBlob, axiosStreamResponseToMediaSource } from '@/utils/fetch.ts'
 
 const getCredentials = () => ({
   apiKey: getProperty('apiKey', true),
@@ -36,19 +37,20 @@ registerEngine({
   getLanguageCode() {
     return DEFAULT_LANGUAGE_CODE
   },
-  synthesizeSpeech({ credentials, payload }) {
+  async synthesizeSpeech({ credentials, payload }) {
+    const stream = getProperty('stream')
+    const apiPayload = {
+      credentials,
+      payload,
+    }
+    if (stream) {
+      return api('local')
+        .post('/tts/elevenlabs/synthesize-speech/stream', apiPayload, { responseType: 'stream' })
+        .then(axiosStreamResponseToMediaSource)
+    }
     return api('local')
-      .post<Blob>(
-        '/tts/elevenlabs/synthesize-speech',
-        {
-          credentials,
-          payload,
-        },
-        {
-          responseType: 'blob',
-        },
-      )
-      .then((res) => res.data)
+      .post('/tts/elevenlabs/synthesize-speech', apiPayload, { responseType: 'blob' })
+      .then(axiosBlobResponseToBlob)
   },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,
