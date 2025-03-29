@@ -89,11 +89,12 @@
           @update:modelValue="(value) => setProperty('use_speaker_boost', value)"
         />
       </NvGroup>
+      <NvDivider direction="horizontal" />
       <NvGroup :spacing="5" align="start" justify="apart" no-wrap>
         <NvStack>
           <NvText type="label">Favor audio stream</NvText>
           <NvText
-          >Faster audio playback but can cause audio artifacts
+          >Faster audio playback but may cause audio artifacts
           </NvText>
         </NvStack>
         <NvSwitch

@@ -18,7 +18,7 @@ export function axiosStreamResponseToMediaSource(response: AxiosResponse<Readabl
     function processQueue() {
       if (queue.length > 0 && !sourceBuffer.updating) {
         sourceBuffer.appendBuffer(queue.shift()!)
-      } else if (streamingEnded && queue.length === 0) {
+      } else if (streamingEnded && queue.length === 0 && !sourceBuffer.updating) {
         mediaSource.endOfStream()
       }
     }

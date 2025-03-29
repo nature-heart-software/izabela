@@ -37,11 +37,9 @@ export default () => {
     }
     currentlyPlayingMessage = message
     message.on('ended', () => {
-      console.log('ooooooooooooooo ended')
       onEnd()
     })
     message.on('error', () => {
-      console.log('ooooooooooooooo error')
       onEnd(true)
     })
     socket.emit('message:load', socketPayload)

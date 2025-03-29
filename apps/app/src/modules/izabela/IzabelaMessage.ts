@@ -33,6 +33,36 @@ export default (messagePayload: IzabelaMessagePayload) => {
     })
   }
 
+
+  async function mediaSourceToBlob(mediaSource: MediaSource): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+      const audioElement = new Audio()
+      audioElement.src = URL.createObjectURL(mediaSource)
+      audioElement.crossOrigin = 'anonymous'
+
+      audioElement.addEventListener('canplay', () => {
+        const stream = audioElement.captureStream?.() || (audioElement as any).mozCaptureStream?.()
+        if (!stream || stream.getAudioTracks().length === 0) {
+          reject(new Error('Failed to capture audio stream. No audio tracks found.'))
+          return
+        }
+
+        const recorder = new MediaRecorder(stream)
+        const chunks: BlobPart[] = []
+
+        recorder.ondataavailable = (event) => chunks.push(event.data)
+        recorder.onstop = () => resolve(new Blob(chunks, { type: 'audio/webm' }))
+
+        recorder.start()
+        audioElement.play().catch(reject)
+
+        audioElement.onended = () => recorder.stop()
+      })
+
+      audioElement.load()
+    })
+  }
+
   function getCacheId() {
     return `${ id }-${ objectHash(payload) }`
   }
@@ -146,33 +176,23 @@ export default (messagePayload: IzabelaMessagePayload) => {
     if (typeof window !== 'undefined') {
       const { ElectronFilesystem } = window
 
+      let base64 = ''
       if (data instanceof Blob) {
-        const base64 = await blobToBase64(data)
-        if (base64) {
-          ElectronFilesystem.cacheAudio(getCacheId(), base64)
-        }
+        base64 = await blobToBase64(data)
       } else if (data instanceof MediaSource) {
-        // throw 'need to implement this first'
-        // data.addEventListener('sourceopen', () => {
-        //   // At this point, the MediaSource is ready to accept data
-        //
-        //   // You may want to append the audio data to the SourceBuffer (this assumes you've got audio data to append)
-        //   const sourceBuffer = data.addSourceBuffer('audio/mpeg'); // Use appropriate MIME type for your data
-        //   // Here you might want to append chunks of data if streaming, not just one Blob
-        //   // Example: sourceBuffer.appendBuffer(someChunkOfAudio);
-        // });
-        //
-        // // Optionally: You can listen to the audio's `canplaythrough` event or `play` event to ensure it's ready for playback
-        // audioElement.addEventListener('canplaythrough', () => {
-        //   // Audio element is ready to play
-        //   console.log("Audio is ready for playback");
-        // });
+        base64 = await blobToBase64(await mediaSourceToBlob(data))
+      }
+      if (base64) {
+        ElectronFilesystem.cacheAudio(getCacheId(), base64)
       }
     }
   }
 
   async function downloadAudioAndBlobify(): Promise<Blob> {
-    return downloadAudio()
+    return downloadAudio().then((data) => {
+      if (data instanceof MediaSource) return mediaSourceToBlob(data)
+      return data
+    })
   }
 
   function loadAudio(blob: Blob | MediaSource) {
