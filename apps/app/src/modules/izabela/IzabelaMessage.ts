@@ -5,10 +5,7 @@ import { getEngineById } from '@/modules/speech-engine-manager'
 import { getMediaDeviceByLabel } from '@/utils/media-devices'
 import { useSettingsStore } from '@/features/settings/store'
 import { blobToBase64, Deferred } from '@packages/toolbox'
-import {
-  useMessagesStore,
-  usePlayingMessageStore,
-} from '@/features/messages/store'
+import { useMessagesStore, usePlayingMessageStore } from '@/features/messages/store'
 import objectHash from 'object-hash'
 import { IzabelaMessageEvent, IzabelaMessagePayload } from './types'
 
@@ -67,7 +64,7 @@ export default (messagePayload: IzabelaMessagePayload) => {
   }
 
   function getCacheId() {
-    return `${id}-${objectHash(payload)}`
+    return `${ id }-${ objectHash(payload) }`
   }
 
   function on(event: IzabelaMessageEvent, callback: () => void): void {
@@ -183,7 +180,8 @@ export default (messagePayload: IzabelaMessagePayload) => {
       if (data instanceof Blob) {
         base64 = await blobToBase64(data)
       } else if (data instanceof MediaSource) {
-        base64 = await blobToBase64(await mediaSourceToBlob(data))
+        // This causes the audio to emit an error because it's sharing the same MediaSoure
+        // base64 = await blobToBase64(await mediaSourceToBlob(data))
       }
       if (base64) {
         ElectronFilesystem.cacheAudio(getCacheId(), base64)
@@ -198,8 +196,8 @@ export default (messagePayload: IzabelaMessagePayload) => {
     })
   }
 
-  function loadAudio(blob: Blob | MediaSource) {
-    audio.src = URL.createObjectURL(blob)
+  function loadAudio(src: Blob | MediaSource) {
+    audio.src = URL.createObjectURL(src)
     audio.load()
   }
 
@@ -257,8 +255,8 @@ export default (messagePayload: IzabelaMessagePayload) => {
   if (!disableAutoplay) {
     addEventListeners()
     downloadAudio()
-      .then((blob) => {
-        loadAudio(blob)
+      .then((src) => {
+        loadAudio(src)
       })
       .catch((reason) => onError(reason))
   }

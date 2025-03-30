@@ -11,33 +11,40 @@ export function axiosStreamResponseToMediaSource(
 
   mediaSource.addEventListener('sourceopen', async () => {
     const contentType = response.headers['content-type']
-
     const sourceBuffer = mediaSource.addSourceBuffer(contentType)
     const reader = response.data.getReader()
-    const queue: Uint8Array[] = []
-    let streamingEnded = false
+    let queue: Uint8Array[] = []
+    let processing = false
 
-    function processQueue() {
-      if (queue.length > 0 && !sourceBuffer.updating) {
-        sourceBuffer.appendBuffer(queue.shift()!)
-      } else if (streamingEnded && queue.length === 0 && !sourceBuffer.updating) {
-        mediaSource.endOfStream()
-      }
-    }
-
-    sourceBuffer.addEventListener('updateend', processQueue)
-
-    while (true) {
+    async function pump() {
+      if (processing) return
       const { done, value } = await reader.read()
       if (done) {
-        streamingEnded = true
-        processQueue()
-        break
+        if (!sourceBuffer.updating) {
+          mediaSource.endOfStream()
+        } else {
+          sourceBuffer.addEventListener('updateend', () => mediaSource.endOfStream(), { once: true })
+        }
+        return
       }
-
       queue.push(value)
       processQueue()
     }
+
+    function processQueue() {
+      if (queue.length > 0 && !sourceBuffer.updating) {
+        processing = true
+        sourceBuffer.appendBuffer(queue.shift()!)
+      }
+    }
+
+    sourceBuffer.addEventListener('updateend', () => {
+      processing = false
+      processQueue()
+      if (!processing) pump()
+    })
+
+    pump()
   })
 
   return mediaSource
