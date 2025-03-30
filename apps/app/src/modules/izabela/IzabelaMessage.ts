@@ -5,7 +5,10 @@ import { getEngineById } from '@/modules/speech-engine-manager'
 import { getMediaDeviceByLabel } from '@/utils/media-devices'
 import { useSettingsStore } from '@/features/settings/store'
 import { blobToBase64, Deferred } from '@packages/toolbox'
-import { useMessagesStore, usePlayingMessageStore } from '@/features/messages/store'
+import {
+  useMessagesStore,
+  usePlayingMessageStore,
+} from '@/features/messages/store'
 import objectHash from 'object-hash'
 import { IzabelaMessageEvent, IzabelaMessagePayload } from './types'
 
@@ -33,7 +36,6 @@ export default (messagePayload: IzabelaMessagePayload) => {
     })
   }
 
-
   async function mediaSourceToBlob(mediaSource: MediaSource): Promise<Blob> {
     return new Promise((resolve, reject) => {
       const audioElement = new Audio()
@@ -41,9 +43,13 @@ export default (messagePayload: IzabelaMessagePayload) => {
       audioElement.crossOrigin = 'anonymous'
 
       audioElement.addEventListener('canplay', () => {
-        const stream = audioElement.captureStream?.() || (audioElement as any).mozCaptureStream?.()
+        const stream =
+          audioElement.captureStream?.() ||
+          (audioElement as any).mozCaptureStream?.()
         if (!stream || stream.getAudioTracks().length === 0) {
-          reject(new Error('Failed to capture audio stream. No audio tracks found.'))
+          reject(
+            new Error('Failed to capture audio stream. No audio tracks found.'),
+          )
           return
         }
 
@@ -51,7 +57,8 @@ export default (messagePayload: IzabelaMessagePayload) => {
         const chunks: BlobPart[] = []
 
         recorder.ondataavailable = (event) => chunks.push(event.data)
-        recorder.onstop = () => resolve(new Blob(chunks, { type: 'audio/webm' }))
+        recorder.onstop = () =>
+          resolve(new Blob(chunks, { type: 'audio/webm' }))
 
         recorder.start()
         audioElement.play().catch(reject)
@@ -64,7 +71,7 @@ export default (messagePayload: IzabelaMessagePayload) => {
   }
 
   function getCacheId() {
-    return `${ id }-${ objectHash(payload) }`
+    return `${id}-${objectHash(payload)}`
   }
 
   function on(event: IzabelaMessageEvent, callback: () => void): void {

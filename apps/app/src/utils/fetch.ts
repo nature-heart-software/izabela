@@ -23,7 +23,11 @@ export function axiosStreamResponseToMediaSource(
         if (!sourceBuffer.updating) {
           mediaSource.endOfStream()
         } else {
-          sourceBuffer.addEventListener('updateend', () => mediaSource.endOfStream(), { once: true })
+          sourceBuffer.addEventListener(
+            'updateend',
+            () => mediaSource.endOfStream(),
+            { once: true },
+          )
         }
         return
       }
