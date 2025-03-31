@@ -1,5 +1,8 @@
 <template>
-  <NvAccessBlocker :allowed="!!getProperty('apiKey', true)" reason="Credentials required">
+  <NvAccessBlocker
+    :allowed="!!getProperty('apiKey', true)"
+    reason="Credentials required"
+  >
     <NvStack spacing="5">
       <NvFormItem label="Models">
         <NvModelSelect placeholder="Select a model" />
@@ -41,7 +44,8 @@
             class="!grow"
             v-bind="{
               modelValue: getProperty('similarity_boost'),
-              'onUpdate:modelValue': (value) => setProperty('similarity_boost', value),
+              'onUpdate:modelValue': (value) =>
+                setProperty('similarity_boost', value),
             }"
           />
           <NvNumberInput
@@ -50,7 +54,8 @@
             :step="0.01"
             v-bind="{
               modelValue: getProperty('similarity_boost'),
-              'onUpdate:modelValue': (value) => setProperty('similarity_boost', value),
+              'onUpdate:modelValue': (value) =>
+                setProperty('similarity_boost', value),
             }"
           />
         </NvGroup>
@@ -86,7 +91,9 @@
         </NvStack>
         <NvSwitch
           :modelValue="getProperty('use_speaker_boost')"
-          @update:modelValue="(value) => setProperty('use_speaker_boost', value)"
+          @update:modelValue="
+            (value) => setProperty('use_speaker_boost', value)
+          "
         />
       </NvGroup>
     </NvStack>

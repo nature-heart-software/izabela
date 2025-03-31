@@ -6,7 +6,10 @@ import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, setProperty } from './store'
-import { axiosBlobResponseToBlob, axiosStreamResponseToMediaSource } from '@/utils/fetch.ts'
+import {
+  axiosBlobResponseToBlob,
+  axiosStreamResponseToMediaSource,
+} from '@/utils/fetch.ts'
 
 const getCredentials = () => ({
   publicKey: getProperty('publicKey', true),
@@ -39,17 +42,23 @@ registerEngine({
   },
   synthesizeSpeech({ credentials, payload }) {
     const speechStore = useSpeechStore()
-    return api(getProperty('useLocalCredentials') ? 'local' : 'remote')
-      .post(
-        `/tts/uberduck/synthesize-speech${ speechStore.streamAudio ? '/stream' : '' }`,
-        {
-          credentials,
-          payload,
-        },
-        { responseType: speechStore.streamAudio ? 'stream' : 'blob' },
-      )
-      // @ts-ignore
-      .then(speechStore.streamAudio ? axiosStreamResponseToMediaSource : axiosBlobResponseToBlob)
+    return (
+      api(getProperty('useLocalCredentials') ? 'local' : 'remote')
+        .post(
+          `/tts/uberduck/synthesize-speech${speechStore.streamAudio ? '/stream' : ''}`,
+          {
+            credentials,
+            payload,
+          },
+          { responseType: speechStore.streamAudio ? 'stream' : 'blob' },
+        )
+        // @ts-ignore
+        .then(
+          speechStore.streamAudio
+            ? axiosStreamResponseToMediaSource
+            : axiosBlobResponseToBlob,
+        )
+    )
   },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,

@@ -35,7 +35,10 @@ export const useSpeechStore = defineStore(
     })
     const hasUniversalApiCredentials = computed(() => {
       const settingsStore = useSettingsStore()
-      return Boolean(decrypt(settingsStore.universalApiKey) && settingsStore.universalApiEndpoint)
+      return Boolean(
+        decrypt(settingsStore.universalApiKey) &&
+          settingsStore.universalApiEndpoint,
+      )
     })
     const customCommands = ref<SpeechCommand[]>([])
     const addCustomCommand = (
@@ -50,7 +53,10 @@ export const useSpeechStore = defineStore(
     const removeCustomCommand = (index: number) => {
       customCommands.value.splice(index, 1)
     }
-    const updateCustomCommands = (index: number, customCommand: SpeechCommand) => {
+    const updateCustomCommands = (
+      index: number,
+      customCommand: SpeechCommand,
+    ) => {
       customCommands.value.splice(index, 1, customCommand)
     }
     const engineCommands = computed(() => {
@@ -66,8 +72,13 @@ export const useSpeechStore = defineStore(
     return {
       streamAudio,
       selectedSpeechEngine,
-      currentSpeechEngine: computed(() => getEngineById(selectedSpeechEngine.value)),
-      commands: computed(() => [...engineCommands.value, ...customCommands.value]),
+      currentSpeechEngine: computed(() =>
+        getEngineById(selectedSpeechEngine.value),
+      ),
+      commands: computed(() => [
+        ...engineCommands.value,
+        ...customCommands.value,
+      ]),
       hasUniversalApiCredentials,
       customCommands,
       engineCommands,

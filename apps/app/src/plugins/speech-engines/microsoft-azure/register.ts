@@ -6,7 +6,10 @@ import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, setProperty } from './store'
-import { axiosBlobResponseToBlob, axiosStreamResponseToMediaSource } from '@/utils/fetch.ts'
+import {
+  axiosBlobResponseToBlob,
+  axiosStreamResponseToMediaSource,
+} from '@/utils/fetch.ts'
 
 const getCredentials = () => ({
   apiKey: getProperty('apiKey', true),
@@ -41,7 +44,7 @@ registerEngine({
     const commandString = newText.split(' ')[0] || ''
     if (commandString.startsWith('/')) {
       const command = commands(voice).find(({ name }) =>
-        commandString.startsWith(`/${ name }`),
+        commandString.startsWith(`/${name}`),
       )
       newText = newText.replace(commandString, '')
       if (command) {
@@ -50,10 +53,10 @@ registerEngine({
     }
     const ssml = expression
       ? `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US"><voice name="${
-        voice.ShortName
-      }"><mstts:express-as style="${ expression }">${
-        translatedText || newText
-      }</mstts:express-as></voice></speak>`
+          voice.ShortName
+        }"><mstts:express-as style="${expression}">${
+          translatedText || newText
+        }</mstts:express-as></voice></speak>`
       : null
     return {
       ssml,
@@ -66,17 +69,23 @@ registerEngine({
   },
   synthesizeSpeech({ credentials, payload }) {
     const speechStore = useSpeechStore()
-    return api(getProperty('useLocalCredentials') ? 'local' : 'remote')
-      .post(
-        `/tts/microsoft-azure/synthesize-speech${ speechStore.streamAudio ? '/stream' : '' }`,
-        {
-          credentials,
-          payload,
-        },
-        { responseType: speechStore.streamAudio ? 'stream' : 'blob' },
-      )
-      // @ts-ignore
-      .then(speechStore.streamAudio ? axiosStreamResponseToMediaSource : axiosBlobResponseToBlob)
+    return (
+      api(getProperty('useLocalCredentials') ? 'local' : 'remote')
+        .post(
+          `/tts/microsoft-azure/synthesize-speech${speechStore.streamAudio ? '/stream' : ''}`,
+          {
+            credentials,
+            payload,
+          },
+          { responseType: speechStore.streamAudio ? 'stream' : 'blob' },
+        )
+        // @ts-ignore
+        .then(
+          speechStore.streamAudio
+            ? axiosStreamResponseToMediaSource
+            : axiosBlobResponseToBlob,
+        )
+    )
   },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,
