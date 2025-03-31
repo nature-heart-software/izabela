@@ -38,6 +38,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
     res,
   ) => {
     try {
+      res.setHeader('Content-Type', 'audio/mpeg')
       const textToSpeech = new TextToSpeechV1({
         authenticator: new IamAuthenticator({
           apikey: apiKey,
@@ -46,12 +47,11 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
       })
       const { result } = await textToSpeech.synthesize({
         ...payload,
-        accept: 'audio/mp3',
+        accept: 'audio/mpeg',
       })
 
       const stream = result.pipe(res)
       stream.on('finish', () => {
-        //
       })
     } catch (e: any) {
       handleError(res, 'Internal server error', e.message, 500)
@@ -59,6 +59,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
   }
   app.post('/api/tts/ibm-watson/list-voices', listVoicesHandler)
   app.post('/api/tts/ibm-watson/synthesize-speech', synthesizeSpeechHandler)
+  app.post('/api/tts/ibm-watson/synthesize-speech/stream', synthesizeSpeechHandler)
 }
 
 export default plugin

@@ -1,10 +1,7 @@
 import { RequestHandler } from 'express'
 import { handleError } from '../../utils/requests'
-import { v4 as uuid } from 'uuid'
-import fs from 'fs'
-import util from 'util'
-import path from 'path'
 import axios, { AxiosResponse } from 'axios'
+import { Readable } from 'stream'
 
 const plugin: Izabela.Server.Plugin = ({ app, config }) => {
   const listVoicesHandler: RequestHandler = async (
@@ -34,46 +31,34 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
     },
     res,
   ) => {
-    const outputFile = path.join(config?.tempPath || '', uuid() + '.mp3')
     try {
-      fs.mkdirSync(path.parse(outputFile).dir, { recursive: true })
-      fs.writeFileSync(outputFile, '')
+      res.setHeader('Content-Type', 'audio/mpeg')
+      const s = new Readable()
 
       const { data }: AxiosResponse<ArrayBuffer> = await axios({
         url: 'https://api.uberduck.ai/speak-synchronous',
         method: 'POST',
         headers: {
-          Authorization: `Basic ${Buffer.from(
-            `${publicKey}:${privateKey}`,
-          ).toString('base64')}`,
+          Authorization: `Basic ${ Buffer.from(
+            `${ publicKey }:${ privateKey }`,
+          ).toString('base64') }`,
         },
         data: payload,
         responseType: 'arraybuffer',
       })
 
-      const writeFile = util.promisify(fs.writeFile)
-
-      await writeFile(outputFile, Buffer.from(data), 'base64')
-      const stat = fs.statSync(outputFile)
-      const total = stat.size
-
-      res.writeHead(200, {
-        'Content-Length': total,
-        'Content-Type': 'audio/mp3',
-      })
-      const stream = fs.createReadStream(outputFile).pipe(res)
+      const stream = s.pipe(res)
       stream.on('finish', () => {
-        fs.unlinkSync(outputFile)
       })
+      s.push(Buffer.from(data))
+      s.push(null)
     } catch (e: any) {
-      if (fs.existsSync(outputFile)) {
-        fs.unlinkSync(outputFile)
-      }
       handleError(res, 'Internal server error', e.message, 500)
     }
   }
   app.post('/api/tts/uberduck/list-voices', listVoicesHandler)
   app.post('/api/tts/uberduck/synthesize-speech', synthesizeSpeechHandler)
+  app.post('/api/tts/uberduck/synthesize-speech/stream', synthesizeSpeechHandler)
 }
 
 export default plugin
