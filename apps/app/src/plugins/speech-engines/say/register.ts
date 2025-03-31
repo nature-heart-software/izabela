@@ -5,6 +5,7 @@ import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, setProperty } from './store'
+import { axiosBlobResponseToBlob } from '@/utils/fetch.ts'
 
 const getSelectedVoice = () => getProperty('selectedVoice')
 registerEngine({
@@ -36,7 +37,7 @@ registerEngine({
         },
         { responseType: 'blob' },
       )
-      .then((res) => res.data)
+      .then(axiosBlobResponseToBlob)
   },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,

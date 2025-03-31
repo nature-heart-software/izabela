@@ -29,9 +29,23 @@
                     align="center"
                     type="ghost"
                     @click="selectedEngineTab = engine.id"
-                    >{{ engine.name }}
+                  >{{ engine.name }}
                   </NvButton>
                 </template>
+              </NvGroup>
+              <NvDivider direction="horizontal" />
+              <NvGroup :spacing="5" align="start" justify="apart" no-wrap>
+                <NvStack>
+                  <NvText type="label">Favor audio stream</NvText>
+                  <NvText
+                  >Faster audio playback but may cause audio artifacts
+                  </NvText>
+                </NvStack>
+                <NvSwitch
+                  :modelValue="speechStore.streamAudio"
+                  class="shrink-0"
+                  @update:modelValue="(value) => speechStore.$patch({streamAudio: value})"
+                />
               </NvGroup>
               <NvDivider direction="horizontal" />
               <template v-if="currentEngineSettingsComponent">
@@ -50,7 +64,7 @@
             <NvStack>
               <NvText type="label">Universal credentials</NvText>
               <NvText
-                >Gain access to multiple text-to-speech engines using a universal API key <br />You
+              >Gain access to multiple text-to-speech engines using a universal API key <br />You
                 can obtain a universal API key by being a
                 <a href="https://ko-fi.com/woowee/tiers" target="_blank">Ko-fi supporter</a></NvText
               >
@@ -68,7 +82,7 @@
 </template>
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue'
-import { NvButton, NvCard, NvDivider, NvGroup, NvStack, NvText } from '@packages/ui'
+import { NvButton, NvCard, NvDivider, NvGroup, NvStack, NvSwitch, NvText } from '@packages/ui'
 import SpeechEngineSelect from '@/features/speech/components/inputs/NvSpeechEngineSelect.vue'
 import { useSpeechEngineManager } from '@/modules/speech-engine-manager'
 import { SpeechEngine } from '@/modules/speech-engine-manager/types'

@@ -5,6 +5,7 @@ import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, setProperty } from './store'
+import { axiosBlobResponseToBlob, axiosStreamResponseToMediaSource } from '@/utils/fetch.ts'
 
 const getCredentials = () => ({
   identityPoolId: getProperty('identityPoolId', true),
@@ -36,16 +37,18 @@ registerEngine({
     return (voice || getSelectedVoice()).LanguageCode
   },
   synthesizeSpeech({ credentials, payload }) {
+    const speechStore = useSpeechStore()
     return api(getProperty('useLocalCredentials') ? 'local' : 'remote')
-      .post<Blob>(
-        '/tts/amazon-polly/synthesize-speech',
+      .post(
+        `/tts/amazon-polly/synthesize-speech${ speechStore.streamAudio ? '/stream' : '' }`,
         {
           credentials,
           payload,
         },
-        { responseType: 'blob' },
+        { responseType: speechStore.streamAudio ? 'stream' : 'blob' },
       )
-      .then((res) => res.data)
+      // @ts-ignore
+      .then(speechStore.streamAudio ? axiosStreamResponseToMediaSource : axiosBlobResponseToBlob)
   },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,

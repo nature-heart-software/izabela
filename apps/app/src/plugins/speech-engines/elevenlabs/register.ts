@@ -5,10 +5,8 @@ import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, setProperty } from './store'
-import {
-  axiosBlobResponseToBlob,
-  axiosStreamResponseToMediaSource,
-} from '@/utils/fetch.ts'
+import { axiosBlobResponseToBlob, axiosStreamResponseToMediaSource } from '@/utils/fetch.ts'
+import { useSpeechStore } from '@/features/speech/store'
 
 const getCredentials = () => ({
   apiKey: getProperty('apiKey', true),
@@ -41,23 +39,17 @@ registerEngine({
     return DEFAULT_LANGUAGE_CODE
   },
   async synthesizeSpeech({ credentials, payload }) {
-    const stream = getProperty('stream')
-    const apiPayload = {
-      credentials,
-      payload,
-    }
-    if (stream) {
-      return api('local')
-        .post('/tts/elevenlabs/synthesize-speech/stream', apiPayload, {
-          responseType: 'stream',
-        })
-        .then(axiosStreamResponseToMediaSource)
-    }
+    const speechStore = useSpeechStore()
     return api('local')
-      .post('/tts/elevenlabs/synthesize-speech', apiPayload, {
-        responseType: 'blob',
+      .post(`/tts/elevenlabs/synthesize-speech${ speechStore.streamAudio ? '/stream' : '' }`, {
+        credentials,
+        payload,
+      }, {
+        responseType: speechStore.streamAudio ? 'stream' : 'blob',
       })
-      .then(axiosBlobResponseToBlob)
+      // @ts-ignore
+      .then(speechStore.streamAudio ? axiosStreamResponseToMediaSource : axiosBlobResponseToBlob)
+
   },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,

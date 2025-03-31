@@ -6,6 +6,7 @@ import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, setProperty } from './store'
+import { axiosBlobResponseToBlob, axiosStreamResponseToMediaSource } from '@/utils/fetch.ts'
 
 const getCredentials = () => ({
   apiKey: getProperty('apiKey', true),
@@ -52,16 +53,18 @@ registerEngine({
     return (voice || getSelectedVoice()).languageCodes[0]
   },
   synthesizeSpeech({ credentials, payload }) {
+    const speechStore = useSpeechStore()
     return api(getProperty('useLocalCredentials') ? 'local' : 'remote')
-      .post<Blob>(
-        '/tts/google-cloud/synthesize-speech',
+      .post(
+        `/tts/google-cloud/synthesize-speech${ speechStore.streamAudio ? '/stream' : '' }`,
         {
           credentials,
           payload,
         },
-        { responseType: 'blob' },
+        { responseType: speechStore.streamAudio ? 'stream' : 'blob' },
       )
-      .then((res) => res.data)
+      // @ts-ignore
+      .then(speechStore.streamAudio ? axiosStreamResponseToMediaSource : axiosBlobResponseToBlob)
   },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,
