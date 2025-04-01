@@ -10,35 +10,38 @@ import {
   usePlayingMessageStore,
 } from '@/features/messages/store'
 import { IzabelaMessageEvent, IzabelaMessagePayload } from './types'
-import CryptoJS from "crypto-js";
+import CryptoJS from 'crypto-js'
 
 function stableStringify(value: unknown): string {
-  if (value === null || value === undefined) return "null";
-  if (typeof value === "number") return value.toFixed(10);
-  if (typeof value === "string") return JSON.stringify(value);
-  if (typeof value === "boolean") return value ? "true" : "false";
+  if (value === null || value === undefined) return 'null'
+  if (typeof value === 'number') return value.toFixed(10)
+  if (typeof value === 'string') return JSON.stringify(value)
+  if (typeof value === 'boolean') return value ? 'true' : 'false'
 
   if (Array.isArray(value)) {
-    return "[" + value.map(stableStringify).join(",") + "]";
+    return '[' + value.map(stableStringify).join(',') + ']'
   }
 
-  if (typeof value === "object") {
-    const keys = Object.keys(value).sort();
+  if (typeof value === 'object') {
+    const keys = Object.keys(value).sort()
     return (
-      "{" +
+      '{' +
       keys
-        .map((key) => JSON.stringify(key) + ":" + stableStringify((value as any)[key]))
-        .join(",") +
-      "}"
-    );
+        .map(
+          (key) =>
+            JSON.stringify(key) + ':' + stableStringify((value as any)[key]),
+        )
+        .join(',') +
+      '}'
+    )
   }
 
-  throw new Error("Unsupported data type");
+  throw new Error('Unsupported data type')
 }
 
 function hash(obj: unknown): string {
-  const jsonString = stableStringify(obj);
-  return CryptoJS.SHA256(jsonString).toString(CryptoJS.enc.Hex);
+  const jsonString = stableStringify(obj)
+  return CryptoJS.SHA256(jsonString).toString(CryptoJS.enc.Hex)
 }
 
 export default (messagePayload: IzabelaMessagePayload) => {
