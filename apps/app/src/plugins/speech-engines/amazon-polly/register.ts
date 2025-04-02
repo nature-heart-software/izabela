@@ -1,14 +1,10 @@
-import { api } from '@/services'
+import { fetchApi } from '@/services'
 import { registerEngine } from '@/modules/speech-engine-manager'
 import { useSpeechStore } from '@/features/speech/store'
 import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, setProperty } from './store'
-import {
-  axiosBlobResponseToBlob,
-  axiosStreamResponseToMediaSource,
-} from '@/utils/fetch.ts'
 
 const getCredentials = () => ({
   identityPoolId: getProperty('identityPoolId', true),
@@ -42,21 +38,16 @@ registerEngine({
   synthesizeSpeech({ credentials, payload }) {
     const speechStore = useSpeechStore()
     return (
-      api(getProperty('useLocalCredentials') ? 'local' : 'remote')
-        .post(
-          `/tts/amazon-polly/synthesize-speech${speechStore.streamAudio ? '/stream' : ''}`,
-          {
+      fetchApi(getProperty('useLocalCredentials') ? 'local' : 'remote',
+        `/tts/amazon-polly/synthesize-speech${ speechStore.streamAudio ? '/stream' : '' }`,
+        {
+          method: 'POST',
+          body: JSON.stringify({
             credentials,
             payload,
-          },
-          { responseType: speechStore.streamAudio ? 'stream' : 'blob' },
-        )
-        // @ts-ignore
-        .then(
-          speechStore.streamAudio
-            ? axiosStreamResponseToMediaSource
-            : axiosBlobResponseToBlob,
-        )
+          }),
+        },
+      )
     )
   },
   voiceSelectComponent: NvVoiceSelect,

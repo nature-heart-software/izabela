@@ -1,11 +1,10 @@
-import { api } from '@/services'
+import { fetchApi } from '@/services'
 import { DEFAULT_LANGUAGE_CODE } from '@/consts'
 import { registerEngine } from '@/modules/speech-engine-manager'
 import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, setProperty } from './store'
-import { axiosBlobResponseToBlob } from '@/utils/fetch.ts'
 
 const getSelectedVoice = () => getProperty('selectedVoice')
 registerEngine({
@@ -28,16 +27,13 @@ registerEngine({
     return DEFAULT_LANGUAGE_CODE
   },
   synthesizeSpeech({ credentials, payload }) {
-    return api('local')
-      .post<Blob>(
-        '/tts/say/synthesize-speech',
-        {
-          credentials,
-          payload,
-        },
-        { responseType: 'blob' },
-      )
-      .then(axiosBlobResponseToBlob)
+    return fetchApi('local', '/tts/say/synthesize-speech', {
+      method: 'POST',
+      body: JSON.stringify({
+        credentials,
+        payload,
+      }),
+    })
   },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,

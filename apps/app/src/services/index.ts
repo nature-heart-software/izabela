@@ -10,32 +10,65 @@ export const socket = io(
   {},
 )
 
-export const localApi = axios.create({
-  baseURL: `http://localhost:${import.meta.env.VITE_SERVER_PORT}/api`,
+const localApiBaseUrl = `http://localhost:${
+  import.meta.env.VITE_SERVER_PORT
+}/api`
+
+export const localAxiosApi = axios.create({
+  baseURL: localApiBaseUrl,
   adapter: 'fetch',
 })
 
-export const remoteApi = axios.create({
+export const remoteAxiosApi = axios.create({
   adapter: 'fetch',
 })
 
 export const api = (type?: 'remote' | 'local') => {
   const settingsStore = useSettingsStore()
   const speechStore = useSpeechStore()
-  if (type === 'local') return localApi
+  if (type === 'local') return localAxiosApi
   if (speechStore.hasUniversalApiCredentials) {
-    remoteApi.defaults.baseURL = path.join(
+    remoteAxiosApi.defaults.baseURL = path.join(
       settingsStore.universalApiEndpoint,
       '/api',
     )
-    remoteApi.interceptors.request.use((config) => ({
+    remoteAxiosApi.interceptors.request.use((config) => ({
       ...config,
       params: {
         ...config.params,
         apiKey: decrypt(settingsStore.universalApiKey),
       },
     }))
-    return remoteApi
+    return remoteAxiosApi
   }
-  return localApi
+  return localAxiosApi
+}
+
+export const fetchApi = (
+  type: 'remote' | 'local',
+  endpoint: string,
+  options: RequestInit = {},
+) => {
+  const settingsStore = useSettingsStore()
+  const speechStore = useSpeechStore()
+  const newOptions = {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  }
+  if (type === 'local') {
+    return fetch(localApiBaseUrl + endpoint, newOptions)
+  }
+  if (speechStore.hasUniversalApiCredentials) {
+    return fetch(
+      settingsStore.universalApiEndpoint +
+        '/api' +
+        endpoint +
+        `?apiKey=${decrypt(settingsStore.universalApiKey)}`,
+      newOptions,
+    )
+  }
+  return fetch(localApiBaseUrl + endpoint, newOptions)
 }

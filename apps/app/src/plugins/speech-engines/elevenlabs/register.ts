@@ -1,14 +1,10 @@
 import { registerEngine } from '@/modules/speech-engine-manager'
 import { DEFAULT_LANGUAGE_CODE } from '@/consts'
-import { api } from '@/services'
+import { fetchApi } from '@/services'
 import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, setProperty } from './store'
-import {
-  axiosBlobResponseToBlob,
-  axiosStreamResponseToMediaSource,
-} from '@/utils/fetch.ts'
 import { useSpeechStore } from '@/features/speech/store'
 
 const getCredentials = () => ({
@@ -43,24 +39,18 @@ registerEngine({
   },
   async synthesizeSpeech({ credentials, payload }) {
     const speechStore = useSpeechStore()
-    return (
-      api('local')
-        .post(
-          `/tts/elevenlabs/synthesize-speech${speechStore.streamAudio ? '/stream' : ''}`,
-          {
-            credentials,
-            payload,
-          },
-          {
-            responseType: speechStore.streamAudio ? 'stream' : 'blob',
-          },
-        )
-        // @ts-ignore
-        .then(
-          speechStore.streamAudio
-            ? axiosStreamResponseToMediaSource
-            : axiosBlobResponseToBlob,
-        )
+    return fetchApi(
+      'local',
+      `/tts/elevenlabs/synthesize-speech${
+        speechStore.streamAudio ? '/stream' : ''
+      }`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          credentials,
+          payload,
+        }),
+      },
     )
   },
   voiceSelectComponent: NvVoiceSelect,
