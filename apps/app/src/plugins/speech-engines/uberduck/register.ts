@@ -37,11 +37,10 @@ registerEngine({
     return DEFAULT_LANGUAGE_CODE
   },
   synthesizeSpeech({ credentials, payload }) {
-    const speechStore = useSpeechStore()
     return fetchApi(
       getProperty('useLocalCredentials') ? 'local' : 'remote',
       `/tts/uberduck/synthesize-speech${
-        speechStore.streamAudio ? '/stream' : ''
+        getProperty('streamAudio') ? '/stream' : ''
       }`,
       {
         method: 'POST',

@@ -5,7 +5,6 @@ import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, setProperty } from './store'
-import { useSpeechStore } from '@/features/speech/store'
 
 const getCredentials = () => ({
   apiKey: getProperty('apiKey', true),
@@ -38,11 +37,10 @@ registerEngine({
     return DEFAULT_LANGUAGE_CODE
   },
   async synthesizeSpeech({ credentials, payload }) {
-    const speechStore = useSpeechStore()
     return fetchApi(
       'local',
       `/tts/elevenlabs/synthesize-speech${
-        speechStore.streamAudio ? '/stream' : ''
+        getProperty('streamAudio') ? '/stream' : ''
       }`,
       {
         method: 'POST',

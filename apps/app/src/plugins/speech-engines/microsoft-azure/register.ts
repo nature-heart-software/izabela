@@ -64,11 +64,10 @@ registerEngine({
     return (voice || getSelectedVoice()).Locale
   },
   synthesizeSpeech({ credentials, payload }) {
-    const speechStore = useSpeechStore()
     return fetchApi(
       getProperty('useLocalCredentials') ? 'local' : 'remote',
       `/tts/microsoft-azure/synthesize-speech${
-        speechStore.streamAudio ? '/stream' : ''
+        getProperty('streamAudio') ? '/stream' : ''
       }`,
       {
         method: 'POST',

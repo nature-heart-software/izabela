@@ -36,11 +36,10 @@ registerEngine({
     return (voice || getSelectedVoice()).LanguageCode
   },
   synthesizeSpeech({ credentials, payload }) {
-    const speechStore = useSpeechStore()
     return fetchApi(
       getProperty('useLocalCredentials') ? 'local' : 'remote',
       `/tts/amazon-polly/synthesize-speech${
-        speechStore.streamAudio ? '/stream' : ''
+        getProperty('streamAudio') ? '/stream' : ''
       }`,
       {
         method: 'POST',

@@ -68,9 +68,7 @@ export const useSpeechStore = defineStore(
       }
       return []
     })
-    const streamAudio = ref(true)
     return {
-      streamAudio,
       selectedSpeechEngine,
       currentSpeechEngine: computed(() =>
         getEngineById(selectedSpeechEngine.value),

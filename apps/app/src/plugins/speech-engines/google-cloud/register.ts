@@ -52,11 +52,10 @@ registerEngine({
     return (voice || getSelectedVoice()).languageCodes[0]
   },
   synthesizeSpeech({ credentials, payload }) {
-    const speechStore = useSpeechStore()
     return fetchApi(
       getProperty('useLocalCredentials') ? 'local' : 'remote',
       `/tts/google-cloud/synthesize-speech${
-        speechStore.streamAudio ? '/stream' : ''
+        getProperty('streamAudio') ? '/stream' : ''
       }`,
       {
         method: 'POST',
