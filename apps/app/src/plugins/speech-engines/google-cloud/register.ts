@@ -67,6 +67,9 @@ registerEngine({
       },
     )
   },
+  getUseCacheOnEveryRequest() {
+    return true
+  },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,
   store: { setProperty, getProperty },

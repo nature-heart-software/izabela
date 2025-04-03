@@ -20,4 +20,6 @@ export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
   use_speaker_boost: true,
   favoriteVoiceIds: [],
   stream: true,
+  useCacheOnEveryRequest: true,
+  streamAudio: true,
 })

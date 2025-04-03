@@ -44,6 +44,13 @@ export const api = (type?: 'remote' | 'local') => {
   return localAxiosApi
 }
 
+function throwIfError(response: Response) {
+  if (!response.ok) {
+    throw new Error(`HTTP error! Status: ${response.status}`)
+  }
+  return response
+}
+
 export const fetchApi = (
   type: 'remote' | 'local',
   endpoint: string,
@@ -59,7 +66,7 @@ export const fetchApi = (
     },
   }
   if (type === 'local') {
-    return fetch(localApiBaseUrl + endpoint, newOptions)
+    return fetch(localApiBaseUrl + endpoint, newOptions).then(throwIfError)
   }
   if (speechStore.hasUniversalApiCredentials) {
     return fetch(
@@ -68,7 +75,7 @@ export const fetchApi = (
         endpoint +
         `?apiKey=${decrypt(settingsStore.universalApiKey)}`,
       newOptions,
-    )
+    ).then(throwIfError)
   }
-  return fetch(localApiBaseUrl + endpoint, newOptions)
+  return fetch(localApiBaseUrl + endpoint, newOptions).then(throwIfError)
 }

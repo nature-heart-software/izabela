@@ -53,6 +53,9 @@ registerEngine({
       },
     )
   },
+  getUseCacheOnEveryRequest() {
+    return getProperty('useCacheOnEveryRequest')
+  },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,
   store: { setProperty, getProperty },

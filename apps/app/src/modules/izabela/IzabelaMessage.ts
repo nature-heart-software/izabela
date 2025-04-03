@@ -38,8 +38,14 @@ export default (messagePayload: IzabelaMessagePayload) => {
     })
   }
 
+  function getEngine() {
+    return getEngineById(engineName)
+  }
+
   function getCacheId() {
-    return `${id}-${hash(payload)}`
+    const engine = getEngine()
+    const useCacheOnEveryRequest = !!engine?.getUseCacheOnEveryRequest()
+    return `${useCacheOnEveryRequest ? 'cache' : id}-${hash(payload)}`
   }
 
   function on(event: IzabelaMessageEvent, callback: () => void): void {
@@ -197,7 +203,7 @@ export default (messagePayload: IzabelaMessagePayload) => {
         }
       }
     }
-    const engine = getEngineById(engineName)
+    const engine = getEngine()
     if (!engine)
       return Promise.reject(
         new Error('Izabela Message: Selected engine was not found'),

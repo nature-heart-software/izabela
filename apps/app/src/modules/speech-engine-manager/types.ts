@@ -13,6 +13,7 @@ export interface SpeechEngine {
   getSelectedVoice: () => any
   getCredentials: () => Credentials
   getLanguageCode: (voice?: any) => string
+  getUseCacheOnEveryRequest: () => boolean
   getPayload: (options: {
     text: string
     voice: any

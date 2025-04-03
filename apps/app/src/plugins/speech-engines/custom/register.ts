@@ -35,7 +35,9 @@ registerEngine({
     const endpoint = getProperty('endpoint')
     return axios
       .post<Blob>(
-        `${endpoint.endsWith('/') ? endpoint.slice(0, -1) : endpoint}/synthesize-speech`,
+        `${
+          endpoint.endsWith('/') ? endpoint.slice(0, -1) : endpoint
+        }/synthesize-speech`,
         {
           credentials,
           payload,
@@ -43,6 +45,9 @@ registerEngine({
         { responseType: 'blob' },
       )
       .then((res) => res.data)
+  },
+  getUseCacheOnEveryRequest() {
+    return getProperty('useCacheOnEveryRequest')
   },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,

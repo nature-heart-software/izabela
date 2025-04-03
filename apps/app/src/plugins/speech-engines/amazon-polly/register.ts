@@ -37,18 +37,22 @@ registerEngine({
   },
   synthesizeSpeech({ credentials, payload }) {
     const speechStore = useSpeechStore()
-    return (
-      fetchApi(getProperty('useLocalCredentials') ? 'local' : 'remote',
-        `/tts/amazon-polly/synthesize-speech${ speechStore.streamAudio ? '/stream' : '' }`,
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            credentials,
-            payload,
-          }),
-        },
-      )
+    return fetchApi(
+      getProperty('useLocalCredentials') ? 'local' : 'remote',
+      `/tts/amazon-polly/synthesize-speech${
+        speechStore.streamAudio ? '/stream' : ''
+      }`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          credentials,
+          payload,
+        }),
+      },
     )
+  },
+  getUseCacheOnEveryRequest() {
+    return true
   },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,

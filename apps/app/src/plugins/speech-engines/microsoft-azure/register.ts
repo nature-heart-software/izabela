@@ -79,6 +79,9 @@ registerEngine({
       },
     )
   },
+  getUseCacheOnEveryRequest() {
+    return true
+  },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,
   commands,

@@ -34,22 +34,6 @@
                 </template>
               </NvGroup>
               <NvDivider direction="horizontal" />
-              <NvGroup :spacing="5" align="start" justify="apart" no-wrap>
-                <NvStack>
-                  <NvText type="label">Favor audio stream</NvText>
-                  <NvText
-                    >Faster audio playback but may cause audio artifacts
-                  </NvText>
-                </NvStack>
-                <NvSwitch
-                  :modelValue="speechStore.streamAudio"
-                  class="shrink-0"
-                  @update:modelValue="
-                    (value) => speechStore.$patch({ streamAudio: value })
-                  "
-                />
-              </NvGroup>
-              <NvDivider direction="horizontal" />
               <template v-if="currentEngineSettingsComponent">
                 <component :is="currentEngineSettingsComponent" />
               </template>
@@ -93,7 +77,6 @@ import {
   NvDivider,
   NvGroup,
   NvStack,
-  NvSwitch,
   NvText,
 } from '@packages/ui'
 import SpeechEngineSelect from '@/features/speech/components/inputs/NvSpeechEngineSelect.vue'
