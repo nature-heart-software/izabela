@@ -52,6 +52,7 @@ import {
 } from './shared'
 import { getProperty, setProperty } from './store'
 import { isGameOverlay } from '@/consts.ts'
+import { useSettingsStore } from '@/features/settings/store'
 
 const queryClient = useQueryClient()
 
@@ -105,8 +106,16 @@ const favoriteVoiceIds = computed<string[]>(() =>
   getProperty('favoriteVoiceIds'),
 )
 
+const settingsStore = useSettingsStore()
+
 watch(
-  () => [getProperty('identityPoolId', true), getProperty('region')],
+  () => [
+    getProperty('identityPoolId'),
+    getProperty('region'),
+    getProperty('useLocalCredentials'),
+    settingsStore.universalApiKey,
+    settingsStore.universalApiEndpoint,
+  ],
   () => canFetch.value && queryClient.refetchQueries(LIST_VOICES_QUERY_KEY),
 )
 </script>

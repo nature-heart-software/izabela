@@ -95,7 +95,7 @@ const favoriteVoiceIds = computed<string[]>(() =>
   getProperty('favoriteVoiceIds'),
 )
 watch(
-  () => getProperty('apiKey', true),
+  () => getProperty('apiKey'),
   () => canFetch.value && queryClient.refetchQueries(LIST_VOICES_QUERY_KEY),
 )
 </script>
