@@ -3,7 +3,6 @@ import { io } from 'socket.io-client'
 import { useSettingsStore } from '@/features/settings/store'
 import { decrypt } from '@/utils/security'
 import { useSpeechStore } from '@/features/speech/store'
-import path from 'path-browserify'
 
 export const socket = io(
   `ws://localhost:${import.meta.env.VITE_SERVER_WS_PORT}`,
@@ -28,10 +27,10 @@ export const api = (type?: 'remote' | 'local') => {
   const speechStore = useSpeechStore()
   if (type === 'local') return localAxiosApi
   if (speechStore.hasUniversalApiCredentials) {
-    remoteAxiosApi.defaults.baseURL = path.join(
-      settingsStore.universalApiEndpoint,
+    remoteAxiosApi.defaults.baseURL = new URL(
       '/api',
-    )
+      settingsStore.universalApiEndpoint,
+    ).toString()
     remoteAxiosApi.interceptors.request.use((config) => ({
       ...config,
       params: {
@@ -66,16 +65,21 @@ export const fetchApi = (
     },
   }
   if (type === 'local') {
-    return fetch(localApiBaseUrl + endpoint, newOptions).then(throwIfError)
-  }
-  if (speechStore.hasUniversalApiCredentials) {
     return fetch(
-      settingsStore.universalApiEndpoint +
-        '/api' +
-        endpoint +
-        `?apiKey=${decrypt(settingsStore.universalApiKey)}`,
+      new URL(endpoint, localApiBaseUrl).toString(),
       newOptions,
     ).then(throwIfError)
   }
-  return fetch(localApiBaseUrl + endpoint, newOptions).then(throwIfError)
+  if (speechStore.hasUniversalApiCredentials) {
+    return fetch(
+      new URL(
+        `/api${endpoint}`,
+        settingsStore.universalApiEndpoint,
+      ).toString() + `?apiKey=${decrypt(settingsStore.universalApiKey)}`,
+      newOptions,
+    ).then(throwIfError)
+  }
+  return fetch(new URL(endpoint, localApiBaseUrl).toString(), newOptions).then(
+    throwIfError,
+  )
 }

@@ -32,12 +32,18 @@ registerEngine({
     return DEFAULT_LANGUAGE_CODE
   },
   synthesizeSpeech({ payload }) {
-    return fetchApi('remote', '/tts/izabela/synthesize-speech', {
-      method: 'POST',
-      body: JSON.stringify({
-        payload,
-      }),
-    })
+    return fetchApi(
+      'remote',
+      `/tts/izabela/synthesize-speech${
+        getProperty('streamAudio') ? '/stream' : ''
+      }`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          payload,
+        }),
+      },
+    )
   },
   getUseCacheOnEveryRequest() {
     return true
