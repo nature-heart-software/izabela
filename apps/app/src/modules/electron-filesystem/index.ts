@@ -1,4 +1,12 @@
-import { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } from 'fs/promises'
+import {
+  copyFile,
+  mkdir,
+  readdir,
+  readFile,
+  rm,
+  stat,
+  writeFile,
+} from 'fs/promises'
 import path from 'path'
 import { app, BrowserWindow, dialog } from 'electron'
 import { IzabelaMessagePayload } from '@/modules/izabela/types'
@@ -24,7 +32,9 @@ export const ElectronFilesystem = () => ({
     )
     // NOTE: need to secure this one day somehow
     return mkdir(credentialsDirPath, { recursive: true })
-      .then(() => copyFile(credentialsPath, googleCloudSpeechCredentialsFilePath))
+      .then(() =>
+        copyFile(credentialsPath, googleCloudSpeechCredentialsFilePath),
+      )
       .then(() => Promise.resolve(googleCloudSpeechCredentialsFilePath))
   },
   getGoogleCloudSpeechCredentialsPath(): Promise<string> {
@@ -46,7 +56,8 @@ export const ElectronFilesystem = () => ({
     await settingsStore.$whenReady()
     const extension = content.split(';')[0].split('/')[1]
     const directory =
-      settingsStore.preferredSavDir && (await stat(settingsStore.preferredSavDir))
+      settingsStore.preferredSavDir &&
+      (await stat(settingsStore.preferredSavDir))
         ? settingsStore.preferredSavDir
         : app.getPath('downloads')
     const options = {
@@ -56,14 +67,25 @@ export const ElectronFilesystem = () => ({
       filters: [
         {
           name: 'Audio',
-          extensions: ['mp3', 'wav', 'ogg', 'flac', 'aac', 'm4a', 'opus', 'webm', 'wma'],
+          extensions: [
+            'mp3',
+            'wav',
+            'ogg',
+            'flac',
+            'aac',
+            'm4a',
+            'opus',
+            'webm',
+            'wma',
+          ],
         },
         { name: 'All Files', extensions: ['*'] },
       ],
     }
 
     const res = await dialog.showSaveDialog(
-      ElectronWindowManager.getInstanceByName('messenger')?.window as BrowserWindow,
+      ElectronWindowManager.getInstanceByName('messenger')
+        ?.window as BrowserWindow,
       options,
     )
     if (!res.filePath) return Promise.reject(Error('No file selected'))
@@ -90,7 +112,9 @@ export const ElectronFilesystem = () => ({
     if (file) {
       const mimeType = mime.getType(path.join(directory, file))
       return Promise.resolve(
-        `data:${mimeType};base64,${await convertFileToBase64(path.join(directory, file))}`,
+        `data:${mimeType};base64,${await convertFileToBase64(
+          path.join(directory, file),
+        )}`,
       )
     }
     return Promise.resolve(null)
@@ -105,6 +129,12 @@ export const ElectronFilesystem = () => ({
       return Promise.resolve(true)
     }
     return Promise.resolve(false)
+  },
+  async clearCache(): Promise<boolean> {
+    const directory = path.join(app.getPath('temp'), pkg.productName, 'cache')
+    await rm(directory, { recursive: true, force: true })
+    await mkdir(directory, { recursive: true })
+    return Promise.resolve(true)
   },
 })
 
