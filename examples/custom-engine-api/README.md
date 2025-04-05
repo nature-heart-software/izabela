@@ -66,4 +66,35 @@ http://localhost:3000/synthesize-speech
 }
 ```
 
-### Response: `audio/mp3`
+### Response: `audio/mpeg`
+
+⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
+
+## Synthesize Speech Stream
+
+### Method: `POST`
+
+```
+http://localhost:3000/synthesize-speech/stream
+```
+
+### Body: `application/json`
+
+```json
+{
+  "credentials": {
+    "apiKey": ""
+  },
+  "payload": {
+    "text": "Hello world, programmed to work and not to feel.",
+    "voice": {
+      "id": "Microsoft Hazel Desktop",
+      "name": "Microsoft Hazel Desktop",
+      "category": "Say",
+      "languageCode": "en-US"
+    }
+  }
+}
+```
+
+### Response: `audio/mpeg`
