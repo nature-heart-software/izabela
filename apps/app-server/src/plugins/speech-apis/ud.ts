@@ -39,17 +39,16 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
         url: 'https://api.uberduck.ai/speak-synchronous',
         method: 'POST',
         headers: {
-          Authorization: `Basic ${ Buffer.from(
-            `${ publicKey }:${ privateKey }`,
-          ).toString('base64') }`,
+          Authorization: `Basic ${Buffer.from(
+            `${publicKey}:${privateKey}`,
+          ).toString('base64')}`,
         },
         data: payload,
         responseType: 'arraybuffer',
       })
 
       const stream = s.pipe(res)
-      stream.on('finish', () => {
-      })
+      stream.on('finish', () => {})
       s.push(Buffer.from(data))
       s.push(null)
     } catch (e: any) {
@@ -58,7 +57,10 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
   }
   app.post('/api/tts/uberduck/list-voices', listVoicesHandler)
   app.post('/api/tts/uberduck/synthesize-speech', synthesizeSpeechHandler)
-  app.post('/api/tts/uberduck/synthesize-speech/stream', synthesizeSpeechHandler)
+  app.post(
+    '/api/tts/uberduck/synthesize-speech/stream',
+    synthesizeSpeechHandler,
+  )
 }
 
 export default plugin

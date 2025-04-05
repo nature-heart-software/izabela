@@ -1,5 +1,9 @@
 import { RequestHandler } from 'express'
-import { DescribeVoicesCommand, Polly, SynthesizeSpeechCommand } from '@aws-sdk/client-polly'
+import {
+  DescribeVoicesCommand,
+  Polly,
+  SynthesizeSpeechCommand,
+} from '@aws-sdk/client-polly'
 import { fromCognitoIdentityPool } from '@aws-sdk/credential-provider-cognito-identity'
 import { CognitoIdentityClient } from '@aws-sdk/client-cognito-identity'
 import { handleError } from '../../utils/requests'
@@ -53,15 +57,17 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
       })
       const { AudioStream } = await client.send(command)
       const stream = (AudioStream as any).pipe(res)
-      stream.on('finish', () => {
-      })
+      stream.on('finish', () => {})
     } catch (e: any) {
       handleError(res, 'Internal server error', e.message, 500)
     }
   }
   app.post('/api/tts/amazon-polly/list-voices', listVoicesHandler)
   app.post('/api/tts/amazon-polly/synthesize-speech', synthesizeSpeechHandler)
-  app.post('/api/tts/amazon-polly/synthesize-speech/stream', synthesizeSpeechHandler)
+  app.post(
+    '/api/tts/amazon-polly/synthesize-speech/stream',
+    synthesizeSpeechHandler,
+  )
 }
 
 export default plugin

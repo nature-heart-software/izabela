@@ -70,8 +70,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
         },
       })
       stream.pipe(res)
-      stream.on('finish', () => {
-      })
+      stream.on('finish', () => {})
     } catch (e: any) {
       handleError(res, 'Internal server error', e.message, 500)
     }

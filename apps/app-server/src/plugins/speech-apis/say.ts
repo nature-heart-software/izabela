@@ -31,7 +31,7 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
     },
     res,
   ) => {
-    const outputFile = path.join(config?.tempPath || '', uuid()+'.wav')
+    const outputFile = path.join(config?.tempPath || '', uuid() + '.wav')
     try {
       res.setHeader('Content-Type', 'audio/wav')
       fs.mkdirSync(path.parse(outputFile).dir, { recursive: true })

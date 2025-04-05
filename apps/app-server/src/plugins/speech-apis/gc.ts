@@ -16,7 +16,7 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
       const {
         data: { voices },
       } = await axios.get(
-        `https://texttospeech.googleapis.com/v1beta1/voices?key=${ apiKey }`,
+        `https://texttospeech.googleapis.com/v1beta1/voices?key=${apiKey}`,
       )
       res.status(200).json(voices)
     } catch (e: any) {
@@ -24,7 +24,9 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
     }
   }
 
-  const synthesizeSpeechHandler: ((stream?: boolean) => RequestHandler) = (streamAudio) => {
+  const synthesizeSpeechHandler: (stream?: boolean) => RequestHandler = (
+    streamAudio,
+  ) => {
     return async (
       {
         body: {
@@ -40,7 +42,7 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
         const {
           data: { audioContent },
         } = await axios.post(
-          `https://texttospeech.googleapis.com/v1beta1/text:synthesize?key=${ apiKey }`,
+          `https://texttospeech.googleapis.com/v1beta1/text:synthesize?key=${apiKey}`,
           {
             ...payload,
             audioConfig: {
@@ -52,8 +54,7 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
         )
 
         const stream = s.pipe(res)
-        stream.on('finish', () => {
-        })
+        stream.on('finish', () => {})
         s.push(Buffer.from(audioContent, 'base64'))
         s.push(null)
       } catch (e: any) {
@@ -63,7 +64,10 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
   }
   app.post('/api/tts/google-cloud/list-voices', listVoicesHandler)
   app.post('/api/tts/google-cloud/synthesize-speech', synthesizeSpeechHandler())
-  app.post('/api/tts/google-cloud/synthesize-speech/stream', synthesizeSpeechHandler(true))
+  app.post(
+    '/api/tts/google-cloud/synthesize-speech/stream',
+    synthesizeSpeechHandler(true),
+  )
 }
 
 export default plugin

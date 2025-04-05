@@ -51,15 +51,17 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
       })
 
       const stream = result.pipe(res)
-      stream.on('finish', () => {
-      })
+      stream.on('finish', () => {})
     } catch (e: any) {
       handleError(res, 'Internal server error', e.message, 500)
     }
   }
   app.post('/api/tts/ibm-watson/list-voices', listVoicesHandler)
   app.post('/api/tts/ibm-watson/synthesize-speech', synthesizeSpeechHandler)
-  app.post('/api/tts/ibm-watson/synthesize-speech/stream', synthesizeSpeechHandler)
+  app.post(
+    '/api/tts/ibm-watson/synthesize-speech/stream',
+    synthesizeSpeechHandler,
+  )
 }
 
 export default plugin

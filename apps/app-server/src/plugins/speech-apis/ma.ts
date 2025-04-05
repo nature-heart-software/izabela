@@ -1,7 +1,11 @@
 import { RequestHandler } from 'express'
 import axios from 'axios'
 import { handleError } from '../../utils/requests'
-import { SpeechConfig, SpeechSynthesisOutputFormat, SpeechSynthesizer } from 'microsoft-cognitiveservices-speech-sdk'
+import {
+  SpeechConfig,
+  SpeechSynthesisOutputFormat,
+  SpeechSynthesizer,
+} from 'microsoft-cognitiveservices-speech-sdk'
 import { Readable } from 'node:stream'
 
 const plugin: Izabela.Server.Plugin = ({ app, config }) => {
@@ -14,7 +18,7 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
     res,
   ) => {
     try {
-      const endpoint = `https://${ region }.tts.speech.${
+      const endpoint = `https://${region}.tts.speech.${
         region.startsWith('china') ? 'azure.cn' : 'microsoft.com'
       }/cognitiveservices/voices/list`
       const { data: voices } = await axios.get(endpoint, {
@@ -77,8 +81,7 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
       })
 
       const stream = s.pipe(res)
-      stream.on('finish', () => {
-      })
+      stream.on('finish', () => {})
       s.push(Buffer.from(audioContent))
       s.push(null)
     } catch (e: any) {
