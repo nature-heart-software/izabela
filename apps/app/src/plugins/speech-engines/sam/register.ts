@@ -121,6 +121,9 @@ registerEngine({
     })
     return Promise.resolve(blob)
   },
+  getUseCacheOnEveryRequest() {
+    return true
+  },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,
   store: { setProperty, getProperty },

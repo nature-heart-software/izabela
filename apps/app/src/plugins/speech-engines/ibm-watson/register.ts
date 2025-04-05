@@ -1,4 +1,4 @@
-import { api } from '@/services'
+import { fetchApi } from '@/services'
 import { registerEngine } from '@/modules/speech-engine-manager'
 import { useSpeechStore } from '@/features/speech/store'
 import NvVoiceSelect from './NvVoiceSelect.vue'
@@ -38,16 +38,22 @@ registerEngine({
     return (voice || getSelectedVoice()).language
   },
   synthesizeSpeech({ credentials, payload }) {
-    return api(
+    return fetchApi(
       getProperty('useLocalCredentials') ? 'local' : 'remote',
-    ).post<Blob>(
-      '/tts/ibm-watson/synthesize-speech',
+      `/tts/ibm-watson/synthesize-speech${
+        getProperty('streamAudio') ? '/stream' : ''
+      }`,
       {
-        credentials,
-        payload,
+        method: 'POST',
+        body: JSON.stringify({
+          credentials,
+          payload,
+        }),
       },
-      { responseType: 'blob' },
     )
+  },
+  getUseCacheOnEveryRequest() {
+    return true
   },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,

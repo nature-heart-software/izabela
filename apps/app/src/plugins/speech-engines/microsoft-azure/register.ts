@@ -1,4 +1,4 @@
-import { api } from '@/services'
+import { fetchApi } from '@/services'
 import { registerEngine } from '@/modules/speech-engine-manager'
 import type { SpeechEngine } from '@/modules/speech-engine-manager/types'
 import { useSpeechStore } from '@/features/speech/store'
@@ -13,7 +13,10 @@ const getCredentials = () => ({
 })
 
 const commands: SpeechEngine['commands'] = (voice) =>
-  (voice?.StyleList || []).map((style: string) => ({ name: style, value: style }))
+  (voice?.StyleList || []).map((style: string) => ({
+    name: style,
+    value: style,
+  }))
 
 const getSelectedVoice = () => getProperty('selectedVoice')
 registerEngine({
@@ -25,7 +28,10 @@ registerEngine({
   getCredentials,
   hasCredentials() {
     const speechStore = useSpeechStore()
-    return speechStore.hasUniversalApiCredentials || Object.values(getCredentials()).every(Boolean)
+    return (
+      speechStore.hasUniversalApiCredentials ||
+      Object.values(getCredentials()).every(Boolean)
+    )
   },
   getPayload({ text, translatedText, voice: v }) {
     const voice = v || getSelectedVoice()
@@ -33,7 +39,9 @@ registerEngine({
     let expression
     const commandString = newText.split(' ')[0] || ''
     if (commandString.startsWith('/')) {
-      const command = commands(voice).find(({ name }) => commandString.startsWith(`/${name}`))
+      const command = commands(voice).find(({ name }) =>
+        commandString.startsWith(`/${name}`),
+      )
       newText = newText.replace(commandString, '')
       if (command) {
         expression = command.value
@@ -56,14 +64,22 @@ registerEngine({
     return (voice || getSelectedVoice()).Locale
   },
   synthesizeSpeech({ credentials, payload }) {
-    return api(getProperty('useLocalCredentials') ? 'local' : 'remote').post<Blob>(
-      '/tts/microsoft-azure/synthesize-speech',
+    return fetchApi(
+      getProperty('useLocalCredentials') ? 'local' : 'remote',
+      `/tts/microsoft-azure/synthesize-speech${
+        getProperty('streamAudio') ? '/stream' : ''
+      }`,
       {
-        credentials,
-        payload,
+        method: 'POST',
+        body: JSON.stringify({
+          credentials,
+          payload,
+        }),
       },
-      { responseType: 'blob' },
     )
+  },
+  getUseCacheOnEveryRequest() {
+    return true
   },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,

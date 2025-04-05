@@ -61,7 +61,7 @@ app.post('/synthesize-speech', async (req, res) => {
         },
       },
     } = req
-    const outputFile = path.join(__dirname, 'example.mp3')
+    const outputFile = path.join(__dirname, 'example.wav')
     fs.mkdirSync(path.parse(outputFile).dir, { recursive: true })
     fs.writeFileSync(outputFile, '')
 
@@ -75,7 +75,7 @@ app.post('/synthesize-speech', async (req, res) => {
     })
 
     res.writeHead(200, {
-      'Content-Type': 'audio/mp3',
+      'Content-Type': 'audio/wav',
     })
     const stream = fs.createReadStream(outputFile).pipe(res)
     stream.on('finish', () => {
@@ -84,6 +84,12 @@ app.post('/synthesize-speech', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message })
   }
+})
+
+app.post('/synthesize-speech/stream', async () => {
+  /* You can reuse the same handler as /synthesize-speech as long as it returns
+   * a streamed mp3 file with the audio/mpeg Content-Type header.
+   **/
 })
 
 app.listen(ENDPOINT_PORT, () => {

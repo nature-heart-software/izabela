@@ -1,6 +1,6 @@
 import { registerEngine } from '@/modules/speech-engine-manager'
 import { DEFAULT_LANGUAGE_CODE } from '@/consts'
-import { api } from '@/services'
+import { fetchApi } from '@/services'
 import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
@@ -36,17 +36,23 @@ registerEngine({
   getLanguageCode() {
     return DEFAULT_LANGUAGE_CODE
   },
-  synthesizeSpeech({ credentials, payload }) {
-    return api('local').post<Blob>(
-      '/tts/elevenlabs/synthesize-speech',
+  async synthesizeSpeech({ credentials, payload }) {
+    return fetchApi(
+      'local',
+      `/tts/elevenlabs/synthesize-speech${
+        getProperty('streamAudio') ? '/stream' : ''
+      }`,
       {
-        credentials,
-        payload,
-      },
-      {
-        responseType: 'blob',
+        method: 'POST',
+        body: JSON.stringify({
+          credentials,
+          payload,
+        }),
       },
     )
+  },
+  getUseCacheOnEveryRequest() {
+    return getProperty('useCacheOnEveryRequest')
   },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,

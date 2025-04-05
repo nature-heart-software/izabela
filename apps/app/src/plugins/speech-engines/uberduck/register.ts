@@ -1,4 +1,4 @@
-import { api } from '@/services'
+import { fetchApi } from '@/services'
 import { registerEngine } from '@/modules/speech-engine-manager'
 import { useSpeechStore } from '@/features/speech/store'
 import { DEFAULT_LANGUAGE_CODE } from '@/consts'
@@ -22,7 +22,10 @@ registerEngine({
   getCredentials,
   hasCredentials() {
     const speechStore = useSpeechStore()
-    return speechStore.hasUniversalApiCredentials || Object.values(getCredentials()).every(Boolean)
+    return (
+      speechStore.hasUniversalApiCredentials ||
+      Object.values(getCredentials()).every(Boolean)
+    )
   },
   getPayload({ text, translatedText, voice }) {
     return {
@@ -34,14 +37,22 @@ registerEngine({
     return DEFAULT_LANGUAGE_CODE
   },
   synthesizeSpeech({ credentials, payload }) {
-    return api(getProperty('useLocalCredentials') ? 'local' : 'remote').post<Blob>(
-      '/tts/uberduck/synthesize-speech',
+    return fetchApi(
+      getProperty('useLocalCredentials') ? 'local' : 'remote',
+      `/tts/uberduck/synthesize-speech${
+        getProperty('streamAudio') ? '/stream' : ''
+      }`,
       {
-        credentials,
-        payload,
+        method: 'POST',
+        body: JSON.stringify({
+          credentials,
+          payload,
+        }),
       },
-      { responseType: 'blob' },
     )
+  },
+  getUseCacheOnEveryRequest() {
+    return true
   },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,

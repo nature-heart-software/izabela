@@ -1,4 +1,4 @@
-import { api } from '@/services'
+import { fetchApi } from '@/services'
 import { registerEngine } from '@/modules/speech-engine-manager'
 import { DEFAULT_LANGUAGE_CODE } from '@/consts'
 import { useSpeechStore } from '@/features/speech/store'
@@ -32,13 +32,21 @@ registerEngine({
     return DEFAULT_LANGUAGE_CODE
   },
   synthesizeSpeech({ payload }) {
-    return api().post<Blob>(
-      '/tts/izabela/synthesize-speech',
+    return fetchApi(
+      'remote',
+      `/tts/izabela/synthesize-speech${
+        getProperty('streamAudio') ? '/stream' : ''
+      }`,
       {
-        payload,
+        method: 'POST',
+        body: JSON.stringify({
+          payload,
+        }),
       },
-      { responseType: 'blob' },
     )
+  },
+  getUseCacheOnEveryRequest() {
+    return true
   },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,

@@ -1,4 +1,3 @@
-import { AxiosResponse } from 'axios'
 import { Component } from 'vue'
 import { definePluginStore } from '@/store'
 import { SpeechCommand } from '@/features/speech/types'
@@ -14,11 +13,16 @@ export interface SpeechEngine {
   getSelectedVoice: () => any
   getCredentials: () => Credentials
   getLanguageCode: (voice?: any) => string
-  getPayload: (options: { text: string; voice: any; translatedText: string | null }) => Payload
+  getUseCacheOnEveryRequest: () => boolean
+  getPayload: (options: {
+    text: string
+    voice: any
+    translatedText: string | null
+  }) => Payload
   synthesizeSpeech: (context: {
     credentials: Credentials
     payload: Payload
-  }) => Promise<AxiosResponse<Blob>> | Promise<Blob>
+  }) => Promise<Blob | Response>
   hasCredentials?: () => boolean
   voiceSelectComponent: Component
   settingsComponent: Component

@@ -63,6 +63,20 @@
           />
         </NvGroup>
       </NvFormItem>
+      <NvDivider direction="horizontal" />
+      <NvGroup :spacing="5" align="start" justify="apart" no-wrap>
+        <NvStack>
+          <NvText type="label">Stream audio</NvText>
+          <NvText
+            >Allows for faster audio playback, may cause audio artifacts
+          </NvText>
+        </NvStack>
+        <NvSwitch
+          :modelValue="getProperty('streamAudio')"
+          class="shrink-0"
+          @update:modelValue="(value) => setProperty('streamAudio', value)"
+        />
+      </NvGroup>
     </NvStack>
   </NvAccessBlocker>
   <template v-if="speechStore.hasUniversalApiCredentials">

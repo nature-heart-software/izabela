@@ -13,4 +13,5 @@ export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
   speakingRate: 1,
   pitch: 0,
   volumeGainDb: 0,
+  streamAudio: true,
 })

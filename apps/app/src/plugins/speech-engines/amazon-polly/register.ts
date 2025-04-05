@@ -1,4 +1,4 @@
-import { api } from '@/services'
+import { fetchApi } from '@/services'
 import { registerEngine } from '@/modules/speech-engine-manager'
 import { useSpeechStore } from '@/features/speech/store'
 import NvVoiceSelect from './NvVoiceSelect.vue'
@@ -21,7 +21,10 @@ registerEngine({
   getCredentials,
   hasCredentials() {
     const speechStore = useSpeechStore()
-    return speechStore.hasUniversalApiCredentials || Object.values(getCredentials()).every(Boolean)
+    return (
+      speechStore.hasUniversalApiCredentials ||
+      Object.values(getCredentials()).every(Boolean)
+    )
   },
   getPayload({ text, translatedText, voice }) {
     return {
@@ -33,14 +36,22 @@ registerEngine({
     return (voice || getSelectedVoice()).LanguageCode
   },
   synthesizeSpeech({ credentials, payload }) {
-    return api(getProperty('useLocalCredentials') ? 'local' : 'remote').post<Blob>(
-      '/tts/amazon-polly/synthesize-speech',
+    return fetchApi(
+      getProperty('useLocalCredentials') ? 'local' : 'remote',
+      `/tts/amazon-polly/synthesize-speech${
+        getProperty('streamAudio') ? '/stream' : ''
+      }`,
       {
-        credentials,
-        payload,
+        method: 'POST',
+        body: JSON.stringify({
+          credentials,
+          payload,
+        }),
       },
-      { responseType: 'blob' },
     )
+  },
+  getUseCacheOnEveryRequest() {
+    return true
   },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,

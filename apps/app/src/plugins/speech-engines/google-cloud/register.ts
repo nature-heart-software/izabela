@@ -1,4 +1,4 @@
-import { api } from '@/services'
+import { fetchApi } from '@/services'
 import pick from 'lodash/pick'
 import { registerEngine } from '@/modules/speech-engine-manager'
 import { useSpeechStore } from '@/features/speech/store'
@@ -52,16 +52,22 @@ registerEngine({
     return (voice || getSelectedVoice()).languageCodes[0]
   },
   synthesizeSpeech({ credentials, payload }) {
-    return api(
+    return fetchApi(
       getProperty('useLocalCredentials') ? 'local' : 'remote',
-    ).post<Blob>(
-      '/tts/google-cloud/synthesize-speech',
+      `/tts/google-cloud/synthesize-speech${
+        getProperty('streamAudio') ? '/stream' : ''
+      }`,
       {
-        credentials,
-        payload,
+        method: 'POST',
+        body: JSON.stringify({
+          credentials,
+          payload,
+        }),
       },
-      { responseType: 'blob' },
     )
+  },
+  getUseCacheOnEveryRequest() {
+    return true
   },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,

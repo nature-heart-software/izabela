@@ -50,9 +50,12 @@
             <NvStack>
               <NvText type="label">Universal credentials</NvText>
               <NvText
-                >Gain access to multiple text-to-speech engines using a universal API key <br />You
-                can obtain a universal API key by being a
-                <a href="https://ko-fi.com/woowee/tiers" target="_blank">Ko-fi supporter</a></NvText
+                >Gain access to multiple text-to-speech engines using a
+                universal API key <br />You can obtain a universal API key by
+                being a
+                <a href="https://ko-fi.com/woowee/tiers" target="_blank"
+                  >Ko-fi supporter</a
+                ></NvText
               >
             </NvStack>
           </NvStack>
@@ -68,7 +71,14 @@
 </template>
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue'
-import { NvButton, NvCard, NvDivider, NvGroup, NvStack, NvText } from '@packages/ui'
+import {
+  NvButton,
+  NvCard,
+  NvDivider,
+  NvGroup,
+  NvStack,
+  NvText,
+} from '@packages/ui'
 import SpeechEngineSelect from '@/features/speech/components/inputs/NvSpeechEngineSelect.vue'
 import { useSpeechEngineManager } from '@/modules/speech-engine-manager'
 import { SpeechEngine } from '@/modules/speech-engine-manager/types'
@@ -79,7 +89,9 @@ import NvUniversalApiForm from '@/features/speech/components/forms/NvUniversalAp
 const speechStore = useSpeechStore()
 const settingsStore = useSettingsStore()
 
-const selectedEngineTab = ref<SpeechEngine['id']>(speechStore.selectedSpeechEngine)
+const selectedEngineTab = ref<SpeechEngine['id']>(
+  speechStore.selectedSpeechEngine,
+)
 watch(
   () => speechStore.selectedSpeechEngine,
   (value) => {
@@ -88,6 +100,8 @@ watch(
 )
 const { engines } = useSpeechEngineManager()
 const currentEngineSettingsComponent = computed(
-  () => engines.value.find((e) => e.id === selectedEngineTab.value)?.settingsComponent,
+  () =>
+    engines.value.find((e) => e.id === selectedEngineTab.value)
+      ?.settingsComponent,
 )
 </script>

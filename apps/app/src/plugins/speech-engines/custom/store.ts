@@ -6,4 +6,6 @@ export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
   endpoint: '',
   apiKey: '',
   favoriteVoiceIds: [],
+  useCacheOnEveryRequest: true,
+  streamAudio: false,
 })
