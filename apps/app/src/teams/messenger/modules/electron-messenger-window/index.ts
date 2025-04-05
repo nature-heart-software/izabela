@@ -92,6 +92,7 @@ export const ElectronMessengerWindow = () => {
     }
   }
 
+  let focusedWithNativeOnce = false
   const focus = (context: 'mouse' | 'keyboard', native = false) =>
     new Promise((_, reject) => {
       messengerWindowStore?.$patch({ focusContext: context })
@@ -99,11 +100,13 @@ export const ElectronMessengerWindow = () => {
       if (window) {
         if (!isFocused) {
           if (native) {
+            // Need to call ensureNativeFocus as late as possible otherwise it can break the foreground window
             window.once('focus', () => {
-              // In applications like League of Legends, the window doesn't always receive focus
-              // but we can force it manually once we're sure the window is shown 100%.
-              // Only possible with a timeout atm.
-              setTimeout(() => ensureNativeFocus(), 100)
+              // For some reason, the first time ensureNative is called it has a chance to close the window right away
+              // so we time it out as late as possible on the first call.
+              if (focusedWithNativeOnce) return ensureNativeFocus()
+              focusedWithNativeOnce = true
+              setTimeout(ensureNativeFocus, 200)
             })
           }
           foregroundWindow = user32.GetForegroundWindow()
