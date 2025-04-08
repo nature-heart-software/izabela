@@ -32,4 +32,5 @@ export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
   useLocalCredentials: false,
   favoriteVoiceIds: [],
   streamAudio: true,
+  includeTimestamps: false,
 })

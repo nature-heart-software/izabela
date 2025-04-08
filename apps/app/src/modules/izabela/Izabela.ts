@@ -42,6 +42,18 @@ export default () => {
     message.on('error', () => {
       onEnd(true)
     })
+    message.on('response:data', (data) => {
+      socket.emit('message:response:data', {
+        ...data,
+        payload: socketPayload,
+      })
+    })
+    message.on('timeupdate', (data) => {
+      socket.emit('message:timeupdate', {
+        ...data,
+        payload: socketPayload,
+      })
+    })
     socket.emit('message:load', socketPayload)
     message
       .isReady()

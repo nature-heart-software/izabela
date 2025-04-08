@@ -48,7 +48,10 @@ export default (messagePayload: IzabelaMessagePayload) => {
     return `${useCacheOnEveryRequest ? 'cache' : id}-${hash(payload)}`
   }
 
-  function on(event: IzabelaMessageEvent, callback: () => void): void {
+  function on(
+    event: IzabelaMessageEvent,
+    callback: (...args: any[]) => void,
+  ): void {
     emitter.on(event, callback)
   }
 
@@ -214,6 +217,14 @@ export default (messagePayload: IzabelaMessagePayload) => {
         payload,
       })
       .then((res) => {
+        try {
+          if (res instanceof Response) {
+            const data = res.headers.get('data')
+            if (data) emitter.emit('response:data', JSON.parse(data))
+          }
+        } catch (e) {
+          console.error(e)
+        }
         audioDownloaded.resolve(true)
         cacheAudio(res)
         return Promise.resolve(res)
@@ -256,14 +267,19 @@ export default (messagePayload: IzabelaMessagePayload) => {
   }
 
   function getAudioProgress() {
-    return audio.currentTime / audio.duration
+    return audio.currentTime / audio.duration || 0
   }
 
   function addEventListeners() {
     audio.addEventListener('timeupdate', () => {
       if (cancelled) return
+      emitter.emit('timeupdate', {
+        currentTime: audio.currentTime,
+        duration: audio.duration,
+        progress: getAudioProgress(),
+      })
       playingMessageStore.$patch({
-        progress: audio.currentTime / audio.duration || 0,
+        progress: getAudioProgress(),
       })
     })
     audio.addEventListener('ended', () => {
@@ -294,9 +310,6 @@ export default (messagePayload: IzabelaMessagePayload) => {
     })
     audio.addEventListener('started', () => emitter.emit('started'))
     audio.addEventListener('ended', () => emitter.emit('ended'))
-    audio.addEventListener('progress', () =>
-      emitter.emit('progress', getAudioProgress()),
-    )
     audio.addEventListener('error', (e) => onError(e))
   }
 
