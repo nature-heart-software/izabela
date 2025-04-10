@@ -38,7 +38,6 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
     res,
   ) => {
     try {
-      res.setHeader('Content-Type', 'audio/mpeg')
       const textToSpeech = new TextToSpeechV1({
         authenticator: new IamAuthenticator({
           apikey: apiKey,
@@ -52,6 +51,10 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
 
       const stream = result.pipe(res)
       stream.on('finish', () => {})
+
+      res.writeHead(200, {
+        'Content-Type': 'audio/mpeg',
+      })
     } catch (e: any) {
       handleError(res, 'Internal server error', e.message, 500)
     }

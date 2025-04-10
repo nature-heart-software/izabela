@@ -37,7 +37,6 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
       res,
     ) => {
       try {
-        res.setHeader('Content-Type', streamAudio ? 'audio/mpeg' : 'audio/wav')
         const s = new Readable()
         const {
           data: { audioContent },
@@ -57,6 +56,10 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
         stream.on('finish', () => {})
         s.push(Buffer.from(audioContent, 'base64'))
         s.push(null)
+
+        res.writeHead(200, {
+          'Content-Type': streamAudio ? 'audio/mpeg' : 'audio/wav',
+        })
       } catch (e: any) {
         handleError(res, 'Internal server error', e.message, 500)
       }

@@ -33,6 +33,18 @@
           "
         />
       </NvGroup>
+      <NvDivider direction="horizontal" />
+      <NvGroup :spacing="5" justify="apart" no-wrap>
+        <NvStack>
+          <NvText type="label">Provide timestamps to WebSocket events</NvText>
+        </NvStack>
+        <NvSwitch
+          :modelValue="getProperty('includeTimestamps')"
+          class="shrink-0"
+          @update:modelValue="
+            (value) => setProperty('includeTimestamps', value)
+          "
+        />
     </NvStack>
   </NvAccessBlocker>
   <NvDivider direction="horizontal" />

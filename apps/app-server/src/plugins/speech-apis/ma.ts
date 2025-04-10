@@ -4,9 +4,10 @@ import { handleError } from '../../utils/requests'
 import {
   SpeechConfig,
   SpeechSynthesisOutputFormat,
+  SpeechSynthesisWordBoundaryEventArgs,
   SpeechSynthesizer,
 } from 'microsoft-cognitiveservices-speech-sdk'
-import { Readable } from 'node:stream'
+import { Readable } from 'stream'
 
 const plugin: Izabela.Server.Plugin = ({ app, config }) => {
   const listVoicesHandler: RequestHandler = async (
@@ -37,21 +38,31 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
       body: {
         credentials: { apiKey, region },
         payload,
+        includeTimestamps,
       },
     },
     res,
   ) => {
     try {
-      res.setHeader('Content-Type', 'audio/mpeg')
       const s = new Readable()
 
+      const wordBoundaries: SpeechSynthesisWordBoundaryEventArgs[] = []
       const speechConfig = SpeechConfig.fromSubscription(apiKey, region)
       speechConfig.speechSynthesisLanguage = payload.voice.Locale
       speechConfig.speechSynthesisVoiceName = payload.voice.ShortName
       speechConfig.speechSynthesisOutputFormat =
         SpeechSynthesisOutputFormat.Audio24Khz160KBitRateMonoMp3
 
+      if (includeTimestamps) speechConfig.requestWordLevelTimestamps()
+
       const synthesizer = new SpeechSynthesizer(speechConfig)
+
+      if (includeTimestamps) {
+        synthesizer.wordBoundary = (_, e) => {
+          wordBoundaries.push(e)
+        }
+      }
+
       const audioContent: ArrayBuffer = await new Promise((resolve, reject) => {
         if (payload.ssml) {
           synthesizer.speakSsmlAsync(
@@ -84,6 +95,13 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
       stream.on('finish', () => {})
       s.push(Buffer.from(audioContent))
       s.push(null)
+
+      res.writeHead(200, {
+        'Content-Type': 'audio/mpeg',
+        Data: JSON.stringify({
+          timestamps: wordBoundaries,
+        }),
+      })
     } catch (e: any) {
       return handleError(res, 'Internal server error', e.message, 500)
     }

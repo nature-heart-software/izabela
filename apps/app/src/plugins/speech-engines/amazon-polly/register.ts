@@ -45,13 +45,14 @@ registerEngine({
         method: 'POST',
         body: JSON.stringify({
           credentials,
+          includeTimestamps: getProperty('includeTimestamps'),
           payload,
         }),
       },
     )
   },
   getUseCacheOnEveryRequest() {
-    return true
+    return !getProperty('includeTimestamps')
   },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,

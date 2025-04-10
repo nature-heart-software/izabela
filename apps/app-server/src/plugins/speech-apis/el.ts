@@ -57,7 +57,6 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
     res,
   ) => {
     try {
-      res.setHeader('Content-Type', 'audio/mpeg')
       const client = new ElevenLabsClient({ apiKey })
       const stream = await client.textToSpeech.convertAsStream(voice.voice_id, {
         text,
@@ -71,6 +70,10 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
       })
       stream.pipe(res)
       stream.on('finish', () => {})
+
+      res.writeHead(200, {
+        'Content-Type': 'audio/mpeg',
+      })
     } catch (e: any) {
       handleError(res, 'Internal server error', e.message, 500)
     }

@@ -8,4 +8,5 @@ export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
   favoriteVoiceIds: [],
   useCacheOnEveryRequest: true,
   streamAudio: false,
+  includeTimestamps: false,
 })

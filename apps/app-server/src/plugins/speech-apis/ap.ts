@@ -7,6 +7,26 @@ import {
 import { fromCognitoIdentityPool } from '@aws-sdk/credential-provider-cognito-identity'
 import { CognitoIdentityClient } from '@aws-sdk/client-cognito-identity'
 import { handleError } from '../../utils/requests'
+import { Readable } from 'stream'
+
+function parseSpeechMarks(stream: Readable): Promise<any[]> {
+  return new Promise((resolve, reject) => {
+    let buffer = ''
+    const result: any[] = []
+
+    stream.on('data', (chunk) => {
+      buffer += chunk.toString()
+      const lines = buffer.split('\n')
+      buffer = lines.pop() || ''
+      for (const line of lines) {
+        if (line.trim()) result.push(JSON.parse(line))
+      }
+    })
+
+    stream.on('end', () => resolve(result))
+    stream.on('error', reject)
+  })
+}
 
 const plugin: Izabela.Server.Plugin = ({ app }) => {
   const listVoicesHandler: RequestHandler = async (
@@ -38,12 +58,13 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
       body: {
         credentials: { identityPoolId, region },
         payload,
+        includeTimestamps,
       },
     },
     res,
   ) => {
     try {
-      res.setHeader('Content-Type', 'audio/mpeg')
+      let timestamps: any[] = []
       const client = new Polly({
         region,
         credentials: fromCognitoIdentityPool({
@@ -51,13 +72,39 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
           identityPoolId: identityPoolId,
         }),
       })
-      const command = new SynthesizeSpeechCommand({
-        ...payload,
-        OutputFormat: 'mp3',
-      })
-      const { AudioStream } = await client.send(command)
-      const stream = (AudioStream as any).pipe(res)
+
+      const [audioRes, markRes] = await Promise.all(
+        [
+          client.send(
+            new SynthesizeSpeechCommand({
+              ...payload,
+              OutputFormat: 'mp3',
+            }),
+          ),
+          includeTimestamps &&
+            client.send(
+              new SynthesizeSpeechCommand({
+                ...payload,
+                SpeechMarkTypes: ['word'],
+                OutputFormat: 'json',
+              }),
+            ),
+        ].filter(Boolean),
+      )
+
+      if (markRes) {
+        timestamps = await parseSpeechMarks((markRes.AudioStream as any)!)
+      }
+
+      const stream = (audioRes.AudioStream as any).pipe(res)
       stream.on('finish', () => {})
+
+      res.writeHead(200, {
+        'Content-Type': 'audio/mpeg',
+        Data: JSON.stringify({
+          timestamps,
+        }),
+      })
     } catch (e: any) {
       handleError(res, 'Internal server error', e.message, 500)
     }
