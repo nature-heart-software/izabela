@@ -45,8 +45,8 @@ registerEngine({
         method: 'POST',
         body: JSON.stringify({
           credentials,
-          includeTimestamps: getProperty('includeTimestamps'),
           payload,
+          includeTimestamps: getProperty('includeTimestamps'),
         }),
       },
     )

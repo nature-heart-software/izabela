@@ -41,6 +41,7 @@ registerEngine({
         {
           credentials,
           payload,
+          includeTimestamps: getProperty('includeTimestamps'),
         },
         { responseType: 'blob' },
       )

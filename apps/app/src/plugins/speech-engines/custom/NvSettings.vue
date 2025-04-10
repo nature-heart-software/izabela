@@ -45,6 +45,7 @@
             (value) => setProperty('includeTimestamps', value)
           "
         />
+      </NvGroup>
     </NvStack>
   </NvAccessBlocker>
   <NvDivider direction="horizontal" />
