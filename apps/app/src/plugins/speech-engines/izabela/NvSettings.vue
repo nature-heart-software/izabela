@@ -48,10 +48,7 @@ import {
 } from '@packages/ui'
 import { useSpeechStore } from '@/features/speech/store'
 import NvVoiceSelect from './NvVoiceSelect'
-import {
-  getProperty,
-  setProperty,
-} from '@/plugins/speech-engines/custom/store.ts'
+import { getProperty, setProperty } from './store.ts'
 
 const speechStore = useSpeechStore()
 </script>

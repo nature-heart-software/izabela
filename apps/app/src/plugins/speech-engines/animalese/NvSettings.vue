@@ -40,20 +40,20 @@
           />
         </NvGroup>
       </NvFormItem>
-      <NvDivider direction="horizontal" />
-      <NvGroup :spacing="5" justify="apart" no-wrap>
-        <NvStack>
-          <NvText type="label">Prefer cache on every message</NvText>
-        </NvStack>
-        <NvSwitch
-          :modelValue="getProperty('useCacheOnEveryRequest')"
-          @update:modelValue="
-            (value) => setProperty('useCacheOnEveryRequest', value)
-          "
-        />
-      </NvGroup>
     </NvStack>
   </NvAccessBlocker>
+  <NvDivider direction="horizontal" />
+  <NvGroup :spacing="5" justify="apart" no-wrap>
+    <NvStack>
+      <NvText type="label">Prefer cache on every message</NvText>
+    </NvStack>
+    <NvSwitch
+      :modelValue="getProperty('useCacheOnEveryRequest')"
+      @update:modelValue="
+        (value) => setProperty('useCacheOnEveryRequest', value)
+      "
+    />
+  </NvGroup>
 </template>
 <script lang="ts" setup>
 import {
