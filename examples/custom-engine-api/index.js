@@ -59,6 +59,7 @@ app.post('/synthesize-speech', async (req, res) => {
             languageCode, // language code of the voice
           },
         },
+        includeTimestamps, // Whether the client wants to include timestamps in the DATA or not
       },
     } = req
     const outputFile = path.join(__dirname, 'example.wav')
@@ -74,12 +75,18 @@ app.post('/synthesize-speech', async (req, res) => {
       })
     })
 
-    res.writeHead(200, {
-      'Content-Type': 'audio/wav',
-    })
     const stream = fs.createReadStream(outputFile).pipe(res)
     stream.on('finish', () => {
       fs.unlinkSync(outputFile)
+    })
+
+    res.writeHead(200, {
+      // prefer audio/mpeg if the engine supports mp3/mpeg files to support audio streaming.
+      'Content-Type': 'audio/wav',
+      Data: {
+        // Pass any data you wish to provide to the "message:response:data" WebSocket event.
+        timestamps: [],
+      },
     })
   } catch (err) {
     res.status(500).json({ error: err.message })

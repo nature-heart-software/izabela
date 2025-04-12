@@ -41,12 +41,16 @@ registerEngine({
         {
           credentials,
           payload,
+          includeTimestamps: getProperty('includeTimestamps'),
         },
         { responseType: 'blob' },
       )
       .then((res) => res.data)
   },
   getUseCacheOnEveryRequest() {
+    if (getProperty('includeTimestamps')) {
+      return false
+    }
     return getProperty('useCacheOnEveryRequest')
   },
   voiceSelectComponent: NvVoiceSelect,

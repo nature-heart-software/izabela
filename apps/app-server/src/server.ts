@@ -14,6 +14,11 @@ app.use(bodyParser.urlencoded({ extended: true }))
 if (process.env.NODE_ENV === 'development') {
   app.use(logger('dev'))
 }
+app.use((_, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Expose-Headers', 'Data')
+  next()
+})
 
 class Server {
   public server?: Izabela.Server.Context['server']
@@ -29,7 +34,6 @@ class Server {
   async startServer() {
     const server = app.listen(this.getConfig().port, () => {
       const address = server.address()
-      console.log(address)
       const port =
         address && typeof address !== 'string' && 'port' in address
           ? address.port

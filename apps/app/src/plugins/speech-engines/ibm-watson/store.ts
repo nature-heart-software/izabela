@@ -20,4 +20,5 @@ export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
   ratePercentage: 0,
   pitchPercentage: 0,
   streamAudio: true,
+  includeTimestamps: false,
 })

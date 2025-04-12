@@ -42,6 +42,8 @@ export default (() => {
           'message:start',
           'message:end',
           'message:error',
+          'message:response:data',
+          'message:timeupdate',
           'window:focus',
           'window:blur',
           'input:focus',

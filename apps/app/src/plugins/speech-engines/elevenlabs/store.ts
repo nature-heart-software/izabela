@@ -22,4 +22,5 @@ export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
   stream: true,
   useCacheOnEveryRequest: true,
   streamAudio: true,
+  includeTimestamps: false,
 })

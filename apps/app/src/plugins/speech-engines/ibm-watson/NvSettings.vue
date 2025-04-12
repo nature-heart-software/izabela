@@ -77,6 +77,19 @@
           @update:modelValue="(value) => setProperty('streamAudio', value)"
         />
       </NvGroup>
+      <NvDivider direction="horizontal" />
+      <NvGroup :spacing="5" justify="apart" no-wrap>
+        <NvStack>
+          <NvText type="label">Provide timestamps to WebSocket events</NvText>
+        </NvStack>
+        <NvSwitch
+          :modelValue="getProperty('includeTimestamps')"
+          class="shrink-0"
+          @update:modelValue="
+            (value) => setProperty('includeTimestamps', value)
+          "
+        />
+      </NvGroup>
     </NvStack>
   </NvAccessBlocker>
   <template v-if="speechStore.hasUniversalApiCredentials">

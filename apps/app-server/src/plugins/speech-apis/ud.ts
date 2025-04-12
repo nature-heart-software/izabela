@@ -32,7 +32,6 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
     res,
   ) => {
     try {
-      res.setHeader('Content-Type', 'audio/mpeg')
       const s = new Readable()
 
       const { data }: AxiosResponse<ArrayBuffer> = await axios({
@@ -51,6 +50,10 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
       stream.on('finish', () => {})
       s.push(Buffer.from(data))
       s.push(null)
+
+      res.writeHead(200, {
+        'Content-Type': 'audio/mpeg',
+      })
     } catch (e: any) {
       handleError(res, 'Internal server error', e.message, 500)
     }

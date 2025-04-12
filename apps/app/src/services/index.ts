@@ -66,7 +66,7 @@ export const fetchApi = (
   }
   if (type === 'local') {
     return fetch(
-      new URL(endpoint, localApiBaseUrl).toString(),
+      new URL(`/api${endpoint}`, localApiBaseUrl).toString(),
       newOptions,
     ).then(throwIfError)
   }
@@ -79,7 +79,8 @@ export const fetchApi = (
       newOptions,
     ).then(throwIfError)
   }
-  return fetch(new URL(endpoint, localApiBaseUrl).toString(), newOptions).then(
-    throwIfError,
-  )
+  return fetch(
+    new URL(`/api${endpoint}`, localApiBaseUrl).toString(),
+    newOptions,
+  ).then(throwIfError)
 }

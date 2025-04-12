@@ -33,7 +33,6 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
   ) => {
     const outputFile = path.join(config?.tempPath || '', uuid() + '.wav')
     try {
-      res.setHeader('Content-Type', 'audio/wav')
       fs.mkdirSync(path.parse(outputFile).dir, { recursive: true })
       fs.writeFileSync(outputFile, '')
 
@@ -51,6 +50,10 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
 
       stream.on('close', () => {
         fs.unlinkSync(outputFile)
+      })
+
+      res.writeHead(200, {
+        'Content-Type': 'audio/wav',
       })
     } catch (e: any) {
       if (fs.existsSync(outputFile)) {

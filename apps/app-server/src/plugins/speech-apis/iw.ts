@@ -2,6 +2,7 @@ import { RequestHandler } from 'express'
 import TextToSpeechV1 from 'ibm-watson/text-to-speech/v1'
 import { IamAuthenticator } from 'ibm-watson/auth'
 import { handleError } from '../../utils/requests'
+import WebSocket from 'ws'
 
 const plugin: Izabela.Server.Plugin = ({ app }) => {
   const listVoicesHandler: RequestHandler = async (
@@ -33,12 +34,83 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
       body: {
         credentials: { apiKey, url },
         payload,
+        includeTimestamps,
       },
     },
     res,
   ) => {
     try {
       res.setHeader('Content-Type', 'audio/mpeg')
+      if (includeTimestamps) {
+        const getAccessToken = async () => {
+          const response = await fetch(
+            'https://iam.cloud.ibm.com/identity/token',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: new URLSearchParams({
+                grant_type: 'urn:ibm:params:oauth:grant-type:apikey',
+                apikey: apiKey || '',
+              }),
+            },
+          )
+
+          const data = await response.json()
+          return data.access_token
+        }
+
+        const accessToken = await getAccessToken()
+        const sanitizedUrl = url.replace(/^(http[s]?:\/\/)/, '')
+        const wsURI = `wss://${sanitizedUrl}/v1/synthesize?voice=${payload.voice}&rate_percentage=${payload.ratePercentage}&pitch_percentage=${payload.pitchPercentage}`
+        const websocket = new WebSocket(wsURI, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+
+        const audioChunks: any[] = []
+        const timestamps: any[] = []
+
+        await new Promise<void>((resolve, reject) => {
+          websocket.onopen = function () {
+            const message = {
+              text: payload.text,
+              accept: 'audio/mpeg',
+              timings: ['words'],
+            }
+            websocket.send(JSON.stringify(message))
+          }
+
+          websocket.onmessage = function (e: any) {
+            if (typeof e.data === 'string') {
+              const data = JSON.parse(e.data)
+              if (data.words) timestamps.push(data.words.flat(1))
+            } else {
+              const chunk = Buffer.from(e.data, 'binary')
+              audioChunks.push(chunk)
+            }
+          }
+
+          websocket.onclose = function () {
+            resolve()
+          }
+
+          websocket.onerror = function () {
+            reject()
+          }
+        })
+
+        res.setHeader(
+          'Data',
+          JSON.stringify({
+            timestamps,
+          }),
+        )
+        res.write(Buffer.concat(audioChunks))
+        return res.end()
+      }
       const textToSpeech = new TextToSpeechV1({
         authenticator: new IamAuthenticator({
           apikey: apiKey,
