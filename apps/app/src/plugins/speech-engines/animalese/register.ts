@@ -64,7 +64,7 @@ registerEngine({
     return Promise.resolve(blob)
   },
   getUseCacheOnEveryRequest() {
-    return true
+    return getProperty('useCacheOnEveryRequest')
   },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,
