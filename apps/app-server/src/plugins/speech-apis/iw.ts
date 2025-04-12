@@ -60,7 +60,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
           const data = await response.json()
           return data.access_token
         }
-        const wsURI = `${url}/v1/synthesize?voice=${payload.voice}&rate_percentage=${payload.ratePercentage}&pitch_percentage=${payload.pitchPercentage}`
+        const wsURI = `ws:${url}/v1/synthesize?voice=${payload.voice}&rate_percentage=${payload.ratePercentage}&pitch_percentage=${payload.pitchPercentage}`
         const websocket = new WebSocket(wsURI, {
           headers: {
             Authorization: `Bearer ${await getAccessToken()}`,
