@@ -52,7 +52,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
               },
               body: new URLSearchParams({
                 grant_type: 'urn:ibm:params:oauth:grant-type:apikey',
-                apikey: url || '',
+                apikey: apiKey || '',
               }),
             },
           )
@@ -60,10 +60,13 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
           const data = await response.json()
           return data.access_token
         }
-        const wsURI = `ws:${url}/v1/synthesize?voice=${payload.voice}&rate_percentage=${payload.ratePercentage}&pitch_percentage=${payload.pitchPercentage}`
+
+        const accessToken = await getAccessToken()
+        const sanitizedUrl = url.replace(/^(http[s]?:\/\/)/, '')
+        const wsURI = `wss://${sanitizedUrl}/v1/synthesize?voice=${payload.voice}&rate_percentage=${payload.ratePercentage}&pitch_percentage=${payload.pitchPercentage}`
         const websocket = new WebSocket(wsURI, {
           headers: {
-            Authorization: `Bearer ${await getAccessToken()}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         })
 
