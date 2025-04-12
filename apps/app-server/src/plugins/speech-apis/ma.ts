@@ -19,7 +19,7 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
     res,
   ) => {
     try {
-      const endpoint = `https://${region}.tts.speech.${
+      const endpoint = `https://${ region }.tts.speech.${
         region.startsWith('china') ? 'azure.cn' : 'microsoft.com'
       }/cognitiveservices/voices/list`
       const { data: voices } = await axios.get(endpoint, {
@@ -46,7 +46,7 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
     try {
       const s = new Readable()
 
-      const wordBoundaries: SpeechSynthesisWordBoundaryEventArgs[] = []
+      const timestamps: SpeechSynthesisWordBoundaryEventArgs[] = []
       const speechConfig = SpeechConfig.fromSubscription(apiKey, region)
       speechConfig.speechSynthesisLanguage = payload.voice.Locale
       speechConfig.speechSynthesisVoiceName = payload.voice.ShortName
@@ -59,7 +59,7 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
 
       if (includeTimestamps) {
         synthesizer.wordBoundary = (_, e) => {
-          wordBoundaries.push(e)
+          timestamps.push(e)
         }
       }
 
@@ -92,15 +92,21 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
       })
 
       const stream = s.pipe(res)
-      stream.on('finish', () => {})
+      stream.on('finish', () => {
+      })
       s.push(Buffer.from(audioContent))
       s.push(null)
 
+      if (timestamps.length) {
+        res.setHeader(
+          'Data',
+          JSON.stringify({
+            timestamps,
+          }),
+        )
+      }
       res.writeHead(200, {
         'Content-Type': 'audio/mpeg',
-        Data: JSON.stringify({
-          timestamps: wordBoundaries,
-        }),
       })
     } catch (e: any) {
       return handleError(res, 'Internal server error', e.message, 500)

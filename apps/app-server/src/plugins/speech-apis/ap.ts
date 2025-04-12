@@ -99,11 +99,16 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
       const stream = (audioRes.AudioStream as any).pipe(res)
       stream.on('finish', () => {})
 
+      if (timestamps.length) {
+        res.setHeader(
+          'Data',
+          JSON.stringify({
+            timestamps,
+          }),
+        )
+      }
       res.writeHead(200, {
         'Content-Type': 'audio/mpeg',
-        Data: JSON.stringify({
-          timestamps,
-        }),
       })
     } catch (e: any) {
       handleError(res, 'Internal server error', e.message, 500)
