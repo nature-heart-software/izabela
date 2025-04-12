@@ -48,9 +48,7 @@ registerEngine({
       .then((res) => res.data)
   },
   getUseCacheOnEveryRequest() {
-    if (getProperty('includeTimestamps')) {
-      return false
-    }
+    if (getProperty('includeTimestamps')) return false
     return getProperty('useCacheOnEveryRequest')
   },
   voiceSelectComponent: NvVoiceSelect,

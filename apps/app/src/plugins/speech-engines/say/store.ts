@@ -3,6 +3,7 @@ import { ENGINE_ID } from './shared'
 
 export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
   selectedVoice: null,
-  favoriteVoiceIds: [],
   speed: 100,
+  favoriteVoiceIds: [],
+  useCacheOnEveryRequest: true,
 })
