@@ -23,7 +23,7 @@
           <NvCard>
             <NvStack spacing="5">
               <NvGroup grow>
-                <template v-for="engine in engines" :key="engine.id">
+                <template v-for="engine in getEngines()" :key="engine.id">
                   <NvButton
                     :selected="selectedEngineTab === engine.id"
                     align="center"
@@ -80,7 +80,7 @@ import {
   NvText,
 } from '@packages/ui'
 import SpeechEngineSelect from '@/features/speech/components/inputs/NvSpeechEngineSelect.vue'
-import { useSpeechEngineManager } from '@/modules/speech-engine-manager'
+import { getEngines } from '@/modules/speech-engine-manager'
 import { SpeechEngine } from '@/modules/speech-engine-manager/types'
 import { useSettingsStore } from '@/features/settings/store'
 import { useSpeechStore } from '@/features/speech/store'
@@ -98,10 +98,9 @@ watch(
     selectedEngineTab.value = value
   },
 )
-const { engines } = useSpeechEngineManager()
 const currentEngineSettingsComponent = computed(
   () =>
-    engines.value.find((e) => e.id === selectedEngineTab.value)
+    getEngines().find((e) => e.id === selectedEngineTab.value)
       ?.settingsComponent,
 )
 </script>
