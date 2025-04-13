@@ -1,6 +1,8 @@
 <template>
-  <template v-if="settingsStore.$isReady">
-    <NvSpeechRecordingLogo v-if="settingsStore.enableSTTTS && speechRecognitionStore.recording" />
+  <template v-if="isReady">
+    <NvSpeechRecordingLogo
+      v-if="settingsStore.enableSTTTS && speechRecognitionStore.recording"
+    />
     <NvSpeechSynthesizer />
     <NvSpeechListener :key="speechListenerKey" />
     <NvAudioInputUpdater />
@@ -18,12 +20,13 @@ body {
 import NvSpeechListener from '@/teams/speech-worker/components/NvSpeechListener.vue'
 import NvSpeechSynthesizer from '@/teams/speech-worker/components/NvSpeechSynthesizer.vue'
 import { useSettingsStore } from '@/features/settings/store'
-import { computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import hash from 'object-hash'
 import NvSpeechRecordingLogo from '@/teams/speech-worker/components/NvSpeechRecordingLogo.vue'
 import { useSpeechRecognitionStore } from '@/features/speech/store'
 import NvAudioInputUpdater from '@/teams/speech-worker/components/NvAudioInputUpdater.vue'
 import { socket } from '@/services'
+import { storesStates } from '@/store'
 
 const speechRecognitionStore = useSpeechRecognitionStore()
 const settingsStore = useSettingsStore()
@@ -49,4 +52,9 @@ watch(
     }
   },
 )
+
+const isReady = ref(false)
+Promise.all(
+  Object.values(storesStates).map((storeStates) => storeStates.$whenReady()),
+).then(() => (isReady.value = true))
 </script>
