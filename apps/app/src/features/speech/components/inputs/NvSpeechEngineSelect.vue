@@ -4,16 +4,15 @@
 <script lang="ts" setup>
 import { NvSelect } from '@packages/ui'
 import { computed } from 'vue'
-import { useSpeechEngineManager } from '@/modules/speech-engine-manager'
+import { getEngines } from '@/modules/speech-engine-manager'
 import orderBy from 'lodash/orderBy'
 import { groupOptions } from '@/utils/select'
 import { capitalize } from '@/utils/text'
 
-const { engines } = useSpeechEngineManager()
 const options = computed(() =>
   groupOptions(
     orderBy(
-      engines.value.map((engine) => {
+      getEngines().map((engine) => {
         const disabled = engine.hasCredentials
           ? !engine.hasCredentials()
           : false
