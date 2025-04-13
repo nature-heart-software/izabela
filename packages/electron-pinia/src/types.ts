@@ -1,7 +1,6 @@
 import { PiniaPluginContext } from 'pinia'
 import type ElectronStore from 'electron-store'
 import type Electron from 'electron'
-import { Ref } from 'vue'
 
 export type StoreOptions = PiniaPluginContext['options'] & {
   electron?: {
@@ -11,7 +10,7 @@ export type StoreOptions = PiniaPluginContext['options'] & {
 }
 
 export type PluginCustomProperties = {
-  $isReady: Ref<boolean>
+  storesStates: Record<string, PluginCustomProperties>
   $whenReady: () => Promise<boolean>
 }
 

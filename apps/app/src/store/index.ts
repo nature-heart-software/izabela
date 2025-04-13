@@ -3,6 +3,8 @@ import { createPinia, defineStore } from 'pinia'
 import { createApp, h, ref } from 'vue'
 import { electronPiniaPlugin } from '@packages/electron-pinia/renderer'
 
+export { storesStates } from '@packages/electron-pinia/renderer'
+
 export const pinia = createPinia().use(electronPiniaPlugin())
 /* ensures pinia is always available */
 createApp(h({})).use(pinia)
