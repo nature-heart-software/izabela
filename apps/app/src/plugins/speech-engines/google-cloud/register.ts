@@ -7,9 +7,12 @@ import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, setProperty } from './store'
 
-const getCredentials = () => ({
-  apiKey: getProperty('apiKey', true),
-})
+const getCredentials = () =>
+  !getProperty('useLocalCredentials')
+    ? {}
+    : {
+        apiKey: getProperty('apiKey', true),
+      }
 
 const getSelectedVoice = () => getProperty('selectedVoice')
 registerEngine({
