@@ -101,8 +101,8 @@
                 foreground application
               </NvText>
               <NvText type="caption"
-                ><strong>NOTE:</strong> Keyboard support is limited.</NvText
-              >
+                ><strong>NOTE:</strong> Keyboard support is limited.
+              </NvText>
             </NvStack>
             <NvSwitch
               :modelValue="settingsStore.enableOverlayWindow"
@@ -239,16 +239,16 @@
               />
             </NvGroup>
           </template>
-          <!--          <NvDivider direction="horizontal" />-->
-          <!--          <NvGroup justify="apart" no-wrap spacing="5">-->
-          <!--            <NvStack>-->
-          <!--              <NvText type="label">Enable background dim</NvText>-->
-          <!--            </NvStack>-->
-          <!--            <NvSwitch-->
-          <!--              :modelValue="settingsStore.enableBackgroundDim"-->
-          <!--              @update:modelValue="(value) => settingsStore.$patch({ enableBackgroundDim: value })"-->
-          <!--            />-->
-          <!--          </NvGroup>-->
+          <NvDivider direction="horizontal" />
+          <NvGroup :spacing="5" justify="apart" no-wrap>
+            <NvStack>
+              <NvText type="label">Cache</NvText>
+            </NvStack>
+            <NvButton :loading="isClearingCache" @click="clearCache">
+              <template v-if="isClearCacheSuccess">Cache cleared</template>
+              <template v-else>Clear cache</template>
+            </NvButton>
+          </NvGroup>
         </NvStack>
       </NvCard>
     </NvStack>
@@ -272,6 +272,7 @@
 </template>
 <script lang="ts" setup>
 import {
+  NvButton,
   NvCard,
   NvDivider,
   NvGroup,
@@ -286,7 +287,20 @@ import NvDisplaySelect from '@/features/display/components/inputs/DisplaySelect.
 import NvKeybinding from '@/features/app/components/inputs/NvKeybinding.vue'
 import NvUpdateChannelSelect from '@/features/update/components/inputs/NvUpdateChannelSelect.vue'
 import { useConfirmAdmin } from '@/hooks/use-confirm-admin.ts'
+import { useClearCacheMutation } from '@/features/app/queries.ts'
 
 const confirmAdmin = useConfirmAdmin()
 const settingsStore = useSettingsStore()
+const {
+  mutateAsync: clearCacheMutation,
+  isSuccess: isClearCacheSuccess,
+  isLoading: isClearingCache,
+  reset: resetClearCache,
+} = useClearCacheMutation()
+const { setTimeout } = window
+const clearCache = async () => {
+  return clearCacheMutation().then(() =>
+    setTimeout(resetClearCache.value, 3000),
+  )
+}
 </script>

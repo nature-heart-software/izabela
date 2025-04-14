@@ -1,10 +1,7 @@
 import { RequestHandler } from 'express'
 import axios from 'axios'
 import { handleError } from '../../utils/requests'
-import path from 'path'
-import { v4 as uuid } from 'uuid'
-import fs from 'fs'
-import util from 'util'
+import { Readable } from 'stream'
 
 const plugin: Izabela.Server.Plugin = ({ app, config }) => {
   const listVoicesHandler: RequestHandler = async (
@@ -27,48 +24,53 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
     }
   }
 
-  const synthesizeSpeechHandler: RequestHandler = async (
-    {
-      body: {
-        credentials: { apiKey },
-        payload,
-      },
-    },
-    res,
+  const synthesizeSpeechHandler: (stream?: boolean) => RequestHandler = (
+    streamAudio,
   ) => {
-    const outputFile = path.join(config?.tempPath || '', uuid() + '.wav')
-    try {
-      fs.mkdirSync(path.parse(outputFile).dir, { recursive: true })
-      fs.writeFileSync(outputFile, '')
-      const {
-        data: { audioContent },
-      } = await axios.post(
-        `https://texttospeech.googleapis.com/v1beta1/text:synthesize?key=${apiKey}`,
-        payload,
-      )
-      const writeFile = util.promisify(fs.writeFile)
+    return async (
+      {
+        body: {
+          credentials: { apiKey },
+          payload,
+        },
+      },
+      res,
+    ) => {
+      try {
+        const s = new Readable()
+        const {
+          data: { audioContent },
+        } = await axios.post(
+          `https://texttospeech.googleapis.com/v1beta1/text:synthesize?key=${apiKey}`,
+          {
+            ...payload,
+            audioConfig: {
+              ...payload.audioConfig,
 
-      await writeFile(outputFile, Buffer.from(audioContent, 'base64'), 'binary')
-      const stat = fs.statSync(outputFile)
-      const total = stat.size
+              audioEncoding: streamAudio ? 'MP3' : 'LINEAR16',
+            },
+          },
+        )
 
-      res.writeHead(200, {
-        'Content-Length': total,
-        'Content-Type': 'audio/wav',
-      })
-      const stream = fs.createReadStream(outputFile).pipe(res)
-      stream.on('finish', () => {
-        fs.unlinkSync(outputFile)
-      })
-    } catch (e: any) {
-      if (fs.existsSync(outputFile)) {
-        fs.unlinkSync(outputFile)
+        const stream = s.pipe(res)
+        stream.on('finish', () => {})
+        s.push(Buffer.from(audioContent, 'base64'))
+        s.push(null)
+
+        res.writeHead(200, {
+          'Content-Type': streamAudio ? 'audio/mpeg' : 'audio/wav',
+        })
+      } catch (e: any) {
+        handleError(res, 'Internal server error', e.message, 500)
       }
-      handleError(res, 'Internal server error', e.message, 500)
     }
   }
   app.post('/api/tts/google-cloud/list-voices', listVoicesHandler)
-  app.post('/api/tts/google-cloud/synthesize-speech', synthesizeSpeechHandler)
+  app.post('/api/tts/google-cloud/synthesize-speech', synthesizeSpeechHandler())
+  app.post(
+    '/api/tts/google-cloud/synthesize-speech/stream',
+    synthesizeSpeechHandler(true),
+  )
 }
 
 export default plugin

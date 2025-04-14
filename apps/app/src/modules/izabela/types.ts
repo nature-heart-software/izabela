@@ -1,6 +1,11 @@
 import { SpeechEngine } from '@/modules/speech-engine-manager/types'
 
-export type IzabelaMessageEvent = 'started' | 'ended' | 'progress' | 'error'
+export type IzabelaMessageEvent =
+  | 'started'
+  | 'ended'
+  | 'timeupdate'
+  | 'error'
+  | 'response:data'
 
 export interface IzabelaMessage {
   id?: string
@@ -25,7 +30,8 @@ export interface IzabelaMessagePayload extends IzabelaMessage {
   }
 }
 
-export interface IzabelaHistoryMessage extends Omit<IzabelaMessagePayload, 'credentials'> {
+export interface IzabelaHistoryMessage
+  extends Omit<IzabelaMessagePayload, 'credentials'> {
   id: string
   createdAt: string
 }

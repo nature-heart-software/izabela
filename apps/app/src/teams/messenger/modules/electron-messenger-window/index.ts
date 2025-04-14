@@ -92,38 +92,34 @@ export const ElectronMessengerWindow = () => {
     }
   }
 
-  const focus = (context: 'mouse' | 'keyboard') =>
+  let focusedWithNativeOnce = false
+  const focus = (context: 'mouse' | 'keyboard', native = false) =>
     new Promise((_, reject) => {
       messengerWindowStore?.$patch({ focusContext: context })
       const window = getWindow()
       if (window) {
         if (!isFocused) {
+          if (native) {
+            // Need to call ensureNativeFocus as late as possible otherwise it can break the foreground window
+            window.once('focus', () => {
+              // For some reason, the first time ensureNative is called it has a chance to close the window right away
+              // so we time it out as late as possible on the first call.
+              if (focusedWithNativeOnce) return ensureNativeFocus()
+              focusedWithNativeOnce = true
+              setTimeout(ensureNativeFocus, 200)
+            })
+          }
           foregroundWindow = user32.GetForegroundWindow()
           // to prevent shenanigans with some softwares (*coughs* League of Legends *coughs*)
           // this makes sure to blur first with ffi-napi for safe measures
           user32.SetForegroundWindow(0)
           isFocused = true
-          // window.once('show', () => {
-          //   /* The focus needs to be delayed after the show() to actually focus properly... */
-          //   setTimeout(() => {
-          //     isFocused = true
-          //     window.focus() // Fixes issues with Chrome and input elements
-          //     resolve(true)
-          //   }, 250)
-          // })
 
           /* order matters */
           window.setFocusable(true) // Fixes alwaysOnTop going in the background sometimes for some reasons
           window.setIgnoreMouseEvents(false)
           window.show() // Fixes focus properly with Hardware Acceleration for some reasons
           window.focus() // needed for immediate focus in case the window is already shown
-
-          // In applications like League of Legends, the window doesn't always receive focus
-          // but we can force it manually once we're sure the window is shown 100%.
-          // Only possible with a timeout atm.
-          setTimeout(() => {
-            ensureNativeFocus()
-          }, 100)
         }
       } else {
         reject()
@@ -206,27 +202,30 @@ export const ElectronMessengerWindow = () => {
     }
   }
 
-  const toggleWindow = throttle((context: 'mouse' | 'keyboard') => {
-    const foregroundWindowPid = WinControl?.getForeground()?.getPid()
-    const isProcessHooked = gameOverlay.isProcessHooked(foregroundWindowPid)
-    if (isProcessHooked && !gameOverlay.intercepting) {
-      gameOverlay.startIntercept()
-      return
-    }
-    if (isProcessHooked && gameOverlay.intercepting) {
-      gameOverlay.stopIntercept()
-      return
-    }
-    const window = getWindow()
-    if (window) {
-      if (window.isVisible()) {
-        hide()
-      } else {
-        focus(context)
+  const toggleWindow = throttle(
+    (context: 'mouse' | 'keyboard', native = false) => {
+      const foregroundWindowPid = WinControl?.getForeground()?.getPid()
+      const isProcessHooked = gameOverlay.isProcessHooked(foregroundWindowPid)
+      if (isProcessHooked && !gameOverlay.intercepting) {
+        gameOverlay.startIntercept()
+        return
       }
-    }
-    return Promise.resolve()
-  }, 250)
+      if (isProcessHooked && gameOverlay.intercepting) {
+        gameOverlay.stopIntercept()
+        return
+      }
+      const window = getWindow()
+      if (window) {
+        if (window.isVisible()) {
+          hide()
+        } else {
+          focus(context, native)
+        }
+      }
+      return Promise.resolve()
+    },
+    250,
+  )
 
   const setDisplay = (id?: Electron.Display['id'] | null) => {
     const window = getWindow()

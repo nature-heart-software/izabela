@@ -36,8 +36,24 @@ export default () => {
       onMessageEnd()
     }
     currentlyPlayingMessage = message
-    message.on('ended', () => onEnd())
-    message.on('error', () => onEnd(true))
+    message.on('ended', () => {
+      onEnd()
+    })
+    message.on('error', () => {
+      onEnd(true)
+    })
+    message.on('response:data', (data) => {
+      socket.emit('message:response:data', {
+        ...data,
+        payload: socketPayload,
+      })
+    })
+    message.on('timeupdate', (data) => {
+      socket.emit('message:timeupdate', {
+        ...data,
+        payload: socketPayload,
+      })
+    })
     socket.emit('message:load', socketPayload)
     message
       .isReady()
@@ -65,7 +81,9 @@ export default () => {
     return message
   }
 
-  function say(messagePayload: IzabelaMessagePayload): ReturnType<typeof IzabelaMessage> {
+  function say(
+    messagePayload: IzabelaMessagePayload,
+  ): ReturnType<typeof IzabelaMessage> {
     const message = createMessage(messagePayload)
     if (currentlyPlayingMessage) {
       return queueMessage(message)

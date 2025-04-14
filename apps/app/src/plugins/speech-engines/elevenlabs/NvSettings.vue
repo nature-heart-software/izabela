@@ -1,5 +1,8 @@
 <template>
-  <NvAccessBlocker :allowed="!!getProperty('apiKey', true)" reason="Credentials required">
+  <NvAccessBlocker
+    :allowed="!!getProperty('apiKey', true)"
+    reason="Credentials required"
+  >
     <NvStack spacing="5">
       <NvFormItem label="Models">
         <NvModelSelect placeholder="Select a model" />
@@ -41,7 +44,8 @@
             class="!grow"
             v-bind="{
               modelValue: getProperty('similarity_boost'),
-              'onUpdate:modelValue': (value) => setProperty('similarity_boost', value),
+              'onUpdate:modelValue': (value) =>
+                setProperty('similarity_boost', value),
             }"
           />
           <NvNumberInput
@@ -50,7 +54,8 @@
             :step="0.01"
             v-bind="{
               modelValue: getProperty('similarity_boost'),
-              'onUpdate:modelValue': (value) => setProperty('similarity_boost', value),
+              'onUpdate:modelValue': (value) =>
+                setProperty('similarity_boost', value),
             }"
           />
         </NvGroup>
@@ -86,7 +91,48 @@
         </NvStack>
         <NvSwitch
           :modelValue="getProperty('use_speaker_boost')"
-          @update:modelValue="(value) => setProperty('use_speaker_boost', value)"
+          @update:modelValue="
+            (value) => setProperty('use_speaker_boost', value)
+          "
+        />
+      </NvGroup>
+      <NvDivider direction="horizontal" />
+      <NvGroup :spacing="5" align="start" justify="apart" no-wrap>
+        <NvStack>
+          <NvText type="label">Stream audio</NvText>
+          <NvText
+            >Allows for faster audio playback, may cause audio artifacts
+          </NvText>
+        </NvStack>
+        <NvSwitch
+          :modelValue="getProperty('streamAudio')"
+          class="shrink-0"
+          @update:modelValue="(value) => setProperty('streamAudio', value)"
+        />
+      </NvGroup>
+      <NvDivider direction="horizontal" />
+      <NvGroup :spacing="5" justify="apart" no-wrap>
+        <NvStack>
+          <NvText type="label">Prefer cache on every message</NvText>
+        </NvStack>
+        <NvSwitch
+          :modelValue="getProperty('useCacheOnEveryRequest')"
+          @update:modelValue="
+            (value) => setProperty('useCacheOnEveryRequest', value)
+          "
+        />
+      </NvGroup>
+      <NvDivider direction="horizontal" />
+      <NvGroup :spacing="5" justify="apart" no-wrap>
+        <NvStack>
+          <NvText type="label">Provide timestamps to WebSocket events</NvText>
+        </NvStack>
+        <NvSwitch
+          :modelValue="getProperty('includeTimestamps')"
+          class="shrink-0"
+          @update:modelValue="
+            (value) => setProperty('includeTimestamps', value)
+          "
         />
       </NvGroup>
     </NvStack>

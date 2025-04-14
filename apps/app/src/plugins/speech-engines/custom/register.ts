@@ -33,14 +33,23 @@ registerEngine({
   },
   synthesizeSpeech({ payload, credentials }) {
     const endpoint = getProperty('endpoint')
-    return axios.post<Blob>(
-      `${endpoint.endsWith('/') ? endpoint.slice(0, -1) : endpoint}/synthesize-speech`,
-      {
-        credentials,
-        payload,
-      },
-      { responseType: 'blob' },
-    )
+    return axios
+      .post<Blob>(
+        `${
+          endpoint.endsWith('/') ? endpoint.slice(0, -1) : endpoint
+        }/synthesize-speech`,
+        {
+          credentials,
+          payload,
+          includeTimestamps: getProperty('includeTimestamps'),
+        },
+        { responseType: 'blob' },
+      )
+      .then((res) => res.data)
+  },
+  getUseCacheOnEveryRequest() {
+    if (getProperty('includeTimestamps')) return false
+    return getProperty('useCacheOnEveryRequest')
   },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,

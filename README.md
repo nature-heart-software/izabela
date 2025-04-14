@@ -40,7 +40,7 @@ who wants to communicate with text-to-speech and for that reason, you can see Iz
 - [x] Translate messages into any language
 - [x] Dictionary to translate abbreviations (ily -> I love you (💖))
 - [x] Local and remote servers to help you build your own text-to-speech implementations
-- [x] Local websocket server to retrieve messages (useful for streaming elements!)
+- [x] Local websocket server to retrieve messages & timestamps (useful for streaming elements!)
 
 ## How to use
 
@@ -88,17 +88,21 @@ Here's a list of all the text-to-speech engines that are supported in Izabela:
 | -------------------------- | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
 | Izabela (multiple engines) | Yes                                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/izabela-sample.mp3?raw=true)             | https://github.com/Weilbyte/tiktok-tts                                        |
 | Amazon Polly               | Yes                                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/amazon-polly-sample.mp3?raw=true)        | https://aws.amazon.com/polly/                                                 |
-| Google Cloud TTS           | Yes                                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/google-cloud-tts-sample.mp3?raw=true)    | https://cloud.google.com/text-to-speech                                       |
-| IBM Watson TTS             | Temporarily unavailable             |                                                                                                                      | https://www.ibm.com/cloud/watson-text-to-speech                               |
-| Microsoft Azure TTS        | Yes                                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/microsoft-azure-tts-sample.mp3?raw=true) | https://azure.microsoft.com/en-us/products/cognitive-services/text-to-speech/ |
+| Google Cloud TTS           | Yes                                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/google-cloud-sample.mp3?raw=true)        | https://cloud.google.com/text-to-speech                                       |
+| IBM Watson TTS             | Yes                                 |                                                                                                                      | https://www.ibm.com/cloud/watson-text-to-speech                               |
+| Microsoft Azure TTS        | Yes                                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/microsoft-azure-sample.mp3?raw=true)     | https://azure.microsoft.com/en-us/products/cognitive-services/text-to-speech/ |
 | Say                        | Included by default                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/say-sample.mp3?raw=true)                 | https://github.com/Marak/say.js/                                              |
 | Sam                        | Included by default                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/sam-sample.mp3?raw=true)                 | https://github.com/discordier/sam / https://github.com/Imrane03/better-sam    |
 | Animalese                  | Included by default                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/animalese-sample.wav?raw=true)           | https://github.com/Acedio/animalese.js                                        |
-| ElevenLabs                 | No                                  | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/elevenlabs-sample.mp3?raw=true)          | https://beta.elevenlabs.io/speech-synthesis                                   |
+| ElevenLabs                 | No                                  | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/elevenlabs-sample.mp3?raw=true)          | https://elevenlabs.io/                                                        |
 
 ## Guides
 
 Find guides and API documentation on the [Wiki](https://github.com/nature-heart-software/izabela/wiki) page.
+
+## More from the community
+
+- [its5Q/izabela-engines](https://github.com/its5Q/izabela-engines) - A small framework for quick development of your own custom engines for Izabela
 
 ## Resources
 

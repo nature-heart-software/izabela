@@ -1,15 +1,13 @@
 // eslint-disable-next-line import/no-cycle
 import { SpeechEngine } from '@/modules/speech-engine-manager/types'
-import { ref } from 'vue'
 // eslint-disable-next-line import/no-cycle
 import { useDictionaryStore } from '@/features/dictionary/store'
 
 const SpeechEngineManager = () => {
-  const engines = ref<SpeechEngine[]>([])
+  const engines: SpeechEngine[] = []
 
-  async function withDictionary(speechEngine: SpeechEngine): Promise<SpeechEngine> {
+  function withDictionary(speechEngine: SpeechEngine): SpeechEngine {
     const dictionaryStore = useDictionaryStore()
-    await dictionaryStore.$whenReady()
     return {
       ...speechEngine,
       getPayload: (options) =>
@@ -20,16 +18,16 @@ const SpeechEngineManager = () => {
     }
   }
 
-  async function registerEngine(speechEngine: SpeechEngine) {
-    engines.value.push(await withDictionary(speechEngine))
+  function registerEngine(speechEngine: SpeechEngine) {
+    engines.push(withDictionary(speechEngine))
   }
 
   function getEngineById(id: SpeechEngine['id']) {
-    return engines.value.find((speechEngine) => speechEngine.id === id)
+    return engines.find((speechEngine) => speechEngine.id === id)
   }
 
   function getEngines() {
-    return engines.value
+    return engines
   }
 
   const useSpeechEngineManager = () => ({
@@ -45,5 +43,10 @@ const SpeechEngineManager = () => {
   }
 }
 const instance = SpeechEngineManager()
-export const { registerEngine, getEngineById, getEngines, useSpeechEngineManager } = instance
+export const {
+  registerEngine,
+  getEngineById,
+  getEngines,
+  useSpeechEngineManager,
+} = instance
 export default instance

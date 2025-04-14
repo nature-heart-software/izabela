@@ -2,8 +2,8 @@ import { RequestHandler } from 'express'
 import say from 'say'
 import { handleError } from '../../utils/requests'
 import path from 'path'
-import { v4 as uuid } from 'uuid'
 import fs from 'fs'
+import { v4 as uuid } from 'uuid'
 
 const plugin: Izabela.Server.Plugin = ({ app, config }) => {
   const listVoicesHandler: RequestHandler = async (_, res) => {
@@ -31,7 +31,7 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
     },
     res,
   ) => {
-    const outputFile = path.join(config?.tempPath || '', uuid() + '.mp3')
+    const outputFile = path.join(config?.tempPath || '', uuid() + '.wav')
     try {
       fs.mkdirSync(path.parse(outputFile).dir, { recursive: true })
       fs.writeFileSync(outputFile, '')
@@ -45,22 +45,21 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
         })
       })
 
-      const stat = fs.statSync(outputFile)
-      const total = stat.size
+      const stream = fs.createReadStream(outputFile)
+      stream.pipe(res)
+
+      stream.on('close', () => {
+        fs.unlinkSync(outputFile)
+      })
 
       res.writeHead(200, {
-        'Content-Length': total,
-        'Content-Type': 'audio/mp3',
-      })
-      const stream = fs.createReadStream(outputFile).pipe(res)
-      stream.on('finish', () => {
-        fs.unlinkSync(outputFile)
+        'Content-Type': 'audio/wav',
       })
     } catch (e: any) {
       if (fs.existsSync(outputFile)) {
         fs.unlinkSync(outputFile)
       }
-      handleError(res, 'Internal server error', e.message, 500)
+      return handleError(res, 'Internal server error', e.message, 500)
     }
   }
 

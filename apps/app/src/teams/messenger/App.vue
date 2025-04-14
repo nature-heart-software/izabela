@@ -13,7 +13,7 @@
     <div class="h-0">
       <div id="router-overlay"></div>
       <NvMessenger
-        v-if="messengerStore.$isReady"
+        v-if="isReady"
         :min-width="768"
         :transform="messengerStore.position.transform"
         class="w-full h-full"
@@ -53,6 +53,7 @@ import { useDatabasesStore } from '@/features/databases/store'
 import takeRight from 'lodash/takeRight'
 import pkg from '@root/package.json'
 import { useGameOverlayStore } from '@/features/game-overlay/store'
+import { storesStates } from '@/store'
 
 const { ElectronMessengerWindow } = window
 const messengerStore = useMessengerStore()
@@ -102,12 +103,18 @@ if (!isGameOverlay) {
   })
 }
 
+const isReady = ref(false)
+
+Promise.all(
+  Object.values(storesStates).map((storeStates) => storeStates.$whenReady()),
+).then(() => (isReady.value = true))
+
 /* Need to wait for the stores to be ready before resetting states
  **/
 watch(
   () => settingsStore.runAsAdmin,
   (value) => {
-    if ([settingsStore.$isReady, gameOverlayStore.$isReady].every(Boolean)) {
+    if (isReady.value) {
       if (!value) {
         settingsStore.$patch({
           enableOverlayWindow: false,

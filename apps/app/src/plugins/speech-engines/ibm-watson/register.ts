@@ -1,4 +1,4 @@
-import { api } from '@/services'
+import { fetchApi } from '@/services'
 import { registerEngine } from '@/modules/speech-engine-manager'
 import { useSpeechStore } from '@/features/speech/store'
 import NvVoiceSelect from './NvVoiceSelect.vue'
@@ -6,10 +6,13 @@ import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, setProperty } from './store'
 
-const getCredentials = () => ({
-  apiKey: getProperty('apiKey', true),
-  url: getProperty('url'),
-})
+const getCredentials = () =>
+  !getProperty('useLocalCredentials')
+    ? {}
+    : {
+        apiKey: getProperty('apiKey', true),
+        url: getProperty('url'),
+      }
 
 const getSelectedVoice = () => getProperty('selectedVoice')
 registerEngine({
@@ -38,16 +41,24 @@ registerEngine({
     return (voice || getSelectedVoice()).language
   },
   synthesizeSpeech({ credentials, payload }) {
-    return api(
+    return fetchApi(
       getProperty('useLocalCredentials') ? 'local' : 'remote',
-    ).post<Blob>(
-      '/tts/ibm-watson/synthesize-speech',
+      `/tts/ibm-watson/synthesize-speech${
+        getProperty('streamAudio') ? '/stream' : ''
+      }`,
       {
-        credentials,
-        payload,
+        method: 'POST',
+        body: JSON.stringify({
+          credentials,
+          payload,
+          includeTimestamps: getProperty('includeTimestamps'),
+        }),
       },
-      { responseType: 'blob' },
     )
+  },
+  getUseCacheOnEveryRequest() {
+    if (getProperty('includeTimestamps')) return false
+    return getProperty('useCacheOnEveryRequest')
   },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,

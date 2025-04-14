@@ -59,9 +59,10 @@ app.post('/synthesize-speech', async (req, res) => {
             languageCode, // language code of the voice
           },
         },
+        includeTimestamps, // Whether the client wants to include timestamps in the DATA or not
       },
     } = req
-    const outputFile = path.join(__dirname, 'example.mp3')
+    const outputFile = path.join(__dirname, 'example.wav')
     fs.mkdirSync(path.parse(outputFile).dir, { recursive: true })
     fs.writeFileSync(outputFile, '')
 
@@ -74,16 +75,28 @@ app.post('/synthesize-speech', async (req, res) => {
       })
     })
 
-    res.writeHead(200, {
-      'Content-Type': 'audio/mp3',
-    })
     const stream = fs.createReadStream(outputFile).pipe(res)
     stream.on('finish', () => {
       fs.unlinkSync(outputFile)
     })
+
+    res.writeHead(200, {
+      // prefer audio/mpeg if the engine supports mp3/mpeg files to support audio streaming.
+      'Content-Type': 'audio/wav',
+      Data: {
+        // Pass any data you wish to provide to the "message:response:data" WebSocket event.
+        timestamps: [],
+      },
+    })
   } catch (err) {
     res.status(500).json({ error: err.message })
   }
+})
+
+app.post('/synthesize-speech/stream', async () => {
+  /* You can reuse the same handler as /synthesize-speech as long as it returns
+   * a streamed mp3 file with the audio/mpeg Content-Type header.
+   **/
 })
 
 app.listen(ENDPOINT_PORT, () => {

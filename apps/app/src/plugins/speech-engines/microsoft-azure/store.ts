@@ -31,4 +31,7 @@ export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
   },
   useLocalCredentials: false,
   favoriteVoiceIds: [],
+  useCacheOnEveryRequest: true,
+  streamAudio: true,
+  includeTimestamps: false,
 })

@@ -29,7 +29,7 @@ export default () =>
         electronMessengerWindow.toggleWindow('keyboard'),
       ),
       toggleMessengerWindowAlt: handleShortcut(() =>
-        electronMessengerWindow.toggleWindow('keyboard'),
+        electronMessengerWindow.toggleWindow('keyboard', true),
       ),
       toggleOverlayWindow: handleShortcut(() =>
         electronOverlayWindow.toggleWindow(),

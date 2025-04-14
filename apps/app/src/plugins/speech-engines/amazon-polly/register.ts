@@ -1,4 +1,4 @@
-import { api } from '@/services'
+import { fetchApi } from '@/services'
 import { registerEngine } from '@/modules/speech-engine-manager'
 import { useSpeechStore } from '@/features/speech/store'
 import NvVoiceSelect from './NvVoiceSelect.vue'
@@ -6,10 +6,13 @@ import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, setProperty } from './store'
 
-const getCredentials = () => ({
-  identityPoolId: getProperty('identityPoolId', true),
-  region: getProperty('region'),
-})
+const getCredentials = () =>
+  !getProperty('useLocalCredentials')
+    ? {}
+    : {
+        identityPoolId: getProperty('identityPoolId', true),
+        region: getProperty('region'),
+      }
 
 const getSelectedVoice = () => getProperty('selectedVoice')
 registerEngine({
@@ -21,7 +24,10 @@ registerEngine({
   getCredentials,
   hasCredentials() {
     const speechStore = useSpeechStore()
-    return speechStore.hasUniversalApiCredentials || Object.values(getCredentials()).every(Boolean)
+    return (
+      speechStore.hasUniversalApiCredentials ||
+      Object.values(getCredentials()).every(Boolean)
+    )
   },
   getPayload({ text, translatedText, voice }) {
     return {
@@ -33,14 +39,24 @@ registerEngine({
     return (voice || getSelectedVoice()).LanguageCode
   },
   synthesizeSpeech({ credentials, payload }) {
-    return api(getProperty('useLocalCredentials') ? 'local' : 'remote').post<Blob>(
-      '/tts/amazon-polly/synthesize-speech',
+    return fetchApi(
+      getProperty('useLocalCredentials') ? 'local' : 'remote',
+      `/tts/amazon-polly/synthesize-speech${
+        getProperty('streamAudio') ? '/stream' : ''
+      }`,
       {
-        credentials,
-        payload,
+        method: 'POST',
+        body: JSON.stringify({
+          credentials,
+          payload,
+          includeTimestamps: getProperty('includeTimestamps'),
+        }),
       },
-      { responseType: 'blob' },
     )
+  },
+  getUseCacheOnEveryRequest() {
+    if (getProperty('includeTimestamps')) return false
+    return getProperty('useCacheOnEveryRequest')
   },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,

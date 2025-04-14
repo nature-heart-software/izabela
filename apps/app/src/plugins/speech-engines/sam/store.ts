@@ -10,4 +10,5 @@ export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
   throat: 128,
   mouth: 128,
   favoriteVoiceIds: [],
+  useCacheOnEveryRequest: true,
 })

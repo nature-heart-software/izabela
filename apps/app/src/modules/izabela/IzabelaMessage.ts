@@ -5,9 +5,14 @@ import { getEngineById } from '@/modules/speech-engine-manager'
 import { getMediaDeviceByLabel } from '@/utils/media-devices'
 import { useSettingsStore } from '@/features/settings/store'
 import { blobToBase64, Deferred } from '@packages/toolbox'
-import { useMessagesStore, usePlayingMessageStore } from '@/features/messages/store'
-import objectHash from 'object-hash'
+import {
+  useMessagesStore,
+  usePlayingMessageStore,
+} from '@/features/messages/store'
 import { IzabelaMessageEvent, IzabelaMessagePayload } from './types'
+import hash from 'object-hash'
+
+type DownloadResponse = Blob | Response
 
 export default (messagePayload: IzabelaMessagePayload) => {
   const {
@@ -33,11 +38,20 @@ export default (messagePayload: IzabelaMessagePayload) => {
     })
   }
 
-  function getCacheId() {
-    return `${id}-${objectHash(payload)}`
+  function getEngine() {
+    return getEngineById(engineName)
   }
 
-  function on(event: IzabelaMessageEvent, callback: () => void): void {
+  function getCacheId() {
+    const engine = getEngine()
+    const useCacheOnEveryRequest = !!engine?.getUseCacheOnEveryRequest()
+    return `${useCacheOnEveryRequest ? 'cache' : id}-${hash(payload)}`
+  }
+
+  function on(
+    event: IzabelaMessageEvent,
+    callback: (...args: any[]) => void,
+  ): void {
     emitter.on(event, callback)
   }
 
@@ -69,40 +83,53 @@ export default (messagePayload: IzabelaMessagePayload) => {
     }
   }
 
+  async function prepareAudioElements() {
+    const settingsStore = useSettingsStore()
+    return settingsStore
+      .$whenReady()
+      .then(() => {
+        return Promise.map(
+          settingsStore.audioOutputs,
+          async (deviceLabel: string) => {
+            let mediaDevice
+
+            try {
+              mediaDevice = await getMediaDeviceByLabel(deviceLabel)
+            } catch (error) {
+              console.error(error)
+              return null
+            }
+            if (mediaDevice) {
+              const audioElement: any = document.createElement('audio')
+
+              try {
+                await audioElement.setSinkId(mediaDevice.deviceId)
+              } catch (error) {
+                console.error(error)
+                return null
+              }
+              return audioElement
+            }
+            return null
+          },
+        )
+      })
+      .then((resolvedAudioElements) => {
+        audioElements = resolvedAudioElements
+        return audioElements
+      })
+  }
+
   async function play() {
     const settingsStore = useSettingsStore()
-    await settingsStore.$whenReady()
-    Promise.map(settingsStore.audioOutputs, async (deviceLabel: string) => {
-      // TODO: Some optimisation possible here
-      let mediaDevice
-
-      try {
-        mediaDevice = await getMediaDeviceByLabel(deviceLabel)
-      } catch (error) {
-        console.error(error)
-        return null
-      }
-      if (mediaDevice) {
-        const audioElement: any = document.createElement('audio')
-        audioElement.src = audio.src
-
-        try {
-          await audioElement.setSinkId(mediaDevice.deviceId)
-        } catch (error) {
-          console.error(error)
-          return null
-        }
-        return audioElement
-      }
-      return null
-    })
-      .then((res: typeof audioElements) => {
+    return settingsStore
+      .$whenReady()
+      .then(() => {
         if (cancelled) return
         if (!settingsStore.playSpeechOnDefaultPlaybackDevice) {
           audio.volume = 0
         }
         audio.play()
-        audioElements = res
         audioElements.forEach((audioEl) => audioEl && audioEl.play())
       })
       .catch(console.error)
@@ -112,7 +139,61 @@ export default (messagePayload: IzabelaMessagePayload) => {
     return Promise.all([audioDownloaded.promise, audioLoaded.promise])
   }
 
-  async function downloadAudio() {
+  async function createAudioSrc(res: DownloadResponse): Promise<string> {
+    if (!('body' in res)) return URL.createObjectURL(res)
+    const clonedResponse = res.clone()
+
+    if (clonedResponse.headers.get('Content-Type') === 'audio/mpeg') {
+      const mediaSource = new MediaSource()
+
+      mediaSource.addEventListener('sourceopen', async () => {
+        const sourceBuffer = mediaSource.addSourceBuffer('audio/mpeg')
+        const reader = clonedResponse.body?.getReader()
+
+        let queue: Uint8Array[] = []
+        let processing = false
+
+        async function pump() {
+          if (processing || !reader) return
+          const { done, value } = await reader.read()
+          if (done) {
+            if (!sourceBuffer.updating) {
+              mediaSource.endOfStream()
+            } else {
+              sourceBuffer.addEventListener(
+                'updateend',
+                () => mediaSource.endOfStream(),
+                { once: true },
+              )
+            }
+            return
+          }
+          queue.push(value)
+          processQueue()
+        }
+
+        function processQueue() {
+          if (queue.length > 0 && !sourceBuffer.updating) {
+            processing = true
+            sourceBuffer.appendBuffer(queue.shift()!)
+          }
+        }
+
+        sourceBuffer.addEventListener('updateend', () => {
+          processing = false
+          processQueue()
+          if (!processing) pump()
+        })
+
+        await pump()
+      })
+
+      return URL.createObjectURL(mediaSource)
+    }
+    return URL.createObjectURL(await clonedResponse.blob())
+  }
+
+  async function downloadAudio(): Promise<DownloadResponse> {
     if (typeof window) {
       const { ElectronFilesystem } = window
       const cachedAudio = await ElectronFilesystem.getCachedAudio(getCacheId())
@@ -125,44 +206,80 @@ export default (messagePayload: IzabelaMessagePayload) => {
         }
       }
     }
-    // TODO: change depending on engine
-    const engine = getEngineById(engineName)
-    if (!engine) return Promise.reject(new Error('Izabela Message: Selected engine was not found'))
+    const engine = getEngine()
+    if (!engine)
+      return Promise.reject(
+        new Error('Izabela Message: Selected engine was not found'),
+      )
     return engine
       .synthesizeSpeech({
         credentials,
         payload,
       })
       .then((res) => {
+        try {
+          if (res instanceof Response) {
+            const data = res.headers.get('data')
+            if (data) emitter.emit('response:data', JSON.parse(data))
+          }
+        } catch (e) {
+          console.error(e)
+        }
         audioDownloaded.resolve(true)
-        const blob = 'data' in res ? res.data : res
-        cacheAudio(blob)
-        return Promise.resolve(blob)
+        cacheAudio(res)
+        return Promise.resolve(res)
       })
   }
 
-  async function cacheAudio(blob: Blob) {
-    if (typeof window) {
+  async function cacheAudio(res: DownloadResponse) {
+    if (typeof window !== 'undefined') {
       const { ElectronFilesystem } = window
-      const base64 = await blobToBase64(blob)
-      if (base64) ElectronFilesystem.cacheAudio(getCacheId(), base64)
+
+      let base64 = ''
+      if (!('body' in res)) {
+        base64 = await blobToBase64(res)
+      } else {
+        const clonedResponse = res.clone()
+        base64 = await blobToBase64(await clonedResponse.blob())
+      }
+      if (base64) {
+        ElectronFilesystem.cacheAudio(getCacheId(), base64)
+      }
     }
   }
 
-  function loadAudio(blob: Blob) {
-    audio.src = URL.createObjectURL(blob)
+  async function downloadAudioAndBlobify(): Promise<Blob> {
+    return downloadAudio().then((res) => {
+      if (!('body' in res)) return res
+      const clonedResponse = res.clone()
+      return clonedResponse.blob()
+    })
+  }
+
+  async function loadAudio(res: DownloadResponse, audioEls = audioElements) {
+    for (const audioElement of audioEls) {
+      if (!audioElement) continue
+      audioElement.src = await createAudioSrc(res)
+      audioElement.load()
+    }
+    audio.src = await createAudioSrc(res)
     audio.load()
   }
 
   function getAudioProgress() {
-    return audio.currentTime / audio.duration
+    return audio.currentTime / audio.duration || 0
   }
 
   function addEventListeners() {
     audio.addEventListener('timeupdate', () => {
       if (cancelled) return
+      emitter.emit('timeupdate', {
+        currentTime: audio.currentTime,
+        duration: audio.duration,
+        progress: getAudioProgress(),
+      })
       playingMessageStore.$patch({
-        progress: audio.currentTime / audio.duration || 0,
+        progress: getAudioProgress(),
       })
     })
     audio.addEventListener('ended', () => {
@@ -193,7 +310,6 @@ export default (messagePayload: IzabelaMessagePayload) => {
     })
     audio.addEventListener('started', () => emitter.emit('started'))
     audio.addEventListener('ended', () => emitter.emit('ended'))
-    audio.addEventListener('progress', () => emitter.emit('progress', getAudioProgress()))
     audio.addEventListener('error', (e) => onError(e))
   }
 
@@ -203,13 +319,17 @@ export default (messagePayload: IzabelaMessagePayload) => {
     audioLoaded.reject(e)
   }
 
-  if (!disableAutoplay) {
+  function prepare() {
     addEventListeners()
-    downloadAudio()
-      .then((blob) => {
-        loadAudio(blob)
-      })
+
+    // Fetch both at the same time for efficiency
+    Promise.all([downloadAudio(), prepareAudioElements()])
+      .then(([res, audioEls]) => loadAudio(res, audioEls))
       .catch((reason) => onError(reason))
+  }
+
+  if (!disableAutoplay) {
+    prepare()
   }
 
   return {
@@ -218,6 +338,7 @@ export default (messagePayload: IzabelaMessagePayload) => {
     play,
     on,
     downloadAudio,
+    downloadAudioAndBlobify,
     pause,
     resume,
     cancel,

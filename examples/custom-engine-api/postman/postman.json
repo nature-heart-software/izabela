@@ -57,6 +57,33 @@
           }
         }
       }
+    },
+    {
+      "name": "Synthesize Speech Stream",
+      "event": [],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "auth": null,
+        "description": "",
+        "url": {
+          "raw": "http://localhost:3000/synthesize-speech/stream",
+          "protocol": "http",
+          "host": ["localhost:3000"],
+          "path": ["synthesize-speech"],
+          "query": [],
+          "variable": []
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"credentials\": {\n    \"apiKey\": \"\"\n  },\n  \"payload\": {\n    \"text\": \"Hello world, programmed to work and not to feel.\",\n    \"voice\": {\n      \"id\": \"Microsoft Hazel Desktop\",\n      \"name\": \"Microsoft Hazel Desktop\",\n      \"category\": \"Say\",\n      \"languageCode\": \"en-US\"\n    }\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
     }
   ],
   "variable": []

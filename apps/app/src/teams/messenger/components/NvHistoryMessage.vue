@@ -12,9 +12,9 @@
           />
           <NvStack class="!flex-1 min-h-0">
             <NvStack>
-              <NvText class="select-text px-3 -mx-3">{{
-                message.originalMessage || id
-              }}</NvText>
+              <NvText class="select-text px-3 -mx-3"
+                >{{ message.originalMessage || id }}
+              </NvText>
               <NvGroup v-if="message.translatedMessage" align="start" noWrap>
                 <NvIcon name="english-to-chinese" size="3" />
                 <NvText class="select-text px-3 -mx-3"
@@ -115,7 +115,7 @@ const downloadMessageLocally = async () => {
       disableAutoplay: true,
     })
     IzabelaMessage(completeMessage)
-      .downloadAudio()
+      .downloadAudioAndBlobify()
       .then((data) => {
         const reader = new FileReader()
         reader.onload = () => {

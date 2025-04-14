@@ -1,16 +1,13 @@
 import { RequestHandler } from 'express'
 import axios from 'axios'
 import { handleError } from '../../utils/requests'
-import path from 'path'
-import { v4 as uuid } from 'uuid'
-import fs from 'fs'
 import {
-  AudioConfig,
   SpeechConfig,
   SpeechSynthesisOutputFormat,
+  SpeechSynthesisWordBoundaryEventArgs,
   SpeechSynthesizer,
 } from 'microsoft-cognitiveservices-speech-sdk'
-import util from 'util'
+import { Readable } from 'stream'
 
 const plugin: Izabela.Server.Plugin = ({ app, config }) => {
   const listVoicesHandler: RequestHandler = async (
@@ -41,23 +38,31 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
       body: {
         credentials: { apiKey, region },
         payload,
+        includeTimestamps,
       },
     },
     res,
   ) => {
-    const outputFile = path.join(config?.tempPath || '', uuid() + '.mp3')
     try {
-      fs.mkdirSync(path.parse(outputFile).dir, { recursive: true })
-      fs.writeFileSync(outputFile, '')
+      const s = new Readable()
 
+      const timestamps: SpeechSynthesisWordBoundaryEventArgs[] = []
       const speechConfig = SpeechConfig.fromSubscription(apiKey, region)
       speechConfig.speechSynthesisLanguage = payload.voice.Locale
       speechConfig.speechSynthesisVoiceName = payload.voice.ShortName
       speechConfig.speechSynthesisOutputFormat =
         SpeechSynthesisOutputFormat.Audio24Khz160KBitRateMonoMp3
-      const audioConfig = AudioConfig.fromAudioFileOutput(outputFile)
 
-      const synthesizer = new SpeechSynthesizer(speechConfig, audioConfig)
+      if (includeTimestamps) speechConfig.requestWordLevelTimestamps()
+
+      const synthesizer = new SpeechSynthesizer(speechConfig)
+
+      if (includeTimestamps) {
+        synthesizer.wordBoundary = (_, e) => {
+          timestamps.push(e)
+        }
+      }
+
       const audioContent: ArrayBuffer = await new Promise((resolve, reject) => {
         if (payload.ssml) {
           synthesizer.speakSsmlAsync(
@@ -86,30 +91,33 @@ const plugin: Izabela.Server.Plugin = ({ app, config }) => {
         }
       })
 
-      const writeFile = util.promisify(fs.writeFile)
+      const stream = s.pipe(res)
+      stream.on('finish', () => {})
+      s.push(Buffer.from(audioContent))
+      s.push(null)
 
-      await writeFile(outputFile, Buffer.from(audioContent), 'binary')
-      const stat = fs.statSync(outputFile)
-      const total = stat.size
-
+      if (timestamps.length) {
+        res.setHeader(
+          'Data',
+          JSON.stringify({
+            timestamps,
+          }),
+        )
+      }
       res.writeHead(200, {
-        'Content-Length': total,
-        'Content-Type': 'audio/mp3',
-      })
-      const stream = fs.createReadStream(outputFile).pipe(res)
-      stream.on('finish', () => {
-        fs.unlinkSync(outputFile)
+        'Content-Type': 'audio/mpeg',
       })
     } catch (e: any) {
-      if (fs.existsSync(outputFile)) {
-        fs.unlinkSync(outputFile)
-      }
-      handleError(res, 'Internal server error', e.message, 500)
+      return handleError(res, 'Internal server error', e.message, 500)
     }
   }
   app.post('/api/tts/microsoft-azure/list-voices', listVoicesHandler)
   app.post(
     '/api/tts/microsoft-azure/synthesize-speech',
+    synthesizeSpeechHandler,
+  )
+  app.post(
+    '/api/tts/microsoft-azure/synthesize-speech/stream',
     synthesizeSpeechHandler,
   )
 }

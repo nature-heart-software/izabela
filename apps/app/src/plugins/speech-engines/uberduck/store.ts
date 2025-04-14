@@ -33,8 +33,11 @@ export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
     accent: '',
     age: '',
     description: '',
-    image_url: 'https://uberduck-images.s3.amazonaws.com/commercial/carolyn.png',
+    image_url:
+      'https://uberduck-images.s3.amazonaws.com/commercial/carolyn.png',
   },
   useLocalCredentials: false,
   favoriteVoiceIds: [],
+  useCacheOnEveryRequest: true,
+  streamAudio: true,
 })
