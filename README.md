@@ -102,7 +102,7 @@ Find guides and API documentation on the [Wiki](https://github.com/nature-heart-
 
 ## More from the community
 
--  [its5Q/izabela-engines](https://github.com/its5Q/izabela-engines) - A small framework for quick development of your own custom engines for Izabela
+- [its5Q/izabela-engines](https://github.com/its5Q/izabela-engines) - A small framework for quick development of your own custom engines for Izabela
 
 ## Resources
 
