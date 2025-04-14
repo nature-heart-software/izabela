@@ -94,7 +94,7 @@ Here's a list of all the text-to-speech engines that are supported in Izabela:
 | Say                        | Included by default                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/say-sample.mp3?raw=true)                 | https://github.com/Marak/say.js/                                              |
 | Sam                        | Included by default                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/sam-sample.mp3?raw=true)                 | https://github.com/discordier/sam / https://github.com/Imrane03/better-sam    |
 | Animalese                  | Included by default                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/animalese-sample.wav?raw=true)           | https://github.com/Acedio/animalese.js                                        |
-| ElevenLabs                 | No                                  | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/elevenlabs-sample.mp3?raw=true)          | https://beta.elevenlabs.io/speech-synthesis                                   |
+| ElevenLabs                 | No                                  | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/elevenlabs-sample.mp3?raw=true)          | https://elevenlabs.io/                                                        |
 
 ## Guides
 
