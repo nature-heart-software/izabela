@@ -92,7 +92,6 @@ export const ElectronMessengerWindow = () => {
     }
   }
 
-  let focusedWithNativeOnce = false
   const focus = (context: 'mouse' | 'keyboard', native = false) =>
     new Promise((_, reject) => {
       messengerWindowStore?.$patch({ focusContext: context })
@@ -102,10 +101,10 @@ export const ElectronMessengerWindow = () => {
           if (native) {
             // Need to call ensureNativeFocus as late as possible otherwise it can break the foreground window
             window.once('focus', () => {
-              // For some reason, the first time ensureNative is called it has a chance to close the window right away
-              // so we time it out as late as possible on the first call.
-              if (focusedWithNativeOnce) return ensureNativeFocus()
-              focusedWithNativeOnce = true
+              // The first time ensureNative is called after the app is alseep,
+              // it has a chance to close the window right away and sometimes
+              // can cause softlock of the system in rare occasions
+              // so we need to time it out as late as possible.
               setTimeout(ensureNativeFocus, 200)
             })
           }
