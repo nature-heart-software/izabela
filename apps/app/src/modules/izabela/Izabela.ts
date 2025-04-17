@@ -72,7 +72,10 @@ export default () => {
     }
   }
 
-  function createMessage(messagePayload: Partial<IzabelaMessagePayload> & Pick<IzabelaMessagePayload, 'engine'>) {
+  function createMessage(
+    messagePayload: Partial<IzabelaMessagePayload> &
+      Pick<IzabelaMessagePayload, 'engine'>,
+  ) {
     return IzabelaMessage({
       message: '',
       originalMessage: '',
@@ -83,7 +86,7 @@ export default () => {
       credentials: {},
       command: null,
       voice: null,
-      ...messagePayload
+      ...messagePayload,
     })
   }
 

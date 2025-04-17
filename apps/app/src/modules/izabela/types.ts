@@ -15,7 +15,7 @@ export interface IzabelaMessage {
   translatedFrom: string | null
   translatedTo: string | null
   command: string | null
-  engine: SpeechEngine['id'] & {} | 'stream'
+  engine: (SpeechEngine['id'] & {}) | 'stream'
   voice: any
   excludeFromHistory?: boolean
   disableAutoplay?: boolean
