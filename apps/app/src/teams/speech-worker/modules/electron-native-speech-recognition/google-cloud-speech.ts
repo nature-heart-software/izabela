@@ -1,15 +1,12 @@
 import { useSettingsStore } from '@/features/settings/store'
 import speech from '@google-cloud/speech'
-import recorder from 'node-record-lpcm16'
 import { v4 as uuid } from 'uuid'
 import { Deferred } from '@packages/toolbox'
 import { Writable } from 'stream'
 import { ipcMain } from 'electron-postman'
 import takeRight from 'lodash/takeRight'
-import path from 'path'
-import { EXTERNALS_DIR } from '@/electron/utils.ts'
 
-export default () => {
+export default ({ recorder, recorderStream }: any) => {
   const settingsStore = useSettingsStore()
   const encoding = 'LINEAR16'
   const sampleRateHertz = 16000
@@ -17,9 +14,7 @@ export default () => {
   const maxEndingChunksCount = settingsStore.soxPostRecordingChunks
   const client = new speech.v1p1beta1.SpeechClient()
 
-  let audioInput: any[] = []
-  let rec: ReturnType<typeof recorder> | null = null
-  let recStream: any = null
+  let rollingBuffer: any[] = []
   const pendingMessages: {
     id: string
     end: () => void
@@ -29,12 +24,8 @@ export default () => {
     reject: (err: Error) => void
   }[] = []
 
-  const onRecorderError = (err: Error) => {
-    console.error(`Audio recording error ${err}`)
-  }
-
   function recorderCleanup() {
-    rec?.stop()
+    recorder?.stop()
   }
 
   function startStream() {
@@ -89,7 +80,7 @@ export default () => {
     })
 
     function onEnded() {
-      recStream?.unpipe(transformer)
+      recorderStream?.unpipe(transformer)
       stream.end()
       setTimeout(() => {
         // automatically resolve if nothing was recognized after some time
@@ -103,11 +94,11 @@ export default () => {
       }, 1000)
     }
 
-    audioInput.forEach((item) => {
+    rollingBuffer.forEach((item) => {
       stream.write(item)
     })
 
-    recStream?.pipe(transformer)
+    recorderStream?.pipe(transformer)
 
     deferredMessage.promise.then((message) => {
       const messageWithoutProfanityFilter = message.replace(/\*/g, '-')
@@ -153,36 +144,18 @@ export default () => {
     })
   }
 
-  // let endOnNextChunk = false
-
   function stopStream() {
-    audioInput = []
+    rollingBuffer = []
     pendingMessages[pendingMessages.length - 1]?.end()
-    // endOnNextChunk = true
   }
 
-  const audioInputStreamTransform = new Writable({
-    write(chunk, _encoding, next) {
-      audioInput = [
-        ...takeRight(audioInput, settingsStore.soxPreRecordingChunks),
-        chunk,
-      ]
-      next()
-    },
-    final() {
-      recorderCleanup()
-    },
+  recorderStream.on('data', (chunk: any) => {
+    rollingBuffer = takeRight(
+      [...rollingBuffer, chunk],
+      settingsStore.soxPreRecordingChunks,
+    )
   })
 
-  rec = recorder.record({
-    sampleRateHertz,
-    recordProgram: 'rec',
-    binPath: path.join(EXTERNALS_DIR, '/sox/sox.exe'),
-    device: settingsStore.soxDevice,
-  })
-
-  recStream = rec.stream()
-  recStream.on('error', onRecorderError).pipe(audioInputStreamTransform)
   return {
     startStream,
     stopStream,

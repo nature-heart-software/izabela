@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const port = 3000
+const port = 3333
 const pkg = require('./package.json')
 const cors = require('cors')
 const bodyParser = require('body-parser')
@@ -18,7 +18,7 @@ const FileWriter = require('wav').FileWriter
 
 // Change this depending on your environment
 const ENDPOINT_BASE_URL = 'http://localhost'
-const ENDPOINT_PORT = 3000
+const ENDPOINT_PORT = port
 
 app.use(cors())
 app.use(bodyParser.json())
@@ -62,9 +62,11 @@ const client = new ElevenLabsClient({
 //     const response = await client.speechToText.convert({
 //       file: createReadStream(wavPath),
 //       model_id: 'scribe_v1',
+//       tag_audio_events: false,
 //     })
 //
-//     console.log('📝 Transcription:', response.text)
+//     console.log('Transcription:', response.text)
+//     socket.emit('say', response.text)
 //   } catch (e) {
 //     console.error(e)
 //   }
@@ -72,7 +74,6 @@ const client = new ElevenLabsClient({
 
 socket.on('speech:recording:data:end', async (data) => {
   console.time('Performance')
-
   const buffer = Buffer.concat(data)
   const audioStream = Readable.from([buffer])
   const pcmPath = resolve('recording.pcm')
@@ -96,6 +97,7 @@ socket.on('speech:recording:data:end', async (data) => {
         audio: createReadStream(wavPath),
         output_format: 'mp3_44100_128',
         model_id: 'eleven_multilingual_sts_v2',
+        remove_background_noise: true,
       },
     )
     stream.pipe(createWriteStream('output.mp3'))

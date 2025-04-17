@@ -5,41 +5,19 @@ import takeRight from 'lodash/takeRight'
 import path from 'path'
 import { EXTERNALS_DIR } from '@/electron/utils.ts'
 import io from 'socket.io-client'
-import { app } from 'electron'
-import fs from 'node:fs'
 
 export default () => {
   const settingsStore = useSettingsStore()
   const sampleRateHertz = 16000
-  const languageCode = settingsStore.speechInputLanguage
   const maxEndingChunksCount = settingsStore.soxPostRecordingChunks
 
-  let audioInput: any[] = []
-  let rec: ReturnType<typeof recorder> | null = null
-  let recStream: any = null
+  let rollingBuffer: any[] = []
 
-  const onRecorderError = (err: Error) => {
-    console.error(`Audio recording error ${err}`)
-  }
+  const socket = io(`ws://localhost:7071`)
+  let fullAudioChunks: any[] = []
+  let transformer: Writable | null = null
 
-  function recorderCleanup() {
-    rec?.stop()
-  }
-
-  const audioInputStreamTransform = new Writable({
-    write(chunk, _encoding, next) {
-      audioInput = [
-        ...takeRight(audioInput, settingsStore.soxPreRecordingChunks),
-        chunk,
-      ]
-      next()
-    },
-    final() {
-      recorderCleanup()
-    },
-  })
-
-  rec = recorder.record({
+  const rec = recorder.record({
     sampleRateHertz,
     recordProgram: 'rec',
     binPath: path.join(EXTERNALS_DIR, '/sox/sox.exe'),
@@ -47,37 +25,28 @@ export default () => {
     audioType: 'raw',
   })
 
-  recStream = rec.stream()
-  recStream.on('error', onRecorderError).pipe(audioInputStreamTransform)
+  const recStream = rec.stream()
 
-  let rollingBuffer: any[] = []
+  recStream.on('error', (err: Error) => {
+    console.error(`Audio recording error ${err}`)
+  })
 
   recStream.on('data', (chunk: any) => {
-    rollingBuffer = [
-      ...takeRight(rollingBuffer, settingsStore.soxPreRecordingChunks),
-      chunk,
-    ]
+    rollingBuffer = takeRight(
+      [...rollingBuffer, chunk],
+      settingsStore.soxPreRecordingChunks,
+    )
 
-    if (customTransformer) {
-      customTransformer.write(chunk)
+    if (transformer) {
+      transformer.write(chunk)
     }
   })
 
-  const socket = io(`ws://localhost:7071`)
-  let customAudioChunks: any[] = []
-  let customTransformer: any = null
-
   function onEnded() {
-    customTransformer?.end()
-    socket.emit('speech:recording:data:end', customAudioChunks)
-
-    const buffer = Buffer.concat(customAudioChunks)
-    const tempPath = path.join(app.getPath('userData'), 'recording.pcm')
-    fs.writeFileSync(tempPath, buffer)
-
-    // Cleanup
-    customAudioChunks = []
-    customTransformer = null
+    transformer?.end()
+    socket.emit('speech:recording:data:end', fullAudioChunks)
+    fullAudioChunks = []
+    transformer = null
   }
 
   let ending = false
@@ -87,10 +56,10 @@ export default () => {
     ending = false
     endingChunksCount = 0
     socket.emit('speech:recording:data:start', rollingBuffer)
-    customTransformer = new Writable({
+    transformer = new Writable({
       write(chunk, _encoding, next) {
         socket.emit('speech:recording:data:chunk', chunk)
-        customAudioChunks.push(chunk)
+        fullAudioChunks.push(chunk)
         if (ending) {
           endingChunksCount += 1
           if (endingChunksCount >= maxEndingChunksCount) {
@@ -102,7 +71,7 @@ export default () => {
     })
 
     rollingBuffer.forEach((chunk) => {
-      customAudioChunks.push(chunk)
+      fullAudioChunks.push(chunk)
     })
   }
 
@@ -114,7 +83,7 @@ export default () => {
     startStream,
     stopStream,
     cleanup() {
-      recorderCleanup()
+      rec?.stop()
     },
   }
 }
