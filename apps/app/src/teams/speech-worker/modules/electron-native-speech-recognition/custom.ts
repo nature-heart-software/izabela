@@ -1,7 +1,7 @@
 import { useSettingsStore } from '@/features/settings/store'
 import io from 'socket.io-client'
 
-export default ({ useRecording, sampleRateHertz }: any) => {
+export default ({ recorder, useRecording }: any) => {
   const settingsStore = useSettingsStore()
   const socket = io(`ws://localhost:7071`)
 
@@ -20,7 +20,7 @@ export default ({ useRecording, sampleRateHertz }: any) => {
       })
 
       socket.emit('speech:recording:data:start', {
-        sampleRateHertz,
+        ...recorder.options,
         language: settingsStore.speechInputLanguage,
         speechRecognitionStrategy: settingsStore.speechRecognitionStrategy,
       })
