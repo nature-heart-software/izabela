@@ -44,7 +44,6 @@ export default ({ useRecording, sampleRateHertz }: any) => {
       .on('data', (res: any) => {
         currentTranscript = res.results[0]?.alternatives[0].transcript
         if (res.results[0]?.isFinal) {
-          console.log('final')
           deferredMessage.resolve(res.results[0].alternatives[0].transcript)
           cleanup(stream)
         }
