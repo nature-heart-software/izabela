@@ -57,7 +57,7 @@ export default ({ useRecording, sampleRateHertz }: any) => {
       }
 
       function onEnd() {
-        if (currentTranscript) {
+        if (!currentTranscript) {
           recording.resolve('')
           cleanup()
         }
