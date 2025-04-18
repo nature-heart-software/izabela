@@ -16,13 +16,16 @@
           <NvStack>
             <NvText type="label">Enable speech-to-text-to-speech</NvText>
             <NvText type="caption"
-              ><strong>NOTE:</strong> This might prevent your device from going to sleep
+              ><strong>NOTE:</strong> This might prevent your device from going
+              to sleep
             </NvText>
           </NvStack>
           <NvSwitch
             :modelValue="settingsStore.enableSTTTS"
             class="shrink-0"
-            @update:modelValue="(value) => settingsStore.$patch({ enableSTTTS: value })"
+            @update:modelValue="
+              (value) => settingsStore.$patch({ enableSTTTS: value })
+            "
           />
         </NvGroup>
         <template v-if="settingsStore.enableSTTTS">
@@ -49,31 +52,41 @@
               <NvStack>
                 <NvText type="label">Push-to-record key</NvText>
                 <NvText>Key to press in order to record speech</NvText>
-                <NvText type="caption">Release the key to transcribe speech</NvText>
+                <NvText type="caption"
+                  >Release the key to transcribe speech</NvText
+                >
               </NvStack>
               <NvKeybinding
                 :modelValue="settingsStore.keybindings.recordAudio"
                 @update:modelValue="
-                  (value) => settingsStore.$patch({ keybindings: { recordAudio: value } })
+                  (value) =>
+                    settingsStore.$patch({
+                      keybindings: { recordAudio: value },
+                    })
                 "
               />
             </NvGroup>
           </template>
-          <template v-if="settingsStore.speechRecognitionStrategy === 'continuous'">
+          <template
+            v-if="settingsStore.speechRecognitionStrategy === 'continuous'"
+          >
             <NvDivider direction="horizontal" />
             <NvStack>
               <NvGroup align="start" justify="apart" noWrap spacing="5">
                 <NvStack>
                   <NvText type="label">Activation threshold</NvText>
                   <NvText>Minimum volume required to record speech (dB)</NvText>
-                  <NvText type="caption">A lower value activates the recording more easily</NvText>
+                  <NvText type="caption"
+                    >A lower value activates the recording more easily</NvText
+                  >
                 </NvStack>
                 <NvNumberInput
                   :max="0"
                   :min="minMeterValue"
                   :modelValue="settingsStore.audioInputSensibility"
                   @update:modelValue="
-                    (value) => settingsStore.$patch({ audioInputSensibility: value })
+                    (value) =>
+                      settingsStore.$patch({ audioInputSensibility: value })
                   "
                 />
               </NvGroup>
@@ -89,13 +102,18 @@
                   spacing="1"
                 >
                   <template
-                    v-for="(_, i) in Array(Math.abs(minMeterValue) + 1).fill(null)"
+                    v-for="(_, i) in Array(Math.abs(minMeterValue) + 1).fill(
+                      null,
+                    )"
                     :key="i"
                   >
                     <div
                       :style="{
                         backgroundColor: tokens.colors.gray['90'],
-                        height: i % 5 ? rem(tokens.spacing['1']) : rem(tokens.spacing['3']),
+                        height:
+                          i % 5
+                            ? rem(tokens.spacing['1'])
+                            : rem(tokens.spacing['3']),
                         width: rem(tokens.spacing['1']),
                         position: 'relative',
                       }"
@@ -150,13 +168,15 @@
               <NvStack>
                 <NvText type="label">Speech recognition polling</NvText>
                 <NvText
-                  >How frequently the audio analyser checks if speech has started or stopped (ms)
+                  >How frequently the audio analyser checks if speech has
+                  started or stopped (ms)
                 </NvText>
               </NvStack>
               <NvNumberInput
                 :modelValue="settingsStore.speechDetectionPolling"
                 @update:modelValue="
-                  (value) => settingsStore.$patch({ speechDetectionPolling: value })
+                  (value) =>
+                    settingsStore.$patch({ speechDetectionPolling: value })
                 "
               />
             </NvGroup>
@@ -164,16 +184,20 @@
             <NvGroup align="start" justify="apart" no-wrap spacing="5">
               <NvStack>
                 <NvText type="label">Pre-recording samples</NvText>
-                <NvText>How many audio samples to record before speech has started</NvText>
+                <NvText
+                  >How many audio samples to record before speech has
+                  started</NvText
+                >
                 <NvText type="caption"
                   >Increase if start of sentences are not properly detected
                 </NvText>
               </NvStack>
               <NvNumberInput
-                :min="3"
+                :min="0"
                 :modelValue="settingsStore.soxPreRecordingChunks"
                 @update:modelValue="
-                  (value) => settingsStore.$patch({ soxPreRecordingChunks: value })
+                  (value) =>
+                    settingsStore.$patch({ soxPreRecordingChunks: value })
                 "
               />
             </NvGroup>
@@ -181,16 +205,20 @@
             <NvGroup align="start" justify="apart" no-wrap spacing="5">
               <NvStack>
                 <NvText type="label">Post-recording samples</NvText>
-                <NvText>How many audio samples to record after speech has stopped</NvText>
+                <NvText
+                  >How many audio samples to record after speech has
+                  stopped</NvText
+                >
                 <NvText type="caption"
                   >Increase if end of sentences are not properly detected
                 </NvText>
               </NvStack>
               <NvNumberInput
-                :min="3"
+                :min="0"
                 :modelValue="settingsStore.soxPostRecordingChunks"
                 @update:modelValue="
-                  (value) => settingsStore.$patch({ soxPostRecordingChunks: value })
+                  (value) =>
+                    settingsStore.$patch({ soxPostRecordingChunks: value })
                 "
               />
             </NvGroup>
@@ -198,9 +226,14 @@
             <NvGroup align="start" justify="apart" no-wrap spacing="5">
               <NvStack>
                 <NvText type="label">Restart speech recognition server</NvText>
-                <NvText>Restart speech recognition server if it stops working</NvText>
+                <NvText
+                  >Restart speech recognition server if it stops working</NvText
+                >
               </NvStack>
-              <NvButton @click="ElectronSpeechWorkerWindow.restartNativeSpeechRecognition()"
+              <NvButton
+                @click="
+                  ElectronSpeechWorkerWindow.restartNativeSpeechRecognition()
+                "
                 >Restart
               </NvButton>
             </NvGroup>
@@ -213,7 +246,10 @@
             <NvSwitch
               :modelValue="settingsStore.speechProfanityFilter"
               class="shrink-0"
-              @update:modelValue="(value) => settingsStore.$patch({ speechProfanityFilter: value })"
+              @update:modelValue="
+                (value) =>
+                  settingsStore.$patch({ speechProfanityFilter: value })
+              "
             />
           </NvGroup>
         </template>
@@ -251,13 +287,18 @@ const micVolume = ref(minMeterValue)
 const settingsStore = useSettingsStore()
 const { audioInputs } = useDevicesList()
 const soxAudioInputs = computed(() => soxMediaInputsFilter(audioInputs.value))
-const soxAudioInput = computed(() => soxAudioInputs.value[settingsStore.soxDevice])
+const soxAudioInput = computed(
+  () => soxAudioInputs.value[settingsStore.soxDevice],
+)
 const meter = new Tone.Meter()
 let mic = new Tone.UserMedia()
 const currentVolumeBarPosition = computed(
-  () => 100 - Math.abs((settingsStore.audioInputSensibility / minMeterValue) * 100),
+  () =>
+    100 - Math.abs((settingsStore.audioInputSensibility / minMeterValue) * 100),
 )
-const micVolumeBarWidth = computed(() => Math.abs(minMeterValue - micVolume.value))
+const micVolumeBarWidth = computed(() =>
+  Math.abs(minMeterValue - micVolume.value),
+)
 let interval: any = null
 watch(
   () => [settingsStore.soxDevice, soxAudioInput],
@@ -279,5 +320,6 @@ onBeforeUnmount(() => {
 
 const { ElectronSpeechWorkerWindow } = window
 
-const { data: googleCloudSpeechCredentialsPath } = useGetGoogleCloudSpeechCredentialsPath()
+const { data: googleCloudSpeechCredentialsPath } =
+  useGetGoogleCloudSpeechCredentialsPath()
 </script>

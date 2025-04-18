@@ -2,38 +2,30 @@ import { useSettingsStore } from '@/features/settings/store'
 import speech from '@google-cloud/speech'
 import { v4 as uuid } from 'uuid'
 import { Deferred } from '@packages/toolbox'
-import { Writable } from 'stream'
 import { ipcMain } from 'electron-postman'
-import takeRight from 'lodash/takeRight'
+import once from 'lodash/once'
 
-export default ({ recorder, recorderStream }: any) => {
+export default ({ useRecording, sampleRateHertz }: any) => {
   const settingsStore = useSettingsStore()
   const encoding = 'LINEAR16'
-  const sampleRateHertz = 16000
   const languageCode = settingsStore.speechInputLanguage
-  const maxEndingChunksCount = settingsStore.soxPostRecordingChunks
   const client = new speech.v1p1beta1.SpeechClient()
 
-  let rollingBuffer: any[] = []
-  const pendingMessages: {
-    id: string
-    end: () => void
-    message: Promise<string>
-    currentTranscript: string
-    resolve: (message: string) => void
-    reject: (err: Error) => void
-  }[] = []
-
-  function recorderCleanup() {
-    recorder?.stop()
-  }
+  const pendingMessages = new Map()
 
   function startStream() {
     const id = uuid()
     const deferredMessage = Deferred<string>()
+    const deferredDone = Deferred<string>()
     let currentTranscript = ''
-    let ending = false
-    let endingChunksCount = 0
+
+    const cleanup = once(
+      (stream: ReturnType<typeof client.streamingRecognize>) => {
+        recording.stopPumping()
+        stream.removeAllListeners()
+        stream.end()
+      },
+    )
 
     const stream = client
       .streamingRecognize({
@@ -49,118 +41,79 @@ export default ({ recorder, recorderStream }: any) => {
         singleUtterance: true,
         interimResults: true,
       })
-      .on('error', onRecognizeStreamError)
-      .on('data', onRecognizeStreamData)
-
-    function onRecognizeStreamError(err: Error) {
-      console.error(`API request error ${err}`)
-      deferredMessage.resolve('')
-    }
-
-    function onRecognizeStreamData(res: any) {
-      currentTranscript = res.results[0]?.alternatives[0].transcript
-      if (res.results[0]?.isFinal) {
-        deferredMessage.resolve(res.results[0].alternatives[0].transcript)
-        stream.removeListener('data', onRecognizeStreamData)
-        stream.removeListener('error', onRecognizeStreamError)
-      }
-    }
-
-    const transformer = new Writable({
-      write(chunk, _encoding, next) {
-        stream.write(chunk)
-        if (ending) {
-          endingChunksCount += 1
-          if (endingChunksCount >= maxEndingChunksCount) {
-            onEnded()
-          }
+      .on('data', (res: any) => {
+        currentTranscript = res.results[0]?.alternatives[0].transcript
+        if (res.results[0]?.isFinal) {
+          console.log('final')
+          deferredMessage.resolve(res.results[0].alternatives[0].transcript)
+          cleanup(stream)
         }
-        next()
+      })
+      .on('error', () => {
+        deferredMessage.resolve('')
+        cleanup(stream)
+      })
+      .on('end', () => {
+        if (currentTranscript) {
+          deferredMessage.resolve('')
+          cleanup(stream)
+        }
+        setTimeout(() => {
+          deferredMessage.resolve('')
+          cleanup(stream)
+        }, 1000)
+      })
+      .on('close', () => {
+        deferredMessage.resolve('')
+        cleanup(stream)
+      })
+
+    const recording = useRecording({
+      onChunk(chunk: any) {
+        stream.write(chunk)
+      },
+      onEnded() {
+        stream.end()
       },
     })
 
-    function onEnded() {
-      recorderStream?.unpipe(transformer)
-      stream.end()
-      setTimeout(() => {
-        // automatically resolve if nothing was recognized after some time
-        if (!currentTranscript) {
-          deferredMessage.resolve('')
-          const index = pendingMessages.findIndex((m) => m.id === id)
-          if (index >= 0) {
-            pendingMessages.splice(index, 1)
-          }
-        }
-      }, 1000)
-    }
+    recording.startPumping()
 
-    rollingBuffer.forEach((item) => {
-      stream.write(item)
-    })
-
-    recorderStream?.pipe(transformer)
-
-    deferredMessage.promise.then((message) => {
-      const messageWithoutProfanityFilter = message.replace(/\*/g, '-')
-      const pendingMessage = pendingMessages.find((m) => m.id === id)
-      if (pendingMessage) {
-        const index = pendingMessages.indexOf(pendingMessage)
-        if (pendingMessages[index - 1]) {
-          pendingMessages[index - 1].message.then(() => {
-            if (messageWithoutProfanityFilter)
-              ipcMain.sendTo(
-                'speech-worker',
-                'say',
-                messageWithoutProfanityFilter,
-              )
-            pendingMessages.splice(pendingMessages.indexOf(pendingMessage), 1)
-          })
-          // if previous stream failed because nothing was recognized, resolve it
-          if (!pendingMessages[index - 1].currentTranscript) {
-            pendingMessages[index - 1].resolve('')
-            pendingMessages.splice(index - 1, 1)
-          }
-        } else {
-          if (messageWithoutProfanityFilter)
-            ipcMain.sendTo(
-              'speech-worker',
-              'say',
-              messageWithoutProfanityFilter,
-            )
-          pendingMessages.splice(pendingMessages.indexOf(pendingMessage), 1)
-        }
-      }
-    })
-
-    pendingMessages.push({
+    pendingMessages.set(id, {
       id,
       end: () => {
-        ending = true
+        recording.stopPumping()
       },
-      message: deferredMessage.promise,
-      resolve: deferredMessage.resolve,
-      reject: deferredMessage.reject,
-      currentTranscript,
+      done: deferredDone.promise,
+    })
+
+    deferredMessage.promise.then(async (message) => {
+      const messageWithoutProfanityFilter = message.replace(/\*/g, '-')
+      const pendingMessage = pendingMessages.get(id)
+      if (pendingMessage) {
+        const values = Array.from(pendingMessages.values())
+        const index = values.indexOf(pendingMessage)
+        const previousPendingMessage = values[index - 1]
+        if (previousPendingMessage) {
+          await previousPendingMessage.done
+        }
+      }
+      if (messageWithoutProfanityFilter) {
+        ipcMain.sendTo('speech-worker', 'say', messageWithoutProfanityFilter)
+      }
+      pendingMessages.delete(id)
+      deferredDone.resolve(messageWithoutProfanityFilter)
     })
   }
 
   function stopStream() {
-    rollingBuffer = []
-    pendingMessages[pendingMessages.length - 1]?.end()
+    pendingMessages.forEach((pendingMessage) => pendingMessage.end())
   }
-
-  recorderStream.on('data', (chunk: any) => {
-    rollingBuffer = takeRight(
-      [...rollingBuffer, chunk],
-      settingsStore.soxPreRecordingChunks,
-    )
-  })
 
   return {
     startStream,
     stopStream,
     cleanup() {
-      recorderCleanup()
       client.close()
     },
   }
