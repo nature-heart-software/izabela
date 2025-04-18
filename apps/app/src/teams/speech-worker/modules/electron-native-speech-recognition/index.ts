@@ -117,6 +117,7 @@ export default () => {
         },
         startPumping,
         stopPumping,
+        rollingBuffer,
       }
     },
   }
