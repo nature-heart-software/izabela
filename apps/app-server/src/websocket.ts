@@ -50,7 +50,6 @@ export default (() => {
           'input:blur',
           'speech:recording:start',
           'speech:recording:end',
-          'speech:recording:settings',
           'speech:recording:data:start',
           'speech:recording:data:chunk',
           'speech:recording:data:end',

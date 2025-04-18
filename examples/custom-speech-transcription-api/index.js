@@ -76,8 +76,9 @@ socket.on('speech:recording:data:end', async (data) => {
   console.time('Performance')
   const buffer = Buffer.concat(data)
   const audioStream = Readable.from([buffer])
-  const pcmPath = resolve('recording.pcm')
-  const wavPath = resolve('recording.wav')
+  const timestamps = new Date().toISOString()
+  const pcmPath = resolve(`./outputs/${timestamps.replaceAll(':', '-')}.pcm`)
+  const wavPath = resolve(`./outputs/${timestamps.replaceAll(':', '-')}.wav`)
 
   writeFileSync(pcmPath, buffer)
   audioStream.pipe(
@@ -91,16 +92,16 @@ socket.on('speech:recording:data:end', async (data) => {
   console.log('Saved WAV file:', wavPath)
   try {
     console.timeEnd('Performance')
-    const stream = await client.speechToSpeech.convertAsStream(
-      'JBFqnCBsd6RMkjVDRZzb',
-      {
-        audio: createReadStream(wavPath),
-        output_format: 'mp3_44100_128',
-        model_id: 'eleven_multilingual_sts_v2',
-        remove_background_noise: true,
-      },
-    )
-    stream.pipe(createWriteStream('output.mp3'))
+    // const stream = await client.speechToSpeech.convertAsStream(
+    //   'JBFqnCBsd6RMkjVDRZzb',
+    //   {
+    //     audio: createReadStream(wavPath),
+    //     output_format: 'mp3_44100_128',
+    //     model_id: 'eleven_multilingual_sts_v2',
+    //     remove_background_noise: true,
+    //   },
+    // )
+    // stream.pipe(createWriteStream(`./outputs/${timestamps}.mp3`))
   } catch (e) {
     console.error(e)
   }

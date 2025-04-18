@@ -117,7 +117,6 @@ export default () => {
         },
         startPumping,
         stopPumping,
-        rollingBuffer,
       }
     },
   }
@@ -125,7 +124,7 @@ export default () => {
   const speechRecognitionEngine = {
     google: googleCloudSpeechRecognition,
     custom: customSpeechRecognition,
-  }['google'](context)
+  }['custom'](context)
 
   const stopWatch = watch(
     () => speechRecognitionStore.recording,
