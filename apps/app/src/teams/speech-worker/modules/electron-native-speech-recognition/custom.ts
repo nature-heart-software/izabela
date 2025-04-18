@@ -7,15 +7,15 @@ export default ({ useRecording, sampleRateHertz }: any) => {
 
   return {
     startStream() {
-      const fullAudioChunks: any[] = []
+      const audioChunks: any[] = []
 
       const recording = useRecording({
         onChunk(chunk: any) {
-          fullAudioChunks.push(chunk)
+          audioChunks.push(chunk)
           socket.emit('speech:recording:data:chunk', chunk)
         },
         onEnded() {
-          socket.emit('speech:recording:data:end', fullAudioChunks)
+          socket.emit('speech:recording:data:end', audioChunks)
         },
       })
 
