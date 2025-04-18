@@ -8,6 +8,9 @@ import { EXTERNALS_DIR } from '@/electron/utils.ts'
 import { useSettingsStore } from '@/features/settings/store'
 import takeRight from 'lodash/takeRight'
 import customSpeechRecognition from './custom.ts'
+import { v4 as uuid } from 'uuid'
+import { Deferred } from '@packages/toolbox'
+import { ipcMain } from 'electron-postman'
 
 export default () => {
   console.log('Starting native speech recognition...')
@@ -41,6 +44,8 @@ export default () => {
     )
   })
 
+  const pendingMessages = new Map()
+
   const context = {
     recorder,
     recorderStream,
@@ -52,8 +57,29 @@ export default () => {
       onChunk: (chunk: any) => void
       onEnded?: () => void
     }) {
+      const id = uuid()
+      const deferredMessage = Deferred<string>()
+      const deferredDone = Deferred<string>()
       let ending = false
       let endingChunksCount = 0
+
+      deferredMessage.promise.then(async (message) => {
+        const messageWithoutProfanityFilter = message.replace(/\*/g, '-')
+        const pendingMessage = pendingMessages.get(id)
+        if (pendingMessage) {
+          const values = Array.from(pendingMessages.values())
+          const index = values.indexOf(pendingMessage)
+          const previousPendingMessage = values[index - 1]
+          if (previousPendingMessage) {
+            await previousPendingMessage.done
+          }
+        }
+        if (messageWithoutProfanityFilter) {
+          ipcMain.sendTo('speech-worker', 'say', messageWithoutProfanityFilter)
+        }
+        pendingMessages.delete(id)
+        deferredDone.resolve(messageWithoutProfanityFilter)
+      })
 
       function onData(chunk: any) {
         onChunk(chunk)
@@ -77,7 +103,18 @@ export default () => {
         ending = true
       }
 
+      pendingMessages.set(id, {
+        id,
+        end: () => {
+          stopPumping()
+        },
+        done: deferredDone.promise,
+      })
+
       return {
+        resolve(message: string) {
+          deferredMessage.resolve(message)
+        },
         startPumping,
         stopPumping,
       }
@@ -96,6 +133,7 @@ export default () => {
         speechRecognitionEngine.startStream()
       } else {
         speechRecognitionEngine.stopStream()
+        pendingMessages.forEach((pendingMessage) => pendingMessage.end())
         rollingBuffer = []
       }
     },
