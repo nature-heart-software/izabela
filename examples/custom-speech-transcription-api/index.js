@@ -46,7 +46,7 @@ app.get('/play/:id', (req, res) => {
     return res.status(404).send('Stream not found or already consumed')
   }
 
-  res.setHeader('Content-Type', 'audio/mp3')
+  res.setHeader('Content-Type', 'audio/mpeg')
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
   res.setHeader('Pragma', 'no-cache')
   res.setHeader('Expires', '0')
