@@ -113,21 +113,24 @@
               :reason="
                 settingsStore.enableSTTTS
                   ? 'Google Cloud credentials required'
-                  : 'STTTS needs to be enabled'
+                  : 'Audio input needs to be enabled'
               "
             >
               <NvStack spacing="4">
                 <NvDivider direction="horizontal" />
+                <NvFormItem label="Speech recognition engine">
+                  <NvSpeechRecognitionEngineSelect />
+                </NvFormItem>
                 <NvFormItem label="Speech recognition language">
                   <NvSpeechInputLanguageSelect />
                 </NvFormItem>
                 <NvDivider direction="horizontal" />
-                <NvFormItem label="Speech recognition strategy">
-                  <NvSpeechRecognitionStrategySelect />
-                </NvFormItem>
-                <NvDivider direction="horizontal" />
                 <NvFormItem label="Recording device">
                   <NvSoxAudioInputSelect class="!w-full" />
+                </NvFormItem>
+                <NvDivider direction="horizontal" />
+                <NvFormItem label="Speech recognition strategy">
+                  <NvSpeechRecognitionStrategySelect />
                 </NvFormItem>
               </NvStack>
             </NvAccessBlocker>
@@ -178,6 +181,7 @@ import { inject } from 'vue'
 import { useRoute } from 'vue-router'
 import NvSpeechRecognitionStrategySelect from '@/features/speech/components/inputs/NvSpeechRecognitionStrategySelect.vue'
 import { useGetGoogleCloudSpeechCredentialsPath } from '@/features/settings/hooks'
+import NvSpeechRecognitionEngineSelect from '@/features/speech/components/inputs/NvSpeechRecognitionEngineSelect.vue'
 
 const speechStore = useSpeechStore()
 const settingsStore = useSettingsStore()
@@ -185,4 +189,5 @@ const messengerContext = inject('messenger')
 const route = useRoute()
 const { data: googleCloudSpeechCredentialsPath } =
   useGetGoogleCloudSpeechCredentialsPath()
+const { ElectronSpeechWorkerWindow } = window
 </script>

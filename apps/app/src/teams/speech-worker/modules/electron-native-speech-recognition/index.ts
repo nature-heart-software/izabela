@@ -122,9 +122,9 @@ export default () => {
   }
 
   const speechRecognitionEngine = {
-    google: googleCloudSpeechRecognition,
+    'google-cloud': googleCloudSpeechRecognition,
     custom: customSpeechRecognition,
-  }['custom'](context)
+  }[settingsStore.selectedSpeechRecognitionEngine](context)
 
   const stopWatch = watch(
     () => speechRecognitionStore.recording,

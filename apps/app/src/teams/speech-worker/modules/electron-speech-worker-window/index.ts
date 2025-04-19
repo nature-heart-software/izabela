@@ -172,6 +172,7 @@ export const ElectronSpeechWindow = () => {
       () => [
         settingsStore?.soxDevice,
         settingsStore?.enableSTTTS,
+        settingsStore?.selectedSpeechRecognitionEngine,
         settingsStore?.speechRecognitionStrategy,
         settingsStore?.speechInputLanguage,
         settingsStore?.soxPreRecordingChunks,

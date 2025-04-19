@@ -15,11 +15,11 @@ export const useSettingsStore = defineStore(
     const channel = version.includes('alpha')
       ? 'alpha'
       : // eslint-disable-next-line no-nested-ternary
-        version.includes('beta')
-        ? 'beta'
-        : version.includes('rc')
-          ? 'rc'
-          : 'latest'
+      version.includes('beta')
+      ? 'beta'
+      : version.includes('rc')
+      ? 'rc'
+      : 'latest'
 
     const enableAutoUpdate = ref(true)
     const enableOverlayWindow = ref(false)
@@ -28,6 +28,9 @@ export const useSettingsStore = defineStore(
     const audioOutputs = ref<MediaDeviceInfo['label'][]>([])
     const audioInput = ref<MediaDeviceInfo['label']>('default')
     const selectedSpeechEngine = ref<SpeechEngine['id']>(ENGINE_ID)
+    const selectedSpeechRecognitionEngine = ref<'google-cloud' | 'custom'>(
+      'google-cloud',
+    )
     const updateChannel = ref(channel)
     const launchOnStartup = ref(true)
     const runAsAdmin = ref(false)
@@ -233,6 +236,7 @@ export const useSettingsStore = defineStore(
       audioOutputs,
       audioInput,
       selectedSpeechEngine,
+      selectedSpeechRecognitionEngine,
       updateChannel,
       launchOnStartup,
       runAsAdmin,

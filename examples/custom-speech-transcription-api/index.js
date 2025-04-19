@@ -74,12 +74,15 @@ app.get('/play/:id', (req, res) => {
 })
 
 socket.on('speech:recording:data:end', async (data) => {
-  const buffer = Buffer.concat(data)
-  const audioStream = Readable.from([buffer])
-  const id = new Date().toISOString().replaceAll(':', '-').replaceAll('.', '-')
-  const debug = false
-
-  if (debug) {
+  try {
+    const buffer = Buffer.concat(data)
+    const audioStream = Readable.from([buffer])
+    const date = new Date()
+      .toISOString()
+      .replaceAll(':', '-')
+      .replaceAll('.', '-')
+    const uniqueSuffix = Math.random().toString(36).substring(2, 10)
+    const id = `${date}-${uniqueSuffix}`
     const pcmPath = resolve(`./outputs/${id}.pcm`)
     const wavPath = resolve(`./outputs/${id}.wav`)
 
@@ -90,18 +93,16 @@ socket.on('speech:recording:data:end', async (data) => {
         channels: 1,
       }),
     )
-  }
-
-  try {
-    const response = await client.speechToText.convert({
-      file: createReadStream(wavPath),
-      model_id: 'scribe_v1',
-      tag_audio_events: false,
-    })
-
-    console.log('Transcription:', response.text)
 
     /* Uncomment this if you want Izabela to play the message with the active tts engine */
+    // const response = await client.speechToText.convert({
+    //   file: createReadStream(wavPath),
+    //   model_id: 'scribe_v1',
+    //   tag_audio_events: false,
+    // })
+    //
+    // console.log('Transcription:', response.text)
+    //
     // socket.emit('say', response.text)
   } catch (e) {
     console.error(e)
@@ -112,43 +113,43 @@ socket.on('speech:recording:data:end', async (data) => {
   try {
     const buffer = Buffer.concat(data)
     const audioStream = Readable.from([buffer])
-    const id = new Date()
+    const date = new Date()
       .toISOString()
       .replaceAll(':', '-')
       .replaceAll('.', '-')
-    const debug = false
+    const uniqueSuffix = Math.random().toString(36).substring(2, 10)
+    const id = `${date}-${uniqueSuffix}`
+    const pcmPath = resolve(`./outputs/${id}.pcm`)
+    const wavPath = resolve(`./outputs/${id}.wav`)
 
-    if (debug) {
-      const pcmPath = resolve(`./outputs/${id}.pcm`)
-      const wavPath = resolve(`./outputs/${id}.wav`)
-
-      writeFileSync(pcmPath, buffer)
-      audioStream.pipe(
+    writeFileSync(pcmPath, buffer)
+    audioStream
+      .pipe(
         new FileWriter(wavPath, {
           sampleRate: 16000,
           channels: 1,
         }),
       )
-    }
-
-    const stream = await client.speechToSpeech.convertAsStream(
-      'JBFqnCBsd6RMkjVDRZzb',
-      {
-        audio: createReadStream(wavPath),
-        output_format: 'mp3_44100_128',
-        model_id: 'eleven_multilingual_sts_v2',
-        remove_background_noise: true,
-      },
-    )
-
-    stream.pipe(streamManager.createStream(id))
-
-    const endpoint = `${ENDPOINT_BASE_URL}:${ENDPOINT_PORT}/play/${id}`
-
-    console.log('Generated endpoint:', endpoint)
-
-    /* Uncomment this if you want to play a specific audio */
-    // socket.emit('audio:play', endpoint)
+      .on('finish', async () => {
+        /* Uncomment this if you want to play a specific audio */
+        // const stream = await client.speechToSpeech.convertAsStream(
+        //   'JBFqnCBsd6RMkjVDRZzb',
+        //   {
+        //     audio: createReadStream(wavPath),
+        //     output_format: 'mp3_44100_128',
+        //     model_id: 'eleven_multilingual_sts_v2',
+        //     remove_background_noise: true,
+        //   },
+        // )
+        //
+        // stream.pipe(streamManager.createStream(id))
+        //
+        // const endpoint = `${ENDPOINT_BASE_URL}:${ENDPOINT_PORT}/play/${id}`
+        //
+        // console.log('Generated endpoint:', endpoint)
+        //
+        // socket.emit('audio:play', endpoint)
+      })
   } catch (e) {
     console.error(e)
   }
