@@ -9,6 +9,7 @@ export default ({ useRecording, sampleRateHertz }: any) => {
   return {
     startStream() {
       let currentTranscript = ''
+      let streamEnded = false
       const stream = client
         .streamingRecognize({
           config: {
@@ -30,7 +31,9 @@ export default ({ useRecording, sampleRateHertz }: any) => {
 
       const recording = useRecording({
         onChunk(chunk: any) {
-          stream.write(chunk)
+          if (!streamEnded) {
+            stream.write(chunk)
+          }
         },
         onEnded() {
           stream.end()
@@ -38,6 +41,7 @@ export default ({ useRecording, sampleRateHertz }: any) => {
       })
 
       const cleanup = once(() => {
+        streamEnded = true
         recording.stopPumping()
         stream.removeAllListeners()
         stream.end()
