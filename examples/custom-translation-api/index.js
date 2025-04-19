@@ -1,6 +1,5 @@
 const express = require('express')
 const app = express()
-const port = 3000
 const pkg = require('./package.json')
 const say = require('say')
 const cors = require('cors')
@@ -11,7 +10,7 @@ const axios = require('axios')
 
 // Change this depending on your environment
 const ENDPOINT_BASE_URL = 'http://localhost'
-const ENDPOINT_PORT = 3000
+const ENDPOINT_PORT = 3332
 
 app.use(cors())
 app.use(bodyParser.json())
@@ -79,7 +78,7 @@ app.post('/translate', async (req, res) => {
   }
 })
 
-app.listen(port, () => {
+app.listen(ENDPOINT_PORT, () => {
   console.log(
     `[${pkg.name}] API endpoint: ${ENDPOINT_BASE_URL}${
       ENDPOINT_PORT ? `:${ENDPOINT_PORT}` : ''

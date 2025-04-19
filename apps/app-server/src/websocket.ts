@@ -38,6 +38,7 @@ export default (() => {
           forwardEventToAllSockets('say', message, [socket.id])
         })
         ;[
+          'audio:play',
           'message:load',
           'message:start',
           'message:end',

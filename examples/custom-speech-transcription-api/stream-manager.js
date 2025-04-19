@@ -1,4 +1,5 @@
 const { PassThrough, Readable } = require('stream')
+const { Writable } = require('node:stream')
 
 class StreamManager {
   constructor() {
@@ -15,19 +16,24 @@ class StreamManager {
       consumed: false,
     })
 
-    return {
-      write: (chunk) => {
-        buffer.push(chunk)
-        stream.write(chunk)
+    return new Writable({
+      write: (chunk, encoding, callback) => {
+        const entry = this.streams.get(audioId)
+        if (entry) {
+          buffer.push(chunk)
+          stream.write(chunk)
+        }
+        callback()
       },
-      end: () => {
+      final: (callback) => {
         stream.end()
         const entry = this.streams.get(audioId)
         if (entry) {
           entry.done = true
         }
+        callback()
       },
-    }
+    })
   }
 
   consume(audioId) {
@@ -36,7 +42,10 @@ class StreamManager {
 
     entry.consumed = true
 
-    setTimeout(() => this.streams.delete(audioId), 10_000)
+    setTimeout(() => {
+      entry.consumed = true
+      this.streams.delete(audioId)
+    }, 60 * 1000)
 
     if (entry.done) {
       return Readable.from(entry.buffer)

@@ -105,9 +105,10 @@ export default () => {
     return playMessage(message)
   }
 
-  function stream(url: string): ReturnType<typeof IzabelaMessage> {
+  function play(url: string): ReturnType<typeof IzabelaMessage> {
     const message = createMessage({
-      engine: 'stream',
+      engine: 'external-audio',
+      excludeFromHistory: true,
       payload: {
         url,
       },
@@ -118,7 +119,7 @@ export default () => {
     return playMessage(message)
   }
 
-  socket.on('stream', stream)
+  socket.on('audio:play', play)
 
   return {
     say,

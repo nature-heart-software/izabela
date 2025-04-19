@@ -9,7 +9,7 @@ const path = require('path')
 
 // Change this depending on your environment
 const ENDPOINT_BASE_URL = 'http://localhost'
-const ENDPOINT_PORT = 3000
+const ENDPOINT_PORT = 3331
 
 app.use(cors())
 app.use(bodyParser.json())
