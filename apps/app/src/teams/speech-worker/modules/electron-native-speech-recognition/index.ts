@@ -1,13 +1,14 @@
 /* inspired by (stolen from) https://github.com/GoogleCloudPlatform/nodejs-docs-samples/blob/main/speech/infiniteStreaming.js */
 import { watch } from 'vue'
 import { useSpeechRecognitionStore } from '@/features/speech/store'
-import googleCloudSpeechRecognition from './google-cloud-speech.ts'
+import googleCloudSpeechRecognition from './engines/google-cloud-speech.ts'
+import elevenlabsSpeechRecognition from './engines/elevenlabs.ts'
 import nodeRecorder from 'node-record-lpcm16'
 import path from 'path'
 import { EXTERNALS_DIR } from '@/electron/utils.ts'
 import { useSettingsStore } from '@/features/settings/store'
 import takeRight from 'lodash/takeRight'
-import customSpeechRecognition from './custom.ts'
+import customSpeechRecognition from './engines/custom.ts'
 import { v4 as uuid } from 'uuid'
 import { Deferred } from '@packages/toolbox'
 import { ipcMain } from 'electron-postman'
@@ -123,6 +124,7 @@ export default () => {
 
   const speechRecognitionEngine = {
     'google-cloud': googleCloudSpeechRecognition,
+    elevenlabs: elevenlabsSpeechRecognition,
     custom: customSpeechRecognition,
   }[settingsStore.selectedSpeechRecognitionEngine](context)
 

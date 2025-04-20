@@ -21,6 +21,7 @@ import mapValues from 'lodash/mapValues'
 import { getTime } from '@/utils/time'
 import { windowHeight, windowWidth } from '@/teams/speech-worker/electron/const'
 import { getTopLeftWindow } from '@/electron/utils'
+import { elevenlabsSpeechRecognitionPlugin } from '@/features/speech/store/plugins/elevenlabs'
 
 export const ElectronSpeechWindow = () => {
   let registeredWindow: BrowserWindow | null = null
@@ -178,7 +179,7 @@ export const ElectronSpeechWindow = () => {
         settingsStore?.soxPreRecordingChunks,
         settingsStore?.soxPostRecordingChunks,
         settingsStore?.speechProfanityFilter,
-        speechStore?.currentSpeechEngine,
+        elevenlabsSpeechRecognitionPlugin.getProperty('apiKey'),
       ],
       restartNativeSpeechRecognition,
       { deep: true, immediate: true },

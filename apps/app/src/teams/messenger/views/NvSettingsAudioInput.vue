@@ -91,6 +91,17 @@
                     </NvStack>
                   </NvAccessBlocker>
                 </template>
+                <template v-if="settingsStore.selectedSpeechRecognitionEngine === 'elevenlabs'">
+                  <NvDivider direction="horizontal" />
+                  <NvFormItem label="API Key">
+                    <NvInput
+                      :modelValue="elevenlabsSpeechRecognitionPlugin.getProperty('apiKey', true)"
+                      show-password
+                      type="password"
+                      @update:modelValue="(value) => elevenlabsSpeechRecognitionPlugin.setProperty('apiKey', value, true)"
+                    />
+                  </NvFormItem>
+                </template>
               </NvStack>
             </NvCard>
             <NvCard>
@@ -111,12 +122,15 @@ import {
   NvStack,
   NvSwitch,
   NvText,
+  NvFormItem,
+  NvInput,
 } from '@packages/ui'
 import NvAudioInputFormPart from '@/features/audio/components/inputs/NvAudioInputFormPart.vue'
 import { useSettingsStore } from '@/features/settings/store'
 import NvSpeechRecognitionEngineSelect from '@/features/speech/components/inputs/NvSpeechRecognitionEngineSelect.vue'
 import NvGoogleCloudCredentialsFormPart from '@/features/settings/components/NvGoogleCloudCredentialsFormPart.vue'
 import { useGetGoogleCloudSpeechCredentialsPath } from '@/features/settings/hooks'
+import { elevenlabsSpeechRecognitionPlugin } from '@/features/speech/store/plugins/elevenlabs'
 
 const settingsStore = useSettingsStore()
 const { data: googleCloudSpeechCredentialsPath } =

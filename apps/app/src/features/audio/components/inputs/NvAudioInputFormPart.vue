@@ -164,7 +164,7 @@
         <NvStack>
           <NvText type="label">Post-recording samples</NvText>
           <NvText
-            >How many audio samples to record after speech has stopped
+            >How many audio samples to record after speech has ended
           </NvText>
           <NvText type="caption"
             >Increase if end of sentences are not properly detected

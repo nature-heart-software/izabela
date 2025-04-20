@@ -19,6 +19,7 @@ const options = computed(() =>
   orderBy(
     [
       { label: 'Google Cloud', value: 'google-cloud' },
+      { label: 'Elevenlabs', value: 'elevenlabs' },
       { label: 'Custom', value: 'custom' },
     ].map(({ label, value }) => {
       return {
