@@ -1,9 +1,9 @@
 <template>
   <NvSelect
-      :modelValue="settingsStore.selectedSpeechRecognitionEngine"
-      :options="options"
-      v-bind="$attrs"
-      @update:modelValue="
+    :modelValue="settingsStore.selectedSpeechRecognitionEngine"
+    :options="options"
+    v-bind="$attrs"
+    @update:modelValue="
       (value) =>
         settingsStore.$patch({ selectedSpeechRecognitionEngine: value })
     "
@@ -16,19 +16,19 @@ import orderBy from 'lodash/orderBy'
 import { useSettingsStore } from '@/features/settings/store'
 
 const options = computed(() =>
-    orderBy(
-        [
-          { label: 'Google Cloud', value: 'google-cloud' },
-          { label: 'Microsoft Azure', value: 'microsoft-azure' },
-          { label: 'Elevenlabs', value: 'elevenlabs' },
-          { label: 'Custom', value: 'custom' },
-        ].map(({ label, value }) => {
-          return {
-            label,
-            value,
-          }
-        }),
-    ),
+  orderBy(
+    [
+      { label: 'Google Cloud', value: 'google-cloud' },
+      { label: 'Microsoft Azure', value: 'microsoft-azure' },
+      { label: 'Elevenlabs', value: 'elevenlabs' },
+      { label: 'Custom', value: 'custom' },
+    ].map(({ label, value }) => {
+      return {
+        label,
+        value,
+      }
+    }),
+  ),
 )
 
 const settingsStore = useSettingsStore()
