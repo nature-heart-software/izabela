@@ -2,32 +2,34 @@ import { useSettingsStore } from '@/features/settings/store'
 import io from 'socket.io-client'
 
 export default ({ recorder, useRecording }: any) => {
-  const settingsStore = useSettingsStore()
-  const socket = io(`ws://localhost:7071`)
+    const settingsStore = useSettingsStore()
+    const socket = io(`ws://localhost:7071`)
 
-  return {
-    startStream() {
-      const audioChunks: any[] = []
+    return {
+        startStream() {
+            const audioChunks: any[] = []
 
-      const recording = useRecording({
-        onChunk(chunk: any) {
-          audioChunks.push(chunk)
-          socket.emit('speech:recording:data:chunk', chunk)
+            const recording = useRecording({
+                onChunk(chunk: any) {
+                    audioChunks.push(chunk)
+                    socket.emit('speech:recording:data:chunk', chunk)
+                },
+                onEnded() {
+                    socket.emit('speech:recording:data:end', audioChunks)
+                },
+            })
+
+            socket.emit('speech:recording:data:start', {
+                ...recorder.options,
+                language: settingsStore.speechInputLanguage,
+                speechRecognitionStrategy: settingsStore.speechRecognitionStrategy,
+            })
+
+            recording.startPumping()
         },
-        onEnded() {
-          socket.emit('speech:recording:data:end', audioChunks)
+        stopStream() {
         },
-      })
-
-      socket.emit('speech:recording:data:start', {
-        ...recorder.options,
-        language: settingsStore.speechInputLanguage,
-        speechRecognitionStrategy: settingsStore.speechRecognitionStrategy,
-      })
-
-      recording.startPumping()
-    },
-    stopStream() {},
-    cleanup() {},
-  }
+        cleanup() {
+        },
+    }
 }

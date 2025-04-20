@@ -13,6 +13,7 @@
     "elevenlabs": "^1.53.0",
     "ffi-napi": "^4.0.3",
     "micromatch": "^4.0.5",
+    "microsoft-cognitiveservices-speech-sdk": "^1.25.0",
     "node-abi": "^3.40.0",
     "node-global-key-listener": "^0.1.1",
     "node-record-lpcm16": "1.0.1",
