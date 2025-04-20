@@ -40,7 +40,8 @@ export default ({ useRecording, sampleRateHertz }: any) => {
         },
       })
 
-      const cleanup = once(() => {
+      const resolve = once((text: string = '') => {
+        recording.resolve(text)
         streamEnded = true
         recording.stopPumping()
         stream.removeAllListeners()
@@ -50,30 +51,25 @@ export default ({ useRecording, sampleRateHertz }: any) => {
       function onData(res: any) {
         currentTranscript = res.results[0]?.alternatives[0].transcript
         if (res.results[0]?.isFinal) {
-          recording.resolve(res.results[0].alternatives[0].transcript)
-          cleanup()
+          resolve(res.results[0].alternatives[0].transcript)
         }
       }
 
       function onError() {
-        recording.resolve('')
-        cleanup()
+        resolve()
       }
 
       function onEnd() {
         if (!currentTranscript) {
-          recording.resolve('')
-          cleanup()
+          resolve()
         }
         setTimeout(() => {
-          recording.resolve('')
-          cleanup()
+          resolve()
         }, 1000)
       }
 
       function onClose() {
-        recording.resolve('')
-        cleanup()
+        resolve()
       }
 
       recording.startPumping()

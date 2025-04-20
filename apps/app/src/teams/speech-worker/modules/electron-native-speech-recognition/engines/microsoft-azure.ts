@@ -1,9 +1,13 @@
+import { useSettingsStore } from '@/features/settings/store'
+import { microsoftAzureSpeechRecognitionPlugin } from '@/features/speech/store/plugins/microsoft-azure'
 import once from 'lodash/once'
 
 import sdk from 'microsoft-cognitiveservices-speech-sdk'
 
 export default ({ useRecording }: any) => {
-  const speechConfig = sdk.SpeechConfig.fromSubscription('', '')
+  const settingsStore = useSettingsStore()
+  const speechConfig = sdk.SpeechConfig.fromSubscription(microsoftAzureSpeechRecognitionPlugin.getProperty('apiKey', true), microsoftAzureSpeechRecognitionPlugin.getProperty('region'))
+  speechConfig.speechRecognitionLanguage = settingsStore.speechInputLanguage
 
   return {
     startStream() {
@@ -17,16 +21,16 @@ export default ({ useRecording }: any) => {
       )
 
       speechRecognizer.recognizeOnceAsync(onRecognizeOnceAsync)
-
+        
       const recording = useRecording({
         onChunk(chunk: any) {
           if (!ended) {
             stream.write(chunk.slice())
           }
         },
-        onEnded() {
-          speechRecognizer.close()
-        },
+          onEnded() {
+            speechRecognizer.close()
+          }
       })
 
       const resolve = once((text: string = '') => {
@@ -36,13 +40,27 @@ export default ({ useRecording }: any) => {
         speechRecognizer.close()
       })
 
+      speechRecognizer.canceled = () => resolve()
+
       function onRecognizeOnceAsync(result: sdk.SpeechRecognitionResult) {
-        resolve(result.text)
+        switch (result.reason) {
+          case sdk.ResultReason.RecognizedSpeech:
+            resolve(result.text)
+            break;
+          case sdk.ResultReason.NoMatch:
+            resolve()
+            break;
+          case sdk.ResultReason.Canceled:
+            resolve()
+            break;
+        }
       }
 
       recording.startPumping()
     },
     stopStream() {},
-    cleanup() {},
+    cleanup() {
+      speechConfig.close()
+    },
   }
 }

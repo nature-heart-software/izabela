@@ -119,6 +119,51 @@
                     />
                   </NvFormItem>
                 </template>
+                <template
+                  v-if="
+                    settingsStore.selectedSpeechRecognitionEngine ===
+                    'microsoft-azure'
+                  "
+                >
+                  <NvDivider direction="horizontal" />
+                  <NvFormItem label="API Key">
+                    <NvInput
+                      :modelValue="
+                        microsoftAzureSpeechRecognitionPlugin.getProperty(
+                          'apiKey',
+                          true,
+                        )
+                      "
+                      show-password
+                      type="password"
+                      @update:modelValue="
+                        (value) =>
+                          microsoftAzureSpeechRecognitionPlugin.setProperty(
+                            'apiKey',
+                            value,
+                            true,
+                          )
+                      "
+                    />
+                  </NvFormItem>
+                  <NvDivider direction="horizontal" />
+                  <NvFormItem label="Region">
+                    <NvInput
+                      :modelValue="
+                        microsoftAzureSpeechRecognitionPlugin.getProperty(
+                          'region',
+                        )
+                      "
+                      @update:modelValue="
+                        (value) =>
+                          microsoftAzureSpeechRecognitionPlugin.setProperty(
+                            'region',
+                            value,
+                          )
+                      "
+                    />
+                  </NvFormItem>
+                </template>
               </NvStack>
             </NvCard>
             <NvCard>
@@ -148,6 +193,7 @@ import NvSpeechRecognitionEngineSelect from '@/features/speech/components/inputs
 import NvGoogleCloudCredentialsFormPart from '@/features/settings/components/NvGoogleCloudCredentialsFormPart.vue'
 import { useGetGoogleCloudSpeechCredentialsPath } from '@/features/settings/hooks'
 import { elevenlabsSpeechRecognitionPlugin } from '@/features/speech/store/plugins/elevenlabs'
+import { microsoftAzureSpeechRecognitionPlugin } from '@/features/speech/store/plugins/microsoft-azure'
 
 const settingsStore = useSettingsStore()
 const { data: googleCloudSpeechCredentialsPath } =
