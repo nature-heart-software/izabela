@@ -77,7 +77,6 @@ export default ({ useRecording }: any) => {
                 cleanup()
               })
           })
-        
       }
 
       recording.startPumping()

@@ -91,14 +91,31 @@
                     </NvStack>
                   </NvAccessBlocker>
                 </template>
-                <template v-if="settingsStore.selectedSpeechRecognitionEngine === 'elevenlabs'">
+                <template
+                  v-if="
+                    settingsStore.selectedSpeechRecognitionEngine ===
+                    'elevenlabs'
+                  "
+                >
                   <NvDivider direction="horizontal" />
                   <NvFormItem label="API Key">
                     <NvInput
-                      :modelValue="elevenlabsSpeechRecognitionPlugin.getProperty('apiKey', true)"
+                      :modelValue="
+                        elevenlabsSpeechRecognitionPlugin.getProperty(
+                          'apiKey',
+                          true,
+                        )
+                      "
                       show-password
                       type="password"
-                      @update:modelValue="(value) => elevenlabsSpeechRecognitionPlugin.setProperty('apiKey', value, true)"
+                      @update:modelValue="
+                        (value) =>
+                          elevenlabsSpeechRecognitionPlugin.setProperty(
+                            'apiKey',
+                            value,
+                            true,
+                          )
+                      "
                     />
                   </NvFormItem>
                 </template>
