@@ -20,6 +20,9 @@ const options = computed(() =>
     [
       { label: 'Google Cloud', value: 'google-cloud' },
       { label: 'Microsoft Azure', value: 'microsoft-azure' },
+      { label: 'Amazon Transcribe', value: 'amazon-transcribe' },
+      { label: 'IBM Watson', value: 'ibm-watson' },
+      { label: 'OpenAI', value: 'openai' },
       { label: 'Elevenlabs', value: 'elevenlabs' },
       { label: 'Custom', value: 'custom' },
     ].map(({ label, value }) => {

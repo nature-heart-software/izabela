@@ -9,6 +9,9 @@ import takeRight from 'lodash/takeRight'
 import googleCloudSpeechRecognition from './engines/google-cloud.ts'
 import elevenlabsSpeechRecognition from './engines/elevenlabs.ts'
 import microsoftAzureSpeechRecognition from './engines/microsoft-azure.ts'
+import amazonTranscribeSpeechRecognition from './engines/amazon-transcribe.ts'
+import ibmWatsonSpeechRecognition from './engines/ibm-watson.ts'
+import openaiSpeechRecognition from './engines/openai.ts'
 import customSpeechRecognition from './engines/custom.ts'
 import { v4 as uuid } from 'uuid'
 import { Deferred } from '@packages/toolbox'
@@ -34,7 +37,7 @@ export default () => {
   const recorderStream = recorder.stream()
 
   recorderStream.on('error', (err: Error) => {
-    console.error(`Audio recording error ${err}`)
+    console.error(`Audio recording error ${ err }`)
   })
 
   let rollingBuffer: any[] = []
@@ -53,9 +56,9 @@ export default () => {
     recorderStream,
     sampleRateHertz,
     useRecording({
-      onEnded,
-      onChunk,
-    }: {
+                   onEnded,
+                   onChunk,
+                 }: {
       onChunk: (chunk: any) => void
       onEnded?: () => void
     }) {
@@ -71,7 +74,7 @@ export default () => {
         if (pendingMessage) {
           const values = Array.from(pendingMessages.values())
           const index = values.indexOf(pendingMessage)
-          const previousPendingMessage = values[index - 1]
+          const previousPendingMessage = values[index-1]
           if (previousPendingMessage) {
             await previousPendingMessage.done
           }
@@ -126,6 +129,9 @@ export default () => {
   const speechRecognitionEngine = {
     'google-cloud': googleCloudSpeechRecognition,
     'microsoft-azure': microsoftAzureSpeechRecognition,
+    'amazon-transcribe': amazonTranscribeSpeechRecognition,
+    'ibm-watson': ibmWatsonSpeechRecognition,
+    openai: openaiSpeechRecognition,
     elevenlabs: elevenlabsSpeechRecognition,
     custom: customSpeechRecognition,
   }[settingsStore.selectedSpeechRecognitionEngine](context)

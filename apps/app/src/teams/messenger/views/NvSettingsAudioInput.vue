@@ -164,6 +164,121 @@
                     />
                   </NvFormItem>
                 </template>
+                <template
+                  v-if="
+                    settingsStore.selectedSpeechRecognitionEngine ===
+                    'amazon-transcribe'
+                  "
+                >
+                  <NvDivider direction="horizontal" />
+                  <NvFormItem label="Identity Pool ID">
+                    <NvInput
+                      :modelValue="
+                        amazonTranscribeSpeechRecognitionPlugin.getProperty(
+                          'identityPoolId',
+                          true,
+                        )
+                      "
+                      show-password
+                      type="password"
+                      @update:modelValue="
+                        (value) =>
+                          amazonTranscribeSpeechRecognitionPlugin.setProperty(
+                            'identityPoolId',
+                            value,
+                            true,
+                          )
+                      "
+                    />
+                  </NvFormItem>
+                  <NvDivider direction="horizontal" />
+                  <NvFormItem label="Region">
+                    <NvInput
+                      :modelValue="
+                        amazonTranscribeSpeechRecognitionPlugin.getProperty(
+                          'region',
+                        )
+                      "
+                      @update:modelValue="
+                        (value) =>
+                          amazonTranscribeSpeechRecognitionPlugin.setProperty(
+                            'region',
+                            value,
+                          )
+                      "
+                    />
+                  </NvFormItem>
+                </template>
+                <template
+                  v-if="
+                    settingsStore.selectedSpeechRecognitionEngine ===
+                    'ibm-watson'
+                  "
+                >
+                  <NvDivider direction="horizontal" />
+                  <NvFormItem label="API Key">
+                    <NvInput
+                      :modelValue="
+                        ibmWatsonSpeechRecognitionPlugin.getProperty(
+                          'apiKey',
+                          true,
+                        )
+                      "
+                      show-password
+                      type="password"
+                      @update:modelValue="
+                        (value) =>
+                          ibmWatsonSpeechRecognitionPlugin.setProperty(
+                            'apiKey',
+                            value,
+                            true,
+                          )
+                      "
+                    />
+                  </NvFormItem>
+                  <NvDivider direction="horizontal" />
+                  <NvFormItem label="Url">
+                    <NvInput
+                      :modelValue="
+                        ibmWatsonSpeechRecognitionPlugin.getProperty('url')
+                      "
+                      @update:modelValue="
+                        (value) =>
+                          ibmWatsonSpeechRecognitionPlugin.setProperty(
+                            'url',
+                            value,
+                          )
+                      "
+                    />
+                  </NvFormItem>
+                </template>
+                <template
+                  v-if="
+                    settingsStore.selectedSpeechRecognitionEngine === 'openai'
+                  "
+                >
+                  <NvDivider direction="horizontal" />
+                  <NvFormItem label="API Key">
+                    <NvInput
+                      :modelValue="
+                        openaiSpeechRecognitionPlugin.getProperty(
+                          'apiKey',
+                          true,
+                        )
+                      "
+                      show-password
+                      type="password"
+                      @update:modelValue="
+                        (value) =>
+                          openaiSpeechRecognitionPlugin.setProperty(
+                            'apiKey',
+                            value,
+                            true,
+                          )
+                      "
+                    />
+                  </NvFormItem>
+                </template>
               </NvStack>
             </NvCard>
             <NvCard>
@@ -180,12 +295,12 @@ import {
   NvAccessBlocker,
   NvCard,
   NvDivider,
+  NvFormItem,
   NvGroup,
+  NvInput,
   NvStack,
   NvSwitch,
   NvText,
-  NvFormItem,
-  NvInput,
 } from '@packages/ui'
 import NvAudioInputFormPart from '@/features/audio/components/inputs/NvAudioInputFormPart.vue'
 import { useSettingsStore } from '@/features/settings/store'
@@ -194,6 +309,9 @@ import NvGoogleCloudCredentialsFormPart from '@/features/settings/components/NvG
 import { useGetGoogleCloudSpeechCredentialsPath } from '@/features/settings/hooks'
 import { elevenlabsSpeechRecognitionPlugin } from '@/features/speech/store/plugins/elevenlabs'
 import { microsoftAzureSpeechRecognitionPlugin } from '@/features/speech/store/plugins/microsoft-azure'
+import { amazonTranscribeSpeechRecognitionPlugin } from '@/features/speech/store/plugins/amazon-transcribe.ts'
+import { ibmWatsonSpeechRecognitionPlugin } from '@/features/speech/store/plugins/ibm-watson'
+import { openaiSpeechRecognitionPlugin } from '@/features/speech/store/plugins/openai'
 
 const settingsStore = useSettingsStore()
 const { data: googleCloudSpeechCredentialsPath } =
