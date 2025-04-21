@@ -1,66 +1,69 @@
-import { useSettingsStore } from '@/features/settings/store'
-import { microsoftAzureSpeechRecognitionPlugin } from '@/features/speech/store/plugins/microsoft-azure'
 import once from 'lodash/once'
-
-import sdk from 'microsoft-cognitiveservices-speech-sdk'
+import { ibmWatsonSpeechRecognitionPlugin } from '@/features/speech/store/plugins/ibm-watson.ts'
+import { IamAuthenticator } from 'ibm-watson/auth'
+import SpeechToTextV1 from 'ibm-watson/speech-to-text/v1'
 
 export default ({ useRecording }: any) => {
-  const settingsStore = useSettingsStore()
-  const speechConfig = sdk.SpeechConfig.fromSubscription(microsoftAzureSpeechRecognitionPlugin.getProperty('apiKey', true), microsoftAzureSpeechRecognitionPlugin.getProperty('region'))
-  speechConfig.speechRecognitionLanguage = settingsStore.speechInputLanguage
+  const speechToText = new SpeechToTextV1({
+    authenticator: new IamAuthenticator({
+      apikey: ibmWatsonSpeechRecognitionPlugin.getProperty('apiKey', true),
+    }),
+    serviceUrl: ibmWatsonSpeechRecognitionPlugin.getProperty('url'),
+  })
 
   return {
-    startStream() {
+    async startStream() {
       let ended = false
 
-      const stream = sdk.AudioInputStream.createPushStream()
-      const audioConfig = sdk.AudioConfig.fromStreamInput(stream)
-      const speechRecognizer = new sdk.SpeechRecognizer(
-        speechConfig,
-        audioConfig,
-      )
+      const stream = speechToText.recognizeUsingWebSocket({
+        objectMode: true,
+        contentType: 'audio/l16;rate=16000;channels=1',
+        model: 'en-US_BroadbandModel',
+      })
 
-      speechRecognizer.recognizeOnceAsync(onRecognizeOnceAsync)
-        
       const recording = useRecording({
         onChunk(chunk: any) {
           if (!ended) {
-            stream.write(chunk.slice())
+            stream.write(chunk)
           }
         },
-          onEnded() {
-            speechRecognizer.close()
-          }
+        onEnded() {
+          stream.end()
+        },
       })
 
       const resolve = once((text: string = '') => {
         recording.resolve(text)
         ended = true
         recording.stopPumping()
-        speechRecognizer.close()
+        stream.end()
       })
 
-      speechRecognizer.canceled = () => resolve()
-
-      function onRecognizeOnceAsync(result: sdk.SpeechRecognitionResult) {
-        switch (result.reason) {
-          case sdk.ResultReason.RecognizedSpeech:
-            resolve(result.text)
-            break;
-          case sdk.ResultReason.NoMatch:
-            resolve()
-            break;
-          case sdk.ResultReason.Canceled:
-            resolve()
-            break;
+      stream.on('data', function (msg) {
+        if (msg.results?.[0]?.alternatives?.[0]) {
+          const transcript = msg.results[0].alternatives[0].transcript
+          const final = msg.results[0].final
+          if (final) {
+            resolve(transcript)
+          }
         }
-      }
+      })
+
+      stream.on('error', () => {
+        resolve()
+      })
+
+      stream.on('close', () => {
+        resolve()
+      })
+
+      stream.on('end', () => {
+        resolve()
+      })
 
       recording.startPumping()
     },
     stopStream() {},
-    cleanup() {
-      speechConfig.close()
-    },
+    cleanup() {},
   }
 }
