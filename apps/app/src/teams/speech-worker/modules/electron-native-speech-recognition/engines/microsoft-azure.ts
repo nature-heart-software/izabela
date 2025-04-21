@@ -6,7 +6,10 @@ import sdk from 'microsoft-cognitiveservices-speech-sdk'
 
 export default ({ useRecording }: any) => {
   const settingsStore = useSettingsStore()
-  const speechConfig = sdk.SpeechConfig.fromSubscription(microsoftAzureSpeechRecognitionPlugin.getProperty('apiKey', true), microsoftAzureSpeechRecognitionPlugin.getProperty('region'))
+  const speechConfig = sdk.SpeechConfig.fromSubscription(
+    microsoftAzureSpeechRecognitionPlugin.getProperty('apiKey', true),
+    microsoftAzureSpeechRecognitionPlugin.getProperty('region'),
+  )
   speechConfig.speechRecognitionLanguage = settingsStore.speechInputLanguage
 
   return {
@@ -21,16 +24,16 @@ export default ({ useRecording }: any) => {
       )
 
       speechRecognizer.recognizeOnceAsync(onRecognizeOnceAsync)
-        
+
       const recording = useRecording({
         onChunk(chunk: any) {
           if (!ended) {
             stream.write(chunk.slice())
           }
         },
-          onEnded() {
-            speechRecognizer.close()
-          }
+        onEnded() {
+          speechRecognizer.close()
+        },
       })
 
       const resolve = once((text: string = '') => {
@@ -46,13 +49,13 @@ export default ({ useRecording }: any) => {
         switch (result.reason) {
           case sdk.ResultReason.RecognizedSpeech:
             resolve(result.text)
-            break;
+            break
           case sdk.ResultReason.NoMatch:
             resolve()
-            break;
+            break
           case sdk.ResultReason.Canceled:
             resolve()
-            break;
+            break
         }
       }
 
