@@ -3,10 +3,7 @@ import speech from '@google-cloud/speech'
 import { BrowserWindow, screen } from 'electron'
 import { ipcMain } from 'electron-postman'
 import { createNotification } from '@/utils/electron-notification'
-import {
-  useSpeechRecognitionStore,
-  useSpeechStore,
-} from '@/features/speech/store'
+import { useSpeechRecognitionStore } from '@/features/speech/store'
 import {
   gkl,
   keybindingReleased,
@@ -32,7 +29,6 @@ export const ElectronSpeechWindow = () => {
   const ready = Deferred<BrowserWindow>()
   const isReady = () => ready.promise
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
-  let speechStore: ReturnType<typeof useSpeechStore> | undefined
   let speechRecognitionStore:
     | ReturnType<typeof useSpeechRecognitionStore>
     | undefined
@@ -170,7 +166,6 @@ export const ElectronSpeechWindow = () => {
 
   isReady().then(() => {
     settingsStore = useSettingsStore()
-    speechStore = useSpeechStore()
     speechRecognitionStore = useSpeechRecognitionStore()
 
     watch(

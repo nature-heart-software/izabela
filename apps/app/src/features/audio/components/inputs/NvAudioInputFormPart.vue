@@ -183,7 +183,7 @@
     <NvGroup align="start" justify="apart" no-wrap spacing="5">
       <NvStack>
         <NvText type="label">Restart speech recognition server</NvText>
-        <NvText>Restart speech recognition server if it stops working </NvText>
+        <NvText>Restart speech recognition server if it stops working</NvText>
       </NvStack>
       <NvButton
         @click="ElectronSpeechWorkerWindow.restartNativeSpeechRecognition()"

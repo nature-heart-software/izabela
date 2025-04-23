@@ -6553,6 +6553,13 @@
   resolved "https://registry.yarnpkg.com/@types/verror/-/verror-1.10.6.tgz#3e600c62d210c5826460858f84bcbb65805460bb"
   integrity sha512-NNm+gdePAX1VGvPcGZCDKQZKYSiAWigKhKaz5KF94hG6f2s8de9Ow5+7AbXoeKxL8gavZfk4UquSAygOF2duEQ==
 
+"@types/wav@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@types/wav/-/wav-1.0.4.tgz#d65674001cc4eb2fe1547a079a59904cd362ea88"
+  integrity sha512-s8C6tD2lPnkNkX2rWl0FMSpOXrKb3zB9eRO36p2bViSVw9lVJLSJRK7sOe7lOQ13YpM22/K91o/stMempoWPFw==
+  dependencies:
+    "@types/node" "*"
+
 "@types/web-bluetooth@^0.0.14":
   version "0.0.14"
   resolved "https://registry.yarnpkg.com/@types/web-bluetooth/-/web-bluetooth-0.0.14.tgz#94e175b53623384bff1f354cdb3197a8d63cdbe5"

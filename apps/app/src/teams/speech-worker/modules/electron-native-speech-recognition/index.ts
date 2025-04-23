@@ -23,7 +23,13 @@ export default () => {
   const settingsStore = useSettingsStore()
   const speechRecognitionStore = useSpeechRecognitionStore()
 
-  const maxEndingChunksCount = settingsStore.soxPostRecordingChunks
+  const isVAD = settingsStore.speechRecognitionStrategy === 'continuous'
+  const preRecordingChunksCount = isVAD
+    ? settingsStore.soxPreRecordingChunks
+    : 0
+  const postRecordingChunksCount = isVAD
+    ? settingsStore.soxPostRecordingChunks
+    : 0
   const sampleRateHertz = 16000
 
   const recorder = nodeRecorder.record({
@@ -37,7 +43,7 @@ export default () => {
   const recorderStream = recorder.stream()
 
   recorderStream.on('error', (err: Error) => {
-    console.error(`Audio recording error ${ err }`)
+    console.error(`Audio recording error ${err}`)
   })
 
   let rollingBuffer: any[] = []
@@ -45,7 +51,7 @@ export default () => {
   recorderStream.on('data', (chunk: any) => {
     rollingBuffer = takeRight(
       [...rollingBuffer, chunk],
-      settingsStore.soxPreRecordingChunks,
+      preRecordingChunksCount,
     )
   })
 
@@ -56,9 +62,9 @@ export default () => {
     recorderStream,
     sampleRateHertz,
     useRecording({
-                   onEnded,
-                   onChunk,
-                 }: {
+      onEnded,
+      onChunk,
+    }: {
       onChunk: (chunk: any) => void
       onEnded?: () => void
     }) {
@@ -67,14 +73,13 @@ export default () => {
       const deferredDone = Deferred<string>()
       let ending = false
       let endingChunksCount = 0
-
       deferredMessage.promise.then(async (message) => {
         const messageWithoutProfanityFilter = message.replace(/\*/g, '-')
         const pendingMessage = pendingMessages.get(id)
         if (pendingMessage) {
           const values = Array.from(pendingMessages.values())
           const index = values.indexOf(pendingMessage)
-          const previousPendingMessage = values[index-1]
+          const previousPendingMessage = values[index - 1]
           if (previousPendingMessage) {
             await previousPendingMessage.done
           }
@@ -90,7 +95,7 @@ export default () => {
         onChunk(chunk)
         if (ending) {
           endingChunksCount += 1
-          if (endingChunksCount >= maxEndingChunksCount) {
+          if (endingChunksCount >= postRecordingChunksCount) {
             recorderStream?.off('data', onData)
             onEnded?.()
           }

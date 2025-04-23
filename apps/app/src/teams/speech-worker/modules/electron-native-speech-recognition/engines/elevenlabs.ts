@@ -3,18 +3,18 @@ import { ElevenLabsClient } from 'elevenlabs'
 import path from 'path'
 import { app } from 'electron'
 import pkg from '@root/package.json'
-import { createReadStream, unlink } from 'node:fs'
+import { createReadStream, unlink } from 'fs'
 
-import { Blob } from 'buffer'
+import buffer from 'buffer'
 import { v4 as uuid } from 'uuid'
-import { Readable } from 'node:stream'
+import { Readable } from 'stream'
 import { FileWriter } from 'wav'
-import { promisify } from 'node:util'
+import { promisify } from 'util'
 import { elevenlabsSpeechRecognitionPlugin } from '@/features/speech/store/plugins/elevenlabs'
 
 const unlinkAsync = promisify(unlink)
 
-globalThis.Blob = Blob
+globalThis.Blob = (buffer as any).Blob
 
 export default ({ useRecording }: any) => {
   const client = new ElevenLabsClient({
