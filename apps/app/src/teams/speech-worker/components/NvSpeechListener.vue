@@ -2,7 +2,7 @@
   <div></div>
 </template>
 <script lang="ts" setup>
-import { onBeforeUnmount } from 'vue'
+import { onBeforeUnmount, watchEffect } from 'vue'
 import { getSoxMediaDeviceByIndex } from '@/utils/media-devices'
 import { useSettingsStore } from '@/features/settings/store'
 import hark from 'hark'
@@ -52,6 +52,13 @@ if (settingsStore.enableSTTTS) {
     })
   }
 }
+
+watchEffect(() => {
+  if (speech) {
+    speech.setThreshold(settingsStore.audioInputSensibility)
+    speech.setInterval(settingsStore.speechDetectionPolling)
+  }
+})
 
 onBeforeUnmount(() => {
   stream?.getTracks().forEach((track) => {
