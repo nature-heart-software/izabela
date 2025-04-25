@@ -2,14 +2,27 @@ import once from 'lodash/once'
 import { ibmWatsonSpeechRecognitionPlugin } from '@/features/speech/store/plugins/ibm-watson.ts'
 import { IamAuthenticator } from 'ibm-watson/auth'
 import SpeechToTextV1 from 'ibm-watson/speech-to-text/v1'
+import { SpeechModel } from 'ibm-watson/speech-to-text/v1-generated'
+import { useSettingsStore } from '@/features/settings/store'
 
 export default ({ useRecording }: any) => {
+  const settingsStore = useSettingsStore()
   const speechToText = new SpeechToTextV1({
     authenticator: new IamAuthenticator({
       apikey: ibmWatsonSpeechRecognitionPlugin.getProperty('apiKey', true),
     }),
     serviceUrl: ibmWatsonSpeechRecognitionPlugin.getProperty('url'),
   })
+  let models: SpeechModel[] = []
+  speechToText.listModels().then((speechModels) => {
+    models = speechModels.result.models
+  })
+
+  const getModelName = () => {
+    const targetModelName = `${settingsStore.speechInputLanguage}_Multimedia`
+    const model = models.find((m) => m.name === targetModelName)
+    return model ? targetModelName : 'en-US_Multimedia'
+  }
 
   return {
     async startStream() {
@@ -18,7 +31,7 @@ export default ({ useRecording }: any) => {
       const stream = speechToText.recognizeUsingWebSocket({
         objectMode: true,
         contentType: 'audio/l16;rate=16000;channels=1',
-        model: 'en-US_BroadbandModel',
+        model: getModelName(),
       })
 
       const recording = useRecording({

@@ -28,7 +28,7 @@ export default ({ useRecording }: any) => {
       const recording = useRecording({
         onChunk(chunk: any) {
           if (!ended) {
-            stream.write(chunk.slice())
+            stream.write(chunk)
           }
         },
         onEnded() {
