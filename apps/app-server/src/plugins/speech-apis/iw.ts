@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express'
 import TextToSpeechV1 from 'ibm-watson/text-to-speech/v1'
-import { IamAuthenticator } from 'ibm-watson/auth'
+import { IamAuthenticator, IamTokenManager } from 'ibm-watson/auth'
 import { handleError } from '../../utils/requests'
 import WebSocket from 'ws'
 
@@ -42,26 +42,8 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
     try {
       res.setHeader('Content-Type', 'audio/mpeg')
       if (includeTimestamps) {
-        const getAccessToken = async () => {
-          const response = await fetch(
-            'https://iam.cloud.ibm.com/identity/token',
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-              },
-              body: new URLSearchParams({
-                grant_type: 'urn:ibm:params:oauth:grant-type:apikey',
-                apikey: apiKey || '',
-              }),
-            },
-          )
-
-          const data = await response.json()
-          return data.access_token
-        }
-
-        const accessToken = await getAccessToken()
+        const tokenManager = new IamTokenManager({ apikey: apiKey || '' })
+        const accessToken = await tokenManager.getToken()
         const sanitizedUrl = url.replace(/^(http[s]?:\/\/)/, '')
         const wsURI = `wss://${sanitizedUrl}/v1/synthesize?voice=${payload.voice}&rate_percentage=${payload.ratePercentage}&pitch_percentage=${payload.pitchPercentage}`
         const websocket = new WebSocket(wsURI, {

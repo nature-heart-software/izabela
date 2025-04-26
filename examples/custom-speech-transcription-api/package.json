@@ -1,0 +1,16 @@
+{
+  "name": "custom-speech-recognition-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "dependencies": {
+    "elevenlabs": "^1.53.0",
+    "express": "^4.20.0",
+    "nodemon": "^2.0.20",
+    "socket.io": "^4.5.4",
+    "wav": "^1.0.2"
+  }
+}

@@ -38,6 +38,7 @@ export default (() => {
           forwardEventToAllSockets('say', message, [socket.id])
         })
         ;[
+          'audio:play',
           'message:load',
           'message:start',
           'message:end',
@@ -50,6 +51,9 @@ export default (() => {
           'input:blur',
           'speech:recording:start',
           'speech:recording:end',
+          'speech:recording:data:start',
+          'speech:recording:data:chunk',
+          'speech:recording:data:end',
         ].forEach((event) => {
           socket.on(event, (message) => forwardEvent(event, message))
         })

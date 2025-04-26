@@ -15,12 +15,9 @@ const localApiBaseUrl = `http://localhost:${
 
 export const localAxiosApi = axios.create({
   baseURL: localApiBaseUrl,
-  adapter: 'fetch',
 })
 
-export const remoteAxiosApi = axios.create({
-  adapter: 'fetch',
-})
+export const remoteAxiosApi = axios.create({})
 
 export const api = (type?: 'remote' | 'local') => {
   const settingsStore = useSettingsStore()

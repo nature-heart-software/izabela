@@ -1,9 +1,9 @@
 import { decrypt, encrypt } from '@/utils/security'
 import { createPinia, defineStore } from 'pinia'
 import { createApp, h, ref } from 'vue'
-import { electronPiniaPlugin } from '@packages/electron-pinia/renderer'
+import { electronPiniaPlugin } from '@packages/electron-pinia'
 
-export { storesStates } from '@packages/electron-pinia/renderer'
+export { storesStates } from '@packages/electron-pinia'
 
 export const pinia = createPinia().use(electronPiniaPlugin())
 /* ensures pinia is always available */
@@ -23,13 +23,14 @@ export const definePluginStore = <S extends Record<any, any>>(
     },
     { electron: { shared: true, persisted: true } },
   )
-  const pluginStore = usePluginStore()
   return {
     setProperty(property: keyof S, value: any, encryptValue = false) {
+      const pluginStore = usePluginStore()
       const fn = encryptValue ? encrypt : (v: any) => v
       pluginStore.$patch({ pluginState: { [property]: fn(value) } })
     },
     getProperty(property: keyof S, decryptValue = false) {
+      const pluginStore = usePluginStore()
       const fn = decryptValue ? decrypt : (v: any) => v
       return fn(pluginStore.$state.pluginState[property])
     },
