@@ -10,6 +10,7 @@ export default ({ recorder, useRecording }: any) => {
       const audioChunks: any[] = []
 
       const recording = useRecording({
+        clearOnEnd: true,
         onChunk(chunk: any) {
           audioChunks.push(chunk)
           socket.emit('speech:recording:data:chunk', chunk)

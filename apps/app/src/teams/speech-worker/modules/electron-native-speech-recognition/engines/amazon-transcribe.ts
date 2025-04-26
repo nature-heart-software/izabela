@@ -104,6 +104,7 @@ export default ({ useRecording }: any) => {
             }
           }
         }
+        resolve()
       } catch (e) {
         resolve()
       }

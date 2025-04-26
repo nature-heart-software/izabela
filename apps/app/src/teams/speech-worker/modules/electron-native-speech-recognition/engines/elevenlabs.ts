@@ -44,7 +44,8 @@ export default ({ useRecording }: any) => {
         },
       })
 
-      const cleanup = once(() => {
+      const resolve = once((text = '') => {
+        recording.resolve(text)
         streamEnded = true
         recording.stopPumping()
         unlinkAsync(wavPath).catch(() => {})
@@ -53,30 +54,31 @@ export default ({ useRecording }: any) => {
       async function onRecordingEnd() {
         const buffer = Buffer.concat(audioChunks)
         const audioStream = Readable.from([buffer])
-        audioStream
-          .pipe(
-            new FileWriter(wavPath, {
-              sampleRate: 16000,
-              channels: 1,
-            }),
-          )
-          .on('finish', () => {
-            client.speechToText
-              .convert({
-                file: createReadStream(wavPath),
-                model_id: 'scribe_v1',
-                tag_audio_events: false,
-              })
-              .then((response) => {
-                recording.resolve(response.text)
-              })
-              .catch(() => {
-                recording.resolve('')
-              })
-              .finally(() => {
-                cleanup()
-              })
-          })
+        try {
+          audioStream
+            .pipe(
+              new FileWriter(wavPath, {
+                sampleRate: 16000,
+                channels: 1,
+              }),
+            )
+            .on('finish', () => {
+              client.speechToText
+                .convert({
+                  file: createReadStream(wavPath),
+                  model_id: 'scribe_v1',
+                  tag_audio_events: false,
+                })
+                .then((response) => {
+                  resolve(response.text)
+                })
+                .catch(() => {
+                  resolve()
+                })
+            })
+        } catch (err) {
+          resolve()
+        }
       }
 
       recording.startPumping()

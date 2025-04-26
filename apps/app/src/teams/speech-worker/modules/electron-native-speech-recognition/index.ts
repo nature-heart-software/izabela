@@ -64,7 +64,9 @@ export default () => {
     useRecording({
       onEnded,
       onChunk,
+      clearOnEnd,
     }: {
+      queueMessages?: boolean
       onChunk: (chunk: any) => void
       onEnded?: () => void
     }) {
@@ -117,6 +119,9 @@ export default () => {
         id,
         end: () => {
           stopPumping()
+          if (clearOnEnd) {
+            pendingMessages.delete(id)
+          }
         },
         done: deferredDone.promise,
       })
@@ -148,6 +153,7 @@ export default () => {
         speechRecognitionEngine.startStream()
       } else {
         speechRecognitionEngine.stopStream()
+        // console.log(Array.from(pendingMessages.values()).map((m) => m.id))
         pendingMessages.forEach((pendingMessage) => pendingMessage.end())
         rollingBuffer = []
       }

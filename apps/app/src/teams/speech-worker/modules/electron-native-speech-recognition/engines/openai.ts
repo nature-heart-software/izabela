@@ -103,6 +103,9 @@ export default ({ useRecording }: any) => {
           const transcript = msg.transcript
           if (transcript) resolve(transcript)
         }
+        if (msg.type === 'error') {
+          resolve()
+        }
       }
 
       function onClose() {
