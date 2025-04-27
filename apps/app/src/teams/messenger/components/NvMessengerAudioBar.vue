@@ -148,6 +148,16 @@
                 data-v-step="audio-input-select"
                 icon-name="direction"
                 size="sm"
+                @click.right.prevent.stop="
+                  settingsStore.$patch({
+                    enableSTTTS: !settingsStore.enableSTTTS,
+                  })
+                "
+                @click.ctrl.prevent.stop="
+                  settingsStore.$patch({
+                    enableSTTTS: !settingsStore.enableSTTTS,
+                  })
+                "
                 >Input
               </NvButton>
             </template>
