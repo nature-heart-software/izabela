@@ -125,6 +125,16 @@
                 data-v-step="translation-button"
                 icon-name="english-to-chinese"
                 size="sm"
+                @click.right.prevent.stop="
+                  settingsStore.$patch({
+                    enableTranslation: !settingsStore.enableTranslation,
+                  })
+                "
+                @click.ctrl.prevent.stop="
+                  settingsStore.$patch({
+                    enableTranslation: !settingsStore.enableTranslation,
+                  })
+                "
               />
             </template>
           </NvTooltip>
