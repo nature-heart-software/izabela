@@ -1,7 +1,7 @@
 import { definePluginStore } from '@/store'
 import { ENGINE_ID } from './shared'
 
-export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
+export const store = definePluginStore(ENGINE_ID, {
   publicKey: '',
   privateKey: '',
   selectedVoice: {
@@ -41,3 +41,5 @@ export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
   useCacheOnEveryRequest: true,
   streamAudio: true,
 })
+
+export const { setProperty, getProperty } = store

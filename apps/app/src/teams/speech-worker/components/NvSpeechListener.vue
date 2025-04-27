@@ -28,10 +28,6 @@ const stream = computedAsync(async () => {
 }, null)
 
 const speech = computed<any>((oldValue) => {
-  console.log('creating speech instance', {
-    threshold: settingsStore.audioInputSensibility,
-    interval: settingsStore.speechDetectionPolling,
-  })
   oldValue?.stop()
   if (realTime.value) {
     return hark(stream.value, {
@@ -43,11 +39,9 @@ const speech = computed<any>((oldValue) => {
 })
 
 watchEffect((onCleanup) => {
-  console.log('adding speech instance listeners')
   speech.value?.on('speaking', onSpeechStarted)
   speech.value?.on('stopped_speaking', onSpeechStop)
   onCleanup(() => {
-    console.log('removing speech instance listeners')
     speech.value?.off('speaking', onSpeechStarted)
     speech.value?.off('stopped_speaking', onSpeechStop)
   })

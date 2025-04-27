@@ -63,3 +63,9 @@ export const onIPCGameOverlayResize = (
     ipc.on(process, 'resize', callback)
   })
 }
+
+export const onIPCApplyProfile = (callback: (id: string) => void) => {
+  processes.forEach((process) => {
+    ipc.on(process, 'apply-profile', callback)
+  })
+}

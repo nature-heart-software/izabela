@@ -94,6 +94,12 @@ export const ElectronMessengerWindow = () => {
 
   const focus = (context: 'mouse' | 'keyboard', native = false) =>
     new Promise((_, reject) => {
+      const foregroundWindowPid = WinControl?.getForeground()?.getPid()
+      const isProcessHooked = gameOverlay.isProcessHooked(foregroundWindowPid)
+      if (isProcessHooked && !gameOverlay.intercepting) {
+        gameOverlay.startIntercept()
+        return
+      }
       messengerWindowStore?.$patch({ focusContext: context })
       const window = getWindow()
       if (window) {
@@ -151,6 +157,12 @@ export const ElectronMessengerWindow = () => {
 
   const hide = (returnFocus?: boolean) =>
     new Promise((resolve, reject) => {
+      const foregroundWindowPid = WinControl?.getForeground()?.getPid()
+      const isProcessHooked = gameOverlay.isProcessHooked(foregroundWindowPid)
+      if (isProcessHooked && gameOverlay.intercepting) {
+        gameOverlay.stopIntercept()
+        return
+      }
       const window = getWindow()
       if (window) {
         blur(returnFocus)

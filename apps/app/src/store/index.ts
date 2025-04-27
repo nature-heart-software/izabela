@@ -24,6 +24,10 @@ export const definePluginStore = <S extends Record<any, any>>(
     { electron: { shared: true, persisted: true } },
   )
   return {
+    getId() {
+      const pluginStore = usePluginStore()
+      return pluginStore.$id
+    },
     setProperty(property: keyof S, value: any, encryptValue = false) {
       const pluginStore = usePluginStore()
       const fn = encryptValue ? encrypt : (v: any) => v

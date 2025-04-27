@@ -6,6 +6,7 @@ import 'pinia'
 import { Deferred } from '@packages/toolbox'
 
 export const storesStates: PluginCustomProperties['storesStates'] = {}
+export const stores = new Map()
 
 export const plugin = (() => {
   const plugin: () => PiniaPlugin =
@@ -17,6 +18,7 @@ export const plugin = (() => {
         storesStates,
         $whenReady: () => whenAllReady,
       }
+      stores.set(store.$id, store)
       storesStates[store.$id] = state
       const isPersisted = options.electron?.persisted
       const isShared = options.electron?.shared

@@ -15,15 +15,18 @@ import {
   keybindingTriggered,
 } from '@/modules/electron-keybinding/utils'
 import {
+  emitIPCApplyProfile,
   emitIPCCancelAllMessages,
   emitIPCCancelCurrentMessage,
 } from '@/electron/events/main'
 import electronOverlayWindow from '@/teams/overlay/modules/electron-overlay-window'
+import { useProfilesStore } from '@/features/profiles/store.ts'
 
 export default () =>
   app.whenReady().then(async () => {
     const settingsStore = useSettingsStore()
     const messagesStore = useMessagesStore()
+    const profilesStore = useProfilesStore()
     const multiKeysKeybindings = {
       toggleMessengerWindow: handleShortcut(() =>
         electronMessengerWindow.toggleWindow('keyboard'),
@@ -190,11 +193,31 @@ export default () =>
         registerElectronShortcut(accelerator, () => null)
         registeredShortcuts[accelerator] = accelerator
       })
+      profilesStore.profiles.forEach((profile) => {
+        const accelerator = getAccelerator(profile.shortcut)
+        registeredCallbacks[accelerator] = handleShortcut(
+          (e: IGlobalKeyEvent) => {
+            if (e.state === 'DOWN' && keybindingTriggered(profile.shortcut)) {
+              emitIPCApplyProfile(profile.id)
+              if (profile.openMessengerOnTrigger) {
+                electronMessengerWindow.focus('keyboard', true)
+              }
+            }
+          },
+        )
+        gkl?.addListener(registeredCallbacks[accelerator])
+        registerElectronShortcut(accelerator, () => null)
+        registeredShortcuts[accelerator] = accelerator
+      })
     }, 500)
 
     registerAllShortcuts()
     watch(
-      () => [settingsStore.keybindings, messagesStore.shortcutMessages],
+      () => [
+        settingsStore.keybindings,
+        messagesStore.shortcutMessages,
+        profilesStore.profiles,
+      ],
       registerAllShortcuts,
       {
         deep: true,

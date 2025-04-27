@@ -130,6 +130,10 @@ const navigation = [
     name: 'Speech',
     children: [
       {
+        name: 'Profiles',
+        to: { name: 'settings-profiles' },
+      },
+      {
         name: 'Speech Engine',
         to: { name: 'settings-engine' },
       },
