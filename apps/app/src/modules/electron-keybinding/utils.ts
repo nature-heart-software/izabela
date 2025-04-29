@@ -78,16 +78,16 @@ const keymapByVKey = Object.fromEntries(
 gkl?.addListener((e) => {
   if (e.state === 'DOWN') {
     // eslint-disable-next-line no-underscore-dangle
-    down[e.rawKey._nameRaw] = true
+    down[e.rawKey?._nameRaw] = true
     if (e.name)
       registeredEvents[e.name] = {
         event: e,
         // eslint-disable-next-line no-underscore-dangle
-        nativeKey: keymapByVKey[e.rawKey._nameRaw],
+        nativeKey: keymapByVKey[e.rawKey?._nameRaw],
       }
   } else if (e.state === 'UP') {
     // eslint-disable-next-line no-underscore-dangle
-    delete down[e.rawKey._nameRaw]
+    delete down[e.rawKey?._nameRaw]
   }
 })
 

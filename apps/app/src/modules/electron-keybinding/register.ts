@@ -177,6 +177,7 @@ export default () =>
         registeredShortcuts[accelerator] = accelerator
       })
       messagesStore.shortcutMessages.forEach((message) => {
+        if (!message.shortcut.length) return
         const accelerator = getAccelerator(message.shortcut)
         registeredCallbacks[accelerator] = handleShortcut(
           (e: IGlobalKeyEvent) => {
@@ -194,6 +195,7 @@ export default () =>
         registeredShortcuts[accelerator] = accelerator
       })
       profilesStore.profiles.forEach((profile) => {
+        if (!profile.shortcut.length) return
         const accelerator = getAccelerator(profile.shortcut)
         registeredCallbacks[accelerator] = handleShortcut(
           (e: IGlobalKeyEvent) => {

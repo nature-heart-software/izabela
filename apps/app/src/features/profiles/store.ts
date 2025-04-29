@@ -4,6 +4,9 @@ import { ref } from 'vue'
 import { v4 as uuid } from 'uuid'
 import { Profile } from './types'
 import { stores } from '@packages/electron-pinia'
+import { useSpeechStore } from '@/features/speech/store'
+import { useSettingsStore } from '@/features/settings/store'
+import { cloneDeep } from 'lodash'
 
 const unflatten = (obj = {}) => {
   const result = {}
@@ -29,32 +32,36 @@ const unflatten = (obj = {}) => {
 export const useProfilesStore = defineStore(
   'profiles',
   () => {
+    const settingsStore = useSettingsStore()
+    const speechStore = useSpeechStore()
     const profiles = ref<Profile[]>([])
     const createProfile = (): Profile => {
-      return {
+      return cloneDeep({
         id: uuid(),
         name: '',
         openMessengerOnTrigger: true,
         shortcut: [],
-        states: {},
-      }
+        states: {
+          'settings.selectedSpeechEngine': settingsStore.selectedSpeechEngine,
+          ...(speechStore.currentSpeechEngine
+            ? {
+                [`${speechStore.currentSpeechEngine.store.getId()}.pluginState.selectedVoice`]:
+                  speechStore.currentSpeechEngine.getSelectedVoice(),
+              }
+            : {}),
+        },
+      })
     }
-    const addProfile = () => {
-      profiles.value.push(createProfile())
-    }
+
     return {
       profiles,
-      addProfile,
+      addProfile() {
+        profiles.value.unshift(createProfile())
+      },
       delete(id: string) {
         const index = profiles.value.findIndex((v) => v.id === id)
         if (index > -1) {
-          profiles.value.slice(index, 1)
-        }
-      },
-      update(profile: Profile) {
-        const index = profiles.value.findIndex((v) => v.id === profile.id)
-        if (index > -1) {
-          profiles.value.splice(index, 1, profile)
+          profiles.value.splice(index, 1)
         }
       },
       apply(id: string) {

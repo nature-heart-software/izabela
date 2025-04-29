@@ -93,6 +93,8 @@ import NvKeybinding from '@/features/app/components/inputs/NvKeybinding.vue'
 import { getEngineById, getEngines } from '@/modules/speech-engine-manager'
 import { useSettingsStore } from '@/features/settings/store'
 import NvSpeechEngineSelect from '@/features/speech/components/inputs/NvSpeechEngineSelect.vue'
+import { useSpeechStore } from '@/features/speech/store'
+import { cloneDeep } from 'lodash'
 
 const props = defineProps({
   id: {
@@ -102,27 +104,30 @@ const props = defineProps({
 })
 const profilesStore = useProfilesStore()
 const settingsStore = useSettingsStore()
+const speechStore = useSpeechStore()
 
 const profile = profilesStore.profiles.find(
   (profile) => profile.id === props.id,
 )
 
-const form = reactive({
-  ...profile,
-  states: {
-    'settings.selectedSpeechEngine': settingsStore.selectedSpeechEngine,
-    ...profile?.states,
-  },
-} as Profile)
+const form = reactive(cloneDeep(profile) as Profile)
 
 const engine = computed(() => {
   if (!form.states['settings.selectedSpeechEngine']) return null
   return getEngineById(form.states['settings.selectedSpeechEngine'])
 })
 
-watch([form], () => {
-  profilesStore.update(form)
-})
+watch(
+  form,
+  () => {
+    profilesStore.$patch({
+      profiles: profilesStore.profiles.map((p) =>
+        p.id === form.id ? form : p,
+      ),
+    })
+  },
+  { deep: true },
+)
 
 function onEnginesChange(value) {
   form.states['settings.selectedSpeechEngine'] = value
@@ -133,5 +138,10 @@ function onEnginesChange(value) {
       }
     })
   })
+  const engine = getEngineById(value)
+  if (engine) {
+    const key = `${engine.store.getId()}.pluginState.selectedVoice`
+    form.states[key] = cloneDeep(engine.getSelectedVoice())
+  }
 }
 </script>
