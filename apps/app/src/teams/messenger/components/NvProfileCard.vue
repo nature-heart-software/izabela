@@ -45,6 +45,31 @@
                 size="sm"
               />
             </NvGroup>
+
+            <NvDialog portalTarget="#settings">
+              <template #reference>
+                <NvButton class="w-full shrink-0" icon-name="" size="sm">
+                  Speech engine settings
+                </NvButton>
+              </template>
+              <template #title>"{{ form.name }}" profile settings</template>
+              <template #description>
+                <NvStack spacing="5">
+                  <NvFormItem label="Speech engine">
+                    <NvSpeechEngineSelect
+                      :modelValue="form.states['settings.selectedSpeechEngine']"
+                      @update:modelValue="onEnginesChange"
+                    />
+                  </NvFormItem>
+                  <NvDivider direction="horizontal" />
+                  <template v-if="currentEngineSettingsComponent">
+                    <component :is="currentEngineSettingsComponent" />
+                  </template>
+                  <NvDivider direction="horizontal" />
+                  <NvTranslationForm size="sm" />
+                </NvStack>
+              </template>
+            </NvDialog>
           </NvStack>
         </NvGroup>
         <NvContextMenu
@@ -79,7 +104,9 @@ import {
   NvButton,
   NvCard,
   NvContextMenu,
+  NvDialog,
   NvDivider,
+  NvFormItem,
   NvGroup,
   NvInput,
   NvStack,
@@ -95,6 +122,7 @@ import { useSettingsStore } from '@/features/settings/store'
 import NvSpeechEngineSelect from '@/features/speech/components/inputs/NvSpeechEngineSelect.vue'
 import { useSpeechStore } from '@/features/speech/store'
 import { cloneDeep } from 'lodash'
+import NvTranslationForm from '@/features/translation/components/forms/NvTranslationForm.vue'
 
 const props = defineProps({
   id: {
@@ -105,7 +133,6 @@ const props = defineProps({
 const profilesStore = useProfilesStore()
 const settingsStore = useSettingsStore()
 const speechStore = useSpeechStore()
-
 const profile = profilesStore.profiles.find(
   (profile) => profile.id === props.id,
 )
@@ -144,4 +171,8 @@ function onEnginesChange(value) {
     form.states[key] = cloneDeep(engine.getSelectedVoice())
   }
 }
+
+const currentEngineSettingsComponent = computed(
+  () => engine.value.settingsComponent,
+)
 </script>

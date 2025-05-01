@@ -1,5 +1,5 @@
 /* eslint-disable */
-import styled, { injectGlobal } from 'vue3-styled-components'
+import styled from 'vue3-styled-components'
 import { Dialog } from '@ark-ui/vue'
 import { tokens } from '@/styles/tokens'
 import { rem, rgba } from 'polished'
@@ -18,17 +18,28 @@ export const StDialogPositioner = styled(Dialog.Positioner)`
   position: absolute;
   z-index: 9999;
   inset: 0;
-  display: grid;
+`
+export const StDialogContent = styled('div')`
+  max-width: 480px;
+`
+export const StDialogContentWrapper = styled(Dialog.Content)`
+  width: 100%;
+  height: 100%;
+  position: relative;
+
+  &:not([hidden]) {
+    display: grid;
+  }
+
   place-items: center;
+  overflow: auto;
+  pointer-events: auto;
 
   & > * {
     min-height: auto;
   }
-`
-export const StDialogContent = styled(Dialog.Content)`
+
   padding: ${() => rem(spacing['3'])};
-  width: 100%;
-  max-width: 480px;
 `
 export const StDialogTitle = styled(Dialog.Title)``
 export const StDialogDescription = styled(Dialog.Description)``
