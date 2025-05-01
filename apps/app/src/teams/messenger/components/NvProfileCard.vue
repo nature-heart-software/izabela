@@ -45,49 +45,53 @@
                 size="sm"
               />
             </NvGroup>
-
-            <NvDialog portalTarget="#settings">
-              <template #reference>
-                <NvButton class="w-full shrink-0" icon-name="" size="sm">
-                  Speech engine settings
-                </NvButton>
-              </template>
-              <template #title>"{{ form.name }}" profile settings</template>
-              <template #description>
-                <NvStack spacing="5">
-                  <NvFormItem label="Speech engine">
-                    <NvSpeechEngineSelect
-                      :modelValue="form.states['settings.selectedSpeechEngine']"
-                      @update:modelValue="onEnginesChange"
-                    />
-                  </NvFormItem>
-                  <NvDivider direction="horizontal" />
-                  <template v-if="currentEngineSettingsComponent">
-                    <component
-                      :is="currentEngineSettingsComponent"
-                      :form="speechEngineForm"
-                    />
-                  </template>
-                  <NvDivider direction="horizontal" />
-                  <NvTranslationForm :form="translationForm" size="sm" />
-                </NvStack>
-              </template>
-            </NvDialog>
           </NvStack>
         </NvGroup>
-        <NvContextMenu
-          :options="[
-            {
-              label: 'Delete',
-              icon: 'trash-alt',
-              onClick: () => {
-                profilesStore.delete(id)
+        <NvStack>
+          <NvContextMenu
+            :options="[
+              {
+                label: 'Delete',
+                icon: 'trash-alt',
+                onClick: () => {
+                  profilesStore.delete(id)
+                },
               },
-            },
-          ]"
-        >
-          <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm" />
-        </NvContextMenu>
+            ]"
+          >
+            <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm" />
+          </NvContextMenu>
+          <NvDialog portalTarget="#settings">
+            <template #reference>
+              <NvTooltip>
+                <NvText>More settings</NvText>
+                <template #reference>
+                  <NvButton icon-name="setting" size="sm" />
+                </template>
+              </NvTooltip>
+            </template>
+            <template #title>"{{ form.name }}" profile settings</template>
+            <template #description>
+              <NvStack spacing="5">
+                <NvFormItem label="Speech engine">
+                  <NvSpeechEngineSelect
+                    :modelValue="form.states['settings.selectedSpeechEngine']"
+                    @update:modelValue="onEnginesChange"
+                  />
+                </NvFormItem>
+                <NvDivider direction="horizontal" />
+                <template v-if="currentEngineSettingsComponent">
+                  <component
+                    :is="currentEngineSettingsComponent"
+                    :form="form.states"
+                  />
+                </template>
+                <NvDivider direction="horizontal" />
+                <NvTranslationForm :form="form.states" size="sm" />
+              </NvStack>
+            </template>
+          </NvDialog>
+        </NvStack>
       </NvGroup>
       <NvDivider direction="horizontal" />
       <NvGroup :spacing="5" justify="apart" no-wrap>
@@ -115,6 +119,7 @@ import {
   NvStack,
   NvSwitch,
   NvText,
+  NvTooltip,
 } from '@packages/ui'
 import { computed, reactive, watch } from 'vue'
 import { useProfilesStore } from '@/features/profiles/store.ts'
@@ -141,15 +146,13 @@ const profile = profilesStore.profiles.find(
 )
 
 const form = reactive(cloneDeep(profile) as Profile)
-const translationForm = reactive({})
-const speechEngineForm = reactive({})
 
 const engine = computed(() => {
   if (!form.states['settings.selectedSpeechEngine']) return null
   return getEngineById(form.states['settings.selectedSpeechEngine'])
 })
 
-watch(translationForm, console.log, { deep: true })
+watch([form], console.log, { deep: true })
 
 watch(
   form,

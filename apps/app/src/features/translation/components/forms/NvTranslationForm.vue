@@ -9,9 +9,9 @@
         v-bind="{
           ...(form
             ? {
-                modelValue: form.enableTranslation,
+                modelValue: form['settings.enableTranslation'],
                 'onUpdate:modelValue': (value) =>
-                  (form.enableTranslation = value),
+                  (form['settings.enableTranslation'] = value),
               }
             : {
                 modelValue: settingsStore.enableTranslation,
@@ -21,35 +21,37 @@
         }"
       />
     </NvGroup>
+    <NvDivider direction="horizontal" />
     <NvAccessBlocker
       :allowed="
-        [settingsStore.enableTranslation, form?.enableTranslation].some(Boolean)
+        form
+          ? form['settings.enableTranslation']
+          : settingsStore.enableTranslation
       "
       reason="Translation needs to be enabled"
     >
       <NvStack :spacing="size === 'sm' ? 4 : 5">
-        <NvDivider direction="horizontal" />
         <NvFormItem label="Translation strategy">
           <NvTranslationStrategySelect
             v-bind="{
               ...(form
                 ? {
-                    modelValue: form.textTranslationStrategy,
+                    modelValue: form['settings.textTranslationStrategy'],
                     'onUpdate:modelValue': (value) =>
-                      (form.textTranslationStrategy = value),
+                      (form['settings.textTranslationStrategy'] = value),
                   }
                 : undefined),
             }"
           />
         </NvFormItem>
-        <NvDivider direction="horizontal" />
         <template
           v-if="
             (form
-              ? form?.textTranslationStrategy
+              ? form['settings.textTranslationStrategy']
               : settingsStore.textTranslationStrategy) === 'cloud-translation'
           "
         >
+          <NvDivider direction="horizontal" />
           <NvAccessBlocker
             :allowed="!!googleCloudSpeechCredentialsPath"
             reason="Google Cloud credentials required"
@@ -60,9 +62,9 @@
                   v-bind="{
                     ...(form
                       ? {
-                          modelValue: form.textInputLanguage,
+                          modelValue: form['settings.textInputLanguage'],
                           'onUpdate:modelValue': (value) =>
-                            (form.textInputLanguage = value),
+                            (form['settings.textInputLanguage'] = value),
                         }
                       : undefined),
                   }"
@@ -74,9 +76,9 @@
                   v-bind="{
                     ...(form
                       ? {
-                          modelValue: form.textOutputLanguage,
+                          modelValue: form['settings.textOutputLanguage'],
                           'onUpdate:modelValue': (value) =>
-                            (form.textOutputLanguage = value),
+                            (form['settings.textOutputLanguage'] = value),
                         }
                       : undefined),
                   }"
@@ -88,10 +90,11 @@
         <template
           v-if="
             (form
-              ? form?.textTranslationStrategy
+              ? form['settings.textTranslationStrategy']
               : settingsStore.textTranslationStrategy) === 'custom'
           "
         >
+          <NvDivider direction="horizontal" />
           <NvAccessBlocker
             :allowed="!!settingsStore.customTextTranslationEndpoint"
             reason="Endpoint and/or credentials required"
@@ -102,9 +105,11 @@
                   v-bind="{
                     ...(form
                       ? {
-                          modelValue: form.customTextTranslationFrom,
+                          modelValue:
+                            form['settings.customTextTranslationFrom'],
                           'onUpdate:modelValue': (value) =>
-                            (form.customTextTranslationFrom = value),
+                            (form['settings.customTextTranslationFrom'] =
+                              value),
                         }
                       : undefined),
                   }"
@@ -116,9 +121,9 @@
                   v-bind="{
                     ...(form
                       ? {
-                          modelValue: form.customTextTranslationTo,
+                          modelValue: form['settings.customTextTranslationTo'],
                           'onUpdate:modelValue': (value) =>
-                            (form.customTextTranslationTo = value),
+                            (form['settings.customTextTranslationTo'] = value),
                         }
                       : undefined),
                   }"

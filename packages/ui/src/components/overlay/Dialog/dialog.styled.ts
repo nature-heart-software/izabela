@@ -21,6 +21,7 @@ export const StDialogPositioner = styled(Dialog.Positioner)`
 `
 export const StDialogContent = styled('div')`
   max-width: 480px;
+  width: 100%;
 `
 export const StDialogContentWrapper = styled(Dialog.Content)`
   width: 100%;
