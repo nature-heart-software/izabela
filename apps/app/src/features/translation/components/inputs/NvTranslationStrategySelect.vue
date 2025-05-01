@@ -2,7 +2,6 @@
   <NvSelect
     ref="select"
     :autocompleteWidth="width"
-    :modelValue="settingsStore.textTranslationStrategy"
     :options="[
       {
         label: 'Cloud Translation',
@@ -14,7 +13,12 @@
       },
     ]"
     class="shrink-0"
-    @update:modelValue="(value) => settingsStore.$patch({ textTranslationStrategy: value })"
+    v-bind="{
+      modelValue: settingsStore.textTranslationStrategy,
+      'onUpdate:modelValue': (value) =>
+        settingsStore.$patch({ textTranslationStrategy: value }),
+      ...$attrs,
+    }"
   />
 </template>
 <script lang="ts" setup>

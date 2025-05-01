@@ -2,9 +2,13 @@
   <NvSelect
     ref="select"
     :autocompleteWidth="width"
-    :modelValue="settingsStore.textInputLanguage"
     :options="options"
-    @update:modelValue="(value) => settingsStore.$patch({ textInputLanguage: value })"
+    v-bind="{
+      modelValue: settingsStore.textInputLanguage,
+      'onUpdate:modelValue': (value) =>
+        settingsStore.$patch({ textInputLanguage: value }),
+      ...$attrs,
+    }"
   />
 </template>
 <script lang="ts" setup>

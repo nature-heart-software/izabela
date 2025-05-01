@@ -63,10 +63,13 @@
                   </NvFormItem>
                   <NvDivider direction="horizontal" />
                   <template v-if="currentEngineSettingsComponent">
-                    <component :is="currentEngineSettingsComponent" />
+                    <component
+                      :is="currentEngineSettingsComponent"
+                      :form="speechEngineForm"
+                    />
                   </template>
                   <NvDivider direction="horizontal" />
-                  <NvTranslationForm size="sm" />
+                  <NvTranslationForm :form="translationForm" size="sm" />
                 </NvStack>
               </template>
             </NvDialog>
@@ -138,11 +141,15 @@ const profile = profilesStore.profiles.find(
 )
 
 const form = reactive(cloneDeep(profile) as Profile)
+const translationForm = reactive({})
+const speechEngineForm = reactive({})
 
 const engine = computed(() => {
   if (!form.states['settings.selectedSpeechEngine']) return null
   return getEngineById(form.states['settings.selectedSpeechEngine'])
 })
+
+watch(translationForm, console.log, { deep: true })
 
 watch(
   form,

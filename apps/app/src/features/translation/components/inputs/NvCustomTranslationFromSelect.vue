@@ -3,10 +3,14 @@
     ref="select"
     v-loading="isFetching"
     :autocompleteWidth="width"
-    :modelValue="settingsStore.customTextTranslationFrom"
     :options="options"
     placeholder="Select a language"
-    @update:modelValue="(value) => settingsStore.$patch({ customTextTranslationFrom: value })"
+    v-bind="{
+      modelValue: settingsStore.customTextTranslationFrom,
+      'onUpdate:modelValue': (value) =>
+        settingsStore.$patch({ customTextTranslationFrom: value }),
+      ...$attrs,
+    }"
   />
 </template>
 <script lang="ts" setup>
