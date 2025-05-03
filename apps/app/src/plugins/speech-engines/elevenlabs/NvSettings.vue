@@ -5,7 +5,11 @@
   >
     <NvStack spacing="5">
       <NvFormItem label="Models">
-        <NvModelSelect placeholder="Select a model" />
+        <NvModelSelect
+          :modelValue="getProperty('model_id')"
+          placeholder="Select a model"
+          @update:modelValue="(value) => setProperty('model_id', value)"
+        />
       </NvFormItem>
       <NvFormItem label="Voice">
         <NvVoiceSelect
