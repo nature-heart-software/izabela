@@ -2,16 +2,15 @@ export function createEngineManager<E>() {
   const engines = new Map()
 
   function registerEngine(id: string, speechEngine: E) {
-    console.log(id)
     engines.set(id, speechEngine)
     return speechEngine
   }
 
-  function getEngineById(id: string) {
+  function getEngineById(id: string): E | undefined {
     return engines.get(id)
   }
 
-  function getEngines() {
+  function getEngines(): E[] {
     return Array.from(engines.values())
   }
 

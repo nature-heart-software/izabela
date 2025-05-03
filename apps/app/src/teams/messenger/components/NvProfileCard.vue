@@ -22,15 +22,15 @@
                 :modelValue="form.states['settings.selectedSpeechEngine']"
                 class="w-1/3"
                 size="sm"
-                @update:modelValue="onEnginesChange"
+                @update:modelValue="onSpeechEnginesChange"
               />
-              <template v-if="engine">
+              <template v-if="speechEngine">
                 <component
-                  :is="engine.voiceSelectComponent"
-                  v-if="engine.voiceSelectComponent"
+                  :is="speechEngine.voiceSelectComponent"
+                  v-if="speechEngine.voiceSelectComponent"
                   v-model="
                     form.states[
-                      `${engine.store.getId()}.pluginState.selectedVoice`
+                      `${speechEngine.store.getId()}.pluginState.selectedVoice`
                     ]
                   "
                   class="w-1/3"
@@ -76,7 +76,7 @@
                 <NvFormItem label="Speech engine">
                   <NvSpeechEngineSelect
                     :modelValue="form.states['settings.selectedSpeechEngine']"
-                    @update:modelValue="onEnginesChange"
+                    @update:modelValue="onSpeechEnginesChange"
                   />
                 </NvFormItem>
                 <NvDivider direction="horizontal" />
@@ -125,7 +125,8 @@ import { computed, reactive, watch } from 'vue'
 import { useProfilesStore } from '@/features/profiles/store.ts'
 import { Profile } from '@/features/profiles/types.ts'
 import NvKeybinding from '@/features/app/components/inputs/NvKeybinding.vue'
-import { getEngineById, getEngines } from '@/modules/speech-engine-manager'
+import speechEngineManager from '@/modules/speech-engine-manager'
+import translationEngineManager from '@/modules/translation-engine-manager'
 import { useSettingsStore } from '@/features/settings/store'
 import NvSpeechEngineSelect from '@/features/speech/components/inputs/NvSpeechEngineSelect.vue'
 import { useSpeechStore } from '@/features/speech/store'
@@ -147,12 +148,14 @@ const profile = profilesStore.profiles.find(
 
 const form = reactive(cloneDeep(profile) as Profile)
 
-const engine = computed(() => {
+const speechEngine = computed(() => {
   if (!form.states['settings.selectedSpeechEngine']) return null
-  return getEngineById(form.states['settings.selectedSpeechEngine'])
+  return speechEngineManager.getEngineById(
+    form.states['settings.selectedSpeechEngine'],
+  )
 })
 
-// watch([form], console.log, { deep: true })
+watch([form], console.log, { deep: true })
 
 watch(
   form,
@@ -166,23 +169,45 @@ watch(
   { deep: true },
 )
 
-function onEnginesChange(value) {
+function onSpeechEnginesChange(value) {
   form.states['settings.selectedSpeechEngine'] = value
-  getEngines().map((e) => {
+  speechEngineManager.getEngines().map((e) => {
     Object.keys(form.states).forEach((key) => {
       if (key.startsWith(e.store.getId())) {
         delete form.states[key]
       }
     })
   })
-  const engine = getEngineById(value)
+  const engine = speechEngineManager.getEngineById(value)
   if (engine) {
-    const key = `${engine.store.getId()}.pluginState.selectedVoice`
+    const key = engine.store.getPropertyPath('selectedVoice')
     form.states[key] = cloneDeep(engine.getSelectedVoice())
   }
 }
 
+watch(
+  () => form.states['settings.selectedTranslationEngine'],
+  (value) => {
+    translationEngineManager.getEngines().map((e) => {
+      Object.keys(form.states).forEach((key) => {
+        if (key.startsWith(e.store.getId())) {
+          delete form.states[key]
+        }
+      })
+    })
+    const engine = translationEngineManager.getEngineById(value)
+    if (engine) {
+      form.states[engine.store.getPropertyPath('translateFrom')] = cloneDeep(
+        engine.store.getProperty('translateFrom'),
+      )
+      form.states[engine.store.getPropertyPath('translateTo')] = cloneDeep(
+        engine.store.getProperty('translateTo'),
+      )
+    }
+  },
+)
+
 const currentEngineSettingsComponent = computed(
-  () => engine.value.settingsComponent,
+  () => speechEngine.value.settingsComponent,
 )
 </script>

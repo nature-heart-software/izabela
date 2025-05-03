@@ -4,9 +4,10 @@ import { ref } from 'vue'
 import { v4 as uuid } from 'uuid'
 import { Profile } from './types'
 import { stores } from '@packages/electron-pinia'
-import { useSpeechStore } from '@/features/speech/store'
 import { useSettingsStore } from '@/features/settings/store'
 import { cloneDeep } from 'lodash'
+import speechEngineManager from '@/modules/speech-engine-manager'
+import translationEngineManager from '@/modules/translation-engine-manager'
 
 const unflatten = (obj = {}) => {
   const result = {}
@@ -33,20 +34,35 @@ export const useProfilesStore = defineStore(
   'profiles',
   () => {
     const settingsStore = useSettingsStore()
-    const speechStore = useSpeechStore()
     const profiles = ref<Profile[]>([])
     const createProfile = (): Profile => {
+      const speechEngine = speechEngineManager.getEngineById(
+        settingsStore.selectedSpeechEngine,
+      )
+      const translationEngine = translationEngineManager.getEngineById(
+        settingsStore.selectedTranslationEngine,
+      )
       return cloneDeep({
         id: uuid(),
-        name: '',
+        name: `Profile ${profiles.value.length + 1}`,
         openMessengerOnTrigger: true,
         shortcut: [],
         states: {
           'settings.selectedSpeechEngine': settingsStore.selectedSpeechEngine,
-          ...(speechStore.currentSpeechEngine
+          'settings.selectedTranslationEngine':
+            settingsStore.selectedTranslationEngine,
+          ...(speechEngine
             ? {
-                [`${speechStore.currentSpeechEngine.store.getId()}.pluginState.selectedVoice`]:
-                  speechStore.currentSpeechEngine.getSelectedVoice(),
+                [speechEngine.store.getPropertyPath('selectedVoice')]:
+                  speechEngine.store.getProperty('selectedVoice'),
+              }
+            : {}),
+          ...(translationEngine
+            ? {
+                [translationEngine.store.getPropertyPath('translateFrom')]:
+                  translationEngine.store.getProperty('translateFrom') || null,
+                [translationEngine.store.getPropertyPath('translateTo')]:
+                  translationEngine.store.getProperty('translateTo') || null,
               }
             : {}),
         },

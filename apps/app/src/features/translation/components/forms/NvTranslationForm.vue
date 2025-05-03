@@ -31,7 +31,7 @@
       reason="Translation needs to be enabled"
     >
       <NvStack :spacing="size === 'sm' ? 4 : 5">
-        <NvFormItem label="Translation strategy">
+        <NvFormItem label="Translation engine">
           <NvTranslationEngineSelect
             v-bind="{
               ...(form
@@ -86,6 +86,6 @@ const engine = computed(() => {
 })
 
 const currentEngineSettingsComponent = computed(
-  () => engine.value.settingsComponent,
+  () => engine.value?.settingsComponent,
 )
 </script>
