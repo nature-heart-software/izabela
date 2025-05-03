@@ -1,20 +1,28 @@
 import { definePluginStore } from '@/store'
 import { ENGINE_ID } from './shared'
 
-export const store = definePluginStore(ENGINE_ID, {
-  apiKey: '',
+const exposedProperties = {
   selectedVoice: {
     languageCodes: ['en-GB'],
     ssmlGender: 'FEMALE',
     name: 'en-GB-Wavenet-A',
   },
-  useLocalCredentials: false,
-  favoriteVoiceIds: [],
   speakingRate: 1,
   pitch: 0,
   volumeGainDb: 0,
-  useCacheOnEveryRequest: true,
-  streamAudio: true,
-})
+}
+
+export const store = definePluginStore(
+  ENGINE_ID,
+  {
+    apiKey: '',
+    useLocalCredentials: false,
+    favoriteVoiceIds: [],
+    useCacheOnEveryRequest: true,
+    streamAudio: true,
+    ...exposedProperties,
+  },
+  Object.keys(exposedProperties) as (keyof typeof exposedProperties)[],
+)
 
 export const { setProperty, getProperty } = store

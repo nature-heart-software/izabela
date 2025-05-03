@@ -1,7 +1,7 @@
 import { definePluginStore } from '@/store'
 import { defaultVoice, ENGINE_ID } from './shared'
 
-export const store = definePluginStore(ENGINE_ID, {
+const exposedProperties = {
   selectedVoice: {
     ...defaultVoice,
   },
@@ -9,8 +9,16 @@ export const store = definePluginStore(ENGINE_ID, {
   pitch: 64,
   throat: 128,
   mouth: 128,
-  favoriteVoiceIds: [],
-  useCacheOnEveryRequest: true,
-})
+}
+
+export const store = definePluginStore(
+  ENGINE_ID,
+  {
+    favoriteVoiceIds: [],
+    useCacheOnEveryRequest: true,
+    ...exposedProperties,
+  },
+  Object.keys(exposedProperties) as (keyof typeof exposedProperties)[],
+)
 
 export const { setProperty, getProperty } = store

@@ -1,8 +1,7 @@
 import { definePluginStore } from '@/store'
 import { ENGINE_ID } from './shared'
 
-export const store = definePluginStore(ENGINE_ID, {
-  apiKey: '',
+const exposedProperties = {
   selectedVoice: {
     voice_id: 'MF3mGyEYCl7XYWbV9V6O',
     name: 'Elli (american, clear)',
@@ -13,16 +12,25 @@ export const store = definePluginStore(ENGINE_ID, {
     available_for_tiers: [],
     settings: null,
   },
-  model_id: undefined,
+  model_id: 'eleven_multilingual_v2',
   stability: 0.5,
   similarity_boost: 0.75,
   style: 0,
   use_speaker_boost: true,
-  favoriteVoiceIds: [],
-  stream: true,
-  useCacheOnEveryRequest: true,
-  streamAudio: true,
-  includeTimestamps: false,
-})
+}
+
+export const store = definePluginStore(
+  ENGINE_ID,
+  {
+    apiKey: '',
+    favoriteVoiceIds: [],
+    stream: true,
+    useCacheOnEveryRequest: true,
+    streamAudio: true,
+    includeTimestamps: false,
+    ...exposedProperties,
+  },
+  Object.keys(exposedProperties) as (keyof typeof exposedProperties)[],
+)
 
 export const { setProperty, getProperty } = store

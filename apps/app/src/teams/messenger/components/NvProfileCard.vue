@@ -19,10 +19,9 @@
             />
             <NvGroup noWrap>
               <NvSpeechEngineSelect
-                :modelValue="form.states['settings.selectedSpeechEngine']"
+                v-model="form.states['settings.selectedSpeechEngine']"
                 class="w-1/3"
                 size="sm"
-                @update:modelValue="onSpeechEnginesChange"
               />
               <template v-if="speechEngine">
                 <component
@@ -30,7 +29,7 @@
                   v-if="speechEngine.voiceSelectComponent"
                   v-model="
                     form.states[
-                      `${speechEngine.store.getId()}.pluginState.selectedVoice`
+                      speechEngine.store.getPropertyPath('selectedVoice')
                     ]
                   "
                   class="w-1/3"
@@ -75,8 +74,7 @@
               <NvStack spacing="5">
                 <NvFormItem label="Speech engine">
                   <NvSpeechEngineSelect
-                    :modelValue="form.states['settings.selectedSpeechEngine']"
-                    @update:modelValue="onSpeechEnginesChange"
+                    v-model="form.states['settings.selectedSpeechEngine']"
                   />
                 </NvFormItem>
                 <NvDivider direction="horizontal" />
@@ -130,7 +128,7 @@ import translationEngineManager from '@/modules/translation-engine-manager'
 import { useSettingsStore } from '@/features/settings/store'
 import NvSpeechEngineSelect from '@/features/speech/components/inputs/NvSpeechEngineSelect.vue'
 import { useSpeechStore } from '@/features/speech/store'
-import { cloneDeep } from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 import NvTranslationForm from '@/features/translation/components/forms/NvTranslationForm.vue'
 
 const props = defineProps({
@@ -169,21 +167,20 @@ watch(
   { deep: true },
 )
 
-function onSpeechEnginesChange(value) {
-  form.states['settings.selectedSpeechEngine'] = value
-  speechEngineManager.getEngines().map((e) => {
-    Object.keys(form.states).forEach((key) => {
-      if (key.startsWith(e.store.getId())) {
-        delete form.states[key]
-      }
+watch(
+  () => form.states['settings.selectedSpeechEngine'],
+  (value) => {
+    speechEngineManager.getEngines().map((e) => {
+      Object.keys(form.states).forEach((key) => {
+        if (key.startsWith(e.store.getId())) {
+          delete form.states[key]
+        }
+      })
     })
-  })
-  const engine = speechEngineManager.getEngineById(value)
-  if (engine) {
-    const key = engine.store.getPropertyPath('selectedVoice')
-    form.states[key] = cloneDeep(engine.getSelectedVoice())
-  }
-}
+    const defaultValues = profilesStore.getSpeechEngineDefaultValues(value)
+    Object.assign(form.states, cloneDeep(defaultValues))
+  },
+)
 
 watch(
   () => form.states['settings.selectedTranslationEngine'],
@@ -195,19 +192,12 @@ watch(
         }
       })
     })
-    const engine = translationEngineManager.getEngineById(value)
-    if (engine) {
-      form.states[engine.store.getPropertyPath('translateFrom')] = cloneDeep(
-        engine.store.getProperty('translateFrom'),
-      )
-      form.states[engine.store.getPropertyPath('translateTo')] = cloneDeep(
-        engine.store.getProperty('translateTo'),
-      )
-    }
+    const defaultValues = profilesStore.getTranslationEngineDefaultValues(value)
+    Object.assign(form.states, cloneDeep(defaultValues))
   },
 )
 
 const currentEngineSettingsComponent = computed(
-  () => speechEngine.value.settingsComponent,
+  () => speechEngine.value?.settingsComponent,
 )
 </script>

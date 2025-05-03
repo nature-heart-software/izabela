@@ -2,8 +2,10 @@
   <NvAccessBlocker
     :allowed="
       (speechStore.hasUniversalApiCredentials &&
-        !getProperty('useLocalCredentials')) ||
-      [getProperty('apiKey', true), getProperty('region')].every(Boolean)
+        !getStoreProperty('useLocalCredentials')) ||
+      [getStoreProperty('apiKey', true), getStoreProperty('region')].every(
+        Boolean,
+      )
     "
     reason="Credentials required"
   >
@@ -73,8 +75,9 @@
   </template>
   <template
     v-if="
-      (!form && getProperty('useLocalCredentials')) ||
-      !speechStore.hasUniversalApiCredentials
+      !form &&
+      (getProperty('useLocalCredentials') ||
+        !speechStore.hasUniversalApiCredentials)
     "
   >
     <NvDivider direction="horizontal" />
@@ -119,5 +122,7 @@ const props = defineProps({
   form: Object,
 })
 
-const { getProperty, setProperty } = store.useStoreOrForm(props.form)
+const { getProperty, setProperty, getStoreProperty } = store.useStoreOrForm(
+  props.form,
+)
 </script>

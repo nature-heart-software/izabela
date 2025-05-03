@@ -1,9 +1,7 @@
 import { definePluginStore } from '@/store'
 import { ENGINE_ID } from './shared'
 
-export const store = definePluginStore(ENGINE_ID, {
-  apiKey: '',
-  region: '',
+const exposedProperties = {
   selectedVoice: {
     Name: 'Microsoft Server Speech Text to Speech Voice (en-US, AshleyNeural)',
     DisplayName: 'Ashley',
@@ -29,11 +27,21 @@ export const store = definePluginStore(ENGINE_ID, {
     ],
     WordsPerMinute: '149',
   },
-  useLocalCredentials: false,
-  favoriteVoiceIds: [],
-  useCacheOnEveryRequest: true,
-  streamAudio: true,
-  includeTimestamps: false,
-})
+}
+
+export const store = definePluginStore(
+  ENGINE_ID,
+  {
+    apiKey: '',
+    region: '',
+    useLocalCredentials: false,
+    favoriteVoiceIds: [],
+    useCacheOnEveryRequest: true,
+    streamAudio: true,
+    includeTimestamps: false,
+    ...exposedProperties,
+  },
+  Object.keys(exposedProperties) as (keyof typeof exposedProperties)[],
+)
 
 export const { setProperty, getProperty } = store

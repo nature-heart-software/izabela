@@ -35,42 +35,57 @@ export const useProfilesStore = defineStore(
   () => {
     const settingsStore = useSettingsStore()
     const profiles = ref<Profile[]>([])
+
+    const getSpeechEngineDefaultValues = (id: string) => {
+      const speechEngine = speechEngineManager.getEngineById(id)
+      return speechEngine
+        ? Object.fromEntries(
+            Object.entries(
+              speechEngine?.store.getExposedProperties() || {},
+            ).map(([key, value]) => [
+              speechEngine?.store.getPropertyPath(key),
+              value,
+            ]),
+          )
+        : {}
+    }
+
+    const getTranslationEngineDefaultValues = (id: string) => {
+      const translationEngine = translationEngineManager.getEngineById(id)
+      return translationEngine
+        ? Object.fromEntries(
+            Object.entries(
+              translationEngine?.store.getExposedProperties() || {},
+            ).map(([key, value]) => [
+              translationEngine?.store.getPropertyPath(key),
+              value,
+            ]),
+          )
+        : {}
+    }
     const createProfile = (): Profile => {
-      const speechEngine = speechEngineManager.getEngineById(
-        settingsStore.selectedSpeechEngine,
-      )
-      const translationEngine = translationEngineManager.getEngineById(
-        settingsStore.selectedTranslationEngine,
-      )
       return cloneDeep({
         id: uuid(),
         name: `Profile ${profiles.value.length + 1}`,
         openMessengerOnTrigger: true,
         shortcut: [],
         states: {
+          'settings.enableTranslation': settingsStore.enableTranslation,
           'settings.selectedSpeechEngine': settingsStore.selectedSpeechEngine,
           'settings.selectedTranslationEngine':
             settingsStore.selectedTranslationEngine,
-          ...(speechEngine
-            ? {
-                [speechEngine.store.getPropertyPath('selectedVoice')]:
-                  speechEngine.store.getProperty('selectedVoice'),
-              }
-            : {}),
-          ...(translationEngine
-            ? {
-                [translationEngine.store.getPropertyPath('translateFrom')]:
-                  translationEngine.store.getProperty('translateFrom') || null,
-                [translationEngine.store.getPropertyPath('translateTo')]:
-                  translationEngine.store.getProperty('translateTo') || null,
-              }
-            : {}),
+          ...getSpeechEngineDefaultValues(settingsStore.selectedSpeechEngine),
+          ...getTranslationEngineDefaultValues(
+            settingsStore.selectedTranslationEngine,
+          ),
         },
       })
     }
 
     return {
       profiles,
+      getSpeechEngineDefaultValues,
+      getTranslationEngineDefaultValues,
       addProfile() {
         profiles.value.unshift(createProfile())
       },

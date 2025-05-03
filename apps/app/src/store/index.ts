@@ -2,6 +2,7 @@ import { decrypt, encrypt } from '@/utils/security'
 import { createPinia, defineStore } from 'pinia'
 import { createApp, h, ref } from 'vue'
 import { electronPiniaPlugin } from '@packages/electron-pinia'
+import pick from 'lodash/pick'
 
 export { storesStates } from '@packages/electron-pinia'
 
@@ -12,6 +13,7 @@ createApp(h({})).use(pinia)
 export const definePluginStore = <S extends Record<any, any>>(
   id: string,
   state: S,
+  exposedProperties: (keyof S)[] = Object.keys(state),
 ) => {
   const usePluginStore = defineStore(
     `plugin-${id}`,
@@ -59,17 +61,26 @@ export const definePluginStore = <S extends Record<any, any>>(
         return {
           getProperty(...args: Parameters<typeof getProperty>) {
             const fn = getDecryptFunction(args[1])
-            return structuredClone(fn(form[getPropertyPath(args[0])]))
+            return fn(form[getPropertyPath(args[0])])
           },
           setProperty(...args: Parameters<typeof setProperty>) {
             const fn = getEncryptFunction(args[2])
-            form[getPropertyPath(args[0])] = structuredClone(fn(args[1]))
+            form[getPropertyPath(args[0])] = fn(args[1])
           },
+          getStoreProperty: getProperty,
+          setStoreProperty: setProperty,
         }
       return {
         getProperty,
         setProperty,
+        getStoreProperty: getProperty,
+        setStoreProperty: setProperty,
       }
+    },
+    exposedProperties,
+    getExposedProperties() {
+      const pluginStore = usePluginStore()
+      return pick(pluginStore.$state.pluginState, exposedProperties)
     },
   }
 }
