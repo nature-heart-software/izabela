@@ -10,17 +10,8 @@
     <NvStack :spacing="5">
       <NvFormItem label="Voice">
         <NvVoiceSelect
-          v-bind="{
-            ...(form
-              ? {
-                  modelValue:
-                    form[`${store.getId()}.pluginState.selectedVoice`],
-                  'onUpdate:modelValue': (value) =>
-                    (form[`${store.getId()}.pluginState.selectedVoice`] =
-                      value),
-                }
-              : undefined),
-          }"
+          :modelValue="getProperty('selectedVoice')"
+          @update:modelValue="(value) => setProperty('selectedVoice', value)"
         />
       </NvFormItem>
       <template v-if="!form">
@@ -121,10 +112,12 @@ import {
 } from '@packages/ui'
 import { useSpeechStore } from '@/features/speech/store'
 import NvVoiceSelect from './NvVoiceSelect'
-import { getProperty, setProperty, store } from './store'
+import { store } from './store'
 
 const speechStore = useSpeechStore()
 const props = defineProps({
   form: Object,
 })
+
+const { getProperty, setProperty } = store.useStoreOrForm(props.form)
 </script>

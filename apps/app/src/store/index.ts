@@ -23,24 +23,53 @@ export const definePluginStore = <S extends Record<any, any>>(
     },
     { electron: { shared: true, persisted: true } },
   )
+
+  const getEncryptFunction = (encryptValue = false) =>
+    encryptValue ? encrypt : (v: any) => v
+  const getDecryptFunction = (decryptValue = false) =>
+    decryptValue ? decrypt : (v: any) => v
+
+  function getProperty(property: keyof S, decryptValue = false) {
+    const pluginStore = usePluginStore()
+    const fn = getDecryptFunction(decryptValue)
+    return fn(pluginStore.$state.pluginState[property])
+  }
+
+  function setProperty(property: keyof S, value: any, encryptValue = false) {
+    const pluginStore = usePluginStore()
+    const fn = getEncryptFunction(encryptValue)
+    pluginStore.$patch({ pluginState: { [property]: fn(value) } })
+  }
+
+  function getPropertyPath(property: keyof S) {
+    const pluginStore = usePluginStore()
+    return [pluginStore.$id, 'pluginState', property].join('.')
+  }
+
   return {
     getId() {
       const pluginStore = usePluginStore()
       return pluginStore.$id
     },
-    setProperty(property: keyof S, value: any, encryptValue = false) {
-      const pluginStore = usePluginStore()
-      const fn = encryptValue ? encrypt : (v: any) => v
-      pluginStore.$patch({ pluginState: { [property]: fn(value) } })
-    },
-    getProperty(property: keyof S, decryptValue = false) {
-      const pluginStore = usePluginStore()
-      const fn = decryptValue ? decrypt : (v: any) => v
-      return fn(pluginStore.$state.pluginState[property])
-    },
-    getPropertyPath(property: keyof S) {
-      const pluginStore = usePluginStore()
-      return [pluginStore.$id, 'pluginState', property].join('.')
+    setProperty,
+    getProperty,
+    getPropertyPath,
+    useStoreOrForm(form?: any) {
+      if (form)
+        return {
+          getProperty(...args: Parameters<typeof getProperty>) {
+            const fn = getDecryptFunction(args[1])
+            return structuredClone(fn(form[getPropertyPath(args[0])]))
+          },
+          setProperty(...args: Parameters<typeof setProperty>) {
+            const fn = getEncryptFunction(args[2])
+            form[getPropertyPath(args[0])] = structuredClone(fn(args[1]))
+          },
+        }
+      return {
+        getProperty,
+        setProperty,
+      }
     },
   }
 }

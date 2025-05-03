@@ -44,6 +44,7 @@
             }"
           />
         </NvFormItem>
+        <NvDivider direction="horizontal" />
         <template v-if="currentEngineSettingsComponent">
           <component :is="currentEngineSettingsComponent" :form="form" />
         </template>

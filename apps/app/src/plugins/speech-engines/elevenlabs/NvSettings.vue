@@ -8,7 +8,10 @@
         <NvModelSelect placeholder="Select a model" />
       </NvFormItem>
       <NvFormItem label="Voice">
-        <NvVoiceSelect />
+        <NvVoiceSelect
+          :modelValue="getProperty('selectedVoice')"
+          @update:modelValue="(value) => setProperty('selectedVoice', value)"
+        />
       </NvFormItem>
       <NvDivider direction="horizontal" />
       <NvFormItem label="Stability">
@@ -163,6 +166,11 @@ import {
   NvText,
 } from '@packages/ui'
 import NvVoiceSelect from './NvVoiceSelect'
-import { getProperty, setProperty } from './store'
+import { store } from './store'
 import NvModelSelect from './NvModelSelect.vue'
+
+const props = defineProps({
+  form: Object,
+})
+const { getProperty, setProperty } = store.useStoreOrForm(props.form)
 </script>

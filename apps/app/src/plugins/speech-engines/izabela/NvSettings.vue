@@ -5,7 +5,10 @@
   >
     <NvStack :spacing="5">
       <NvFormItem label="Voice">
-        <NvVoiceSelect />
+        <NvVoiceSelect
+          :modelValue="getProperty('selectedVoice')"
+          @update:modelValue="(value) => setProperty('selectedVoice', value)"
+        />
       </NvFormItem>
       <NvDivider direction="horizontal" />
       <NvGroup :spacing="5" align="start" justify="apart" no-wrap>
@@ -48,7 +51,11 @@ import {
 } from '@packages/ui'
 import { useSpeechStore } from '@/features/speech/store'
 import NvVoiceSelect from './NvVoiceSelect'
-import { getProperty, setProperty } from './store.ts'
+import { store } from './store'
 
 const speechStore = useSpeechStore()
+const props = defineProps({
+  form: Object,
+})
+const { getProperty, setProperty } = store.useStoreOrForm(props.form)
 </script>

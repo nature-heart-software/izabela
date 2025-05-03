@@ -87,7 +87,7 @@
                   />
                 </template>
                 <NvDivider direction="horizontal" />
-                <NvTranslationForm :form="form.states" size="sm" />
+                <NvTranslationForm :form="form.states" />
               </NvStack>
             </template>
           </NvDialog>
