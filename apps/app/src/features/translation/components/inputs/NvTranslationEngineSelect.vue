@@ -1,0 +1,29 @@
+<template>
+  <NvSelect :options="options" v-bind="$attrs" />
+</template>
+<script lang="ts" setup>
+import { NvSelect } from '@packages/ui'
+import { computed } from 'vue'
+import translationEngineManager from '@/modules/translation-engine-manager'
+import orderBy from 'lodash/orderBy'
+
+console.log(translationEngineManager)
+const options = computed(() =>
+  orderBy(
+    translationEngineManager.getEngines().map((engine) => {
+      const disabled = engine.hasCredentials ? !engine.hasCredentials() : false
+      return {
+        disabled,
+        label: engine.name,
+        value: engine.id,
+        attrs: {
+          title: disabled ? 'Requires credentials' : '',
+        },
+      }
+    }),
+    ['disabled', 'label'],
+    ['asc', 'asc'],
+  ),
+)
+console.log(options)
+</script>

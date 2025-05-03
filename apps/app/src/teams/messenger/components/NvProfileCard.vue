@@ -152,7 +152,7 @@ const engine = computed(() => {
   return getEngineById(form.states['settings.selectedSpeechEngine'])
 })
 
-watch([form], console.log, { deep: true })
+// watch([form], console.log, { deep: true })
 
 watch(
   form,

@@ -38,5 +38,9 @@ export const definePluginStore = <S extends Record<any, any>>(
       const fn = decryptValue ? decrypt : (v: any) => v
       return fn(pluginStore.$state.pluginState[property])
     },
+    getPropertyPath(property: keyof S) {
+      const pluginStore = usePluginStore()
+      return [pluginStore.$id, 'pluginState', property].join('.')
+    },
   }
 }

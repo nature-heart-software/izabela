@@ -32,105 +32,20 @@
     >
       <NvStack :spacing="size === 'sm' ? 4 : 5">
         <NvFormItem label="Translation strategy">
-          <NvTranslationStrategySelect
+          <NvTranslationEngineSelect
             v-bind="{
               ...(form
                 ? {
-                    modelValue: form['settings.textTranslationStrategy'],
+                    modelValue: form['settings.selectedTranslationEngine'],
                     'onUpdate:modelValue': (value) =>
-                      (form['settings.textTranslationStrategy'] = value),
+                      (form['settings.selectedTranslationEngine'] = value),
                   }
                 : undefined),
             }"
           />
         </NvFormItem>
-        <template
-          v-if="
-            (form
-              ? form['settings.textTranslationStrategy']
-              : settingsStore.textTranslationStrategy) === 'cloud-translation'
-          "
-        >
-          <NvDivider direction="horizontal" />
-          <NvAccessBlocker
-            :allowed="!!googleCloudSpeechCredentialsPath"
-            reason="Google Cloud credentials required"
-          >
-            <NvStack :spacing="size === 'sm' ? 4 : 5">
-              <NvFormItem label="From">
-                <NvTranslationFromSelect
-                  v-bind="{
-                    ...(form
-                      ? {
-                          modelValue: form['settings.textInputLanguage'],
-                          'onUpdate:modelValue': (value) =>
-                            (form['settings.textInputLanguage'] = value),
-                        }
-                      : undefined),
-                  }"
-                />
-              </NvFormItem>
-              <NvDivider direction="horizontal" />
-              <NvFormItem label="To">
-                <NvTranslationToSelect
-                  v-bind="{
-                    ...(form
-                      ? {
-                          modelValue: form['settings.textOutputLanguage'],
-                          'onUpdate:modelValue': (value) =>
-                            (form['settings.textOutputLanguage'] = value),
-                        }
-                      : undefined),
-                  }"
-                />
-              </NvFormItem>
-            </NvStack>
-          </NvAccessBlocker>
-        </template>
-        <template
-          v-if="
-            (form
-              ? form['settings.textTranslationStrategy']
-              : settingsStore.textTranslationStrategy) === 'custom'
-          "
-        >
-          <NvDivider direction="horizontal" />
-          <NvAccessBlocker
-            :allowed="!!settingsStore.customTextTranslationEndpoint"
-            reason="Endpoint and/or credentials required"
-          >
-            <NvStack :spacing="size === 'sm' ? 4 : 5">
-              <NvFormItem label="From">
-                <NvCustomTranslationFromSelect
-                  v-bind="{
-                    ...(form
-                      ? {
-                          modelValue:
-                            form['settings.customTextTranslationFrom'],
-                          'onUpdate:modelValue': (value) =>
-                            (form['settings.customTextTranslationFrom'] =
-                              value),
-                        }
-                      : undefined),
-                  }"
-                />
-              </NvFormItem>
-              <NvDivider direction="horizontal" />
-              <NvFormItem label="To">
-                <NvCustomTranslationToSelect
-                  v-bind="{
-                    ...(form
-                      ? {
-                          modelValue: form['settings.customTextTranslationTo'],
-                          'onUpdate:modelValue': (value) =>
-                            (form['settings.customTextTranslationTo'] = value),
-                        }
-                      : undefined),
-                  }"
-                />
-              </NvFormItem>
-            </NvStack>
-          </NvAccessBlocker>
+        <template v-if="currentEngineSettingsComponent">
+          <component :is="currentEngineSettingsComponent" :form="form" />
         </template>
       </NvStack>
     </NvAccessBlocker>
@@ -146,14 +61,10 @@ import {
   NvSwitch,
   NvText,
 } from '@packages/ui'
-import NvTranslationStrategySelect from '@/features/translation/components/inputs/NvTranslationStrategySelect.vue'
-import NvCustomTranslationFromSelect from '@/features/translation/components/inputs/NvCustomTranslationFromSelect.vue'
-import NvCustomTranslationToSelect from '@/features/translation/components/inputs/NvCustomTranslationToSelect.vue'
-import NvTranslationToSelect from '@/features/translation/components/inputs/NvTranslationToSelect.vue'
-import NvTranslationFromSelect from '@/features/translation/components/inputs/NvTranslationFromSelect.vue'
 import { useSettingsStore } from '@/features/settings/store'
-import { PropType } from 'vue'
-import { useGetGoogleCloudSpeechCredentialsPath } from '@/features/settings/hooks'
+import { computed, PropType } from 'vue'
+import NvTranslationEngineSelect from '@/features/translation/components/inputs/NvTranslationEngineSelect.vue'
+import translationEngineManager from '@/modules/translation-engine-manager'
 
 const settingsStore = useSettingsStore()
 const props = defineProps({
@@ -163,6 +74,18 @@ const props = defineProps({
   },
   form: Object,
 })
-const { data: googleCloudSpeechCredentialsPath } =
-  useGetGoogleCloudSpeechCredentialsPath()
+
+const engine = computed(() => {
+  if (props.form)
+    return translationEngineManager.getEngineById(
+      props.form['settings.selectedTranslationEngine'],
+    )
+  return translationEngineManager.getEngineById(
+    settingsStore.selectedTranslationEngine,
+  )
+})
+
+const currentEngineSettingsComponent = computed(
+  () => engine.value.settingsComponent,
+)
 </script>
