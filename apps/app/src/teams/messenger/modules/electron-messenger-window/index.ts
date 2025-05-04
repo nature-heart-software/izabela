@@ -173,13 +173,13 @@ export const ElectronMessengerWindow = () => {
     })
 
   const show = () =>
-    new Promise((resolve, reject) => {
+    new Promise((resolve) => {
       const window = getWindow()
       if (window) {
         focus('mouse')
         resolve(true)
       } else {
-        reject()
+        resolve(false)
       }
     })
 
