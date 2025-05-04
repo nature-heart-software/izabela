@@ -10,4 +10,11 @@ export interface TranslationEngine {
   hasCredentials?: () => boolean
   settingsComponent: Component
   store: ReturnType<typeof definePluginStore>
+
+  translate(text: string, voiceLanguage?: string): Promise<string | null>
+
+  getTranslationOptions(voiceLanguage?: string): {
+    translateFrom: string
+    translateTo: string
+  }
 }

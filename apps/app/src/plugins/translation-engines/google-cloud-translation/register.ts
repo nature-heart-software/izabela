@@ -3,9 +3,13 @@ import { ENGINE_ID, ENGINE_NAME } from './shared.ts'
 import { store } from './store.ts'
 import NvSettings from './NvSettings.vue'
 
-const getCredentials = () => ({
-  apiKey: store.getProperty('apiKey', true),
-})
+const getCredentials = () => ({})
+const getTranslationOptions = (voiceLanguage?: string) => {
+  return {
+    translateFrom: store.getProperty('translateFrom') || undefined,
+    translateTo: store.getProperty('translateTo') || voiceLanguage,
+  }
+}
 translationEngineManager.registerEngine(ENGINE_ID, {
   id: ENGINE_ID,
   name: ENGINE_NAME,
@@ -15,4 +19,17 @@ translationEngineManager.registerEngine(ENGINE_ID, {
     return Object.values(getCredentials()).every(Boolean)
   },
   settingsComponent: NvSettings,
+  getTranslationOptions,
+  async translate(text, voiceLanguage) {
+    const { ElectronTranslation } = window
+    const { translateFrom, translateTo } = getTranslationOptions(voiceLanguage)
+    try {
+      return await ElectronTranslation.translate(text, {
+        from: translateFrom,
+        to: translateTo,
+      })
+    } catch (e) {
+      return text
+    }
+  },
 })

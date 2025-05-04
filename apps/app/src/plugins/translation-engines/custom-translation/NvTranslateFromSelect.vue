@@ -1,6 +1,7 @@
 <template>
   <NvSelect
     ref="select"
+    v-loading="isFetching"
     :autocompleteWidth="width"
     :options="options"
     v-bind="$attrs"
@@ -9,18 +10,29 @@
 <script lang="ts" setup>
 import { NvSelect } from '@packages/ui'
 import { useElementSize } from '@vueuse/core'
-import { ref } from 'vue'
-// eslint-disable-next-line camelcase
-import { getAll639_1, getName } from 'all-iso-language-codes'
+import { computed, ref, unref } from 'vue'
+import { useGetLanguagesQuery } from './queries.ts'
+import { groupOptions } from '@/utils/select.ts'
 
 const select = ref()
 const { width } = useElementSize(select)
-const isoCodes = getAll639_1()
-const options = [
-  {
-    label: 'Auto',
-    value: null,
-  },
-  ...isoCodes.map((code) => ({ label: getName(code, 'en'), value: code })),
-]
+const { data, isFetching } = useGetLanguagesQuery()
+const options = computed(() => {
+  const languages = unref(data)?.from || []
+  return groupOptions(
+    [
+      {
+        label: 'Auto',
+        value: null,
+        category: 'Default',
+      },
+      ...languages.map((language) => ({
+        label: language.name,
+        value: language.value,
+        category: language.category,
+      })),
+    ],
+    'category',
+  )
+})
 </script>

@@ -40,13 +40,23 @@
                     'onUpdate:modelValue': (value) =>
                       (form['settings.selectedTranslationEngine'] = value),
                   }
-                : undefined),
+                : {
+                    modelValue: settingsStore.selectedTranslationEngine,
+                    'onUpdate:modelValue': (value) =>
+                      settingsStore.$patch({
+                        selectedTranslationEngine: value,
+                      }),
+                  }),
             }"
           />
         </NvFormItem>
         <NvDivider direction="horizontal" />
         <template v-if="currentEngineSettingsComponent">
-          <component :is="currentEngineSettingsComponent" :form="form" />
+          <component
+            :is="currentEngineSettingsComponent"
+            :form="form"
+            :size="size"
+          />
         </template>
       </NvStack>
     </NvAccessBlocker>

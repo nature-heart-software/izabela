@@ -41,6 +41,18 @@
       </NvFormItem>
     </NvStack>
   </NvAccessBlocker>
+  <template v-if="!form && size === 'md'">
+    <NvDivider direction="horizontal" />
+    <NvGoogleCloudCredentialsFormPart>
+      Izabela uses Google Cloud Translation AI for translation which requires a
+      <a
+        href="https://github.com/nature-heart-software/izabela/wiki/How-to-get-Google-Cloud-service-account-credentials"
+        target="_blank"
+        >Google Cloud service account credentials</a
+      >
+      file to be imported
+    </NvGoogleCloudCredentialsFormPart>
+  </template>
 </template>
 <script lang="ts" setup>
 import { PropType } from 'vue'
@@ -49,6 +61,7 @@ import NvTranslateFromSelect from './NvTranslateFromSelect.vue'
 import NvTranslateToSelect from './NvTranslateToSelect.vue'
 import { useGetGoogleCloudSpeechCredentialsPath } from '@/features/settings/hooks'
 import { store } from './store.ts'
+import NvGoogleCloudCredentialsFormPart from '@/features/settings/components/NvGoogleCloudCredentialsFormPart.vue'
 
 const props = defineProps({
   size: {

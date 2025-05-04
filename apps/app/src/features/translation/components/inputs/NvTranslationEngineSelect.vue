@@ -10,7 +10,8 @@ import orderBy from 'lodash/orderBy'
 const options = computed(() =>
   orderBy(
     translationEngineManager.getEngines().map((engine) => {
-      const disabled = engine.hasCredentials ? !engine.hasCredentials() : false
+      // const disabled = engine.hasCredentials ? !engine.hasCredentials() : false
+      const disabled = false
       return {
         disabled,
         label: engine.name,

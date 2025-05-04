@@ -8,6 +8,7 @@ import {
 } from '@/electron/events/renderer'
 import { useSpeechStore } from '@/features/speech/store'
 import speechEngineManager from '@/modules/speech-engine-manager'
+import translationEngineManager from '@/modules/translation-engine-manager'
 import {
   getCleanMessage,
   getMessageCommand,
@@ -16,7 +17,6 @@ import {
 import { useSettingsStore } from '@/features/settings/store'
 import { io } from 'socket.io-client'
 
-const { ElectronTranslation } = window
 const speechStore = useSpeechStore()
 const settingsStore = useSettingsStore()
 const socket = io(`ws://localhost:${import.meta.env.VITE_SERVER_WS_PORT}`, {})
@@ -26,28 +26,35 @@ const onMessage = async (payload: string | IzabelaMessage) => {
   console.log('Saying something:', payload)
   let message = null
   if (typeof payload === 'string') {
-    const engine = speechStore.currentSpeechEngine
-    if (!engine) return
-    const voice = engine.getSelectedVoice()
-    const engineCommands = engine.commands?.(voice) || []
+    const speechEngine = speechStore.currentSpeechEngine
+    const translationEngine = translationEngineManager.getEngineById(
+      settingsStore.selectedTranslationEngine,
+    )
+    if (!speechEngine) return
+    const voice = speechEngine.getSelectedVoice()
+    const engineCommands = speechEngine.commands?.(voice) || []
     const cleanMessage = getCleanMessage(payload, engineCommands)
-    const translatedMessage = settingsStore.enableTranslation
-      ? await ElectronTranslation.translate(removeCommandFromMessage(payload), {
-          from: settingsStore.textInputLanguage || undefined,
-          to: settingsStore.textOutputLanguage || engine.getLanguageCode(voice),
-        })
-      : null
+    const voiceLanguageCode = speechEngine.getLanguageCode(voice)
+    const translationOptions =
+      translationEngine?.getTranslationOptions(voiceLanguageCode)
+    const translatedMessage =
+      settingsStore.enableTranslation && translationEngine
+        ? await translationEngine.translate(
+            removeCommandFromMessage(payload),
+            voiceLanguageCode,
+          )
+        : null
     console.log('Translated message:', translatedMessage)
     message = {
       voice,
       message: cleanMessage,
       originalMessage: payload,
       translatedMessage,
-      translatedFrom: settingsStore.textInputLanguage,
-      translatedTo: settingsStore.textOutputLanguage,
-      engine: engine.id,
-      credentials: engine.getCredentials(),
-      payload: engine.getPayload({
+      translatedFrom: translationOptions?.translateFrom,
+      translatedTo: translationOptions?.translateTo,
+      engine: speechEngine.id,
+      credentials: speechEngine.getCredentials(),
+      payload: speechEngine.getPayload({
         voice,
         translatedText: translatedMessage,
         text: cleanMessage,
