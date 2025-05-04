@@ -2,9 +2,10 @@
 import { SpeechEngine } from '@/modules/speech-engine-manager/types'
 // eslint-disable-next-line import/no-cycle
 import { useDictionaryStore } from '@/features/dictionary/store'
+import { createEngineManager } from '@/modules/engine-manager'
 
 const SpeechEngineManager = () => {
-  const engines: SpeechEngine[] = []
+  const engineManager = createEngineManager<SpeechEngine>()
 
   function withDictionary(speechEngine: SpeechEngine): SpeechEngine {
     const dictionaryStore = useDictionaryStore()
@@ -19,34 +20,23 @@ const SpeechEngineManager = () => {
   }
 
   function registerEngine(speechEngine: SpeechEngine) {
-    engines.push(withDictionary(speechEngine))
+    engineManager.registerEngine(speechEngine.id, withDictionary(speechEngine))
   }
 
   function getEngineById(id: SpeechEngine['id']) {
-    return engines.find((speechEngine) => speechEngine.id === id)
+    return engineManager.getEngineById(id)
   }
 
   function getEngines() {
-    return engines
+    return engineManager.getEngines()
   }
 
-  const useSpeechEngineManager = () => ({
-    getEngineById,
-    getEngines,
-    engines,
-  })
   return {
     registerEngine,
     getEngineById,
     getEngines,
-    useSpeechEngineManager,
   }
 }
 const instance = SpeechEngineManager()
-export const {
-  registerEngine,
-  getEngineById,
-  getEngines,
-  useSpeechEngineManager,
-} = instance
+export const { registerEngine, getEngineById, getEngines } = instance
 export default instance

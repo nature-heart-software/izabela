@@ -2,20 +2,17 @@
   <NvSelect
     ref="select"
     :autocompleteWidth="width"
-    :modelValue="settingsStore.textInputLanguage"
     :options="options"
-    @update:modelValue="(value) => settingsStore.$patch({ textInputLanguage: value })"
+    v-bind="$attrs"
   />
 </template>
 <script lang="ts" setup>
 import { NvSelect } from '@packages/ui'
 import { useElementSize } from '@vueuse/core'
 import { ref } from 'vue'
-import { useSettingsStore } from '@/features/settings/store'
 // eslint-disable-next-line camelcase
 import { getAll639_1, getName } from 'all-iso-language-codes'
 
-const settingsStore = useSettingsStore()
 const select = ref()
 const { width } = useElementSize(select)
 const isoCodes = getAll639_1()

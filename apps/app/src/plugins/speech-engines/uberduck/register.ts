@@ -5,15 +5,18 @@ import { DEFAULT_LANGUAGE_CODE } from '@/consts'
 import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
-import { getProperty, setProperty } from './store'
+import { getProperty, store } from './store'
 
-const getCredentials = () =>
-  !getProperty('useLocalCredentials')
+const getCredentials = () => {
+  const speechStore = useSpeechStore()
+  return speechStore.hasUniversalApiCredentials &&
+    !getProperty('useLocalCredentials')
     ? {}
     : {
         publicKey: getProperty('publicKey', true),
         privateKey: getProperty('privateKey', true),
       }
+}
 
 const getSelectedVoice = () => getProperty('selectedVoice')
 registerEngine({
@@ -59,5 +62,5 @@ registerEngine({
   },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,
-  store: { setProperty, getProperty },
+  store,
 })

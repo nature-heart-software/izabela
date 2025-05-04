@@ -154,7 +154,6 @@ export const StSelectOption = styled('div', {
     position: relative;
     z-index: 0;
     min-width: 0;
-    flex-grow: 1;
     ${({ readonly }) =>
       readonly &&
       `

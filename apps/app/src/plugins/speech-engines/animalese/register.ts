@@ -4,7 +4,7 @@ import animalese from '@packages/animalese'
 import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
-import { getProperty, setProperty } from './store'
+import { getProperty, store } from './store'
 
 function dataURItoBlob(dataURI: string) {
   // convert base64/URLEncoded data component to raw binary data held in a string
@@ -68,5 +68,5 @@ registerEngine({
   },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,
-  store: { setProperty, getProperty },
+  store,
 })

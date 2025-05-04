@@ -1,10 +1,13 @@
 <template>
   <NvFormItem label="Voice">
-    <NvVoiceSelect />
+    <NvVoiceSelect
+      :modelValue="getProperty('selectedVoice')"
+      @update:modelValue="(value) => setProperty('selectedVoice', value)"
+    />
   </NvFormItem>
   <NvDivider direction="horizontal" />
   <NvAccessBlocker
-    :allowed="getProperty('selectedVoice').name === 'Custom'"
+    :allowed="getProperty('selectedVoice')?.name === 'Custom'"
     reason='Only available for the "Custom" voice'
   >
     <NvStack spacing="5">
@@ -93,18 +96,20 @@
       </NvFormItem>
     </NvStack>
   </NvAccessBlocker>
-  <NvDivider direction="horizontal" />
-  <NvGroup :spacing="5" justify="apart" no-wrap>
-    <NvStack>
-      <NvText type="label">Prefer cache on every message</NvText>
-    </NvStack>
-    <NvSwitch
-      :modelValue="getProperty('useCacheOnEveryRequest')"
-      @update:modelValue="
-        (value) => setProperty('useCacheOnEveryRequest', value)
-      "
-    />
-  </NvGroup>
+  <template v-if="!form">
+    <NvDivider direction="horizontal" />
+    <NvGroup :spacing="5" justify="apart" no-wrap>
+      <NvStack>
+        <NvText type="label">Prefer cache on every message</NvText>
+      </NvStack>
+      <NvSwitch
+        :modelValue="getProperty('useCacheOnEveryRequest')"
+        @update:modelValue="
+          (value) => setProperty('useCacheOnEveryRequest', value)
+        "
+      />
+    </NvGroup>
+  </template>
 </template>
 <script lang="ts" setup>
 import {
@@ -119,5 +124,10 @@ import {
   NvText,
 } from '@packages/ui'
 import NvVoiceSelect from './NvVoiceSelect'
-import { getProperty, setProperty } from './store'
+import { store } from './store'
+
+const props = defineProps({
+  form: Object,
+})
+const { getProperty, setProperty } = store.useStoreOrForm(props.form)
 </script>

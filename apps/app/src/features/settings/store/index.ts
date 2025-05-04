@@ -4,7 +4,8 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { SpeechEngine } from '@/modules/speech-engine-manager/types'
 import { Key } from '@/types/keybinds'
-import { ENGINE_ID } from '@/plugins/speech-engines/say/shared'
+import { ENGINE_ID as defaultSpeechEngineId } from '@/plugins/speech-engines/say/shared'
+import { ENGINE_ID as defaultTranslationEngineId } from '@/plugins/translation-engines/google-cloud-translation/shared'
 import { useMessengerStateStore } from '@/teams/messenger/store'
 
 export const useSettingsStore = defineStore(
@@ -15,11 +16,11 @@ export const useSettingsStore = defineStore(
     const channel = version.includes('alpha')
       ? 'alpha'
       : // eslint-disable-next-line no-nested-ternary
-        version.includes('beta')
-        ? 'beta'
-        : version.includes('rc')
-          ? 'rc'
-          : 'latest'
+      version.includes('beta')
+      ? 'beta'
+      : version.includes('rc')
+      ? 'rc'
+      : 'latest'
 
     const enableAutoUpdate = ref(true)
     const enableOverlayWindow = ref(false)
@@ -27,7 +28,8 @@ export const useSettingsStore = defineStore(
     const playSpeechOnDefaultPlaybackDevice = ref(true)
     const audioOutputs = ref<MediaDeviceInfo['label'][]>([])
     const audioInput = ref<MediaDeviceInfo['label']>('default')
-    const selectedSpeechEngine = ref<SpeechEngine['id']>(ENGINE_ID)
+    const selectedSpeechEngine = ref<SpeechEngine['id']>(defaultSpeechEngineId)
+    const selectedTranslationEngine = ref(defaultTranslationEngineId)
     const selectedSpeechRecognitionEngine = ref<
       | 'google-cloud'
       | 'microsoft-azure'
@@ -52,19 +54,10 @@ export const useSettingsStore = defineStore(
     const soxDevice = ref(0)
     const speechDetectionPolling = ref(40)
     const enableSTTTS = ref(false)
-    const textInputLanguage = ref(null)
-    const textOutputLanguage = ref(null)
     const speechInputLanguage = ref('en-US')
     const enableTranslation = ref(false)
     const speechProfanityFilter = ref(true)
     const speechRecognitionStrategy = ref<'continuous' | 'ptr'>('ptr')
-    const textTranslationStrategy = ref<'cloud-translation' | 'custom'>(
-      'cloud-translation',
-    )
-    const customTextTranslationEndpoint = ref('')
-    const customTextTranslationApiKey = ref('')
-    const customTextTranslationFrom = ref('')
-    const customTextTranslationTo = ref('')
     // const enableBackgroundDim = ref(true)
     const backgroundDimOpacity = ref(50)
     const keybindings = ref<Record<string, Key[]>>({
@@ -241,6 +234,7 @@ export const useSettingsStore = defineStore(
       playSpeechOnDefaultPlaybackDevice,
       audioOutputs,
       audioInput,
+      selectedTranslationEngine,
       selectedSpeechEngine,
       selectedSpeechRecognitionEngine,
       updateChannel,
@@ -258,15 +252,8 @@ export const useSettingsStore = defineStore(
       enableSTTTS,
       speechRecognitionStrategy,
       soxDevice,
-      textInputLanguage,
-      textOutputLanguage,
       speechInputLanguage,
       enableTranslation,
-      textTranslationStrategy,
-      customTextTranslationEndpoint,
-      customTextTranslationApiKey,
-      customTextTranslationFrom,
-      customTextTranslationTo,
       speechProfanityFilter,
       soxPreRecordingChunks,
       soxPostRecordingChunks,
