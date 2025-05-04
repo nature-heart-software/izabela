@@ -146,7 +146,7 @@ onIPCApplyProfile((id) => {
     profilesStore.apply(id)
     const profile = profilesStore.profiles.find((p) => p.id === id)
     if (profile) {
-      const {ElectronDialog} = window
+      const { ElectronDialog } = window
       ElectronDialog.showNotification({
         title: 'Applied profile',
         body: profile.name,
