@@ -7,7 +7,6 @@ import { computed } from 'vue'
 import translationEngineManager from '@/modules/translation-engine-manager'
 import orderBy from 'lodash/orderBy'
 
-console.log(translationEngineManager)
 const options = computed(() =>
   orderBy(
     translationEngineManager.getEngines().map((engine) => {
@@ -25,5 +24,4 @@ const options = computed(() =>
     ['asc', 'asc'],
   ),
 )
-console.log(options)
 </script>

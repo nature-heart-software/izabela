@@ -154,7 +154,6 @@ export const StSelectOption = styled('div', {
     position: relative;
     z-index: 0;
     min-width: 0;
-    flex-grow: 1;
     ${({ readonly }) =>
       readonly &&
       `
@@ -197,12 +196,12 @@ export const StSelectOption = styled('div', {
             }
           `
       : disabled
-        ? `
+      ? `
           user-select: none;
           pointer-events: none;
           color: ${colors.gray['40']} !important;
       `
-        : `
+      : `
         &:hover {
             background-color: ${colors.gray['10']} !important;
         }
