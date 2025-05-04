@@ -196,12 +196,12 @@ export const StSelectOption = styled('div', {
             }
           `
       : disabled
-      ? `
+        ? `
           user-select: none;
           pointer-events: none;
           color: ${colors.gray['40']} !important;
       `
-      : `
+        : `
         &:hover {
             background-color: ${colors.gray['10']} !important;
         }
