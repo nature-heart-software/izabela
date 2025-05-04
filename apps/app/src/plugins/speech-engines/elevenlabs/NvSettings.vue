@@ -4,17 +4,18 @@
     reason="Credentials required"
   >
     <NvStack spacing="5">
+      <NvFormItem label="Voice">
+        <NvVoiceSelect
+          :modelValue="getProperty('selectedVoice')"
+          @update:modelValue="(value) => setProperty('selectedVoice', value)"
+        />
+      </NvFormItem>
+      <NvDivider direction="horizontal" />
       <NvFormItem label="Models">
         <NvModelSelect
           :modelValue="getProperty('model_id')"
           placeholder="Select a model"
           @update:modelValue="(value) => setProperty('model_id', value)"
-        />
-      </NvFormItem>
-      <NvFormItem label="Voice">
-        <NvVoiceSelect
-          :modelValue="getProperty('selectedVoice')"
-          @update:modelValue="(value) => setProperty('selectedVoice', value)"
         />
       </NvFormItem>
       <NvDivider direction="horizontal" />
