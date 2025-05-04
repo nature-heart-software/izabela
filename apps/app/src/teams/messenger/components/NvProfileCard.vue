@@ -3,13 +3,17 @@
     <NvStack>
       <NvGroup align="start" justify="between" noWrap>
         <NvGroup align="start" class="!flex-1 min-w-0" noWrap>
-          <!--          <NvButton-->
-          <!--            :loading="isLoading"-->
-          <!--            class="shrink-0"-->
-          <!--            icon-name="play"-->
-          <!--            size="sm"-->
-          <!--            @click="() => play()"-->
-          <!--          />-->
+          <NvTooltip>
+            <NvText>Apply</NvText>
+            <template #reference>
+              <NvButton
+                class="shrink-0"
+                icon-name="download-alt"
+                size="sm"
+                @click="() => profilesStore.apply(id)"
+              />
+            </template>
+          </NvTooltip>
           <NvStack class="!flex-1 min-h-0">
             <NvInput
               v-model="form.name"
@@ -72,6 +76,22 @@
             <template #title>"{{ form.name }}" profile settings</template>
             <template #description>
               <NvStack spacing="5">
+                <NvFormItem label="Name">
+                  <NvInput
+                    v-model="form.name"
+                    class="w-full"
+                    placeholder="Profile name"
+                  />
+                </NvFormItem>
+                <NvDivider direction="horizontal" />
+                <NvFormItem label="Shortcut">
+                  <NvKeybinding
+                    v-model="form.shortcut"
+                    class="w-full"
+                    multiple
+                  />
+                </NvFormItem>
+                <NvDivider direction="horizontal" />
                 <NvFormItem label="Speech engine">
                   <NvSpeechEngineSelect
                     v-model="form.states['settings.selectedSpeechEngine']"
