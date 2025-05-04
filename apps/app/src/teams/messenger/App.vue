@@ -54,6 +54,8 @@ import takeRight from 'lodash/takeRight'
 import pkg from '@root/package.json'
 import { useGameOverlayStore } from '@/features/game-overlay/store'
 import { storesStates } from '@/store'
+import { onIPCApplyProfile } from '@/electron/events/renderer.ts'
+import { useProfilesStore } from '@/features/profiles/store.ts'
 
 const { ElectronMessengerWindow } = window
 const messengerStore = useMessengerStore()
@@ -137,4 +139,20 @@ watch(
     }
   },
 )
+
+const profilesStore = useProfilesStore()
+onIPCApplyProfile((id) => {
+  if (!isGameOverlay) {
+    profilesStore.apply(id)
+    const profile = profilesStore.profiles.find((p) => p.id === id)
+    if (profile) {
+      const { ElectronDialog } = window
+      ElectronDialog.showNotification({
+        title: 'Applied profile',
+        body: profile.name,
+        silent: true,
+      })
+    }
+  }
+})
 </script>

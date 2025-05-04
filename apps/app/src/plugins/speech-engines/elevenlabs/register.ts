@@ -4,7 +4,7 @@ import { fetchApi } from '@/services'
 import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
-import { getProperty, setProperty } from './store'
+import { getProperty, store } from './store'
 
 const getCredentials = () => ({
   apiKey: getProperty('apiKey', true),
@@ -58,5 +58,5 @@ registerEngine({
   },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,
-  store: { setProperty, getProperty },
+  store,
 })

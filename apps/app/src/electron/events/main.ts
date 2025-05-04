@@ -48,3 +48,7 @@ export const emitIPCGameOverlayResize = (size: {
 }) => {
   ipcMain.sendTo('messenger-game-overlay', 'resize', size)
 }
+
+export const emitIPCApplyProfile = (id: string) => {
+  ipcMain.sendTo('messenger', 'apply-profile', id)
+}

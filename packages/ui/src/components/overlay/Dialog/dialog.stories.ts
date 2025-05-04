@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { StoryFn } from '@storybook/vue3'
-import { NvButton, NvCenter, NvDialog, NvText, NvGroup } from '@/components'
+import { NvButton, NvCenter, NvDialog, NvGroup, NvText } from '@/components'
 
 export default {
   title: 'Dialog',

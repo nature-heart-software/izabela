@@ -25,8 +25,8 @@ export const useSpeechRecognitionStore = defineStore(
 export const useSpeechStore = defineStore(
   'speech',
   () => {
+    const settingsStore = useSettingsStore()
     const selectedSpeechEngine = computed(() => {
-      const settingsStore = useSettingsStore()
       const engine = getEngineById(settingsStore.selectedSpeechEngine)
       if (engine && (!engine.hasCredentials || engine.hasCredentials())) {
         return settingsStore.selectedSpeechEngine

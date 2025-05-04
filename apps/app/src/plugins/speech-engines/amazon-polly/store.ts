@@ -1,9 +1,7 @@
 import { definePluginStore } from '@/store'
 import { ENGINE_ID } from './shared'
 
-export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
-  identityPoolId: '',
-  region: '',
+const exposedProperties = {
   selectedVoice: {
     Gender: 'Female',
     Id: 'Amy',
@@ -12,9 +10,21 @@ export const { setProperty, getProperty } = definePluginStore(ENGINE_ID, {
     Name: 'Amy',
     SupportedEngines: ['neural', 'standard'],
   },
-  favoriteVoiceIds: [],
-  useLocalCredentials: false,
-  useCacheOnEveryRequest: true,
-  streamAudio: true,
-  includeTimestamps: false,
-})
+}
+
+export const store = definePluginStore(
+  ENGINE_ID,
+  {
+    identityPoolId: '',
+    region: '',
+    favoriteVoiceIds: [],
+    useLocalCredentials: false,
+    useCacheOnEveryRequest: true,
+    streamAudio: true,
+    includeTimestamps: false,
+    ...exposedProperties,
+  },
+  Object.keys(exposedProperties) as (keyof typeof exposedProperties)[],
+)
+
+export const { getProperty, setProperty } = store

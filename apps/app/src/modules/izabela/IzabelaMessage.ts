@@ -206,29 +206,34 @@ export default (messagePayload: IzabelaMessagePayload) => {
         }
       }
     }
-    const engine = getEngine()
-    if (!engine)
-      return Promise.reject(
-        new Error('Izabela Message: Selected engine was not found'),
-      )
-    return engine
-      .synthesizeSpeech({
+
+    let audioPromise: Promise<DownloadResponse>
+    if (engineName === 'external-audio') {
+      audioPromise = fetch(payload.url)
+    } else {
+      const engine = getEngine()
+      if (!engine)
+        return Promise.reject(
+          new Error('Izabela Message: Selected engine was not found'),
+        )
+      audioPromise = engine.synthesizeSpeech({
         credentials,
         payload,
       })
-      .then((res) => {
-        try {
-          if (res instanceof Response) {
-            const data = res.headers.get('data')
-            if (data) emitter.emit('response:data', JSON.parse(data))
-          }
-        } catch (e) {
-          console.error(e)
+    }
+    return audioPromise.then((res) => {
+      try {
+        if (res instanceof Response) {
+          const data = res.headers.get('data')
+          if (data) emitter.emit('response:data', JSON.parse(data))
         }
-        audioDownloaded.resolve(true)
-        cacheAudio(res)
-        return Promise.resolve(res)
-      })
+      } catch (e) {
+        console.error(e)
+      }
+      audioDownloaded.resolve(true)
+      cacheAudio(res)
+      return Promise.resolve(res)
+    })
   }
 
   async function cacheAudio(res: DownloadResponse) {

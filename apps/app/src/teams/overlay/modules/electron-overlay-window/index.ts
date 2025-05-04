@@ -146,7 +146,7 @@ export const ElectronOverlayWindow = () => {
           e.name !== 'SPACE'
         ) {
           const nativeKey = Object.values(keymap.getKeyMap()).find(
-            (k: any) => k.vkey === e.rawKey._nameRaw,
+            (k: any) => k.vkey === e.rawKey?._nameRaw,
           )
           if (nativeKey) {
             const hasShift = down['LEFT SHIFT'] || down['RIGHT SHIFT']

@@ -3,6 +3,7 @@ import NvSettings from '@/teams/messenger/views/NvSettings.vue'
 import NvSettingsGeneral from '@/teams/messenger/views/NvSettingsGeneral.vue'
 import NvSettingsGameOverlay from '@/teams/messenger/views/NvSettingsGameOverlay.vue'
 import NvSettingsEngine from '@/teams/messenger/views/NvSettingsEngine.vue'
+import NvSettingsProfiles from '@/teams/messenger/views/NvSettingsProfiles.vue'
 import NvSettingsAudioInput from '@/teams/messenger/views/NvSettingsAudioInput.vue'
 import NvSettingsAudioOutputs from '@/teams/messenger/views/NvSettingsAudioOutputs.vue'
 import NvSettingsDictionary from '@/teams/messenger/views/NvSettingsDictionary.vue'
@@ -13,7 +14,6 @@ import NvSettingsCommands from '@/teams/messenger/views/NvSettingsCommands.vue'
 import NvSettingsAbout from '@/teams/messenger/views/NvSettingsAbout.vue'
 import NvSettingsSupport from '@/teams/messenger/views/NvSettingsSupport.vue'
 import NvSettingsTranslation from '@/teams/messenger/views/NvSettingsTranslation.vue'
-import NvSettingsWiki from '@/teams/messenger/views/NvSettingsWiki.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -30,6 +30,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'settings-game-overlay',
         path: 'game-overlay',
         component: NvSettingsGameOverlay,
+      },
+      {
+        name: 'settings-profiles',
+        path: 'profiles',
+        component: NvSettingsProfiles,
       },
       {
         name: 'settings-engine',
@@ -60,11 +65,6 @@ const routes: Array<RouteRecordRaw> = [
         name: 'settings-commands',
         path: 'commands',
         component: NvSettingsCommands,
-      },
-      {
-        name: 'settings-wiki',
-        path: 'wiki',
-        component: NvSettingsWiki,
       },
       {
         name: 'settings-about',

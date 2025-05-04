@@ -4,7 +4,7 @@ import SamJs from 'sam-js'
 import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
 import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
-import { getProperty, setProperty } from './store'
+import { getProperty, store } from './store'
 
 const text2Uint8Array = (text: string) => {
   const buffer = new Uint8Array(text.length)
@@ -126,5 +126,5 @@ registerEngine({
   },
   voiceSelectComponent: NvVoiceSelect,
   settingsComponent: NvSettings,
-  store: { setProperty, getProperty },
+  store,
 })

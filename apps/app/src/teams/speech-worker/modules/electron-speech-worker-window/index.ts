@@ -3,10 +3,7 @@ import speech from '@google-cloud/speech'
 import { BrowserWindow, screen } from 'electron'
 import { ipcMain } from 'electron-postman'
 import { createNotification } from '@/utils/electron-notification'
-import {
-  useSpeechRecognitionStore,
-  useSpeechStore,
-} from '@/features/speech/store'
+import { useSpeechRecognitionStore } from '@/features/speech/store'
 import {
   gkl,
   keybindingReleased,
@@ -21,13 +18,17 @@ import mapValues from 'lodash/mapValues'
 import { getTime } from '@/utils/time'
 import { windowHeight, windowWidth } from '@/teams/speech-worker/electron/const'
 import { getTopLeftWindow } from '@/electron/utils'
+import { elevenlabsSpeechRecognitionPlugin } from '@/features/speech/store/plugins/elevenlabs'
+import { microsoftAzureSpeechRecognitionPlugin } from '@/features/speech/store/plugins/microsoft-azure'
+import { amazonTranscribeSpeechRecognitionPlugin } from '@/features/speech/store/plugins/amazon-transcribe'
+import { ibmWatsonSpeechRecognitionPlugin } from '@/features/speech/store/plugins/ibm-watson'
+import { openaiSpeechRecognitionPlugin } from '@/features/speech/store/plugins/openai'
 
 export const ElectronSpeechWindow = () => {
   let registeredWindow: BrowserWindow | null = null
   const ready = Deferred<BrowserWindow>()
   const isReady = () => ready.promise
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
-  let speechStore: ReturnType<typeof useSpeechStore> | undefined
   let speechRecognitionStore:
     | ReturnType<typeof useSpeechRecognitionStore>
     | undefined
@@ -165,19 +166,26 @@ export const ElectronSpeechWindow = () => {
 
   isReady().then(() => {
     settingsStore = useSettingsStore()
-    speechStore = useSpeechStore()
     speechRecognitionStore = useSpeechRecognitionStore()
 
     watch(
       () => [
         settingsStore?.soxDevice,
         settingsStore?.enableSTTTS,
+        settingsStore?.selectedSpeechRecognitionEngine,
         settingsStore?.speechRecognitionStrategy,
         settingsStore?.speechInputLanguage,
         settingsStore?.soxPreRecordingChunks,
         settingsStore?.soxPostRecordingChunks,
         settingsStore?.speechProfanityFilter,
-        speechStore?.currentSpeechEngine,
+        elevenlabsSpeechRecognitionPlugin.getProperty('apiKey'),
+        microsoftAzureSpeechRecognitionPlugin.getProperty('apiKey'),
+        microsoftAzureSpeechRecognitionPlugin.getProperty('region'),
+        amazonTranscribeSpeechRecognitionPlugin.getProperty('identityPoolId'),
+        amazonTranscribeSpeechRecognitionPlugin.getProperty('region'),
+        ibmWatsonSpeechRecognitionPlugin.getProperty('apiKey'),
+        ibmWatsonSpeechRecognitionPlugin.getProperty('url'),
+        openaiSpeechRecognitionPlugin.getProperty('apiKey'),
       ],
       restartNativeSpeechRecognition,
       { deep: true, immediate: true },

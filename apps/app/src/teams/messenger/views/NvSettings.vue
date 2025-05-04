@@ -134,6 +134,10 @@ const navigation = [
         to: { name: 'settings-engine' },
       },
       {
+        name: 'Profiles',
+        to: { name: 'settings-profiles' },
+      },
+      {
         name: 'Audio Ouputs',
         to: { name: 'settings-audio-outputs' },
       },
@@ -158,10 +162,6 @@ const navigation = [
   {
     name: 'Other',
     children: [
-      {
-        name: 'Wiki',
-        to: { name: 'settings-wiki' },
-      },
       {
         name: 'About',
         to: { name: 'settings-about' },
