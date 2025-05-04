@@ -7,7 +7,7 @@ import {
   onIPCSay,
 } from '@/electron/events/renderer'
 import { useSpeechStore } from '@/features/speech/store'
-import { getEngineById } from '@/modules/speech-engine-manager'
+import speechEngineManager from '@/modules/speech-engine-manager'
 import {
   getCleanMessage,
   getMessageCommand,
@@ -20,6 +20,8 @@ const { ElectronTranslation } = window
 const speechStore = useSpeechStore()
 const settingsStore = useSettingsStore()
 const socket = io(`ws://localhost:${import.meta.env.VITE_SERVER_WS_PORT}`, {})
+// this ensures every store has been loaded
+speechEngineManager.getEngines().map((e) => e.store.getExposedProperties())
 const onMessage = async (payload: string | IzabelaMessage) => {
   console.log('Saying something:', payload)
   let message = null
@@ -53,7 +55,7 @@ const onMessage = async (payload: string | IzabelaMessage) => {
       command: getMessageCommand(payload),
     }
   } else {
-    const engine = getEngineById(payload.engine)
+    const engine = speechEngineManager.getEngineById(payload.engine)
     if (!engine) return
     const { voice } = payload
     const engineCommands = engine.commands?.(voice) || []
