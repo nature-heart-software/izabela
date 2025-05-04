@@ -14,7 +14,6 @@ import NvSettingsCommands from '@/teams/messenger/views/NvSettingsCommands.vue'
 import NvSettingsAbout from '@/teams/messenger/views/NvSettingsAbout.vue'
 import NvSettingsSupport from '@/teams/messenger/views/NvSettingsSupport.vue'
 import NvSettingsTranslation from '@/teams/messenger/views/NvSettingsTranslation.vue'
-import NvSettingsWiki from '@/teams/messenger/views/NvSettingsWiki.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -66,11 +65,6 @@ const routes: Array<RouteRecordRaw> = [
         name: 'settings-commands',
         path: 'commands',
         component: NvSettingsCommands,
-      },
-      {
-        name: 'settings-wiki',
-        path: 'wiki',
-        component: NvSettingsWiki,
       },
       {
         name: 'settings-about',
