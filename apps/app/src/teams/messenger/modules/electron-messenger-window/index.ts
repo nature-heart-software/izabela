@@ -14,7 +14,7 @@ import { Deferred } from '@packages/toolbox'
 import ffi from 'ffi-napi'
 import { getNativeWindowHandleInt } from '@/utils/electron-window'
 import gameOverlay from '@/electron/game-overlay.ts'
-import ref from 'ref-napi'
+import { focusWindow } from 'forcefocus'
 
 export const ElectronMessengerWindow = () => {
   /* use isFocused as source of truth instead of window.isFocused() as in some instances
@@ -84,11 +84,7 @@ export const ElectronMessengerWindow = () => {
   const ensureNativeFocus = () => {
     const window = getWindow()
     if (window) {
-      const windowNativeHandle = getNativeWindowHandleInt(window)
-      const processIdRef = ref.alloc('int')
-      user32.GetWindowThreadProcessId(windowNativeHandle, processIdRef)
-      const processId = processIdRef.deref()
-      WinControl.getByPid(processId).setForeground()
+      focusWindow(window)
     }
   }
 
