@@ -6,6 +6,7 @@ export type Credentials = { [key: string]: any }
 export interface TranslationEngine {
   id: string
   name: string
+  category: string
   getCredentials: () => Credentials
   hasCredentials?: () => boolean
   settingsComponent: Component

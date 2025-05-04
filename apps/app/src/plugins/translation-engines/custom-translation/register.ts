@@ -18,6 +18,7 @@ translationEngineManager.registerEngine(ENGINE_ID, {
   id: ENGINE_ID,
   name: ENGINE_NAME,
   store,
+  category: 'other',
   getCredentials,
   hasCredentials() {
     return Object.values(getCredentials()).every(Boolean)
