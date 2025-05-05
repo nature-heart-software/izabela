@@ -1,38 +1,38 @@
 <template>
-  <NvSelect
-    :modelValue="settingsStore.selectedSpeechRecognitionEngine"
-    :options="options"
-    v-bind="$attrs"
-    @update:modelValue="
-      (value) =>
-        settingsStore.$patch({ selectedSpeechRecognitionEngine: value })
-    "
-  />
+  <NvSelect :options="options" v-bind="$attrs" />
 </template>
 <script lang="ts" setup>
 import { NvSelect } from '@packages/ui'
 import { computed } from 'vue'
+import speechRecognitionEngineManager from '@/modules/speech-recognition-engine-manager'
 import orderBy from 'lodash/orderBy'
-import { useSettingsStore } from '@/features/settings/store'
+import { capitalize } from '@/utils/text.ts'
+import { groupOptions } from '@/utils/select.ts'
 
 const options = computed(() =>
   orderBy(
-    [
-      { label: 'Google Cloud', value: 'google-cloud' },
-      { label: 'Microsoft Azure', value: 'microsoft-azure' },
-      { label: 'Amazon Transcribe', value: 'amazon-transcribe' },
-      { label: 'IBM Watson', value: 'ibm-watson' },
-      { label: 'OpenAI', value: 'openai' },
-      { label: 'Elevenlabs', value: 'elevenlabs' },
-      { label: 'Custom', value: 'custom' },
-    ].map(({ label, value }) => {
-      return {
-        label,
-        value,
-      }
-    }),
+    groupOptions(
+      orderBy(
+        speechRecognitionEngineManager.getEngines().map((engine) => {
+          // const disabled = engine.hasCredentials ? !engine.hasCredentials() : false
+          const disabled = false
+          return {
+            disabled,
+            label: engine.name,
+            value: engine.id,
+            category: capitalize(engine.category),
+            attrs: {
+              title: disabled ? 'Requires credentials' : '',
+            },
+          }
+        }),
+        ['disabled', 'label'],
+        ['asc', 'asc'],
+      ),
+      'category',
+    ),
+    'label',
+    'asc',
   ),
 )
-
-const settingsStore = useSettingsStore()
 </script>

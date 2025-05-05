@@ -1,6 +1,7 @@
 import { useSettingsStore } from '@/features/settings/store'
 import speech from '@google-cloud/speech'
 import once from 'lodash/once'
+import { store } from '@/plugins/speech-recognition-engines/google-cloud-speech-recognition/store'
 
 export default ({ useRecording, sampleRateHertz }: any) => {
   const settingsStore = useSettingsStore()
@@ -19,7 +20,7 @@ export default ({ useRecording, sampleRateHertz }: any) => {
             enableAutomaticPunctuation: true,
             model: 'latest_long',
             useEnhanced: true,
-            profanityFilter: settingsStore.speechProfanityFilter,
+            profanityFilter: store.getProperty('profanityFilter'),
           },
           singleUtterance: true,
           interimResults: true,

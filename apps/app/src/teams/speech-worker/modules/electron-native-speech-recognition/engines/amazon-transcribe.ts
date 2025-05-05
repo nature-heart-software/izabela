@@ -1,5 +1,5 @@
 import { useSettingsStore } from '@/features/settings/store'
-import { amazonTranscribeSpeechRecognitionPlugin } from '@/features/speech/store/plugins/amazon-transcribe.ts'
+import { store } from '@/plugins/speech-recognition-engines/amazon-transcribe-speech-recognition/store'
 import once from 'lodash/once'
 import { fromCognitoIdentityPool } from '@aws-sdk/credential-providers'
 import {
@@ -12,9 +12,9 @@ import { PassThrough } from 'stream'
 const getCredentials = async () => {
   const credentials = fromCognitoIdentityPool({
     clientConfig: {
-      region: amazonTranscribeSpeechRecognitionPlugin.getProperty('region'),
+      region: store.getProperty('region'),
     },
-    identityPoolId: amazonTranscribeSpeechRecognitionPlugin.getProperty(
+    identityPoolId: store.getProperty(
       'identityPoolId',
       true,
     ),
@@ -30,7 +30,7 @@ const getCredentials = async () => {
 export default ({ useRecording }: any) => {
   const settingsStore = useSettingsStore()
   let credentials: Awaited<ReturnType<typeof getCredentials>>
-  const region = amazonTranscribeSpeechRecognitionPlugin.getProperty('region')
+  const region = store.getProperty('region')
 
   async function refreshCredentials() {
     credentials = await getCredentials()

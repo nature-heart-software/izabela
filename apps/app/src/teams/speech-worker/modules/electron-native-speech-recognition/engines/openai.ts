@@ -1,8 +1,7 @@
 import once from 'lodash/once'
 import { Buffer } from 'buffer'
-
+import { store } from '@/plugins/speech-recognition-engines/openai-speech-recognition/store'
 import WebSocket from 'ws'
-import { openaiSpeechRecognitionPlugin } from '@/features/speech/store/plugins/openai.ts'
 import { useSettingsStore } from '@/features/settings/store'
 import { WebSocketSessionManager } from '@/teams/speech-worker/modules/electron-native-speech-recognition/websocket-session-manager.ts'
 
@@ -16,7 +15,7 @@ export default ({ useRecording }: any) => {
           headers: {
             Authorization:
               'Bearer ' +
-              openaiSpeechRecognitionPlugin.getProperty('apiKey', true),
+              store.getProperty('apiKey', true),
             'OpenAI-Beta': 'realtime=v1',
           },
         },

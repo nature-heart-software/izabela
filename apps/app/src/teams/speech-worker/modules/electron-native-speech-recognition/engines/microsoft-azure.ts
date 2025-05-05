@@ -1,14 +1,13 @@
 import { useSettingsStore } from '@/features/settings/store'
-import { microsoftAzureSpeechRecognitionPlugin } from '@/features/speech/store/plugins/microsoft-azure'
 import once from 'lodash/once'
-
 import sdk from 'microsoft-cognitiveservices-speech-sdk'
+import { store } from '@/plugins/speech-recognition-engines/microsoft-azure-speech-recognition/store'
 
 export default ({ useRecording }: any) => {
   const settingsStore = useSettingsStore()
   const speechConfig = sdk.SpeechConfig.fromSubscription(
-    microsoftAzureSpeechRecognitionPlugin.getProperty('apiKey', true),
-    microsoftAzureSpeechRecognitionPlugin.getProperty('region'),
+    store.getProperty('apiKey', true),
+    store.getProperty('region'),
   )
   speechConfig.speechRecognitionLanguage = settingsStore.speechInputLanguage
 

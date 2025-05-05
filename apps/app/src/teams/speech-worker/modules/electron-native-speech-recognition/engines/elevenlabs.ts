@@ -10,7 +10,7 @@ import { v4 as uuid } from 'uuid'
 import { Readable } from 'stream'
 import { FileWriter } from 'wav'
 import { promisify } from 'util'
-import { elevenlabsSpeechRecognitionPlugin } from '@/features/speech/store/plugins/elevenlabs'
+import { store } from '@/plugins/speech-recognition-engines/elevenlabs-speech-recognition/store'
 
 const unlinkAsync = promisify(unlink)
 
@@ -18,7 +18,7 @@ globalThis.Blob = (buffer as any).Blob
 
 export default ({ useRecording }: any) => {
   const client = new ElevenLabsClient({
-    apiKey: elevenlabsSpeechRecognitionPlugin.getProperty('apiKey', true),
+    apiKey: store.getProperty('apiKey', true),
   })
 
   return {

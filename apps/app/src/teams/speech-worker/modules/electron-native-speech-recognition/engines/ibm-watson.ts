@@ -1,17 +1,17 @@
 import once from 'lodash/once'
-import { ibmWatsonSpeechRecognitionPlugin } from '@/features/speech/store/plugins/ibm-watson.ts'
 import { IamAuthenticator } from 'ibm-watson/auth'
 import SpeechToTextV1 from 'ibm-watson/speech-to-text/v1'
 import { SpeechModel } from 'ibm-watson/speech-to-text/v1-generated'
 import { useSettingsStore } from '@/features/settings/store'
+import { store } from '@/plugins/speech-recognition-engines/ibm-watson-speech-recognition/store'
 
 export default ({ useRecording }: any) => {
   const settingsStore = useSettingsStore()
   const speechToText = new SpeechToTextV1({
     authenticator: new IamAuthenticator({
-      apikey: ibmWatsonSpeechRecognitionPlugin.getProperty('apiKey', true),
+      apikey: store.getProperty('apiKey', true),
     }),
-    serviceUrl: ibmWatsonSpeechRecognitionPlugin.getProperty('url'),
+    serviceUrl: store.getProperty('url'),
   })
   let models: SpeechModel[] = []
   speechToText.listModels().then((speechModels) => {
