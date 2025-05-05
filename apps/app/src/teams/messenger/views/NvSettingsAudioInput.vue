@@ -52,9 +52,7 @@
                 </NvGroup>
                 <NvDivider direction="horizontal" />
                 <template v-if="currentEngineSettingsComponent">
-                  <component
-                    :is="currentEngineSettingsComponent"
-                  />
+                  <component :is="currentEngineSettingsComponent" />
                 </template>
               </NvStack>
             </NvCard>
