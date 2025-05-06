@@ -1,8 +1,7 @@
 import { definePluginStore } from '@/store'
 import { ENGINE_ID } from './shared.ts'
 
-const exposedProperties = {
-}
+const exposedProperties = {}
 
 export const store = definePluginStore(
   ENGINE_ID,

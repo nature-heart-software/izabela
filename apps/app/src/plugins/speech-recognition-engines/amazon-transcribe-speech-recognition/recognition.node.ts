@@ -14,10 +14,7 @@ const getCredentials = async () => {
     clientConfig: {
       region: store.getProperty('region'),
     },
-    identityPoolId: store.getProperty(
-      'identityPoolId',
-      true,
-    ),
+    identityPoolId: store.getProperty('identityPoolId', true),
   })
   const res = await credentials()
   return res as {

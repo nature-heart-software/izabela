@@ -12,9 +12,7 @@ export default ({ useRecording }: any) => {
         'wss://api.openai.com/v1/realtime?intent=transcription',
         {
           headers: {
-            Authorization:
-              'Bearer ' +
-              store.getProperty('apiKey', true),
+            Authorization: 'Bearer ' + store.getProperty('apiKey', true),
             'OpenAI-Beta': 'realtime=v1',
           },
         },
