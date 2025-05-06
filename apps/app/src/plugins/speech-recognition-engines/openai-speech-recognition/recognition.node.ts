@@ -1,10 +1,9 @@
 import once from 'lodash/once'
 import { Buffer } from 'buffer'
-import { store } from '@/plugins/speech-recognition-engines/openai-speech-recognition/store'
 import WebSocket from 'ws'
 import { useSettingsStore } from '@/features/settings/store'
 import { WebSocketSessionManager } from '@/teams/speech-worker/modules/electron-native-speech-recognition/websocket-session-manager.ts'
-
+import {store} from './store.ts'
 export default ({ useRecording }: any) => {
   const manager = new WebSocketSessionManager({
     sessionMaxAge: 30 * 60 * 1000,

@@ -9,6 +9,7 @@ export interface SpeechRecognitionEngine {
   category: string
   getCredentials: () => Credentials
   hasCredentials?: () => boolean
-  settingsComponent: Component
+  settingsComponent?: Component | null
+  recognitionFn?: (context: any) => any
   store: ReturnType<typeof definePluginStore>
 }

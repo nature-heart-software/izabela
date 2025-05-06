@@ -1,7 +1,7 @@
 import { useSettingsStore } from '@/features/settings/store'
 import once from 'lodash/once'
 import sdk from 'microsoft-cognitiveservices-speech-sdk'
-import { store } from '@/plugins/speech-recognition-engines/microsoft-azure-speech-recognition/store'
+import {store} from './store.ts'
 
 export default ({ useRecording }: any) => {
   const settingsStore = useSettingsStore()

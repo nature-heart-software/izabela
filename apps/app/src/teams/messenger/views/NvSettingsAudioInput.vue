@@ -50,8 +50,8 @@
                     "
                   />
                 </NvGroup>
-                <NvDivider direction="horizontal" />
                 <template v-if="currentEngineSettingsComponent">
+                  <NvDivider direction="horizontal" />
                   <component
                     :is="currentEngineSettingsComponent"
                   />

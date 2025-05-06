@@ -1,19 +1,9 @@
 import speechRecognitionEngineManager from '@/modules/speech-recognition-engine-manager'
-import { ENGINE_ID, ENGINE_NAME } from './shared.ts'
-import { store } from './store.ts'
+import { ENGINE_ID } from './shared.ts'
+import engineOptions from './engine-options.ts'
 import NvSettings from './NvSettings.vue'
-const getCredentials = () => ({
-  apiKey: store.getProperty('apiKey', true),
-  region: store.getProperty('region'),
-})
-speechRecognitionEngineManager.registerEngine(ENGINE_ID, {
-  id: ENGINE_ID,
-  name: ENGINE_NAME,
-  store,
-  category: 'cloud',
-  getCredentials,
-  hasCredentials() {
-    return Object.values(getCredentials()).every(Boolean)
-  },
+
+export default speechRecognitionEngineManager.registerEngine(ENGINE_ID, {
+  ...engineOptions,
   settingsComponent: NvSettings,
 })

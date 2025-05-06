@@ -1,3 +1,4 @@
+import '@/plugins/node'
 import { app, BrowserWindow, protocol } from 'electron'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import path from 'path'

@@ -1,8 +1,7 @@
 import { useSettingsStore } from '@/features/settings/store'
 import speech from '@google-cloud/speech'
 import once from 'lodash/once'
-import { store } from '@/plugins/speech-recognition-engines/google-cloud-speech-recognition/store'
-
+import {store} from './store.ts'
 export default ({ useRecording, sampleRateHertz }: any) => {
   const settingsStore = useSettingsStore()
   const client = new speech.v1p1beta1.SpeechClient()

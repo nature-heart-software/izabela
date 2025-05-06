@@ -1,5 +1,4 @@
 import { useSettingsStore } from '@/features/settings/store'
-import { store } from '@/plugins/speech-recognition-engines/amazon-transcribe-speech-recognition/store'
 import once from 'lodash/once'
 import { fromCognitoIdentityPool } from '@aws-sdk/credential-providers'
 import {
@@ -8,6 +7,7 @@ import {
   TranscribeStreamingClient,
 } from '@aws-sdk/client-transcribe-streaming'
 import { PassThrough } from 'stream'
+import {store} from './store.ts'
 
 const getCredentials = async () => {
   const credentials = fromCognitoIdentityPool({

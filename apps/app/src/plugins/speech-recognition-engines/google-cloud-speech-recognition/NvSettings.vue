@@ -24,7 +24,7 @@
           class="shrink-0"
           @update:modelValue="
                             (value) =>
-                              store.getProperty('profanityFilter', value)
+                              store.setProperty('profanityFilter', value)
                           "
         />
       </NvGroup>

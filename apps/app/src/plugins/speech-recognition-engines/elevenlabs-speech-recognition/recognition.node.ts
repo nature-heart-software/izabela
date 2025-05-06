@@ -10,8 +10,7 @@ import { v4 as uuid } from 'uuid'
 import { Readable } from 'stream'
 import { FileWriter } from 'wav'
 import { promisify } from 'util'
-import { store } from '@/plugins/speech-recognition-engines/elevenlabs-speech-recognition/store'
-
+import {store} from './store.ts'
 const unlinkAsync = promisify(unlink)
 
 globalThis.Blob = (buffer as any).Blob

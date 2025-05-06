@@ -6,6 +6,7 @@ import { SpeechEngine } from '@/modules/speech-engine-manager/types'
 import { Key } from '@/types/keybinds'
 import { ENGINE_ID as defaultSpeechEngineId } from '@/plugins/speech-engines/say/shared'
 import { ENGINE_ID as defaultTranslationEngineId } from '@/plugins/translation-engines/google-cloud-translation/shared'
+import { ENGINE_ID as defaultSpeechRecognitionEngineId } from '@/plugins/speech-recognition-engines/google-cloud-speech-recognition/shared'
 import { useMessengerStateStore } from '@/teams/messenger/store'
 
 export const useSettingsStore = defineStore(
@@ -30,15 +31,7 @@ export const useSettingsStore = defineStore(
     const audioInput = ref<MediaDeviceInfo['label']>('default')
     const selectedSpeechEngine = ref<SpeechEngine['id']>(defaultSpeechEngineId)
     const selectedTranslationEngine = ref(defaultTranslationEngineId)
-    const selectedSpeechRecognitionEngine = ref<
-      | 'google-cloud'
-      | 'microsoft-azure'
-      | 'amazon-transcribe'
-      | 'ibm-watson'
-      | 'openai'
-      | 'elevenlabs'
-      | 'custom'
-    >('google-cloud')
+    const selectedSpeechRecognitionEngine = ref(defaultSpeechRecognitionEngineId)
     const updateChannel = ref(channel)
     const launchOnStartup = ref(true)
     const runAsAdmin = ref(false)
