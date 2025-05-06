@@ -183,7 +183,7 @@ export const ElectronMessengerWindow = () => {
       }
     })
 
-  const onMouseMove = (mouseX = 0, mouseY = 0) => {
+  const onMouseMove = (initialMouseX = 0, initialMouseY = 0) => {
     if (!hitboxesStore) return
     const window = getWindow()
     if (window) {
@@ -194,6 +194,7 @@ export const ElectronMessengerWindow = () => {
         const isWithinAnyHitboxes = hitboxes
           .filter(({ w, h }) => w && h)
           .some(({ x, y, w, h }: Hitbox) => {
+            const { x: mouseX, y: mouseY } =  screen.screenToDipPoint({ x: initialMouseX, y: initialMouseY })
             const isWithinXHitbox =
               mouseX >= windowX + x && mouseX <= windowX + x + w
             const isWithinYHitbox =
