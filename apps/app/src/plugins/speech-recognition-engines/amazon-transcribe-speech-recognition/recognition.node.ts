@@ -7,7 +7,7 @@ import {
   TranscribeStreamingClient,
 } from '@aws-sdk/client-transcribe-streaming'
 import { PassThrough } from 'stream'
-import {store} from './store.ts'
+import { store } from './store.ts'
 
 const getCredentials = async () => {
   const credentials = fromCognitoIdentityPool({
