@@ -3,7 +3,7 @@ import { Buffer } from 'buffer'
 import WebSocket from 'ws'
 import { useSettingsStore } from '@/features/settings/store'
 import { WebSocketSessionManager } from '@/teams/speech-worker/modules/electron-native-speech-recognition/websocket-session-manager.ts'
-import {store} from './store.ts'
+import { store } from './store.ts'
 export default ({ useRecording }: any) => {
   const manager = new WebSocketSessionManager({
     sessionMaxAge: 30 * 60 * 1000,
