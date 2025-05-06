@@ -1,9 +1,13 @@
-import { ENGINE_ID, ENGINE_NAME } from '@/plugins/speech-recognition-engines/elevenlabs-speech-recognition/shared.ts'
-import { store } from '@/plugins/speech-recognition-engines/elevenlabs-speech-recognition/store.ts'
+import { store } from './store.ts'
 import { SpeechRecognitionEngine } from '@/modules/speech-recognition-engine-manager/types.ts'
+import {
+  ENGINE_ID,
+  ENGINE_NAME,
+} from './shared.ts'
 
 const getCredentials = () => ({
-  apiKey: store.getProperty('apiKey', true),
+  apiKey: store.getProperty('identityPoolId', true),
+  endpoint: store.getProperty('region'),
 })
 export default {
   id: ENGINE_ID,

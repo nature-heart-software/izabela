@@ -1,5 +1,5 @@
-import { ENGINE_ID, ENGINE_NAME } from '@/plugins/speech-recognition-engines/custom-speech-recognition/shared.ts'
-import { store } from '@/plugins/speech-recognition-engines/custom-speech-recognition/store.ts'
+import { ENGINE_ID, ENGINE_NAME } from './shared.ts'
+import { store } from './store.ts'
 import { SpeechRecognitionEngine } from '@/modules/speech-recognition-engine-manager/types.ts'
 
 const getCredentials = () => ({

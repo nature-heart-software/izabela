@@ -1,15 +1,11 @@
-import { store } from '@/plugins/speech-recognition-engines/amazon-transcribe-speech-recognition/store.ts'
+import { ENGINE_ID, ENGINE_NAME } from './shared.ts'
+import { store } from './store.ts'
 import { SpeechRecognitionEngine } from '@/modules/speech-recognition-engine-manager/types.ts'
-import {
-  ENGINE_ID,
-  ENGINE_NAME,
-} from './shared.ts'
 
 const getCredentials = () => ({
-  apiKey: store.getProperty('identityPoolId', true),
-  endpoint: store.getProperty('region'),
+  apiKey: store.getProperty('apiKey', true),
 })
-export default {
+export default  {
   id: ENGINE_ID,
   name: ENGINE_NAME,
   store,

@@ -1,7 +1,7 @@
 import { useQuery } from 'vue-query'
 import axios from 'axios'
 import { store } from './store'
-import { ENGINE_ID } from '@/plugins/translation-engines/custom-translation/shared.ts'
+import { ENGINE_ID } from './shared.ts'
 
 export const getLanguagesQueryKey = () => [ENGINE_ID, 'get-languages']
 export const useGetLanguagesQuery = () =>
