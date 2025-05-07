@@ -2,7 +2,7 @@
   <NvStack :spacing="size === 'sm' ? 4 : 5">
     <NvGroup justify="apart" no-wrap>
       <NvStack>
-        <NvText type="label">Enable speech-to-text-to-speech</NvText>
+        <NvText type="label">Enable audio input</NvText>
       </NvStack>
       <NvSwitch
         :modelValue="settingsStore.enableSTTTS"
@@ -19,19 +19,33 @@
     >
       <NvStack :spacing="size === 'sm' ? 4 : 5">
         <NvFormItem label="Speech recognition engine">
-          <NvSpeechRecognitionEngineSelect />
-        </NvFormItem>
-        <NvFormItem label="Speech recognition language">
-          <NvSpeechInputLanguageSelect />
+          <NvSpeechRecognitionEngineSelect
+            :modelValue="settingsStore.selectedSpeechRecognitionEngine"
+            @update:modelValue="
+                      (value) => {
+                        settingsStore.$patch({
+                          selectedSpeechRecognitionEngine: value,
+                        })
+                      }
+                    "
+          />
         </NvFormItem>
         <NvDivider direction="horizontal" />
-        <NvFormItem label="Recording device">
-          <NvSoxAudioInputSelect class="!w-full" />
-        </NvFormItem>
-        <NvDivider direction="horizontal" />
-        <NvFormItem label="Speech recognition strategy">
-          <NvSpeechRecognitionStrategySelect />
-        </NvFormItem>
+        <NvAccessBlocker :allowed="engine ? engine.hasCredentials() : true" reason="Credentials required">
+          <NvStack :spacing="size === 'sm' ? 4 : 5">
+            <NvFormItem label="Speech recognition language">
+              <NvSpeechInputLanguageSelect />
+            </NvFormItem>
+            <NvDivider direction="horizontal" />
+            <NvFormItem label="Recording device">
+              <NvSoxAudioInputSelect class="!w-full" />
+            </NvFormItem>
+            <NvDivider direction="horizontal" />
+            <NvFormItem label="Speech recognition strategy">
+              <NvSpeechRecognitionStrategySelect />
+            </NvFormItem>
+          </NvStack>
+        </NvAccessBlocker>
       </NvStack>
     </NvAccessBlocker>
   </NvStack>
@@ -51,9 +65,15 @@ import NvSoxAudioInputSelect from '@/features/audio/components/inputs/NvSoxAudio
 import NvSpeechRecognitionStrategySelect from '@/features/speech/components/inputs/NvSpeechRecognitionStrategySelect.vue'
 import NvSpeechRecognitionEngineSelect from '@/features/speech/components/inputs/NvSpeechRecognitionEngineSelect.vue'
 import { useSettingsStore } from '@/features/settings/store'
-import { PropType } from 'vue'
+import { computed, PropType } from 'vue'
+import speechRecognitionEngineManager from '@/modules/speech-recognition-engine-manager'
 
 const settingsStore = useSettingsStore()
+const engine = computed(() => {
+  return speechRecognitionEngineManager.getEngineById(
+    settingsStore.selectedSpeechRecognitionEngine,
+  )
+})
 const props = defineProps({
   size: {
     type: String as PropType<'sm' | 'md'>,
