@@ -1,10 +1,10 @@
 <template>
-    <NvSpeechRecordingLogo
-      v-if="settingsStore.enableSTTTS && speechRecognitionStore.recording"
-    />
-    <NvSpeechSynthesizer />
-    <NvSpeechListener />
-    <NvAudioInputUpdater />
+  <NvSpeechRecordingLogo
+    v-if="settingsStore.enableSTTTS && speechRecognitionStore.recording"
+  />
+  <NvSpeechSynthesizer />
+  <NvSpeechListener />
+  <NvAudioInputUpdater />
 </template>
 <style lang="scss">
 body {

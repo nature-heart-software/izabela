@@ -1,14 +1,14 @@
 <template>
-    <div
-      :style="{
-        opacity: settingsStore.backgroundDimOpacity / 100,
-        zIndex: -1,
-      }"
-      class="fixed w-full h-full bg-black"
-    ></div>
-    <NvOverlayInput
-      class="w-[720px] fixed bottom-[60px] left-1/2 transform -translate-x-1/2"
-    />
+  <div
+    :style="{
+      opacity: settingsStore.backgroundDimOpacity / 100,
+      zIndex: -1,
+    }"
+    class="fixed w-full h-full bg-black"
+  ></div>
+  <NvOverlayInput
+    class="w-[720px] fixed bottom-[60px] left-1/2 transform -translate-x-1/2"
+  />
 </template>
 <style lang="scss">
 body {
