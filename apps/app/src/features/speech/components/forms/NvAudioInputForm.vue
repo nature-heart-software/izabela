@@ -31,7 +31,7 @@
           />
         </NvFormItem>
         <NvDivider direction="horizontal" />
-        <NvAccessBlocker :allowed="engine?.hasCredentials ? engine.hasCredentials() : true" reason="Credentials required">
+        <NvAccessBlocker :allowed="engine ? engine.hasCredentials() : true" reason="Credentials required">
           <NvStack :spacing="size === 'sm' ? 4 : 5">
             <NvFormItem label="Speech recognition language">
               <NvSpeechInputLanguageSelect />

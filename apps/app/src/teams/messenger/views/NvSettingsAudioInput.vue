@@ -55,7 +55,7 @@
               </NvStack>
             </NvCard>
             <NvCard>
-              <NvAccessBlocker :allowed="settingsStore.enableSTTTS ? engine?.hasCredentials ? engine.hasCredentials() : true : false" :reason="settingsStore.enableSTTTS ? 'Credentials required' : 'Audio input needs to be enabled'">
+              <NvAccessBlocker :allowed="settingsStore.enableSTTTS ? engine ? engine.hasCredentials() : true : false" :reason="settingsStore.enableSTTTS ? 'Credentials required' : 'Audio input needs to be enabled'">
                 <NvAudioInputFormPart />
               </NvAccessBlocker>
             </NvCard>

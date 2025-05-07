@@ -136,9 +136,9 @@ export default () => {
     () => speechRecognitionStore.recording,
     () => {
       if (speechRecognitionStore.recording) {
-        speechRecognitionEngine?.startStream()
+        speechRecognitionEngine?.startStream?.()
       } else {
-        speechRecognitionEngine?.stopStream()
+        speechRecognitionEngine?.stopStream?.()
         // console.log(Array.from(pendingMessages.values()).map((m) => m.id))
         pendingMessages.forEach((pendingMessage) => pendingMessage.end())
         rollingBuffer = []
@@ -149,7 +149,7 @@ export default () => {
   return () => {
     console.log('Stopping native speech recognition...')
     recorder.stop()
-    speechRecognitionEngine.cleanup()
+    speechRecognitionEngine?.cleanup?.()
     stopWatch()
   }
 }
