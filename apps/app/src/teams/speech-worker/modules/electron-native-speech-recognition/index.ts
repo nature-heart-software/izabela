@@ -130,7 +130,9 @@ export default () => {
     },
   }
 
-  const speechRecognitionEngine = speechRecognitionEngineManager.getEngineById(settingsStore.selectedSpeechRecognitionEngine)?.recognitionFn?.(context)
+  const speechRecognitionEngine = speechRecognitionEngineManager
+    .getEngineById(settingsStore.selectedSpeechRecognitionEngine)
+    ?.recognitionFn?.(context)
 
   const stopWatch = watch(
     () => speechRecognitionStore.recording,

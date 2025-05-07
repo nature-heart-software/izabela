@@ -31,7 +31,9 @@ export const useSettingsStore = defineStore(
     const audioInput = ref<MediaDeviceInfo['label']>('default')
     const selectedSpeechEngine = ref<SpeechEngine['id']>(defaultSpeechEngineId)
     const selectedTranslationEngine = ref(defaultTranslationEngineId)
-    const selectedSpeechRecognitionEngine = ref(defaultSpeechRecognitionEngineId)
+    const selectedSpeechRecognitionEngine = ref(
+      defaultSpeechRecognitionEngineId,
+    )
     const updateChannel = ref(channel)
     const launchOnStartup = ref(true)
     const runAsAdmin = ref(false)

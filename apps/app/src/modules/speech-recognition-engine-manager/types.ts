@@ -10,10 +10,12 @@ export interface SpeechRecognitionEngine {
   getCredentials: () => Credentials
   hasCredentials: () => boolean
   settingsComponent?: Component | null
-  recognitionFn?: (context: any) => {
-    startStream: () => void,
-    stopStream: () => void,
-    cleanup: () => void,
-  } | undefined
+  recognitionFn?: (context: any) =>
+    | {
+        startStream: () => void
+        stopStream: () => void
+        cleanup: () => void
+      }
+    | undefined
   store: ReturnType<typeof definePluginStore>
 }

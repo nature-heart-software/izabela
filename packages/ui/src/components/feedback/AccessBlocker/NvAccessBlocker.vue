@@ -1,5 +1,8 @@
 <template>
-  <StAccessBlocker v-bind="props" :class="[!props.allowed && 'overflow-hidden']">
+  <StAccessBlocker
+    v-bind="props"
+    :class="[!props.allowed && 'overflow-hidden']"
+  >
     <slot />
     <Transition class="transition">
       <StAccessBlockerReason v-if="!props.allowed">

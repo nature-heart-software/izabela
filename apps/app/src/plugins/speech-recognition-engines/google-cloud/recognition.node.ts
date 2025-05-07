@@ -1,7 +1,7 @@
 import { useSettingsStore } from '@/features/settings/store'
 import speech from '@google-cloud/speech'
 import once from 'lodash/once'
-import {store} from './store.ts'
+import { store } from './store.ts'
 import engine from './register.node.ts'
 
 export default ({ useRecording, sampleRateHertz }: any) => {

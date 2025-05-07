@@ -1,9 +1,6 @@
 import { store } from './store.ts'
 import { SpeechRecognitionEngine } from '@/modules/speech-recognition-engine-manager/types.ts'
-import {
-  ENGINE_ID,
-  ENGINE_NAME,
-} from './shared.ts'
+import { ENGINE_ID, ENGINE_NAME } from './shared.ts'
 
 const getCredentials = () => ({
   apiKey: store.getProperty('identityPoolId', true),

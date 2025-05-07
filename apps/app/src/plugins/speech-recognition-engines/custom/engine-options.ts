@@ -2,8 +2,7 @@ import { ENGINE_ID, ENGINE_NAME } from './shared.ts'
 import { store } from './store.ts'
 import { SpeechRecognitionEngine } from '@/modules/speech-recognition-engine-manager/types.ts'
 
-const getCredentials = () => ({
-})
+const getCredentials = () => ({})
 export default {
   id: ENGINE_ID,
   name: ENGINE_NAME,
@@ -12,5 +11,5 @@ export default {
   getCredentials,
   hasCredentials() {
     return Object.values(getCredentials()).every(Boolean)
-  }
+  },
 } as SpeechRecognitionEngine

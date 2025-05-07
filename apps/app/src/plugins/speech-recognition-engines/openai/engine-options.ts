@@ -5,7 +5,7 @@ import { SpeechRecognitionEngine } from '@/modules/speech-recognition-engine-man
 const getCredentials = () => ({
   apiKey: store.getProperty('apiKey', true),
 })
-export default  {
+export default {
   id: ENGINE_ID,
   name: ENGINE_NAME,
   store,

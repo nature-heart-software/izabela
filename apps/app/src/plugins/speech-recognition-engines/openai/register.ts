@@ -5,5 +5,5 @@ import NvSettings from './NvSettings.vue'
 
 export default speechRecognitionEngineManager.registerEngine(ENGINE_ID, {
   ...engineOptions,
-  settingsComponent: NvSettings
+  settingsComponent: NvSettings,
 })

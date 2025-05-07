@@ -84,6 +84,6 @@ export const definePluginStore = <S extends Record<any, any>>(
     },
     getState() {
       return usePluginStore()
-    }
+    },
   }
 }

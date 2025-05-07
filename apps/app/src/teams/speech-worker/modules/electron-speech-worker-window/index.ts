@@ -174,7 +174,9 @@ export const ElectronSpeechWindow = () => {
         settingsStore?.soxPreRecordingChunks,
         settingsStore?.soxPostRecordingChunks,
         settingsStore?.speechProfanityFilter,
-        ...speechRecognitionEngineManager.getEngines().map((e) => e.store.getState())
+        ...speechRecognitionEngineManager
+          .getEngines()
+          .map((e) => e.store.getState()),
       ],
       restartNativeSpeechRecognition,
       { deep: true, immediate: true },

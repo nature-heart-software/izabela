@@ -10,7 +10,7 @@ import { v4 as uuid } from 'uuid'
 import { Readable } from 'stream'
 import { FileWriter } from 'wav'
 import { promisify } from 'util'
-import {store} from './store.ts'
+import { store } from './store.ts'
 import engine from './register.node.ts'
 const unlinkAsync = promisify(unlink)
 

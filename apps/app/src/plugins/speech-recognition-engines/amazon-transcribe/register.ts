@@ -7,4 +7,3 @@ export default speechRecognitionEngineManager.registerEngine(ENGINE_ID, {
   ...engineOptions,
   settingsComponent: NvSettings,
 })
-

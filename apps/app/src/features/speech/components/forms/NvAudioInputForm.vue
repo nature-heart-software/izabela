@@ -22,16 +22,19 @@
           <NvSpeechRecognitionEngineSelect
             :modelValue="settingsStore.selectedSpeechRecognitionEngine"
             @update:modelValue="
-                      (value) => {
-                        settingsStore.$patch({
-                          selectedSpeechRecognitionEngine: value,
-                        })
-                      }
-                    "
+              (value) => {
+                settingsStore.$patch({
+                  selectedSpeechRecognitionEngine: value,
+                })
+              }
+            "
           />
         </NvFormItem>
         <NvDivider direction="horizontal" />
-        <NvAccessBlocker :allowed="engine ? engine.hasCredentials() : true" reason="Credentials required">
+        <NvAccessBlocker
+          :allowed="engine ? engine.hasCredentials() : true"
+          reason="Credentials required"
+        >
           <NvStack :spacing="size === 'sm' ? 4 : 5">
             <NvFormItem label="Speech recognition language">
               <NvSpeechInputLanguageSelect />

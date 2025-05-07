@@ -26,15 +26,22 @@
                   <NvSwitch
                     class="shrink-0"
                     :modelValue="settingsStore.enableSTTTS"
-                    @update:modelValue="(value) => settingsStore.$patch({ enableSTTTS: value })"
+                    @update:modelValue="
+                      (value) => settingsStore.$patch({ enableSTTTS: value })
+                    "
                   />
                 </NvGroup>
                 <NvDivider direction="horizontal" />
-                <NvAccessBlocker :allowed="settingsStore.enableSTTTS" :reason="'Audio input needs to be enabled'">
+                <NvAccessBlocker
+                  :allowed="settingsStore.enableSTTTS"
+                  :reason="'Audio input needs to be enabled'"
+                >
                   <NvStack spacing="5">
                     <NvFormItem label="Speech recognition engine">
                       <NvSpeechRecognitionEngineSelect
-                        :modelValue="settingsStore.selectedSpeechRecognitionEngine"
+                        :modelValue="
+                          settingsStore.selectedSpeechRecognitionEngine
+                        "
                         @update:modelValue="
                           (value) => {
                             settingsStore.$patch({
@@ -46,16 +53,27 @@
                     </NvFormItem>
                     <template v-if="currentEngineSettingsComponent">
                       <NvDivider direction="horizontal" />
-                      <component
-                        :is="currentEngineSettingsComponent"
-                      />
+                      <component :is="currentEngineSettingsComponent" />
                     </template>
                   </NvStack>
                 </NvAccessBlocker>
               </NvStack>
             </NvCard>
             <NvCard>
-              <NvAccessBlocker :allowed="settingsStore.enableSTTTS ? engine ? engine.hasCredentials() : true : false" :reason="settingsStore.enableSTTTS ? 'Credentials required' : 'Audio input needs to be enabled'">
+              <NvAccessBlocker
+                :allowed="
+                  settingsStore.enableSTTTS
+                    ? engine
+                      ? engine.hasCredentials()
+                      : true
+                    : false
+                "
+                :reason="
+                  settingsStore.enableSTTTS
+                    ? 'Credentials required'
+                    : 'Audio input needs to be enabled'
+                "
+              >
                 <NvAudioInputFormPart />
               </NvAccessBlocker>
             </NvCard>
