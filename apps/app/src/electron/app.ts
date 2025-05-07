@@ -77,6 +77,7 @@ const App = () => {
     app.commandLine.appendSwitch('disable-renderer-backgrounding')
     app.commandLine.appendSwitch('ignore-certificate-errors')
     app.commandLine.appendSwitch('wm-window-animations-disabled')
+    if (import.meta.env.DEV) app.commandLine.appendSwitch ("disable-http-cache");
 
     /* Disabling Hardware Acceleration does the following:
      * - fixes ui freeze in DevTools when unfocused
