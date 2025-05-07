@@ -5,22 +5,7 @@
       <NvStack spacing="4">
         <NvCard>
           <NvStack>
-            <NvGroup justify="apart">
-              <NvGroup>
-                <NvText type="label">Enable audio input</NvText>
-                <NvText>(optional)</NvText>
-              </NvGroup>
-              <NvSwitch
-                :modelValue="settingsStore.enableSTTTS"
-                @update:modelValue="
-                  (value) => {
-                    settingsStore.$patch({
-                      enableSTTTS: value,
-                    })
-                  }
-                "
-              />
-            </NvGroup>
+            <NvText type="label">Audio input</NvText>
             <NvText
               >Generate audio using your voice (speech-to-text-to-speech)
             </NvText>
@@ -30,36 +15,49 @@
             </NvText>
           </NvStack>
         </NvCard>
-        <div v-if="settingsStore.enableSTTTS" class="pl-8">
+        <div class="pl-8">
           <NvStack spacing="4">
             <NvCard>
               <NvStack spacing="5">
-                <NvGroup align="start" justify="apart" no-wrap spacing="5">
+                <NvGroup justify="apart" no-wrap>
                   <NvStack>
-                    <NvText type="label">Speech recognition engine</NvText>
-                    <NvText>Select the speech recognition engine to use</NvText>
+                    <NvText type="label">Enable audio input</NvText>
                   </NvStack>
-                  <NvSpeechRecognitionEngineSelect
-                    :modelValue="settingsStore.selectedSpeechRecognitionEngine"
-                    @update:modelValue="
-                      (value) => {
-                        settingsStore.$patch({
-                          selectedSpeechRecognitionEngine: value,
-                        })
-                      }
-                    "
+                  <NvSwitch
+                    class="shrink-0"
+                    :modelValue="settingsStore.enableSTTTS"
+                    @update:modelValue="(value) => settingsStore.$patch({ enableSTTTS: value })"
                   />
                 </NvGroup>
-                <template v-if="currentEngineSettingsComponent">
-                  <NvDivider direction="horizontal" />
-                  <component
-                    :is="currentEngineSettingsComponent"
-                  />
-                </template>
+                <NvDivider direction="horizontal" />
+                <NvAccessBlocker :allowed="settingsStore.enableSTTTS" :reason="'Audio input needs to be enabled'">
+                  <NvStack spacing="5">
+                    <NvFormItem label="Speech recognition engine">
+                      <NvSpeechRecognitionEngineSelect
+                        :modelValue="settingsStore.selectedSpeechRecognitionEngine"
+                        @update:modelValue="
+                          (value) => {
+                            settingsStore.$patch({
+                              selectedSpeechRecognitionEngine: value,
+                            })
+                          }
+                        "
+                      />
+                    </NvFormItem>
+                    <template v-if="currentEngineSettingsComponent">
+                      <NvDivider direction="horizontal" />
+                      <component
+                        :is="currentEngineSettingsComponent"
+                      />
+                    </template>
+                  </NvStack>
+                </NvAccessBlocker>
               </NvStack>
             </NvCard>
             <NvCard>
-              <NvAudioInputFormPart />
+              <NvAccessBlocker :allowed="settingsStore.enableSTTTS ? engine?.hasCredentials ? engine.hasCredentials() : true : false" :reason="settingsStore.enableSTTTS ? 'Credentials required' : 'Audio input needs to be enabled'">
+                <NvAudioInputFormPart />
+              </NvAccessBlocker>
             </NvCard>
           </NvStack>
         </div>
