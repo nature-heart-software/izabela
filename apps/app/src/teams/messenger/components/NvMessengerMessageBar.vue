@@ -61,16 +61,9 @@
                 data-v-step="translation-button"
                 icon-name="english-to-chinese"
                 size="sm"
-                @click.right.prevent.stop="
-                  settingsStore.$patch({
-                    enableTranslation: !settingsStore.enableTranslation,
-                  })
-                "
-                @click.ctrl.prevent.stop="
-                  settingsStore.$patch({
-                    enableTranslation: !settingsStore.enableTranslation,
-                  })
-                "
+                @click.middle.prevent.stop="toggleTranslation"
+                @click.right.prevent.stop="toggleTranslation"
+                @click.ctrl.prevent.stop="toggleTranslation"
               />
             </template>
           </NvTooltip>
@@ -153,4 +146,10 @@ import NvTranslationForm from '@/features/translation/components/forms/NvTransla
 const settingsStore = useSettingsStore()
 const messengerContext = inject('messenger')
 const route = useRoute()
+
+function toggleTranslation() {
+  settingsStore.$patch({
+    enableTranslation: !settingsStore.enableTranslation,
+  })
+}
 </script>

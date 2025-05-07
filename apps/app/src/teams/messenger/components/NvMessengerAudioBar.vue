@@ -107,16 +107,9 @@
                 data-v-step="audio-input-select"
                 icon-name="direction"
                 size="sm"
-                @click.right.prevent.stop="
-                  settingsStore.$patch({
-                    enableSTTTS: !settingsStore.enableSTTTS,
-                  })
-                "
-                @click.ctrl.prevent.stop="
-                  settingsStore.$patch({
-                    enableSTTTS: !settingsStore.enableSTTTS,
-                  })
-                "
+                @click.middle.prevent.stop="toggleSTTTS"
+                @click.right.prevent.stop="toggleSTTTS"
+                @click.ctrl.prevent.stop="toggleSTTTS"
                 >Input
               </NvButton>
             </template>
@@ -151,5 +144,10 @@ const speechStore = useSpeechStore()
 const settingsStore = useSettingsStore()
 const messengerContext = inject('messenger')
 const route = useRoute()
-const { ElectronSpeechWorkerWindow } = window
+
+function toggleSTTTS() {
+  settingsStore.$patch({
+    enableSTTTS: !settingsStore.enableSTTTS,
+  })
+}
 </script>
