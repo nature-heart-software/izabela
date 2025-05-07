@@ -8,6 +8,7 @@ import { NvLoading } from '@packages/ui'
 import VueJsTour from '@globalhive/vuejs-tour'
 import '@globalhive/vuejs-tour/dist/style.css'
 import './styles'
+import { loadStores } from '@/store/stores.ts'
 
 const vueQueryPluginOptions: VueQueryPluginOptions = {
   queryClientConfig: {
@@ -26,6 +27,8 @@ const app = createApp(App)
   .use(NvLoading)
   .use(VueJsTour)
 
-app.mount('#app')
+loadStores()
+  .then(() => app.mount('#app'))
+
 
 app.config.warnHandler = () => null

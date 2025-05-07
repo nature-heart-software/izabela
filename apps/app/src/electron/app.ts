@@ -25,6 +25,7 @@ import { createOverlayWindow } from '@/teams/overlay/electron/background'
 import './game-overlay'
 import gameOverlay from '@/electron/game-overlay.ts'
 import { gkl } from '@/modules/electron-keybinding/utils.ts'
+import { loadStores } from '@/store/stores.ts'
 
 const App = () => {
   const isDevelopment = import.meta.env.DEV
@@ -56,6 +57,10 @@ const App = () => {
     createApp(h({})).use(
       createPinia().use((electronPiniaPlugin.default || electronPiniaPlugin)()),
     )
+  }
+
+  const registerStores = () => {
+    return loadStores()
   }
 
   const startGameOverlay = async () =>
@@ -183,6 +188,7 @@ const App = () => {
       exec('Register app listeners', () => addEventListeners()),
       exec('Configure app defaults', () => configureAppDefaults()),
       exec('Register electron-pinia', () => registerElectronPinia()),
+      exec('Load stores', () => registerStores()),
       /* Check if app needs to run as admin before continuing */
       exec('Register startup', () => registerElectronStartup()),
     ]).then(async () => {
