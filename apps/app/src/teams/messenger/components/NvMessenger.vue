@@ -27,6 +27,8 @@
         "
         @hidden="
           (instance) => {
+            // forces refresh of pages when it's opened again
+            router.push({ path: '/' })
             instance.popperInstance?.update()
           }
         "
@@ -92,9 +94,7 @@
           <RouterView
             @close="
               () => {
-                popover.value?.hide()
-                // forces refresh of pages when it's opened again
-                router.push({ path: '/' })
+                popover?.hide()
               }
             "
           />
