@@ -11,7 +11,7 @@
   <ThemeProvider :theme="tokens">
     <NvBackground />
     <div class="h-0">
-      <div id="router-overlay"></div>
+      <div id="router-overlay" ref="routerOverlay"></div>
       <NvMessenger
         v-if="isReady"
         :min-width="768"
@@ -46,7 +46,7 @@ import {
 } from '@/teams/messenger/store'
 import NvDebug from '@/teams/messenger/components/NvDebug.vue'
 import { useSettingsStore } from '@/features/settings/store'
-import { ref, watch } from 'vue'
+import { ref, watch, provide } from 'vue'
 import { socket } from '@/services'
 import { isGameOverlay } from '@/consts.ts'
 import { useDatabasesStore } from '@/features/databases/store'
@@ -64,6 +64,8 @@ const gameOverlayStore = useGameOverlayStore()
 const messengerWindowStore = useMessengerWindowStore()
 const displayOffscreenFocusFix = ref(isGameOverlay)
 
+const routerOverlay = ref()
+provide('router-overlay', routerOverlay)
 window.addEventListener('keydown', (event) => {
   const isCtrlOrCmdKey = event.ctrlKey || event.metaKey
 
