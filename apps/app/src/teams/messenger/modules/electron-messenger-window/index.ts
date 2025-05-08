@@ -188,20 +188,27 @@ export const ElectronMessengerWindow = () => {
     const window = getWindow()
     if (window) {
       if (!window.isDestroyed() && window.isVisible()) {
-        // const { x: mouseX = 0, y: mouseY = 0 } = event
         const [windowX, windowY] = window.getPosition()
         const { hitboxes } = hitboxesStore
         const isWithinAnyHitboxes = hitboxes
           .filter(({ w, h }) => w && h)
-          .some(({ x, y, w, h }: Hitbox) => {
+          .some((hitbox: Hitbox) => {
             const { x: mouseX, y: mouseY } = screen.screenToDipPoint({
               x: initialMouseX,
               y: initialMouseY,
             })
+            const scaleFactor = screen.getDisplayNearestPoint({
+              x: mouseX,
+              y: mouseY,
+            }).scaleFactor
+            const x1 = hitbox.x / scaleFactor
+            const y1 = hitbox.y / scaleFactor
+            const x2 = (hitbox.x + hitbox.w) / scaleFactor
+            const y2 = (hitbox.x + hitbox.w) / scaleFactor
             const isWithinXHitbox =
-              mouseX >= windowX + x && mouseX <= windowX + x + w
+              mouseX >= windowX + x1 && mouseX <= windowX + x2
             const isWithinYHitbox =
-              mouseY >= windowY + y && mouseY <= windowY + y + h
+              mouseY >= windowY + y1 && mouseY <= windowY + y2
             return isWithinXHitbox && isWithinYHitbox
           })
         if (isWithinAnyHitboxes) {
