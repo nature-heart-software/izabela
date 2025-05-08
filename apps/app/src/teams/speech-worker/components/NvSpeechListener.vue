@@ -11,7 +11,7 @@ const settingsStore = useSettingsStore()
 const speechRecognitionStore = useSpeechRecognitionStore()
 const mediaDevice = await getSoxMediaDeviceByIndex(settingsStore.soxDevice)
 const realTime = computed(
-    () => settingsStore.speechRecognitionStrategy === 'continuous',
+  () => settingsStore.speechRecognitionStrategy === 'continuous',
 )
 
 const stream = computedAsync(async () => {
