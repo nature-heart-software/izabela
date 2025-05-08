@@ -4,7 +4,7 @@
       ...props.instance.dialogProps,
       portalTarget: props.portalTarget,
       open: open,
-      'onUpdate:open': (value) => open = value,
+      'onUpdate:open': (value) => (open = value),
     }"
   >
     <template #title>
@@ -52,11 +52,15 @@ const open = ref(false)
 onMounted(() => {
   open.value = true
 })
-watch(open, (value) => {
-  if(!value) {
-    setTimeout(props.instance.remove, 1000)
-  }
-}, {
-  immediate: false
-})
+watch(
+  open,
+  (value) => {
+    if (!value) {
+      setTimeout(props.instance.remove, 1000)
+    }
+  },
+  {
+    immediate: false,
+  },
+)
 </script>
