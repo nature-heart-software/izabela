@@ -27,10 +27,13 @@
         <slot name="reference" />
       </Popover.Trigger>
       <Teleport :to="portalTarget" defer>
-        <div v-show="props.visible" class="fixed inset-0 pointer-events-auto" :style="{ zIndex: 9999 }"
-             @click.stop.prevent
-             @mouseup.stop.prevent
-             @mousedown.stop.prevent
+        <div
+          v-show="props.visible"
+          class="fixed inset-0 pointer-events-auto"
+          :style="{ zIndex: 9999 }"
+          @click.stop.prevent
+          @mouseup.stop.prevent
+          @mousedown.stop.prevent
         />
         <Popover.Positioner ref="positioner" :style="{ zIndex: 9999 }">
           <Popover.Content :hidden="false" asChild>
