@@ -27,12 +27,20 @@
         <slot name="reference" />
       </Popover.Trigger>
       <Teleport :to="portalTarget" defer>
+        <div
+          v-show="props.visible"
+          class="fixed inset-0 pointer-events-auto"
+          :style="{ zIndex: 9999 }"
+          @click.stop.prevent
+          @mouseup.stop.prevent
+          @mousedown.stop.prevent
+        />
         <Popover.Positioner ref="positioner" :style="{ zIndex: 9999 }">
           <Popover.Content :hidden="false" asChild>
             <div
               @click.stop.prevent
               @mouseup.stop.prevent
-              @mousedown.prevent.stop
+              @mousedown.stop.prevent
             >
               <Transition>
                 <StAutocomplete
@@ -95,6 +103,7 @@ import NvVirtualList from '@/components/miscellaneous/VirtualList/NvVirtualList.
 import NvVirtualListContainer from '@/components/miscellaneous/VirtualList/NvVirtualListContainer.vue'
 import get from 'lodash/get'
 import { Virtualizer } from '@tanstack/virtual-core'
+import { getElement } from '@/utils/vue'
 
 const props = defineProps(propsDefinition)
 const list = ref<
@@ -203,5 +212,5 @@ const onVisible = () => {
   loading.value = false
 }
 const injectedPortalTarget = inject('portal-target')
-const portalTarget = computed(() => unref(injectedPortalTarget) || 'body')
+const portalTarget = computed(() => getElement(injectedPortalTarget) || 'body')
 </script>

@@ -82,5 +82,8 @@ export const definePluginStore = <S extends Record<any, any>>(
       const pluginStore = usePluginStore()
       return pick(pluginStore.$state.pluginState, exposedProperties)
     },
+    getState() {
+      return usePluginStore()
+    },
   }
 }

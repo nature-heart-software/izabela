@@ -11,9 +11,8 @@
   <ThemeProvider :theme="tokens">
     <NvBackground />
     <div class="h-0">
-      <div id="router-overlay"></div>
+      <div id="router-overlay" ref="routerOverlay"></div>
       <NvMessenger
-        v-if="isReady"
         :min-width="768"
         :transform="messengerStore.position.transform"
         class="w-full h-full"
@@ -46,14 +45,13 @@ import {
 } from '@/teams/messenger/store'
 import NvDebug from '@/teams/messenger/components/NvDebug.vue'
 import { useSettingsStore } from '@/features/settings/store'
-import { ref, watch } from 'vue'
+import { ref, watch, provide } from 'vue'
 import { socket } from '@/services'
 import { isGameOverlay } from '@/consts.ts'
 import { useDatabasesStore } from '@/features/databases/store'
 import takeRight from 'lodash/takeRight'
 import pkg from '@root/package.json'
 import { useGameOverlayStore } from '@/features/game-overlay/store'
-import { storesStates } from '@/store'
 import { onIPCApplyProfile } from '@/electron/events/renderer.ts'
 import { useProfilesStore } from '@/features/profiles/store.ts'
 
@@ -64,6 +62,8 @@ const gameOverlayStore = useGameOverlayStore()
 const messengerWindowStore = useMessengerWindowStore()
 const displayOffscreenFocusFix = ref(isGameOverlay)
 
+const routerOverlay = ref()
+provide('router-overlay', routerOverlay)
 window.addEventListener('keydown', (event) => {
   const isCtrlOrCmdKey = event.ctrlKey || event.metaKey
 
@@ -105,26 +105,18 @@ if (!isGameOverlay) {
   })
 }
 
-const isReady = ref(false)
-
-Promise.all(
-  Object.values(storesStates).map((storeStates) => storeStates.$whenReady()),
-).then(() => (isReady.value = true))
-
 /* Need to wait for the stores to be ready before resetting states
  **/
 watch(
   () => settingsStore.runAsAdmin,
   (value) => {
-    if (isReady.value) {
-      if (!value) {
-        settingsStore.$patch({
-          enableOverlayWindow: false,
-        })
-        gameOverlayStore.$patch({
-          enableGameOverlay: false,
-        })
-      }
+    if (!value) {
+      settingsStore.$patch({
+        enableOverlayWindow: false,
+      })
+      gameOverlayStore.$patch({
+        enableGameOverlay: false,
+      })
     }
   },
 )

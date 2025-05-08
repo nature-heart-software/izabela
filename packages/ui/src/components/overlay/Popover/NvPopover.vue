@@ -17,8 +17,16 @@
       <Popover.Trigger asChild>
         <slot name="reference" />
       </Popover.Trigger>
-      <Teleport to="body">
-        <Popover.Positioner>
+      <Teleport :to="portalTarget" defer>
+        <div
+          v-show="open"
+          class="fixed inset-0 pointer-events-auto"
+          :style="{ zIndex: 9999 }"
+          @click.stop.prevent
+          @mouseup.stop.prevent
+          @mousedown.stop.prevent
+        />
+        <Popover.Positioner :style="{ zIndex: 9999 }">
           <Popover.Content :hidden="false">
             <Transition>
               <Card
@@ -36,14 +44,17 @@
   </Popover.Root>
 </template>
 <script lang="ts" setup>
-import { defineProps, ref } from 'vue'
+import { computed, defineProps, inject, ref } from 'vue'
 import { StPopover } from './popover.styled'
 import { props as propsDefinition } from './popover.shared'
 import { tokens } from '@/styles/tokens'
 import { Popover } from '@ark-ui/vue'
 import Card from '@/components/display/Card/NvCard.vue'
 import { rem } from 'polished'
+import { getElement } from '@/utils/vue'
 
 const open = ref(false)
 const props = defineProps(propsDefinition)
+const injectedPortalTarget = inject('portal-target')
+const portalTarget = computed(() => getElement(injectedPortalTarget) || 'body')
 </script>

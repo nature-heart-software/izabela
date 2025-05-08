@@ -6,16 +6,10 @@ import path from 'path'
 import { EXTERNALS_DIR } from '@/electron/utils.ts'
 import { useSettingsStore } from '@/features/settings/store'
 import takeRight from 'lodash/takeRight'
-import googleCloudSpeechRecognition from './engines/google-cloud.ts'
-import elevenlabsSpeechRecognition from './engines/elevenlabs.ts'
-import microsoftAzureSpeechRecognition from './engines/microsoft-azure.ts'
-import amazonTranscribeSpeechRecognition from './engines/amazon-transcribe.ts'
-import ibmWatsonSpeechRecognition from './engines/ibm-watson.ts'
-import openaiSpeechRecognition from './engines/openai.ts'
-import customSpeechRecognition from './engines/custom.ts'
 import { v4 as uuid } from 'uuid'
 import { Deferred } from '@packages/toolbox'
 import { ipcMain } from 'electron-postman'
+import speechRecognitionEngineManager from '@/modules/speech-recognition-engine-manager'
 
 export default () => {
   console.log('Starting native speech recognition...')
@@ -136,23 +130,17 @@ export default () => {
     },
   }
 
-  const speechRecognitionEngine = {
-    'google-cloud': googleCloudSpeechRecognition,
-    'microsoft-azure': microsoftAzureSpeechRecognition,
-    'amazon-transcribe': amazonTranscribeSpeechRecognition,
-    'ibm-watson': ibmWatsonSpeechRecognition,
-    openai: openaiSpeechRecognition,
-    elevenlabs: elevenlabsSpeechRecognition,
-    custom: customSpeechRecognition,
-  }[settingsStore.selectedSpeechRecognitionEngine](context)
+  const speechRecognitionEngine = speechRecognitionEngineManager
+    .getEngineById(settingsStore.selectedSpeechRecognitionEngine)
+    ?.recognitionFn?.(context)
 
   const stopWatch = watch(
     () => speechRecognitionStore.recording,
     () => {
       if (speechRecognitionStore.recording) {
-        speechRecognitionEngine.startStream()
+        speechRecognitionEngine?.startStream?.()
       } else {
-        speechRecognitionEngine.stopStream()
+        speechRecognitionEngine?.stopStream?.()
         // console.log(Array.from(pendingMessages.values()).map((m) => m.id))
         pendingMessages.forEach((pendingMessage) => pendingMessage.end())
         rollingBuffer = []
@@ -163,7 +151,7 @@ export default () => {
   return () => {
     console.log('Stopping native speech recognition...')
     recorder.stop()
-    speechRecognitionEngine.cleanup()
+    speechRecognitionEngine?.cleanup?.()
     stopWatch()
   }
 }

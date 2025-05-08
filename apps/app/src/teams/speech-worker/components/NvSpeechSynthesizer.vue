@@ -20,8 +20,7 @@ import { io } from 'socket.io-client'
 const speechStore = useSpeechStore()
 const settingsStore = useSettingsStore()
 const socket = io(`ws://localhost:${import.meta.env.VITE_SERVER_WS_PORT}`, {})
-// this ensures every store has been loaded
-speechEngineManager.getEngines().map((e) => e.store.getExposedProperties())
+
 const onMessage = async (payload: string | IzabelaMessage) => {
   console.log('Saying something:', payload)
   let message = null

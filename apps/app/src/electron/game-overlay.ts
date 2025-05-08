@@ -155,6 +155,9 @@ class GameOverlay {
     })
 
     window.webContents.on('paint', (_, __, image: Electron.NativeImage) => {
+      // this function can cause the whole software to crash when the windows
+      // display scale changes so let's mitigate this with a condition for now
+      if (!this.intercepting) return
       if (this.markQuit) {
         return
       }
@@ -171,6 +174,9 @@ class GameOverlay {
     })
 
     window.on('resize', () => {
+      // this function can cause the whole software to crash when the windows
+      // display scale changes so let's mitigate this with a condition for now
+      if (!this.intercepting) return
       this.Overlay!.sendWindowBounds(window.id, {
         rect: {
           x: window.getBounds().x,

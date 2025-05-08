@@ -1,5 +1,5 @@
 import '@/electron/renderer'
 import '@/modules/electron-debug/renderer'
-import './app'
 import '@/styles'
 import '@/plugins'
+import './app'

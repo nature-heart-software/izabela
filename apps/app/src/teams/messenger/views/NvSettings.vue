@@ -1,6 +1,7 @@
 <template>
   <div
     id="settings"
+    ref="settings"
     class="settings relative bg-gray-10/95 rounded p-4 overflow-hidden"
   >
     <div class="flex flex-col space-y-4 h-full">
@@ -72,7 +73,7 @@
               </NvStack>
             </div>
             <div class="settings__content flex-1 pl-4">
-              <div :id="id" class="h-full relative overflow-hidden">
+              <div ref="portalTarget" class="h-full relative overflow-hidden">
                 <div class="h-full relative">
                   <!-- View -->
                   <router-view v-slot="{ Component }">
@@ -93,7 +94,7 @@
       </div>
     </div>
     <template v-for="instance in instances">
-      <NvStoreDialog :instance="instance" portal-target="#settings" />
+      <NvStoreDialog :instance="instance" :portal-target="settings" />
     </template>
   </div>
 </template>
@@ -101,16 +102,16 @@
 import { NvButton, NvCard, NvStack, NvText, NvTooltip } from '@packages/ui'
 import NvStoreDialog from '@/teams/messenger/components/NvStoreDialog.vue'
 import { useRoute } from 'vue-router'
-import { v4 as uuid } from 'uuid'
-import { provide } from 'vue'
+import { provide, ref } from 'vue'
 import { useConfirmStore } from '@/store/use-confirm-store.ts'
 import { useMessengerStateStore } from '@/teams/messenger/store'
 import NvMarkForRestartMessage from '@/teams/messenger/components/NvMarkForRestartMessage.vue'
 import { isGameOverlay } from '@/consts.ts'
 import { useGetAppInfoQuery } from '@/features/app/queries.ts'
 
-const id = `_${uuid()}`
-provide('portal-target', `#${id}`)
+const settings = ref()
+const portalTarget = ref()
+provide('portal-target', portalTarget)
 
 const navigation = [
   {
