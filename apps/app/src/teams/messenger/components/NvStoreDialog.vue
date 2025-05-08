@@ -1,9 +1,11 @@
 <template>
   <NvDialog
-    v-model:open="open"
-    :portal-target="props.portalTarget"
-    v-bind="props.instance.dialogProps"
-    @close="props.instance.close"
+    v-bind="{
+      ...props.instance.dialogProps,
+      portalTarget: props.portalTarget,
+      open: open,
+      'onUpdate:open': (value) => open = value,
+    }"
   >
     <template #title>
       {{ props.instance.title }}
@@ -32,7 +34,7 @@
   </NvDialog>
 </template>
 <script lang="ts" setup>
-import { ref, PropType, onMounted } from 'vue'
+import { ref, PropType, onMounted, watch } from 'vue'
 import { NvButton, NvDialog, NvGroup } from '@packages/ui'
 import { StoreDialog } from '@/store/use-confirm-store'
 
@@ -49,5 +51,12 @@ const props = defineProps({
 const open = ref(false)
 onMounted(() => {
   open.value = true
+})
+watch(open, (value) => {
+  if(!value) {
+    setTimeout(props.instance.remove, 1000)
+  }
+}, {
+  immediate: false
 })
 </script>
