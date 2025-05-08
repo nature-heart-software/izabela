@@ -1,13 +1,25 @@
 <template>
-  <StDialogRoot v-model:open="dialogOpen" v-bind="props">
+  <StDialogRoot
+    v-bind="{
+      ...props,
+      open: dialogOpen,
+      'onUpdate:open': (value) => (dialogOpen = value),
+    }"
+  >
     <StDialogTrigger>
       <slot name="reference" />
     </StDialogTrigger>
-    <Teleport :to="props.portalTarget">
-      <div ref="newPortalTarget">
-        <StDialogBackdrop />
-        <StDialogPositioner>
-          <StDialogContentWrapper @click.self="closeDialog">
+    <Teleport :to="props.portalTarget" defer>
+      <Transition class="transition">
+        <StDialogBackdrop v-if="dialogOpen" />
+      </Transition>
+      <Transition class="transition">
+        <!-- v-if causes this error:  https://github.com/vuejs/core/issues/5657-->
+        <StDialogPositioner v-show="dialogOpen">
+          <StDialogContentWrapper
+            @mousedown.self="closeDialog"
+            ref="portalTarget"
+          >
             <StDialogContent>
               <NvCard>
                 <NvStack spacing="5">
@@ -37,7 +49,7 @@
             </StDialogContent>
           </StDialogContentWrapper>
         </StDialogPositioner>
-      </div>
+      </Transition>
     </Teleport>
   </StDialogRoot>
 </template>
@@ -61,27 +73,27 @@ import {
   StDialogTrigger,
 } from './dialog.styled'
 
-const newPortalTarget = ref()
-provide('portal-target', newPortalTarget)
+const portalTarget = ref()
+provide('portal-target', portalTarget)
 
 const props = defineProps({
   ...propsDefinition,
-  modelValue: {
+  open: {
     type: Boolean,
     default: undefined,
   },
 })
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:open'])
 
 const localOpen = ref(false)
 
 const dialogOpen = computed({
-  get: () =>
-    props.modelValue !== undefined ? props.modelValue : localOpen.value,
+  get: () => (props.open !== undefined ? props.open : localOpen.value),
   set: (value) => {
-    localOpen.value = value
-    emit('update:modelValue', value)
+    props.open !== undefined
+      ? emit('update:open', value)
+      : (localOpen.value = value)
   },
 })
 

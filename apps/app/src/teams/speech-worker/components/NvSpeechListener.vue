@@ -1,6 +1,6 @@
 <template></template>
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, watchEffect } from 'vue'
+import { computed, onBeforeUnmount, watch } from 'vue'
 import { getSoxMediaDeviceByIndex } from '@/utils/media-devices'
 import { useSettingsStore } from '@/features/settings/store'
 import hark from 'hark'
@@ -38,7 +38,7 @@ const speech = computed<any>((oldValue) => {
   return null
 })
 
-watchEffect((onCleanup) => {
+watch(speech, (onCleanup) => {
   speech.value?.on('speaking', onSpeechStarted)
   speech.value?.on('stopped_speaking', onSpeechStop)
   onCleanup(() => {
@@ -61,7 +61,7 @@ function onSpeechStop() {
   })
 }
 
-watchEffect(() => {
+watch([settingsStore.enableSTTTS, realTime], () => {
   if (settingsStore.enableSTTTS) {
     if (realTime.value) {
       console.log('Starting web speech recognition...')

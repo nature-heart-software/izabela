@@ -25,6 +25,7 @@ import { createOverlayWindow } from '@/teams/overlay/electron/background'
 import './game-overlay'
 import gameOverlay from '@/electron/game-overlay.ts'
 import { gkl } from '@/modules/electron-keybinding/utils.ts'
+import { loadStores } from '@/store/stores.ts'
 
 const App = () => {
   const isDevelopment = import.meta.env.DEV
@@ -58,6 +59,10 @@ const App = () => {
     )
   }
 
+  const registerStores = () => {
+    return loadStores()
+  }
+
   const startGameOverlay = async () =>
     app.whenReady().then(() => gameOverlay.start())
 
@@ -77,6 +82,7 @@ const App = () => {
     app.commandLine.appendSwitch('disable-renderer-backgrounding')
     app.commandLine.appendSwitch('ignore-certificate-errors')
     app.commandLine.appendSwitch('wm-window-animations-disabled')
+    if (import.meta.env.DEV) app.commandLine.appendSwitch('disable-http-cache')
 
     /* Disabling Hardware Acceleration does the following:
      * - fixes ui freeze in DevTools when unfocused
@@ -182,6 +188,7 @@ const App = () => {
       exec('Register app listeners', () => addEventListeners()),
       exec('Configure app defaults', () => configureAppDefaults()),
       exec('Register electron-pinia', () => registerElectronPinia()),
+      exec('Load stores', () => registerStores()),
       /* Check if app needs to run as admin before continuing */
       exec('Register startup', () => registerElectronStartup()),
     ]).then(async () => {

@@ -9,7 +9,6 @@ export type StoreDialog = {
   title?: string
   description?: string
   remove: () => void
-  close: () => void
   deferred: ReturnType<typeof Deferred>
   dialogProps?: Partial<InstanceType<typeof NvDialog>['$props']>
   actions: {
@@ -35,18 +34,18 @@ export const useConfirmStore = defineStore('confirm', () => {
         close: () => void
       }>()
       const id = uuid()
+      function remove() {
+        const index = instances.value.findIndex(
+          (instance) => instance.id === id,
+        )
+        if (index > -1) {
+          instances.value.splice(index, 1)
+        }
+      }
       instances.value.push({
         id,
         deferred: deferredPromise as any,
-        remove() {
-          const index = instances.value.findIndex(
-            (instance) => instance.id === id,
-          )
-          instances.value.splice(index, 1, {
-            ...instances.value[index],
-          })
-        },
-        close() {},
+        remove,
         ...options,
       })
 

@@ -1,4 +1,4 @@
-import { Comment, VNode } from 'vue'
+import { Comment, VNode, unref } from 'vue'
 
 export function isVNodeEmpty(
   slot: (d: object) => VNode | VNode[] | undefined | null,
@@ -12,4 +12,13 @@ export function isVNodeEmpty(
       ? vnodes.every((vnode) => vnode.type === Comment || !vnode.children)
       : vnodes.type === Comment || !vnodes.children)
   )
+}
+
+export function getElement(value: any): HTMLElement | null {
+  if (!value) return null
+  const unwrapped = unref(value)
+  if (unwrapped instanceof HTMLElement) return unwrapped
+  if (unwrapped?.$el instanceof HTMLElement) return unwrapped.$el
+  if (typeof unwrapped === 'string') return document.querySelector(unwrapped)
+  return null
 }

@@ -1,6 +1,7 @@
 <template>
   <template v-if="isListeningToKeys">
     <NvButton
+      ref="target"
       class="pointer-events-none"
       title="Press Esc to cancel. Hold to remove"
       v-bind="$attrs"
@@ -16,7 +17,7 @@
 <script lang="ts" setup>
 import { NvButton } from '@packages/ui'
 import { computed, PropType, Ref, ref, shallowRef, watch } from 'vue'
-import { useEventListener } from '@vueuse/core'
+import { useEventListener, onClickOutside } from '@vueuse/core'
 import { Key } from '@/types/keybinds'
 
 const props = defineProps({
@@ -52,6 +53,15 @@ const rawCodeAliases: Record<KeyboardEvent['code'], number> = {
   AltRight: 165,
 }
 const escTimeout = shallowRef<ReturnType<typeof setTimeout> | null>(null)
+
+const target = ref(null)
+
+onClickOutside(target, () => {
+  if (isListeningToKeys.value) {
+    cancelled.value = true
+    isListeningToKeys.value = false
+  }
+})
 
 useEventListener(document, 'keydown', (e) => {
   if (isListeningToKeys.value) {

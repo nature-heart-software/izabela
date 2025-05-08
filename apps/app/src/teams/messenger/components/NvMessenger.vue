@@ -1,33 +1,105 @@
 <template>
   <div class="messengerWrapper">
     <NvHitbox id="moveable" ref="moveableTarget" class="inline-flex">
-      <div
-        ref="messenger"
-        class="messenger bg-gray-10/95 rounded grid p-4 gap-4 grid-rows-3 grid-rows-none w-[768px]"
-        data-v-step="messenger-window"
+      <Tippy
+        ref="popover"
+        trigger="manual"
+        interactive
+        :append-to="routerOverlay"
+        max-width="none"
+        :offset="[0, tokens.spacing['4']]"
+        placement="top-start"
+        :hide-on-click="false"
+        @show="
+          (instance) => {
+            instance.popperInstance?.update()
+          }
+        "
+        @shown="
+          (instance) => {
+            instance.popperInstance?.update()
+          }
+        "
+        @create="
+          (instance) => {
+            instance.popperInstance?.update()
+          }
+        "
+        @hidden="
+          (instance) => {
+            // forces refresh of pages when it's opened again
+            router.push({ path: '/' })
+            instance.popperInstance?.update()
+          }
+        "
+        @mount="
+          (instance) => {
+            instance.popperInstance?.update()
+          }
+        "
+        @clickOutside="
+          (instance) => {
+            instance.popperInstance?.update()
+          }
+        "
+        @hide="
+          (instance) => {
+            instance.popperInstance?.update()
+          }
+        "
+        @trigger="
+          (instance) => {
+            instance.popperInstance?.update()
+          }
+        "
+        @destroy="
+          (instance) => {
+            instance.popperInstance?.update()
+          }
+        "
+        @untrigger="
+          (instance) => {
+            instance.popperInstance?.update()
+          }
+        "
       >
-        <!-- Top -->
-        <NvGroup :spacing="4">
-          <NvMessengerLinksBar />
-          <NvGroup :spacing="4" class="!flex-1">
-            <div class="moveable-handle cursor-all-scroll !flex-1">
-              <NvMessengerHandleBar />
-            </div>
-            <NvMessengerNavigationBar />
+        <div
+          ref="messenger"
+          class="messenger bg-gray-10/95 rounded grid p-4 gap-4 grid-rows-3 grid-rows-none w-[768px]"
+          data-v-step="messenger-window"
+        >
+          <!-- Top -->
+          <NvGroup :spacing="4">
+            <NvMessengerLinksBar />
+            <NvGroup :spacing="4" class="!flex-1">
+              <div class="moveable-handle cursor-all-scroll !flex-1">
+                <NvMessengerHandleBar />
+              </div>
+              <NvMessengerNavigationBar />
+            </NvGroup>
           </NvGroup>
-        </NvGroup>
 
-        <!-- Middle -->
-        <NvGroup :spacing="4" justify="between">
-          <NvMessengerAudioBar />
-          <NvMessengerMessageBar />
-        </NvGroup>
+          <!-- Middle -->
+          <NvGroup :spacing="4" justify="between">
+            <NvMessengerAudioBar />
+            <NvMessengerMessageBar />
+          </NvGroup>
 
-        <!-- Bottom -->
-        <NvGroup :spacing="4" grow>
-          <NvMessengerInputBar />
-        </NvGroup>
-      </div>
+          <!-- Bottom -->
+          <NvGroup :spacing="4" grow>
+            <NvMessengerInputBar />
+          </NvGroup>
+        </div>
+        <template #content>
+          <RouterView
+            @close="
+              () => {
+                popover?.hide()
+              }
+            "
+          />
+        </template>
+      </Tippy>
     </NvHitbox>
     <Moveable
       ref="moveable"
@@ -37,9 +109,9 @@
         top: 12,
         bottom: viewport.height - 12,
       }"
-      :dragTarget="doc.querySelector('.moveable-handle')"
+      :dragTarget="document.querySelector('.moveable-handle')"
       :draggable="true"
-      :elementGuidelines="[doc.querySelector('body')]"
+      :elementGuidelines="[document.querySelector('body')]"
       :preventClickEventOnDrag="false"
       :resizable="false"
       :rotatable="false"
@@ -66,12 +138,12 @@ import {
   ref,
   unref,
   watch,
+  inject,
 } from 'vue'
 import Moveable from 'vue3-moveable'
-import { NvGroup } from '@packages/ui'
+import { NvGroup, tokens } from '@packages/ui'
 import { RouteLocationRaw, useRouter } from 'vue-router'
 import NvHitbox from '@/modules/vue-hitboxes/NvHitbox.vue'
-import { useRouterViewPopover } from '@/features/router/hooks'
 import { useMessengerStore } from '@/teams/messenger/store'
 import NvMessengerInputBar from '@/teams/messenger/components/NvMessengerInputBar.vue'
 import NvMessengerAudioBar from '@/teams/messenger/components/NvMessengerAudioBar.vue'
@@ -83,6 +155,9 @@ import debounce from 'lodash/debounce'
 import { useElementSize, useEventListener, useWindowSize } from '@vueuse/core'
 import throttle from 'lodash/throttle'
 import { isGameOverlay } from '@/consts.ts'
+import { Tippy } from 'vue-tippy'
+
+const routerOverlay = inject('router-overlay')
 // import gsap from 'gsap'
 // const messengerWindowStore = useMessengerWindowStore()
 const messengerStore = useMessengerStore()
@@ -122,29 +197,23 @@ const messenger = ref()
 const moveable = ref()
 const moveableTarget = ref<ComponentPublicInstance>()
 
-const doc = document
-const settingsPopover = useRouterViewPopover({
-  popoverTarget: messenger,
-  popoverOptions: {
-    trigger: 'manual',
-  },
-})
-
+const popover = ref()
+const { document } = window
 const router = useRouter()
 const navigateTo = (location: RouteLocationRaw) => {
   if (
-    unref(settingsPopover.popover.value?.state)?.isShown &&
+    unref(popover.value?.state)?.isShown &&
     typeof location === 'object' &&
     'name' in location &&
     router.currentRoute.value.name === location.name
   ) {
-    settingsPopover.popover.value?.hide()
+    popover.value?.hide()
     return
   }
   router.push(location)
-  settingsPopover.popover.value?.show()
+  popover.value?.show()
 }
-const popover = computed(() => settingsPopover.popover.value)
+
 const popoverState = computed<any>(() => popover.value?.state)
 const isViewShown = computed(() => popoverState.value?.isShown)
 provide('messenger', {
@@ -193,7 +262,7 @@ const onDrag = (event: any) => {
   if (!isGameOverlay) {
     savePosition(event)
   }
-  settingsPopover.update()
+  popover.value?.tippy?.popperInstance?.update()
 }
 // watch(() => messengerWindowStore.isShown, (isShown) => {
 //   console.log(gsap.getProperty(messenger.value, 'y'))
