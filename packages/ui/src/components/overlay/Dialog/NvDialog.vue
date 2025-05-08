@@ -1,44 +1,53 @@
 <template>
-  <StDialogRoot v-model:open="dialogOpen" v-bind="props">
+  <StDialogRoot
+    v-bind="{
+      ...props,
+      open: dialogOpen,
+      'onUpdate:open': (value) => (dialogOpen = value),
+    }"
+  >
     <StDialogTrigger>
       <slot name="reference" />
     </StDialogTrigger>
-    <Teleport :to="props.portalTarget">
+    <Teleport :to="props.portalTarget" defer>
       <Transition class="transition">
         <StDialogBackdrop v-if="dialogOpen" />
       </Transition>
       <Transition class="transition">
         <!-- v-if causes this error:  https://github.com/vuejs/core/issues/5657-->
         <StDialogPositioner v-show="dialogOpen">
-            <StDialogContentWrapper @mousedown.self="closeDialog" ref="portalTarget">
-              <StDialogContent>
-                <NvCard>
-                  <NvStack spacing="5">
-                    <NvGroup justify="between">
-                      <StDialogTitle asChild>
-                        <NvText type="title">
-                          <slot name="title" />
-                        </NvText>
-                      </StDialogTitle>
-                      <StDialogCloseTrigger>
-                        <NvButton
-                          icon-name="times"
-                          size="xs"
-                          squared
-                          type="plain"
-                        />
-                      </StDialogCloseTrigger>
-                    </NvGroup>
-                    <StDialogDescription v-if="$slots.description">
-                      <NvText>
-                        <slot name="description" />
+          <StDialogContentWrapper
+            @mousedown.self="closeDialog"
+            ref="portalTarget"
+          >
+            <StDialogContent>
+              <NvCard>
+                <NvStack spacing="5">
+                  <NvGroup justify="between">
+                    <StDialogTitle asChild>
+                      <NvText type="title">
+                        <slot name="title" />
                       </NvText>
-                    </StDialogDescription>
-                    <slot name="footer" />
-                  </NvStack>
-                </NvCard>
-              </StDialogContent>
-            </StDialogContentWrapper>
+                    </StDialogTitle>
+                    <StDialogCloseTrigger>
+                      <NvButton
+                        icon-name="times"
+                        size="xs"
+                        squared
+                        type="plain"
+                      />
+                    </StDialogCloseTrigger>
+                  </NvGroup>
+                  <StDialogDescription v-if="$slots.description">
+                    <NvText>
+                      <slot name="description" />
+                    </NvText>
+                  </StDialogDescription>
+                  <slot name="footer" />
+                </NvStack>
+              </NvCard>
+            </StDialogContent>
+          </StDialogContentWrapper>
         </StDialogPositioner>
       </Transition>
     </Teleport>
@@ -69,22 +78,22 @@ provide('portal-target', portalTarget)
 
 const props = defineProps({
   ...propsDefinition,
-  modelValue: {
+  open: {
     type: Boolean,
     default: undefined,
   },
 })
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:open'])
 
 const localOpen = ref(false)
 
 const dialogOpen = computed({
-  get: () =>
-    props.modelValue !== undefined ? props.modelValue : localOpen.value,
+  get: () => (props.open !== undefined ? props.open : localOpen.value),
   set: (value) => {
-    localOpen.value = value
-    emit('update:modelValue', value)
+    props.open !== undefined
+      ? emit('update:open', value)
+      : (localOpen.value = value)
   },
 })
 

@@ -32,7 +32,7 @@
   </NvDialog>
 </template>
 <script lang="ts" setup>
-import { ref, PropType } from 'vue'
+import { ref, PropType, onMounted } from 'vue'
 import { NvButton, NvDialog, NvGroup } from '@packages/ui'
 import { StoreDialog } from '@/store/use-confirm-store'
 
@@ -46,5 +46,8 @@ const props = defineProps({
   },
 })
 
-const open = ref(true)
+const open = ref(false)
+onMounted(() => {
+  open.value = true
+})
 </script>
