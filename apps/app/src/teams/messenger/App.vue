@@ -110,14 +110,14 @@ if (!isGameOverlay) {
 watch(
   () => settingsStore.runAsAdmin,
   (value) => {
-      if (!value) {
-        settingsStore.$patch({
-          enableOverlayWindow: false,
-        })
-        gameOverlayStore.$patch({
-          enableGameOverlay: false,
-        })
-      }
+    if (!value) {
+      settingsStore.$patch({
+        enableOverlayWindow: false,
+      })
+      gameOverlayStore.$patch({
+        enableGameOverlay: false,
+      })
+    }
   },
 )
 

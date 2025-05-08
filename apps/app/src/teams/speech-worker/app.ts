@@ -8,7 +8,6 @@ const app = createApp(App)
 
 app.use(pinia).use(VueQueryPlugin)
 
-loadStores()
-  .then(() => app.mount('#app'))
+loadStores().then(() => app.mount('#app'))
 
 app.config.warnHandler = () => null

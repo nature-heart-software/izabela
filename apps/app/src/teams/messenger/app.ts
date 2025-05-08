@@ -27,8 +27,6 @@ const app = createApp(App)
   .use(NvLoading)
   .use(VueJsTour)
 
-loadStores()
-  .then(() => app.mount('#app'))
-
+loadStores().then(() => app.mount('#app'))
 
 app.config.warnHandler = () => null
