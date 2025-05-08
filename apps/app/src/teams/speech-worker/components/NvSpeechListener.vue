@@ -38,7 +38,7 @@ const speech = computed<any>((oldValue) => {
   return null
 })
 
-watch(speech, (onCleanup) => {
+watch(speech, (_1, _2, onCleanup) => {
   speech.value?.on('speaking', onSpeechStarted)
   speech.value?.on('stopped_speaking', onSpeechStop)
   onCleanup(() => {
