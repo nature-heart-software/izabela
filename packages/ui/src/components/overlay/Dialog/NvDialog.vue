@@ -4,14 +4,13 @@
       <slot name="reference" />
     </StDialogTrigger>
     <Teleport :to="props.portalTarget">
-      <div ref="newPortalTarget">
-        <Transition class="transition">
-          <StDialogBackdrop v-if="dialogOpen" />
-        </Transition>
-        <Transition class="transition">
-          <!-- v-if causes this error:  https://github.com/vuejs/core/issues/5657-->
-          <StDialogPositioner v-show="dialogOpen">
-            <StDialogContentWrapper @click.self="closeDialog">
+      <Transition class="transition">
+        <StDialogBackdrop v-if="dialogOpen" />
+      </Transition>
+      <Transition class="transition">
+        <!-- v-if causes this error:  https://github.com/vuejs/core/issues/5657-->
+        <StDialogPositioner v-show="dialogOpen">
+            <StDialogContentWrapper @mousedown.self="closeDialog" ref="portalTarget">
               <StDialogContent>
                 <NvCard>
                   <NvStack spacing="5">
@@ -40,9 +39,8 @@
                 </NvCard>
               </StDialogContent>
             </StDialogContentWrapper>
-          </StDialogPositioner>
-        </Transition>
-      </div>
+        </StDialogPositioner>
+      </Transition>
     </Teleport>
   </StDialogRoot>
 </template>
@@ -66,8 +64,8 @@ import {
   StDialogTrigger,
 } from './dialog.styled'
 
-const newPortalTarget = ref()
-provide('portal-target', newPortalTarget)
+const portalTarget = ref()
+provide('portal-target', portalTarget)
 
 const props = defineProps({
   ...propsDefinition,
