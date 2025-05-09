@@ -12,6 +12,7 @@
     "@packages/native-keymap": "3.3.2",
     "@packages/process-watcher": "0.0.0",
     "@packages/win-mouse": "2.0.1",
+    "@vitalets/google-translate-api": "^9.2.1",
     "elevenlabs": "^1.53.0",
     "ffi-napi": "^4.0.3",
     "forcefocus": "^1.1.0",

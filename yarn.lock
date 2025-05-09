@@ -7095,6 +7095,11 @@
   resolved "https://registry.yarnpkg.com/@types/http-cache-semantics/-/http-cache-semantics-4.0.4.tgz#b979ebad3919799c979b17c72621c0bc0a31c6c4"
   integrity sha512-1m0bIFVc7eJWyve9S0RnuRgcQqF/Xd5QsUZAZeQFr1Q3/p9JWoQQEqmVy+DPTNpGXwhgIetAoYF8JSc33q29QA==
 
+"@types/http-errors@^1.8.2":
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/@types/http-errors/-/http-errors-1.8.2.tgz#7315b4c4c54f82d13fa61c228ec5c2ea5cc9e0e1"
+  integrity sha512-EqX+YQxINb+MeXaIqYDASb6U6FCHbWjkj4a1CKDBks3d/QiB2+PqBLyO72vLDgAO1wUI4O+9gweRcQK11bTL/w==
+
 "@types/isstream@^0.1.0":
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/@types/isstream/-/isstream-0.1.0.tgz#f6522f52c0903ad5dc153950a720321928309fa1"
@@ -7462,6 +7467,15 @@
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@ungap/structured-clone/-/structured-clone-1.0.1.tgz#549ce746c163d0869a61cfdabafe625a13ab5d0f"
   integrity sha512-zKVyTt6rELvPXYwcVPTJcPFtY0AckN5A7xWuc7owBqR0FdtuDYhE9MZZUi6IY1kZUQFSXV1B3UOOIyLkVHYd2w==
+
+"@vitalets/google-translate-api@^9.2.1":
+  version "9.2.1"
+  resolved "https://registry.yarnpkg.com/@vitalets/google-translate-api/-/google-translate-api-9.2.1.tgz#7e7a772c15fee783e09663e58c974474f6abdf29"
+  integrity sha512-zlwQWSjXUZhbZQ6qwtIQ7GdYXFQmJ4wYqzcrYJUxtvzQQwUP+uKUb/SRJaBOQuBntjBjzcdcJoLFrpCKUbIkOg==
+  dependencies:
+    "@types/http-errors" "^1.8.2"
+    http-errors "^2.0.0"
+    node-fetch "^2.6.7"
 
 "@vitejs/plugin-vue@^5.0.4":
   version "5.0.4"
@@ -14276,7 +14290,7 @@ http-cache-semantics@^4.0.0, http-cache-semantics@^4.1.0, http-cache-semantics@^
   resolved "https://registry.yarnpkg.com/http-cache-semantics/-/http-cache-semantics-4.1.1.tgz#abe02fcb2985460bf0323be664436ec3476a6d5a"
   integrity sha512-er295DKPVsV82j5kw1Gjt+ADA/XYHsajl82cGNQG2eyoPkvgUhX+nDIyelzhIWbbsXP39EHcI6l5tYs2FYqYXQ==
 
-http-errors@2.0.0:
+http-errors@2.0.0, http-errors@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/http-errors/-/http-errors-2.0.0.tgz#b7774a1486ef73cf7667ac9ae0858c012c57b9d3"
   integrity sha512-FtwrG/euBzaEjYeRqOgly7G0qviiXoJWnvEH2Z1plBdXgbyjv34pHTSb9zoeHMyDy33+DWy5Wt9Wo+TURtOYSQ==
