@@ -3,7 +3,8 @@
     :allowed="
       [getStoreProperty('apiKey', true), getStoreProperty('region')].every(
         Boolean,
-      )"
+      )
+    "
     reason="Credentials required"
   >
     <NvStack :spacing="size === 'sm' ? 4 : 5">
@@ -30,7 +31,9 @@
           :modelValue="getStoreProperty('apiKey', true)"
           show-password
           type="password"
-          @update:modelValue="(value) => setStoreProperty('apiKey', value, true)"
+          @update:modelValue="
+            (value) => setStoreProperty('apiKey', value, true)
+          "
         />
       </NvFormItem>
     </NvStack>
