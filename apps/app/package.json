@@ -6,6 +6,7 @@
   "dependencies": {
     "@apps/app-server": "0.0.0",
     "@aws-sdk/client-transcribe-streaming": "^3.787.0",
+    "@aws-sdk/client-translate": "^3.806.0",
     "@aws-sdk/credential-providers": "3.716.0",
     "@azure-rest/ai-translation-text": "^1.0.1",
     "@nut-tree-fork/nut-js": "^4.2.1",
