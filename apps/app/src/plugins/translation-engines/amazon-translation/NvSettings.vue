@@ -1,9 +1,11 @@
 <template>
   <NvAccessBlocker
     :allowed="
-      [getStoreProperty('identityPoolId', true), getStoreProperty('region')].every(
-        Boolean,
-      )"
+      [
+        getStoreProperty('identityPoolId', true),
+        getStoreProperty('region'),
+      ].every(Boolean)
+    "
     reason="Credentials required"
   >
     <NvStack :spacing="size === 'sm' ? 4 : 5">
@@ -67,6 +69,7 @@ const props = defineProps({
   },
   form: Object,
 })
-const { getProperty, setProperty, getStoreProperty } =
-  store.useStoreOrForm(props.form)
+const { getProperty, setProperty, getStoreProperty } = store.useStoreOrForm(
+  props.form,
+)
 </script>
