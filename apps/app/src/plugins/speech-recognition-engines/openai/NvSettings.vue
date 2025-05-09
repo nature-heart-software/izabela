@@ -1,4 +1,12 @@
 <template>
+  <NvFormItem label="Prompt">
+    <NvInput
+      placeholder="Example: The speaker may stutter or repeat syllables..."
+      :modelValue="store.getProperty('prompt')"
+      @update:modelValue="(value) => store.setProperty('prompt', value)"
+    />
+  </NvFormItem>
+  <NvDivider direction="horizontal" />
   <NvFormItem label="API Key">
     <NvInput
       :modelValue="store.getProperty('apiKey', true)"
@@ -9,6 +17,6 @@
   </NvFormItem>
 </template>
 <script lang="ts" setup>
-import { NvFormItem, NvInput } from '@packages/ui'
+import { NvDivider, NvFormItem, NvInput } from '@packages/ui'
 import { store } from './store'
 </script>
