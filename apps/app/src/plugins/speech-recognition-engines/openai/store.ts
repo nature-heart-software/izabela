@@ -2,7 +2,7 @@ import { definePluginStore } from '@/store'
 import { ENGINE_ID } from './shared.ts'
 
 const exposedProperties = {
-  prompt: ''
+  prompt: '',
 }
 
 export const store = definePluginStore(

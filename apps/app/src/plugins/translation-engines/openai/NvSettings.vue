@@ -1,9 +1,6 @@
 <template>
   <NvAccessBlocker
-    :allowed="
-      [getStoreProperty('apiKey', true)].every(
-        Boolean,
-      )"
+    :allowed="[getStoreProperty('apiKey', true)].every(Boolean)"
     reason="Credentials required"
   >
     <NvStack :spacing="size === 'sm' ? 4 : 5">

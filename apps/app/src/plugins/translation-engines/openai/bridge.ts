@@ -26,8 +26,11 @@ bridge.register([
                 content: [
                   `You are a translator. Translate all user input into ${to}.`,
                   from && `The source language is ${from}.`,
-                  prompt && `Here are extra instructions from the user: ${prompt}`
-                ].filter(Boolean).join(' '),
+                  prompt &&
+                    `Here are extra instructions from the user: ${prompt}`,
+                ]
+                  .filter(Boolean)
+                  .join(' '),
               },
               { role: 'user', content: text },
             ],

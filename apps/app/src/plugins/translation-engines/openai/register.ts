@@ -26,13 +26,14 @@ translationEngineManager.registerEngine(ENGINE_ID, {
   async translate(text, voiceLanguage) {
     const credentials = getCredentials()
     try {
-      const { translateFrom, translateTo } = getTranslationOptions(voiceLanguage)
+      const { translateFrom, translateTo } =
+        getTranslationOptions(voiceLanguage)
       return await window[electronModuleName as keyof typeof window].translate({
         text,
         from: translateFrom,
         to: translateTo,
         prompt: store.getProperty('prompt'),
-        credentials
+        credentials,
       })
     } catch (e) {
       return text
