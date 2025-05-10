@@ -1,6 +1,7 @@
 /* eslint-disable */
 import styled from 'vue3-styled-components'
 import { tokens } from '@/styles/tokens'
+import lightTheme from '@/tokens/light'
 import { props, Props, Size } from './number-input.shared'
 import { CSSObject } from '@/types/css-in-js'
 import {
@@ -10,8 +11,7 @@ import {
 } from '@/utils/css-in-js'
 import { rem } from 'polished'
 
-const { fontSize, spacing, borderRadius, borderWidth, colors, transition } =
-  tokens
+const { fontSize, spacing, borderRadius, borderWidth, transition } = tokens
 const styleBySize = ({ size }: Props) => {
   const borderRadius = borderRadiusStyleBySize(size)
   const horizontalPadding = horizontalPaddingStyleBySize(size)
@@ -53,23 +53,23 @@ export const StNumberInput = styled('div', props)`
       font-weight: 600;
       border-width: ${() => rem(borderWidth.DEFAULT)};
       outline: 0;
-      border-color: ${() => colors.gray['20']};
+      border-color: ${() => lightTheme.numberInput.borderColor};
       transition: ${() => transition.DEFAULT};
       min-width: ${() => rem(80)};
       width: 100%;
 
       &:hover {
-        border-color: ${() => colors.gray['30']};
+        border-color: ${() => lightTheme.numberInput.hover.borderColor};
       }
 
       &:focus {
         box-shadow: 0 0 0 ${() => rem(borderWidth.lg)}
-          ${() => colors.gray['10']};
-        border-color: ${() => colors.gray['30']};
+          ${() => lightTheme.numberInput.focus.boxShadow};
+        border-color: ${() => lightTheme.numberInput.focus.borderColor};
       }
 
       &::placeholder {
-        color: ${() => colors.gray['40']};
+        color: ${() => lightTheme.numberInput.placeholder.color};
         font-weight: 300;
       }
 

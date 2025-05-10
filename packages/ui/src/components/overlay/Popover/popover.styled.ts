@@ -5,9 +5,10 @@ import { borderRadiusStyleBySize, paddingStyleBySize } from '@/utils/css-in-js'
 import { CSSObject } from '@/types/css-in-js'
 
 import { tokens } from '@/styles/tokens'
+import lightTheme from '@/tokens/light'
 import { rem } from 'polished'
 
-const { boxShadow, colors, borderWidth } = tokens
+const { boxShadow, borderWidth } = tokens
 
 const popperStyleBySize = ({ size }: Props) => {
   const borderRadius = borderRadiusStyleBySize(size)
@@ -29,9 +30,9 @@ export const StPopover = styled('div', props)`
   ${(props) => injectGlobal`
   [data-theme="popover-${props.size}"] {
     box-shadow: ${boxShadow.lg} !important;
-    border-color: ${colors.gray['20']} !important;
+    border-color: ${lightTheme.popover.borderColor} !important;
     border-width: ${rem(borderWidth.DEFAULT)};
-    background-color: white;
+    background-color: ${lightTheme.popover.backgroundColor};
     ${paddingStyleBySize(props.size)}
     ${popperStyleBySize(props)}
   }`}

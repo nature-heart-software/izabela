@@ -1,10 +1,11 @@
 /* eslint-disable */
 import styled from 'vue3-styled-components'
 import { tokens } from '@/styles/tokens'
+import lightTheme from '@/tokens/light'
 import { props } from './range-input.shared'
 import { rem } from 'polished'
 
-const { spacing, borderWidth, colors, borderRadius, transition } = tokens
+const { spacing, borderWidth, borderRadius, transition } = tokens
 export const StRangeInput = styled('input', props)`
   /********** Range Input Styles **********/
   /*Range Reset*/
@@ -27,7 +28,7 @@ export const StRangeInput = styled('input', props)`
   /* slider track */
 
   &::-webkit-slider-runnable-track {
-    background-color: ${() => colors.gray['20']};
+    background-color: ${() => lightTheme.rangeInput.trackColor};
     height: ${() => rem(spacing['2'])};
   }
 
@@ -46,26 +47,26 @@ export const StRangeInput = styled('input', props)`
     width: ${() => rem(spacing['4'])};
     border-radius: ${() => rem(borderRadius.DEFAULT)};
 
-    background-color: ${() => colors.gray['100']};
-    border-color: ${() => colors.gray['100']};
+    background-color: ${() => lightTheme.rangeInput.thumbColor};
+    border-color: ${() => lightTheme.rangeInput.thumbColor};
 
     &:hover {
-      border-color: ${() => colors.gray['90']};
-      background-color: ${() => colors.gray['90']};
+      border-color: ${() => lightTheme.rangeInput.thumbHoverColor};
+      background-color: ${() => lightTheme.rangeInput.thumbHoverColor};
     }
 
     &:active {
-      border-color: ${() => colors.gray['70']};
-      background-color: ${() => colors.gray['70']};
+      border-color: ${() => lightTheme.rangeInput.thumbActiveColor};
+      background-color: ${() => lightTheme.rangeInput.thumbActiveColor};
     }
 
     &:focus {
-      box-shadow: 0 0 0 ${() => rem(borderWidth.lg)} ${() => colors.gray['70']};
+      box-shadow: 0 0 0 ${() => rem(borderWidth.lg)} ${() => lightTheme.rangeInput.thumbFocusBoxShadow};
     }
   }
 
   &:focus::-webkit-slider-thumb {
     border: ${() => rem(borderWidth['DEFAULT'])} solid
-      ${() => colors.gray['90']};
+      ${() => lightTheme.rangeInput.thumbFocusBorderColor};
   }
 `

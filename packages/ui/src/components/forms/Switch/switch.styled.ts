@@ -1,15 +1,16 @@
 /* eslint-disable */
 import styled from 'vue3-styled-components'
 import { tokens } from '@/styles/tokens'
+import lightTheme from '@/tokens/light'
 import { props } from './switch.shared'
 import { rem } from 'polished'
 
-const { spacing, borderWidth, colors, borderRadius, transition } = tokens
+const { spacing, borderWidth, borderRadius, transition } = tokens
 export const StSwitch = styled('span', props)`
   display: inline-flex;
   width: ${() => rem(spacing['8'])};
   height: ${() => rem(spacing['6'])};
-  background-color: white;
+  background-color: ${() => lightTheme.switch.backgroundColor};
   padding: ${() => rem(spacing['2'])};
   position: relative;
   border-radius: ${() => rem(borderRadius.sm)};
@@ -24,7 +25,7 @@ export const StSwitch = styled('span', props)`
     width: ${() => rem(spacing['5'])};
     height: ${() => rem(spacing['5'])};
     border-radius: ${() => rem(borderRadius.xs)};
-    background-color: ${() => colors.gray['20']};
+    background-color: ${() => lightTheme.switch.thumbColor};
     left: 0;
     transition: ${() => transition.DEFAULT};
   }
@@ -33,7 +34,7 @@ export const StSwitch = styled('span', props)`
     content: '';
     width: 100%;
     height: 100%;
-    border: ${() => rem(borderWidth.DEFAULT)} solid ${() => colors.gray['20']};
+    border: ${() => rem(borderWidth.DEFAULT)} solid ${() => lightTheme.switch.borderColor};
     border-radius: ${() => rem(borderRadius.sm)};
     position: absolute;
     top: 0;
@@ -44,15 +45,15 @@ export const StSwitch = styled('span', props)`
 
   &:hover {
     &::after {
-      border-color: ${() => colors.gray['30']};
+      border-color: ${() => lightTheme.switch.hover.borderColor};
     }
   }
 
   &:focus {
-    box-shadow: 0 0 0 ${() => rem(borderWidth.lg)} ${() => colors.gray['10']};
+    box-shadow: 0 0 0 ${() => rem(borderWidth.lg)} ${() => lightTheme.switch.focus.boxShadow};
 
     &::after {
-      border-color: ${() => colors.gray['30']};
+      border-color: ${() => lightTheme.switch.focus.borderColor};
     }
   }
 
@@ -60,7 +61,7 @@ export const StSwitch = styled('span', props)`
     modelValue &&
     `
     &::before {
-      background-color: ${colors.gray['100']};
+      background-color: ${lightTheme.switch.activeThumbColor};
       left: ${rem(spacing['5'])};
     }
   `}

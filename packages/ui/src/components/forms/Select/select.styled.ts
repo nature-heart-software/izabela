@@ -1,6 +1,7 @@
 /* eslint-disable */
 import styled from 'vue3-styled-components'
 import { tokens } from '@/styles/tokens'
+import lightTheme from '@/tokens/light'
 import { selectProps, SelectProps, Size } from './select.shared'
 import { CSSObject } from '@/types/css-in-js'
 import { rem } from 'polished'
@@ -13,7 +14,7 @@ import {
   iconStyleBySize,
 } from '@/utils/css-in-js'
 
-const { fontSize, spacing, borderWidth, colors, transition } = tokens
+const { fontSize, spacing, borderWidth, transition } = tokens
 const iconStyle = ({ size }: SelectProps) => {
   const position = iconStyleBySize(size)
   const styles: Record<Size, CSSObject> = {
@@ -81,18 +82,18 @@ export const StSelect = styled('div', selectProps)`
   display: inline-flex;
   align-items: center;
   border-width: ${() => rem(borderWidth.DEFAULT)};
-  border-color: ${() => colors.gray['20']};
+  border-color: ${() => lightTheme.select.borderColor};
   transition: ${() => transition.DEFAULT};
 
   ${(props) => styleBySize(props)}
   &:hover {
-    border-color: ${() => colors.gray['30']};
+    border-color: ${() => lightTheme.select.hover.borderColor};
   }
 
   ${({ isFocused }) =>
     isFocused && {
-      boxShadow: `0 0 0 ${rem(borderWidth.lg)} ${colors.gray['10']}`,
-      borderColor: colors.gray['30'],
+      boxShadow: `0 0 0 ${rem(borderWidth.lg)} ${lightTheme.select.focus.boxShadow}`,
+      borderColor: lightTheme.select.focus.borderColor,
     }}
 `
 
@@ -118,7 +119,7 @@ export const StSelectInput = styled('input', selectProps)`
   ${inputStyleBySize};
 
   &::placeholder {
-    color: ${() => colors.gray['40']};
+    color: ${() => lightTheme.select.placeholder.color};
     font-weight: 300;
     font-size: inherit;
     letter-spacing: inherit;
@@ -163,7 +164,7 @@ export const StSelectOption = styled('div', {
         position: absolute;
         display: inline-flex;
         inset: ${rem(-spacing['2'])};
-        background-color: ${colors.white};
+        background-color: ${lightTheme.select.backgroundColor || lightTheme.card.backgroundColor};
     }
     `}
   }
@@ -180,7 +181,7 @@ export const StSelectOption = styled('div', {
     readonly
       ? ` 
           cursor: auto;
-            color: ${colors.gray['40']} !important;
+            color: ${lightTheme.select.option.readonlyColor} !important;
             position: relative;
             z-index: 0;
             &::before {
@@ -189,7 +190,7 @@ export const StSelectOption = styled('div', {
                 top: 50%;
                 left: 0;
                 transform: translateY(-50%);
-                background-color: ${colors.gray['20']};
+                background-color: ${lightTheme.select.option.readonlyDividerColor};
                 height: ${rem(1)};
                 width: 100%;
                 z-index: -1;
@@ -199,24 +200,24 @@ export const StSelectOption = styled('div', {
         ? `
           user-select: none;
           pointer-events: none;
-          color: ${colors.gray['40']} !important;
+          color: ${lightTheme.select.option.disabledColor} !important;
       `
         : `
         &:hover {
-            background-color: ${colors.gray['10']} !important;
+            background-color: ${lightTheme.select.option.hoverBackgroundColor} !important;
         }
         ${
           selected
             ? `
             font-weight: 700;
-            background-color: ${colors.gray['10']} !important;
+            background-color: ${lightTheme.select.option.selectedBackgroundColor} !important;
           `
             : ''
         }
         ${
           active
             ? `
-            background-color: ${colors.gray['20']} !important;
+            background-color: ${lightTheme.select.option.activeBackgroundColor} !important;
           `
             : ''
         }
