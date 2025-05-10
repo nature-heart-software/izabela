@@ -24,7 +24,6 @@ registerEngine({
   },
   getPayload({ text, translatedText, voice: v, command }) {
     const voice = v || getSelectedVoice()
-    console.log(text, translatedText, command)
     const { customCommands } = useSpeechStore()
     const customCommand = customCommands.find((e) => e.value === command)
     return {
