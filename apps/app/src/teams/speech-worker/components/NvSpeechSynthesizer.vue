@@ -1,6 +1,9 @@
 <script lang="ts" setup>
 import izabela from '@/modules/izabela'
-import type { IzabelaMessage, IzabelaMessagePayload } from '@/modules/izabela/types'
+import type {
+  IzabelaMessage,
+  IzabelaMessagePayload,
+} from '@/modules/izabela/types'
 import {
   onIPCCancelAllMessages,
   onIPCCancelCurrentMessage,
@@ -33,7 +36,9 @@ const onMessage = async (payload: string | IzabelaMessage) => {
     const voice = speechEngine.getSelectedVoice()
     const engineCommands = speechEngine.commands?.(voice) || []
     const command = getMessageCommand(payload)
-    const customCommand = speechStore.customCommands.find(e => e.value === command)
+    const customCommand = speechStore.customCommands.find(
+      (e) => e.value === command,
+    )
     const cleanMessage = getCleanMessage(payload, engineCommands)
     const voiceLanguageCode = speechEngine.getLanguageCode(voice)
     const translationOptions =
@@ -71,7 +76,9 @@ const onMessage = async (payload: string | IzabelaMessage) => {
     const engineCommands = engine.commands?.(voice) || []
     const cleanMessage = getCleanMessage(payload.message, engineCommands)
     const command = payload.command
-    const customCommand = speechStore.customCommands.find(e => e.value === payload.command)
+    const customCommand = speechStore.customCommands.find(
+      (e) => e.value === payload.command,
+    )
     message = {
       ...payload,
       credentials: engine.getCredentials(),
