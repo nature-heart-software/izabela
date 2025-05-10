@@ -18,6 +18,7 @@ export interface SpeechEngine {
     text: string
     voice: any
     translatedText: string | null
+    command?: string | null
   }) => Payload
   synthesizeSpeech: (context: {
     credentials: Credentials

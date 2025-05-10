@@ -1,6 +1,9 @@
 <script lang="ts" setup>
 import izabela from '@/modules/izabela'
-import type { IzabelaMessage } from '@/modules/izabela/types'
+import type {
+  IzabelaMessage,
+  IzabelaMessagePayload,
+} from '@/modules/izabela/types'
 import {
   onIPCCancelAllMessages,
   onIPCCancelCurrentMessage,
@@ -23,7 +26,7 @@ const socket = io(`ws://localhost:${import.meta.env.VITE_SERVER_WS_PORT}`, {})
 
 const onMessage = async (payload: string | IzabelaMessage) => {
   console.log('Saying something:', payload)
-  let message = null
+  let message: IzabelaMessagePayload | null = null
   if (typeof payload === 'string') {
     const speechEngine = speechStore.currentSpeechEngine
     const translationEngine = translationEngineManager.getEngineById(
@@ -32,6 +35,10 @@ const onMessage = async (payload: string | IzabelaMessage) => {
     if (!speechEngine) return
     const voice = speechEngine.getSelectedVoice()
     const engineCommands = speechEngine.commands?.(voice) || []
+    const command = getMessageCommand(payload)
+    const customCommand = speechStore.customCommands.find(
+      (e) => e.value === command,
+    )
     const cleanMessage = getCleanMessage(payload, engineCommands)
     const voiceLanguageCode = speechEngine.getLanguageCode(voice)
     const translationOptions =
@@ -49,16 +56,18 @@ const onMessage = async (payload: string | IzabelaMessage) => {
       message: cleanMessage,
       originalMessage: payload,
       translatedMessage,
-      translatedFrom: translationOptions?.translateFrom,
-      translatedTo: translationOptions?.translateTo,
+      translatedFrom: translationOptions?.translateFrom || null,
+      translatedTo: translationOptions?.translateTo || null,
       engine: speechEngine.id,
       credentials: speechEngine.getCredentials(),
       payload: speechEngine.getPayload({
         voice,
         translatedText: translatedMessage,
         text: cleanMessage,
+        command,
       }),
-      command: getMessageCommand(payload),
+      command,
+      customCommand,
     }
   } else {
     const engine = speechEngineManager.getEngineById(payload.engine)
@@ -66,6 +75,10 @@ const onMessage = async (payload: string | IzabelaMessage) => {
     const { voice } = payload
     const engineCommands = engine.commands?.(voice) || []
     const cleanMessage = getCleanMessage(payload.message, engineCommands)
+    const command = payload.command
+    const customCommand = speechStore.customCommands.find(
+      (e) => e.value === payload.command,
+    )
     message = {
       ...payload,
       credentials: engine.getCredentials(),
@@ -73,7 +86,10 @@ const onMessage = async (payload: string | IzabelaMessage) => {
         voice,
         translatedText: payload.translatedMessage,
         text: cleanMessage,
+        command,
       }),
+      command,
+      customCommand,
     }
   }
   if (message) izabela.say(message)
