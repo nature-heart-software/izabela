@@ -89,5 +89,8 @@ export default {
         backgroundColor: colors.gray["0"],
       }
     }
+  },
+  card: {
+    backgroundColor: colors.white
   }
 }
