@@ -114,5 +114,19 @@ export default {
   autocomplete: {
     backgroundColor: colors.white,
     borderColor: colors.gray["20"]
+  },
+  input: {
+    borderColor: colors.gray["20"],
+    color: colors.gray["90"],
+    hover: {
+      borderColor: colors.gray["30"]
+    },
+    focus: {
+      boxShadow: colors.gray["10"],
+      borderColor: colors.gray["30"]
+    },
+    placeholder: {
+      color: colors.gray["40"]
+    }
   }
 }
