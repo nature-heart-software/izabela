@@ -110,5 +110,9 @@ export default {
       backgroundColor: colors.white,
       color: colors.black,
     }
+  },
+  autocomplete: {
+    backgroundColor: colors.white,
+    borderColor: colors.gray["20"]
   }
 }
