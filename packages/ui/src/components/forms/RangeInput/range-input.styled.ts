@@ -61,7 +61,8 @@ export const StRangeInput = styled('input', props)`
     }
 
     &:focus {
-      box-shadow: 0 0 0 ${() => rem(borderWidth.lg)} ${() => lightTheme.rangeInput.thumbFocusBoxShadow};
+      box-shadow: 0 0 0 ${() => rem(borderWidth.lg)}
+        ${() => lightTheme.rangeInput.thumbFocusBoxShadow};
     }
   }
 

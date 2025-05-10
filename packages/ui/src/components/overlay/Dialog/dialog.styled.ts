@@ -13,7 +13,8 @@ export const StDialogBackdrop = styled(Dialog.Backdrop)`
   position: absolute;
   z-index: 9999;
   inset: 0;
-  background-color: ${() => rgba(lightTheme.dialog.backdropColor, lightTheme.dialog.backdropOpacity)};
+  background-color: ${() =>
+    rgba(lightTheme.dialog.backdropColor, lightTheme.dialog.backdropOpacity)};
 `
 export const StDialogPositioner = styled(Dialog.Positioner)`
   position: absolute;

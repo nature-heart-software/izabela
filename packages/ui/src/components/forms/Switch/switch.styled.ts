@@ -34,7 +34,8 @@ export const StSwitch = styled('span', props)`
     content: '';
     width: 100%;
     height: 100%;
-    border: ${() => rem(borderWidth.DEFAULT)} solid ${() => lightTheme.switch.borderColor};
+    border: ${() => rem(borderWidth.DEFAULT)} solid
+      ${() => lightTheme.switch.borderColor};
     border-radius: ${() => rem(borderRadius.sm)};
     position: absolute;
     top: 0;
@@ -50,7 +51,8 @@ export const StSwitch = styled('span', props)`
   }
 
   &:focus {
-    box-shadow: 0 0 0 ${() => rem(borderWidth.lg)} ${() => lightTheme.switch.focus.boxShadow};
+    box-shadow: 0 0 0 ${() => rem(borderWidth.lg)}
+      ${() => lightTheme.switch.focus.boxShadow};
 
     &::after {
       border-color: ${() => lightTheme.switch.focus.borderColor};
