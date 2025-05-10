@@ -1,6 +1,7 @@
 /* eslint-disable */
 import styled from 'vue3-styled-components'
 import { tokens } from '@/styles/tokens'
+import lightTheme from '@/tokens/light'
 import { props, Props, Size } from './button.shared'
 import { CSSObject } from '@/types/css-in-js'
 import {
@@ -12,7 +13,7 @@ import {
 } from '@/utils/css-in-js'
 import { rem } from 'polished'
 
-const { spacing, borderWidth, fontSize, colors, transition, boxShadow } = tokens
+const { spacing, borderWidth, fontSize, transition, boxShadow } = tokens
 
 const styleBySize = ({ size, iconName }: Props) => {
   const horizontalPadding = (
@@ -93,122 +94,122 @@ export const StButton = styled('button', props)`
     [
       type === 'default' &&
         `
-            background-color: ${colors.white};
-            border-color: ${colors.gray['20']};
+            background-color: ${lightTheme.button.default.backgroundColor};
+            border-color: ${lightTheme.button.default.borderColor};
             &:hover {
-                background-color: ${colors.gray['10']};
+                background-color: ${lightTheme.button.default.hover.backgroundColor};
             }
 
             &:active {
-                background-color: ${colors.gray['30']};
+                background-color: ${lightTheme.button.default.active.backgroundColor};
             }
 
             &:focus {
-                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${colors.gray['10']};
+                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${lightTheme.button.default.focus.boxShadow};
             }
 
             ${[
               selected &&
                 `
-                    background-color: ${colors.gray['20']};
+                    background-color: ${lightTheme.button.default.selected.backgroundColor};
                 `,
             ].filter(Boolean)}
         `,
       type === 'active' &&
         `
-            background-color: ${colors.white};
-            border-color: ${colors.gray['100']};
+            background-color: ${lightTheme.button.active.backgroundColor};
+            border-color: ${lightTheme.button.active.borderColor};
             border-width: ${rem(2)};
             &:hover {
-                background-color: ${colors.gray['10']};
+                background-color: ${lightTheme.button.active.hover.backgroundColor};
             }
 
             &:active {
-                background-color: ${colors.gray['30']};
+                background-color: ${lightTheme.button.active.active.backgroundColor};
             }
 
             &:focus {
-                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${colors.gray['10']};
+                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${lightTheme.button.active.focus.boxShadow};
             }
 
             ${[
               selected &&
                 `
-                    background-color: ${colors.gray['20']};
+                    background-color: ${lightTheme.button.active.selected.backgroundColor};
                 `,
             ].filter(Boolean)}
         `,
       type === 'plain' &&
         `
-            color: ${colors.white};
-            background-color: ${colors.gray['100']};
-            border-color: ${colors.gray['100']};
+            color: ${lightTheme.button.plain.color};
+            background-color: ${lightTheme.button.plain.backgroundColor};
+            border-color: ${lightTheme.button.plain.borderColor};
             &:hover {
-                border-color: ${colors.gray['90']};
-                background-color: ${colors.gray['90']};
+                border-color: ${lightTheme.button.plain.hover.borderColor};
+                background-color: ${lightTheme.button.plain.hover.backgroundColor};
             }
 
             &:active {
-                border-color: ${colors.gray['70']};
-                background-color: ${colors.gray['70']};
+                border-color: ${lightTheme.button.plain.active.borderColor};
+                background-color: ${lightTheme.button.plain.active.backgroundColor};
             }
 
             &:focus {
-                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${colors.gray['70']};
+                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${lightTheme.button.plain.focus.boxShadow};
             }
 
             ${[
               selected &&
                 `
-                    border-color: ${colors.gray['80']};
-                    background-color: ${colors.gray['80']};
+                    border-color: ${lightTheme.button.plain.selected.borderColor};
+                    background-color: ${lightTheme.button.plain.selected.backgroundColor};
                 `,
             ].filter(Boolean)}
         `,
       type === 'ghost' &&
         `
-            background-color: transparent;
-            border-color: transparent;
+            background-color: ${lightTheme.button.ghost.backgroundColor};
+            border-color: ${lightTheme.button.ghost.borderColor};
             &:hover {
-                background-color: ${colors.gray['10']};
+                background-color: ${lightTheme.button.ghost.hover.backgroundColor};
             }
 
             &:active {
-                background-color: ${colors.gray['30']};
+                background-color: ${lightTheme.button.ghost.active.backgroundColor};
             }
 
             &:focus {
-                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${colors.gray['10']};
+                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${lightTheme.button.ghost.focus.boxShadow};
             }
 
             ${[
               selected &&
                 `
-                    background-color: ${colors.gray['20']};
+                    background-color: ${lightTheme.button.ghost.selected.backgroundColor};
                 `,
             ].filter(Boolean)}
         `,
       type === 'ghost-alt' &&
         `
-            background-color: transparent;
-            border-color: transparent;
+            background-color: ${lightTheme.button["ghost-alt"].backgroundColor};
+            border-color: ${lightTheme.button["ghost-alt"].borderColor};
             &:hover {
-                background-color: ${colors.gray['20']};
+                background-color: ${lightTheme.button["ghost-alt"].hover.backgroundColor};
             }
 
             &:active {
-                background-color: ${colors.gray['30']};
+                background-color: ${lightTheme.button["ghost-alt"].active.backgroundColor};
             }
 
             &:focus {
-                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${colors.gray['10']};
+                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${lightTheme.button["ghost-alt"].focus.boxShadow};
             }
 
             ${[
               selected &&
                 `
                     box-shadow: ${boxShadow.DEFAULT};
-                    background-color: ${colors.gray['0']};
+                    background-color: ${lightTheme.button["ghost-alt"].selected.backgroundColor};
                 `,
             ].filter(Boolean)}
         `,
