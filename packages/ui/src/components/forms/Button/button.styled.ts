@@ -191,25 +191,25 @@ export const StButton = styled('button', props)`
         `,
       type === 'ghost-alt' &&
         `
-            background-color: ${lightTheme.button["ghost-alt"].backgroundColor};
-            border-color: ${lightTheme.button["ghost-alt"].borderColor};
+            background-color: ${lightTheme.button['ghost-alt'].backgroundColor};
+            border-color: ${lightTheme.button['ghost-alt'].borderColor};
             &:hover {
-                background-color: ${lightTheme.button["ghost-alt"].hover.backgroundColor};
+                background-color: ${lightTheme.button['ghost-alt'].hover.backgroundColor};
             }
 
             &:active {
-                background-color: ${lightTheme.button["ghost-alt"].active.backgroundColor};
+                background-color: ${lightTheme.button['ghost-alt'].active.backgroundColor};
             }
 
             &:focus {
-                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${lightTheme.button["ghost-alt"].focus.boxShadow};
+                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${lightTheme.button['ghost-alt'].focus.boxShadow};
             }
 
             ${[
               selected &&
                 `
                     box-shadow: ${boxShadow.DEFAULT};
-                    background-color: ${lightTheme.button["ghost-alt"].selected.backgroundColor};
+                    background-color: ${lightTheme.button['ghost-alt'].selected.backgroundColor};
                 `,
             ].filter(Boolean)}
         `,
