@@ -1,7 +1,7 @@
 /* eslint-disable */
 import styled from 'vue3-styled-components'
 import { tokens } from '@/styles/tokens'
-import lightTheme from '@/tokens/light'
+import { themes } from '@/themes'
 import { props, Props, Size } from './card.shared'
 import { CSSObject } from '@/types/css-in-js'
 import { rem } from 'polished'
@@ -22,7 +22,7 @@ const styleBySize = ({ size }: Props) => {
   return styles[size]
 }
 export const StCard = styled('div', props)`
-  background-color: ${() => lightTheme.card.backgroundColor};
+  background-color: ${({theme}) => theme.card.backgroundColor};
   padding: ${() => rem(spacing['3'])};
   border-radius: ${() => rem(borderRadius.DEFAULT)};
   box-shadow: ${() => boxShadow.DEFAULT};

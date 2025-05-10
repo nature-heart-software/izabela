@@ -1,7 +1,7 @@
 /* eslint-disable */
 import styled from 'vue3-styled-components'
 import { tokens } from '@/styles/tokens'
-import lightTheme from '@/tokens/light'
+import { themes } from '@/themes'
 import { selectProps, SelectProps, Size } from './select.shared'
 import { CSSObject } from '@/types/css-in-js'
 import { rem } from 'polished'
@@ -82,18 +82,18 @@ export const StSelect = styled('div', selectProps)`
   display: inline-flex;
   align-items: center;
   border-width: ${() => rem(borderWidth.DEFAULT)};
-  border-color: ${() => lightTheme.select.borderColor};
+  border-color: ${({theme}) => theme.select.borderColor};
   transition: ${() => transition.DEFAULT};
 
   ${(props) => styleBySize(props)}
   &:hover {
-    border-color: ${() => lightTheme.select.hover.borderColor};
+    border-color: ${({theme}) => theme.select.hover.borderColor};
   }
 
-  ${({ isFocused }) =>
+  ${({ theme, isFocused }) =>
     isFocused && {
-      boxShadow: `0 0 0 ${rem(borderWidth.lg)} ${lightTheme.select.focus.boxShadow}`,
-      borderColor: lightTheme.select.focus.borderColor,
+      boxShadow: `0 0 0 ${rem(borderWidth.lg)} ${theme.select.focus.boxShadow}`,
+      borderColor: theme.select.focus.borderColor,
     }}
 `
 
@@ -119,7 +119,7 @@ export const StSelectInput = styled('input', selectProps)`
   ${inputStyleBySize};
 
   &::placeholder {
-    color: ${() => lightTheme.select.placeholder.color};
+    color: ${({theme}) => theme.select.placeholder.color};
     font-weight: 300;
     font-size: inherit;
     letter-spacing: inherit;
@@ -155,7 +155,7 @@ export const StSelectOption = styled('div', {
     position: relative;
     z-index: 0;
     min-width: 0;
-    ${({ readonly }) =>
+    ${({ theme, readonly }) =>
       readonly &&
       `
     &::before {
@@ -164,7 +164,7 @@ export const StSelectOption = styled('div', {
         position: absolute;
         display: inline-flex;
         inset: ${rem(-spacing['2'])};
-        background-color: ${lightTheme.select.backgroundColor || lightTheme.card.backgroundColor};
+        background-color: ${theme.select.backgroundColor || theme.card.backgroundColor};
     }
     `}
   }
@@ -177,11 +177,11 @@ export const StSelectOption = styled('div', {
     }
   }
 
-  ${({ disabled, selected, active, readonly }) =>
+  ${({ theme, disabled, selected, active, readonly }) =>
     readonly
       ? ` 
           cursor: auto;
-            color: ${lightTheme.select.option.readonlyColor} !important;
+            color: ${theme.select.option.readonlyColor} !important;
             position: relative;
             z-index: 0;
             &::before {
@@ -190,7 +190,7 @@ export const StSelectOption = styled('div', {
                 top: 50%;
                 left: 0;
                 transform: translateY(-50%);
-                background-color: ${lightTheme.select.option.readonlyDividerColor};
+                background-color: ${theme.select.option.readonlyDividerColor};
                 height: ${rem(1)};
                 width: 100%;
                 z-index: -1;
@@ -200,24 +200,24 @@ export const StSelectOption = styled('div', {
         ? `
           user-select: none;
           pointer-events: none;
-          color: ${lightTheme.select.option.disabledColor} !important;
+          color: ${theme.select.option.disabledColor} !important;
       `
         : `
         &:hover {
-            background-color: ${lightTheme.select.option.hoverBackgroundColor} !important;
+            background-color: ${theme.select.option.hoverBackgroundColor} !important;
         }
         ${
           selected
             ? `
             font-weight: 700;
-            background-color: ${lightTheme.select.option.selectedBackgroundColor} !important;
+            background-color: ${theme.select.option.selectedBackgroundColor} !important;
           `
             : ''
         }
         ${
           active
             ? `
-            background-color: ${lightTheme.select.option.activeBackgroundColor} !important;
+            background-color: ${theme.select.option.activeBackgroundColor} !important;
           `
             : ''
         }

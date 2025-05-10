@@ -1,4 +1,5 @@
 export * from './components'
+export * from './themes'
 export { tokens, tailwindTheme } from './styles/tokens'
 export { ElLoading as NvLoading } from 'element-plus'
 import './styles'

@@ -1,4 +1,6 @@
 import '@/styles'
+import { themes } from '@/themes'
+import { ThemeProvider } from 'vue3-styled-components'
 
 export const parameters = {
   controls: {
@@ -8,3 +10,17 @@ export const parameters = {
     },
   },
 }
+
+export const decorators = [
+  (story) => ({
+    components: { story, ThemeProvider },
+    setup() {
+      return { theme: themes.get('light') };
+    },
+    template: `
+      <ThemeProvider :theme="theme">
+        <story />
+      </ThemeProvider>
+    `,
+  }),
+];

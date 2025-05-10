@@ -1,7 +1,7 @@
 /* eslint-disable */
 import styled from 'vue3-styled-components'
 import { tokens } from '@/styles/tokens'
-import lightTheme from '@/tokens/light'
+import { themes } from '@/themes'
 import { props, Props, Type } from './alert.shared'
 import { rem } from 'polished'
 import { borderRadiusStyleBySize, paddingStyleBySize } from '@/utils/css-in-js'
@@ -10,23 +10,23 @@ import { CSSObject } from '@/types/css-in-js'
 
 const { spacing } = tokens
 
-const typeStyle = ({ type }: Props): CSSObject => {
+const typeStyle = ({ theme, type }: Props & { theme: any }): CSSObject => {
   const typeStyles: Record<Type, CSSObject> = {
     info: {
-      backgroundColor: lightTheme.alert.info.backgroundColor,
-      color: lightTheme.alert.info.color,
+      backgroundColor: theme.alert.info.backgroundColor,
+      color: theme.alert.info.color,
     },
     success: {
-      backgroundColor: lightTheme.alert.success.backgroundColor,
-      color: lightTheme.alert.success.color,
+      backgroundColor: theme.alert.success.backgroundColor,
+      color: theme.alert.success.color,
     },
     warning: {
-      backgroundColor: lightTheme.alert.warning.backgroundColor,
-      color: lightTheme.alert.warning.color,
+      backgroundColor: theme.alert.warning.backgroundColor,
+      color: theme.alert.warning.color,
     },
     error: {
-      backgroundColor: lightTheme.alert.error.backgroundColor,
-      color: lightTheme.alert.error.color,
+      backgroundColor: theme.alert.error.backgroundColor,
+      color: theme.alert.error.color,
     },
   }
   return typeStyles[type]

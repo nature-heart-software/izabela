@@ -4,18 +4,18 @@ import { props } from './context-menu.shared'
 import { borderRadiusStyleBySize } from '@/utils/css-in-js'
 
 import { tokens } from '@/styles/tokens'
-import lightTheme from '@/tokens/light'
+import { themes } from '@/themes'
 import { rem } from 'polished'
 
 const { boxShadow, borderWidth } = tokens
 
 export const StContextMenu = styled('div', props)`
-  ${() => injectGlobal`
+  ${({ theme }) => injectGlobal`
     [data-theme="context-menu"] {
       box-shadow: ${boxShadow.lg} !important;
-      border-color: ${lightTheme.contextMenu.borderColor} !important;
+      border-color: ${theme.contextMenu.borderColor} !important;
       border-width: ${rem(borderWidth.DEFAULT)};
-      background-color: ${lightTheme.contextMenu.backgroundColor};
+      background-color: ${theme.contextMenu.backgroundColor};
       ${borderRadiusStyleBySize('md')}
       min-width: ${rem(150)};
     }`}

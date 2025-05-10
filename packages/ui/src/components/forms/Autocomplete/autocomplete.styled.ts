@@ -3,7 +3,7 @@ import styled from 'vue3-styled-components'
 import { defaultWidth, props, Props, Size } from './autocomplete.shared'
 import { rem } from 'polished'
 import { tokens } from '@/styles/tokens'
-import lightTheme from '@/tokens/light'
+import { themes } from '@/themes'
 import { borderRadiusStyleBySize } from '@/utils/css-in-js'
 import { CSSObject } from '@/types/css-in-js'
 
@@ -41,9 +41,9 @@ export const StAutocomplete = styled('div', props)`
   border-width: ${() => rem(tokens.borderWidth.DEFAULT)};
   border-style: solid;
   box-shadow: ${() => boxShadow.lg} !important;
-  border-color: ${() => lightTheme.autocomplete.borderColor} !important;
+  border-color: ${({theme}) => theme.autocomplete.borderColor} !important;
   overflow: hidden;
-  background-color: ${() => lightTheme.autocomplete.backgroundColor};
+  background-color: ${({theme}) => theme.autocomplete.backgroundColor};
 
   ${popperStyleBySize}
   .autocomplete__list {

@@ -1,7 +1,7 @@
 /* eslint-disable */
 import styled from 'vue3-styled-components'
 import { tokens } from '@/styles/tokens'
-import lightTheme from '@/tokens/light'
+import { themes } from '@/themes'
 import { props } from './range-input.shared'
 import { rem } from 'polished'
 
@@ -28,7 +28,7 @@ export const StRangeInput = styled('input', props)`
   /* slider track */
 
   &::-webkit-slider-runnable-track {
-    background-color: ${() => lightTheme.rangeInput.trackColor};
+    background-color: ${({theme}) => theme.rangeInput.trackColor};
     height: ${() => rem(spacing['2'])};
   }
 
@@ -47,26 +47,26 @@ export const StRangeInput = styled('input', props)`
     width: ${() => rem(spacing['4'])};
     border-radius: ${() => rem(borderRadius.DEFAULT)};
 
-    background-color: ${() => lightTheme.rangeInput.thumbColor};
-    border-color: ${() => lightTheme.rangeInput.thumbColor};
+    background-color: ${({theme}) => theme.rangeInput.thumbColor};
+    border-color: ${({theme}) => theme.rangeInput.thumbColor};
 
     &:hover {
-      border-color: ${() => lightTheme.rangeInput.thumbHoverColor};
-      background-color: ${() => lightTheme.rangeInput.thumbHoverColor};
+      border-color: ${({theme}) => theme.rangeInput.thumbHoverColor};
+      background-color: ${({theme}) => theme.rangeInput.thumbHoverColor};
     }
 
     &:active {
-      border-color: ${() => lightTheme.rangeInput.thumbActiveColor};
-      background-color: ${() => lightTheme.rangeInput.thumbActiveColor};
+      border-color: ${({theme}) => theme.rangeInput.thumbActiveColor};
+      background-color: ${({theme}) => theme.rangeInput.thumbActiveColor};
     }
 
     &:focus {
-      box-shadow: 0 0 0 ${() => rem(borderWidth.lg)} ${() => lightTheme.rangeInput.thumbFocusBoxShadow};
+      box-shadow: 0 0 0 ${() => rem(borderWidth.lg)} ${({theme}) => theme.rangeInput.thumbFocusBoxShadow};
     }
   }
 
   &:focus::-webkit-slider-thumb {
     border: ${() => rem(borderWidth['DEFAULT'])} solid
-      ${() => lightTheme.rangeInput.thumbFocusBorderColor};
+      ${({theme}) => theme.rangeInput.thumbFocusBorderColor};
   }
 `

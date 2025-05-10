@@ -1,7 +1,7 @@
 /* eslint-disable */
 import styled from 'vue3-styled-components'
 import { tokens } from '@/styles/tokens'
-import lightTheme from '@/tokens/light'
+import { themes } from '@/themes'
 import { props, Props, Size } from './button.shared'
 import { CSSObject } from '@/types/css-in-js'
 import {
@@ -90,126 +90,126 @@ export const StButton = styled('button', props)`
         justify-content: center;
     `}
     ${(props) => styleBySquared(props)}
-    ${({ type, selected }) =>
+    ${({ theme, type, selected }) =>
     [
       type === 'default' &&
         `
-            background-color: ${lightTheme.button.default.backgroundColor};
-            border-color: ${lightTheme.button.default.borderColor};
+            background-color: ${theme.button.default.backgroundColor};
+            border-color: ${theme.button.default.borderColor};
             &:hover {
-                background-color: ${lightTheme.button.default.hover.backgroundColor};
+                background-color: ${theme.button.default.hover.backgroundColor};
             }
 
             &:active {
-                background-color: ${lightTheme.button.default.active.backgroundColor};
+                background-color: ${theme.button.default.active.backgroundColor};
             }
 
             &:focus {
-                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${lightTheme.button.default.focus.boxShadow};
+                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${theme.button.default.focus.boxShadow};
             }
 
             ${[
               selected &&
                 `
-                    background-color: ${lightTheme.button.default.selected.backgroundColor};
+                    background-color: ${theme.button.default.selected.backgroundColor};
                 `,
             ].filter(Boolean)}
         `,
       type === 'active' &&
         `
-            background-color: ${lightTheme.button.active.backgroundColor};
-            border-color: ${lightTheme.button.active.borderColor};
+            background-color: ${theme.button.active.backgroundColor};
+            border-color: ${theme.button.active.borderColor};
             border-width: ${rem(2)};
             &:hover {
-                background-color: ${lightTheme.button.active.hover.backgroundColor};
+                background-color: ${theme.button.active.hover.backgroundColor};
             }
 
             &:active {
-                background-color: ${lightTheme.button.active.active.backgroundColor};
+                background-color: ${theme.button.active.active.backgroundColor};
             }
 
             &:focus {
-                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${lightTheme.button.active.focus.boxShadow};
+                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${theme.button.active.focus.boxShadow};
             }
 
             ${[
               selected &&
                 `
-                    background-color: ${lightTheme.button.active.selected.backgroundColor};
+                    background-color: ${theme.button.active.selected.backgroundColor};
                 `,
             ].filter(Boolean)}
         `,
       type === 'plain' &&
         `
-            color: ${lightTheme.button.plain.color};
-            background-color: ${lightTheme.button.plain.backgroundColor};
-            border-color: ${lightTheme.button.plain.borderColor};
+            color: ${theme.button.plain.color};
+            background-color: ${theme.button.plain.backgroundColor};
+            border-color: ${theme.button.plain.borderColor};
             &:hover {
-                border-color: ${lightTheme.button.plain.hover.borderColor};
-                background-color: ${lightTheme.button.plain.hover.backgroundColor};
+                border-color: ${theme.button.plain.hover.borderColor};
+                background-color: ${theme.button.plain.hover.backgroundColor};
             }
 
             &:active {
-                border-color: ${lightTheme.button.plain.active.borderColor};
-                background-color: ${lightTheme.button.plain.active.backgroundColor};
+                border-color: ${theme.button.plain.active.borderColor};
+                background-color: ${theme.button.plain.active.backgroundColor};
             }
 
             &:focus {
-                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${lightTheme.button.plain.focus.boxShadow};
+                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${theme.button.plain.focus.boxShadow};
             }
 
             ${[
               selected &&
                 `
-                    border-color: ${lightTheme.button.plain.selected.borderColor};
-                    background-color: ${lightTheme.button.plain.selected.backgroundColor};
+                    border-color: ${theme.button.plain.selected.borderColor};
+                    background-color: ${theme.button.plain.selected.backgroundColor};
                 `,
             ].filter(Boolean)}
         `,
       type === 'ghost' &&
         `
-            background-color: ${lightTheme.button.ghost.backgroundColor};
-            border-color: ${lightTheme.button.ghost.borderColor};
+            background-color: ${theme.button.ghost.backgroundColor};
+            border-color: ${theme.button.ghost.borderColor};
             &:hover {
-                background-color: ${lightTheme.button.ghost.hover.backgroundColor};
+                background-color: ${theme.button.ghost.hover.backgroundColor};
             }
 
             &:active {
-                background-color: ${lightTheme.button.ghost.active.backgroundColor};
+                background-color: ${theme.button.ghost.active.backgroundColor};
             }
 
             &:focus {
-                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${lightTheme.button.ghost.focus.boxShadow};
+                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${theme.button.ghost.focus.boxShadow};
             }
 
             ${[
               selected &&
                 `
-                    background-color: ${lightTheme.button.ghost.selected.backgroundColor};
+                    background-color: ${theme.button.ghost.selected.backgroundColor};
                 `,
             ].filter(Boolean)}
         `,
       type === 'ghost-alt' &&
         `
-            background-color: ${lightTheme.button['ghost-alt'].backgroundColor};
-            border-color: ${lightTheme.button['ghost-alt'].borderColor};
+            background-color: ${theme.button['ghost-alt'].backgroundColor};
+            border-color: ${theme.button['ghost-alt'].borderColor};
             &:hover {
-                background-color: ${lightTheme.button['ghost-alt'].hover.backgroundColor};
+                background-color: ${theme.button['ghost-alt'].hover.backgroundColor};
             }
 
             &:active {
-                background-color: ${lightTheme.button['ghost-alt'].active.backgroundColor};
+                background-color: ${theme.button['ghost-alt'].active.backgroundColor};
             }
 
             &:focus {
-                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${lightTheme.button['ghost-alt'].focus.boxShadow};
+                box-shadow: 0 0 0 ${rem(borderWidth.lg)} ${theme.button['ghost-alt'].focus.boxShadow};
             }
 
             ${[
               selected &&
                 `
                     box-shadow: ${boxShadow.DEFAULT};
-                    background-color: ${lightTheme.button['ghost-alt'].selected.backgroundColor};
+                    background-color: ${theme.button['ghost-alt'].selected.backgroundColor};
                 `,
             ].filter(Boolean)}
         `,

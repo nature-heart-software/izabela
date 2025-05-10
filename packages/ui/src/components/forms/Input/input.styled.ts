@@ -1,7 +1,7 @@
 /* eslint-disable */
 import styled from 'vue3-styled-components'
 import { tokens } from '@/styles/tokens'
-import lightTheme from '@/tokens/light'
+import { themes } from '@/themes'
 import { props, Props, Size } from './input.shared'
 import { CSSObject } from '@/types/css-in-js'
 import {
@@ -52,22 +52,22 @@ export const StInput = styled('div', props)`
       font-weight: 600;
       border-width: ${() => rem(borderWidth.DEFAULT)};
       outline: 0;
-      border-color: ${() => lightTheme.input.borderColor};
+      border-color: ${({theme}) => theme.input.borderColor};
       transition: ${() => transition.DEFAULT};
-      color: ${() => lightTheme.input.color};
+      color: ${({theme}) => theme.input.color};
 
       &:hover {
-        border-color: ${() => lightTheme.input.hover.borderColor};
+        border-color: ${({theme}) => theme.input.hover.borderColor};
       }
 
       &:focus {
         box-shadow: 0 0 0 ${() => rem(borderWidth.lg)}
-          ${() => lightTheme.input.focus.boxShadow};
-        border-color: ${() => lightTheme.input.focus.borderColor};
+          ${({theme}) => theme.input.focus.boxShadow};
+        border-color: ${({theme}) => theme.input.focus.borderColor};
       }
 
       &::placeholder {
-        color: ${() => lightTheme.input.placeholder.color};
+        color: ${({theme}) => theme.input.placeholder.color};
         font-weight: 300;
       }
 

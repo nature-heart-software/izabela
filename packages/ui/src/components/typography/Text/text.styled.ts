@@ -1,30 +1,30 @@
 /* eslint-disable */
 import styled from 'vue3-styled-components'
 import { tokens } from '@/styles/tokens'
-import lightTheme from '@/tokens/light'
+import { themes } from '@/themes'
 import { props } from './text.shared'
 import { fontSizeStyle } from '@/utils/css-in-js'
 import { rem } from 'polished'
 
 const { fontFamily, fontSize } = tokens
-export const defaultTextStyle = () => ({
-  color: lightTheme.text.color,
+export const defaultTextStyle = ({theme}: any) => ({
+  color: theme.text.color,
   fontFamily: fontFamily.sans.join(', '),
   ...fontSizeStyle(fontSize['2']),
 })
 
 export const StText = styled('div', props)`
-  ${() => defaultTextStyle()}
+  ${(props) => defaultTextStyle(props)}
   ${({ align = '' }) => align && `text-align: ${align};`}
   ${({ as }) =>
     as === 'span' &&
     `
     display: inline-flex;
   `}
-  ${({ type }) =>
+  ${({ theme, type }) =>
     [
       type === 'caption' && {
-        color: lightTheme.text.captionColor,
+        color: theme.text.captionColor,
         ...fontSizeStyle(fontSize['1']),
       },
       type === 'label' && {
@@ -52,7 +52,7 @@ export const StText = styled('div', props)`
       left: 0;
       right: 0;
       height: ${() => rem(tokens.spacing[1])};
-      background-color: ${() => lightTheme.text.linkUnderlineColor};
+      background-color: ${({theme}) => theme.text.linkUnderlineColor};
     }
   }
 `

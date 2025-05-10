@@ -1,7 +1,7 @@
 /* eslint-disable */
 import styled from 'vue3-styled-components'
 import { tokens } from '@/styles/tokens'
-import lightTheme from '@/tokens/light'
+import { themes } from '@/themes'
 import { props } from './tag.shared'
 import { rem } from 'polished'
 import {
@@ -42,8 +42,8 @@ export const StTag = styled('span', props)`
   border-width: ${() => rem(borderWidth.DEFAULT)};
   outline: 0;
   transition: ${() => transition.DEFAULT};
-  background-color: ${() => lightTheme.tag.backgroundColor};
-  border-color: ${() => lightTheme.tag.borderColor};
+  background-color: ${({theme}) => theme.tag.backgroundColor};
+  border-color: ${({theme}) => theme.tag.borderColor};
   min-width: 0;
 
   ${() => fontSizeStyle(fontSize['1'])}
