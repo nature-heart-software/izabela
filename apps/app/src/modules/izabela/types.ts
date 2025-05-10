@@ -1,4 +1,5 @@
 import { SpeechEngine } from '@/modules/speech-engine-manager/types'
+import { SpeechCommand } from '@/features/speech/types.ts'
 
 export type IzabelaMessageEvent =
   | 'started'
@@ -15,6 +16,7 @@ export interface IzabelaMessage {
   translatedFrom: string | null
   translatedTo: string | null
   command: string | null
+  customCommand?: SpeechCommand | null
   engine: (SpeechEngine['id'] & {}) | 'external-audio'
   voice: any
   excludeFromHistory?: boolean
