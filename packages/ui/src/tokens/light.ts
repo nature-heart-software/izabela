@@ -92,5 +92,23 @@ export default {
   },
   card: {
     backgroundColor: colors.white
+  },
+  alert: {
+    info: {
+      backgroundColor: colors.black,
+      color: colors.white,
+    },
+    success: {
+      backgroundColor: colors.white,
+      color: colors.black,
+    },
+    warning: {
+      backgroundColor: colors.white,
+      color: colors.black,
+    },
+    error: {
+      backgroundColor: colors.white,
+      color: colors.black,
+    }
   }
 }
