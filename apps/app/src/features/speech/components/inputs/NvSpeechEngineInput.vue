@@ -101,7 +101,7 @@ const commands = computed(
 const inputValue = computed(() => props.modelValue)
 const isInputFocused = ref(false)
 const latestCommands = ref<string[]>([])
-const fuseOptions = computed<UseFuseOptions<typeof commands.value[number]>>(
+const fuseOptions = computed<UseFuseOptions<(typeof commands.value)[number]>>(
   () => ({
     fuseOptions: {
       keys: ['command'],
