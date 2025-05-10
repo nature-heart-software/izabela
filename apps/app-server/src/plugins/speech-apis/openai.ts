@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express'
 import { handleError } from '../../utils/requests'
-import OpenAI from "openai";
+import OpenAI from 'openai'
 
 const plugin: Izabela.Server.Plugin = ({ app }) => {
   const listVoicesHandler: RequestHandler = async (
@@ -12,9 +12,21 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
     res,
   ) => {
     try {
-      res.status(200).json([
-        'alloy', 'ash', 'ballad', 'coral', 'echo', 'fable', 'onyx', 'nova', 'sage', 'shimmer', 'verse'
-      ])
+      res
+        .status(200)
+        .json([
+          'alloy',
+          'ash',
+          'ballad',
+          'coral',
+          'echo',
+          'fable',
+          'onyx',
+          'nova',
+          'sage',
+          'shimmer',
+          'verse',
+        ])
     } catch (e: any) {
       handleError(res, 'Internal server error', e.message, 500)
     }
@@ -24,12 +36,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
     {
       body: {
         credentials: { apiKey },
-        payload: {
-          input,
-          voice,
-          instructions,
-          userInstructions,
-        },
+        payload: { input, voice, instructions, userInstructions },
         includeTimestamps,
       },
     },
@@ -37,16 +44,22 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
   ) => {
     try {
       res.setHeader('Content-Type', 'audio/mpeg')
-      const openai = new OpenAI({ apiKey });
+      const openai = new OpenAI({ apiKey })
 
-      const concatenatedInstructions = [instructions && `Follow these default instructions: "${instructions}"`, userInstructions && `Follow these user provided instructions: "${userInstructions}"`].filter(Boolean).join('. ');
+      const concatenatedInstructions = [
+        instructions && `Follow these default instructions: "${instructions}"`,
+        userInstructions &&
+          `Follow these user provided instructions: "${userInstructions}"`,
+      ]
+        .filter(Boolean)
+        .join('. ')
       const mp3 = await openai.audio.speech.create({
-        model: "gpt-4o-mini-tts",
+        model: 'gpt-4o-mini-tts',
         voice,
         input,
         instructions: concatenatedInstructions,
-        response_format: 'mp3'
-      });
+        response_format: 'mp3',
+      })
 
       const arrayBuffer = await mp3.arrayBuffer()
       res.end(Buffer.from(arrayBuffer))
@@ -57,10 +70,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
 
   app.post('/api/tts/openai/list-voices', listVoicesHandler)
   app.post('/api/tts/openai/synthesize-speech', synthesizeSpeechHandler)
-  app.post(
-    '/api/tts/openai/synthesize-speech/stream',
-    synthesizeSpeechHandler,
-  )
+  app.post('/api/tts/openai/synthesize-speech/stream', synthesizeSpeechHandler)
 }
 
 export default plugin

@@ -74,7 +74,7 @@ export const StInput = styled('div', props)`
       ${styleBySize}
     }
   }
-  &[type="password"] {
+  &[type='password'] {
     .el-input .el-input__inner {
       padding-right: ${() => rem(spacing['7'])};
     }

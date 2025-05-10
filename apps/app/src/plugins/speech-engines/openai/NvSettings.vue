@@ -26,7 +26,9 @@
         <NvSwitch
           :modelValue="getProperty('useCommandDescriptionAsInstruction')"
           class="shrink-0"
-          @update:modelValue="(value) => setProperty('useCommandDescriptionAsInstruction', value)"
+          @update:modelValue="
+            (value) => setProperty('useCommandDescriptionAsInstruction', value)
+          "
         />
       </NvGroup>
       <template v-if="!form">
@@ -35,7 +37,7 @@
           <NvStack>
             <NvText type="label">Stream audio</NvText>
             <NvText
-            >Allows for faster audio playback, may cause audio artifacts
+              >Allows for faster audio playback, may cause audio artifacts
             </NvText>
           </NvStack>
           <NvSwitch
