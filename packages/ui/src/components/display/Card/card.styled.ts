@@ -22,7 +22,13 @@ const styleBySize = ({ size }: Props) => {
   return styles[size]
 }
 export const StCard = styled('div', props)`
-  background-color: ${({theme, variant}) => variant === 'transparent' ? rgba(theme.card.transparent.backdropColor, theme.card.transparent.backdropOpacity) : theme.card.backgroundColor};
+  background-color: ${({ theme, variant }) =>
+    variant === 'transparent'
+      ? rgba(
+          theme.card.transparent.backdropColor,
+          theme.card.transparent.backdropOpacity,
+        )
+      : theme.card.backgroundColor};
   padding: ${() => rem(spacing['3'])};
   border-radius: ${() => rem(borderRadius.DEFAULT)};
   box-shadow: ${() => boxShadow.DEFAULT};

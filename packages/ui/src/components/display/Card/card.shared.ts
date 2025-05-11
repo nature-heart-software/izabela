@@ -1,7 +1,7 @@
 import { ExtractPropTypes, PropType } from 'vue'
 
 export const sizeValues = ['xs', 'sm', 'md'] as const
-export type Size = typeof sizeValues[number]
+export type Size = (typeof sizeValues)[number]
 
 export const props = {
   size: {
@@ -11,6 +11,6 @@ export const props = {
   variant: {
     type: String as PropType<'default' | 'transparent'>,
     default: 'default',
-  }
+  },
 }
 export type Props = ExtractPropTypes<typeof props>
