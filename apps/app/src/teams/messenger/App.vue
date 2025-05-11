@@ -10,7 +10,7 @@
   />
   <ThemeProvider :theme="{
     ...tokens,
-    ...themes.get('light')
+    ...themes.get('dark')
   }">
     <NvBackground />
     <div class="h-0">

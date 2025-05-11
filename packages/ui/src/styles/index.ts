@@ -8,7 +8,7 @@ import { injectGlobal } from 'vue3-styled-components'
 import { rem } from 'polished'
 import { disabledItemBackgroundStyle } from '@/utils/css-in-js'
 import { tokens } from './tokens'
-
+import {themes} from '@/themes'
 const { spacing, colors, transition } = tokens
 // eslint-disable-next-line no-unused-expressions
 injectGlobal`
@@ -33,7 +33,7 @@ injectGlobal`
   }
 
   .el-loading-mask {
-    ${disabledItemBackgroundStyle()}
+    ${disabledItemBackgroundStyle({ theme: themes.get('light') })}
     .el-loading-spinner {
       .circular {
         .path {

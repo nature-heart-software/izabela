@@ -94,6 +94,7 @@ export const StButton = styled('button', props)`
     [
       type === 'default' &&
         `
+            color: ${theme.button.default.color};
             background-color: ${theme.button.default.backgroundColor};
             border-color: ${theme.button.default.borderColor};
             &:hover {
@@ -117,6 +118,7 @@ export const StButton = styled('button', props)`
         `,
       type === 'active' &&
         `
+            color: ${theme.button.active.color};
             background-color: ${theme.button.active.backgroundColor};
             border-color: ${theme.button.active.borderColor};
             border-width: ${rem(2)};
@@ -168,6 +170,7 @@ export const StButton = styled('button', props)`
         `,
       type === 'ghost' &&
         `
+            color: ${theme.button.ghost.color};
             background-color: ${theme.button.ghost.backgroundColor};
             border-color: ${theme.button.ghost.borderColor};
             &:hover {
@@ -191,6 +194,7 @@ export const StButton = styled('button', props)`
         `,
       type === 'ghost-alt' &&
         `
+            color: ${theme.button['ghost-alt'].color};
             background-color: ${theme.button['ghost-alt'].backgroundColor};
             border-color: ${theme.button['ghost-alt'].borderColor};
             &:hover {

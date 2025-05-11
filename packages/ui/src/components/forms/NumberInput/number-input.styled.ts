@@ -57,7 +57,8 @@ export const StNumberInput = styled('div', props)`
       transition: ${() => transition.DEFAULT};
       min-width: ${() => rem(80)};
       width: 100%;
-
+      color: ${({theme}) => theme.numberInput.color};
+      background: ${({theme}) => theme.numberInput.backgroundColor};
       &:hover {
         border-color: ${({theme}) => theme.numberInput.hover.borderColor};
       }

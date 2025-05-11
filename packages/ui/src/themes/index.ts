@@ -1,4 +1,6 @@
 import light from './light'
-export const themes = new Map<'light' | 'dark', typeof light>([
+import dark from './dark'
+export const themes = new Map<'light' | 'dark', typeof light | typeof dark>([
   ['light', light],
+  ['dark', dark],
 ])

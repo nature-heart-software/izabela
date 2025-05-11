@@ -55,7 +55,7 @@ export const StInput = styled('div', props)`
       border-color: ${({theme}) => theme.input.borderColor};
       transition: ${() => transition.DEFAULT};
       color: ${({theme}) => theme.input.color};
-
+      background: ${({theme}) => theme.input.backgroundColor};
       &:hover {
         border-color: ${({theme}) => theme.input.hover.borderColor};
       }

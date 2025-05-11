@@ -1,10 +1,11 @@
 import { tokens } from '@/styles/tokens'
 
 const { colors } = tokens
-
+const color = colors.gray["80"];
 export default {
   button: {
     default: {
+      color,
       backgroundColor: colors.white,
       borderColor: colors.gray["20"],
       hover: {
@@ -21,6 +22,7 @@ export default {
       }
     },
     active: {
+      color,
       backgroundColor: colors.white,
       borderColor: colors.gray["100"],
       hover: {
@@ -57,6 +59,7 @@ export default {
       }
     },
     ghost: {
+      color,
       backgroundColor: "transparent",
       borderColor: "transparent",
       hover: {
@@ -73,6 +76,7 @@ export default {
       }
     },
     "ghost-alt": {
+      color,
       backgroundColor: "transparent",
       borderColor: "transparent",
       hover: {
@@ -118,6 +122,7 @@ export default {
   input: {
     borderColor: colors.gray["20"],
     color: colors.gray["90"],
+    backgroundColor: colors.white,
     hover: {
       borderColor: colors.gray["30"]
     },
@@ -131,6 +136,8 @@ export default {
   },
   numberInput: {
     borderColor: colors.gray["20"],
+    color: colors.gray["90"],
+    backgroundColor: colors.white,
     hover: {
       borderColor: colors.gray["30"]
     },
@@ -161,6 +168,8 @@ export default {
   },
   select: {
     borderColor: colors.gray["20"],
+    color: colors.gray["90"],
+    backgroundColor: colors.white,
     hover: {
       borderColor: colors.gray["30"]
     },
@@ -213,5 +222,9 @@ export default {
     backdropColor: colors.gray["100"],
     backdropOpacity: 0.95,
     contentBackgroundColor: colors.white
+  },
+  disabledItemBackground: {
+    backdropColor: colors.white,
+    backdropOpacity: 0.9,
   }
 }

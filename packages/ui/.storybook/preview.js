@@ -15,7 +15,7 @@ export const decorators = [
   (story) => ({
     components: { story, ThemeProvider },
     setup() {
-      return { theme: themes.get('light') };
+      return { theme: themes.get('dark') };
     },
     template: `
       <ThemeProvider :theme="theme">

@@ -84,6 +84,8 @@ export const StSelect = styled('div', selectProps)`
   border-width: ${() => rem(borderWidth.DEFAULT)};
   border-color: ${({theme}) => theme.select.borderColor};
   transition: ${() => transition.DEFAULT};
+  color: ${({theme}) => theme.select.color};
+  background: ${({theme}) => theme.select.backgroundColor};
 
   ${(props) => styleBySize(props)}
   &:hover {
@@ -118,6 +120,9 @@ export const StSelectInput = styled('input', selectProps)`
   width: 100%;
   ${inputStyleBySize};
 
+  color: ${({theme}) => theme.select.color};
+  background: ${({theme}) => theme.select.backgroundColor};
+  
   &::placeholder {
     color: ${({theme}) => theme.select.placeholder.color};
     font-weight: 300;
