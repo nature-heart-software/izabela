@@ -1,7 +1,8 @@
 <template>
-  <div
+  <NvCard
+    variant="transparent"
     ref="messenger"
-    class="messenger bg-gray-10/95 rounded grid p-4 gap-4 grid-rows-3 grid-rows-none min-w-[480px]"
+    class="messenger rounded grid p-4 gap-4 grid-rows-3 grid-rows-none min-w-[480px]"
     data-v-step="messenger-window"
   >
     <NvGroup :spacing="4" class="min-w-0" grow>
@@ -47,7 +48,7 @@
         </NvGroup>
       </NvCard>
     </NvGroup>
-  </div>
+  </NvCard>
 </template>
 
 <script lang="ts" setup>

@@ -2,40 +2,63 @@ import { tokens } from '@/styles/tokens'
 
 const { colors } = tokens
 const color = colors.gray["80"];
+const backgroundColor = colors.white
+const borderColor = colors.gray["20"]
+const inputColors = {
+  borderColor,
+  color: colors.gray["90"],
+  backgroundColor,
+  hover: {
+    borderColor: colors.gray["30"]
+  },
+  focus: {
+    boxShadow: colors.gray["10"],
+    borderColor: colors.gray["30"]
+  },
+  placeholder: {
+    color: colors.gray["40"]
+  }
+}
+
+const buttonColors = {
+  color,
+  backgroundColor,
+  borderColor,
+  hover: {
+    backgroundColor: colors.gray["10"],
+  },
+  active: {
+    backgroundColor: colors.gray["30"],
+  },
+  focus: {
+    boxShadow: colors.gray["10"],
+  },
+  selected: {
+    backgroundColor: colors.gray["20"],
+  }
+}
+
 export default {
   button: {
     default: {
-      color,
-      backgroundColor: colors.white,
-      borderColor: colors.gray["20"],
-      hover: {
-        backgroundColor: colors.gray["10"],
-      },
-      active: {
-        backgroundColor: colors.gray["30"],
-      },
-      focus: {
-        boxShadow: colors.gray["10"],
-      },
-      selected: {
-        backgroundColor: colors.gray["20"],
-      }
+      ...buttonColors,
     },
     active: {
-      color,
-      backgroundColor: colors.white,
+      ...buttonColors,
       borderColor: colors.gray["100"],
-      hover: {
-        backgroundColor: colors.gray["10"],
-      },
-      active: {
-        backgroundColor: colors.gray["30"],
-      },
-      focus: {
-        boxShadow: colors.gray["10"],
-      },
+    },
+    ghost: {
+      ...buttonColors,
+      backgroundColor: "transparent",
+      borderColor: "transparent",
+    },
+    "ghost-alt": {
+      ...buttonColors,
+      backgroundColor: "transparent",
+      borderColor: "transparent",
       selected: {
-        backgroundColor: colors.gray["20"],
+        boxShadow: colors.gray['10'],
+        backgroundColor: colors.gray["0"],
       }
     },
     plain: {
@@ -58,44 +81,13 @@ export default {
         backgroundColor: colors.gray["80"],
       }
     },
-    ghost: {
-      color,
-      backgroundColor: "transparent",
-      borderColor: "transparent",
-      hover: {
-        backgroundColor: colors.gray["10"],
-      },
-      active: {
-        backgroundColor: colors.gray["30"],
-      },
-      focus: {
-        boxShadow: colors.gray["10"],
-      },
-      selected: {
-        backgroundColor: colors.gray["20"],
-      }
-    },
-    "ghost-alt": {
-      color,
-      backgroundColor: "transparent",
-      borderColor: "transparent",
-      hover: {
-        backgroundColor: colors.gray["20"],
-      },
-      active: {
-        backgroundColor: colors.gray["30"],
-      },
-      focus: {
-        boxShadow: colors.gray["10"],
-      },
-      selected: {
-        boxShadow: 'boxShadow.DEFAULT',
-        backgroundColor: colors.gray["0"],
-      }
-    }
   },
   card: {
-    backgroundColor: colors.white
+    backgroundColor,
+    transparent: {
+      backdropColor: colors.gray["10"],
+      backdropOpacity: 0.95,
+    },
   },
   alert: {
     info: {
@@ -103,55 +95,31 @@ export default {
       color: colors.white,
     },
     success: {
-      backgroundColor: colors.white,
+      backgroundColor,
       color: colors.black,
     },
     warning: {
-      backgroundColor: colors.white,
+      backgroundColor,
       color: colors.black,
     },
     error: {
-      backgroundColor: colors.white,
+      backgroundColor,
       color: colors.black,
     }
   },
   autocomplete: {
-    backgroundColor: colors.white,
-    borderColor: colors.gray["20"]
+    backgroundColor,
+    borderColor,
   },
   input: {
-    borderColor: colors.gray["20"],
-    color: colors.gray["90"],
-    backgroundColor: colors.white,
-    hover: {
-      borderColor: colors.gray["30"]
-    },
-    focus: {
-      boxShadow: colors.gray["10"],
-      borderColor: colors.gray["30"]
-    },
-    placeholder: {
-      color: colors.gray["40"]
-    }
+    ...inputColors,
   },
   numberInput: {
-    borderColor: colors.gray["20"],
-    color: colors.gray["90"],
-    backgroundColor: colors.white,
-    hover: {
-      borderColor: colors.gray["30"]
-    },
-    focus: {
-      boxShadow: colors.gray["10"],
-      borderColor: colors.gray["30"]
-    },
-    placeholder: {
-      color: colors.gray["40"]
-    }
+    ...inputColors,
   },
   switch: {
-    backgroundColor: colors.white,
-    borderColor: colors.gray["20"],
+    backgroundColor,
+    borderColor,
     thumbColor: colors.gray["20"],
     activeThumbColor: colors.gray["100"],
     hover: {
@@ -163,23 +131,11 @@ export default {
     }
   },
   tag: {
-    backgroundColor: colors.white,
-    borderColor: colors.gray["20"]
+    backgroundColor,
+    borderColor,
   },
   select: {
-    borderColor: colors.gray["20"],
-    color: colors.gray["90"],
-    backgroundColor: colors.white,
-    hover: {
-      borderColor: colors.gray["30"]
-    },
-    focus: {
-      boxShadow: colors.gray["10"],
-      borderColor: colors.gray["30"]
-    },
-    placeholder: {
-      color: colors.gray["40"]
-    },
+    ...inputColors,
     option: {
       hoverBackgroundColor: colors.gray["10"],
       selectedBackgroundColor: colors.gray["10"],
@@ -198,7 +154,7 @@ export default {
     thumbFocusBorderColor: colors.gray["90"]
   },
   divider: {
-    color: colors.gray["20"]
+    borderColor,
   },
   text: {
     color: "inherit",
@@ -211,20 +167,20 @@ export default {
     color: colors.white
   },
   popover: {
-    backgroundColor: colors.white,
-    borderColor: colors.gray["20"]
+    backgroundColor,
+    borderColor,
   },
   contextMenu: {
-    backgroundColor: colors.white,
-    borderColor: colors.gray["20"]
+    backgroundColor,
+    borderColor,
   },
   dialog: {
     backdropColor: colors.gray["100"],
     backdropOpacity: 0.95,
-    contentBackgroundColor: colors.white
+    contentBackgroundColor: backgroundColor
   },
   disabledItemBackground: {
-    backdropColor: colors.white,
+    backdropColor: backgroundColor,
     backdropOpacity: 0.9,
   }
 }

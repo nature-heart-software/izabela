@@ -1,5 +1,5 @@
 <template>
-  <div class="settings bg-gray-10/95 rounded p-4 flex flex-col space-y-4">
+  <NvCard variant="transparent" class="settings rounded p-4 flex flex-col space-y-4">
     <!-- Top -->
     <div class="flex justify-between space-x-4">
       <div></div>
@@ -52,10 +52,10 @@
         </div>
       </div>
     </div>
-  </div>
+  </NvCard>
 </template>
 <script lang="ts" setup>
-import { NvButton, NvCard, NvStack, NvText } from '@packages/ui'
+import { NvButton, NvStack, NvText, NvCard } from '@packages/ui'
 import { useRoute } from 'vue-router'
 
 const navigation = [

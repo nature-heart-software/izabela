@@ -1,8 +1,9 @@
 <template>
-  <div
+  <NvCard
+    variant="transparent"
     id="settings"
     ref="settings"
-    class="settings relative bg-gray-10/95 rounded p-4 overflow-hidden"
+    class="settings relative rounded p-4 overflow-hidden"
   >
     <div class="flex flex-col space-y-4 h-full">
       <!-- Top -->
@@ -96,7 +97,7 @@
     <template v-for="instance in instances" :key="instance.id">
       <NvStoreDialog :instance="instance" :portal-target="settings" />
     </template>
-  </div>
+  </NvCard>
 </template>
 <script lang="ts" setup>
 import { NvButton, NvCard, NvStack, NvText, NvTooltip } from '@packages/ui'

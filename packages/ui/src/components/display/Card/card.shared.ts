@@ -8,5 +8,9 @@ export const props = {
     type: String as PropType<Size>,
     default: 'md',
   },
+  variant: {
+    type: String as PropType<'default' | 'transparent'>,
+    default: 'default',
+  }
 }
 export type Props = ExtractPropTypes<typeof props>

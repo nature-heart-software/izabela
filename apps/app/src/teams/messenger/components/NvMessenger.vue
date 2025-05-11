@@ -63,9 +63,10 @@
           }
         "
       >
-        <div
+        <NvCard
+          variant="transparent"
           ref="messenger"
-          class="messenger bg-gray-10/95 rounded grid p-4 gap-4 grid-rows-3 grid-rows-none w-[768px]"
+          class="messenger rounded grid p-4 gap-4 grid-rows-3 grid-rows-none w-[768px]"
           data-v-step="messenger-window"
         >
           <!-- Top -->
@@ -89,7 +90,7 @@
           <NvGroup :spacing="4" grow>
             <NvMessengerInputBar />
           </NvGroup>
-        </div>
+        </NvCard>
         <template #content>
           <RouterView
             @close="
@@ -141,7 +142,7 @@ import {
   inject,
 } from 'vue'
 import Moveable from 'vue3-moveable'
-import { NvGroup, tokens } from '@packages/ui'
+import { NvCard, NvGroup, tokens } from '@packages/ui'
 import { RouteLocationRaw, useRouter } from 'vue-router'
 import NvHitbox from '@/modules/vue-hitboxes/NvHitbox.vue'
 import { useMessengerStore } from '@/teams/messenger/store'
