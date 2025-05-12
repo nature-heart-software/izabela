@@ -28,7 +28,8 @@
                 ref="keysRef"
                 :class="{
                   activeIndex: carretIndex === i,
-                  inSelection: selection[0] < i && i <= selection[1] && hasSelection,
+                  inSelection:
+                    selection[0] < i && i <= selection[1] && hasSelection,
                 }"
                 >{{ key }}</span
               >
@@ -41,7 +42,11 @@
                 >
               </template>
               <label class="hidden">
-                <input ref="selectionValueRef" :value="selectionValue" type="text" />
+                <input
+                  ref="selectionValueRef"
+                  :value="selectionValue"
+                  type="text"
+                />
               </label>
             </div>
           </div>
@@ -64,7 +69,9 @@ import { useElementSize } from '@vueuse/core'
 import { rem } from 'polished'
 
 const { ElectronOverlayWindow, ElectronKeybinding } = window
-const placeholder = ref('So, said the angel to the child who, divided, broke the knife..')
+const placeholder = ref(
+  'So, said the angel to the child who, divided, broke the knife..',
+)
 const carretIndex = ref(-1)
 const selection = ref([-1, -1])
 const settingsStore = useSettingsStore()
@@ -113,7 +120,10 @@ function del() {
     // keys.value = keys.value
   } else {
     targetIndex = carretIndex.value > -1 ? carretIndex.value - 1 : -1
-    keys.value.splice(carretIndex.value, selection.value[1] - selection.value[0] + 1)
+    keys.value.splice(
+      carretIndex.value,
+      selection.value[1] - selection.value[0] + 1,
+    )
     // keys.value = keys.value
   }
   carretIndex.value = targetIndex
@@ -139,7 +149,10 @@ function paste(text: any = '') {
   if (text) {
     insertKey(text.split(''))
     carretIndex.value += text.length
-    selection.value = [carretIndex.value + text.length, carretIndex.value + text.length]
+    selection.value = [
+      carretIndex.value + text.length,
+      carretIndex.value + text.length,
+    ]
   } else {
     ElectronKeybinding.readFromClipboard().then((clipboardContent: string) => {
       if (clipboardContent) {
@@ -164,9 +177,15 @@ function paste(text: any = '') {
 
 function suppr() {
   if (hasSelection.value) {
-    keys.value.splice(selection.value[0] + 1, selection.value[1] - selection.value[0])
+    keys.value.splice(
+      selection.value[0] + 1,
+      selection.value[1] - selection.value[0],
+    )
   } else {
-    keys.value.splice(carretIndex.value + 1, selection.value[1] - selection.value[0] + 1)
+    keys.value.splice(
+      carretIndex.value + 1,
+      selection.value[1] - selection.value[0] + 1,
+    )
   }
   // eslint-disable-next-line prefer-destructuring
   carretIndex.value = selection.value[0]

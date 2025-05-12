@@ -1,11 +1,19 @@
 <template>
-  <NvCard variant="transparent" class="settings rounded p-4 flex flex-col space-y-4">
+  <NvCard
+    variant="transparent"
+    class="settings rounded p-4 flex flex-col space-y-4"
+  >
     <!-- Top -->
     <div class="flex justify-between space-x-4">
       <div></div>
       <NvCard class="inline-flex" size="sm">
         <div class="inline-flex space-x-2">
-          <NvButton icon-name="times" size="xs" type="plain" @click="$emit('close')"/>
+          <NvButton
+            icon-name="times"
+            size="xs"
+            type="plain"
+            @click="$emit('close')"
+          />
         </div>
       </NvCard>
     </div>
@@ -21,14 +29,20 @@
                     {{ category.name }}
                   </NvText>
                   <NvStack spacing="2">
-                    <template v-for="entry in category.children" :key="entry.name">
-                      <router-link :to="entry.to || { name: 'messages' }" class="w-full">
+                    <template
+                      v-for="entry in category.children"
+                      :key="entry.name"
+                    >
+                      <router-link
+                        :to="entry.to || { name: 'messages' }"
+                        class="w-full"
+                      >
                         <NvButton
                           :selected="currentRoute.name === entry.to?.name"
                           class="w-full"
                           size="sm"
                           type="ghost-alt"
-                        >{{ entry.name }}
+                          >{{ entry.name }}
                         </NvButton>
                       </router-link>
                     </template>
@@ -42,8 +56,11 @@
               <!-- View -->
               <router-view v-slot="{ Component }">
                 <Transition class="transition">
-                  <div :key="Component" class="absolute inset-0 overflow-y-auto">
-                    <component :is="Component"/>
+                  <div
+                    :key="Component"
+                    class="absolute inset-0 overflow-y-auto"
+                  >
+                    <component :is="Component" />
                   </div>
                 </Transition>
               </router-view>

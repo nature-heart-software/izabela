@@ -8,7 +8,7 @@ import { rem } from 'polished'
 export const StDivider = styled('div', props)`
   ${({ direction }) => [
     direction === 'vertical' ? 'border-right' : 'border-top',
-  ]}: ${() => rem(1)} solid ${({theme}) => theme.divider.borderColor};
+  ]}: ${() => rem(1)} solid ${({ theme }) => theme.divider.borderColor};
   ${({ direction }) =>
     direction === 'vertical' &&
     `
