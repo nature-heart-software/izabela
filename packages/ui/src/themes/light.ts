@@ -6,7 +6,7 @@ const backgroundColor = colors.white
 const borderColor = colors.gray["20"]
 const inputColors = {
   borderColor,
-  color: colors.gray["90"],
+  color,
   backgroundColor,
   hover: {
     borderColor: colors.gray["30"]
@@ -38,6 +38,27 @@ const buttonColors = {
   }
 }
 
+const buttonPlainColors = {
+    color: colors.white,
+    backgroundColor: colors.gray["100"],
+    borderColor: colors.gray["100"],
+    hover: {
+      borderColor: colors.gray["90"],
+      backgroundColor: colors.gray["90"],
+    },
+    active: {
+      borderColor: colors.gray["70"],
+      backgroundColor: colors.gray["70"],
+    },
+    focus: {
+      boxShadow: colors.gray["70"],
+    },
+    selected: {
+      borderColor: colors.gray["80"],
+      backgroundColor: colors.gray["80"],
+    }
+}
+
 export default {
   button: {
     default: {
@@ -45,7 +66,7 @@ export default {
     },
     active: {
       ...buttonColors,
-      borderColor: colors.gray["100"],
+      borderColor: buttonPlainColors.borderColor,
     },
     ghost: {
       ...buttonColors,
@@ -62,24 +83,7 @@ export default {
       }
     },
     plain: {
-      color: colors.white,
-      backgroundColor: colors.gray["100"],
-      borderColor: colors.gray["100"],
-      hover: {
-        borderColor: colors.gray["90"],
-        backgroundColor: colors.gray["90"],
-      },
-      active: {
-        borderColor: colors.gray["70"],
-        backgroundColor: colors.gray["70"],
-      },
-      focus: {
-        boxShadow: colors.gray["70"],
-      },
-      selected: {
-        borderColor: colors.gray["80"],
-        backgroundColor: colors.gray["80"],
-      }
+      ...buttonPlainColors
     },
   },
   card: {
@@ -121,13 +125,13 @@ export default {
     backgroundColor,
     borderColor,
     thumbColor: colors.gray["20"],
-    activeThumbColor: colors.gray["100"],
+    activeThumbColor: buttonPlainColors.backgroundColor,
     hover: {
-      borderColor: colors.gray["30"]
+      borderColor: inputColors.hover.borderColor,
     },
     focus: {
-      boxShadow: colors.gray["10"],
-      borderColor: colors.gray["30"]
+      boxShadow: inputColors.focus.boxShadow,
+      borderColor: inputColors.focus.borderColor,
     }
   },
   tag: {
@@ -157,7 +161,7 @@ export default {
     borderColor,
   },
   text: {
-    color: "inherit",
+    color: colors.gray['90'],
     captionColor: colors.gray["60"],
     linkUnderlineColor: colors.gray["80"]
   },

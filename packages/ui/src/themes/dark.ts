@@ -1,22 +1,23 @@
 import { tokens } from '@/styles/tokens'
+import { darken, lighten } from 'polished'
 
 const { colors } = tokens
-const color = colors.gray["20"];
-const backgroundColor = colors.gray['90']
-const borderColor = colors.gray["70"]
+const color = colors.gray["30"];
+const backgroundColor = darken(.0675)(colors.gray['80'])
+const borderColor = colors.gray["80"]
 const inputColors = {
   borderColor,
-  color: colors.gray["10"],
+  color,
   backgroundColor,
   hover: {
-    borderColor: colors.gray["60"]
+    borderColor: colors.gray["70"]
   },
   focus: {
     boxShadow: colors.gray["80"],
-    borderColor: colors.gray["60"]
+    borderColor: colors.gray["70"]
   },
   placeholder: {
-    color: colors.gray["50"]
+    color: colors.gray["60"]
   }
 }
 
@@ -28,7 +29,7 @@ const buttonColors = {
     backgroundColor: colors.gray["80"],
   },
   active: {
-    backgroundColor: colors.gray["60"],
+    backgroundColor: colors.gray["90"],
   },
   focus: {
     boxShadow: colors.gray["80"],
@@ -38,6 +39,27 @@ const buttonColors = {
   }
 }
 
+const buttonPlainColors = {
+    color: colors.gray["80"],
+    backgroundColor: lighten(.05)(colors.gray["50"]),
+    borderColor: lighten(.05)(colors.gray["50"]),
+    hover: {
+      borderColor: colors.gray["40"],
+      backgroundColor: colors.gray["40"],
+    },
+    active: {
+      borderColor: colors.gray["50"],
+      backgroundColor: colors.gray["50"],
+    },
+    focus: {
+      boxShadow: lighten(.05)(colors.gray["50"]),
+    },
+    selected: {
+      borderColor: lighten(.05)(colors.gray["50"]),
+      backgroundColor: lighten(.05)(colors.gray["50"]),
+    }
+  }
+
 export default {
   button: {
     default: {
@@ -45,7 +67,7 @@ export default {
     },
     active: {
       ...buttonColors,
-      borderColor: colors.gray["20"],
+      borderColor: buttonPlainColors.borderColor,
     },
     ghost: {
       ...buttonColors,
@@ -58,34 +80,17 @@ export default {
       borderColor: "transparent",
       selected: {
         boxShadow: colors.gray['80'],
-       backgroundColor,
+        backgroundColor,
       }
     },
     plain: {
-      color: colors.gray["90"],
-      backgroundColor: colors.gray["10"],
-      borderColor: colors.gray["10"],
-      hover: {
-        borderColor: colors.gray["20"],
-        backgroundColor: colors.gray["20"],
-      },
-      active: {
-        borderColor: colors.gray["40"],
-        backgroundColor: colors.gray["40"],
-      },
-      focus: {
-        boxShadow: colors.gray["30"],
-      },
-      selected: {
-        borderColor: colors.gray["30"],
-        backgroundColor: colors.gray["30"],
-      }
-    },
+      ...buttonPlainColors
+    }
   },
   card: {
    backgroundColor,
     transparent: {
-      backdropColor: colors.gray["80"],
+      backdropColor: colors.gray["90"],
       backdropOpacity: 0.95,
     },
   },
@@ -118,16 +123,16 @@ export default {
     ...inputColors,
   },
   switch: {
-   backgroundColor,
+    backgroundColor,
     borderColor,
     thumbColor: colors.gray["70"],
-    activeThumbColor: colors.gray["10"],
+    activeThumbColor: buttonPlainColors.backgroundColor,
     hover: {
-      borderColor: colors.gray["60"]
+      borderColor: inputColors.hover.borderColor,
     },
     focus: {
-      boxShadow: colors.gray["80"],
-      borderColor: colors.gray["60"]
+      boxShadow: inputColors.focus.boxShadow,
+      borderColor: inputColors.focus.borderColor,
     }
   },
   tag: {
@@ -157,7 +162,7 @@ export default {
     borderColor,
   },
   text: {
-    color: colors.gray["20"],
+    color: colors.gray["30"],
     captionColor: colors.gray["40"],
     linkUnderlineColor: colors.gray["30"]
   },
