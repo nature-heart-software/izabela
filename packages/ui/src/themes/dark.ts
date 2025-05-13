@@ -35,7 +35,7 @@ const buttonColors = {
     boxShadow: colors.gray["80"],
   },
   selected: {
-    backgroundColor: colors.gray["70"],
+    backgroundColor: darken(.0675)(colors.gray["70"]),
   }
 }
 

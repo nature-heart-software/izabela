@@ -1,27 +1,31 @@
 <template>
-  <button
-    v-show="displayOffscreenFocusFix"
-    id="offscreen-focus-fix"
-    :style="{
-      zIndex: 999999999,
+  <ThemeProvider
+    :theme="{
+      ...tokens,
+      ...themes.get(settingsStore.theme),
     }"
-    class="fixed inset-0 pointer-events-auto cursor-none"
-    @click="displayOffscreenFocusFix = false"
-  />
-  <ThemeProvider :theme="{
-    ...tokens,
-    ...themes.get('dark')
-  }">
-    <NvBackground />
-    <div class="h-0">
-      <div id="router-overlay" ref="routerOverlay"></div>
-      <NvMessenger
-        :min-width="768"
-        :transform="messengerStore.position.transform"
-        class="w-full h-full"
+  >
+    <GlobalStyles>
+      <button
+        v-show="displayOffscreenFocusFix"
+        id="offscreen-focus-fix"
+        :style="{
+          zIndex: 999999999,
+        }"
+        class="fixed inset-0 pointer-events-auto cursor-none"
+        @click="displayOffscreenFocusFix = false"
       />
-    </div>
-    <NvDebug v-if="!isGameOverlay && settingsStore.debugMode" />
+      <NvBackground />
+      <div class="h-0">
+        <div id="router-overlay" ref="routerOverlay"></div>
+        <NvMessenger
+          :min-width="768"
+          :transform="messengerStore.position.transform"
+          class="w-full h-full"
+        />
+      </div>
+      <NvDebug v-if="!isGameOverlay && settingsStore.debugMode" />
+    </GlobalStyles>
   </ThemeProvider>
 </template>
 <style lang="scss">
@@ -57,7 +61,8 @@ import pkg from '@root/package.json'
 import { useGameOverlayStore } from '@/features/game-overlay/store'
 import { onIPCApplyProfile } from '@/electron/events/renderer.ts'
 import { useProfilesStore } from '@/features/profiles/store.ts'
-import {themes} from '@packages/ui'
+import { themes, GlobalStyles } from '@packages/ui'
+
 const { ElectronMessengerWindow } = window
 const messengerStore = useMessengerStore()
 const settingsStore = useSettingsStore()

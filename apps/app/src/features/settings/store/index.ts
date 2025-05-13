@@ -34,6 +34,7 @@ export const useSettingsStore = defineStore(
     const selectedSpeechRecognitionEngine = ref(
       defaultSpeechRecognitionEngineId,
     )
+    const theme = ref('light')
     const updateChannel = ref(channel)
     const launchOnStartup = ref(true)
     const runAsAdmin = ref(false)
@@ -219,6 +220,7 @@ export const useSettingsStore = defineStore(
     }
 
     return {
+      theme,
       enableAutoUpdate,
       enableRunAsAdmin,
       disableRunAsAdmin,
