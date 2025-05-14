@@ -194,17 +194,17 @@
                 {
                   label: 'Dark',
                   value: 'dark',
-                }
+                },
               ]"
               :modelValue="settingsStore.theme"
               @update:modelValue="
-                  (value) => {
-                    settingsStore.$patch({ theme: value })
-                    messengerStateStore.$patch({
-                      markForRestart: true,
-                    })
-                  }
-                "
+                (value) => {
+                  settingsStore.$patch({ theme: value })
+                  messengerStateStore.$patch({
+                    markForRestart: true,
+                  })
+                }
+              "
             />
           </NvGroup>
           <NvDivider direction="horizontal" />
