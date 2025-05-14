@@ -167,9 +167,9 @@ export default {
     linkUnderlineColor: colors.gray["30"]
   },
   tooltip: {
-    backgroundColor: colors.white,
-    borderColor: colors.white,
-    color: colors.black
+    backgroundColor: buttonPlainColors.backgroundColor,
+    borderColor: buttonPlainColors.backgroundColor,
+    color: buttonPlainColors.color
   },
   popover: {
    backgroundColor,
@@ -180,7 +180,7 @@ export default {
     borderColor,
   },
   dialog: {
-    backdropColor: colors.gray["10"],
+    backdropColor: colors.gray["90"],
     backdropOpacity: 0.95,
     contentBackgroundColor: backgroundColor
   },

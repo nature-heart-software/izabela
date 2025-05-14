@@ -23,7 +23,6 @@ export const StDialogPositioner = styled(Dialog.Positioner)`
 export const StDialogContent = styled('div')`
   max-width: 480px;
   width: 100%;
-  background-color: ${({theme}: any) => theme.dialog.contentBackgroundColor};
 `
 export const StDialogContentWrapper = styled(Dialog.Content)`
   width: 100%;

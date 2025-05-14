@@ -71,6 +71,9 @@ export const GlobalStyles = styled('div')`
       background-color: ${({theme}) => theme.tooltip.backgroundColor} !important;
       padding: ${() => rem(spacing[1])} ${() => rem(spacing[2])};
       ${() => borderRadiusStyleBySize('xs')}
+      * {
+        color: inherit!important;
+      }
     }
 `
 declare module 'vue3-styled-components' {

@@ -1,11 +1,8 @@
 <template>
   <ThemeProvider
-    :theme="{
-      ...tokens,
-      ...themes.get(settingsStore.theme),
-    }"
+    :theme="theme"
   >
-    <GlobalStyles>
+    <GlobalStyles ref="globalStyles">
       <button
         v-show="displayOffscreenFocusFix"
         id="offscreen-focus-fix"
@@ -52,7 +49,7 @@ import {
 } from '@/teams/messenger/store'
 import NvDebug from '@/teams/messenger/components/NvDebug.vue'
 import { useSettingsStore } from '@/features/settings/store'
-import { ref, watch, provide } from 'vue'
+import { ref, watch, provide, computed } from 'vue'
 import { socket } from '@/services'
 import { isGameOverlay } from '@/consts.ts'
 import { useDatabasesStore } from '@/features/databases/store'
@@ -70,6 +67,13 @@ const gameOverlayStore = useGameOverlayStore()
 const messengerWindowStore = useMessengerWindowStore()
 const displayOffscreenFocusFix = ref(isGameOverlay)
 
+const theme = computed(() => ({
+  ...tokens,
+  ...themes.get(settingsStore.theme),
+}))
+
+const globalStyles = ref()
+provide('portal-target', globalStyles)
 const routerOverlay = ref()
 provide('router-overlay', routerOverlay)
 window.addEventListener('keydown', (event) => {

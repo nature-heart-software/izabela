@@ -1,9 +1,6 @@
 <template>
   <ThemeProvider
-    :theme="{
-      ...tokens,
-      ...themes.get(settingsStore.theme),
-    }"
+    :theme="theme"
   >
     <GlobalStyles>
       <div
@@ -32,6 +29,12 @@ import { useSettingsStore } from '@/features/settings/store'
 import NvOverlayInput from '@/teams/overlay/components/NvOverlayInput.vue'
 import { GlobalStyles, themes, tokens } from '@packages/ui'
 import { ThemeProvider } from 'vue3-styled-components'
+import { computed } from 'vue'
 
 const settingsStore = useSettingsStore()
+
+const theme = computed(() => ({
+  ...tokens,
+  ...themes.get(settingsStore.theme),
+}))
 </script>

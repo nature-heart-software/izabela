@@ -106,6 +106,7 @@ import { useRoute } from 'vue-router'
 import { provide, ref } from 'vue'
 import { useConfirmStore } from '@/store/use-confirm-store.ts'
 import { useMessengerStateStore } from '@/teams/messenger/store'
+import { useSettingsStore } from '@/features/settings/store'
 import NvMarkForRestartMessage from '@/teams/messenger/components/NvMarkForRestartMessage.vue'
 import { isGameOverlay } from '@/consts.ts'
 import { useGetAppInfoQuery } from '@/features/app/queries.ts'
@@ -114,6 +115,7 @@ const settings = ref()
 const portalTarget = ref()
 provide('portal-target', portalTarget)
 
+const settingsStore = useSettingsStore()
 const navigation = [
   {
     name: 'Application',
@@ -168,14 +170,13 @@ const navigation = [
         name: 'About',
         to: { name: 'settings-about' },
       },
-      { name: '🖤', to: { name: 'settings-support' } },
+      { name: settingsStore.theme === 'light' ? '🖤' : '🤍', to: { name: 'settings-support' } },
     ],
   },
 ]
 const currentRoute = useRoute()
 const { instances } = useConfirmStore()
 const messengerStateStore = useMessengerStateStore()
-
 const { data: info } = useGetAppInfoQuery()
 </script>
 <style lang="scss" scoped>
