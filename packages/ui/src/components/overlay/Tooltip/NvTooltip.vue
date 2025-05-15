@@ -20,7 +20,7 @@ import { getElement } from '@/utils/vue'
 const props = defineProps(propsDefinition)
 const injectedPortalTarget = inject('portal-target')
 const portalTarget = computed(() => getElement(injectedPortalTarget) || document.body)
-watch(portalTarget, console.log)
+
 const tippyProps: TippyOptions = computed(() => ({
   trigger: 'mouseenter focus',
   delay: [250, 0],

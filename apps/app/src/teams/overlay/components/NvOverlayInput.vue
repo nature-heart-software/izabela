@@ -8,8 +8,8 @@
     <NvGroup :spacing="4" class="min-w-0" grow>
       <NvCard class="min-w-0" size="sm">
         <NvGroup noWrap>
-          <div
-            class="overlayInput border rounded px-5 h-8 text-2 flex items-center text-gray-90 focused font-semibold"
+          <NvWrapper
+            class="overlayInput border rounded px-5 h-8 text-2 flex items-center focused font-semibold"
             tabindex="-1"
           >
             <!--.overlayInput-->
@@ -49,7 +49,7 @@
                 />
               </label>
             </div>
-          </div>
+          </NvWrapper>
         </NvGroup>
       </NvCard>
     </NvGroup>
@@ -67,6 +67,11 @@ import {
 } from '@/electron/events/renderer'
 import { useElementSize } from '@vueuse/core'
 import { rem } from 'polished'
+import styled from 'vue3-styled-components'
+
+const NvWrapper = styled('div')`
+    color: ${({theme}) => theme.text.color};
+`
 
 const { ElectronOverlayWindow, ElectronKeybinding } = window
 const placeholder = ref(

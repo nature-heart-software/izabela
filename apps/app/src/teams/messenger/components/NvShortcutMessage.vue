@@ -58,12 +58,12 @@
           <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm" />
         </NvContextMenu>
       </NvGroup>
-      <div v-if="isPlaying" class="h-2 relative bg-gray-10">
-        <div
+      <NvBarWrapper v-if="isPlaying" class="h-2 relative">
+        <NvBar
           :style="{ width: `${progress * 100}%` }"
-          class="h-full bg-black"
-        ></div>
-      </div>
+          class="h-full"
+        ></NvBar>
+      </NvBarWrapper>
     </NvStack>
   </NvCard>
 </template>
@@ -81,6 +81,7 @@ import { usePlayMessage } from '@/features/messages/hooks'
 import NvSpeechEngineInput from '@/features/speech/components/inputs/NvSpeechEngineInput.vue'
 import { getCleanMessage, getMessageCommand } from '@/modules/izabela/utils'
 import hash from 'object-hash'
+import { NvBar, NvBarWrapper } from '@/components'
 
 const props = defineProps({
   id: {

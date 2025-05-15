@@ -12,7 +12,7 @@ import {
 } from '@/utils/css-in-js'
 import { themes } from '@/themes'
 import { tokens } from '@/styles/tokens'
-const { spacing, boxShadow, borderWidth, transition } = tokens
+const { spacing, boxShadow, borderWidth, transition, borderRadius } = tokens
 
 export const GlobalStyles = styled('div')`
   color: ${({ theme }) => theme.text.color};
@@ -77,6 +77,37 @@ export const GlobalStyles = styled('div')`
       * {
         color: inherit!important;
       }
+    }
+  
+    #vjt-tooltip {
+        background-color: ${({ theme }) => theme.button.plain.backgroundColor} !important;
+        box-shadow: ${() => boxShadow.DEFAULT};
+        color: ${({ theme }) => theme.button.plain.color} !important;
+        [type="body"] {
+          color: ${({ theme }) => theme.button.plain.color} !important;
+        }
+        border-radius: ${() => rem(borderRadius.md)} !important;
+        font-size: inherit !important;
+        padding: ${() => rem(spacing['5'])} !important;
+        display: flex;
+        flex-direction: column;
+        gap: ${() => rem(spacing['5'])};
+
+        &[data-hidden] {
+            display: none !important;
+        }
+    }
+
+    #vjt-arrow {
+        &::before {
+            background-color: ${({ theme }) => theme.button.plain.backgroundColor} !important;
+            box-shadow: ${() => boxShadow.DEFAULT};
+        }
+    }
+
+    .vjt-highlight {
+        outline: ${() => rem(2)} solid ${({ theme }) => theme.button.plain.backgroundColor} !important;
+        border-radius: inherit !important;
     }
 `
 declare module 'vue3-styled-components' {

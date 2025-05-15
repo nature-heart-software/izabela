@@ -40,12 +40,12 @@
           <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm" />
         </NvContextMenu>
       </NvGroup>
-      <div v-if="isPlaying" class="h-2 relative bg-gray-10">
-        <div
+      <NvBarWrapper v-if="isPlaying" class="h-2 relative">
+        <NvBar
           :style="{ width: `${progress * 100}%` }"
-          class="h-full bg-black"
-        ></div>
-      </div>
+          class="h-full"
+        ></NvBar>
+      </NvBarWrapper>
     </NvStack>
   </NvCard>
 </template>
@@ -72,6 +72,7 @@ import { UseTimeAgo } from '@vueuse/components'
 import { useDateFormat } from '@vueuse/core'
 import { usePlayMessage } from '@/features/messages/hooks'
 import { copyTextToClipboard } from '@/utils/text'
+import {NvBar, NvBarWrapper} from '@/components'
 
 const props = defineProps({
   id: {
