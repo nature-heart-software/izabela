@@ -59,10 +59,7 @@
         </NvContextMenu>
       </NvGroup>
       <NvBarWrapper v-if="isPlaying" class="h-2 relative">
-        <NvBar
-          :style="{ width: `${progress * 100}%` }"
-          class="h-full"
-        ></NvBar>
+        <NvBar :style="{ width: `${progress * 100}%` }" class="h-full"></NvBar>
       </NvBarWrapper>
     </NvStack>
   </NvCard>
