@@ -8,7 +8,7 @@
     <NvGroup :spacing="4" class="min-w-0" grow>
       <NvCard class="min-w-0" size="sm">
         <NvGroup noWrap>
-          <NvWrapper
+          <NvInput
             class="overlayInput border rounded px-5 h-8 text-2 flex items-center focused font-semibold"
             tabindex="-1"
           >
@@ -49,7 +49,7 @@
                 />
               </label>
             </div>
-          </NvWrapper>
+          </NvInput>
         </NvGroup>
       </NvCard>
     </NvGroup>
@@ -69,8 +69,14 @@ import { useElementSize } from '@vueuse/core'
 import { rem } from 'polished'
 import styled from 'vue3-styled-components'
 
-const NvWrapper = styled('div')`
+const NvInput = styled('div')`
   color: ${({ theme }) => theme.text.color};
+  border-color: ${({ theme }) => theme.input.borderColor};
+  .activeIndex {
+    &:after {
+      background-color: ${({ theme }) => theme.input.color};
+    }
+  }
 `
 
 const { ElectronOverlayWindow, ElectronKeybinding } = window
@@ -374,7 +380,6 @@ watch(carretIndex, () => {
         right: 0;
         bottom: 0;
         width: 1px;
-        background-color: #2b2b2c;
         animation: caret 1s steps(1) infinite;
         z-index: 100000;
       }

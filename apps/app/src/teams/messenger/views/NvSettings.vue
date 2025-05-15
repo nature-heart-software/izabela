@@ -95,7 +95,7 @@
       </div>
     </div>
     <template v-for="instance in instances" :key="instance.id">
-      <NvStoreDialog :instance="instance" :portal-target="settings" />
+      <NvStoreDialog :instance="instance" portal-target="#settings" />
     </template>
   </NvCard>
 </template>
