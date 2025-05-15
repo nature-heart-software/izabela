@@ -70,7 +70,7 @@ import { rem } from 'polished'
 import styled from 'vue3-styled-components'
 
 const NvWrapper = styled('div')`
-    color: ${({theme}) => theme.text.color};
+  color: ${({ theme }) => theme.text.color};
 `
 
 const { ElectronOverlayWindow, ElectronKeybinding } = window

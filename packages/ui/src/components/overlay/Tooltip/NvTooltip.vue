@@ -19,19 +19,24 @@ import { getElement } from '@/utils/vue'
 
 const props = defineProps(propsDefinition)
 const injectedPortalTarget = inject('portal-target')
-const portalTarget = computed(() => getElement(injectedPortalTarget) || document.body)
+const portalTarget = computed(
+  () => getElement(injectedPortalTarget) || document.body,
+)
 
-const tippyProps: TippyOptions = computed(() => ({
-  trigger: 'mouseenter focus',
-  delay: [250, 0],
-  interactive: false,
-  placement: 'top',
-  offset: [0, tokens.spacing['4']],
-  appendTo: () => portalTarget.value,
-  theme: `tooltip`,
-  maxWidth: 300,
-  ...props.tippyOptions,
-} as TippyOptions))
+const tippyProps: TippyOptions = computed(
+  () =>
+    ({
+      trigger: 'mouseenter focus',
+      delay: [250, 0],
+      interactive: false,
+      placement: 'top',
+      offset: [0, tokens.spacing['4']],
+      appendTo: () => portalTarget.value,
+      theme: `tooltip`,
+      maxWidth: 300,
+      ...props.tippyOptions,
+    }) as TippyOptions,
+)
 const tooltip = ref<MaybeElement>()
 const tippyInstance = ref<TippyInstance>()
 const { focused } = useFocusWithin(tooltip)

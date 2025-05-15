@@ -41,10 +41,7 @@
         </NvContextMenu>
       </NvGroup>
       <NvBarWrapper v-if="isPlaying" class="h-2 relative">
-        <NvBar
-          :style="{ width: `${progress * 100}%` }"
-          class="h-full"
-        ></NvBar>
+        <NvBar :style="{ width: `${progress * 100}%` }" class="h-full"></NvBar>
       </NvBarWrapper>
     </NvStack>
   </NvCard>
@@ -72,7 +69,7 @@ import { UseTimeAgo } from '@vueuse/components'
 import { useDateFormat } from '@vueuse/core'
 import { usePlayMessage } from '@/features/messages/hooks'
 import { copyTextToClipboard } from '@/utils/text'
-import {NvBar, NvBarWrapper} from '@/components'
+import { NvBar, NvBarWrapper } from '@/components'
 
 const props = defineProps({
   id: {
