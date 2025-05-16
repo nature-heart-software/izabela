@@ -170,7 +170,10 @@ const navigation = [
         name: 'About',
         to: { name: 'settings-about' },
       },
-      { name: settingsStore.theme === 'light' ? '🖤' : '🤍', to: { name: 'settings-support' } },
+      {
+        name: settingsStore.theme === 'light' ? '🖤' : '🤍',
+        to: { name: 'settings-support' },
+      },
     ],
   },
 ]
