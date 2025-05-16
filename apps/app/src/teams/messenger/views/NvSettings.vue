@@ -100,7 +100,7 @@
   </NvCard>
 </template>
 <script lang="ts" setup>
-import { NvButton, NvCard, NvStack, NvText, NvTooltip } from '@packages/ui'
+import { NvButton, NvCard, NvStack, NvText, NvTooltip, PORTAL_TARGET } from '@packages/ui'
 import NvStoreDialog from '@/teams/messenger/components/NvStoreDialog.vue'
 import { useRoute } from 'vue-router'
 import { provide, ref } from 'vue'
@@ -111,10 +111,8 @@ import NvMarkForRestartMessage from '@/teams/messenger/components/NvMarkForResta
 import { isGameOverlay } from '@/consts.ts'
 import { useGetAppInfoQuery } from '@/features/app/queries.ts'
 
-const settings = ref()
 const portalTarget = ref()
-provide('portal-target', portalTarget)
-
+provide(PORTAL_TARGET, portalTarget)
 const settingsStore = useSettingsStore()
 const navigation = [
   {

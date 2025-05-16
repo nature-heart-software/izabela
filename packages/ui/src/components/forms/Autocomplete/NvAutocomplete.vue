@@ -104,6 +104,7 @@ import NvVirtualListContainer from '@/components/miscellaneous/VirtualList/NvVir
 import get from 'lodash/get'
 import { Virtualizer } from '@tanstack/virtual-core'
 import { getElement } from '@/utils/vue'
+import { PORTAL_TARGET } from '@/consts'
 
 const props = defineProps(propsDefinition)
 const list = ref<
@@ -211,6 +212,6 @@ const onVisible = () => {
   selection.value = props.autoScrollIndex
   loading.value = false
 }
-const injectedPortalTarget = inject('portal-target')
+const injectedPortalTarget = inject(PORTAL_TARGET)
 const portalTarget = computed(() => getElement(injectedPortalTarget) || 'body')
 </script>

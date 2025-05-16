@@ -10,8 +10,8 @@ import {
   disabledItemBackgroundStyle,
   borderRadiusStyleBySize,
 } from '@/utils/css-in-js'
-import { themes } from '@/themes'
 import { tokens } from '@/styles/tokens'
+export { PORTAL_TARGET } from '@/consts'
 const { spacing, boxShadow, borderWidth, transition, borderRadius } = tokens
 
 export const GlobalStyles = styled('div')`

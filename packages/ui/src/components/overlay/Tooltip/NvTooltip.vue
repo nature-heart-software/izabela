@@ -16,14 +16,14 @@ import { Tippy, TippyInstance, TippyOptions } from 'vue-tippy'
 import { tokens } from '@/styles/tokens'
 import { MaybeElement, useFocusWithin } from '@vueuse/core'
 import { getElement } from '@/utils/vue'
+import { PORTAL_TARGET } from '@/consts'
 
 const props = defineProps(propsDefinition)
-const injectedPortalTarget = inject('portal-target')
+const injectedPortalTarget = inject(PORTAL_TARGET)
 const portalTarget = computed(
   () => getElement(injectedPortalTarget) || document.body,
 )
-
-const tippyProps: TippyOptions = computed(
+const tippyProps = computed<TippyOptions>(
   () =>
     ({
       trigger: 'mouseenter focus',
@@ -31,7 +31,7 @@ const tippyProps: TippyOptions = computed(
       interactive: false,
       placement: 'top',
       offset: [0, tokens.spacing['4']],
-      appendTo: () => portalTarget.value,
+      appendTo: portalTarget.value,
       theme: `tooltip`,
       maxWidth: 300,
       ...props.tippyOptions,

@@ -52,18 +52,20 @@
             </NvStack>
           </div>
           <div class="settings__content flex-1 pl-4">
-            <div class="h-full relative">
-              <!-- View -->
-              <router-view v-slot="{ Component }">
-                <Transition class="transition">
-                  <div
-                    :key="Component"
-                    class="absolute inset-0 overflow-y-auto"
-                  >
-                    <component :is="Component" />
-                  </div>
-                </Transition>
-              </router-view>
+            <div ref="portalTarget" class="h-full relative overflow-hidden">
+              <div class="h-full relative">
+                <!-- View -->
+                <router-view v-slot="{ Component }">
+                  <Transition class="transition">
+                    <div
+                      :key="Component"
+                      class="absolute inset-0 overflow-y-auto"
+                    >
+                      <component :is="Component" />
+                    </div>
+                  </Transition>
+                </router-view>
+              </div>
             </div>
           </div>
         </div>
@@ -72,9 +74,12 @@
   </NvCard>
 </template>
 <script lang="ts" setup>
-import { NvButton, NvStack, NvText, NvCard } from '@packages/ui'
+import { NvButton, NvStack, NvText, NvCard, PORTAL_TARGET } from '@packages/ui'
 import { useRoute } from 'vue-router'
+import { provide, ref } from 'vue'
 
+const portalTarget = ref()
+provide(PORTAL_TARGET, portalTarget)
 const navigation = [
   {
     name: 'Messages',

@@ -58,7 +58,7 @@ import pkg from '@root/package.json'
 import { useGameOverlayStore } from '@/features/game-overlay/store'
 import { onIPCApplyProfile } from '@/electron/events/renderer.ts'
 import { useProfilesStore } from '@/features/profiles/store.ts'
-import { themes, GlobalStyles } from '@packages/ui'
+import { themes, GlobalStyles, PORTAL_TARGET } from '@packages/ui'
 
 const { ElectronMessengerWindow } = window
 const messengerStore = useMessengerStore()
@@ -73,7 +73,7 @@ const theme = computed(() => ({
 }))
 
 const globalStyles = ref()
-provide('portal-target', globalStyles)
+provide(PORTAL_TARGET, globalStyles)
 const routerOverlay = ref()
 provide('router-overlay', routerOverlay)
 window.addEventListener('keydown', (event) => {
