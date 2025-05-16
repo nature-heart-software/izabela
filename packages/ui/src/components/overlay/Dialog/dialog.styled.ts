@@ -2,9 +2,10 @@
 import styled from 'vue3-styled-components'
 import { Dialog } from '@ark-ui/vue'
 import { tokens } from '@/styles/tokens'
+import { themes } from '@/themes'
 import { rem, rgba } from 'polished'
 
-const { colors, spacing } = tokens
+const { spacing } = tokens
 
 export const StDialogRoot = styled(Dialog.Root)``
 export const StDialogTrigger = styled(Dialog.Trigger)``
@@ -12,7 +13,7 @@ export const StDialogBackdrop = styled(Dialog.Backdrop)`
   position: absolute;
   z-index: 9999;
   inset: 0;
-  background-color: ${() => rgba(colors.gray['100'], 0.95)};
+  background-color: ${({theme}) => rgba(theme.dialog.backdropColor, theme.dialog.backdropOpacity)};
 `
 export const StDialogPositioner = styled(Dialog.Positioner)`
   position: absolute;

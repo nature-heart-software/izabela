@@ -1,14 +1,15 @@
 <template>
-  <div
+  <NvCard
+    variant="transparent"
     ref="messenger"
-    class="messenger bg-gray-10/95 rounded grid p-4 gap-4 grid-rows-3 grid-rows-none min-w-[480px]"
+    class="messenger rounded grid p-4 gap-4 grid-rows-3 grid-rows-none min-w-[480px]"
     data-v-step="messenger-window"
   >
     <NvGroup :spacing="4" class="min-w-0" grow>
       <NvCard class="min-w-0" size="sm">
         <NvGroup noWrap>
-          <div
-            class="overlayInput border rounded px-5 h-8 text-2 flex items-center text-gray-90 focused font-semibold"
+          <NvInput
+            class="overlayInput border rounded px-5 h-8 text-2 flex items-center focused font-semibold"
             tabindex="-1"
           >
             <!--.overlayInput-->
@@ -27,7 +28,8 @@
                 ref="keysRef"
                 :class="{
                   activeIndex: carretIndex === i,
-                  inSelection: selection[0] < i && i <= selection[1] && hasSelection,
+                  inSelection:
+                    selection[0] < i && i <= selection[1] && hasSelection,
                 }"
                 >{{ key }}</span
               >
@@ -40,14 +42,18 @@
                 >
               </template>
               <label class="hidden">
-                <input ref="selectionValueRef" :value="selectionValue" type="text" />
+                <input
+                  ref="selectionValueRef"
+                  :value="selectionValue"
+                  type="text"
+                />
               </label>
             </div>
-          </div>
+          </NvInput>
         </NvGroup>
       </NvCard>
     </NvGroup>
-  </div>
+  </NvCard>
 </template>
 
 <script lang="ts" setup>
@@ -61,9 +67,22 @@ import {
 } from '@/electron/events/renderer'
 import { useElementSize } from '@vueuse/core'
 import { rem } from 'polished'
+import styled from 'vue3-styled-components'
+
+const NvInput = styled('div')`
+  color: ${({ theme }) => theme.text.color};
+  border-color: ${({ theme }) => theme.input.borderColor};
+  .activeIndex {
+    &:after {
+      background-color: ${({ theme }) => theme.input.color};
+    }
+  }
+`
 
 const { ElectronOverlayWindow, ElectronKeybinding } = window
-const placeholder = ref('So, said the angel to the child who, divided, broke the knife..')
+const placeholder = ref(
+  'So, said the angel to the child who, divided, broke the knife..',
+)
 const carretIndex = ref(-1)
 const selection = ref([-1, -1])
 const settingsStore = useSettingsStore()
@@ -112,7 +131,10 @@ function del() {
     // keys.value = keys.value
   } else {
     targetIndex = carretIndex.value > -1 ? carretIndex.value - 1 : -1
-    keys.value.splice(carretIndex.value, selection.value[1] - selection.value[0] + 1)
+    keys.value.splice(
+      carretIndex.value,
+      selection.value[1] - selection.value[0] + 1,
+    )
     // keys.value = keys.value
   }
   carretIndex.value = targetIndex
@@ -138,7 +160,10 @@ function paste(text: any = '') {
   if (text) {
     insertKey(text.split(''))
     carretIndex.value += text.length
-    selection.value = [carretIndex.value + text.length, carretIndex.value + text.length]
+    selection.value = [
+      carretIndex.value + text.length,
+      carretIndex.value + text.length,
+    ]
   } else {
     ElectronKeybinding.readFromClipboard().then((clipboardContent: string) => {
       if (clipboardContent) {
@@ -163,9 +188,15 @@ function paste(text: any = '') {
 
 function suppr() {
   if (hasSelection.value) {
-    keys.value.splice(selection.value[0] + 1, selection.value[1] - selection.value[0])
+    keys.value.splice(
+      selection.value[0] + 1,
+      selection.value[1] - selection.value[0],
+    )
   } else {
-    keys.value.splice(carretIndex.value + 1, selection.value[1] - selection.value[0] + 1)
+    keys.value.splice(
+      carretIndex.value + 1,
+      selection.value[1] - selection.value[0] + 1,
+    )
   }
   // eslint-disable-next-line prefer-destructuring
   carretIndex.value = selection.value[0]
@@ -349,7 +380,6 @@ watch(carretIndex, () => {
         right: 0;
         bottom: 0;
         width: 1px;
-        background-color: #2b2b2c;
         animation: caret 1s steps(1) infinite;
         z-index: 100000;
       }

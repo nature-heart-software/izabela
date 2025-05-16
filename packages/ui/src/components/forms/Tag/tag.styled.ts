@@ -1,6 +1,7 @@
 /* eslint-disable */
 import styled from 'vue3-styled-components'
 import { tokens } from '@/styles/tokens'
+import { themes } from '@/themes'
 import { props } from './tag.shared'
 import { rem } from 'polished'
 import {
@@ -11,7 +12,7 @@ import {
   iconStyleBySize,
 } from '@/utils/css-in-js'
 
-const { borderWidth, transition, colors, fontSize, spacing } = tokens
+const { borderWidth, transition, fontSize, spacing } = tokens
 
 export const StTagContentWrapper = styled('span', props)`
   position: relative;
@@ -41,8 +42,8 @@ export const StTag = styled('span', props)`
   border-width: ${() => rem(borderWidth.DEFAULT)};
   outline: 0;
   transition: ${() => transition.DEFAULT};
-  background-color: ${() => colors.white};
-  border-color: ${() => colors.gray['20']};
+  background-color: ${({theme}) => theme.tag.backgroundColor};
+  border-color: ${({theme}) => theme.tag.borderColor};
   min-width: 0;
 
   ${() => fontSizeStyle(fontSize['1'])}

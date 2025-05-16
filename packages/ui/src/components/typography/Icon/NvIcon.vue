@@ -20,8 +20,3 @@ const component = computed(() =>
   ),
 )
 </script>
-<style lang="scss">
-body {
-  @apply font-sans text-gray-80 text-2;
-}
-</style>

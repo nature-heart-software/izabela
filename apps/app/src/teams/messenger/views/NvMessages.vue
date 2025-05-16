@@ -1,11 +1,24 @@
 <template>
-  <div class="settings bg-gray-10/95 rounded p-4 flex flex-col space-y-4">
+  <NvCard
+    variant="transparent"
+    class="settings rounded p-4 flex flex-col space-y-4"
+  >
     <!-- Top -->
     <div class="flex justify-between space-x-4">
       <div></div>
       <NvCard class="inline-flex" size="sm">
         <div class="inline-flex space-x-2">
-          <NvButton icon-name="times" size="xs" type="plain" @click="$emit('close')"/>
+          <NvTooltip>
+            <NvText>Close</NvText>
+            <template #reference>
+              <NvButton
+                icon-name="times"
+                size="xs"
+                type="plain"
+                @click="$emit('close')"
+              />
+            </template>
+          </NvTooltip>
         </div>
       </NvCard>
     </div>
@@ -21,14 +34,20 @@
                     {{ category.name }}
                   </NvText>
                   <NvStack spacing="2">
-                    <template v-for="entry in category.children" :key="entry.name">
-                      <router-link :to="entry.to || { name: 'messages' }" class="w-full">
+                    <template
+                      v-for="entry in category.children"
+                      :key="entry.name"
+                    >
+                      <router-link
+                        :to="entry.to || { name: 'messages' }"
+                        class="w-full"
+                      >
                         <NvButton
                           :selected="currentRoute.name === entry.to?.name"
                           class="w-full"
                           size="sm"
                           type="ghost-alt"
-                        >{{ entry.name }}
+                          >{{ entry.name }}
                         </NvButton>
                       </router-link>
                     </template>
@@ -38,25 +57,31 @@
             </NvStack>
           </div>
           <div class="settings__content flex-1 pl-4">
-            <div class="h-full relative">
-              <!-- View -->
-              <router-view v-slot="{ Component }">
-                <Transition class="transition">
-                  <div :key="Component" class="absolute inset-0 overflow-y-auto">
-                    <component :is="Component"/>
-                  </div>
-                </Transition>
-              </router-view>
-            </div>
+            <NvPortalTarget class="h-full relative overflow-hidden">
+              <div class="h-full relative">
+                <!-- View -->
+                <router-view v-slot="{ Component }">
+                  <Transition class="transition">
+                    <div
+                      :key="Component"
+                      class="absolute inset-0 overflow-y-auto"
+                    >
+                      <component :is="Component" />
+                    </div>
+                  </Transition>
+                </router-view>
+              </div>
+            </NvPortalTarget>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </NvCard>
 </template>
 <script lang="ts" setup>
-import { NvButton, NvCard, NvStack, NvText } from '@packages/ui'
+import { NvButton, NvStack, NvText, NvCard, NvTooltip } from '@packages/ui'
 import { useRoute } from 'vue-router'
+import NvPortalTarget from '@/teams/messenger/components/NvPortalTarget.vue'
 
 const navigation = [
   {

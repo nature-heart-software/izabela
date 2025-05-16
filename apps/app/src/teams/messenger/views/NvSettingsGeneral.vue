@@ -183,6 +183,33 @@
         <NvStack :spacing="5">
           <NvGroup :spacing="5" justify="apart" no-wrap>
             <NvStack>
+              <NvText type="label">Theme</NvText>
+            </NvStack>
+            <NvSelect
+              :options="[
+                {
+                  label: 'Light',
+                  value: 'light',
+                },
+                {
+                  label: 'Dark',
+                  value: 'dark',
+                },
+              ]"
+              :modelValue="settingsStore.theme"
+              @update:modelValue="
+                (value) => {
+                  settingsStore.$patch({ theme: value })
+                  messengerStateStore.$patch({
+                    markForRestart: true,
+                  })
+                }
+              "
+            />
+          </NvGroup>
+          <NvDivider direction="horizontal" />
+          <NvGroup :spacing="5" justify="apart" no-wrap>
+            <NvStack>
               <NvText type="label">Run as Administrator</NvText>
             </NvStack>
             <NvSwitch
@@ -281,6 +308,7 @@ import {
   NvStack,
   NvSwitch,
   NvText,
+  NvSelect,
 } from '@packages/ui'
 import { useSettingsStore } from '@/features/settings/store'
 import NvDisplaySelect from '@/features/display/components/inputs/DisplaySelect.vue'
@@ -288,9 +316,12 @@ import NvKeybinding from '@/features/app/components/inputs/NvKeybinding.vue'
 import NvUpdateChannelSelect from '@/features/update/components/inputs/NvUpdateChannelSelect.vue'
 import { useConfirmAdmin } from '@/hooks/use-confirm-admin.ts'
 import { useClearCacheMutation } from '@/features/app/queries.ts'
+import { useMessengerStateStore } from '@/teams/messenger/store'
 
 const confirmAdmin = useConfirmAdmin()
 const settingsStore = useSettingsStore()
+const messengerStateStore = useMessengerStateStore()
+
 const {
   mutateAsync: clearCacheMutation,
   isSuccess: isClearCacheSuccess,

@@ -11,7 +11,7 @@
             people's lives has been incredibly motivating!
           </NvText>
           <NvText>
-            This is my gift to the world and I believe you'll make good use of it in turn! 🖤
+            This is my gift to the world and I believe you'll make good use of it in turn! {{settingsStore.theme === 'light' ? '🖤' : '🤍'}}
           </NvText>
           <NvText>
             And please, if you enjoy the project, consider supporting me on
@@ -25,6 +25,9 @@
 </template>
 <script lang="ts" setup>
 import { NvCard, NvStack, NvText } from '@packages/ui'
+import { useSettingsStore } from '@/features/settings/store'
 
 const years = new Date().getFullYear() - 2017 // wow this long?
+
+const settingsStore = useSettingsStore()
 </script>

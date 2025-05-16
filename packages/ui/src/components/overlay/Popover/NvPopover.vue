@@ -52,9 +52,10 @@ import { Popover } from '@ark-ui/vue'
 import Card from '@/components/display/Card/NvCard.vue'
 import { rem } from 'polished'
 import { getElement } from '@/utils/vue'
+import { PORTAL_TARGET } from '@/consts'
 
 const open = ref(false)
 const props = defineProps(propsDefinition)
-const injectedPortalTarget = inject('portal-target')
+const injectedPortalTarget = inject(PORTAL_TARGET)
 const portalTarget = computed(() => getElement(injectedPortalTarget) || 'body')
 </script>

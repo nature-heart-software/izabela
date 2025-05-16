@@ -2,7 +2,6 @@
   <NvDialog
     v-bind="{
       ...props.instance.dialogProps,
-      portalTarget: props.portalTarget,
       open: open,
       'onUpdate:open': (value) => (open = value),
     }"
@@ -42,9 +41,6 @@ const props = defineProps({
   instance: {
     type: Object as PropType<StoreDialog>,
     required: true,
-  },
-  portalTarget: {
-    type: String,
   },
 })
 

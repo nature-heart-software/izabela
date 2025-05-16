@@ -26,26 +26,33 @@
   </StContextMenu>
 </template>
 <script lang="ts" setup>
-import { defineProps, ref } from 'vue'
+import { computed, defineProps, inject, ref, watch } from 'vue'
 import { StContextMenu } from './context-menu.styled'
 import { props as propsDefinition } from './context-menu.shared'
-import { Tippy } from 'vue-tippy'
+import { Tippy, TippyOptions } from 'vue-tippy'
 import { tokens } from '@/styles/tokens'
 import NvOption from '@/components/forms/Select/NvOption.vue'
 import NvDivider from '@/components/miscellaneous/Divider/NvDivider.vue'
 import NvGroup from '@/components/miscellaneous/Group/NvGroup.vue'
 import NvIcon from '@/components/typography/Icon/NvIcon.vue'
+import { getElement } from '@/utils/vue'
+import { PORTAL_TARGET } from '@/consts'
 
 const props = defineProps(propsDefinition)
-const tippyProps: (typeof props)['tippyOptions'] = {
+const injectedPortalTarget = inject(PORTAL_TARGET)
+const portalTarget = computed(
+  () => getElement(injectedPortalTarget) || document.body,
+)
+const tippyProps = computed<TippyOptions>(() => ({
   trigger: 'click',
   interactive: true,
   placement: 'bottom-end',
   offset: [0, tokens.spacing['4']],
+  appendTo: portalTarget.value,
   theme: `context-menu`,
   maxWidth: 300,
   ...props.tippyOptions,
-}
+}))
 const tippyRef = ref()
 const close = () => {
   tippyRef.value?.hide()

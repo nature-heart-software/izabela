@@ -1,8 +1,9 @@
 <template>
-  <div
+  <NvCard
+    variant="transparent"
     id="settings"
     ref="settings"
-    class="settings relative bg-gray-10/95 rounded p-4 overflow-hidden"
+    class="settings relative rounded p-4 overflow-hidden"
   >
     <div class="flex flex-col space-y-4 h-full">
       <!-- Top -->
@@ -73,7 +74,7 @@
               </NvStack>
             </div>
             <div class="settings__content flex-1 pl-4">
-              <div ref="portalTarget" class="h-full relative overflow-hidden">
+              <NvPortalTarget class="h-full relative overflow-hidden">
                 <div class="h-full relative">
                   <!-- View -->
                   <router-view v-slot="{ Component }">
@@ -87,32 +88,32 @@
                     </Transition>
                   </router-view>
                 </div>
-              </div>
+              </NvPortalTarget>
             </div>
           </div>
         </div>
       </div>
     </div>
     <template v-for="instance in instances" :key="instance.id">
-      <NvStoreDialog :instance="instance" :portal-target="settings" />
+      <NvStoreDialog :instance="instance" />
     </template>
-  </div>
+  </NvCard>
 </template>
 <script lang="ts" setup>
 import { NvButton, NvCard, NvStack, NvText, NvTooltip } from '@packages/ui'
 import NvStoreDialog from '@/teams/messenger/components/NvStoreDialog.vue'
 import { useRoute } from 'vue-router'
-import { provide, ref } from 'vue'
 import { useConfirmStore } from '@/store/use-confirm-store.ts'
 import { useMessengerStateStore } from '@/teams/messenger/store'
+import { useSettingsStore } from '@/features/settings/store'
 import NvMarkForRestartMessage from '@/teams/messenger/components/NvMarkForRestartMessage.vue'
 import { isGameOverlay } from '@/consts.ts'
 import { useGetAppInfoQuery } from '@/features/app/queries.ts'
+import NvPortalTarget from '@/teams/messenger/components/NvPortalTarget.vue'
+import { ref } from 'vue'
 
 const settings = ref()
-const portalTarget = ref()
-provide('portal-target', portalTarget)
-
+const settingsStore = useSettingsStore()
 const navigation = [
   {
     name: 'Application',
@@ -167,14 +168,16 @@ const navigation = [
         name: 'About',
         to: { name: 'settings-about' },
       },
-      { name: '🖤', to: { name: 'settings-support' } },
+      {
+        name: settingsStore.theme === 'light' ? '🖤' : '🤍',
+        to: { name: 'settings-support' },
+      },
     ],
   },
 ]
 const currentRoute = useRoute()
 const { instances } = useConfirmStore()
 const messengerStateStore = useMessengerStateStore()
-
 const { data: info } = useGetAppInfoQuery()
 </script>
 <style lang="scss" scoped>
