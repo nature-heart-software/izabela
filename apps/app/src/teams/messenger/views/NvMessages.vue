@@ -8,12 +8,17 @@
       <div></div>
       <NvCard class="inline-flex" size="sm">
         <div class="inline-flex space-x-2">
-          <NvButton
-            icon-name="times"
-            size="xs"
-            type="plain"
-            @click="$emit('close')"
-          />
+          <NvTooltip>
+            <NvText>Close</NvText>
+            <template #reference>
+              <NvButton
+                icon-name="times"
+                size="xs"
+                type="plain"
+                @click="$emit('close')"
+              />
+            </template>
+          </NvTooltip>
         </div>
       </NvCard>
     </div>
@@ -52,7 +57,7 @@
             </NvStack>
           </div>
           <div class="settings__content flex-1 pl-4">
-            <div ref="portalTarget" class="h-full relative overflow-hidden">
+            <NvPortalTarget class="h-full relative overflow-hidden">
               <div class="h-full relative">
                 <!-- View -->
                 <router-view v-slot="{ Component }">
@@ -66,7 +71,7 @@
                   </Transition>
                 </router-view>
               </div>
-            </div>
+            </NvPortalTarget>
           </div>
         </div>
       </div>
@@ -74,12 +79,10 @@
   </NvCard>
 </template>
 <script lang="ts" setup>
-import { NvButton, NvStack, NvText, NvCard, PORTAL_TARGET } from '@packages/ui'
+import { NvButton, NvStack, NvText, NvCard, NvTooltip } from '@packages/ui'
 import { useRoute } from 'vue-router'
-import { provide, ref } from 'vue'
+import NvPortalTarget from '@/teams/messenger/components/NvPortalTarget.vue'
 
-const portalTarget = ref()
-provide(PORTAL_TARGET, portalTarget)
 const navigation = [
   {
     name: 'Messages',

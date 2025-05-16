@@ -74,7 +74,7 @@
               </NvStack>
             </div>
             <div class="settings__content flex-1 pl-4">
-              <div ref="portalTarget" class="h-full relative overflow-hidden">
+              <NvPortalTarget class="h-full relative overflow-hidden">
                 <div class="h-full relative">
                   <!-- View -->
                   <router-view v-slot="{ Component }">
@@ -88,31 +88,31 @@
                     </Transition>
                   </router-view>
                 </div>
-              </div>
+              </NvPortalTarget>
             </div>
           </div>
         </div>
       </div>
     </div>
     <template v-for="instance in instances" :key="instance.id">
-      <NvStoreDialog :instance="instance" portal-target="#settings" />
+      <NvStoreDialog :instance="instance" />
     </template>
   </NvCard>
 </template>
 <script lang="ts" setup>
-import { NvButton, NvCard, NvStack, NvText, NvTooltip, PORTAL_TARGET } from '@packages/ui'
+import { NvButton, NvCard, NvStack, NvText, NvTooltip } from '@packages/ui'
 import NvStoreDialog from '@/teams/messenger/components/NvStoreDialog.vue'
 import { useRoute } from 'vue-router'
-import { provide, ref } from 'vue'
 import { useConfirmStore } from '@/store/use-confirm-store.ts'
 import { useMessengerStateStore } from '@/teams/messenger/store'
 import { useSettingsStore } from '@/features/settings/store'
 import NvMarkForRestartMessage from '@/teams/messenger/components/NvMarkForRestartMessage.vue'
 import { isGameOverlay } from '@/consts.ts'
 import { useGetAppInfoQuery } from '@/features/app/queries.ts'
+import NvPortalTarget from '@/teams/messenger/components/NvPortalTarget.vue'
+import { ref } from 'vue'
 
-const portalTarget = ref()
-provide(PORTAL_TARGET, portalTarget)
+const settings = ref()
 const settingsStore = useSettingsStore()
 const navigation = [
   {
