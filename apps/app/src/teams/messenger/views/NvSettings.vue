@@ -100,7 +100,14 @@
   </NvCard>
 </template>
 <script lang="ts" setup>
-import { NvButton, NvCard, NvStack, NvText, NvTooltip, PORTAL_TARGET } from '@packages/ui'
+import {
+  NvButton,
+  NvCard,
+  NvStack,
+  NvText,
+  NvTooltip,
+  PORTAL_TARGET,
+} from '@packages/ui'
 import NvStoreDialog from '@/teams/messenger/components/NvStoreDialog.vue'
 import { useRoute } from 'vue-router'
 import { provide, ref } from 'vue'
