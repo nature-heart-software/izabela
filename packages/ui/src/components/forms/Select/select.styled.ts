@@ -169,7 +169,7 @@ export const StSelectOption = styled('div', {
         position: absolute;
         display: inline-flex;
         inset: ${rem(-spacing['2'])};
-        background-color: ${theme.select.backgroundColor || theme.card.backgroundColor};
+        background-color: ${theme.select.option.backgroundColor};
     }
     `}
   }
@@ -186,7 +186,7 @@ export const StSelectOption = styled('div', {
     readonly
       ? ` 
           cursor: auto;
-            color: ${theme.select.option.readonlyColor} !important;
+            color: ${theme.select.option.readonly.color} !important;
             position: relative;
             z-index: 0;
             &::before {
@@ -195,7 +195,7 @@ export const StSelectOption = styled('div', {
                 top: 50%;
                 left: 0;
                 transform: translateY(-50%);
-                background-color: ${theme.select.option.readonlyDividerColor};
+                background-color: ${theme.select.option.readonly.borderColor};
                 height: ${rem(1)};
                 width: 100%;
                 z-index: -1;
@@ -205,24 +205,24 @@ export const StSelectOption = styled('div', {
         ? `
           user-select: none;
           pointer-events: none;
-          color: ${theme.select.option.disabledColor} !important;
+          color: ${theme.select.option.disabled.backgroundColor} !important;
       `
         : `
         &:hover {
-            background-color: ${theme.select.option.hoverBackgroundColor} !important;
+            background-color: ${theme.select.option.hover.backgroundColor} !important;
         }
         ${
           selected
             ? `
             font-weight: 700;
-            background-color: ${theme.select.option.selectedBackgroundColor} !important;
+            background-color: ${theme.select.option.selected.backgroundColor} !important;
           `
             : ''
         }
         ${
           active
             ? `
-            background-color: ${theme.select.option.activeBackgroundColor} !important;
+            background-color: ${theme.select.option.active.backgroundColor} !important;
           `
             : ''
         }

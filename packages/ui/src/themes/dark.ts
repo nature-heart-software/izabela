@@ -3,6 +3,7 @@ import { darken, lighten } from 'polished'
 
 const { colors } = tokens
 const color = colors.gray["30"];
+const colorAlt = colors.gray["40"];
 const backgroundColor = darken(.0675)(colors.gray['80'])
 const borderColor = colors.gray["80"]
 const inputColors = {
@@ -23,10 +24,16 @@ const inputColors = {
 
 const buttonColors = {
   color,
- backgroundColor,
+  backgroundColor,
   borderColor,
+  disabled: {
+    backgroundColor: colors.gray["50"]
+  },
   hover: {
     backgroundColor: colors.gray["80"],
+  },
+  selected: {
+    backgroundColor: darken(.0675)(colors.gray["70"]),
   },
   active: {
     backgroundColor: colors.gray["90"],
@@ -34,8 +41,23 @@ const buttonColors = {
   focus: {
     boxShadow: colors.gray["80"],
   },
+  readonly: {
+    color: colors.gray["50"],
+    borderColor: colors.gray["70"],
+  },
+}
+
+const buttonGhostColors = {
+  ...buttonColors,
+  backgroundColor: "transparent",
+  borderColor: "transparent",
+}
+
+const buttonGhostAltColors = {
+  ...buttonGhostColors,
   selected: {
-    backgroundColor: darken(.0675)(colors.gray["70"]),
+    boxShadow: colors.gray['80'],
+    backgroundColor,
   }
 }
 
@@ -70,18 +92,10 @@ export default {
       borderColor: buttonPlainColors.borderColor,
     },
     ghost: {
-      ...buttonColors,
-      backgroundColor: "transparent",
-      borderColor: "transparent",
+      ...buttonGhostColors,
     },
     "ghost-alt": {
-      ...buttonColors,
-      backgroundColor: "transparent",
-      borderColor: "transparent",
-      selected: {
-        boxShadow: colors.gray['80'],
-        backgroundColor,
-      }
+      ...buttonGhostAltColors,
     },
     plain: {
       ...buttonPlainColors
@@ -113,7 +127,7 @@ export default {
     }
   },
   autocomplete: {
-   backgroundColor,
+    backgroundColor,
     borderColor
   },
   input: {
@@ -142,19 +156,14 @@ export default {
   select: {
     ...inputColors,
     option: {
-      hoverBackgroundColor: colors.gray["80"],
-      selectedBackgroundColor: colors.gray["80"],
-      activeBackgroundColor: colors.gray["70"],
-      disabledColor: colors.gray["50"],
-      readonlyColor: colors.gray["50"],
-      readonlyDividerColor: colors.gray["70"]
+      ...buttonColors,
     }
   },
   rangeInput: {
-    trackColor: colors.gray["70"],
-    thumbColor: colors.gray["10"],
-    thumbHoverColor: colors.gray["20"],
-    thumbActiveColor: colors.gray["40"],
+    trackColor: borderColor,
+    thumbColor: buttonPlainColors.backgroundColor,
+    thumbHoverColor: buttonPlainColors.hover.backgroundColor,
+    thumbActiveColor: buttonPlainColors.active.backgroundColor,
     thumbFocusBoxShadow: colors.gray["30"],
     thumbFocusBorderColor: colors.gray["20"]
   },
@@ -162,9 +171,9 @@ export default {
     borderColor,
   },
   text: {
-    color: colors.gray["30"],
-    captionColor: colors.gray["40"],
-    linkUnderlineColor: colors.gray["30"]
+    color,
+    captionColor: colorAlt,
+    linkUnderlineColor: color,
   },
   tooltip: {
     backgroundColor: buttonPlainColors.backgroundColor,
