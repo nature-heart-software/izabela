@@ -52,22 +52,22 @@ export const StInput = styled('div', props)`
       font-weight: 600;
       border-width: ${() => rem(borderWidth.DEFAULT)};
       outline: 0;
-      border-color: ${({theme}) => theme.input.borderColor};
+      border-color: ${({ theme }) => theme.input.borderColor};
       transition: ${() => transition.DEFAULT};
-      color: ${({theme}) => theme.input.color};
-      background: ${({theme}) => theme.input.backgroundColor};
+      color: ${({ theme }) => theme.input.color};
+      background: ${({ theme }) => theme.input.backgroundColor};
       &:hover {
-        border-color: ${({theme}) => theme.input.hover.borderColor};
+        border-color: ${({ theme }) => theme.input.hover.borderColor};
       }
 
       &:focus {
         box-shadow: 0 0 0 ${() => rem(borderWidth.lg)}
-          ${({theme}) => theme.input.focus.boxShadow};
-        border-color: ${({theme}) => theme.input.focus.borderColor};
+          ${({ theme }) => theme.input.focus.boxShadow};
+        border-color: ${({ theme }) => theme.input.focus.borderColor};
       }
 
       &::placeholder {
-        color: ${({theme}) => theme.input.placeholder.color};
+        color: ${({ theme }) => theme.input.placeholder.color};
         font-weight: 300;
       }
 

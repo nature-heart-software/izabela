@@ -10,7 +10,7 @@ export const StSwitch = styled('span', props)`
   display: inline-flex;
   width: ${() => rem(spacing['8'])};
   height: ${() => rem(spacing['6'])};
-  background-color: ${({theme}) => theme.switch.backgroundColor};
+  background-color: ${({ theme }) => theme.switch.backgroundColor};
   padding: ${() => rem(spacing['2'])};
   position: relative;
   border-radius: ${() => rem(borderRadius.sm)};
@@ -25,7 +25,7 @@ export const StSwitch = styled('span', props)`
     width: ${() => rem(spacing['5'])};
     height: ${() => rem(spacing['5'])};
     border-radius: ${() => rem(borderRadius.xs)};
-    background-color: ${({theme}) => theme.switch.thumbColor};
+    background-color: ${({ theme }) => theme.switch.thumbColor};
     left: 0;
     transition: ${() => transition.DEFAULT};
   }
@@ -34,7 +34,8 @@ export const StSwitch = styled('span', props)`
     content: '';
     width: 100%;
     height: 100%;
-    border: ${() => rem(borderWidth.DEFAULT)} solid ${({theme}) => theme.switch.borderColor};
+    border: ${() => rem(borderWidth.DEFAULT)} solid
+      ${({ theme }) => theme.switch.borderColor};
     border-radius: ${() => rem(borderRadius.sm)};
     position: absolute;
     top: 0;
@@ -45,15 +46,16 @@ export const StSwitch = styled('span', props)`
 
   &:hover {
     &::after {
-      border-color: ${({theme}) => theme.switch.hover.borderColor};
+      border-color: ${({ theme }) => theme.switch.hover.borderColor};
     }
   }
 
   &:focus {
-    box-shadow: 0 0 0 ${() => rem(borderWidth.lg)} ${({theme}) => theme.switch.focus.boxShadow};
+    box-shadow: 0 0 0 ${() => rem(borderWidth.lg)}
+      ${({ theme }) => theme.switch.focus.boxShadow};
 
     &::after {
-      border-color: ${({theme}) => theme.switch.focus.borderColor};
+      border-color: ${({ theme }) => theme.switch.focus.borderColor};
     }
   }
 

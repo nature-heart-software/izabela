@@ -147,7 +147,7 @@ export function iconStyleBySize(size: Size) {
   return styles[size]
 }
 
-export function disabledItemBackgroundStyle({theme}: any) {
+export function disabledItemBackgroundStyle({ theme }: any) {
   return `
     background-color: ${rgba(theme.disabledItemBackground.backdropColor, theme.disabledItemBackground.backdropOpacity)};
   `

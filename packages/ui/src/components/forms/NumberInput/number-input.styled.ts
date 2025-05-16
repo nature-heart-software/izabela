@@ -53,24 +53,24 @@ export const StNumberInput = styled('div', props)`
       font-weight: 600;
       border-width: ${() => rem(borderWidth.DEFAULT)};
       outline: 0;
-      border-color: ${({theme}) => theme.numberInput.borderColor};
+      border-color: ${({ theme }) => theme.numberInput.borderColor};
       transition: ${() => transition.DEFAULT};
       min-width: ${() => rem(80)};
       width: 100%;
-      color: ${({theme}) => theme.numberInput.color};
-      background: ${({theme}) => theme.numberInput.backgroundColor};
+      color: ${({ theme }) => theme.numberInput.color};
+      background: ${({ theme }) => theme.numberInput.backgroundColor};
       &:hover {
-        border-color: ${({theme}) => theme.numberInput.hover.borderColor};
+        border-color: ${({ theme }) => theme.numberInput.hover.borderColor};
       }
 
       &:focus {
         box-shadow: 0 0 0 ${() => rem(borderWidth.lg)}
-          ${({theme}) => theme.numberInput.focus.boxShadow};
-        border-color: ${({theme}) => theme.numberInput.focus.borderColor};
+          ${({ theme }) => theme.numberInput.focus.boxShadow};
+        border-color: ${({ theme }) => theme.numberInput.focus.borderColor};
       }
 
       &::placeholder {
-        color: ${({theme}) => theme.numberInput.placeholder.color};
+        color: ${({ theme }) => theme.numberInput.placeholder.color};
         font-weight: 300;
       }
 

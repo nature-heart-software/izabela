@@ -42,8 +42,8 @@ export const StTag = styled('span', props)`
   border-width: ${() => rem(borderWidth.DEFAULT)};
   outline: 0;
   transition: ${() => transition.DEFAULT};
-  background-color: ${({theme}) => theme.tag.backgroundColor};
-  border-color: ${({theme}) => theme.tag.borderColor};
+  background-color: ${({ theme }) => theme.tag.backgroundColor};
+  border-color: ${({ theme }) => theme.tag.borderColor};
   min-width: 0;
 
   ${() => fontSizeStyle(fontSize['1'])}

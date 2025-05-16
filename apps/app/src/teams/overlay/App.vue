@@ -1,7 +1,5 @@
 <template>
-  <ThemeProvider
-    :theme="theme"
-  >
+  <ThemeProvider :theme="theme">
     <GlobalStyles>
       <div
         :style="{

@@ -2,24 +2,24 @@ import { tokens } from '@/styles/tokens'
 import { darken, lighten } from 'polished'
 
 const { colors } = tokens
-const color = colors.gray["30"];
-const colorAlt = colors.gray["40"];
-const backgroundColor = darken(.0675)(colors.gray['80'])
-const borderColor = colors.gray["80"]
+const color = colors.gray['30']
+const colorAlt = colors.gray['40']
+const backgroundColor = darken(0.0675)(colors.gray['80'])
+const borderColor = colors.gray['80']
 const inputColors = {
   borderColor,
   color,
   backgroundColor,
   hover: {
-    borderColor: colors.gray["70"]
+    borderColor: colors.gray['70'],
   },
   focus: {
-    boxShadow: colors.gray["80"],
-    borderColor: colors.gray["70"]
+    boxShadow: colors.gray['80'],
+    borderColor: colors.gray['70'],
   },
   placeholder: {
-    color: colors.gray["60"]
-  }
+    color: colors.gray['60'],
+  },
 }
 
 const buttonColors = {
@@ -27,30 +27,30 @@ const buttonColors = {
   backgroundColor,
   borderColor,
   disabled: {
-    backgroundColor: colors.gray["50"]
+    backgroundColor: colors.gray['50'],
   },
   hover: {
-    backgroundColor: colors.gray["80"],
+    backgroundColor: colors.gray['80'],
   },
   selected: {
-    backgroundColor: darken(.0675)(colors.gray["70"]),
+    backgroundColor: darken(0.0675)(colors.gray['70']),
   },
   active: {
-    backgroundColor: colors.gray["90"],
+    backgroundColor: colors.gray['90'],
   },
   focus: {
-    boxShadow: colors.gray["80"],
+    boxShadow: colors.gray['80'],
   },
   readonly: {
-    color: colors.gray["50"],
-    borderColor: colors.gray["70"],
+    color: colors.gray['50'],
+    borderColor: colors.gray['70'],
   },
 }
 
 const buttonGhostColors = {
   ...buttonColors,
-  backgroundColor: "transparent",
-  borderColor: "transparent",
+  backgroundColor: 'transparent',
+  borderColor: 'transparent',
 }
 
 const buttonGhostAltColors = {
@@ -58,29 +58,29 @@ const buttonGhostAltColors = {
   selected: {
     boxShadow: colors.gray['80'],
     backgroundColor,
-  }
+  },
 }
 
 const buttonPlainColors = {
-    color: colors.gray["80"],
-    backgroundColor: lighten(.05)(colors.gray["50"]),
-    borderColor: lighten(.05)(colors.gray["50"]),
-    hover: {
-      borderColor: colors.gray["40"],
-      backgroundColor: colors.gray["40"],
-    },
-    active: {
-      borderColor: colors.gray["50"],
-      backgroundColor: colors.gray["50"],
-    },
-    focus: {
-      boxShadow: lighten(.05)(colors.gray["50"]),
-    },
-    selected: {
-      borderColor: lighten(.05)(colors.gray["50"]),
-      backgroundColor: lighten(.05)(colors.gray["50"]),
-    }
-  }
+  color: colors.gray['80'],
+  backgroundColor: lighten(0.05)(colors.gray['50']),
+  borderColor: lighten(0.05)(colors.gray['50']),
+  hover: {
+    borderColor: colors.gray['40'],
+    backgroundColor: colors.gray['40'],
+  },
+  active: {
+    borderColor: colors.gray['50'],
+    backgroundColor: colors.gray['50'],
+  },
+  focus: {
+    boxShadow: lighten(0.05)(colors.gray['50']),
+  },
+  selected: {
+    borderColor: lighten(0.05)(colors.gray['50']),
+    backgroundColor: lighten(0.05)(colors.gray['50']),
+  },
+}
 
 export default {
   button: {
@@ -94,17 +94,17 @@ export default {
     ghost: {
       ...buttonGhostColors,
     },
-    "ghost-alt": {
+    'ghost-alt': {
       ...buttonGhostAltColors,
     },
     plain: {
-      ...buttonPlainColors
-    }
+      ...buttonPlainColors,
+    },
   },
   card: {
-   backgroundColor,
+    backgroundColor,
     transparent: {
-      backdropColor: colors.gray["90"],
+      backdropColor: colors.gray['90'],
       backdropOpacity: 0.95,
     },
   },
@@ -114,21 +114,21 @@ export default {
       color: colors.black,
     },
     success: {
-     backgroundColor,
+      backgroundColor,
       color: colors.white,
     },
     warning: {
-     backgroundColor,
+      backgroundColor,
       color: colors.white,
     },
     error: {
-     backgroundColor,
+      backgroundColor,
       color: colors.white,
-    }
+    },
   },
   autocomplete: {
     backgroundColor,
-    borderColor
+    borderColor,
   },
   input: {
     ...inputColors,
@@ -139,7 +139,7 @@ export default {
   switch: {
     backgroundColor,
     borderColor,
-    thumbColor: colors.gray["70"],
+    thumbColor: colors.gray['70'],
     activeThumbColor: buttonPlainColors.backgroundColor,
     hover: {
       borderColor: inputColors.hover.borderColor,
@@ -147,25 +147,25 @@ export default {
     focus: {
       boxShadow: inputColors.focus.boxShadow,
       borderColor: inputColors.focus.borderColor,
-    }
+    },
   },
   tag: {
-   backgroundColor,
-    borderColor
+    backgroundColor,
+    borderColor,
   },
   select: {
     ...inputColors,
     option: {
       ...buttonColors,
-    }
+    },
   },
   rangeInput: {
     trackColor: borderColor,
     thumbColor: buttonPlainColors.backgroundColor,
     thumbHoverColor: buttonPlainColors.hover.backgroundColor,
     thumbActiveColor: buttonPlainColors.active.backgroundColor,
-    thumbFocusBoxShadow: colors.gray["30"],
-    thumbFocusBorderColor: colors.gray["20"]
+    thumbFocusBoxShadow: colors.gray['30'],
+    thumbFocusBorderColor: colors.gray['20'],
   },
   divider: {
     borderColor,
@@ -178,23 +178,23 @@ export default {
   tooltip: {
     backgroundColor: buttonPlainColors.backgroundColor,
     borderColor: buttonPlainColors.backgroundColor,
-    color: buttonPlainColors.color
+    color: buttonPlainColors.color,
   },
   popover: {
-   backgroundColor,
+    backgroundColor,
     borderColor,
   },
   contextMenu: {
-   backgroundColor,
+    backgroundColor,
     borderColor,
   },
   dialog: {
-    backdropColor: colors.gray["90"],
+    backdropColor: colors.gray['90'],
     backdropOpacity: 0.95,
-    contentBackgroundColor: backgroundColor
+    contentBackgroundColor: backgroundColor,
   },
   disabledItemBackground: {
     backdropColor: backgroundColor,
     backdropOpacity: 0.9,
-  }
+  },
 }

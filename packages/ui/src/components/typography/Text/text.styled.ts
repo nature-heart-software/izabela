@@ -7,7 +7,7 @@ import { fontSizeStyle } from '@/utils/css-in-js'
 import { rem } from 'polished'
 
 const { fontFamily, fontSize } = tokens
-export const defaultTextStyle = ({theme}: any) => ({
+export const defaultTextStyle = ({ theme }: any) => ({
   color: theme.text.color,
   fontFamily: fontFamily.sans.join(', '),
   ...fontSizeStyle(fontSize['2']),
@@ -52,7 +52,7 @@ export const StText = styled('div', props)`
       left: 0;
       right: 0;
       height: ${() => rem(tokens.spacing[1])};
-      background-color: ${({theme}) => theme.text.linkUnderlineColor};
+      background-color: ${({ theme }) => theme.text.linkUnderlineColor};
     }
   }
 `

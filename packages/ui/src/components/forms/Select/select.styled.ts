@@ -82,14 +82,14 @@ export const StSelect = styled('div', selectProps)`
   display: inline-flex;
   align-items: center;
   border-width: ${() => rem(borderWidth.DEFAULT)};
-  border-color: ${({theme}) => theme.select.borderColor};
+  border-color: ${({ theme }) => theme.select.borderColor};
   transition: ${() => transition.DEFAULT};
-  color: ${({theme}) => theme.select.color};
-  background: ${({theme}) => theme.select.backgroundColor};
+  color: ${({ theme }) => theme.select.color};
+  background: ${({ theme }) => theme.select.backgroundColor};
 
   ${(props) => styleBySize(props)}
   &:hover {
-    border-color: ${({theme}) => theme.select.hover.borderColor};
+    border-color: ${({ theme }) => theme.select.hover.borderColor};
   }
 
   ${({ theme, isFocused }) =>
@@ -120,11 +120,11 @@ export const StSelectInput = styled('input', selectProps)`
   width: 100%;
   ${inputStyleBySize};
 
-  color: ${({theme}) => theme.select.color};
-  background: ${({theme}) => theme.select.backgroundColor};
-  
+  color: ${({ theme }) => theme.select.color};
+  background: ${({ theme }) => theme.select.backgroundColor};
+
   &::placeholder {
-    color: ${({theme}) => theme.select.placeholder.color};
+    color: ${({ theme }) => theme.select.placeholder.color};
     font-weight: 300;
     font-size: inherit;
     letter-spacing: inherit;

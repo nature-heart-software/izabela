@@ -41,9 +41,9 @@ export const StAutocomplete = styled('div', props)`
   border-width: ${() => rem(tokens.borderWidth.DEFAULT)};
   border-style: solid;
   box-shadow: ${() => boxShadow.lg} !important;
-  border-color: ${({theme}) => theme.autocomplete.borderColor} !important;
+  border-color: ${({ theme }) => theme.autocomplete.borderColor} !important;
   overflow: hidden;
-  background-color: ${({theme}) => theme.autocomplete.backgroundColor};
+  background-color: ${({ theme }) => theme.autocomplete.backgroundColor};
 
   ${popperStyleBySize}
   .autocomplete__list {
