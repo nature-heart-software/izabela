@@ -1,2 +1,1 @@
-
-export const PORTAL_TARGET = Symbol('portal-target');
+export const PORTAL_TARGET = Symbol('portal-target')

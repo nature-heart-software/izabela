@@ -40,7 +40,9 @@ import { PORTAL_TARGET } from '@/consts'
 
 const props = defineProps(propsDefinition)
 const injectedPortalTarget = inject(PORTAL_TARGET)
-const portalTarget = computed(() => getElement(injectedPortalTarget) || document.body,)
+const portalTarget = computed(
+  () => getElement(injectedPortalTarget) || document.body,
+)
 const tippyProps = computed<TippyOptions>(() => ({
   trigger: 'click',
   interactive: true,
