@@ -5,7 +5,7 @@
   >
     <NvStack :spacing="size === 'sm' ? 4 : 5">
       <NvFormItem label="Prompt">
-        <NvInput
+        <NvTextarea
           placeholder="Example: Translate into Shakespearean English..."
           :modelValue="getProperty('prompt')"
           @update:modelValue="(value) => setProperty('prompt', value)"
@@ -47,6 +47,7 @@ import {
   NvFormItem,
   NvInput,
   NvStack,
+  NvTextarea,
 } from '@packages/ui'
 import NvTranslateFromSelect from './NvTranslateFromSelect.vue'
 import NvTranslateToSelect from './NvTranslateToSelect.vue'
