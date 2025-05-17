@@ -1,5 +1,5 @@
 <template>
-  <StTextarea ref="elInputRef" v-bind="props"/>
+  <StTextarea ref="elInputRef" v-bind="props" />
 </template>
 <script lang="ts" setup>
 import { computed, defineProps, ref } from 'vue'

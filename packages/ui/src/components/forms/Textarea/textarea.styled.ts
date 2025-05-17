@@ -37,33 +37,33 @@ const styleBySize = ({ size }: Props) => {
   return styles[size]
 }
 export const StTextarea = styled('textarea', props)`
-      align-items: center;
-      font-weight: 600;
-      border-width: ${() => rem(borderWidth.DEFAULT)};
-      outline: 0;
-      border-color: ${({ theme }) => theme.input.borderColor};
-      transition: ${() => transition.DEFAULT};
-      color: ${({ theme }) => theme.input.color};
-      background: ${({ theme }) => theme.input.backgroundColor};
-      &:hover {
-        border-color: ${({ theme }) => theme.input.hover.borderColor};
-      }
+  align-items: center;
+  font-weight: 600;
+  border-width: ${() => rem(borderWidth.DEFAULT)};
+  outline: 0;
+  border-color: ${({ theme }) => theme.input.borderColor};
+  transition: ${() => transition.DEFAULT};
+  color: ${({ theme }) => theme.input.color};
+  background: ${({ theme }) => theme.input.backgroundColor};
+  &:hover {
+    border-color: ${({ theme }) => theme.input.hover.borderColor};
+  }
 
-      &:focus {
-        box-shadow: 0 0 0 ${() => rem(borderWidth.lg)}
-          ${({ theme }) => theme.input.focus.boxShadow};
-        border-color: ${({ theme }) => theme.input.focus.borderColor};
-      }
+  &:focus {
+    box-shadow: 0 0 0 ${() => rem(borderWidth.lg)}
+      ${({ theme }) => theme.input.focus.boxShadow};
+    border-color: ${({ theme }) => theme.input.focus.borderColor};
+  }
 
-      &::placeholder {
-        color: ${({ theme }) => theme.input.placeholder.color};
-        font-weight: 300;
-      }
+  &::placeholder {
+    color: ${({ theme }) => theme.input.placeholder.color};
+    font-weight: 300;
+  }
 
-      ${styleBySize}
+  ${styleBySize}
 
-      height: ${() => rem(spacing['10'])};
-      padding-top: ${() => rem(spacing['3'] - 1)};
-      padding-bottom: ${() => rem(spacing['3'] - 1)};
-      border-bottom-right-radius: 0;
+  height: ${() => rem(spacing['10'])};
+  padding-top: ${() => rem(spacing['3'] - 1)};
+  padding-bottom: ${() => rem(spacing['3'] - 1)};
+  border-bottom-right-radius: 0;
 `
