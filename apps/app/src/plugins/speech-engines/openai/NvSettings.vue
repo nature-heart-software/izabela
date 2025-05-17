@@ -12,7 +12,7 @@
       </NvFormItem>
       <NvDivider direction="horizontal" />
       <NvFormItem label="Instructions">
-        <NvInput
+        <NvTextarea
           placeholder="Example: Speak in a cheerful and positive tone..."
           :modelValue="getProperty('instructions')"
           @update:modelValue="(value) => setProperty('instructions', value)"
@@ -85,6 +85,7 @@ import {
   NvStack,
   NvSwitch,
   NvText,
+  NvTextarea,
 } from '@packages/ui'
 import NvVoiceSelect from './NvVoiceSelect'
 import { store } from './store'

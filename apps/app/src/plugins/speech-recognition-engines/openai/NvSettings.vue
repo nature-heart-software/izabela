@@ -1,6 +1,6 @@
 <template>
   <NvFormItem label="Prompt">
-    <NvInput
+    <NvTextarea
       placeholder="Example: The speaker may stutter or repeat syllables..."
       :modelValue="store.getProperty('prompt')"
       @update:modelValue="(value) => store.setProperty('prompt', value)"
@@ -17,6 +17,6 @@
   </NvFormItem>
 </template>
 <script lang="ts" setup>
-import { NvDivider, NvFormItem, NvInput } from '@packages/ui'
+import { NvDivider, NvFormItem, NvInput, NvTextarea } from '@packages/ui'
 import { store } from './store'
 </script>
