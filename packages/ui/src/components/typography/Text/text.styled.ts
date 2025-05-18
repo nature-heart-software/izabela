@@ -1,29 +1,30 @@
 /* eslint-disable */
 import styled from 'vue3-styled-components'
 import { tokens } from '@/styles/tokens'
+import { themes } from '@/themes'
 import { props } from './text.shared'
 import { fontSizeStyle } from '@/utils/css-in-js'
 import { rem } from 'polished'
 
-const { fontFamily, fontSize, colors } = tokens
-export const defaultTextStyle = () => ({
-  color: 'inherit',
+const { fontFamily, fontSize } = tokens
+export const defaultTextStyle = ({ theme }: any) => ({
+  color: theme.text.color,
   fontFamily: fontFamily.sans.join(', '),
   ...fontSizeStyle(fontSize['2']),
 })
 
 export const StText = styled('div', props)`
-  ${() => defaultTextStyle()}
+  ${(props) => defaultTextStyle(props)}
   ${({ align = '' }) => align && `text-align: ${align};`}
   ${({ as }) =>
     as === 'span' &&
     `
     display: inline-flex;
   `}
-  ${({ type }) =>
+  ${({ theme, type }) =>
     [
       type === 'caption' && {
-        color: colors.gray['60'],
+        color: theme.text.captionColor,
         ...fontSizeStyle(fontSize['1']),
       },
       type === 'label' && {
@@ -51,7 +52,7 @@ export const StText = styled('div', props)`
       left: 0;
       right: 0;
       height: ${() => rem(tokens.spacing[1])};
-      background-color: ${() => tokens.colors.gray[80]};
+      background-color: ${({ theme }) => theme.text.linkUnderlineColor};
     }
   }
 `

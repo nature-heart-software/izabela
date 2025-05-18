@@ -9,25 +9,34 @@
   </StTooltip>
 </template>
 <script lang="ts" setup>
-import { defineProps, ref, watch } from 'vue'
+import { computed, defineProps, inject, ref, watch } from 'vue'
 import { StTooltip } from './tooltip.styled'
 import { props as propsDefinition } from './tooltip.shared'
 import { Tippy, TippyInstance, TippyOptions } from 'vue-tippy'
 import { tokens } from '@/styles/tokens'
 import { MaybeElement, useFocusWithin } from '@vueuse/core'
+import { getElement } from '@/utils/vue'
+import { PORTAL_TARGET } from '@/consts'
 
 const props = defineProps(propsDefinition)
-const tippyProps: TippyOptions = {
-  trigger: 'mouseenter focus',
-  delay: [250, 0],
-  interactive: false,
-  placement: 'top',
-  offset: [0, tokens.spacing['4']],
-  appendTo: () => document.body,
-  theme: `tooltip`,
-  maxWidth: 300,
-  ...props.tippyOptions,
-} as TippyOptions
+const injectedPortalTarget = inject(PORTAL_TARGET)
+const portalTarget = computed(
+  () => getElement(injectedPortalTarget) || document.body,
+)
+const tippyProps = computed<TippyOptions>(
+  () =>
+    ({
+      trigger: 'mouseenter focus',
+      delay: [250, 0],
+      interactive: false,
+      placement: 'top',
+      offset: [0, tokens.spacing['4']],
+      appendTo: portalTarget.value,
+      theme: `tooltip`,
+      maxWidth: 300,
+      ...props.tippyOptions,
+    }) as TippyOptions,
+)
 const tooltip = ref<MaybeElement>()
 const tippyInstance = ref<TippyInstance>()
 const { focused } = useFocusWithin(tooltip)

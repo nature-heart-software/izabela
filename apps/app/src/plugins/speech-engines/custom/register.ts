@@ -26,6 +26,7 @@ registerEngine({
     return {
       text: translatedText || text,
       voice,
+      additionalData: getProperty('additionalData'),
     }
   },
   getLanguageCode(voice) {

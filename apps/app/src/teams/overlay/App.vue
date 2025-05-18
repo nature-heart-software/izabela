@@ -1,14 +1,18 @@
 <template>
-  <div
-    :style="{
-      opacity: settingsStore.backgroundDimOpacity / 100,
-      zIndex: -1,
-    }"
-    class="fixed w-full h-full bg-black"
-  ></div>
-  <NvOverlayInput
-    class="w-[720px] fixed bottom-[60px] left-1/2 transform -translate-x-1/2"
-  />
+  <ThemeProvider :theme="theme">
+    <GlobalStyles>
+      <div
+        :style="{
+          opacity: settingsStore.backgroundDimOpacity / 100,
+          zIndex: -1,
+        }"
+        class="fixed w-full h-full bg-black"
+      ></div>
+      <NvOverlayInput
+        class="w-[720px] fixed bottom-[60px] left-1/2 transform -translate-x-1/2"
+      />
+    </GlobalStyles>
+  </ThemeProvider>
 </template>
 <style lang="scss">
 body {
@@ -21,6 +25,14 @@ body {
 <script lang="ts" setup>
 import { useSettingsStore } from '@/features/settings/store'
 import NvOverlayInput from '@/teams/overlay/components/NvOverlayInput.vue'
+import { GlobalStyles, themes, tokens } from '@packages/ui'
+import { ThemeProvider } from 'vue3-styled-components'
+import { computed } from 'vue'
 
 const settingsStore = useSettingsStore()
+
+const theme = computed(() => ({
+  ...tokens,
+  ...themes.get(settingsStore.theme),
+}))
 </script>

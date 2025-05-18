@@ -70,9 +70,8 @@
               v-for="(_, i) in Array(Math.abs(minMeterValue) + 1).fill(null)"
               :key="i"
             >
-              <div
+              <NvBar
                 :style="{
-                  backgroundColor: tokens.colors.gray['90'],
                   height:
                     i % 5 ? rem(tokens.spacing['1']) : rem(tokens.spacing['3']),
                   width: rem(tokens.spacing['1']),
@@ -90,19 +89,17 @@
                 >
                   <NvText type="caption">{{ i + minMeterValue }}</NvText>
                 </div>
-              </div>
+              </NvBar>
             </template>
           </NvGroup>
-          <div
+          <NvBarWrapper
             :style="{
-              backgroundColor: tokens.colors.gray['10'],
               height: rem(tokens.spacing['2']),
               position: 'relative',
             }"
           >
-            <div
+            <NvBar
               :style="{
-                backgroundColor: tokens.colors.gray['90'],
                 height: rem(tokens.spacing['2']),
                 position: 'absolute',
                 top: 0,
@@ -110,9 +107,8 @@
                 width: `${micVolumeBarWidth}%`,
               }"
             />
-            <div
+            <NvBar
               :style="{
-                backgroundColor: tokens.colors.gray['90'],
                 height: rem(tokens.spacing['5']),
                 position: 'absolute',
                 top: '50%',
@@ -121,7 +117,7 @@
                 transform: 'translate(-50%, -50%)',
               }"
             />
-          </div>
+          </NvBarWrapper>
         </NvStack>
       </NvStack>
       <NvDivider direction="horizontal" />
@@ -212,6 +208,7 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import NvSoxAudioInputSelect from '@/features/audio/components/inputs/NvSoxAudioInputSelect.vue'
 import { useDevicesList } from '@vueuse/core'
 import { soxMediaInputsFilter } from '@/utils/media-devices'
+import { NvBar, NvBarWrapper } from '@/components'
 
 const minMeterValue = -80
 const micVolume = ref(minMeterValue)

@@ -5,7 +5,7 @@ import { ref } from 'vue'
 import { SpeechEngine } from '@/modules/speech-engine-manager/types'
 import { Key } from '@/types/keybinds'
 import { ENGINE_ID as defaultSpeechEngineId } from '@/plugins/speech-engines/say/shared'
-import { ENGINE_ID as defaultTranslationEngineId } from '@/plugins/translation-engines/google-cloud/shared'
+import { ENGINE_ID as defaultTranslationEngineId } from '@/plugins/translation-engines/google-translate/shared'
 import { ENGINE_ID as defaultSpeechRecognitionEngineId } from '@/plugins/speech-recognition-engines/google-cloud/shared'
 import { useMessengerStateStore } from '@/teams/messenger/store'
 
@@ -34,6 +34,7 @@ export const useSettingsStore = defineStore(
     const selectedSpeechRecognitionEngine = ref(
       defaultSpeechRecognitionEngineId,
     )
+    const theme = ref<'light' | 'dark'>('light')
     const updateChannel = ref(channel)
     const launchOnStartup = ref(true)
     const runAsAdmin = ref(false)
@@ -219,6 +220,7 @@ export const useSettingsStore = defineStore(
     }
 
     return {
+      theme,
       enableAutoUpdate,
       enableRunAsAdmin,
       disableRunAsAdmin,

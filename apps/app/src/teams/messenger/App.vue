@@ -1,24 +1,27 @@
 <template>
-  <button
-    v-show="displayOffscreenFocusFix"
-    id="offscreen-focus-fix"
-    :style="{
-      zIndex: 999999999,
-    }"
-    class="fixed inset-0 pointer-events-auto cursor-none"
-    @click="displayOffscreenFocusFix = false"
-  />
-  <ThemeProvider :theme="tokens">
-    <NvBackground />
-    <div class="h-0">
-      <div id="router-overlay" ref="routerOverlay"></div>
-      <NvMessenger
-        :min-width="768"
-        :transform="messengerStore.position.transform"
-        class="w-full h-full"
+  <ThemeProvider :theme="theme">
+    <GlobalStyles ref="globalStyles">
+      <button
+        v-show="displayOffscreenFocusFix"
+        data-offscreen-focus-fix
+        ref="offscreenFocusFix"
+        :style="{
+          zIndex: 999999999,
+        }"
+        class="fixed inset-0 pointer-events-auto cursor-none"
+        @click="displayOffscreenFocusFix = false"
       />
-    </div>
-    <NvDebug v-if="!isGameOverlay && settingsStore.debugMode" />
+      <NvBackground />
+      <div class="h-0">
+        <div id="router-overlay" ref="routerOverlay"></div>
+        <NvMessenger
+          :min-width="768"
+          :transform="messengerStore.position.transform"
+          class="w-full h-full"
+        />
+      </div>
+      <NvDebug v-if="!isGameOverlay && settingsStore.debugMode" />
+    </GlobalStyles>
   </ThemeProvider>
 </template>
 <style lang="scss">
@@ -45,7 +48,7 @@ import {
 } from '@/teams/messenger/store'
 import NvDebug from '@/teams/messenger/components/NvDebug.vue'
 import { useSettingsStore } from '@/features/settings/store'
-import { ref, watch, provide } from 'vue'
+import { ref, watch, provide, computed } from 'vue'
 import { socket } from '@/services'
 import { isGameOverlay } from '@/consts.ts'
 import { useDatabasesStore } from '@/features/databases/store'
@@ -54,7 +57,10 @@ import pkg from '@root/package.json'
 import { useGameOverlayStore } from '@/features/game-overlay/store'
 import { onIPCApplyProfile } from '@/electron/events/renderer.ts'
 import { useProfilesStore } from '@/features/profiles/store.ts'
+import { themes, GlobalStyles, PORTAL_TARGET } from '@packages/ui'
 
+const offscreenFocusFix = ref()
+provide('offscreen-focus-fix', offscreenFocusFix)
 const { ElectronMessengerWindow } = window
 const messengerStore = useMessengerStore()
 const settingsStore = useSettingsStore()
@@ -62,6 +68,13 @@ const gameOverlayStore = useGameOverlayStore()
 const messengerWindowStore = useMessengerWindowStore()
 const displayOffscreenFocusFix = ref(isGameOverlay)
 
+const theme = computed(() => ({
+  ...tokens,
+  ...themes.get(settingsStore.theme),
+}))
+
+const globalStyles = ref()
+provide(PORTAL_TARGET, globalStyles)
 const routerOverlay = ref()
 provide('router-overlay', routerOverlay)
 window.addEventListener('keydown', (event) => {

@@ -55,12 +55,7 @@
   </NvCard>
   <VTour ref="tour" :steps="steps">
     <template #content="{ step }">
-      <NvText
-        :style="{
-          color: 'white',
-        }"
-        >{{ steps[step.currentStep].content }}
-      </NvText>
+      <NvText>{{ steps[step.currentStep].content }} </NvText>
     </template>
     <template #actions="scope">
       <NvGroup :key="step" justify="apart">

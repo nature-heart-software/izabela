@@ -1,6 +1,7 @@
 /* High priority plugins */
 import '@packages/electron-pinia/preload'
 import '@/modules/electron-log/preload'
+import '@/plugins/preload'
 /* Other plugins */
 import { ipcRenderer } from 'electron-postman'
 import { bridgeModules } from '@/electron/bridge'

@@ -1,6 +1,6 @@
 <template>
   <StAlert v-bind="props">
-    <NvText>
+    <NvText :style="{ color: 'inherit' }">
       <slot />
     </NvText>
   </StAlert>

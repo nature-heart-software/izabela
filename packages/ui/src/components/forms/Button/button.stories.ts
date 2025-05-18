@@ -48,7 +48,7 @@ const Template: StoryFn = (args) => ({
     }
   },
   template: `
-      <NvButton v-bind="args">{{ args.content }}</NvButton>
+      <NvButton v-bind="args">this is a button</NvButton>
     `,
 })
 

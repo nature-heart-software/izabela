@@ -1,11 +1,12 @@
 /* eslint-disable */
 import styled from 'vue3-styled-components'
 import { tokens } from '@/styles/tokens'
+import { themes } from '@/themes'
 import { props, Props, Size } from './card.shared'
 import { CSSObject } from '@/types/css-in-js'
-import { rem } from 'polished'
+import { rem, rgba } from 'polished'
 
-const { colors, spacing, borderRadius, boxShadow } = tokens
+const { spacing, borderRadius, boxShadow } = tokens
 const styleBySize = ({ size }: Props) => {
   const styles: Record<Size, CSSObject> = {
     xs: {
@@ -21,7 +22,13 @@ const styleBySize = ({ size }: Props) => {
   return styles[size]
 }
 export const StCard = styled('div', props)`
-  background-color: ${() => colors.white};
+  background-color: ${({ theme, variant }) =>
+    variant === 'transparent'
+      ? rgba(
+          theme.card.transparent.backdropColor,
+          theme.card.transparent.backdropOpacity,
+        )
+      : theme.card.backgroundColor};
   padding: ${() => rem(spacing['3'])};
   border-radius: ${() => rem(borderRadius.DEFAULT)};
   box-shadow: ${() => boxShadow.DEFAULT};
