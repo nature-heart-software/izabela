@@ -12,8 +12,7 @@
           <template
             v-if="
               messengerStateStore.markForRestart &&
-              !isGameOverlay &&
-              !info?.isRunningAsAdmin
+              !isGameOverlay
             "
           >
             <NvCard class="settings__message pl-2" size="xs">
@@ -178,7 +177,6 @@ const navigation = [
 const currentRoute = useRoute()
 const { instances } = useConfirmStore()
 const messengerStateStore = useMessengerStateStore()
-const { data: info } = useGetAppInfoQuery()
 </script>
 <style lang="scss" scoped>
 .settings {

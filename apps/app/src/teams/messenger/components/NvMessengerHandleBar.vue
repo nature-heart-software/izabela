@@ -24,8 +24,7 @@
       <template
         v-if="
           messengerStateStore.markForRestart &&
-          !isGameOverlay &&
-          !info?.isRunningAsAdmin
+          !isGameOverlay
         "
       >
         <NvMarkForRestartMessage />
@@ -51,6 +50,4 @@ const reload = () => {
   window.location.reload()
 }
 const messengerStateStore = useMessengerStateStore()
-
-const { data: info } = useGetAppInfoQuery()
 </script>
