@@ -11,6 +11,14 @@
           @update:modelValue="(value) => setProperty('selectedVoice', value)"
         />
       </NvFormItem>
+      <NvDivider direction="horizontal" />
+      <NvFormItem label="Additional data">
+        <NvTextarea
+          placeholder="Additional data you want to send to the server..."
+          :modelValue="getProperty('additionalData')"
+          @update:modelValue="(value) => setProperty('additionalData', value)"
+        />
+      </NvFormItem>
       <template v-if="!form">
         <NvDivider direction="horizontal" />
         <NvGroup :spacing="5" align="start" justify="apart" no-wrap>
@@ -82,7 +90,7 @@ import {
   NvInput,
   NvStack,
   NvSwitch,
-  NvText,
+  NvText, NvTextarea,
 } from '@packages/ui'
 import NvVoiceSelect from './NvVoiceSelect'
 import { store } from './store'

@@ -3,6 +3,7 @@ import { ENGINE_ID } from './shared'
 
 const exposedProperties = {
   selectedVoice: null,
+  additionalData: '',
 }
 
 export const store = definePluginStore(
