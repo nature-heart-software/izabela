@@ -21,12 +21,7 @@
           </NvTooltip>
         </template>
       </NvGroup>
-      <template
-        v-if="
-          messengerStateStore.markForRestart &&
-          !isGameOverlay
-        "
-      >
+      <template v-if="messengerStateStore.markForRestart && !isGameOverlay">
         <NvMarkForRestartMessage />
       </template>
     </NvGroup>

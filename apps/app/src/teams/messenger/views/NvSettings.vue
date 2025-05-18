@@ -9,12 +9,7 @@
       <!-- Top -->
       <div class="flex justify-between space-x-4">
         <div class="grow">
-          <template
-            v-if="
-              messengerStateStore.markForRestart &&
-              !isGameOverlay
-            "
-          >
+          <template v-if="messengerStateStore.markForRestart && !isGameOverlay">
             <NvCard class="settings__message pl-2" size="xs">
               <div class="pl-4">
                 <NvMarkForRestartMessage />
