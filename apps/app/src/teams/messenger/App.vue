@@ -3,7 +3,8 @@
     <GlobalStyles ref="globalStyles">
       <button
         v-show="displayOffscreenFocusFix"
-        id="offscreen-focus-fix"
+        data-offscreen-focus-fix
+        ref="offscreenFocusFix"
         :style="{
           zIndex: 999999999,
         }"
@@ -58,6 +59,8 @@ import { onIPCApplyProfile } from '@/electron/events/renderer.ts'
 import { useProfilesStore } from '@/features/profiles/store.ts'
 import { themes, GlobalStyles, PORTAL_TARGET } from '@packages/ui'
 
+const offscreenFocusFix = ref()
+provide('offscreen-focus-fix', offscreenFocusFix)
 const { ElectronMessengerWindow } = window
 const messengerStore = useMessengerStore()
 const settingsStore = useSettingsStore()

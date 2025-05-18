@@ -15,7 +15,7 @@ export { PORTAL_TARGET } from '@/consts'
 const { spacing, boxShadow, borderWidth, transition, borderRadius } = tokens
 
 export const GlobalStyles = styled('div')`
-  color: ${({ theme }) => theme.text.color};
+  color: ${({ theme }: any) => theme.text.color};
   * {
     &::-webkit-scrollbar {
       width: ${() => rem(spacing['5'])};
@@ -24,25 +24,25 @@ export const GlobalStyles = styled('div')`
     &::-webkit-scrollbar-thumb {
       border-left: ${() => rem(spacing['3'])} solid rgba(0, 0, 0, 0);
       background-clip: padding-box;
-      background-color: ${({ theme }) => theme.button.plain.backgroundColor};
+      background-color: ${({ theme }: any) => theme.button.plain.backgroundColor};
 
       &:hover {
-        background-color: ${({ theme }) => theme.button.plain.hover.backgroundColor};
+        background-color: ${({ theme }: any) => theme.button.plain.hover.backgroundColor};
       }
 
       &:active {
-        background-color: ${({ theme }) => theme.button.plain.active.backgroundColor};
+        background-color: ${({ theme }: any) => theme.button.plain.active.backgroundColor};
       }
     }
   }
 
   .el-loading-mask {
-    ${({ theme }) => disabledItemBackgroundStyle({ theme })}
+    ${({ theme }: any) => disabledItemBackgroundStyle({ theme })}
     .el-loading-spinner {
       .circular {
         .path {
           r: ${() => rem(spacing['3'])}
-          stroke: ${({ theme }) => theme.text.color}
+          stroke: ${({ theme }: any) => theme.text.color}
           stroke-width: ${() => rem(spacing['1'])}
         }
       }
@@ -68,10 +68,10 @@ export const GlobalStyles = styled('div')`
   
     [data-theme="tooltip"] {
       box-shadow: ${() => boxShadow.lg} !important;
-      border-color: ${({ theme }) => theme.tooltip.borderColor} !important;
+      border-color: ${({ theme }: any) => theme.tooltip.borderColor} !important;
       border-width: ${() => rem(borderWidth.DEFAULT)};
-      color: ${({ theme }) => theme.tooltip.color} !important;
-      background-color: ${({ theme }) => theme.tooltip.backgroundColor} !important;
+      color: ${({ theme }: any) => theme.tooltip.color} !important;
+      background-color: ${({ theme }: any) => theme.tooltip.backgroundColor} !important;
       padding: ${() => rem(spacing[1])} ${() => rem(spacing[2])};
       ${() => borderRadiusStyleBySize('xs')}
       * {
@@ -80,11 +80,11 @@ export const GlobalStyles = styled('div')`
     }
   
     #vjt-tooltip {
-        background-color: ${({ theme }) => theme.button.plain.backgroundColor} !important;
+        background-color: ${({ theme }: any) => theme.button.plain.backgroundColor} !important;
         box-shadow: ${() => boxShadow.DEFAULT};
-        color: ${({ theme }) => theme.button.plain.color} !important;
+        color: ${({ theme }: any) => theme.button.plain.color} !important;
         [type="body"] {
-          color: ${({ theme }) => theme.button.plain.color} !important;
+          color: ${({ theme }: any) => theme.button.plain.color} !important;
         }
         border-radius: ${() => rem(borderRadius.md)} !important;
         font-size: inherit !important;
@@ -100,13 +100,13 @@ export const GlobalStyles = styled('div')`
 
     #vjt-arrow {
         &::before {
-            background-color: ${({ theme }) => theme.button.plain.backgroundColor} !important;
+            background-color: ${({ theme }: any) => theme.button.plain.backgroundColor} !important;
             box-shadow: ${() => boxShadow.DEFAULT};
         }
     }
 
     .vjt-highlight {
-        outline: ${() => rem(2)} solid ${({ theme }) => theme.button.plain.backgroundColor} !important;
+        outline: ${() => rem(2)} solid ${({ theme }: any) => theme.button.plain.backgroundColor} !important;
         border-radius: inherit !important;
     }
 `

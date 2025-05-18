@@ -32,8 +32,8 @@
   </NvCard>
 </template>
 <script lang="ts" setup>
-import { NvButton, NvCard, NvGroup } from '@packages/ui'
-import { computed, ref, watch } from 'vue'
+import { NvButton, NvCard, NvGroup, Ref } from '@packages/ui'
+import { computed, ref, watch, inject } from 'vue'
 import { useMessengerWindowStore } from '@/teams/messenger/store'
 import {
   emitIPCGameOverlayStopIntercept,
@@ -44,6 +44,7 @@ import { useSettingsStore } from '@/features/settings/store'
 import NvSpeechEngineInput from '@/features/speech/components/inputs/NvSpeechEngineInput.vue'
 import { socket } from '@/services'
 import { isGameOverlay } from '@/consts.ts'
+import { useEventListener } from '@vueuse/core'
 
 const { ElectronMessengerWindow } = window
 const messengerWindowStore = useMessengerWindowStore()
@@ -103,6 +104,13 @@ const onWindowFocus = () => {
 const onWindowBlur = () => {
   if (inputRef.value) inputRef.value.blur()
 }
+
+const offscreenFocusFix: Ref<HTMLElement> = inject('offscreen-focus-fix')
+
+useEventListener(offscreenFocusFix, 'click', () => {
+  inputRef.value.focus()
+})
+
 if (isGameOverlay) {
   window.addEventListener('focus', () => {
     inputRef.value.focus()
@@ -110,12 +118,8 @@ if (isGameOverlay) {
   window.addEventListener('blur', () => {
     inputRef.value.blur()
   })
-  document
-    .querySelector('#offscreen-focus-fix')
-    ?.addEventListener('click', (e) => {
-      inputRef.value.focus()
-    })
 }
+
 watch(
   // Makes sure all conditions are met to focus or blur properly
   () => [
