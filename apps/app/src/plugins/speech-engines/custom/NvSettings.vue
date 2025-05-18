@@ -90,7 +90,8 @@ import {
   NvInput,
   NvStack,
   NvSwitch,
-  NvText, NvTextarea,
+  NvText,
+  NvTextarea,
 } from '@packages/ui'
 import NvVoiceSelect from './NvVoiceSelect'
 import { store } from './store'
