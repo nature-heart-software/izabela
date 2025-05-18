@@ -21,13 +21,7 @@
           </NvTooltip>
         </template>
       </NvGroup>
-      <template
-        v-if="
-          messengerStateStore.markForRestart &&
-          !isGameOverlay &&
-          !info?.isRunningAsAdmin
-        "
-      >
+      <template v-if="messengerStateStore.markForRestart && !isGameOverlay">
         <NvMarkForRestartMessage />
       </template>
     </NvGroup>
@@ -51,6 +45,4 @@ const reload = () => {
   window.location.reload()
 }
 const messengerStateStore = useMessengerStateStore()
-
-const { data: info } = useGetAppInfoQuery()
 </script>
