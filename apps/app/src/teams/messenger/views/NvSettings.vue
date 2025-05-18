@@ -9,13 +9,7 @@
       <!-- Top -->
       <div class="flex justify-between space-x-4">
         <div class="grow">
-          <template
-            v-if="
-              messengerStateStore.markForRestart &&
-              !isGameOverlay &&
-              !info?.isRunningAsAdmin
-            "
-          >
+          <template v-if="messengerStateStore.markForRestart && !isGameOverlay">
             <NvCard class="settings__message pl-2" size="xs">
               <div class="pl-4">
                 <NvMarkForRestartMessage />
@@ -178,7 +172,6 @@ const navigation = [
 const currentRoute = useRoute()
 const { instances } = useConfirmStore()
 const messengerStateStore = useMessengerStateStore()
-const { data: info } = useGetAppInfoQuery()
 </script>
 <style lang="scss" scoped>
 .settings {
