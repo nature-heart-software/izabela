@@ -7717,7 +7717,7 @@
     remark-slug "^6.0.0"
     ts-dedent "^2.0.0"
 
-"@storybook/addon-essentials@^7.0.5":
+"@storybook/addon-essentials@^7.6.20":
   version "7.6.20"
   resolved "https://registry.yarnpkg.com/@storybook/addon-essentials/-/addon-essentials-7.6.20.tgz#149c22b51a7abd8977acaaf2e1941c5b5dcb2fd5"
   integrity sha512-hCupSOiJDeOxJKZSgH0x5Mb2Xqii6mps21g5hpxac1XjhQtmGflShxi/xOHhK3sNqrbgTSbScfpUP3hUlZO/2Q==
@@ -7744,7 +7744,7 @@
   dependencies:
     "@storybook/global" "^5.0.0"
 
-"@storybook/addon-interactions@^7.0.5":
+"@storybook/addon-interactions@^7.6.20":
   version "7.6.20"
   resolved "https://registry.yarnpkg.com/@storybook/addon-interactions/-/addon-interactions-7.6.20.tgz#9471575cb3699d12a7011299ce6bca1cb8aea252"
   integrity sha512-uH+OIxLtvfnnmdN3Uf8MwzfEFYtaqSA6Hir6QNPc643se0RymM8mULN0rzRyvspwd6OagWdtOxsws3aHk02KTA==
@@ -7755,7 +7755,7 @@
     polished "^4.2.2"
     ts-dedent "^2.2.0"
 
-"@storybook/addon-links@^7.0.5":
+"@storybook/addon-links@^7.6.20":
   version "7.6.20"
   resolved "https://registry.yarnpkg.com/@storybook/addon-links/-/addon-links-7.6.20.tgz#c6bedc7bdc0112ce4cb3f1bfc701445df696598d"
   integrity sha512-iomSnBD90CA4MinesYiJkFX2kb3P1Psd/a1Y0ghlFEsHD4uMId9iT6sx2s16DYMja0SlPkrbWYnGukqaCjZpRw==
@@ -7792,7 +7792,7 @@
   dependencies:
     memoizerific "^1.11.3"
 
-"@storybook/blocks@7.6.20", "@storybook/blocks@^7.0.5":
+"@storybook/blocks@7.6.20", "@storybook/blocks@^7.6.20":
   version "7.6.20"
   resolved "https://registry.yarnpkg.com/@storybook/blocks/-/blocks-7.6.20.tgz#1cc142f1c238616f0f3a9f900965c651e7ee7c52"
   integrity sha512-xADKGEOJWkG0UD5jbY4mBXRlmj2C+CIupDL0/hpzvLvwobxBMFPKZIkcZIMvGvVnI/Ui+tJxQxLSuJ5QsPthUw==
@@ -8261,7 +8261,7 @@
     fs-extra "^11.1.0"
     read-pkg-up "^7.0.1"
 
-"@storybook/test@7.0.5":
+"@storybook/test@7.6.0":
   version "7.6.0"
   resolved "https://registry.yarnpkg.com/@storybook/test/-/test-7.6.0.tgz#4ce574082509649630fd1df6739e14b5b5be7741"
   integrity sha512-+ruF0Gp4QjjPlsq/Qu9vetnETJicm9OxTPvH7HEqAA0npFv3WnV9+Mgqr0PeBJg2dLgDhkmrJvX9MmnjObdEgQ==
@@ -8309,7 +8309,7 @@
     "@types/express" "^4.7.0"
     file-system-cache "2.3.0"
 
-"@storybook/vue3-vite@^7.0.5":
+"@storybook/vue3-vite@^7.6.20":
   version "7.6.20"
   resolved "https://registry.yarnpkg.com/@storybook/vue3-vite/-/vue3-vite-7.6.20.tgz#e539deab989dce9b735c361175c538e9ff4edad8"
   integrity sha512-uWqgOExT70CTCFPr+MPZmqdi7saETFxrGUfhORqXW/mjIw9uLccGgIQuwUbIl0YXg3LhVSBvHYKRZgPbI9jkVw==
@@ -8321,7 +8321,7 @@
     magic-string "^0.30.0"
     vue-docgen-api "^4.40.0"
 
-"@storybook/vue3@7.6.20", "@storybook/vue3@^7.0.5":
+"@storybook/vue3@7.6.20", "@storybook/vue3@^7.6.20":
   version "7.6.20"
   resolved "https://registry.yarnpkg.com/@storybook/vue3/-/vue3-7.6.20.tgz#d545a93c87f24c47453a11f3bd6555081dc85f9e"
   integrity sha512-NA27tNCmvJzRJ9yrVblrc296gem7WmreVzkF9UPW2ciMzsUJdVss2Oakt5xJIX/9c0B7y0ptzbwEXfeNc7e0Tg==
@@ -9033,6 +9033,11 @@
   version "0.0.16"
   resolved "https://registry.yarnpkg.com/@types/web-bluetooth/-/web-bluetooth-0.0.16.tgz#1d12873a8e49567371f2a75fe3e7f7edca6662d8"
   integrity sha512-oh8q2Zc32S6gd/j50GowEjKLoOVOwHP/bWVjKJInBwQqdOYMdPrf1oVlelTlyfFK3CKxL1uahMDAr+vy8T7yMQ==
+
+"@types/webrtc@^0.0.37":
+  version "0.0.37"
+  resolved "https://registry.yarnpkg.com/@types/webrtc/-/webrtc-0.0.37.tgz#693663dc5de8c6c85406f6cf5661ccc1e84e4c68"
+  integrity sha512-JGAJC/ZZDhcrrmepU4sPLQLIOIAgs5oIK+Ieq90K8fdaNMhfdfqmYatJdgif1NDQtvrSlTOGJDUYHIDunuufOg==
 
 "@types/websocket@^1.0.1":
   version "1.0.5"
@@ -18502,6 +18507,18 @@ microsoft-cognitiveservices-speech-sdk@^1.21.0, microsoft-cognitiveservices-spee
     uuid "^8.3.0"
     ws "^7.5.6"
 
+microsoft-cognitiveservices-speech-sdk@^1.45.0:
+  version "1.45.0"
+  resolved "https://registry.yarnpkg.com/microsoft-cognitiveservices-speech-sdk/-/microsoft-cognitiveservices-speech-sdk-1.45.0.tgz#93698217c02738eb7a4d0c48f0a7ef1507ea447f"
+  integrity sha512-etTSMGxDELxBQtNL8cgq2bwMrE6CjgfC8oIqKH9I9ghFs4/ITyLXy9HZuo0wQItN1zfDH3FhBeR72TmApe6pCQ==
+  dependencies:
+    "@types/webrtc" "^0.0.37"
+    agent-base "^6.0.1"
+    bent "^7.3.12"
+    https-proxy-agent "^4.0.0"
+    uuid "^9.0.0"
+    ws "^8.18.2"
+
 miller-rabin@^4.0.0:
   version "4.0.1"
   resolved "https://registry.npmjs.org/miller-rabin/-/miller-rabin-4.0.1.tgz"
@@ -23008,7 +23025,7 @@ store2@^2.14.2:
   resolved "https://registry.yarnpkg.com/store2/-/store2-2.14.3.tgz#24077d7ba110711864e4f691d2af941ec533deb5"
   integrity sha512-4QcZ+yx7nzEFiV4BMLnr/pRa5HYzNITX2ri0Zh6sT9EyQHbBHacC6YigllUPU9X3D0f/22QCgfokpKs52YRrUg==
 
-storybook@^7.0.5:
+storybook@^7.6.20:
   version "7.6.20"
   resolved "https://registry.yarnpkg.com/storybook/-/storybook-7.6.20.tgz#6204ff0c28471536a1a64cb16d1c97872dd33f95"
   integrity sha512-Wt04pPTO71pwmRmsgkyZhNo4Bvdb/1pBAMsIFb9nQLykEdzzpXjvingxFFvdOG4nIowzwgxD+CLlyRqVJqnATw==
@@ -23062,7 +23079,7 @@ string-hash@^1.1.1, string-hash@^1.1.3:
   resolved "https://registry.yarnpkg.com/string-hash/-/string-hash-1.1.3.tgz#e8aafc0ac1855b4666929ed7dd1275df5d6c811b"
   integrity sha512-kJUvRUFK49aub+a7T1nNE66EJbZBMnBgoC1UbCZ5n6bsZKBRga4KgBRTMn/pFkeCZSYtNeSyMxPDM0AXWELk2A==
 
-"string-width-cjs@npm:string-width@^4.2.0":
+"string-width-cjs@npm:string-width@^4.2.0", "string-width@^1.0.2 || 2 || 3 || 4", string-width@^4.1.0, string-width@^4.2.0, string-width@^4.2.3:
   version "4.2.3"
   resolved "https://registry.npmjs.org/string-width/-/string-width-4.2.3.tgz"
   integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
@@ -23079,15 +23096,6 @@ string-width@^1.0.1:
     code-point-at "^1.0.0"
     is-fullwidth-code-point "^1.0.0"
     strip-ansi "^3.0.0"
-
-"string-width@^1.0.2 || 2 || 3 || 4", string-width@^4.1.0, string-width@^4.2.0, string-width@^4.2.3:
-  version "4.2.3"
-  resolved "https://registry.npmjs.org/string-width/-/string-width-4.2.3.tgz"
-  integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
-  dependencies:
-    emoji-regex "^8.0.0"
-    is-fullwidth-code-point "^3.0.0"
-    strip-ansi "^6.0.1"
 
 string-width@^2.0.0:
   version "2.1.1"
@@ -23175,7 +23183,7 @@ string_decoder@~1.1.1:
   dependencies:
     safe-buffer "~5.1.0"
 
-"strip-ansi-cjs@npm:strip-ansi@^6.0.1":
+"strip-ansi-cjs@npm:strip-ansi@^6.0.1", strip-ansi@^6.0.0, strip-ansi@^6.0.1:
   version "6.0.1"
   resolved "https://registry.npmjs.org/strip-ansi/-/strip-ansi-6.0.1.tgz"
   integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
@@ -23202,13 +23210,6 @@ strip-ansi@^5.1.0, strip-ansi@^5.2.0:
   integrity sha512-DuRs1gKbBqsMKIZlrffwlug8MHkcnpjs5VPmL1PAh+mA30U0DTotfDZ0d2UUsXpPmPmMMJ6W773MaA3J+lbiWA==
   dependencies:
     ansi-regex "^4.1.0"
-
-strip-ansi@^6.0.0, strip-ansi@^6.0.1:
-  version "6.0.1"
-  resolved "https://registry.npmjs.org/strip-ansi/-/strip-ansi-6.0.1.tgz"
-  integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
-  dependencies:
-    ansi-regex "^5.0.1"
 
 strip-ansi@^7.0.1, strip-ansi@^7.1.0:
   version "7.1.0"
@@ -24863,7 +24864,7 @@ wql-process-monitor@3.0.1:
     emittery "^1.0.1"
     koffi "^2.6.1"
 
-"wrap-ansi-cjs@npm:wrap-ansi@^7.0.0":
+"wrap-ansi-cjs@npm:wrap-ansi@^7.0.0", wrap-ansi@^7.0.0:
   version "7.0.0"
   resolved "https://registry.npmjs.org/wrap-ansi/-/wrap-ansi-7.0.0.tgz"
   integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==
@@ -24876,15 +24877,6 @@ wrap-ansi@^6.0.1:
   version "6.2.0"
   resolved "https://registry.npmjs.org/wrap-ansi/-/wrap-ansi-6.2.0.tgz"
   integrity sha512-r6lPcBGxZXlIcymEu7InxDMhdW0KDxpLgoFLcguasxCaJ/SOIZwINatK9KY/tf+ZrlywOKU0UDj3ATXUBfxJXA==
-  dependencies:
-    ansi-styles "^4.0.0"
-    string-width "^4.1.0"
-    strip-ansi "^6.0.0"
-
-wrap-ansi@^7.0.0:
-  version "7.0.0"
-  resolved "https://registry.npmjs.org/wrap-ansi/-/wrap-ansi-7.0.0.tgz"
-  integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==
   dependencies:
     ansi-styles "^4.0.0"
     string-width "^4.1.0"
@@ -24983,6 +24975,11 @@ ws@^7.5.6:
   version "7.5.9"
   resolved "https://registry.yarnpkg.com/ws/-/ws-7.5.9.tgz#54fa7db29f4c7cec68b1ddd3a89de099942bb591"
   integrity sha512-F+P9Jil7UiSKSkppIiD94dN07AwvFixvLIj1Og1Rl9GGMuNipJnV9JzjD6XuqmAeiswGvUmNLjr5cFuXwNS77Q==
+
+ws@^8.18.2:
+  version "8.18.3"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.18.3.tgz#b56b88abffde62791c639170400c93dcb0c95472"
+  integrity sha512-PEIGCY5tSlUt50cqyMXfCzX+oOPqN0vuGqWzbcJ2xvnkzkq46oOpz7dQaTDBdfICb4N14+GARUDw2XV2N4tvzg==
 
 ws@^8.2.3:
   version "8.12.0"
