@@ -214,9 +214,6 @@ export const useSettingsStore = defineStore(
 
     const disableRunAsAdmin = () => {
       runAsAdmin.value = false
-      messengerStateStore.$patch({
-        markForRestart: false,
-      })
     }
 
     return {
