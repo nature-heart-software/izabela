@@ -8,7 +8,7 @@
     "nan": "^2.14.1"
   },
   "devDependencies": {
-    "standard": "^14.3.4"
+    "standard": "^17.1.2"
   },
   "homepage": "https://github.com/kapetan/win-mouse",
   "keywords": [
