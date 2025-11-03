@@ -16,7 +16,6 @@
     "@packages/win-mouse": "2.0.1",
     "@vitalets/google-translate-api": "^9.2.1",
     "elevenlabs": "^1.53.0",
-    "ffi-napi": "^4.0.3",
     "forcefocus": "^1.1.0",
     "ibm-watson": "^7.2.0",
     "micromatch": "^4.0.5",
@@ -39,7 +38,7 @@
     "@packages/toolbox": "0.0.0",
     "@packages/ui": "0.0.0",
     "@types/wav": "^1.0.4",
-    "electron": "20.3.8"
+    "electron": "20.3.9"
   },
   "main": "dist-electron/background.js",
   "private": true,

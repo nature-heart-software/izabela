@@ -11,7 +11,6 @@ import {
 import { useSettingsStore } from '@/features/settings/store'
 import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
 import { Deferred } from '@packages/toolbox'
-import ffi from 'ffi-napi'
 import { getNativeWindowHandleInt } from '@/utils/electron-window'
 import gameOverlay from '@/electron/game-overlay.ts'
 import { focusWindow } from 'forcefocus'
@@ -36,27 +35,11 @@ export const ElectronMessengerWindow = () => {
   const isReady = () => ready.promise
   let foregroundWindow: string | number | null = null
 
-  const kernel32 = new ffi.Library('Kernel32.dll', {
-    GetCurrentThreadId: ['int', []],
-  })
 
-  const user32 = new ffi.Library('user32', {
-    SetForegroundWindow: ['bool', ['long']],
-    GetForegroundWindow: ['long', []],
-    SetFocus: ['long', ['long']],
-    SetActiveWindow: ['long', ['long']],
-    AttachThreadInput: ['bool', ['int', 'long', 'bool']],
-    ShowWindow: ['bool', ['long', 'int']],
-    FindWindowA: ['long', ['string', 'string']],
-    GetTopWindow: ['long', ['long']],
-    BringWindowToTop: ['bool', ['long']],
-    SwitchToThisWindow: ['void', ['long', 'bool']],
-    GetWindowThreadProcessId: ['int', ['long', 'pointer']],
-    SetWindowPos: [
-      'bool',
-      ['long', 'long', 'int', 'int', 'int', 'int', 'uint'],
-    ],
-  })
+  const user32 = {
+    SetForegroundWindow(){ throw new Error('Unimplemented')},
+    GetForegroundWindow(){ throw new Error('Unimplemented')},
+  }
 
   const getWindow = () =>
     registeredWindow ||

@@ -64,7 +64,7 @@
     "cors": "^2.8.5",
     "crypto-js": "^4.1.1",
     "depcheck": "^1.4.7",
-    "electron": "20.3.8",
+    "electron": "20.3.9",
     "electron-builder": "^24.6.4",
     "electron-devtools-installer": "^3.2.0",
     "electron-log": "^4.4.8",

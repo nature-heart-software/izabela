@@ -3,7 +3,6 @@ import throttle from 'lodash/throttle'
 import { BrowserWindow, screen } from 'electron'
 import { useSettingsStore } from '@/features/settings/store'
 import { Deferred } from '@packages/toolbox'
-import ffi from 'ffi-napi'
 import {
   gkl,
   keybindingAllReleased,
@@ -26,9 +25,9 @@ export const ElectronOverlayWindow = () => {
   const ready = Deferred<BrowserWindow>()
   const isReady = () => ready.promise
 
-  const user32 = new ffi.Library('user32', {
-    BlockInput: ['bool', ['bool']],
-  })
+  const user32 = {
+    BlockInput() { throw new Error('Not implemented') },
+  }
 
   const getWindow = () =>
     registeredWindow ||
