@@ -35,10 +35,13 @@ export const ElectronMessengerWindow = () => {
   const isReady = () => ready.promise
   let foregroundWindow: string | number | null = null
 
-
   const user32 = {
-    SetForegroundWindow(){ throw new Error('Unimplemented')},
-    GetForegroundWindow(){ throw new Error('Unimplemented')},
+    SetForegroundWindow() {
+      throw new Error('Unimplemented')
+    },
+    GetForegroundWindow() {
+      throw new Error('Unimplemented')
+    },
   }
 
   const getWindow = () =>

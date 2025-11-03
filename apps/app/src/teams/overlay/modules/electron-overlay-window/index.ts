@@ -26,7 +26,9 @@ export const ElectronOverlayWindow = () => {
   const isReady = () => ready.promise
 
   const user32 = {
-    BlockInput() { throw new Error('Not implemented') },
+    BlockInput() {
+      throw new Error('Not implemented')
+    },
   }
 
   const getWindow = () =>
