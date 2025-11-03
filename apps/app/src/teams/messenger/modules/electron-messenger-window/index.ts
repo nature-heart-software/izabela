@@ -14,6 +14,7 @@ import { Deferred } from '@packages/toolbox'
 import { getNativeWindowHandleInt } from '@/utils/electron-window'
 import gameOverlay from '@/electron/game-overlay.ts'
 import { focusWindow } from 'forcefocus'
+import koffi from 'koffi'
 
 export const ElectronMessengerWindow = () => {
   /* use isFocused as source of truth instead of window.isFocused() as in some instances
@@ -35,13 +36,11 @@ export const ElectronMessengerWindow = () => {
   const isReady = () => ready.promise
   let foregroundWindow: string | number | null = null
 
-  const user32 = {
-    SetForegroundWindow() {
-      throw new Error('Unimplemented')
-    },
-    GetForegroundWindow() {
-      throw new Error('Unimplemented')
-    },
+  const user32 = koffi.load('user32.dll')
+
+  const user32Api = {
+    SetForegroundWindow: user32.func('bool SetForegroundWindow(void* hWnd)'),
+    GetForegroundWindow: user32.func('void* GetForegroundWindow()'),
   }
 
   const getWindow = () =>
@@ -96,10 +95,10 @@ export const ElectronMessengerWindow = () => {
               setTimeout(ensureNativeFocus, 200)
             })
           }
-          foregroundWindow = user32.GetForegroundWindow()
+          foregroundWindow = user32Api.GetForegroundWindow()
           // to prevent shenanigans with some softwares (*coughs* League of Legends *coughs*)
           // this makes sure to blur first with ffi-napi for safe measures
-          user32.SetForegroundWindow(0)
+          user32Api.SetForegroundWindow(0)
           isFocused = true
 
           /* order matters */
@@ -126,7 +125,7 @@ export const ElectronMessengerWindow = () => {
           window.setFocusable(false) // Fixes alwaysOnTop going in the background sometimes for some reasons
           if (foregroundWindow) {
             if (foregroundWindow !== windowNativeHandle && returnFocus) {
-              user32.SetForegroundWindow(foregroundWindow)
+              user32Api.SetForegroundWindow(foregroundWindow)
             }
             foregroundWindow = null
           }

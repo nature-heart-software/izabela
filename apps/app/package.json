@@ -18,6 +18,7 @@
     "elevenlabs": "^1.53.0",
     "forcefocus": "^1.1.0",
     "ibm-watson": "^7.2.0",
+    "koffi": "^2.9.1",
     "micromatch": "^4.0.5",
     "microsoft-cognitiveservices-speech-sdk": "^1.25.0",
     "node-abi": "^3.40.0",
@@ -38,7 +39,7 @@
     "@packages/toolbox": "0.0.0",
     "@packages/ui": "0.0.0",
     "@types/wav": "^1.0.4",
-    "electron": "20.3.9"
+    "electron": "22.3.27"
   },
   "main": "dist-electron/background.js",
   "private": true,
