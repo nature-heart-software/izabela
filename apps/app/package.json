@@ -21,7 +21,7 @@
     "koffi": "^2.9.1",
     "micromatch": "^4.0.5",
     "microsoft-cognitiveservices-speech-sdk": "^1.25.0",
-    "node-abi": "^3.40.0",
+    "node-abi": "^4.17.0",
     "node-global-key-listener": "^0.1.1",
     "node-record-lpcm16": "1.0.1",
     "openai": "^4.98.0",
