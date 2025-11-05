@@ -22,11 +22,13 @@ const MSLLHOOKSTRUCT = koffi.struct('MSLLHOOKSTRUCT', {
 })
 
 const user32 = koffi.load('user32.dll')
-const SetWindowsHookExW = user32.func('void* SetWindowsHookExW(int idHook, void *lpfn, void *hmod, uint32 dwThreadId)')
-const CallNextHookEx = user32.func('intptr_t CallNextHookEx(void *hhk, int nCode, uintptr_t wParam, intptr_t lParam)')
-const UnhookWindowsHookEx = user32.func('bool UnhookWindowsHookEx(void *hhk)')
-const GetMessageW = user32.func('bool GetMessageW(_Out_ void *lpMsg, void *hWnd, uint32 wMsgFilterMin, uint32 wMsgFilterMax)')
-const PostQuitMessage = user32.func('void PostQuitMessage(int nExitCode)')
+const HookProc = koffi.proto('intptr_t __stdcall HookProc(int nCode, uintptr_t wParam, intptr_t lParam)')
+const HookProcPtr = koffi.pointer(HookProc)
+const SetWindowsHookExW = user32.func('void* __stdcall SetWindowsHookExW(int idHook, HookProc *lpfn, void *hmod, uint32 dwThreadId)')
+const CallNextHookEx = user32.func('intptr_t __stdcall CallNextHookEx(void *hhk, int nCode, uintptr_t wParam, intptr_t lParam)')
+const UnhookWindowsHookEx = user32.func('bool __stdcall UnhookWindowsHookEx(void *hhk)')
+const GetMessageW = user32.func('bool __stdcall GetMessageW(_Out_ void *lpMsg, void *hWnd, uint32 wMsgFilterMin, uint32 wMsgFilterMax)')
+const PostQuitMessage = user32.func('void __stdcall PostQuitMessage(int nExitCode)')
 
 module.exports = function () {
   var that = new events.EventEmitter()
@@ -37,41 +39,45 @@ module.exports = function () {
 
   that.once('newListener', function () {
     hookCallback = koffi.register(function (nCode, wParam, lParam) {
-      if (nCode >= 0) {
-        const hookStruct = koffi.decode(lParam, koffi.pointer(MSLLHOOKSTRUCT))
-        const x = hookStruct.pt.x
-        const y = hookStruct.pt.y
-        var type = null
+      try {
+        if (nCode >= 0) {
+          const hookStruct = koffi.decode(lParam, koffi.pointer(MSLLHOOKSTRUCT))
+          const x = hookStruct.pt.x
+          const y = hookStruct.pt.y
+          var type = null
 
-        if (wParam === WM_LBUTTONDOWN) {
-          type = 'left-down'
-          left = true
-        } else if (wParam === WM_LBUTTONUP) {
-          type = 'left-up'
-          left = false
-        } else if (wParam === WM_RBUTTONDOWN) {
-          type = 'right-down'
-          right = true
-        } else if (wParam === WM_RBUTTONUP) {
-          type = 'right-up'
-          right = false
-        } else if (wParam === WM_MOUSEMOVE) {
-          if (left) {
-            type = 'left-drag'
-          } else if (right) {
-            type = 'right-drag'
-          } else {
-            type = 'move'
+          if (wParam === WM_LBUTTONDOWN) {
+            type = 'left-down'
+            left = true
+          } else if (wParam === WM_LBUTTONUP) {
+            type = 'left-up'
+            left = false
+          } else if (wParam === WM_RBUTTONDOWN) {
+            type = 'right-down'
+            right = true
+          } else if (wParam === WM_RBUTTONUP) {
+            type = 'right-up'
+            right = false
+          } else if (wParam === WM_MOUSEMOVE) {
+            if (left) {
+              type = 'left-drag'
+            } else if (right) {
+              type = 'right-drag'
+            } else {
+              type = 'move'
+            }
+          }
+
+          if (type) {
+            that.emit(type, x, y)
           }
         }
-
-        if (type) {
-          that.emit(type, x, y)
-        }
+      } catch (err) {
+        // Ignore decoding errors
       }
 
       return CallNextHookEx(null, nCode, wParam, lParam)
-    }, 'intptr_t', ['int', 'uintptr_t', koffi.pointer(MSLLHOOKSTRUCT)])
+    }, HookProcPtr)
 
     hookHandle = SetWindowsHookExW(WH_MOUSE_LL, hookCallback, null, 0)
 
