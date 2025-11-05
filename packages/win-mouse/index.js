@@ -10,7 +10,7 @@ const WM_MOUSEMOVE = 0x0200
 
 const POINT = koffi.struct('POINT', {
   x: 'long',
-  y: 'long'
+  y: 'long',
 })
 
 const MSLLHOOKSTRUCT = koffi.struct('MSLLHOOKSTRUCT', {
@@ -18,14 +18,20 @@ const MSLLHOOKSTRUCT = koffi.struct('MSLLHOOKSTRUCT', {
   mouseData: 'uint32',
   flags: 'uint32',
   time: 'uint32',
-  dwExtraInfo: 'uintptr_t'
+  dwExtraInfo: 'uintptr_t',
 })
 
 const user32 = koffi.load('user32.dll')
-const SetWindowsHookExW = user32.func('void* SetWindowsHookExW(int idHook, void *lpfn, void *hmod, uint32 dwThreadId)')
-const CallNextHookEx = user32.func('intptr_t CallNextHookEx(void *hhk, int nCode, uintptr_t wParam, intptr_t lParam)')
+const SetWindowsHookExW = user32.func(
+  'void* SetWindowsHookExW(int idHook, void *lpfn, void *hmod, uint32 dwThreadId)',
+)
+const CallNextHookEx = user32.func(
+  'intptr_t CallNextHookEx(void *hhk, int nCode, uintptr_t wParam, intptr_t lParam)',
+)
 const UnhookWindowsHookEx = user32.func('bool UnhookWindowsHookEx(void *hhk)')
-const GetMessageW = user32.func('bool GetMessageW(_Out_ void *lpMsg, void *hWnd, uint32 wMsgFilterMin, uint32 wMsgFilterMax)')
+const GetMessageW = user32.func(
+  'bool GetMessageW(_Out_ void *lpMsg, void *hWnd, uint32 wMsgFilterMin, uint32 wMsgFilterMax)',
+)
 const PostQuitMessage = user32.func('void PostQuitMessage(int nExitCode)')
 
 module.exports = function () {
@@ -36,42 +42,46 @@ module.exports = function () {
   var hookCallback = null
 
   that.once('newListener', function () {
-    hookCallback = koffi.register(function (nCode, wParam, lParam) {
-      if (nCode >= 0) {
-        const hookStruct = koffi.decode(lParam, koffi.pointer(MSLLHOOKSTRUCT))
-        const x = hookStruct.pt.x
-        const y = hookStruct.pt.y
-        var type = null
+    hookCallback = koffi.register(
+      function (nCode, wParam, lParam) {
+        if (nCode >= 0) {
+          const hookStruct = koffi.decode(lParam, koffi.pointer(MSLLHOOKSTRUCT))
+          const x = hookStruct.pt.x
+          const y = hookStruct.pt.y
+          var type = null
 
-        if (wParam === WM_LBUTTONDOWN) {
-          type = 'left-down'
-          left = true
-        } else if (wParam === WM_LBUTTONUP) {
-          type = 'left-up'
-          left = false
-        } else if (wParam === WM_RBUTTONDOWN) {
-          type = 'right-down'
-          right = true
-        } else if (wParam === WM_RBUTTONUP) {
-          type = 'right-up'
-          right = false
-        } else if (wParam === WM_MOUSEMOVE) {
-          if (left) {
-            type = 'left-drag'
-          } else if (right) {
-            type = 'right-drag'
-          } else {
-            type = 'move'
+          if (wParam === WM_LBUTTONDOWN) {
+            type = 'left-down'
+            left = true
+          } else if (wParam === WM_LBUTTONUP) {
+            type = 'left-up'
+            left = false
+          } else if (wParam === WM_RBUTTONDOWN) {
+            type = 'right-down'
+            right = true
+          } else if (wParam === WM_RBUTTONUP) {
+            type = 'right-up'
+            right = false
+          } else if (wParam === WM_MOUSEMOVE) {
+            if (left) {
+              type = 'left-drag'
+            } else if (right) {
+              type = 'right-drag'
+            } else {
+              type = 'move'
+            }
+          }
+
+          if (type) {
+            that.emit(type, x, y)
           }
         }
 
-        if (type) {
-          that.emit(type, x, y)
-        }
-      }
-
-      return CallNextHookEx(null, nCode, wParam, lParam)
-    }, 'intptr_t', ['int', 'uintptr_t', koffi.pointer(MSLLHOOKSTRUCT)])
+        return CallNextHookEx(null, nCode, wParam, lParam)
+      },
+      'intptr_t',
+      ['int', 'uintptr_t', koffi.pointer(MSLLHOOKSTRUCT)],
+    )
 
     hookHandle = SetWindowsHookExW(WH_MOUSE_LL, hookCallback, null, 0)
 
@@ -87,7 +97,7 @@ module.exports = function () {
         wParam: 'uintptr_t',
         lParam: 'intptr_t',
         time: 'uint32',
-        pt: POINT
+        pt: POINT,
       })
       const msg = {}
       if (hookHandle && GetMessageW(msg, null, 0, 0)) {
