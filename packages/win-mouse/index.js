@@ -27,8 +27,6 @@ const HookProcPtr = koffi.pointer(HookProc)
 const SetWindowsHookExW = user32.func('void* __stdcall SetWindowsHookExW(int idHook, HookProc *lpfn, void *hmod, uint32 dwThreadId)')
 const CallNextHookEx = user32.func('intptr_t __stdcall CallNextHookEx(void *hhk, int nCode, uintptr_t wParam, intptr_t lParam)')
 const UnhookWindowsHookEx = user32.func('bool __stdcall UnhookWindowsHookEx(void *hhk)')
-const GetMessageW = user32.func('bool __stdcall GetMessageW(_Out_ void *lpMsg, void *hWnd, uint32 wMsgFilterMin, uint32 wMsgFilterMax)')
-const PostQuitMessage = user32.func('void __stdcall PostQuitMessage(int nExitCode)')
 
 module.exports = function () {
   var that = new events.EventEmitter()
@@ -84,22 +82,6 @@ module.exports = function () {
     if (!hookHandle) {
       throw new Error('Failed to install mouse hook')
     }
-
-    // Start message loop in background
-    setImmediate(function pump() {
-      const MSG = koffi.struct('MSG', {
-        hwnd: 'void*',
-        message: 'uint32',
-        wParam: 'uintptr_t',
-        lParam: 'intptr_t',
-        time: 'uint32',
-        pt: POINT
-      })
-      const msg = {}
-      if (hookHandle && GetMessageW(msg, null, 0, 0)) {
-        setImmediate(pump)
-      }
-    })
   })
 
   that.ref = function () {
@@ -113,7 +95,6 @@ module.exports = function () {
   that.destroy = function () {
     if (hookHandle) {
       UnhookWindowsHookEx(hookHandle)
-      PostQuitMessage(0)
       hookHandle = null
       hookCallback = null
     }
