@@ -18,5 +18,7 @@ export default () =>
       }
     }
     process.on('uncaughtException', errorHandler)
-    onIPCProcessError((error: Error, processName) => errorHandler(error, processName))
+    onIPCProcessError((error: Error, processName) =>
+      errorHandler(error, processName),
+    )
   })

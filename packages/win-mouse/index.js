@@ -10,7 +10,7 @@ const WM_MOUSEMOVE = 0x0200
 
 const POINT = koffi.struct('POINT', {
   x: 'long',
-  y: 'long'
+  y: 'long',
 })
 
 const MSLLHOOKSTRUCT = koffi.struct('MSLLHOOKSTRUCT', {
@@ -18,15 +18,23 @@ const MSLLHOOKSTRUCT = koffi.struct('MSLLHOOKSTRUCT', {
   mouseData: 'uint32',
   flags: 'uint32',
   time: 'uint32',
-  dwExtraInfo: 'uintptr_t'
+  dwExtraInfo: 'uintptr_t',
 })
 
 const user32 = koffi.load('user32.dll')
-const HookProc = koffi.proto('intptr_t __stdcall HookProc(int nCode, uintptr_t wParam, intptr_t lParam)')
+const HookProc = koffi.proto(
+  'intptr_t __stdcall HookProc(int nCode, uintptr_t wParam, intptr_t lParam)',
+)
 const HookProcPtr = koffi.pointer(HookProc)
-const SetWindowsHookExW = user32.func('void* __stdcall SetWindowsHookExW(int idHook, HookProc *lpfn, void *hmod, uint32 dwThreadId)')
-const CallNextHookEx = user32.func('intptr_t __stdcall CallNextHookEx(void *hhk, int nCode, uintptr_t wParam, intptr_t lParam)')
-const UnhookWindowsHookEx = user32.func('bool __stdcall UnhookWindowsHookEx(void *hhk)')
+const SetWindowsHookExW = user32.func(
+  'void* __stdcall SetWindowsHookExW(int idHook, HookProc *lpfn, void *hmod, uint32 dwThreadId)',
+)
+const CallNextHookEx = user32.func(
+  'intptr_t __stdcall CallNextHookEx(void *hhk, int nCode, uintptr_t wParam, intptr_t lParam)',
+)
+const UnhookWindowsHookEx = user32.func(
+  'bool __stdcall UnhookWindowsHookEx(void *hhk)',
+)
 
 module.exports = function () {
   var that = new events.EventEmitter()
