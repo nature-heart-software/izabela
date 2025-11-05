@@ -11,6 +11,7 @@
     "@babel/plugin-transform-modules-systemjs": "^7.17.8",
     "@babel/plugin-transform-modules-umd": "^7.16.7",
     "@babel/preset-typescript": "^7.16.7",
+    "@electron/rebuild": "^4.0.1",
     "@floating-ui/dom": "^1.0.1",
     "@floating-ui/vue": "^0.2.1",
     "@globalhive/vuejs-tour": "^1.3.4",
@@ -64,12 +65,11 @@
     "cors": "^2.8.5",
     "crypto-js": "^4.1.1",
     "depcheck": "^1.4.7",
-    "electron": "23.3.13",
+    "electron": "39.1.0",
     "electron-builder": "^24.6.4",
     "electron-devtools-installer": "^3.2.0",
     "electron-log": "^4.4.8",
     "electron-postman": "^0.1.2",
-    "electron-rebuild": "^3.2.7",
     "electron-store": "^8.1.0",
     "electron-updater": "^5.0.1",
     "element-plus": "^1.2.0-beta.6",
@@ -92,6 +92,7 @@
     "minimatch": "^5.0.1",
     "mitt": "^3.0.0",
     "morgan": "^1.10.0",
+    "nan": "^2.23.0",
     "node-cache": "^5.1.2",
     "nodemon": "^2.0.15",
     "npm-delay": "^1.0.4",
@@ -178,7 +179,7 @@
     "dev": "yarn lerna run dev --scope izabela-next --stream",
     "docker:build": "docker build -t izabela . && docker create --name dummy izabela && docker cp dummy:dist_electron dist_electron && docker rm -f dummy",
     "patch": "yarn patch-package",
-    "postinstall": "yarn patch && electron-rebuild -f -o @packages/win-mouse"
+    "postinstall": "yarn patch"
   },
   "workspaces": [
     "apps/*",

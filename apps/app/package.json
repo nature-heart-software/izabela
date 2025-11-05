@@ -39,7 +39,7 @@
     "@packages/toolbox": "0.0.0",
     "@packages/ui": "0.0.0",
     "@types/wav": "^1.0.4",
-    "electron": "23.3.13"
+    "electron": "39.1.0"
   },
   "main": "dist-electron/background.js",
   "private": true,
