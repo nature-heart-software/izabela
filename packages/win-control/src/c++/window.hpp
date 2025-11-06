@@ -14,7 +14,7 @@ public:
   static Napi::Value GetByPid(const Napi::CallbackInfo &info);
   static Napi::Object Init(Napi::Env env, Napi::Object exports);
 
-  static BOOL CALLBACK Window::EnumWindowsCallback(HWND, LPARAM);
+  static BOOL CALLBACK EnumWindowsCallback(HWND, LPARAM);
 
   Napi::Value SetForeground(const Napi::CallbackInfo &info);
   Napi::Value SetPosition(const Napi::CallbackInfo& info);
