@@ -1,0 +1,5 @@
+build/
+node_modules/
+.npmrc
+.env
+lib/binding/*.node
