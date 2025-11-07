@@ -1,5 +1,5 @@
 import ElectronWindowManager from '@/modules/electron-window-manager'
-import { mouse } from '@/modules/node-mouse'
+import { startMouse, stopMouse } from '@/modules/node-mouse'
 import throttle from 'lodash/throttle'
 import { Hitbox } from '@/modules/vue-hitboxes/types'
 import { app, BrowserWindow, screen, shell } from 'electron'
@@ -168,7 +168,7 @@ export const ElectronMessengerWindow = () => {
       }
     })
 
-  const onMouseMove = (initialMouseX = 0, initialMouseY = 0) => {
+  const onMouseMove = ({ x: initialMouseX = 0, y: initialMouseY = 0 }) => {
     if (!hitboxesStore) return
     const window = getWindow()
     if (window) {
@@ -259,16 +259,17 @@ export const ElectronMessengerWindow = () => {
 
   const addEventListeners = () => {
     const window = getWindow()
-    mouse.on('move', throttle(onMouseMove, 150))
 
     if (window) {
       window.on('show', () => {
         if (!messengerWindowStore) return
         messengerWindowStore.$patch({ isShown: true })
+        startMouse(150).on('move', onMouseMove)
       })
       window.on('hide', () => {
         if (!messengerWindowStore) return
         messengerWindowStore.$patch({ isShown: false })
+        stopMouse()
       })
       window.on('focus', () => {
         if (!messengerWindowStore) return

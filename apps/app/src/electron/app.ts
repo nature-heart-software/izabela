@@ -20,7 +20,7 @@ import registerElectronDebug from '@/modules/electron-debug/register'
 import registerElectronDisplay from '@/modules/electron-display/register'
 import registerElectronKeybinding from '@/modules/electron-keybinding/register'
 import registerElectronCache from '@/modules/electron-cache/register'
-import { destroyWinMouse } from '@/modules/node-mouse'
+import { stopMouse } from '@/modules/node-mouse'
 import { createOverlayWindow } from '@/teams/overlay/electron/background'
 import './game-overlay'
 import gameOverlay from '@/electron/game-overlay.ts'
@@ -109,7 +109,7 @@ const App = () => {
     ElectronWindowManager.getInstances().forEach(({ window }) => {
       window.removeAllListeners()
     })
-    destroyWinMouse()
+    stopMouse()
   }
 
   function addEventListeners() {
