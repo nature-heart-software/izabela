@@ -40,14 +40,24 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 16.x
-          registry-url: 'https://npm.pkg.github.com'
-          cache: 'yarn'
+          node-version: 22.x
 
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v2
         with:
-          vs-version: '16.11'
+          vs-version: '17.9'
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - uses: actions/cache@v4
+        id: npm-cache
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
       - name: Set env variables
         shell: bash
@@ -62,15 +72,16 @@ jobs:
             ./package.json
             ./apps/app/package.json
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Build
-        uses: borales/actions-yarn@v4
+        run: npm run build
         env:
           NODE_OPTIONS: '--max_old_space_size=4096'
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           VUE_APP_ENCRYPTION_KEY: ${{ secrets.APP_ENCRYPTION_KEY }}
           VITE_APP_ENCRYPTION_KEY: ${{ secrets.APP_ENCRYPTION_KEY }}
-        with:
-          cmd: build
 
       - name: Cleanup electron dist
         shell: bash
