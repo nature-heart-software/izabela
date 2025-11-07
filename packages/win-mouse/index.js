@@ -61,7 +61,7 @@ const DispatchMessageW = user32.func(
   'intptr_t __stdcall DispatchMessageW(MSG *lpMsg)',
 )
 const GetModuleHandleW = kernel32.func(
-  'void* __stdcall GetModuleHandleW(const wchar_t *lpModuleName)'
+  'void* __stdcall GetModuleHandleW(const wchar_t *lpModuleName)',
 )
 
 // Helper: robust allocator across Koffi versions (alloc may require 2 args)
@@ -75,7 +75,10 @@ function allocType(type) {
       return koffi.alloc(type)
     } catch (e2) {
       // Last resort: allocate raw buffer and cast
-      if (typeof koffi.sizeof === 'function' && typeof koffi.as === 'function') {
+      if (
+        typeof koffi.sizeof === 'function' &&
+        typeof koffi.as === 'function'
+      ) {
         const buf = Buffer.alloc(koffi.sizeof(type))
         return koffi.as(type, buf)
       }
@@ -87,7 +90,10 @@ function allocType(type) {
 // Debug and tuning
 const DEBUG = process.env.WIN_MOUSE_DEBUG === '1'
 const PUMP_MS = Math.max(1, Number(process.env.WIN_MOUSE_PUMP_MS) || 16)
-const MAX_MESSAGES_PER_TICK = Math.max(1, Number(process.env.WIN_MOUSE_MAX_PER_TICK) || 100)
+const MAX_MESSAGES_PER_TICK = Math.max(
+  1,
+  Number(process.env.WIN_MOUSE_MAX_PER_TICK) || 100,
+)
 
 module.exports = function () {
   var that = new events.EventEmitter()
@@ -172,7 +178,10 @@ module.exports = function () {
       pumpTimer = setInterval(function () {
         try {
           var count = 0
-          while (count < MAX_MESSAGES_PER_TICK && PeekMessageW(pumpMsg, null, 0, 0, PM_REMOVE)) {
+          while (
+            count < MAX_MESSAGES_PER_TICK &&
+            PeekMessageW(pumpMsg, null, 0, 0, PM_REMOVE)
+          ) {
             TranslateMessage(pumpMsg)
             DispatchMessageW(pumpMsg)
             count++
