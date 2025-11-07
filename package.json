@@ -171,14 +171,14 @@
     ]
   },
   "scripts": {
-    "build": "yarn install && yarn lerna run build",
-    "build:app": "yarn lerna run build --scope izabela-next --stream",
-    "build:deps": "yarn lerna run build --scope '{@packages/*,@apps/app-server}' --stream",
-    "build:prod": "yarn lerna run build:prod --stream",
-    "dev": "yarn lerna run dev --scope izabela-next --stream",
+    "build": "npm install && lerna run build",
+    "build:app": "lerna run build --scope izabela-next --stream",
+    "build:deps": "lerna run build --scope '{@packages/*,@apps/app-server}' --stream",
+    "build:prod": "lerna run build:prod --stream",
+    "dev": "lerna run dev --scope izabela-next --stream",
     "docker:build": "docker build -t izabela . && docker create --name dummy izabela && docker cp dummy:dist_electron dist_electron && docker rm -f dummy",
-    "patch": "yarn patch-package",
-    "postinstall": "yarn patch"
+    "patch": "patch-package",
+    "postinstall": "npm run patch"
   },
   "workspaces": [
     "apps/*",
