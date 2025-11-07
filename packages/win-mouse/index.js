@@ -84,12 +84,14 @@ function allocType(type) {
   }
 }
 
-// Debug and tuning
-const DEBUG = process.env.WIN_MOUSE_DEBUG === '1'
-const PUMP_MS = Math.max(1, Number(process.env.WIN_MOUSE_PUMP_MS) || 16)
-const MAX_MESSAGES_PER_TICK = Math.max(1, Number(process.env.WIN_MOUSE_MAX_PER_TICK) || 100)
+// Debug and tuning are configurable per-instance via init options; env vars remain as defaults
 
-module.exports = function () {
+module.exports = function (options) {
+  const opts = options || {}
+  const instDebug = typeof opts.debug === 'boolean' ? opts.debug : false
+  const instPumpMs = Math.max(1, Number(opts.pumpMs ?? 1))
+  const instMaxMessagesPerTick = Math.max(1, Number(opts.maxMessagesPerTick ?? 100))
+
   var that = new events.EventEmitter()
   var hookHandle = null
   var left = false
@@ -131,7 +133,7 @@ module.exports = function () {
           }
 
           if (type) {
-            if (DEBUG) {
+            if (instDebug) {
               const now = Date.now()
               if (now - lastDebugLog > 250) {
                 lastDebugLog = now
@@ -156,7 +158,7 @@ module.exports = function () {
       throw new Error('Failed to install mouse hook')
     }
 
-    if (DEBUG) console.log('[win-mouse] hook installed')
+    if (instDebug) console.log('[win-mouse] hook installed')
 
     // Ensure this thread has a message queue
     try {
@@ -172,12 +174,12 @@ module.exports = function () {
       pumpTimer = setInterval(function () {
         try {
           var count = 0
-          while (count < MAX_MESSAGES_PER_TICK && PeekMessageW(pumpMsg, null, 0, 0, PM_REMOVE)) {
+          while (count < instMaxMessagesPerTick && PeekMessageW(pumpMsg, null, 0, 0, PM_REMOVE)) {
             TranslateMessage(pumpMsg)
             DispatchMessageW(pumpMsg)
             count++
           }
-          if (DEBUG && count > 0) {
+          if (instDebug && count > 0) {
             const now = Date.now()
             if (now - lastDebugLog > 250) {
               lastDebugLog = now
@@ -187,7 +189,7 @@ module.exports = function () {
         } catch (e) {
           // ignore
         }
-      }, PUMP_MS)
+      }, instPumpMs)
     }
   })
 
