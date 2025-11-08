@@ -168,7 +168,7 @@ export const ElectronMessengerWindow = () => {
       }
     })
 
-  const onMouseMove = ({ x: initialMouseX = 0, y: initialMouseY = 0 }) => {
+  const onMouseMove = (initialMouseX = 0, initialMouseY = 0) => {
     if (!hitboxesStore) return
     const window = getWindow()
     if (window) {
@@ -259,17 +259,28 @@ export const ElectronMessengerWindow = () => {
 
   const addEventListeners = () => {
     const window = getWindow()
+    let mouseInstanceId: string | null = null
+
+    function initMouseInstance() {
+      if (mouseInstanceId) return
+      mouseInstanceId = startMouse('move', throttle(onMouseMove, 150))
+    }
+
+    function clearMouseInstance() {
+      if (mouseInstanceId) stopMouse(mouseInstanceId)
+      mouseInstanceId = null
+    }
 
     if (window) {
       window.on('show', () => {
         if (!messengerWindowStore) return
         messengerWindowStore.$patch({ isShown: true })
-        startMouse(150).on('move', onMouseMove)
+        initMouseInstance()
       })
       window.on('hide', () => {
         if (!messengerWindowStore) return
         messengerWindowStore.$patch({ isShown: false })
-        stopMouse()
+        clearMouseInstance()
       })
       window.on('focus', () => {
         if (!messengerWindowStore) return

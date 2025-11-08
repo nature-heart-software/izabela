@@ -1,27 +1,31 @@
-import { mouse } from '@nut-tree-fork/nut-js'
-import mitt from 'mitt'
-import throttle from 'lodash/throttle'
+import { fork, ChildProcess } from 'child_process'
+import { v4 as uuid } from 'uuid'
+import { onExit } from '@/electron/on-exit.ts'
 
-const mouseEventEmitter = mitt()
+let winMouseChildProcess: ChildProcess | null = null
 
-let stop = true
+const instances = new Map()
 
-export function startMouse(throttleMs: number = 0) {
-  if (typeof window !== 'undefined') return null
-  stop = false
-  const check = throttle(
-    () =>
-      mouse.getPosition().then((mousePosition) => {
-        if (stop) return
-        mouseEventEmitter.emit('move', mousePosition)
-        check()
-      }),
-    throttleMs,
+export function startMouse(event: string, callback: (...args: any[]) => void) {
+  const id = uuid()
+  winMouseChildProcess = fork(
+    require.resolve('@packages/win-mouse'),
+    [event]
   )
-  check()
-  return mouseEventEmitter
+  winMouseChildProcess.on('message', (args: any) => {
+    callback(...args)
+  })
+  instances.set(id, winMouseChildProcess)
+  return id
 }
 
-export function stopMouse() {
-  stop = true
+export function stopMouse(id: string) {
+  instances.get(id)?.kill()
 }
+
+export function killMouse() {
+    Array.from(instances.keys()).forEach(stopMouse)
+    instances.clear()
+}
+
+onExit(killMouse)
