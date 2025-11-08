@@ -61,7 +61,7 @@ const DispatchMessageW = user32.func(
   'intptr_t __stdcall DispatchMessageW(MSG *lpMsg)',
 )
 const GetModuleHandleW = kernel32.func(
-  'void* __stdcall GetModuleHandleW(const wchar_t *lpModuleName)'
+  'void* __stdcall GetModuleHandleW(const wchar_t *lpModuleName)',
 )
 
 // Helper: robust allocator across Koffi versions (alloc may require 2 args)
@@ -75,7 +75,10 @@ function allocType(type) {
       return koffi.alloc(type)
     } catch (e2) {
       // Last resort: allocate raw buffer and cast
-      if (typeof koffi.sizeof === 'function' && typeof koffi.as === 'function') {
+      if (
+        typeof koffi.sizeof === 'function' &&
+        typeof koffi.as === 'function'
+      ) {
         const buf = Buffer.alloc(koffi.sizeof(type))
         return koffi.as(type, buf)
       }
@@ -90,7 +93,10 @@ const init = function (options) {
   const opts = options || {}
   const instDebug = typeof opts.debug === 'boolean' ? opts.debug : false
   const instPumpMs = Math.max(1, Number(opts.pumpMs ?? 4))
-  const instMaxMessagesPerTick = Math.max(1, Number(opts.maxMessagesPerTick ?? 60))
+  const instMaxMessagesPerTick = Math.max(
+    1,
+    Number(opts.maxMessagesPerTick ?? 60),
+  )
 
   var that = new events.EventEmitter()
   var hookHandle = null
@@ -174,7 +180,10 @@ const init = function (options) {
       pumpTimer = setInterval(function () {
         try {
           var count = 0
-          while (count < instMaxMessagesPerTick && PeekMessageW(pumpMsg, null, 0, 0, PM_REMOVE)) {
+          while (
+            count < instMaxMessagesPerTick &&
+            PeekMessageW(pumpMsg, null, 0, 0, PM_REMOVE)
+          ) {
             TranslateMessage(pumpMsg)
             DispatchMessageW(pumpMsg)
             count++
@@ -222,10 +231,18 @@ function send(...args) {
 }
 
 if (process.argv[2]) {
-  const event = process.argv[2];
-  const mouse= init();
+  const event = process.argv[2]
+  const mouse = init()
   mouse.on(event, send)
-  ;['SIGINT', 'SIGTERM', 'SIGQUIT', 'SIGHUP', 'SIGBREAK', 'beforeExit', 'exit'].forEach((signal) => {
+  ;[
+    'SIGINT',
+    'SIGTERM',
+    'SIGQUIT',
+    'SIGHUP',
+    'SIGBREAK',
+    'beforeExit',
+    'exit',
+  ].forEach((signal) => {
     process?.on(signal, () => {
       mouse.destroy()
     })

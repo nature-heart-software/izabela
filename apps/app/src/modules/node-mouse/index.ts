@@ -8,10 +8,7 @@ const instances = new Map()
 
 export function startMouse(event: string, callback: (...args: any[]) => void) {
   const id = uuid()
-  winMouseChildProcess = fork(
-    require.resolve('@packages/win-mouse'),
-    [event]
-  )
+  winMouseChildProcess = fork(require.resolve('@packages/win-mouse'), [event])
   winMouseChildProcess.on('message', (args: any) => {
     callback(...args)
   })
@@ -24,8 +21,8 @@ export function stopMouse(id: string) {
 }
 
 export function killMouse() {
-    Array.from(instances.keys()).forEach(stopMouse)
-    instances.clear()
+  Array.from(instances.keys()).forEach(stopMouse)
+  instances.clear()
 }
 
 onExit(killMouse)

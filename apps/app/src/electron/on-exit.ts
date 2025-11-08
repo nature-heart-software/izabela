@@ -7,8 +7,15 @@ export const onExit = (callback: () => void) => {
       callback()
     }
   })
-
-  ;['SIGINT', 'SIGTERM', 'SIGQUIT', 'SIGHUP', 'SIGBREAK', 'beforeExit', 'exit'].forEach((signal) => {
+  ;[
+    'SIGINT',
+    'SIGTERM',
+    'SIGQUIT',
+    'SIGHUP',
+    'SIGBREAK',
+    'beforeExit',
+    'exit',
+  ].forEach((signal) => {
     process?.on(signal, () => {
       callback()
     })
