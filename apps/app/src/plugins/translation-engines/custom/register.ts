@@ -5,8 +5,8 @@ import NvSettings from './NvSettings.vue'
 import axios from 'axios'
 
 const getCredentials = () => ({
-  apiKey: store.getProperty('apiKey', true),
-  endpoint: store.getProperty('endpoint'),
+  apiKey: store.getProperty('apiKey', true) || import.meta.env.VITE_TRANSLATION_ENGINE_CUSTOM_API_KEY,
+  endpoint: store.getProperty('endpoint') || import.meta.env.VITE_TRANSLATION_ENGINE_CUSTOM_ENDPOINT,
 })
 const getTranslationOptions = (voiceLanguage?: string) => {
   return {

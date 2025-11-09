@@ -13,8 +13,8 @@ const getCredentials = () => {
     !getProperty('useLocalCredentials')
     ? {}
     : {
-        apiKey: getProperty('apiKey', true),
-        region: getProperty('region'),
+        apiKey: getProperty('apiKey', true) || import.meta.env.VITE_SPEECH_ENGINE_MICROSOFT_AZURE_API_KEY,
+        region: getProperty('region') || import.meta.env.VITE_SPEECH_ENGINE_MICROSOFT_AZURE_REGION,
       }
 }
 

@@ -3,8 +3,8 @@ import { SpeechRecognitionEngine } from '@/modules/speech-recognition-engine-man
 import { ENGINE_ID, ENGINE_NAME } from './shared.ts'
 
 const getCredentials = () => ({
-  apiKey: store.getProperty('identityPoolId', true),
-  endpoint: store.getProperty('region'),
+  apiKey: store.getProperty('identityPoolId', true) || import.meta.env.VITE_SPEECH_RECOGNITION_ENGINE_AMAZON_TRANSCRIBE_API_KEY,
+  endpoint: store.getProperty('region') || import.meta.env.VITE_SPEECH_RECOGNITION_ENGINE_AMAZON_TRANSCRIBE_ENDPOINT,
 })
 export default {
   id: ENGINE_ID,

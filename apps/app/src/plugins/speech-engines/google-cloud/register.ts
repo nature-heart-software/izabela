@@ -13,7 +13,7 @@ const getCredentials = () => {
     !getProperty('useLocalCredentials')
     ? {}
     : {
-        apiKey: getProperty('apiKey', true),
+        apiKey: getProperty('apiKey', true) || import.meta.env.VITE_SPEECH_ENGINE_GOOGLE_CLOUD_API_KEY,
       }
 }
 

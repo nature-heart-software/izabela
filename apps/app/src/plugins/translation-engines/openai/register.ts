@@ -4,7 +4,7 @@ import { store } from './store.ts'
 import NvSettings from './NvSettings.vue'
 
 const getCredentials = () => ({
-  apiKey: store.getProperty('apiKey', true),
+  apiKey: store.getProperty('apiKey', true) || import.meta.env.VITE_TRANSLATION_ENGINE_OPENAI_API_KEY,
 })
 const getTranslationOptions = (voiceLanguage?: string) => {
   return {
