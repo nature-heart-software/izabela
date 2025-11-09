@@ -12,8 +12,12 @@ const getCredentials = () => {
     !getProperty('useLocalCredentials')
     ? {}
     : {
-        identityPoolId: getProperty('identityPoolId', true) || import.meta.env.VITE_SPEECH_ENGINE_AMAZON_POLLY_IDENTITY_POOL_ID,
-        region: getProperty('region') || import.meta.env.VITE_SPEECH_ENGINE_AMAZON_POLLY_REGION,
+        identityPoolId:
+          getProperty('identityPoolId', true) ||
+          import.meta.env.VITE_SPEECH_ENGINE_AMAZON_POLLY_IDENTITY_POOL_ID,
+        region:
+          getProperty('region') ||
+          import.meta.env.VITE_SPEECH_ENGINE_AMAZON_POLLY_REGION,
       }
 }
 

@@ -12,8 +12,12 @@ const getCredentials = () => {
     !getProperty('useLocalCredentials')
     ? {}
     : {
-        apiKey: getProperty('apiKey', true) || import.meta.env.VITE_SPEECH_ENGINE_IBM_WATSON_API_KEY,
-        url: getProperty('url') || import.meta.env.VITE_SPEECH_ENGINE_IBM_WATSON_URL,
+        apiKey:
+          getProperty('apiKey', true) ||
+          import.meta.env.VITE_SPEECH_ENGINE_IBM_WATSON_API_KEY,
+        url:
+          getProperty('url') ||
+          import.meta.env.VITE_SPEECH_ENGINE_IBM_WATSON_URL,
       }
 }
 

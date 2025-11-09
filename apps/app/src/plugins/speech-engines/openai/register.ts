@@ -8,7 +8,9 @@ import { DEFAULT_LANGUAGE_CODE } from '@/consts.ts'
 import { useSpeechStore } from '@/features/speech/store'
 
 const getCredentials = () => ({
-  apiKey: getProperty('apiKey', true) || import.meta.env.VITE_SPEECH_ENGINE_OPENAI_API_KEY,
+  apiKey:
+    getProperty('apiKey', true) ||
+    import.meta.env.VITE_SPEECH_ENGINE_OPENAI_API_KEY,
 })
 
 const getSelectedVoice = () => getProperty('selectedVoice')

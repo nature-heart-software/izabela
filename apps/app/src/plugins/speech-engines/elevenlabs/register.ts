@@ -7,7 +7,9 @@ import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, store } from './store'
 
 const getCredentials = () => ({
-  apiKey: getProperty('apiKey', true) || import.meta.env.VITE_SPEECH_ENGINE_ELEVENLABS_API_KEY,
+  apiKey:
+    getProperty('apiKey', true) ||
+    import.meta.env.VITE_SPEECH_ENGINE_ELEVENLABS_API_KEY,
 })
 
 const getSelectedVoice = () => getProperty('selectedVoice')

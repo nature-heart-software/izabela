@@ -18,7 +18,9 @@ registerEngine({
   },
   getCredentials() {
     return {
-      apiKey: getProperty('apiKey', true) || import.meta.env.VITE_SPEECH_ENGINE_CUSTOM_API_KEY,
+      apiKey:
+        getProperty('apiKey', true) ||
+        import.meta.env.VITE_SPEECH_ENGINE_CUSTOM_API_KEY,
     }
   },
   getPayload({ text, translatedText, voice: v }) {

@@ -4,8 +4,12 @@ import { store } from './store.ts'
 import NvSettings from './NvSettings.vue'
 
 const getCredentials = () => ({
-  apiKey: store.getProperty('apiKey', true) || import.meta.env.VITE_TRANSLATION_ENGINE_MICROSOFT_AZURE_API_KEY,
-  region: store.getProperty('region') || import.meta.env.VITE_TRANSLATION_ENGINE_MICROSOFT_AZURE_REGION,
+  apiKey:
+    store.getProperty('apiKey', true) ||
+    import.meta.env.VITE_TRANSLATION_ENGINE_MICROSOFT_AZURE_API_KEY,
+  region:
+    store.getProperty('region') ||
+    import.meta.env.VITE_TRANSLATION_ENGINE_MICROSOFT_AZURE_REGION,
 })
 const getTranslationOptions = (voiceLanguage?: string) => {
   return {

@@ -13,8 +13,12 @@ const getCredentials = () => {
     !getProperty('useLocalCredentials')
     ? {}
     : {
-        publicKey: getProperty('publicKey', true) || import.meta.env.VITE_SPEECH_ENGINE_UBERDUCK_PUBLIC_KEY,
-        privateKey: getProperty('privateKey', true) || import.meta.env.VITE_SPEECH_ENGINE_UBERDUCK_PRIVATE_KEY,
+        publicKey:
+          getProperty('publicKey', true) ||
+          import.meta.env.VITE_SPEECH_ENGINE_UBERDUCK_PUBLIC_KEY,
+        privateKey:
+          getProperty('privateKey', true) ||
+          import.meta.env.VITE_SPEECH_ENGINE_UBERDUCK_PRIVATE_KEY,
       }
 }
 

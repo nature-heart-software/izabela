@@ -3,8 +3,12 @@ import { store } from './store.ts'
 import { SpeechRecognitionEngine } from '@/modules/speech-recognition-engine-manager/types.ts'
 
 const getCredentials = () => ({
-  apiKey: store.getProperty('apiKey', true) || import.meta.env.VITE_SPEECH_RECOGNITION_ENGINE_IBM_WATSON_API_KEY,
-  url: store.getProperty('url') || import.meta.env.VITE_SPEECH_RECOGNITION_ENGINE_IBM_WATSON_URL,
+  apiKey:
+    store.getProperty('apiKey', true) ||
+    import.meta.env.VITE_SPEECH_RECOGNITION_ENGINE_IBM_WATSON_API_KEY,
+  url:
+    store.getProperty('url') ||
+    import.meta.env.VITE_SPEECH_RECOGNITION_ENGINE_IBM_WATSON_URL,
 })
 export default {
   id: ENGINE_ID,

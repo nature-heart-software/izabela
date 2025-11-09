@@ -4,8 +4,12 @@ import { store } from './store.ts'
 import NvSettings from './NvSettings.vue'
 
 const getCredentials = () => ({
-  identityPoolId: store.getProperty('identityPoolId', true) || import.meta.env.VITE_TRANSLATION_ENGINE_AMAZON_TRANSLATION_IDENTITY_POOL_ID,
-  region: store.getProperty('region') || import.meta.env.VITE_TRANSLATION_ENGINE_AMAZON_TRANSLATION_REGION,
+  identityPoolId:
+    store.getProperty('identityPoolId', true) ||
+    import.meta.env.VITE_TRANSLATION_ENGINE_AMAZON_TRANSLATION_IDENTITY_POOL_ID,
+  region:
+    store.getProperty('region') ||
+    import.meta.env.VITE_TRANSLATION_ENGINE_AMAZON_TRANSLATION_REGION,
 })
 const getTranslationOptions = (voiceLanguage?: string) => {
   return {
