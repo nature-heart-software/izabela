@@ -5,7 +5,8 @@ import { ENGINE_ID, ENGINE_NAME } from './shared.ts'
 const getCredentials: SpeechRecognitionEngine['getCredentials'] = () => ({
   apiKey:
     store.getProperty('identityPoolId', true) ||
-    import.meta.env.VITE_SPEECH_RECOGNITION_ENGINE_AMAZON_TRANSCRIBE_API_KEY,
+    import.meta.env
+      .VITE_SPEECH_RECOGNITION_ENGINE_AMAZON_TRANSCRIBE_IDENTITY_POOL_ID,
   endpoint:
     store.getProperty('region') ||
     import.meta.env.VITE_SPEECH_RECOGNITION_ENGINE_AMAZON_TRANSCRIBE_ENDPOINT,
