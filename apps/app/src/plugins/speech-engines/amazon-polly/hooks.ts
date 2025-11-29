@@ -3,7 +3,7 @@ import { useQuery, UseQueryOptions } from 'vue-query'
 import { api } from '@/services'
 import { LIST_VOICES_QUERY_KEY } from './shared'
 import { getProperty } from './store'
-import {engine} from './register.ts'
+import { engine } from './register.ts'
 
 export const useListVoicesQuery = (
   params: Ref<{ credentials: ReturnType<typeof engine.getCredentials> }>,
