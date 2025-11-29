@@ -103,6 +103,7 @@ import { NvAccessBlocker, NvDivider, NvFormItem, NvGroup, NvInput, NvStack, NvSw
 import { useSpeechStore } from '@/features/speech/store'
 import NvVoiceSelect from './NvVoiceSelect'
 import { store } from './store'
+import { engine } from './register.ts'
 
 const speechStore = useSpeechStore()
 const props = defineProps({

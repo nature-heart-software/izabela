@@ -1,6 +1,6 @@
 <template>
   <NvAccessBlocker
-    :allowed="engine.hasCrentials()"
+    :allowed="engine.hasCredentials()"
     reason="Credentials required"
   >
     <NvStack spacing="5">
