@@ -1,6 +1,6 @@
 <template>
   <NvAccessBlocker
-    :allowed="!!getStoreProperty('endpoint')"
+    :allowed="engine.hasCredentials()"
     reason="Endpoint and/or credentials required"
   >
     <NvStack :spacing="5">
@@ -14,8 +14,8 @@
       <NvDivider direction="horizontal" />
       <NvFormItem label="Additional data">
         <NvTextarea
-          placeholder="Additional data you want to send to the server..."
           :modelValue="getProperty('additionalData')"
+          placeholder="Additional data you want to send to the server..."
           @update:modelValue="(value) => setProperty('additionalData', value)"
         />
       </NvFormItem>
@@ -95,6 +95,7 @@ import {
 } from '@packages/ui'
 import NvVoiceSelect from './NvVoiceSelect'
 import { store } from './store'
+import { engine } from './register.ts'
 
 const props = defineProps({
   form: Object,

@@ -1,6 +1,6 @@
 <template>
   <NvAccessBlocker
-    :allowed="!!getStoreProperty('apiKey', true)"
+    :allowed="engine.hasCredentials()"
     reason="Credentials required"
   >
     <NvStack spacing="5">
@@ -177,6 +177,7 @@ import {
 import NvVoiceSelect from './NvVoiceSelect'
 import { store } from './store'
 import NvModelSelect from './NvModelSelect.vue'
+import { engine } from './register.ts'
 
 const props = defineProps({
   form: Object,

@@ -53,13 +53,14 @@ import { useListVoicesQuery } from './hooks'
 import { getProperty, setProperty } from './store'
 import { isGameOverlay } from '@/consts.ts'
 import { useSettingsStore } from '@/features/settings/store'
+import { engine } from './register.ts'
 
 const queryClient = useQueryClient()
 const computedParams = computed(() => ({
   credentials: {},
 }))
 const speechStore = useSpeechStore()
-const canFetch = computed(() => speechStore.hasUniversalApiCredentials)
+const canFetch = computed(() => engine.hasCredentials?.())
 const { data, isFetching } = useListVoicesQuery(computedParams, {
   enabled: canFetch,
 })

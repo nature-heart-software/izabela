@@ -2,14 +2,17 @@ import translationEngineManager from '@/modules/translation-engine-manager'
 import { electronModuleName, ENGINE_ID, ENGINE_NAME } from './shared.ts'
 import { store } from './store.ts'
 import NvSettings from './NvSettings.vue'
+import { TranslationEngine } from '@/modules/translation-engine-manager/types.ts'
 
-const getCredentials = () => ({})
+const getCredentials: TranslationEngine['getCredentials'] = () => ({})
+
 const getTranslationOptions = (voiceLanguage?: string) => {
   return {
     translateFrom: store.getProperty('translateFrom') || undefined,
     translateTo: store.getProperty('translateTo') || voiceLanguage,
   }
 }
+
 translationEngineManager.registerEngine(ENGINE_ID, {
   id: ENGINE_ID,
   name: ENGINE_NAME,

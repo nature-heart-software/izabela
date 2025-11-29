@@ -1,6 +1,6 @@
 <template>
   <NvAccessBlocker
-    :allowed="speechStore.hasUniversalApiCredentials"
+    :allowed="engine.hasCredentials()"
     reason="Universal credentials required"
   >
     <NvStack :spacing="5">
@@ -54,6 +54,7 @@ import {
 import { useSpeechStore } from '@/features/speech/store'
 import NvVoiceSelect from './NvVoiceSelect'
 import { store } from './store'
+import { engine } from './register.ts'
 
 const speechStore = useSpeechStore()
 const props = defineProps({

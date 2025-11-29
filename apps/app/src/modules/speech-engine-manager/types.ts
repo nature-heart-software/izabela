@@ -5,13 +5,13 @@ import { SpeechCommand } from '@/features/speech/types'
 export type Credentials = { [key: string]: any }
 export type Payload = { [key: string]: any }
 
-export interface SpeechEngine {
+export interface SpeechEngine<C = Credentials> {
   id: string
   name: string
   category: 'cloud' | 'local' | 'other'
   getVoiceName: (voice: any) => string
   getSelectedVoice: () => any
-  getCredentials: () => Credentials
+  getCredentials: (useStoreValues?: boolean) => C | {}
   getLanguageCode: (voice?: any) => string
   getUseCacheOnEveryRequest: () => boolean
   getPayload: (options: {

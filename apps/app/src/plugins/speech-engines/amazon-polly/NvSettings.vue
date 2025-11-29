@@ -1,13 +1,6 @@
 <template>
   <NvAccessBlocker
-    :allowed="
-      (speechStore.hasUniversalApiCredentials &&
-        !getStoreProperty('useLocalCredentials')) ||
-      [
-        getStoreProperty('identityPoolId', true),
-        getStoreProperty('region'),
-      ].every(Boolean)
-    "
+    :allowed="engine.hasCredentials()"
     reason="Credentials required"
   >
     <NvStack :spacing="5">

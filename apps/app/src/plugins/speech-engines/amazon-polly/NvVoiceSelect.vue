@@ -41,7 +41,6 @@ import { purify } from '@packages/toolbox'
 import orderBy from 'lodash/orderBy'
 import xor from 'lodash/xor'
 import { NvButton, NvSelect } from '@packages/ui'
-import { useSpeechStore } from '@/features/speech/store'
 import { groupOptions } from '@/utils/select'
 import { useListVoicesQuery } from './hooks'
 import {
@@ -53,28 +52,24 @@ import {
 import { getProperty, setProperty } from './store'
 import { isGameOverlay } from '@/consts.ts'
 import { useSettingsStore } from '@/features/settings/store'
+import { engine } from './register'
 
 const queryClient = useQueryClient()
 
 const computedParams = computed(() => ({
-  credentials: {
-    identityPoolId: getProperty('identityPoolId', true),
-    region: getProperty('region'),
-  },
+  credentials: engine.getCredentials(),
 }))
 
-const speechStore = useSpeechStore()
-const canFetch = computed(
-  () =>
-    speechStore.hasUniversalApiCredentials ||
-    Object.values(computedParams.value.credentials).every(Boolean),
-)
+const canFetch = computed(() => engine.hasCredentials?.())
+
 const { data, isFetching } = useListVoicesQuery(computedParams, {
   enabled: canFetch,
 })
+
 const voices = computed(() =>
   orderBy(data.value || [], ['LanguageCode', 'Name']),
 )
+
 const getOptionFromVoice = (voice: any) => ({
   id: getVoiceId(voice),
   label: getVoiceName(voice),

@@ -53,21 +53,12 @@ import {
 import { getProperty, setProperty } from './store'
 import { isGameOverlay } from '@/consts.ts'
 import { useSettingsStore } from '@/features/settings/store'
+import { engine } from './register.ts'
 
 const queryClient = useQueryClient()
 
-const computedParams = computed(() => ({
-  credentials: {
-    apiKey: getProperty('publicKey', true),
-    url: getProperty('privateKey', true),
-  },
-}))
 const speechStore = useSpeechStore()
-const canFetch = computed(
-  () =>
-    speechStore.hasUniversalApiCredentials ||
-    Object.values(computedParams.value.credentials).every(Boolean),
-)
+const canFetch = computed(() => engine.hasCredentials?.())
 const { data, isFetching } = useListVoicesQuery({
   enabled: canFetch,
 })

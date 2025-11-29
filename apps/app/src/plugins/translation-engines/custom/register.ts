@@ -3,8 +3,9 @@ import { ENGINE_ID, ENGINE_NAME } from './shared.ts'
 import { store } from './store.ts'
 import NvSettings from './NvSettings.vue'
 import axios from 'axios'
+import { TranslationEngine } from '@/modules/translation-engine-manager/types.ts'
 
-const getCredentials = () => ({
+const getCredentials: TranslationEngine['getCredentials'] = () => ({
   apiKey:
     store.getProperty('apiKey', true) ||
     import.meta.env.VITE_TRANSLATION_ENGINE_CUSTOM_API_KEY,

@@ -176,6 +176,7 @@
     "build:deps": "lerna run build --scope '{@packages/*,@apps/app-server}' --stream",
     "build:prod": "lerna run build:prod --stream",
     "dev": "lerna run dev --scope izabela-next --stream",
+    "infisical:dev": "infisical run --path=\"/apps/app\" -- nu -c \"lerna run dev --scope izabela-next --stream\"",
     "docker:build": "docker build -t izabela . && docker create --name dummy izabela && docker cp dummy:dist_electron dist_electron && docker rm -f dummy",
     "patch": "patch-package",
     "postinstall": "npm run patch"

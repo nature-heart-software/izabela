@@ -7,7 +7,8 @@ import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, store } from './store'
 
 const getSelectedVoice = () => getProperty('selectedVoice')
-registerEngine({
+
+export const engine = registerEngine({
   id: ENGINE_ID,
   name: ENGINE_NAME,
   category: 'other',
@@ -19,8 +20,7 @@ registerEngine({
   getCredentials() {
     return {
       apiKey:
-        getProperty('apiKey', true) ||
-        import.meta.env.VITE_SPEECH_ENGINE_CUSTOM_API_KEY,
+        getProperty('apiKey', true),
     }
   },
   getPayload({ text, translatedText, voice: v }) {

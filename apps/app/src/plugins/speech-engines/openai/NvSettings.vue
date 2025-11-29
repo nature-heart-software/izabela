@@ -1,6 +1,6 @@
 <template>
   <NvAccessBlocker
-    :allowed="!!getStoreProperty('apiKey', true)"
+    :allowed="engine.hasCrentials()"
     reason="Credentials required"
   >
     <NvStack spacing="5">
@@ -13,8 +13,8 @@
       <NvDivider direction="horizontal" />
       <NvFormItem label="Instructions">
         <NvTextarea
-          placeholder="Example: Speak in a cheerful and positive tone..."
           :modelValue="getProperty('instructions')"
+          placeholder="Example: Speak in a cheerful and positive tone..."
           @update:modelValue="(value) => setProperty('instructions', value)"
         />
       </NvFormItem>
@@ -89,6 +89,7 @@ import {
 } from '@packages/ui'
 import NvVoiceSelect from './NvVoiceSelect'
 import { store } from './store'
+import { engine } from './register'
 
 const props = defineProps({
   form: Object,

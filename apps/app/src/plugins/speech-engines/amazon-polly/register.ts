@@ -3,10 +3,11 @@ import { registerEngine } from '@/modules/speech-engine-manager'
 import { useSpeechStore } from '@/features/speech/store'
 import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
-import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
+import { Credentials, ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, store } from './store'
+import { SpeechEngine } from '@/modules/speech-engine-manager/types.ts'
 
-const getCredentials = () => {
+const getCredentials: SpeechEngine<Credentials>['getCredentials'] = () => {
   const speechStore = useSpeechStore()
   return speechStore.hasUniversalApiCredentials &&
     !getProperty('useLocalCredentials')
@@ -22,7 +23,8 @@ const getCredentials = () => {
 }
 
 const getSelectedVoice = () => getProperty('selectedVoice')
-registerEngine({
+
+export const engine = registerEngine({
   id: ENGINE_ID,
   name: ENGINE_NAME,
   category: 'cloud',

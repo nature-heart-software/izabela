@@ -2,8 +2,9 @@ import translationEngineManager from '@/modules/translation-engine-manager'
 import { electronModuleName, ENGINE_ID, ENGINE_NAME } from './shared.ts'
 import { store } from './store.ts'
 import NvSettings from './NvSettings.vue'
+import { TranslationEngine } from '@/modules/translation-engine-manager/types.ts'
 
-const getCredentials = () => ({
+const getCredentials: TranslationEngine['getCredentials'] = () => ({
   apiKey:
     store.getProperty('apiKey', true) ||
     import.meta.env.VITE_TRANSLATION_ENGINE_MICROSOFT_AZURE_API_KEY,
@@ -11,6 +12,7 @@ const getCredentials = () => ({
     store.getProperty('region') ||
     import.meta.env.VITE_TRANSLATION_ENGINE_MICROSOFT_AZURE_REGION,
 })
+
 const getTranslationOptions = (voiceLanguage?: string) => {
   return {
     translateFrom: store.getProperty('translateFrom') || undefined,

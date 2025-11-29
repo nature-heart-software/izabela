@@ -2,8 +2,9 @@ import translationEngineManager from '@/modules/translation-engine-manager'
 import { electronModuleName, ENGINE_ID, ENGINE_NAME } from './shared.ts'
 import { store } from './store.ts'
 import NvSettings from './NvSettings.vue'
+import { TranslationEngine } from '@/modules/translation-engine-manager/types.ts'
 
-const getCredentials = () => ({
+const getCredentials: TranslationEngine['getCredentials'] = () => ({
   identityPoolId:
     store.getProperty('identityPoolId', true) ||
     import.meta.env.VITE_TRANSLATION_ENGINE_AMAZON_TRANSLATION_IDENTITY_POOL_ID,
