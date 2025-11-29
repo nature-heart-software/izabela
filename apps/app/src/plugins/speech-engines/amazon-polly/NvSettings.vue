@@ -99,16 +99,7 @@
   </template>
 </template>
 <script lang="ts" setup>
-import {
-  NvAccessBlocker,
-  NvDivider,
-  NvFormItem,
-  NvGroup,
-  NvInput,
-  NvStack,
-  NvSwitch,
-  NvText,
-} from '@packages/ui'
+import { NvAccessBlocker, NvDivider, NvFormItem, NvGroup, NvInput, NvStack, NvSwitch, NvText, } from '@packages/ui'
 import { useSpeechStore } from '@/features/speech/store'
 import NvVoiceSelect from './NvVoiceSelect'
 import { store } from './store'
