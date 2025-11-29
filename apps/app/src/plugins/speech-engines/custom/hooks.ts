@@ -2,7 +2,7 @@ import { Ref } from 'vue'
 import { useQuery, UseQueryOptions } from 'vue-query'
 import axios from 'axios'
 import { LIST_VOICES_QUERY_KEY } from './shared'
-import {engine} from './register.ts'
+import { engine } from './register.ts'
 
 export const useListVoicesQuery = (
   params: Ref<{

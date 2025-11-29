@@ -19,8 +19,7 @@ export const engine = registerEngine({
   },
   getCredentials() {
     return {
-      apiKey:
-        getProperty('apiKey', true),
+      apiKey: getProperty('apiKey', true),
     }
   },
   getPayload({ text, translatedText, voice: v }) {

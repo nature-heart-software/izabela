@@ -1,10 +1,7 @@
 import { Ref } from 'vue'
 import { useQuery, UseQueryOptions } from 'vue-query'
 import { api } from '@/services'
-import {
-  LIST_MODELS_QUERY_KEY,
-  LIST_VOICES_QUERY_KEY,
-} from './shared'
+import { LIST_MODELS_QUERY_KEY, LIST_VOICES_QUERY_KEY } from './shared'
 import { engine } from './register.ts'
 
 export const useListVoicesQuery = (
