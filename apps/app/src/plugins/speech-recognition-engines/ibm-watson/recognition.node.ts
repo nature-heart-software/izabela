@@ -3,17 +3,17 @@ import { IamAuthenticator } from 'ibm-watson/auth'
 import SpeechToTextV1 from 'ibm-watson/speech-to-text/v1'
 import { SpeechModel } from 'ibm-watson/speech-to-text/v1-generated'
 import { useSettingsStore } from '@/features/settings/store'
-import { store } from './store.ts'
 import engine from './register.node.ts'
 
 export default ({ useRecording }: any) => {
   if (!engine.hasCredentials()) return
+  const { apiKey, url } = engine.getCredentials()
   const settingsStore = useSettingsStore()
   const speechToText = new SpeechToTextV1({
     authenticator: new IamAuthenticator({
-      apikey: store.getProperty('apiKey', true),
+      apikey: apiKey,
     }),
-    serviceUrl: store.getProperty('url'),
+    serviceUrl: url,
   })
   let models: SpeechModel[] = []
   speechToText.listModels().then((speechModels) => {
