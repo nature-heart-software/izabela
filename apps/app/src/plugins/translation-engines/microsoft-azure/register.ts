@@ -19,7 +19,8 @@ const getTranslationOptions = (voiceLanguage?: string) => {
     translateTo: store.getProperty('translateTo') || voiceLanguage,
   }
 }
-translationEngineManager.registerEngine(ENGINE_ID, {
+
+export const engine = translationEngineManager.registerEngine(ENGINE_ID, {
   id: ENGINE_ID,
   name: ENGINE_NAME,
   store,

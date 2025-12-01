@@ -13,7 +13,7 @@ const getTranslationOptions = (voiceLanguage?: string) => {
   }
 }
 
-translationEngineManager.registerEngine(ENGINE_ID, {
+export const engine = translationEngineManager.registerEngine(ENGINE_ID, {
   id: ENGINE_ID,
   name: ENGINE_NAME,
   store,
