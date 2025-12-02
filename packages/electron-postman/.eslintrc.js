@@ -5,9 +5,7 @@ module.exports = {
     es2021: true,
     node: true,
   },
-  extends: [
-    'airbnb-base',
-  ],
+  extends: ['airbnb-base'],
   parserOptions: {
     ecmaVersion: 12,
   },
@@ -16,4 +14,4 @@ module.exports = {
     'import/no-extraneous-dependencies': 'off',
     'no-unused-vars': 'warn',
   },
-};
+}
