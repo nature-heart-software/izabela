@@ -18,14 +18,14 @@ all other windows automatically.
 
 ```js
 // main.js
-ipcMain.registerBrowserWindow('window-a', windowA);
+ipcMain.registerBrowserWindow('window-a', windowA)
 ```
 
 From now on, windows can communicate directly with each other.
 
 ```js
 // windowB.js
-ipcRenderer.sendTo('window-a', 'channel-name', args);
+ipcRenderer.sendTo('window-a', 'channel-name', args)
 ```
 
 If you implement [Electron's security recommandations](https://www.electronjs.org/docs/tutorial/security)
@@ -34,12 +34,12 @@ windows, you can expose Electron Postman easily via a preload script.
 
 ```js
 // preload.js
-ipcRenderer.exposeInMainWorld('ipc');
+ipcRenderer.exposeInMainWorld('ipc')
 ```
 
 ```js
 // windowA.js
-window.ipc.invokeTo('window-b').then((result) => console.log(result));
+window.ipc.invokeTo('window-b').then((result) => console.log(result))
 ```
 
 ## Installation
@@ -60,22 +60,22 @@ npm install electron-postman
 
 1. Register a window **before** its content is loaded.
 
-  ```js
-  // main.js
-  const { ipcMain } = require('electron-postman');
-  // ...
-  const mainWindow = createMainWindow();
-  ipcMain.registerBrowserWindow('main-window', mainWindow);
-  mainWindow.loadFile(path);
-  ```
-  
+```js
+// main.js
+const { ipcMain } = require('electron-postman')
+// ...
+const mainWindow = createMainWindow()
+ipcMain.registerBrowserWindow('main-window', mainWindow)
+mainWindow.loadFile(path)
+```
+
 2. (Optional) If using a preload script, expose the API to the renderer process.
 
-  ```js
-  // preload.js
-  const { ipcRenderer } = require('electron-postman');
-  ipcRenderer.exposeInMainWorld('ipc');
-  ```
+```js
+// preload.js
+const { ipcRenderer } = require('electron-postman')
+ipcRenderer.exposeInMainWorld('ipc')
+```
 
 3. Send, invoke, handle and receive messages in main and in renderer processes.
 
@@ -87,26 +87,26 @@ npm install electron-postman
 
 - `windowName` String
 - `browserWindow` BrowserWindow
-  
+
 Registers the window and is made known with all other existing windows.
-  
+
 #### `ipcMain.sendTo(windowName, channel, ...args)`
 
 - `windowName` String
 - `channel` String
 - `...args` any[]
-  
+
 Send an asynchronous message to the renderer process via `channel`, along with
 arguments. Requires that `windowName` is a registered window. The renderer
 process can handle the message by listening to `channel`.
-  
+
 #### `ipcMain.on(windowName, channel, listener)`
 
 - `windowName` String
 - `channel` String
 - `listener` Function
   - `...args` any[]
-  
+
 Listen to messages on `channel` from window `windowName`. Requires that
 `windowName` is a registered window.
 
@@ -137,7 +137,7 @@ The other process should listen for channel with `ipcMain.handle()` or
 - `channel` String
 - `listener` Function
   - `...args` any[]
-  
+
 Adds a handler for an invokeable IPC. This handler will be called whenever a
 renderer calls `ipcRenderer.invoke(channel, ...args)` or
 `ipcRenderer.invokeTo('main', channel, ...args`.
@@ -152,7 +152,7 @@ listener will be used as the value of the reply.
 - `channel` String
 - `listener` Function
   - `...args` any[]
-  
+
 Same as `ipcMain.handle`, but handler is removed once an invoke call was handled.
 
 #### `ipcMain.removeAllListeners(windowName, channel)`
@@ -161,7 +161,7 @@ Same as `ipcMain.handle`, but handler is removed once an invoke call was handled
 - `channel` String
 
 Removes all listeners registered on `windowName` and `channel`.
-  
+
 #### `ipcMain.removeHandler(windowName, channel)`
 
 - `windowName` String
@@ -188,7 +188,7 @@ if `contextIsolation` is enabled for that window. Uses Electron's
 
 - `channel` String
 - `...args` any[]
-  
+
 Equivalent to `ipcRenderer.sendTo('main', channel, ...args)`.
 
 #### `ipcRenderer.sendTo(processName, channel, ...args)`
@@ -196,7 +196,7 @@ Equivalent to `ipcRenderer.sendTo('main', channel, ...args)`.
 - `processName` String
 - `channel` String
 - `...args` any[]
-  
+
 Send an asynchronous message to the process registered as `processName` via
 `channel`, along with arguments. The receiving process can handle the message by
 listening to `channel`.
@@ -207,7 +207,7 @@ listening to `channel`.
 - `channel` String
 - `listener` Function
   - `...args` any[]
-  
+
 Listen to messages on `channel` from process `processName`.
 
 #### `ipcRenderer.once(processName, channel, listener)`
@@ -245,7 +245,7 @@ The other process should listen for channel with `ipcMain.handle()` or
 - `channel` String
 - `listener` Function
   - `...args` any[]
-  
+
 Adds a handler for an invokeable IPC. This handler will be called whenever a process
 calls `.invoke('this-window-name', channel, ...args)`.
 
@@ -259,7 +259,7 @@ be used as the value of the reply.
 - `channel` String
 - `listener` Function
   - `...args` any[]
-  
+
 Same as `ipcRenderer.handle`, but handler is removed once an invoke call was handled.
 
 #### `ipcRenderer.removeAllListeners(processName, channel)`
@@ -268,7 +268,7 @@ Same as `ipcRenderer.handle`, but handler is removed once an invoke call was han
 - `channel` String
 
 Removes all listeners registered on `processName` and `channel`.
-  
+
 #### `ipcRenderer.removeHandler(processName, channel)`
 
 - `processName` String
