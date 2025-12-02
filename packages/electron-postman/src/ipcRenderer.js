@@ -11,7 +11,6 @@ const {
 let processes = new Map()
 processes.set(MAIN_PROCESS_ID, 0)
 let windowName
-
 ;(function listenToWindowAnnouncements() {
   ipcRenderer.on(INTERNAL_CHANNELS.announceWindowId, (event, name, id) => {
     if (id === undefined) {
@@ -21,7 +20,6 @@ let windowName
     }
   })
 })()
-
 ;(function initializeRendererIpc() {
   ipcRenderer.once(
     INTERNAL_CHANNELS.initRendererIpc,
