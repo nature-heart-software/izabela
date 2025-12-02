@@ -11,6 +11,7 @@ function prefixed(processName, channel, token) {
 const INTERNAL_CHANNELS = {
   announceWindowId: 'announce-window-id',
   initRendererIpc: 'init-renderer-ipc',
+  relayMessage: 'relay-message',
 };
 
 function throwError(msg) {
