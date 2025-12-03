@@ -2,9 +2,9 @@
   "name": "@apps/app-server",
   "version": "0.0.0",
   "dependencies": {
-    "@aws-sdk/client-cognito-identity": "^3.87.0",
-    "@aws-sdk/client-polly": "^3.87.0",
-    "@aws-sdk/credential-provider-cognito-identity": "^3.87.0",
+    "@aws-sdk/client-cognito-identity": "^3.943.0",
+    "@aws-sdk/client-polly": "^3.943.0",
+    "@aws-sdk/credential-provider-cognito-identity": "^3.943.0",
     "@google-cloud/text-to-speech": "^3.4.0",
     "@types/object-hash": "^3.0.2",
     "axios": "^0.27.2",

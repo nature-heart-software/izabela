@@ -9,7 +9,7 @@ const getCredentials: SpeechRecognitionEngine['getCredentials'] = () => ({
       .VITE_SPEECH_RECOGNITION_ENGINE_AMAZON_TRANSCRIBE_IDENTITY_POOL_ID,
   region:
     store.getProperty('region') ||
-    import.meta.env.VITE_SPEECH_RECOGNITION_ENGINE_AMAZON_TRANSCRIBE_ENDPOINT,
+    import.meta.env.VITE_SPEECH_RECOGNITION_ENGINE_AMAZON_TRANSCRIBE_REGION,
 })
 export default {
   id: ENGINE_ID,

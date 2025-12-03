@@ -71,17 +71,19 @@ export default ({ useRecording }: any) => {
 
       recording.startPumping()
 
-      const audioStream = async function* () {
-        for await (const payloadChunk of audioPayloadStream) {
-          yield { AudioEvent: { AudioChunk: payloadChunk } }
-        }
-      }
+      await new Promise((resolve) => {
+        audioPayloadStream.once('data', resolve)
+      })
 
       const command = new StartStreamTranscriptionCommand({
         LanguageCode: settingsStore.speechInputLanguage as LanguageCode,
         MediaEncoding: 'pcm',
         MediaSampleRateHertz: 16000,
-        AudioStream: audioStream(),
+        AudioStream: (async function* () {
+          for await (const payloadChunk of audioPayloadStream) {
+            yield { AudioEvent: { AudioChunk: payloadChunk } }
+          }
+        })(),
       })
 
       try {
