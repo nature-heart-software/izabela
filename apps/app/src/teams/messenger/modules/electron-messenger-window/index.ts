@@ -4,10 +4,7 @@ import throttle from 'lodash/throttle'
 import { Hitbox } from '@/modules/vue-hitboxes/types'
 import { app, BrowserWindow, screen, shell } from 'electron'
 
-import {
-  useMessengerStore,
-  useMessengerWindowStore,
-} from '@/teams/messenger/store'
+import { useMessengerStore, useMessengerWindowStore, } from '@/teams/messenger/store'
 import { useSettingsStore } from '@/features/settings/store'
 import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
 import { Deferred } from '@packages/toolbox'
@@ -189,11 +186,13 @@ export const ElectronMessengerWindow = () => {
             const x1 = hitbox.x / scaleFactor
             const y1 = hitbox.y / scaleFactor
             const x2 = (hitbox.x + hitbox.w) / scaleFactor
-            const y2 = (hitbox.x + hitbox.w) / scaleFactor
+            const y2 = (hitbox.y + hitbox.h) / scaleFactor
+
             const isWithinXHitbox =
               mouseX >= windowX + x1 && mouseX <= windowX + x2
             const isWithinYHitbox =
               mouseY >= windowY + y1 && mouseY <= windowY + y2
+
             return isWithinXHitbox && isWithinYHitbox
           })
         if (isWithinAnyHitboxes) {
