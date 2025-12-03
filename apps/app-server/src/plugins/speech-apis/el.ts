@@ -96,13 +96,14 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
         return res.end()
       }
 
-      const stream = await client.textToSpeech.convertAsStream(
+      const readable = await client.textToSpeech.convertAsStream(
         voice.voice_id,
         payload,
       )
-
-      stream.pipe(res)
-      stream.on('finish', () => {})
+      for await (const chunk of readable) {
+        res.write(chunk)
+      }
+      res.end()
     } catch (e: any) {
       handleError(res, 'Internal server error', e.message, 500)
     }
