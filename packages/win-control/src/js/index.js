@@ -1,8 +1,10 @@
 const binary = require('node-pre-gyp')
 const path = require('path')
 
-const bindingPath = binary.find(path.resolve(path.join(__dirname, '../../package.json')))
-const {Window} = require(bindingPath) // eslint-disable-line
+const bindingPath = binary.find(
+  path.resolve(path.join(__dirname, '../../package.json')),
+)
+const { Window } = require(bindingPath) // eslint-disable-line
 
 module.exports = {
   Window,
@@ -22,13 +24,13 @@ module.exports = {
     SHOWNA: 8,
     RESTORE: 9,
     SHOWDEFAULT: 10,
-    FORCEMINIMIZE: 11
+    FORCEMINIMIZE: 11,
   }),
 
   AncestorFlags: Object.freeze({
     PARENT: 1,
     ROOT: 2,
-    ROOTOWNER: 3
+    ROOTOWNER: 3,
   }),
 
   // Used when calling to setPosition as 2 argument. For more information see:
@@ -37,7 +39,7 @@ module.exports = {
     NOTOPMOST: -2,
     TOPMOST: -1,
     TOP: 0,
-    BOTTOM: 1
+    BOTTOM: 1,
   }),
 
   // Used when calling to setPosition as 7 argument. For more information see:
@@ -57,6 +59,6 @@ module.exports = {
     NOREPOSITION: 0x0200,
     NOSENDCHANGING: 0x0400,
     DEFERERASE: 0x2000,
-    ASYNCWINDOWPOS: 0x4000
-  })
+    ASYNCWINDOWPOS: 0x4000,
+  }),
 }

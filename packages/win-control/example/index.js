@@ -1,9 +1,15 @@
 const spawn = require('child_process').spawn
 
-const {Window, WindowStates, SWP, AncestorFlags, HWND} = require('../src/js/index');
+const {
+  Window,
+  WindowStates,
+  SWP,
+  AncestorFlags,
+  HWND,
+} = require('../src/js/index')
 
-(async () => {
-  const showInfo = w => {
+;(async () => {
+  const showInfo = (w) => {
     if (!w) {
       console.log('Window not found')
       return
@@ -26,8 +32,10 @@ const {Window, WindowStates, SWP, AncestorFlags, HWND} = require('../src/js/inde
   showInfo(current)
   console.log('------------------------------------------\n')
 
-  const bat = spawn('notepad.exe', [], {detached: true})
-  await new Promise(resolve => { setTimeout(resolve, 2000) })
+  const bat = spawn('notepad.exe', [], { detached: true })
+  await new Promise((resolve) => {
+    setTimeout(resolve, 2000)
+  })
 
   console.log('------------------------------------------')
   console.log('              notepad by pid')
@@ -61,19 +69,27 @@ const {Window, WindowStates, SWP, AncestorFlags, HWND} = require('../src/js/inde
 
   console.log('Minimize notepad')
   notepad.setShowStatus(WindowStates.FORCEMINIMIZE)
-  await new Promise(resolve => { setTimeout(resolve, 2000) })
+  await new Promise((resolve) => {
+    setTimeout(resolve, 2000)
+  })
 
   console.log('show notepad maximized')
   notepad.setShowStatus(WindowStates.SHOWMAXIMIZED)
-  await new Promise(resolve => { setTimeout(resolve, 2000) })
+  await new Promise((resolve) => {
+    setTimeout(resolve, 2000)
+  })
 
   console.log('show normal notepad')
   notepad.setShowStatus(WindowStates.SHOWNORMAL)
-  await new Promise(resolve => { setTimeout(resolve, 2000) })
+  await new Promise((resolve) => {
+    setTimeout(resolve, 2000)
+  })
 
   console.log('move notepad to 00')
   notepad.setPosition(HWND.TOP, 0, 0, 200, 200, SWP.SHOWWINDOW)
-  await new Promise(resolve => { setTimeout(resolve, 2000) })
+  await new Promise((resolve) => {
+    setTimeout(resolve, 2000)
+  })
 
   // When function are used incorrectly, exceptions are raised
   try {
