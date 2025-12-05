@@ -20,7 +20,9 @@ const SpeechEngineManager = () => {
   }
 
   function registerEngine(speechEngine: SpeechEngine) {
-    engineManager.registerEngine(speechEngine.id, withDictionary(speechEngine))
+    const finalSpeechEngine = withDictionary(speechEngine)
+    engineManager.registerEngine(speechEngine.id, finalSpeechEngine)
+    return finalSpeechEngine
   }
 
   function getEngineById(id: SpeechEngine['id']) {

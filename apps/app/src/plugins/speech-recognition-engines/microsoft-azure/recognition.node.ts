@@ -1,16 +1,13 @@
 import { useSettingsStore } from '@/features/settings/store'
 import once from 'lodash/once'
 import sdk from 'microsoft-cognitiveservices-speech-sdk'
-import { store } from './store.ts'
 import engine from './register.node.ts'
 
 export default ({ useRecording }: any) => {
   if (!engine.hasCredentials()) return
+  const { apiKey, region } = engine.getCredentials()
   const settingsStore = useSettingsStore()
-  const speechConfig = sdk.SpeechConfig.fromSubscription(
-    store.getProperty('apiKey', true),
-    store.getProperty('region'),
-  )
+  const speechConfig = sdk.SpeechConfig.fromSubscription(apiKey, region)
   speechConfig.speechRecognitionLanguage = settingsStore.speechInputLanguage
 
   return {

@@ -4,3 +4,4 @@ export const LIST_VOICES_QUERY_KEY = 'iwtts-list-voices' as const
 export const getVoiceName = (voice: any) => `${voice.name} - ${voice.gender}`
 export const getVoiceId = (voice: any) => voice.name
 export const getVoiceCategory = (voice: any) => 'General'
+export type Credentials = { apiKey: string; url: string }

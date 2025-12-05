@@ -40,7 +40,6 @@ import { useQueryClient } from 'vue-query'
 import { NvButton, NvSelect } from '@packages/ui'
 import { groupOptions } from '@/utils/select'
 import xor from 'lodash/xor'
-import { purify } from '@packages/toolbox'
 import { useListVoicesQuery } from './hooks'
 import {
   getVoiceCategory,
@@ -50,16 +49,13 @@ import {
 } from './shared'
 import { getProperty, setProperty } from './store'
 import { isGameOverlay } from '@/consts.ts'
+import { engine } from './register.ts'
 
 const queryClient = useQueryClient()
 const computedParams = computed(() => ({
-  credentials: {
-    apiKey: getProperty('apiKey', true),
-  },
+  credentials: engine.getCredentials(),
 }))
-const canFetch = computed(() =>
-  Object.values(computedParams.value.credentials).every(Boolean),
-)
+const canFetch = computed(() => engine.hasCredentials?.())
 const { data, isFetching } = useListVoicesQuery(computedParams, {
   enabled: canFetch,
 })

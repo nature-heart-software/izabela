@@ -1,10 +1,6 @@
 <template>
   <NvAccessBlocker
-    :allowed="
-      [getStoreProperty('apiKey', true), getStoreProperty('region')].every(
-        Boolean,
-      )
-    "
+    :allowed="engine.hasCredentials()"
     reason="Credentials required"
   >
     <NvStack :spacing="size === 'sm' ? 4 : 5">
@@ -60,6 +56,7 @@ import {
 import NvTranslateFromSelect from './NvTranslateFromSelect.vue'
 import NvTranslateToSelect from './NvTranslateToSelect.vue'
 import { store } from './store.ts'
+import { engine } from './register.ts'
 
 const props = defineProps({
   size: {

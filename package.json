@@ -11,6 +11,7 @@
     "@babel/plugin-transform-modules-systemjs": "^7.17.8",
     "@babel/plugin-transform-modules-umd": "^7.16.7",
     "@babel/preset-typescript": "^7.16.7",
+    "@electron/rebuild": "^4.0.1",
     "@floating-ui/dom": "^1.0.1",
     "@floating-ui/vue": "^0.2.1",
     "@globalhive/vuejs-tour": "^1.3.4",
@@ -64,12 +65,11 @@
     "cors": "^2.8.5",
     "crypto-js": "^4.1.1",
     "depcheck": "^1.4.7",
-    "electron": "20.3.8",
+    "electron": "39.1.0",
     "electron-builder": "^24.6.4",
     "electron-devtools-installer": "^3.2.0",
     "electron-log": "^4.4.8",
     "electron-postman": "^0.1.2",
-    "electron-rebuild": "^3.2.7",
     "electron-store": "^8.1.0",
     "electron-updater": "^5.0.1",
     "element-plus": "^1.2.0-beta.6",
@@ -171,14 +171,15 @@
     ]
   },
   "scripts": {
-    "build": "yarn install && yarn lerna run build",
-    "build:app": "yarn lerna run build --scope izabela-next --stream",
-    "build:deps": "yarn lerna run build --scope '{@packages/*,@apps/app-server}' --stream",
-    "build:prod": "yarn lerna run build:prod --stream",
-    "dev": "yarn lerna run dev --scope izabela-next --stream",
+    "build": "npm install && lerna run build",
+    "build:app": "lerna run build --scope izabela-next --stream",
+    "build:deps": "lerna run build --scope '{@packages/*,@apps/app-server}' --stream",
+    "build:prod": "lerna run build:prod --stream",
+    "dev": "lerna run dev --scope izabela-next --stream",
+    "infisical:dev": "infisical run --path=\"/apps/app\" -- nu -c \"lerna run dev --scope izabela-next --stream\"",
     "docker:build": "docker build -t izabela . && docker create --name dummy izabela && docker cp dummy:dist_electron dist_electron && docker rm -f dummy",
-    "patch": "yarn patch-package",
-    "postinstall": "yarn patch && electron-rebuild -f -o @packages/win-mouse"
+    "patch": "patch-package",
+    "postinstall": "npm run patch"
   },
   "workspaces": [
     "apps/*",
@@ -186,5 +187,8 @@
   ],
   "devDependencies": {
     "@types/ws": "^8.5.4"
+  },
+  "overrides": {
+    "node-gyp": "^9.4.1"
   }
 }

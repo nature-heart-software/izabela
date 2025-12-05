@@ -112,10 +112,6 @@ Find guides and API documentation on the [Wiki](https://github.com/nature-heart-
 
 The project requires the following in order to run:
 
-- Node 16
-- Yarn
-- Python 3.10
-- Visual Studio Build Tools 2019 or higher
-  - Desktop development with C++
-  - Node.js build tools
-- CMake
+- Node 22
+- [Python 3.11](https://github.com/nodejs/node-gyp?tab=readme-ov-file#configuring-python-dependency)
+- [Visual Studio Build Tools 2022](https://github.com/nodejs/node-gyp?tab=readme-ov-file#on-windows)

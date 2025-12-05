@@ -8,6 +8,7 @@ import engine from './register.node.ts'
 
 export default ({ useRecording }: any) => {
   if (!engine.hasCredentials()) return
+  const { apiKey } = engine.getCredentials()
   const manager = new WebSocketSessionManager({
     sessionMaxAge: 30 * 60 * 1000,
     async factory() {
@@ -15,7 +16,7 @@ export default ({ useRecording }: any) => {
         'wss://api.openai.com/v1/realtime?intent=transcription',
         {
           headers: {
-            Authorization: 'Bearer ' + store.getProperty('apiKey', true),
+            Authorization: 'Bearer ' + apiKey,
             'OpenAI-Beta': 'realtime=v1',
           },
         },

@@ -7,15 +7,15 @@ import {
   TranscribeStreamingClient,
 } from '@aws-sdk/client-transcribe-streaming'
 import { PassThrough } from 'stream'
-import { store } from './store.ts'
 import engine from './register.node.ts'
 
 const getCredentials = async () => {
+  const { region, identityPoolId } = engine.getCredentials()
   const credentials = fromCognitoIdentityPool({
     clientConfig: {
-      region: store.getProperty('region'),
+      region,
     },
-    identityPoolId: store.getProperty('identityPoolId', true),
+    identityPoolId,
   })
   const res = await credentials()
   return res as {
@@ -27,9 +27,9 @@ const getCredentials = async () => {
 
 export default ({ useRecording }: any) => {
   if (!engine.hasCredentials()) return
+  const { region } = engine.getCredentials()
   const settingsStore = useSettingsStore()
   let credentials: Awaited<ReturnType<typeof getCredentials>>
-  const region = store.getProperty('region')
 
   async function refreshCredentials() {
     credentials = await getCredentials()
@@ -71,17 +71,19 @@ export default ({ useRecording }: any) => {
 
       recording.startPumping()
 
-      const audioStream = async function* () {
-        for await (const payloadChunk of audioPayloadStream) {
-          yield { AudioEvent: { AudioChunk: payloadChunk } }
-        }
-      }
+      await new Promise((resolve) => {
+        audioPayloadStream.once('data', resolve)
+      })
 
       const command = new StartStreamTranscriptionCommand({
         LanguageCode: settingsStore.speechInputLanguage as LanguageCode,
         MediaEncoding: 'pcm',
         MediaSampleRateHertz: 16000,
-        AudioStream: audioStream(),
+        AudioStream: (async function* () {
+          for await (const payloadChunk of audioPayloadStream) {
+            yield { AudioEvent: { AudioChunk: payloadChunk } }
+          }
+        })(),
       })
 
       try {

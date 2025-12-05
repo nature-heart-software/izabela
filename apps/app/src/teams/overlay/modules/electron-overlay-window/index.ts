@@ -3,7 +3,6 @@ import throttle from 'lodash/throttle'
 import { BrowserWindow, screen } from 'electron'
 import { useSettingsStore } from '@/features/settings/store'
 import { Deferred } from '@packages/toolbox'
-import ffi from 'ffi-napi'
 import {
   gkl,
   keybindingAllReleased,
@@ -17,6 +16,7 @@ import {
 import keymap from '@packages/native-keymap'
 import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
 import { useOverlayWindowStore } from '@/teams/overlay/store'
+import koffi from 'koffi'
 
 export const ElectronOverlayWindow = () => {
   let waitingToShow = false
@@ -26,9 +26,11 @@ export const ElectronOverlayWindow = () => {
   const ready = Deferred<BrowserWindow>()
   const isReady = () => ready.promise
 
-  const user32 = new ffi.Library('user32', {
-    BlockInput: ['bool', ['bool']],
-  })
+  const user32 = koffi.load('user32.dll')
+
+  const user32Api = {
+    BlockInput: user32.func('bool BlockInput(bool fBlockIt)'),
+  }
 
   const getWindow = () =>
     registeredWindow ||
@@ -41,7 +43,7 @@ export const ElectronOverlayWindow = () => {
         window.hide()
         gkl?.removeListener(toggleOverlayWindowListener)
         setTimeout(() => {
-          user32.BlockInput(false)
+          user32Api.BlockInput(false)
         }, 100)
         resolve(true)
       } else {
@@ -70,7 +72,7 @@ export const ElectronOverlayWindow = () => {
           .then(() => {
             gkl?.addListener(toggleOverlayWindowListener)
             setTimeout(() => {
-              user32.BlockInput(true)
+              user32Api.BlockInput(true)
             }, 100)
             window.showInactive()
             waitingToShow = false

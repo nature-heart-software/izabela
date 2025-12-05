@@ -4,17 +4,21 @@ import type { SpeechEngine } from '@/modules/speech-engine-manager/types'
 import { useSpeechStore } from '@/features/speech/store'
 import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
-import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
+import { Credentials, ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, store } from './store'
 
-const getCredentials = () => {
+const getCredentials: SpeechEngine<Credentials>['getCredentials'] = () => {
   const speechStore = useSpeechStore()
   return speechStore.hasUniversalApiCredentials &&
     !getProperty('useLocalCredentials')
     ? {}
     : {
-        apiKey: getProperty('apiKey', true),
-        region: getProperty('region'),
+        apiKey:
+          getProperty('apiKey', true) ||
+          import.meta.env.VITE_SPEECH_ENGINE_MICROSOFT_AZURE_API_KEY,
+        region:
+          getProperty('region') ||
+          import.meta.env.VITE_SPEECH_ENGINE_MICROSOFT_AZURE_REGION,
       }
 }
 
@@ -25,7 +29,7 @@ const commands: SpeechEngine['commands'] = (voice) =>
   }))
 
 const getSelectedVoice = () => getProperty('selectedVoice')
-registerEngine({
+export const engine = registerEngine({
   id: ENGINE_ID,
   name: ENGINE_NAME,
   category: 'cloud',

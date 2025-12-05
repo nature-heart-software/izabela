@@ -1,13 +1,6 @@
 <template>
   <NvAccessBlocker
-    :allowed="
-      (speechStore.hasUniversalApiCredentials &&
-        !getStoreProperty('useLocalCredentials')) ||
-      [
-        getStoreProperty('publicKey', true),
-        getStoreProperty('privateKey', true),
-      ].every(Boolean)
-    "
+    :allowed="engine.hasCredentials()"
     reason="Credentials required"
   >
     <NvStack :spacing="5">
@@ -106,6 +99,7 @@ import {
 import { useSpeechStore } from '@/features/speech/store'
 import NvVoiceSelect from './NvVoiceSelect'
 import { store } from './store'
+import { engine } from './register.ts'
 
 const speechStore = useSpeechStore()
 const props = defineProps({

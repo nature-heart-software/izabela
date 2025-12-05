@@ -20,12 +20,13 @@ import registerElectronDebug from '@/modules/electron-debug/register'
 import registerElectronDisplay from '@/modules/electron-display/register'
 import registerElectronKeybinding from '@/modules/electron-keybinding/register'
 import registerElectronCache from '@/modules/electron-cache/register'
-import { destroyWinMouse } from '@/modules/node-mouse'
+import { stopMouse } from '@/modules/node-mouse'
 import { createOverlayWindow } from '@/teams/overlay/electron/background'
 import './game-overlay'
 import gameOverlay from '@/electron/game-overlay.ts'
 import { gkl } from '@/modules/electron-keybinding/utils.ts'
 import { loadStores } from '@/store/stores.ts'
+import { writeFileSync, mkdirSync, existsSync } from 'node:fs'
 
 const App = () => {
   const isDevelopment = import.meta.env.DEV
@@ -109,7 +110,7 @@ const App = () => {
     ElectronWindowManager.getInstances().forEach(({ window }) => {
       window.removeAllListeners()
     })
-    destroyWinMouse()
+    stopMouse()
   }
 
   function addEventListeners() {
@@ -122,6 +123,25 @@ const App = () => {
         credentialsDirPath,
         'google-cloud-speech-credentials.json',
       )
+      if (import.meta.env.VITE_GOOGLE_CLOUD_SERVICE_ACCOUNT) {
+        try {
+          if (!existsSync(credentialsDirPath)) {
+            mkdirSync(credentialsDirPath, { recursive: true })
+          }
+          writeFileSync(
+            googleCloudSpeechCredentialsFilePath,
+            import.meta.env.VITE_GOOGLE_CLOUD_SERVICE_ACCOUNT,
+            {
+              encoding: 'utf8',
+            },
+          )
+        } catch (error) {
+          console.error(
+            'Failed to write Google Cloud Speech credentials:',
+            error,
+          )
+        }
+      }
       process.env.GOOGLE_APPLICATION_CREDENTIALS =
         googleCloudSpeechCredentialsFilePath
     })

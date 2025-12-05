@@ -10,16 +10,17 @@ import { v4 as uuid } from 'uuid'
 import { Readable } from 'stream'
 import { FileWriter } from 'wav'
 import { promisify } from 'util'
-import { store } from './store.ts'
 import engine from './register.node.ts'
+
 const unlinkAsync = promisify(unlink)
 
 globalThis.Blob = (buffer as any).Blob
 
 export default ({ useRecording }: any) => {
   if (!engine.hasCredentials()) return
+  const { apiKey } = engine.getCredentials()
   const client = new ElevenLabsClient({
-    apiKey: store.getProperty('apiKey', true),
+    apiKey,
   })
 
   return {

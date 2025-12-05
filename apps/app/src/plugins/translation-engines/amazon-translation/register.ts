@@ -2,10 +2,15 @@ import translationEngineManager from '@/modules/translation-engine-manager'
 import { electronModuleName, ENGINE_ID, ENGINE_NAME } from './shared.ts'
 import { store } from './store.ts'
 import NvSettings from './NvSettings.vue'
+import { TranslationEngine } from '@/modules/translation-engine-manager/types.ts'
 
-const getCredentials = () => ({
-  identityPoolId: store.getProperty('identityPoolId', true),
-  region: store.getProperty('region'),
+const getCredentials: TranslationEngine['getCredentials'] = () => ({
+  identityPoolId:
+    store.getProperty('identityPoolId', true) ||
+    import.meta.env.VITE_TRANSLATION_ENGINE_AMAZON_TRANSLATION_IDENTITY_POOL_ID,
+  region:
+    store.getProperty('region') ||
+    import.meta.env.VITE_TRANSLATION_ENGINE_AMAZON_TRANSLATION_REGION,
 })
 const getTranslationOptions = (voiceLanguage?: string) => {
   return {
@@ -13,7 +18,8 @@ const getTranslationOptions = (voiceLanguage?: string) => {
     translateTo: store.getProperty('translateTo') || voiceLanguage,
   }
 }
-translationEngineManager.registerEngine(ENGINE_ID, {
+
+export const engine = translationEngineManager.registerEngine(ENGINE_ID, {
   id: ENGINE_ID,
   name: ENGINE_NAME,
   store,

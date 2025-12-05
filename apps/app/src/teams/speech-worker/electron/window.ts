@@ -49,11 +49,11 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     window.webContents.openDevTools({ mode: 'undocked' })
   }
 
-  const filePath = `./src/teams/${name}/index.html`
+  const filePath = `src/teams/${name}/index.html`
   if (import.meta.env.VITE_DEV_SERVER_URL) {
-    await window.loadURL(
-      path.join(import.meta.env.VITE_DEV_SERVER_URL as string, filePath),
-    )
+    const url = new URL(filePath, import.meta.env.VITE_DEV_SERVER_URL as string)
+      .href
+    await window.loadURL(url)
   } else {
     createProtocol('app')
     await window.loadURL(`app://${filePath}`)

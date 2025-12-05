@@ -1,13 +1,13 @@
 <template>
   <NvAccessBlocker
-    :allowed="[getStoreProperty('apiKey', true)].every(Boolean)"
+    :allowed="engine.getCredentials()"
     reason="Credentials required"
   >
     <NvStack :spacing="size === 'sm' ? 4 : 5">
       <NvFormItem label="Prompt">
         <NvTextarea
-          placeholder="Example: Translate into Shakespearean English..."
           :modelValue="getProperty('prompt')"
+          placeholder="Example: Translate into Shakespearean English..."
           @update:modelValue="(value) => setProperty('prompt', value)"
         />
       </NvFormItem>
@@ -52,6 +52,7 @@ import {
 import NvTranslateFromSelect from './NvTranslateFromSelect.vue'
 import NvTranslateToSelect from './NvTranslateToSelect.vue'
 import { store } from './store.ts'
+import { engine } from './register.ts'
 
 const props = defineProps({
   size: {
