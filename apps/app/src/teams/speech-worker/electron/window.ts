@@ -49,7 +49,7 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     window.webContents.openDevTools({ mode: 'undocked' })
   }
 
-  const filePath = `src/teams/${name}/index.html`
+  const filePath = `./src/teams/${name}/index.html`
   if (import.meta.env.VITE_DEV_SERVER_URL) {
     const url = new URL(filePath, import.meta.env.VITE_DEV_SERVER_URL as string)
       .href
