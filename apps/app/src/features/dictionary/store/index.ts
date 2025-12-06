@@ -128,7 +128,7 @@ export const useDictionaryStore = defineStore(
         definitions.value.splice(index, 1, definition)
       },
       addDefinition: (
-        definition: typeof definitions['value'][number] = ['', ''],
+        definition: (typeof definitions)['value'][number] = ['', ''],
       ) => {
         definitions.value.unshift(definition)
       },
