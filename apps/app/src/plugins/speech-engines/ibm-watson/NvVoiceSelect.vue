@@ -53,6 +53,7 @@ import { getProperty, setProperty } from './store'
 import { isGameOverlay } from '@/consts.ts'
 import { useSettingsStore } from '@/features/settings/store'
 import { engine } from './register.ts'
+import { purify } from '@packages/toolbox'
 
 const queryClient = useQueryClient()
 
