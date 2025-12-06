@@ -17,8 +17,8 @@
         <!-- v-if causes this error:  https://github.com/vuejs/core/issues/5657-->
         <StDialogPositioner v-show="dialogOpen">
           <StDialogContentWrapper
-            @mousedown.self="closeDialog"
             ref="portalTarget"
+            @mousedown.self="closeDialog"
           >
             <StDialogContent>
               <NvCard>
@@ -72,9 +72,10 @@ import {
   StDialogTitle,
   StDialogTrigger,
 } from './dialog.styled'
+import { PORTAL_TARGET } from '@/consts'
 
 const portalTarget = ref()
-provide('portal-target', portalTarget)
+provide(PORTAL_TARGET, portalTarget)
 
 const props = defineProps({
   ...propsDefinition,
