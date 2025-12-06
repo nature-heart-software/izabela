@@ -41,7 +41,12 @@ import { NvButton, NvSelect } from '@packages/ui'
 import { groupOptions } from '@/utils/select'
 import xor from 'lodash/xor'
 import { useListVoicesQuery } from './hooks'
-import { getVoiceCategory, getVoiceId, getVoiceName, LIST_VOICES_QUERY_KEY, } from './shared'
+import {
+  getVoiceCategory,
+  getVoiceId,
+  getVoiceName,
+  LIST_VOICES_QUERY_KEY,
+} from './shared'
 import { getProperty, setProperty } from './store'
 import { isGameOverlay } from '@/consts.ts'
 import { engine } from './register.ts'
