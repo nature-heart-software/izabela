@@ -95,6 +95,7 @@ Here's a list of all the text-to-speech engines that are supported in Izabela:
 | Sam                        | Included by default                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/sam-sample.mp3?raw=true)             | https://github.com/discordier/sam / https://github.com/Imrane03/better-sam    |
 | Animalese                  | Included by default                 | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/animalese-sample.wav?raw=true)       | https://github.com/Acedio/animalese.js                                        |
 | ElevenLabs                 | No                                  | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/elevenlabs-sample.mp3?raw=true)      | https://elevenlabs.io/                                                        |
+| OpenAI                     | No                                  | [Download](https://github.com/nature-heart-software/izabela/blob/dev/assets/openai-sample.mp3?raw=true)          | https://openai.com/                                                           |
 
 ## Guides
 
@@ -102,7 +103,8 @@ Find guides and API documentation on the [Wiki](https://github.com/nature-heart-
 
 ## More from the community
 
-- [its5Q/izabela-engines](https://github.com/its5Q/izabela-engines) - A small framework for quick development of your own custom engines for Izabela
+- [its5Q/izabela-engines](https://github.com/its5Q/izabela-engines) - A small framework for quick development of your
+  own custom engines for Izabela
 
 ## Resources
 
