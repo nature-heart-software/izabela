@@ -31,10 +31,11 @@ export const engine = registerEngine({
       text: translatedText || text,
       voice,
       stability: getProperty('stability'),
-      similarity_boost: getProperty('similarity_boost'),
+      similarityBoost: getProperty('similarity_boost'),
       style: getProperty('style'),
-      use_speaker_boost: getProperty('use_speaker_boost'),
-      model_id: getProperty('model_id'),
+      useSpeakerBoost: getProperty('use_speaker_boost'),
+      modelId: getProperty('model_id'),
+      speed: getProperty('speed'),
     }
   },
   getLanguageCode() {

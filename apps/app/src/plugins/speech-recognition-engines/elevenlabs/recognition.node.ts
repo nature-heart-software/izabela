@@ -1,20 +1,40 @@
 import once from 'lodash/once'
-import { ElevenLabsClient } from 'elevenlabs'
+import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js'
 import path from 'path'
 import { app } from 'electron'
 import pkg from '@root/package.json'
-import { createReadStream, unlink } from 'fs'
+import { createReadStream, mkdirSync, unlink, writeFileSync } from 'fs'
 
-import buffer from 'buffer'
 import { v4 as uuid } from 'uuid'
-import { Readable } from 'stream'
-import { FileWriter } from 'wav'
 import { promisify } from 'util'
 import engine from './register.node.ts'
 
 const unlinkAsync = promisify(unlink)
 
-globalThis.Blob = (buffer as any).Blob
+function createWavBuffer(
+  pcmData: Buffer,
+  sampleRate: number,
+  channels: number,
+): Buffer {
+  const dataSize = pcmData.length
+  const header = Buffer.alloc(44)
+
+  header.write('RIFF', 0)
+  header.writeUInt32LE(36 + dataSize, 4)
+  header.write('WAVE', 8)
+  header.write('fmt ', 12)
+  header.writeUInt32LE(16, 16)
+  header.writeUInt16LE(1, 20) // PCM
+  header.writeUInt16LE(channels, 22)
+  header.writeUInt32LE(sampleRate, 24)
+  header.writeUInt32LE(sampleRate * channels * 2, 28)
+  header.writeUInt16LE(channels * 2, 32)
+  header.writeUInt16LE(16, 34)
+  header.write('data', 36)
+  header.writeUInt32LE(dataSize, 40)
+
+  return Buffer.concat([header, pcmData])
+}
 
 export default ({ useRecording }: any) => {
   if (!engine.hasCredentials()) return
@@ -54,30 +74,24 @@ export default ({ useRecording }: any) => {
       })
 
       async function onRecordingEnd() {
-        const buffer = Buffer.concat(audioChunks)
-        const audioStream = Readable.from([buffer])
         try {
-          audioStream
-            .pipe(
-              new FileWriter(wavPath, {
-                sampleRate: 16000,
-                channels: 1,
-              }),
-            )
-            .on('finish', () => {
-              client.speechToText
-                .convert({
-                  file: createReadStream(wavPath),
-                  model_id: 'scribe_v1',
-                  tag_audio_events: false,
-                })
-                .then((response) => {
-                  resolve(response.text)
-                })
-                .catch(() => {
-                  resolve()
-                })
-            })
+          const pcmData = Buffer.concat(audioChunks)
+          const wavBuffer = createWavBuffer(pcmData, 16000, 1)
+
+          mkdirSync(path.dirname(wavPath), { recursive: true })
+          writeFileSync(wavPath, wavBuffer)
+
+          const response = await client.speechToText.convert({
+            file: createReadStream(wavPath),
+            modelId: 'scribe_v1',
+            tagAudioEvents: false,
+          })
+
+          if ('text' in response) {
+            resolve(response.text)
+          } else {
+            resolve()
+          }
         } catch (err) {
           resolve()
         }

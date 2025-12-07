@@ -8,7 +8,7 @@
         setProperty('selectedVoice', purify(value)),
       ...$attrs,
     }"
-    valueKey="voice_id"
+    valueKey="voiceId"
   >
     <template #optionAfter="{ option, hover }">
       <span
