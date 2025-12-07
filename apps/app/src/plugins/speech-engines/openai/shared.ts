@@ -6,3 +6,4 @@ export const getVoiceName = (voice: string) => capitalize(voice)
 export const getVoiceId = (voice: string) => voice
 export const getVoiceCategory = (voice: any) => 'General'
 export type Credentials = { apiKey: string }
+export const preferredDefaultVoiceId = 'alloy'

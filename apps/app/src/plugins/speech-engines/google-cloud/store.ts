@@ -2,11 +2,7 @@ import { definePluginStore } from '@/store'
 import { ENGINE_ID } from './shared'
 
 const exposedProperties = {
-  selectedVoice: {
-    languageCodes: ['en-GB'],
-    ssmlGender: 'FEMALE',
-    name: 'en-GB-Wavenet-A',
-  },
+  selectedVoice: null,
   speakingRate: 1,
   pitch: 0,
   volumeGainDb: 0,

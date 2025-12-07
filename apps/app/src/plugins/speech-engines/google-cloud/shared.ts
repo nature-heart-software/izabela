@@ -6,3 +6,4 @@ export const getVoiceName = (voice: any) =>
 export const getVoiceId = (voice: any) => voice.name
 export const getVoiceCategory = (voice: any) => 'General'
 export type Credentials = { apiKey: string }
+export const preferredDefaultVoiceId = 'en-GB-Wavenet-A'

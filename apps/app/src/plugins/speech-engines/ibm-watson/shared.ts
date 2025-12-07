@@ -5,3 +5,4 @@ export const getVoiceName = (voice: any) => `${voice.name} - ${voice.gender}`
 export const getVoiceId = (voice: any) => voice.name
 export const getVoiceCategory = (voice: any) => 'General'
 export type Credentials = { apiKey: string; url: string }
+export const preferredDefaultVoiceId = 'en-US_AllisonV3Voice'

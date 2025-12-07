@@ -2,17 +2,7 @@ import { definePluginStore } from '@/store'
 import { ENGINE_ID } from './shared'
 
 const exposedProperties = {
-  selectedVoice: {
-    gender: 'female',
-    supported_features: {
-      custom_pronunciation: true,
-      voice_transformation: false,
-    },
-    name: 'en-US_AllisonV3Voice',
-    customizable: true,
-    description: 'Allison: American English female voice. Dnn technology.',
-    language: 'en-US',
-  },
+  selectedVoice: null,
   ratePercentage: 0,
   pitchPercentage: 0,
 }

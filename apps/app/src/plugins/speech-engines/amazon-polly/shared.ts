@@ -6,3 +6,4 @@ export const getVoiceName = (voice: any) =>
 export const getVoiceId = (voice: any) => voice.Id
 export const getVoiceCategory = (voice: any) => voice.LanguageName
 export type Credentials = { identityPoolId: string; region: string }
+export const preferredDefaultVoiceId = 'Amy'

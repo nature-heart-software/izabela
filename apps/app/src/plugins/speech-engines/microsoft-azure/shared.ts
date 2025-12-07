@@ -6,3 +6,5 @@ export const getVoiceName = (voice: any) =>
 export const getVoiceId = (voice: any) => voice.Name
 export const getVoiceCategory = (voice: any) => voice.LocaleName
 export type Credentials = { apiKey: string; region: string }
+export const preferredDefaultVoiceId =
+  'Microsoft Server Speech Text to Speech Voice (en-US, AshleyNeural)'

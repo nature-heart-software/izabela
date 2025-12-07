@@ -8,3 +8,4 @@ export const getVoiceName = (voice: any) => voice.name
 export const getVoiceId = (voice: any) => voice.voiceId
 export const getVoiceCategory = (voice: any) => capitalize(voice.category)
 export type Credentials = { apiKey: string }
+export const preferredDefaultVoiceId = 'MF3mGyEYCl7XYWbV9V6O'
