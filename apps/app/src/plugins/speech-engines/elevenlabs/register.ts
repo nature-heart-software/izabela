@@ -35,6 +35,7 @@ export const engine = registerEngine({
       style: getProperty('style'),
       useSpeakerBoost: getProperty('use_speaker_boost'),
       modelId: getProperty('model_id'),
+      speed: getProperty('speed'),
     }
   },
   getLanguageCode() {

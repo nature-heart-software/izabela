@@ -16,6 +16,7 @@ const exposedProperties = {
   stability: 0.5,
   similarity_boost: 0.75,
   style: 0,
+  speed: 1,
   use_speaker_boost: true,
 }
 

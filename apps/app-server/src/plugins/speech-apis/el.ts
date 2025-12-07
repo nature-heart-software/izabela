@@ -51,6 +51,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
           useSpeakerBoost,
           style,
           modelId,
+          speed,
         },
         includeTimestamps,
       },
@@ -68,6 +69,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
           similarityBoost,
           useSpeakerBoost,
           style,
+          speed,
         },
       }
       if (includeTimestamps) {
