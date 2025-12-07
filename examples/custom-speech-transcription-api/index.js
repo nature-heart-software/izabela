@@ -3,16 +3,35 @@ const pkg = require('./package.json')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const io = require('socket.io-client')
-const { Readable } = require('node:stream')
-const { ElevenLabsClient } = require('elevenlabs')
-const { Blob } = require('buffer')
-const { writeFileSync, createReadStream } = require('node:fs')
+const { ElevenLabsClient } = require('@elevenlabs/elevenlabs-js')
+const { writeFileSync } = require('node:fs')
 const StreamManager = require('./stream-manager')
 const { resolve, join } = require('node:path')
-const FileWriter = require('wav').FileWriter
+const { mkdirSync } = require('fs')
+import * as path from 'path'
 
 const streamManager = new StreamManager()
-globalThis.Blob = Blob
+
+function createWavBuffer(pcmData, sampleRate, channels) {
+  const dataSize = pcmData.length
+  const header = Buffer.alloc(44)
+
+  header.write('RIFF', 0)
+  header.writeUInt32LE(36 + dataSize, 4)
+  header.write('WAVE', 8)
+  header.write('fmt ', 12)
+  header.writeUInt32LE(16, 16)
+  header.writeUInt16LE(1, 20) // PCM
+  header.writeUInt16LE(channels, 22)
+  header.writeUInt32LE(sampleRate, 24)
+  header.writeUInt32LE(sampleRate * channels * 2, 28)
+  header.writeUInt16LE(channels * 2, 32)
+  header.writeUInt16LE(16, 34)
+  header.write('data', 36)
+  header.writeUInt32LE(dataSize, 40)
+
+  return Buffer.concat([header, pcmData])
+}
 
 const socket = io(`ws://localhost:7071`)
 const client = new ElevenLabsClient({
@@ -75,8 +94,6 @@ app.get('/play/:id', (req, res) => {
 
 socket.on('speech:recording:data:end', async (data) => {
   try {
-    const buffer = Buffer.concat(data)
-    const audioStream = Readable.from([buffer])
     const date = new Date()
       .toISOString()
       .replaceAll(':', '-')
@@ -86,13 +103,13 @@ socket.on('speech:recording:data:end', async (data) => {
     const pcmPath = resolve(`./outputs/${id}.pcm`)
     const wavPath = resolve(`./outputs/${id}.wav`)
 
-    writeFileSync(pcmPath, buffer)
-    audioStream.pipe(
-      new FileWriter(wavPath, {
-        sampleRate: 16000,
-        channels: 1,
-      }),
-    )
+    const pcmBuffer = Buffer.concat(data)
+    const wavBuffer = createWavBuffer(pcmBuffer, 16000, 1)
+
+    mkdirSync(path.dirname(pcmPath), { recursive: true })
+    mkdirSync(path.dirname(wavPath), { recursive: true })
+    writeFileSync(pcmPath, pcmBuffer)
+    writeFileSync(wavPath, wavBuffer)
 
     /* Uncomment this if you want Izabela to play the message with the active tts engine */
     // const response = await client.speechToText.convert({
@@ -111,8 +128,6 @@ socket.on('speech:recording:data:end', async (data) => {
 
 socket.on('speech:recording:data:end', async (data) => {
   try {
-    const buffer = Buffer.concat(data)
-    const audioStream = Readable.from([buffer])
     const date = new Date()
       .toISOString()
       .replaceAll(':', '-')
@@ -122,34 +137,32 @@ socket.on('speech:recording:data:end', async (data) => {
     const pcmPath = resolve(`./outputs/${id}.pcm`)
     const wavPath = resolve(`./outputs/${id}.wav`)
 
-    writeFileSync(pcmPath, buffer)
-    audioStream
-      .pipe(
-        new FileWriter(wavPath, {
-          sampleRate: 16000,
-          channels: 1,
-        }),
-      )
-      .on('finish', async () => {
-        /* Uncomment this if you want to play a specific audio */
-        // const stream = await client.speechToSpeech.convertAsStream(
-        //   'JBFqnCBsd6RMkjVDRZzb',
-        //   {
-        //     audio: createReadStream(wavPath),
-        //     output_format: 'mp3_44100_128',
-        //     model_id: 'eleven_multilingual_sts_v2',
-        //     remove_background_noise: true,
-        //   },
-        // )
-        //
-        // stream.pipe(streamManager.createStream(id))
-        //
-        // const endpoint = `${ENDPOINT_BASE_URL}:${ENDPOINT_PORT}/play/${id}`
-        //
-        // console.log('Generated endpoint:', endpoint)
-        //
-        // socket.emit('audio:play', endpoint)
-      })
+    const pcmBuffer = Buffer.concat(data)
+    const wavBuffer = createWavBuffer(pcmBuffer, 16000, 1)
+
+    mkdirSync(path.dirname(pcmPath), { recursive: true })
+    mkdirSync(path.dirname(wavPath), { recursive: true })
+    writeFileSync(pcmPath, pcmBuffer)
+    writeFileSync(wavPath, wavBuffer)
+
+    /* Uncomment this if you want to play a specific audio */
+    // const stream = await client.speechToSpeech.convertAsStream(
+    //   'JBFqnCBsd6RMkjVDRZzb',
+    //   {
+    //     audio: createReadStream(wavPath),
+    //     output_format: 'mp3_44100_128',
+    //     model_id: 'eleven_multilingual_sts_v2',
+    //     remove_background_noise: true,
+    //   },
+    // )
+    //
+    // stream.pipe(streamManager.createStream(id))
+    //
+    // const endpoint = `${ENDPOINT_BASE_URL}:${ENDPOINT_PORT}/play/${id}`
+    //
+    // console.log('Generated endpoint:', endpoint)
+    //
+    // socket.emit('audio:play', endpoint)
   } catch (e) {
     console.error(e)
   }
