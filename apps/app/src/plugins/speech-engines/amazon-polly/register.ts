@@ -39,9 +39,11 @@ export const engine = registerEngine({
     )
   },
   getPayload({ text, translatedText, voice }) {
+    const selectedVoice = voice || getSelectedVoice()
     return {
       Text: translatedText || text,
-      VoiceId: (voice || getSelectedVoice()).Id,
+      VoiceId: selectedVoice.Id,
+      Engine: selectedVoice.SupportedEngines[0],
     }
   },
   getLanguageCode(voice) {
