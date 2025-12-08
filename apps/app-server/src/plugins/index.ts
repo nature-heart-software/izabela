@@ -10,5 +10,4 @@ export { default as iw } from './speech-apis/iw'
 export { default as ma } from './speech-apis/ma'
 export { default as openai } from './speech-apis/openai'
 export { default as say } from './speech-apis/say'
-export { default as ud } from './speech-apis/ud'
 /* End of auto-generated content. */
