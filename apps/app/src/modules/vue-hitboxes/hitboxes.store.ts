@@ -26,6 +26,9 @@ export const useHitboxesStore = defineStore(
         }
         hitboxes.value = newHitboxes
       },
+      removeAll() {
+        hitboxes.value = []
+      },
     }
   },
   { electron: { shared: true } },
