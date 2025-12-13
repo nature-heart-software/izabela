@@ -29,7 +29,7 @@ export const ElectronOverlayWindow = () => {
   const user32 = koffi.load('user32.dll')
 
   const user32Api = {
-    BlockInput: user32.func('bool BlockInput(bool fBlockIt)'),
+    BlockInput: user32.func('int BlockInput(int fBlockIt)'),
   }
 
   const getWindow = () =>
@@ -43,7 +43,7 @@ export const ElectronOverlayWindow = () => {
         window.hide()
         gkl?.removeListener(toggleOverlayWindowListener)
         setTimeout(() => {
-          user32Api.BlockInput(false)
+          user32Api.BlockInput(0)
         }, 100)
         resolve(true)
       } else {
@@ -72,7 +72,7 @@ export const ElectronOverlayWindow = () => {
           .then(() => {
             gkl?.addListener(toggleOverlayWindowListener)
             setTimeout(() => {
-              user32Api.BlockInput(true)
+              user32Api.BlockInput(1)
             }, 100)
             window.showInactive()
             waitingToShow = false
