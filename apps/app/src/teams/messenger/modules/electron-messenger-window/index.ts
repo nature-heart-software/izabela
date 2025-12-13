@@ -1,5 +1,5 @@
 import ElectronWindowManager from '@/modules/electron-window-manager'
-import { mouse } from '@/modules/node-mouse'
+import { startMouse, stopMouse } from '@/modules/node-mouse'
 import throttle from 'lodash/throttle'
 import { Hitbox } from '@/modules/vue-hitboxes/types'
 import { app, BrowserWindow, screen, shell } from 'electron'
@@ -11,10 +11,10 @@ import {
 import { useSettingsStore } from '@/features/settings/store'
 import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
 import { Deferred } from '@packages/toolbox'
-import ffi from 'ffi-napi'
 import { getNativeWindowHandleInt } from '@/utils/electron-window'
 import gameOverlay from '@/electron/game-overlay.ts'
 import { focusWindow } from 'forcefocus'
+import koffi from 'koffi'
 
 export const ElectronMessengerWindow = () => {
   /* use isFocused as source of truth instead of window.isFocused() as in some instances
@@ -36,27 +36,12 @@ export const ElectronMessengerWindow = () => {
   const isReady = () => ready.promise
   let foregroundWindow: string | number | null = null
 
-  const kernel32 = new ffi.Library('Kernel32.dll', {
-    GetCurrentThreadId: ['int', []],
-  })
+  const user32 = koffi.load('user32.dll')
 
-  const user32 = new ffi.Library('user32', {
-    SetForegroundWindow: ['bool', ['long']],
-    GetForegroundWindow: ['long', []],
-    SetFocus: ['long', ['long']],
-    SetActiveWindow: ['long', ['long']],
-    AttachThreadInput: ['bool', ['int', 'long', 'bool']],
-    ShowWindow: ['bool', ['long', 'int']],
-    FindWindowA: ['long', ['string', 'string']],
-    GetTopWindow: ['long', ['long']],
-    BringWindowToTop: ['bool', ['long']],
-    SwitchToThisWindow: ['void', ['long', 'bool']],
-    GetWindowThreadProcessId: ['int', ['long', 'pointer']],
-    SetWindowPos: [
-      'bool',
-      ['long', 'long', 'int', 'int', 'int', 'int', 'uint'],
-    ],
-  })
+  const user32Api = {
+    SetForegroundWindow: user32.func('bool SetForegroundWindow(void* hWnd)'),
+    GetForegroundWindow: user32.func('void* GetForegroundWindow()'),
+  }
 
   const getWindow = () =>
     registeredWindow ||
@@ -110,10 +95,10 @@ export const ElectronMessengerWindow = () => {
               setTimeout(ensureNativeFocus, 200)
             })
           }
-          foregroundWindow = user32.GetForegroundWindow()
+          foregroundWindow = user32Api.GetForegroundWindow()
           // to prevent shenanigans with some softwares (*coughs* League of Legends *coughs*)
           // this makes sure to blur first with ffi-napi for safe measures
-          user32.SetForegroundWindow(0)
+          user32Api.SetForegroundWindow(0)
           isFocused = true
 
           /* order matters */
@@ -140,7 +125,7 @@ export const ElectronMessengerWindow = () => {
           window.setFocusable(false) // Fixes alwaysOnTop going in the background sometimes for some reasons
           if (foregroundWindow) {
             if (foregroundWindow !== windowNativeHandle && returnFocus) {
-              user32.SetForegroundWindow(foregroundWindow)
+              user32Api.SetForegroundWindow(foregroundWindow)
             }
             foregroundWindow = null
           }
@@ -204,11 +189,18 @@ export const ElectronMessengerWindow = () => {
             const x1 = hitbox.x / scaleFactor
             const y1 = hitbox.y / scaleFactor
             const x2 = (hitbox.x + hitbox.w) / scaleFactor
-            const y2 = (hitbox.x + hitbox.w) / scaleFactor
+            const y2 = (hitbox.y + hitbox.h) / scaleFactor
+
             const isWithinXHitbox =
               mouseX >= windowX + x1 && mouseX <= windowX + x2
             const isWithinYHitbox =
               mouseY >= windowY + y1 && mouseY <= windowY + y2
+            // console.log(isWithinXHitbox && isWithinYHitbox, mouseX, mouseY, {
+            //   x1,
+            //   y1,
+            //   x2,
+            //   y2,
+            // })
             return isWithinXHitbox && isWithinYHitbox
           })
         if (isWithinAnyHitboxes) {
@@ -274,16 +266,28 @@ export const ElectronMessengerWindow = () => {
 
   const addEventListeners = () => {
     const window = getWindow()
-    mouse.on('move', throttle(onMouseMove, 150))
+    let mouseInstanceId: string | null = null
+
+    function initMouseInstance() {
+      if (mouseInstanceId) return
+      mouseInstanceId = startMouse('move', onMouseMove)
+    }
+
+    function clearMouseInstance() {
+      if (mouseInstanceId) stopMouse(mouseInstanceId)
+      mouseInstanceId = null
+    }
 
     if (window) {
       window.on('show', () => {
         if (!messengerWindowStore) return
         messengerWindowStore.$patch({ isShown: true })
+        initMouseInstance()
       })
       window.on('hide', () => {
         if (!messengerWindowStore) return
         messengerWindowStore.$patch({ isShown: false })
+        clearMouseInstance()
       })
       window.on('focus', () => {
         if (!messengerWindowStore) return

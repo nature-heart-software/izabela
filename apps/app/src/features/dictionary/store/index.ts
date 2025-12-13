@@ -69,21 +69,45 @@ export const useDictionaryStore = defineStore(
       if (!enableDictionary.value) return text
       const words = text.split(' ')
       const flags = caseSensitive.value ? 'g' : 'gi'
-      filteredDefinitions.value.forEach(([word, definition]) => {
+      const definitions = filteredDefinitions.value
+
+      const deduplicatedDefinitions = new Map<string, string>()
+      const definitionCounts = new Map<string, number>()
+
+      definitions.forEach(([word, definition]) => {
+        const key = caseSensitive.value ? word : word.toLowerCase()
+
+        const count = (definitionCounts.get(key) || 0) + 1
+        definitionCounts.set(key, count)
+
+        if (Math.random() < 1 / count) {
+          deduplicatedDefinitions.set(key, definition)
+        }
+      })
+
+      deduplicatedDefinitions.forEach((definition, word) => {
         const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
         const exactMatchRegexExpression = `(?<![\\w:])${escapedWord}(?![\\w:])`
         const boundaryMatchRegexExpression = `^${escapedWord}|${escapedWord}$`
         const exactMatchRegex = new RegExp(exactMatchRegexExpression, flags)
-        const boundaryMatchRegex = new RegExp(boundaryMatchRegexExpression, flags)
+        const boundaryMatchRegex = new RegExp(
+          boundaryMatchRegexExpression,
+          flags,
+        )
         words.forEach((currentWord, i) => {
           const evaluations = [
             exactMatchRegex.test(currentWord),
             boundaryMatchRegex.test(currentWord),
           ]
-          if (word && (evaluations[0] || (!matchExactWord.value && evaluations[1]))) {
+          if (
+            word &&
+            (evaluations[0] || (!matchExactWord.value && evaluations[1]))
+          ) {
             words[i] = currentWord.replace(
               new RegExp(
-                evaluations[0] ? exactMatchRegexExpression : boundaryMatchRegexExpression,
+                evaluations[0]
+                  ? exactMatchRegexExpression
+                  : boundaryMatchRegexExpression,
                 flags,
               ),
               definition,
@@ -103,7 +127,9 @@ export const useDictionaryStore = defineStore(
       updateDefinition: (index: number, definition: [string, string]) => {
         definitions.value.splice(index, 1, definition)
       },
-      addDefinition: (definition: (typeof definitions)['value'][number] = ['', '']) => {
+      addDefinition: (
+        definition: (typeof definitions)['value'][number] = ['', ''],
+      ) => {
         definitions.value.unshift(definition)
       },
       removeDefinition: (index: number) => {

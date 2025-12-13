@@ -1,0 +1,38 @@
+{
+  "name": "electron-postman",
+  "version": "0.1.2",
+  "description": "Easy Electron IPC with focus on window-to-window communication and disabled node integration in renderers",
+  "keywords": [
+    "electron",
+    "electron-ipc",
+    "ipc",
+    "electron-postman",
+    "window-to-window",
+    "window-communication",
+    "node-integration",
+    "electron-module",
+    "nodejs",
+    "electron-security"
+  ],
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ylieder/electron-postman"
+  },
+  "homepage": "https://github.com/ylieder/electron-postman",
+  "bugs": {
+    "url": "https://github.com/ylieder/electron-postman/issues"
+  },
+  "author": "Yannic Lieder",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^10.1.2",
+    "eslint": "^7.10.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.21.2"
+  }
+}

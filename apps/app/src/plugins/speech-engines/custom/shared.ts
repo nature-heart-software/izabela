@@ -4,3 +4,4 @@ export const LIST_VOICES_QUERY_KEY = 'customtts-list-voices' as const
 export const getVoiceName = (voice: any) => voice?.name || 'None'
 export const getVoiceId = (voice: any) => voice.name
 export const getVoiceCategory = (voice: any) => voice.category || 'General'
+export const preferredDefaultVoiceId = null

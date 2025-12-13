@@ -38,7 +38,6 @@
 import { computed, watch } from 'vue'
 import { useQueryClient } from 'vue-query'
 import { NvButton, NvSelect } from '@packages/ui'
-import { purify } from '@packages/toolbox'
 import orderBy from 'lodash/orderBy'
 import xor from 'lodash/xor'
 import { useSpeechStore } from '@/features/speech/store'
@@ -53,21 +52,16 @@ import {
 import { getProperty, setProperty } from './store'
 import { isGameOverlay } from '@/consts.ts'
 import { useSettingsStore } from '@/features/settings/store'
+import { engine } from './register.ts'
+import { purify } from '@packages/toolbox'
 
 const queryClient = useQueryClient()
 
 const computedParams = computed(() => ({
-  credentials: {
-    apiKey: getProperty('apiKey', true),
-    region: getProperty('region'),
-  },
+  credentials: engine.getCredentials(),
 }))
 const speechStore = useSpeechStore()
-const canFetch = computed(
-  () =>
-    speechStore.hasUniversalApiCredentials ||
-    Object.values(computedParams.value.credentials).every(Boolean),
-)
+const canFetch = computed(() => engine.hasCredentials?.())
 const { data, isFetching } = useListVoicesQuery(computedParams, {
   enabled: canFetch,
 })

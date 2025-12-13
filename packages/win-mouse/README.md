@@ -6,7 +6,7 @@ Mouse tracking for Windows. Receive the screen position of various mouse events.
 
 Versions of this library prior to version 2.0.0 also run with Node.js version 9 and below. Version 2.0.0 and above are context-aware.
 
-	npm install win-mouse
+    npm install win-mouse
 
 # Usage
 
@@ -15,8 +15,8 @@ The module returns an event emitter instance.
 ```javascript
 var mouse = require('win-mouse')()
 
-mouse.on('move', function(x, y) {
-	console.log(x, y)
+mouse.on('move', function (x, y) {
+  console.log(x, y)
 })
 ```
 

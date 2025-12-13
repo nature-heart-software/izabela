@@ -9,12 +9,15 @@ import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import throttle from 'lodash/throttle'
 import {
   useDevicePixelRatio,
+  useEventListener,
   useIntersectionObserver,
   useMutationObserver,
   useResizeObserver,
-  useEventListener,
 } from '@vueuse/core'
-import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
+import {
+  hitboxStoreSessionId,
+  useHitboxesStore,
+} from '@/modules/vue-hitboxes/hitboxes.store'
 import { isGameOverlay } from '@/consts.ts'
 
 const hitboxesStore = useHitboxesStore()
@@ -31,9 +34,12 @@ const hitboxes = ref({
 })
 const onHitboxUpdate = () => {
   if (isGameOverlay) return
-  // console.log('hitbox update', hitboxes.value, componentRef.value)
+
   if (componentRef.value) {
-    hitboxesStore.addHitbox({ ...hitboxes.value })
+    hitboxesStore.addHitbox({
+      sessionId: hitboxStoreSessionId,
+      ...hitboxes.value,
+    })
   } else {
     hitboxesStore.removeHitbox(hitboxes.value.id)
   }

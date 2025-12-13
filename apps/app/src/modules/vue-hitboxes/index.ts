@@ -1,7 +1,10 @@
 import ready from '@ryanmorr/ready'
 import { v4 as uuid } from 'uuid'
 import throttle from 'lodash/throttle'
-import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
+import {
+  hitboxStoreSessionId,
+  useHitboxesStore,
+} from '@/modules/vue-hitboxes/hitboxes.store'
 import { useDevicePixelRatio } from '@vueuse/core'
 import { isGameOverlay } from '@/consts.ts'
 
@@ -34,6 +37,7 @@ export const watchHitbox = (selector: string) => {
       if (element) {
         const { x, y, width: w, height: h } = element.getBoundingClientRect()
         hitboxesStore.addHitbox({
+          sessionId: hitboxStoreSessionId,
           id,
           x: x * pixelRatio.value,
           y: y * pixelRatio.value,

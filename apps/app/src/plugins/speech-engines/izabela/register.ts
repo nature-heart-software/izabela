@@ -8,7 +8,7 @@ import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, store } from './store'
 
 const getSelectedVoice = () => getProperty('selectedVoice')
-registerEngine({
+export const engine = registerEngine({
   id: ENGINE_ID,
   name: ENGINE_NAME,
   category: 'cloud',

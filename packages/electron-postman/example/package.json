@@ -1,0 +1,16 @@
+{
+  "name": "electron-postman-example",
+  "version": "1.0.0",
+  "description": "Example to demonstrate Electron Postman",
+  "main": "main.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^10.1.3"
+  },
+  "dependencies": {
+    "electron-postman": "^0.1.0"
+  }
+}

@@ -3,15 +3,19 @@ import { DEFAULT_LANGUAGE_CODE } from '@/consts'
 import { fetchApi } from '@/services'
 import NvVoiceSelect from './NvVoiceSelect.vue'
 import NvSettings from './NvSettings.vue'
-import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
+import { Credentials, ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, store } from './store'
+import { SpeechEngine } from '@/modules/speech-engine-manager/types.ts'
 
-const getCredentials = () => ({
-  apiKey: getProperty('apiKey', true),
+const getCredentials: SpeechEngine<Credentials>['getCredentials'] = () => ({
+  apiKey:
+    getProperty('apiKey', true) ||
+    import.meta.env.VITE_SPEECH_ENGINE_ELEVENLABS_API_KEY,
 })
 
 const getSelectedVoice = () => getProperty('selectedVoice')
-registerEngine({
+
+export const engine = registerEngine({
   id: ENGINE_ID,
   name: ENGINE_NAME,
   category: 'cloud',
@@ -27,10 +31,11 @@ registerEngine({
       text: translatedText || text,
       voice,
       stability: getProperty('stability'),
-      similarity_boost: getProperty('similarity_boost'),
+      similarityBoost: getProperty('similarity_boost'),
       style: getProperty('style'),
-      use_speaker_boost: getProperty('use_speaker_boost'),
-      model_id: getProperty('model_id'),
+      useSpeakerBoost: getProperty('use_speaker_boost'),
+      modelId: getProperty('model_id'),
+      speed: getProperty('speed'),
     }
   },
   getLanguageCode() {

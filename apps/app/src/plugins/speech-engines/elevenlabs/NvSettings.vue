@@ -1,6 +1,6 @@
 <template>
   <NvAccessBlocker
-    :allowed="!!getStoreProperty('apiKey', true)"
+    :allowed="engine.hasCredentials()"
     reason="Credentials required"
   >
     <NvStack spacing="5">
@@ -93,6 +93,30 @@
         </NvGroup>
       </NvFormItem>
       <NvDivider direction="horizontal" />
+      <NvFormItem label="Speed">
+        <NvGroup>
+          <NvRangeInput
+            :max="1.2"
+            :min="0.7"
+            :step="0.01"
+            class="!grow"
+            v-bind="{
+              modelValue: getProperty('speed'),
+              'onUpdate:modelValue': (value) => setProperty('speed', value),
+            }"
+          />
+          <NvNumberInput
+            :max="1.2"
+            :min="0.7"
+            :step="0.01"
+            v-bind="{
+              modelValue: getProperty('speed'),
+              'onUpdate:modelValue': (value) => setProperty('speed', value),
+            }"
+          />
+        </NvGroup>
+      </NvFormItem>
+      <NvDivider direction="horizontal" />
       <NvGroup justify="apart" no-wrap spacing="5">
         <NvStack>
           <NvText type="label">Speaker Boost</NvText>
@@ -177,6 +201,7 @@ import {
 import NvVoiceSelect from './NvVoiceSelect'
 import { store } from './store'
 import NvModelSelect from './NvModelSelect.vue'
+import { engine } from './register.ts'
 
 const props = defineProps({
   form: Object,

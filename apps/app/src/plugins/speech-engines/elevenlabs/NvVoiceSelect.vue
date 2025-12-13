@@ -8,7 +8,7 @@
         setProperty('selectedVoice', purify(value)),
       ...$attrs,
     }"
-    valueKey="voice_id"
+    valueKey="voiceId"
   >
     <template #optionAfter="{ option, hover }">
       <span
@@ -50,20 +50,22 @@ import {
 } from './shared'
 import { getProperty, setProperty } from './store'
 import { isGameOverlay } from '@/consts.ts'
+import { engine } from './register.ts'
 
 const queryClient = useQueryClient()
+
 const computedParams = computed(() => ({
-  credentials: {
-    apiKey: getProperty('apiKey', true),
-  },
+  credentials: engine.getCredentials(),
 }))
-const canFetch = computed(() =>
-  Object.values(computedParams.value.credentials).every(Boolean),
-)
+
+const canFetch = computed(() => engine.hasCredentials?.())
+
 const { data, isFetching } = useListVoicesQuery(computedParams, {
   enabled: canFetch,
 })
+
 const voices = computed(() => data.value || [])
+
 const getOptionFromVoice = (voice: any) => ({
   id: getVoiceId(voice),
   label: getVoiceName(voice),

@@ -2,14 +2,7 @@ import { definePluginStore } from '@/store'
 import { ENGINE_ID } from './shared'
 
 const exposedProperties = {
-  selectedVoice: {
-    Gender: 'Female',
-    Id: 'Amy',
-    LanguageCode: 'en-GB',
-    LanguageName: 'British English',
-    Name: 'Amy',
-    SupportedEngines: ['neural', 'standard'],
-  },
+  selectedVoice: null,
 }
 
 export const store = definePluginStore(

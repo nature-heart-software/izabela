@@ -4,4 +4,6 @@ export const ENGINE_NAME = 'OpenAI' as const
 export const LIST_VOICES_QUERY_KEY = 'openai-tts-list-voices' as const
 export const getVoiceName = (voice: string) => capitalize(voice)
 export const getVoiceId = (voice: string) => voice
-export const getVoiceCategory = (voice: string) => 'General'
+export const getVoiceCategory = (voice: any) => 'General'
+export type Credentials = { apiKey: string }
+export const preferredDefaultVoiceId = 'alloy'

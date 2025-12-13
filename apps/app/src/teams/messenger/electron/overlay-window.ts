@@ -52,9 +52,9 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
 
   const filePath = `./src/teams/messenger/index.html?game-overlay`
   if (import.meta.env.VITE_DEV_SERVER_URL) {
-    await window.loadURL(
-      path.join(import.meta.env.VITE_DEV_SERVER_URL as string, filePath),
-    )
+    const url = new URL(filePath, import.meta.env.VITE_DEV_SERVER_URL as string)
+      .href
+    await window.loadURL(url)
   } else {
     createProtocol('app')
     await window.loadURL(`app://${filePath}`)

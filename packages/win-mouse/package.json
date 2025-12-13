@@ -4,11 +4,10 @@
   "version": "2.0.1",
   "bugs": "https://github.com/kapetan/win-mouse/issues",
   "dependencies": {
-    "bindings": "^1.5.0",
-    "nan": "^2.14.1"
+    "koffi": "^2.9.0"
   },
   "devDependencies": {
-    "standard": "^14.3.4"
+    "standard": "^17.1.2"
   },
   "homepage": "https://github.com/kapetan/win-mouse",
   "keywords": [

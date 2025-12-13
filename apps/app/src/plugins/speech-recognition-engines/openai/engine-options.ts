@@ -3,7 +3,9 @@ import { store } from './store.ts'
 import { SpeechRecognitionEngine } from '@/modules/speech-recognition-engine-manager/types.ts'
 
 const getCredentials = () => ({
-  apiKey: store.getProperty('apiKey', true),
+  apiKey:
+    store.getProperty('apiKey', true) ||
+    import.meta.env.VITE_SPEECH_RECOGNITION_ENGINE_OPENAI_API_KEY,
 })
 export default {
   id: ENGINE_ID,

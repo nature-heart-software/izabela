@@ -2,7 +2,7 @@ import { definePluginStore } from '@/store'
 import { ENGINE_ID } from './shared'
 
 const exposedProperties = {
-  selectedVoice: 'alloy',
+  selectedVoice: null,
   instructions: '',
 }
 
