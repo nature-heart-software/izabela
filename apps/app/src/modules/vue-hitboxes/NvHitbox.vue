@@ -14,7 +14,10 @@ import {
   useMutationObserver,
   useResizeObserver,
 } from '@vueuse/core'
-import { hitboxStoreSessionId, useHitboxesStore, } from '@/modules/vue-hitboxes/hitboxes.store'
+import {
+  hitboxStoreSessionId,
+  useHitboxesStore,
+} from '@/modules/vue-hitboxes/hitboxes.store'
 import { isGameOverlay } from '@/consts.ts'
 
 const hitboxesStore = useHitboxesStore()
