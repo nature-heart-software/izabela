@@ -4,7 +4,10 @@ import throttle from 'lodash/throttle'
 import { Hitbox } from '@/modules/vue-hitboxes/types'
 import { app, BrowserWindow, screen, shell } from 'electron'
 
-import { useMessengerStore, useMessengerWindowStore, } from '@/teams/messenger/store'
+import {
+  useMessengerStore,
+  useMessengerWindowStore,
+} from '@/teams/messenger/store'
 import { useSettingsStore } from '@/features/settings/store'
 import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
 import { Deferred } from '@packages/toolbox'
@@ -300,9 +303,6 @@ export const ElectronMessengerWindow = () => {
       })
       window.on('minimize', () => {
         hide()
-      })
-      window.webContents.on('did-start-loading', () => {
-        hitboxesStore?.removeAll()
       })
       window.webContents.setWindowOpenHandler(({ url }) => {
         shell.openExternal(url)
