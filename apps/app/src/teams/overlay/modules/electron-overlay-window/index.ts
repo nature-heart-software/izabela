@@ -3,9 +3,16 @@ import throttle from 'lodash/throttle'
 import { BrowserWindow, screen } from 'electron'
 import { useSettingsStore } from '@/features/settings/store'
 import { Deferred } from '@packages/toolbox'
-import { gkl, keybindingAllReleased, keybindingTriggered, } from '@/modules/electron-keybinding/utils'
+import {
+  gkl,
+  keybindingAllReleased,
+  keybindingTriggered,
+} from '@/modules/electron-keybinding/utils'
 import { IGlobalKeyEvent } from 'node-global-key-listener'
-import { emitIPCOverlayInputCharacter, emitIPCOverlayInputCommand, } from '@/electron/events/main'
+import {
+  emitIPCOverlayInputCharacter,
+  emitIPCOverlayInputCommand,
+} from '@/electron/events/main'
 import keymap from '@packages/native-keymap'
 import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
 import { useOverlayWindowStore } from '@/teams/overlay/store'
@@ -150,10 +157,10 @@ export const ElectronOverlayWindow = () => {
               hasRightAlt && hasShift
                 ? nativeKey.withShiftAltGr
                 : hasRightAlt
-                ? nativeKey.withAltGr
-                : hasShift
-                ? nativeKey.withShift
-                : nativeKey.value
+                  ? nativeKey.withAltGr
+                  : hasShift
+                    ? nativeKey.withShift
+                    : nativeKey.value
             if (key) {
               emitIPCOverlayInputCharacter(key)
             }
