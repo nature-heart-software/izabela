@@ -304,9 +304,6 @@ export const ElectronMessengerWindow = () => {
       window.on('minimize', () => {
         hide()
       })
-      window.webContents.on('did-start-loading', () => {
-        hitboxesStore?.removeAll()
-      })
       window.webContents.setWindowOpenHandler(({ url }) => {
         shell.openExternal(url)
         return { action: 'deny' }
