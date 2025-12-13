@@ -3,16 +3,9 @@ import throttle from 'lodash/throttle'
 import { BrowserWindow, screen } from 'electron'
 import { useSettingsStore } from '@/features/settings/store'
 import { Deferred } from '@packages/toolbox'
-import {
-  gkl,
-  keybindingAllReleased,
-  keybindingTriggered,
-} from '@/modules/electron-keybinding/utils'
+import { gkl, keybindingAllReleased, keybindingTriggered, } from '@/modules/electron-keybinding/utils'
 import { IGlobalKeyEvent } from 'node-global-key-listener'
-import {
-  emitIPCOverlayInputCharacter,
-  emitIPCOverlayInputCommand,
-} from '@/electron/events/main'
+import { emitIPCOverlayInputCharacter, emitIPCOverlayInputCommand, } from '@/electron/events/main'
 import keymap from '@packages/native-keymap'
 import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
 import { useOverlayWindowStore } from '@/teams/overlay/store'
@@ -29,7 +22,7 @@ export const ElectronOverlayWindow = () => {
   const user32 = koffi.load('user32.dll')
 
   const user32Api = {
-    BlockInput: user32.func('bool BlockInput(bool fBlockIt)'),
+    BlockInput: user32.func('int BlockInput(int fBlockIt)'),
   }
 
   const getWindow = () =>
@@ -43,7 +36,7 @@ export const ElectronOverlayWindow = () => {
         window.hide()
         gkl?.removeListener(toggleOverlayWindowListener)
         setTimeout(() => {
-          user32Api.BlockInput(false)
+          user32Api.BlockInput(0)
         }, 100)
         resolve(true)
       } else {
@@ -72,7 +65,7 @@ export const ElectronOverlayWindow = () => {
           .then(() => {
             gkl?.addListener(toggleOverlayWindowListener)
             setTimeout(() => {
-              user32Api.BlockInput(true)
+              user32Api.BlockInput(1)
             }, 100)
             window.showInactive()
             waitingToShow = false
@@ -157,10 +150,10 @@ export const ElectronOverlayWindow = () => {
               hasRightAlt && hasShift
                 ? nativeKey.withShiftAltGr
                 : hasRightAlt
-                  ? nativeKey.withAltGr
-                  : hasShift
-                    ? nativeKey.withShift
-                    : nativeKey.value
+                ? nativeKey.withAltGr
+                : hasShift
+                ? nativeKey.withShift
+                : nativeKey.value
             if (key) {
               emitIPCOverlayInputCharacter(key)
             }
