@@ -153,7 +153,7 @@ const SM_CYSCREEN = 1
 const init = function (options) {
   const opts = options || {}
   const instDebug = typeof opts.debug === 'boolean' ? opts.debug : false
-  const instPumpMs = Math.max(1, Number(opts.pumpMs ?? 4))
+  const instPumpMs = Math.max(1, Number(opts.pumpMs ?? 6))
   const instMaxMessagesPerTick = Math.max(
     1,
     Number(opts.maxMessagesPerTick ?? 60),
@@ -367,7 +367,11 @@ const init = function (options) {
         lastAbsoluteX = cursorPosBuf.readInt32LE(0)
         lastAbsoluteY = cursorPosBuf.readInt32LE(4)
         if (instDebug)
-          console.log('[win-mouse] initial cursor pos:', lastAbsoluteX, lastAbsoluteY)
+          console.log(
+            '[win-mouse] initial cursor pos:',
+            lastAbsoluteX,
+            lastAbsoluteY,
+          )
       }
     } catch (e) {
       // ignore
