@@ -1,24 +1,49 @@
 var events = require('events')
 var koffi = require('koffi')
 
-const WH_MOUSE_LL = 14
-const WM_LBUTTONDOWN = 0x0201
-const WM_LBUTTONUP = 0x0202
-const WM_RBUTTONDOWN = 0x0204
-const WM_RBUTTONUP = 0x0205
-const WM_MOUSEMOVE = 0x0200
+const WM_INPUT = 0x00ff
+const WM_DESTROY = 0x0002
+const RID_INPUT = 0x10000003
+const RIDEV_INPUTSINK = 0x00000100
+const RIM_TYPEMOUSE = 0
+const MOUSE_MOVE_ABSOLUTE = 0x0001
+const RI_MOUSE_LEFT_BUTTON_DOWN = 0x0001
+const RI_MOUSE_LEFT_BUTTON_UP = 0x0002
+const RI_MOUSE_RIGHT_BUTTON_DOWN = 0x0004
+const RI_MOUSE_RIGHT_BUTTON_UP = 0x0008
 
 const POINT = koffi.struct('POINT', {
   x: 'long',
   y: 'long',
 })
 
-const MSLLHOOKSTRUCT = koffi.struct('MSLLHOOKSTRUCT', {
-  pt: POINT,
-  mouseData: 'uint32',
-  flags: 'uint32',
-  time: 'uint32',
-  dwExtraInfo: 'uintptr_t',
+const RAWINPUTDEVICE = koffi.struct('RAWINPUTDEVICE', {
+  usUsagePage: 'uint16',
+  usUsage: 'uint16',
+  dwFlags: 'uint32',
+  hwndTarget: 'void*',
+})
+
+const RAWINPUTHEADER = koffi.struct('RAWINPUTHEADER', {
+  dwType: 'uint32',
+  dwSize: 'uint32',
+  hDevice: 'void*',
+  wParam: 'uintptr_t',
+})
+
+const RAWMOUSE = koffi.struct('RAWMOUSE', {
+  usFlags: 'uint16',
+  usButtonFlags: 'uint16',
+  usButtonData: 'uint16',
+  ulRawButtons: 'uint32',
+  lLastX: 'int32',
+  lLastY: 'int32',
+  ulExtraInformation: 'uint32',
+})
+
+const RAWINPUT = koffi.struct('RAWINPUT', {
+  header: RAWINPUTHEADER,
+  mouse: RAWMOUSE,
 })
 
 const user32 = koffi.load('user32.dll')
@@ -38,18 +63,44 @@ const MSG = koffi.struct('MSG', {
   lPrivate: 'uint32',
 })
 
-const HookProc = koffi.proto(
-  'intptr_t __stdcall HookProc(int nCode, uintptr_t wParam, void* lParam)',
+const WNDPROC = koffi.proto(
+  'intptr_t __stdcall WNDPROC(void* hwnd, uint32 uMsg, uintptr_t wParam, intptr_t lParam)',
 )
-const HookProcPtr = koffi.pointer(HookProc)
-const SetWindowsHookExW = user32.func(
-  'void* __stdcall SetWindowsHookExW(int idHook, HookProc *lpfn, void *hmod, uint32 dwThreadId)',
+const WNDPROCPtr = koffi.pointer(WNDPROC)
+
+const WNDCLASSEXW = koffi.struct('WNDCLASSEXW', {
+  cbSize: 'uint32',
+  style: 'uint32',
+  lpfnWndProc: WNDPROCPtr,
+  cbClsExtra: 'int32',
+  cbWndExtra: 'int32',
+  hInstance: 'void*',
+  hIcon: 'void*',
+  hCursor: 'void*',
+  hbrBackground: 'void*',
+  lpszMenuName: 'void*',
+  lpszClassName: 'const wchar_t*',
+  hIconSm: 'void*',
+})
+
+const RegisterRawInputDevices = user32.func(
+  'bool __stdcall RegisterRawInputDevices(RAWINPUTDEVICE *pRawInputDevices, uint32 uiNumDevices, uint32 cbSize)',
 )
-const CallNextHookEx = user32.func(
-  'intptr_t __stdcall CallNextHookEx(void *hhk, int nCode, uintptr_t wParam, intptr_t lParam)',
+const GetRawInputData = user32.func(
+  'uint32 __stdcall GetRawInputData(void *hRawInput, uint32 uiCommand, void *pData, uint32 *pcbSize, uint32 cbSizeHeader)',
 )
-const UnhookWindowsHookEx = user32.func(
-  'bool __stdcall UnhookWindowsHookEx(void *hhk)',
+const RegisterClassExW = user32.func(
+  'uint16 __stdcall RegisterClassExW(WNDCLASSEXW *lpWndClass)',
+)
+const CreateWindowExW = user32.func(
+  'void* __stdcall CreateWindowExW(uint32 dwExStyle, const wchar_t *lpClassName, const wchar_t *lpWindowName, uint32 dwStyle, int32 X, int32 Y, int32 nWidth, int32 nHeight, void *hWndParent, void *hMenu, void *hInstance, void *lpParam)',
+)
+const DefWindowProcW = user32.func(
+  'intptr_t __stdcall DefWindowProcW(void *hWnd, uint32 Msg, uintptr_t wParam, intptr_t lParam)',
+)
+const DestroyWindow = user32.func('bool __stdcall DestroyWindow(void *hWnd)')
+const UnregisterClassW = user32.func(
+  'bool __stdcall UnregisterClassW(const wchar_t *lpClassName, void *hInstance)',
 )
 const PeekMessageW = user32.func(
   'bool __stdcall PeekMessageW(MSG *lpMsg, void *hWnd, uint32 wMsgFilterMin, uint32 wMsgFilterMax, uint32 wRemoveMsg)',
@@ -63,6 +114,11 @@ const DispatchMessageW = user32.func(
 const GetModuleHandleW = kernel32.func(
   'void* __stdcall GetModuleHandleW(const wchar_t *lpModuleName)',
 )
+const GetSystemMetrics = user32.func(
+  'int32 __stdcall GetSystemMetrics(int32 nIndex)',
+)
+const GetLastError = kernel32.func('uint32 __stdcall GetLastError()')
+const GetCursorPos = user32.func('bool __stdcall GetCursorPos(POINT *lpPoint)')
 
 // Helper: robust allocator across Koffi versions (alloc may require 2 args)
 function allocType(type) {
@@ -89,6 +145,11 @@ function allocType(type) {
 
 // Debug and tuning are configurable per-instance via init options; env vars remain as defaults
 
+const SM_CXVIRTUALSCREEN = 78
+const SM_CYVIRTUALSCREEN = 79
+const SM_CXSCREEN = 0
+const SM_CYSCREEN = 1
+
 const init = function (options) {
   const opts = options || {}
   const instDebug = typeof opts.debug === 'boolean' ? opts.debug : false
@@ -99,72 +160,232 @@ const init = function (options) {
   )
 
   var that = new events.EventEmitter()
-  var hookHandle = null
+  var hwnd = null
   var left = false
   var right = false
-  var hookCallback = null
+  var windowProc = null
   var pumpTimer = null
   var lastDebugLog = 0
+  var lastAbsoluteX = 0
+  var lastAbsoluteY = 0
+  const className = 'WinMouseRawInputClass_' + Date.now()
 
   that.once('newListener', function () {
-    hookCallback = koffi.register(function (nCode, wParam, lParam) {
+    const hInstance = GetModuleHandleW(null)
+
+    // Create window procedure callback
+    windowProc = koffi.register(function (hwnd, msg, wParam, lParam) {
       try {
-        if (nCode >= 0) {
-          const hookStruct = koffi.decode(lParam, MSLLHOOKSTRUCT)
-          const x = hookStruct.pt.x
-          const y = hookStruct.pt.y
-          var type = null
-
-          const wp = Number(wParam)
-          if (wp === WM_LBUTTONDOWN) {
-            type = 'left-down'
-            left = true
-          } else if (wp === WM_LBUTTONUP) {
-            type = 'left-up'
-            left = false
-          } else if (wp === WM_RBUTTONDOWN) {
-            type = 'right-down'
-            right = true
-          } else if (wp === WM_RBUTTONUP) {
-            type = 'right-up'
-            right = false
-          } else if (wp === WM_MOUSEMOVE) {
-            if (left) {
-              type = 'left-drag'
-            } else if (right) {
-              type = 'right-drag'
-            } else {
-              type = 'move'
-            }
-          }
-
-          if (type) {
-            if (instDebug) {
-              const now = Date.now()
-              if (now - lastDebugLog > 250) {
-                lastDebugLog = now
-                // Avoid spamming; log occasional type for diagnostics
-                console.log('[win-mouse] event', type, x, y)
-              }
-            }
-            that.emit(type, x, y)
+        if (instDebug) {
+          const now = Date.now()
+          if (now - lastDebugLog > 1000) {
+            lastDebugLog = now
+            console.log('[win-mouse] received msg:', '0x' + msg.toString(16))
           }
         }
+        if (msg === WM_INPUT) {
+          if (instDebug) console.log('[win-mouse] WM_INPUT received')
+          // Get size needed
+          const sizeBuf = Buffer.alloc(4)
+          sizeBuf.writeUInt32LE(0)
+          GetRawInputData(
+            lParam,
+            RID_INPUT,
+            null,
+            sizeBuf,
+            koffi.sizeof(RAWINPUTHEADER),
+          )
+
+          const rawSize = sizeBuf.readUInt32LE(0)
+          if (instDebug) console.log('[win-mouse] rawSize:', rawSize)
+          if (rawSize > 0) {
+            const raw = Buffer.alloc(rawSize)
+            const sizeForRead = Buffer.alloc(4)
+            sizeForRead.writeUInt32LE(rawSize)
+            const actualSize = GetRawInputData(
+              lParam,
+              RID_INPUT,
+              raw,
+              sizeForRead,
+              koffi.sizeof(RAWINPUTHEADER),
+            )
+
+            if (instDebug) console.log('[win-mouse] actualSize:', actualSize)
+            if (actualSize > 0) {
+              const rawInput = koffi.decode(raw, RAWINPUT)
+              if (instDebug)
+                console.log(
+                  '[win-mouse] rawInput type:',
+                  rawInput.header.dwType,
+                  'mouse:',
+                  rawInput.mouse,
+                )
+              if (rawInput.header.dwType === RIM_TYPEMOUSE) {
+                const mouse = rawInput.mouse
+                var x, y
+
+                // Get actual cursor position from Windows
+                try {
+                  const cursorPosBuf = Buffer.alloc(8)
+                  if (GetCursorPos(cursorPosBuf)) {
+                    x = cursorPosBuf.readInt32LE(0)
+                    y = cursorPosBuf.readInt32LE(4)
+                  } else {
+                    throw new Error('GetCursorPos failed')
+                  }
+                } catch (e) {
+                  // Fallback to tracking relative movement
+                  if (mouse.usFlags & MOUSE_MOVE_ABSOLUTE) {
+                    const screenWidth =
+                      GetSystemMetrics(SM_CXVIRTUALSCREEN) ||
+                      GetSystemMetrics(SM_CXSCREEN)
+                    const screenHeight =
+                      GetSystemMetrics(SM_CYVIRTUALSCREEN) ||
+                      GetSystemMetrics(SM_CYSCREEN)
+
+                    const scaleX = screenWidth / 65535.0
+                    const scaleY = screenHeight / 65535.0
+
+                    x = Math.round(mouse.lLastX * scaleX)
+                    y = Math.round(mouse.lLastY * scaleY)
+                  } else {
+                    lastAbsoluteX += mouse.lLastX
+                    lastAbsoluteY += mouse.lLastY
+                    x = lastAbsoluteX
+                    y = lastAbsoluteY
+                  }
+                }
+
+                // Process button events
+                var type = null
+                const buttonFlags = mouse.usButtonFlags
+
+                if (buttonFlags & RI_MOUSE_LEFT_BUTTON_DOWN) {
+                  type = 'left-down'
+                  left = true
+                } else if (buttonFlags & RI_MOUSE_LEFT_BUTTON_UP) {
+                  type = 'left-up'
+                  left = false
+                } else if (buttonFlags & RI_MOUSE_RIGHT_BUTTON_DOWN) {
+                  type = 'right-down'
+                  right = true
+                } else if (buttonFlags & RI_MOUSE_RIGHT_BUTTON_UP) {
+                  type = 'right-up'
+                  right = false
+                } else if (mouse.lLastX !== 0 || mouse.lLastY !== 0) {
+                  if (left) {
+                    type = 'left-drag'
+                  } else if (right) {
+                    type = 'right-drag'
+                  } else {
+                    type = 'move'
+                  }
+                }
+
+                if (type) {
+                  if (instDebug) {
+                    const now = Date.now()
+                    if (now - lastDebugLog > 250) {
+                      lastDebugLog = now
+                      console.log('[win-mouse] event', type, x, y)
+                    }
+                  }
+                  that.emit(type, x, y)
+                }
+              }
+            }
+          }
+
+          return 0
+        } else if (msg === WM_DESTROY) {
+          return 0
+        }
       } catch (err) {
-        // Ignore decoding errors
+        if (instDebug) console.error('[win-mouse] error in windowProc:', err)
       }
 
-      return CallNextHookEx(null, nCode, wParam, lParam)
-    }, HookProcPtr)
+      return DefWindowProcW(hwnd, msg, wParam, lParam)
+    }, WNDPROCPtr)
 
-    const hMod = GetModuleHandleW(null)
-    hookHandle = SetWindowsHookExW(WH_MOUSE_LL, hookCallback, hMod, 0)
-
-    if (!hookHandle) {
-      throw new Error('Failed to install mouse hook')
+    // Register window class
+    const wndClass = {
+      cbSize: koffi.sizeof(WNDCLASSEXW),
+      style: 0,
+      lpfnWndProc: windowProc,
+      cbClsExtra: 0,
+      cbWndExtra: 0,
+      hInstance: hInstance,
+      hIcon: null,
+      hCursor: null,
+      hbrBackground: null,
+      lpszMenuName: null,
+      lpszClassName: className,
+      hIconSm: null,
     }
 
-    if (instDebug) console.log('[win-mouse] hook installed')
+    const regResult = RegisterClassExW(wndClass)
+    if (!regResult) {
+      const errCode = GetLastError()
+      throw new Error('Failed to register window class. Error code: ' + errCode)
+    }
+
+    // Create message-only window (use null parent for a simple hidden window)
+    hwnd = CreateWindowExW(
+      0,
+      className,
+      'WinMouseRawInput',
+      0,
+      0,
+      0,
+      0,
+      0,
+      null, // parent window
+      null,
+      hInstance,
+      null,
+    )
+
+    if (!hwnd) {
+      const errCode = GetLastError()
+      UnregisterClassW(className, hInstance)
+      throw new Error('Failed to create window. Error code: ' + errCode)
+    }
+
+    // Register for raw input
+    const rid = {
+      usUsagePage: 0x01, // HID_USAGE_PAGE_GENERIC
+      usUsage: 0x02, // HID_USAGE_GENERIC_MOUSE
+      dwFlags: RIDEV_INPUTSINK,
+      hwndTarget: hwnd,
+    }
+
+    if (!RegisterRawInputDevices(rid, 1, koffi.sizeof(RAWINPUTDEVICE))) {
+      const errCode = GetLastError()
+      DestroyWindow(hwnd)
+      UnregisterClassW(className, hInstance)
+      throw new Error(
+        'Failed to register raw input devices. Error code: ' + errCode,
+      )
+    }
+
+    if (instDebug) console.log('[win-mouse] raw input registered')
+
+    // Initialize cursor position
+    try {
+      const cursorPos = { x: 0, y: 0 }
+      if (GetCursorPos(cursorPos)) {
+        lastAbsoluteX = cursorPos.x
+        lastAbsoluteY = cursorPos.y
+        if (instDebug)
+          console.log(
+            '[win-mouse] initial cursor pos:',
+            cursorPos.x,
+            cursorPos.y,
+          )
+      }
+    } catch (e) {
+      // ignore
+    }
 
     // Ensure this thread has a message queue
     try {
@@ -174,7 +395,7 @@ const init = function (options) {
       // ignore
     }
 
-    // Start a tiny message pump to dispatch messages so the low-level hook fires
+    // Start message pump - check ALL windows (null), not just our hwnd
     if (!pumpTimer) {
       const pumpMsg = allocType(MSG)
       pumpTimer = setInterval(function () {
@@ -215,11 +436,17 @@ const init = function (options) {
       clearInterval(pumpTimer)
       pumpTimer = null
     }
-    if (hookHandle) {
-      UnhookWindowsHookEx(hookHandle)
-      if (instDebug) console.log('[win-mouse] hook uninstalled')
-      hookHandle = null
-      hookCallback = null
+    if (hwnd) {
+      try {
+        DestroyWindow(hwnd)
+        const hInstance = GetModuleHandleW(null)
+        UnregisterClassW(className, hInstance)
+        if (instDebug) console.log('[win-mouse] raw input unregistered')
+      } catch (e) {
+        // ignore
+      }
+      hwnd = null
+      windowProc = null
     }
   }
 
