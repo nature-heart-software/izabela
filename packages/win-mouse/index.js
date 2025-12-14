@@ -184,7 +184,6 @@ const init = function (options) {
           }
         }
         if (msg === WM_INPUT) {
-          if (instDebug) console.log('[win-mouse] WM_INPUT received')
           // Get size needed
           const sizeBuf = Buffer.alloc(4)
           sizeBuf.writeUInt32LE(0)
@@ -197,7 +196,6 @@ const init = function (options) {
           )
 
           const rawSize = sizeBuf.readUInt32LE(0)
-          if (instDebug) console.log('[win-mouse] rawSize:', rawSize)
           if (rawSize > 0) {
             const raw = Buffer.alloc(rawSize)
             const sizeForRead = Buffer.alloc(4)
@@ -210,16 +208,8 @@ const init = function (options) {
               koffi.sizeof(RAWINPUTHEADER),
             )
 
-            if (instDebug) console.log('[win-mouse] actualSize:', actualSize)
             if (actualSize > 0) {
               const rawInput = koffi.decode(raw, RAWINPUT)
-              if (instDebug)
-                console.log(
-                  '[win-mouse] rawInput type:',
-                  rawInput.header.dwType,
-                  'mouse:',
-                  rawInput.mouse,
-                )
               if (rawInput.header.dwType === RIM_TYPEMOUSE) {
                 const mouse = rawInput.mouse
                 var x, y
@@ -370,18 +360,14 @@ const init = function (options) {
 
     if (instDebug) console.log('[win-mouse] raw input registered')
 
-    // Initialize cursor position
+    // Initialize cursor position for fallback tracking
     try {
-      const cursorPos = { x: 0, y: 0 }
-      if (GetCursorPos(cursorPos)) {
-        lastAbsoluteX = cursorPos.x
-        lastAbsoluteY = cursorPos.y
+      const cursorPosBuf = Buffer.alloc(8)
+      if (GetCursorPos(cursorPosBuf)) {
+        lastAbsoluteX = cursorPosBuf.readInt32LE(0)
+        lastAbsoluteY = cursorPosBuf.readInt32LE(4)
         if (instDebug)
-          console.log(
-            '[win-mouse] initial cursor pos:',
-            cursorPos.x,
-            cursorPos.y,
-          )
+          console.log('[win-mouse] initial cursor pos:', lastAbsoluteX, lastAbsoluteY)
       }
     } catch (e) {
       // ignore
