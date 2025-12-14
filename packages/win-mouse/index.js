@@ -367,7 +367,11 @@ const init = function (options) {
         lastAbsoluteX = cursorPosBuf.readInt32LE(0)
         lastAbsoluteY = cursorPosBuf.readInt32LE(4)
         if (instDebug)
-          console.log('[win-mouse] initial cursor pos:', lastAbsoluteX, lastAbsoluteY)
+          console.log(
+            '[win-mouse] initial cursor pos:',
+            lastAbsoluteX,
+            lastAbsoluteY,
+          )
       }
     } catch (e) {
       // ignore
