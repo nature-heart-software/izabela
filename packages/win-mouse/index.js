@@ -153,10 +153,10 @@ const SM_CYSCREEN = 1
 const init = function (options) {
   const opts = options || {}
   const instDebug = typeof opts.debug === 'boolean' ? opts.debug : false
-  const instPumpMs = Math.max(1, Number(opts.pumpMs ?? 1))
+  const instPumpMs = Math.max(1, Number(opts.pumpMs ?? 4))
   const instMaxMessagesPerTick = Math.max(
     1,
-    Number(opts.maxMessagesPerTick ?? 20),
+    Number(opts.maxMessagesPerTick ?? 60),
   )
 
   var that = new events.EventEmitter()
