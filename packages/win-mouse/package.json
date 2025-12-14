@@ -29,6 +29,7 @@
   "scripts": {
     "install": "",
     "lint": "standard",
-    "test": "node test/parallel-destroy && node test/parallel-unref && node test/sequence-destroy && node test/sequence-unref"
+    "test": "node test/parallel-destroy && node test/parallel-unref && node test/sequence-destroy && node test/sequence-unref",
+    "win-mouse": "node -e \"const mouse = require('./')({debug: true}); mouse.on('move', (x, y) => console.log('move', x, y)); mouse.on('left-down', (x, y) => console.log('left-down', x, y)); console.log('Mouse tracker started. Move your mouse or click.');\""
   }
 }
