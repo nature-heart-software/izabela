@@ -248,18 +248,17 @@ const init = function (options) {
 
                 // Process button events
                 var type = null
-                const buttonFlags = mouse.usButtonFlags
-
-                if (buttonFlags & RI_MOUSE_LEFT_BUTTON_DOWN) {
+                const usButtonData = mouse.usButtonData
+                if (usButtonData & RI_MOUSE_LEFT_BUTTON_DOWN) {
                   type = 'left-down'
                   left = true
-                } else if (buttonFlags & RI_MOUSE_LEFT_BUTTON_UP) {
+                } else if (usButtonData & RI_MOUSE_LEFT_BUTTON_UP) {
                   type = 'left-up'
                   left = false
-                } else if (buttonFlags & RI_MOUSE_RIGHT_BUTTON_DOWN) {
+                } else if (usButtonData & RI_MOUSE_RIGHT_BUTTON_DOWN) {
                   type = 'right-down'
                   right = true
-                } else if (buttonFlags & RI_MOUSE_RIGHT_BUTTON_UP) {
+                } else if (usButtonData & RI_MOUSE_RIGHT_BUTTON_UP) {
                   type = 'right-up'
                   right = false
                 } else if (mouse.lLastX !== 0 || mouse.lLastY !== 0) {

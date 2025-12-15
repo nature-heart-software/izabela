@@ -4,10 +4,7 @@ import throttle from 'lodash/throttle'
 import { Hitbox } from '@/modules/vue-hitboxes/types'
 import { app, BrowserWindow, screen, shell } from 'electron'
 
-import {
-  useMessengerStore,
-  useMessengerWindowStore,
-} from '@/teams/messenger/store'
+import { useMessengerStore, useMessengerWindowStore, } from '@/teams/messenger/store'
 import { useSettingsStore } from '@/features/settings/store'
 import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
 import { Deferred } from '@packages/toolbox'
@@ -168,45 +165,57 @@ export const ElectronMessengerWindow = () => {
       }
     })
 
+  const isPosWithinHitbox = (x: number, y: number) => {
+    const window = getWindow()
+    if (!window) return false
+    if (!hitboxesStore) return false
+    const { hitboxes } = hitboxesStore
+    const [windowX, windowY] = window.getPosition()
+    return hitboxes
+      .filter(({ w, h }) => w && h)
+      .some((hitbox: Hitbox) => {
+        const { x: mouseX, y: mouseY } = screen.screenToDipPoint({
+          x,
+          y,
+        })
+        const scaleFactor = screen.getDisplayNearestPoint({
+          x: mouseX,
+          y: mouseY,
+        }).scaleFactor
+        const x1 = hitbox.x / scaleFactor
+        const y1 = hitbox.y / scaleFactor
+        const x2 = (hitbox.x + hitbox.w) / scaleFactor
+        const y2 = (hitbox.y + hitbox.h) / scaleFactor
+
+        const isWithinXHitbox = mouseX >= windowX + x1 && mouseX <= windowX + x2
+        const isWithinYHitbox = mouseY >= windowY + y1 && mouseY <= windowY + y2
+        // console.log(isWithinXHitbox && isWithinYHitbox, mouseX, mouseY, {
+        //   x1,
+        //   y1,
+        //   x2,
+        //   y2,
+        // })
+        return isWithinXHitbox && isWithinYHitbox
+      })
+  }
   const onMouseMove = (initialMouseX = 0, initialMouseY = 0) => {
-    if (!hitboxesStore) return
     const window = getWindow()
     if (window) {
       if (!window.isDestroyed() && window.isVisible()) {
-        const [windowX, windowY] = window.getPosition()
-        const { hitboxes } = hitboxesStore
-        const isWithinAnyHitboxes = hitboxes
-          .filter(({ w, h }) => w && h)
-          .some((hitbox: Hitbox) => {
-            const { x: mouseX, y: mouseY } = screen.screenToDipPoint({
-              x: initialMouseX,
-              y: initialMouseY,
-            })
-            const scaleFactor = screen.getDisplayNearestPoint({
-              x: mouseX,
-              y: mouseY,
-            }).scaleFactor
-            const x1 = hitbox.x / scaleFactor
-            const y1 = hitbox.y / scaleFactor
-            const x2 = (hitbox.x + hitbox.w) / scaleFactor
-            const y2 = (hitbox.y + hitbox.h) / scaleFactor
-
-            const isWithinXHitbox =
-              mouseX >= windowX + x1 && mouseX <= windowX + x2
-            const isWithinYHitbox =
-              mouseY >= windowY + y1 && mouseY <= windowY + y2
-            // console.log(isWithinXHitbox && isWithinYHitbox, mouseX, mouseY, {
-            //   x1,
-            //   y1,
-            //   x2,
-            //   y2,
-            // })
-            return isWithinXHitbox && isWithinYHitbox
-          })
-        if (isWithinAnyHitboxes) {
+        if (isPosWithinHitbox(initialMouseX, initialMouseY)) {
           focus('mouse')
         } else {
           blur()
+        }
+      }
+    }
+  }
+  const onMouseClick = (initialMouseX = 0, initialMouseY = 0) => {
+    const window = getWindow()
+    if (window) {
+      if (!window.isDestroyed() && window.isVisible()) {
+        if (!isPosWithinHitbox(initialMouseX, initialMouseY)) {
+          hide(false)
         }
       }
     }
@@ -267,15 +276,19 @@ export const ElectronMessengerWindow = () => {
   const addEventListeners = () => {
     const window = getWindow()
     let mouseInstanceId: string | null = null
+    let mouseInstanceId2: string | null = null
 
     function initMouseInstance() {
-      if (mouseInstanceId) return
-      mouseInstanceId = startMouse('move', onMouseMove)
+      if (!mouseInstanceId) mouseInstanceId = startMouse('move', onMouseMove)
+      if (!mouseInstanceId2)
+        mouseInstanceId2 = startMouse('left-down', onMouseClick)
     }
 
     function clearMouseInstance() {
       if (mouseInstanceId) stopMouse(mouseInstanceId)
+      if (mouseInstanceId2) stopMouse(mouseInstanceId2)
       mouseInstanceId = null
+      mouseInstanceId2 = null
     }
 
     if (window) {
