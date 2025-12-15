@@ -4,7 +4,6 @@
     data-v-step="handle-bar"
     size="xs"
     @mousedown="dragging = true"
-    @mouseup="dragging = false"
   >
     <NvGroup :spacing="2" justify="between">
       <NvGroup :spacing="2" noWrap>
@@ -44,8 +43,12 @@ import NvMarkForRestartMessage from '@/teams/messenger/components/NvMarkForResta
 import { isGameOverlay } from '@/consts.ts'
 import NvHitbox from '@/modules/vue-hitboxes/NvHitbox.vue'
 import { ref } from 'vue'
+import { useEventListener } from '@vueuse/core'
 
 const dragging = ref(false)
+useEventListener('mouseup', () => {
+  dragging.value = false
+})
 const settingsStore = useSettingsStore()
 const { ElectronMessengerWindow } = window
 const openDevTools = () => {
