@@ -1,5 +1,11 @@
 <template>
-  <NvCard class="h-7" data-v-step="handle-bar" size="xs">
+  <NvCard
+    class="h-7"
+    data-v-step="handle-bar"
+    size="xs"
+    @mousedown="dragging = true"
+    @mouseup="dragging = false"
+  >
     <NvGroup :spacing="2" justify="between">
       <NvGroup :spacing="2" noWrap>
         <template v-if="settingsStore.debugMode">
@@ -26,6 +32,9 @@
       </template>
     </NvGroup>
   </NvCard>
+  <Teleport to="body">
+    <NvHitbox v-if="dragging" class="absolute inset-0 z-[-1]" />
+  </Teleport>
 </template>
 <script lang="ts" setup>
 import { NvButton, NvCard, NvGroup, NvText, NvTooltip } from '@packages/ui'
@@ -33,8 +42,10 @@ import { useSettingsStore } from '@/features/settings/store'
 import { useMessengerStateStore } from '@/teams/messenger/store'
 import NvMarkForRestartMessage from '@/teams/messenger/components/NvMarkForRestartMessage.vue'
 import { isGameOverlay } from '@/consts.ts'
-import { useGetAppInfoQuery } from '@/features/app/queries.ts'
+import NvHitbox from '@/modules/vue-hitboxes/NvHitbox.vue'
+import { ref } from 'vue'
 
+const dragging = ref(false)
 const settingsStore = useSettingsStore()
 const { ElectronMessengerWindow } = window
 const openDevTools = () => {
