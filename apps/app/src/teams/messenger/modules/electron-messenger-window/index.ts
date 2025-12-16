@@ -4,10 +4,7 @@ import throttle from 'lodash/throttle'
 import { Hitbox } from '@/modules/vue-hitboxes/types'
 import { app, BrowserWindow, screen, shell } from 'electron'
 
-import {
-  useMessengerStore,
-  useMessengerWindowStore,
-} from '@/teams/messenger/store'
+import { useMessengerStore, useMessengerWindowStore, } from '@/teams/messenger/store'
 import { useSettingsStore } from '@/features/settings/store'
 import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
 import { Deferred } from '@packages/toolbox'
@@ -279,19 +276,19 @@ export const ElectronMessengerWindow = () => {
   const addEventListeners = () => {
     const window = getWindow()
     let mouseInstanceId: string | null = null
-    let mouseInstanceId2: string | null = null
 
     function initMouseInstance() {
-      if (!mouseInstanceId) mouseInstanceId = startMouse('move', onMouseMove)
-      if (!mouseInstanceId2)
-        mouseInstanceId2 = startMouse('left-down', onMouseClick)
+      if (!mouseInstanceId)
+        mouseInstanceId = startMouse('*', (type, x, y) => {
+          if (type === 'move') onMouseMove(x, y)
+          if (['left-down', 'middle-down', 'right-down'].includes(type))
+            onMouseClick(x, y)
+        })
     }
 
     function clearMouseInstance() {
       if (mouseInstanceId) stopMouse(mouseInstanceId)
-      if (mouseInstanceId2) stopMouse(mouseInstanceId2)
       mouseInstanceId = null
-      mouseInstanceId2 = null
     }
 
     if (window) {

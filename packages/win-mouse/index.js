@@ -280,6 +280,7 @@ const init = function (options) {
                     }
                   }
                   that.emit(type, x, y)
+                  that.emit('*', type, x, y)
                 }
               }
             }
