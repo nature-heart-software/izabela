@@ -25,6 +25,34 @@
           <NvDivider direction="horizontal" />
           <NvGroup :spacing="5" justify="apart" no-wrap>
             <NvStack>
+              <NvText type="label">Hide window when clicking outside</NvText>
+            </NvStack>
+            <NvSwitch
+              :modelValue="settingsStore.hideWindowOnClickOutside"
+              @update:modelValue="
+                (value) =>
+                  settingsStore.$patch({ hideWindowOnClickOutside: value })
+              "
+            />
+          </NvGroup>
+          <NvDivider direction="horizontal" />
+          <NvGroup :spacing="5" justify="apart" no-wrap>
+            <NvStack>
+              <NvText type="label"
+                >Clear text input when the window hides</NvText
+              >
+            </NvStack>
+            <NvSwitch
+              :modelValue="settingsStore.clearMessageOnWindowHide"
+              @update:modelValue="
+                (value) =>
+                  settingsStore.$patch({ clearMessageOnWindowHide: value })
+              "
+            />
+          </NvGroup>
+          <NvDivider direction="horizontal" />
+          <NvGroup :spacing="5" justify="apart" no-wrap>
+            <NvStack>
               <NvText type="label">Background dim opacity</NvText>
             </NvStack>
             <NvGroup>
@@ -186,6 +214,7 @@
               <NvText type="label">Theme</NvText>
             </NvStack>
             <NvSelect
+              :modelValue="settingsStore.theme"
               :options="[
                 {
                   label: 'Light',
@@ -196,7 +225,6 @@
                   value: 'dark',
                 },
               ]"
-              :modelValue="settingsStore.theme"
               @update:modelValue="
                 (value) => {
                   settingsStore.$patch({ theme: value })
@@ -305,10 +333,10 @@ import {
   NvGroup,
   NvNumberInput,
   NvRangeInput,
+  NvSelect,
   NvStack,
   NvSwitch,
   NvText,
-  NvSelect,
 } from '@packages/ui'
 import { useSettingsStore } from '@/features/settings/store'
 import NvDisplaySelect from '@/features/display/components/inputs/DisplaySelect.vue'

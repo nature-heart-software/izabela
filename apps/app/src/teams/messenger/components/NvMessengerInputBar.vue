@@ -32,8 +32,8 @@
   </NvCard>
 </template>
 <script lang="ts" setup>
-import { NvButton, NvCard, NvGroup, Ref } from '@packages/ui'
-import { computed, ref, watch, inject } from 'vue'
+import { NvButton, NvCard, NvGroup } from '@packages/ui'
+import { computed, inject, ref, Ref, watch } from 'vue'
 import { useMessengerWindowStore } from '@/teams/messenger/store'
 import {
   emitIPCGameOverlayStopIntercept,
@@ -105,7 +105,9 @@ const onWindowBlur = () => {
   if (inputRef.value) inputRef.value.blur()
 }
 
-const offscreenFocusFix: Ref<HTMLElement> = inject('offscreen-focus-fix')
+const offscreenFocusFix: Ref<HTMLElement> | undefined = inject(
+  'offscreen-focus-fix',
+)
 
 useEventListener(offscreenFocusFix, 'click', () => {
   inputRef.value.focus()
@@ -117,6 +119,9 @@ if (isGameOverlay) {
   })
   window.addEventListener('blur', () => {
     inputRef.value.blur()
+    if (settingsStore.clearMessageOnWindowHide) {
+      inputValue.value = ''
+    }
   })
 }
 
@@ -132,6 +137,15 @@ watch(
       onWindowFocus()
     } else {
       onWindowBlur()
+    }
+  },
+)
+
+watch(
+  () => messengerWindowStore.isShown,
+  (isShown) => {
+    if (!isShown && settingsStore.clearMessageOnWindowHide) {
+      inputValue.value = ''
     }
   },
 )
