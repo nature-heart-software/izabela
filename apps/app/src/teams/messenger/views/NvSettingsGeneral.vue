@@ -13,7 +13,7 @@
           <NvDivider direction="horizontal" />
           <NvGroup :spacing="5" justify="apart" no-wrap>
             <NvStack>
-              <NvText type="label">Hide window after sending a message</NvText>
+              <NvText type="label">Hide window after a message is sent</NvText>
             </NvStack>
             <NvSwitch
               :modelValue="settingsStore.hideWindowOnMessage"
@@ -25,7 +25,7 @@
           <NvDivider direction="horizontal" />
           <NvGroup :spacing="5" justify="apart" no-wrap>
             <NvStack>
-              <NvText type="label">Hide window when clicking outside</NvText>
+              <NvText type="label">Hide window on outside click</NvText>
             </NvStack>
             <NvSwitch
               :modelValue="settingsStore.hideWindowOnClickOutside"
@@ -38,9 +38,7 @@
           <NvDivider direction="horizontal" />
           <NvGroup :spacing="5" justify="apart" no-wrap>
             <NvStack>
-              <NvText type="label"
-                >Clear text input when the window hides</NvText
-              >
+              <NvText type="label">Clear text input on window hide</NvText>
             </NvStack>
             <NvSwitch
               :modelValue="settingsStore.clearMessageOnWindowHide"
@@ -125,8 +123,8 @@
             <NvStack>
               <NvText type="label">Enable Overlay window</NvText>
               <NvText
-                >Allow to open a window that doesn't take focus away from the
-                foreground application
+                >Opens a window that doesn't take focus away from the foreground
+                application
               </NvText>
               <NvText type="caption"
                 ><strong>NOTE:</strong> Keyboard support is limited.
@@ -238,7 +236,7 @@
           <NvDivider direction="horizontal" />
           <NvGroup :spacing="5" justify="apart" no-wrap>
             <NvStack>
-              <NvText type="label">Run as Administrator</NvText>
+              <NvText type="label">Run as administrator</NvText>
             </NvStack>
             <NvSwitch
               :modelValue="settingsStore.runAsAdmin"
@@ -268,7 +266,7 @@
           <NvDivider direction="horizontal" />
           <NvGroup :spacing="5" justify="apart" no-wrap>
             <NvStack>
-              <NvText type="label">Enable Auto-update</NvText>
+              <NvText type="label">Enable auto-update</NvText>
             </NvStack>
             <NvSwitch
               :modelValue="settingsStore.enableAutoUpdate"
