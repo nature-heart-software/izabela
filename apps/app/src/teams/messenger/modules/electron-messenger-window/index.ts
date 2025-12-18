@@ -4,17 +4,16 @@ import throttle from 'lodash/throttle'
 import { Hitbox } from '@/modules/vue-hitboxes/types'
 import { app, BrowserWindow, screen, shell } from 'electron'
 
-import {
-  useMessengerStore,
-  useMessengerWindowStore,
-} from '@/teams/messenger/store'
+import { useMessengerWindowStore } from '@/teams/messenger/store'
 import { useSettingsStore } from '@/features/settings/store'
 import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
 import { Deferred } from '@packages/toolbox'
 import { getNativeWindowHandleInt } from '@/utils/electron-window'
 import gameOverlay from '@/electron/game-overlay.ts'
+// @ts-ignore
 import { focusWindow } from 'forcefocus'
 import koffi from 'koffi'
+import { dialogsMap } from '@/modules/electron-dialog'
 
 export const ElectronMessengerWindow = () => {
   /* use isFocused as source of truth instead of window.isFocused() as in some instances
@@ -28,7 +27,6 @@ export const ElectronMessengerWindow = () => {
   let WinControl: any | null = null
   let hitboxesStore: ReturnType<typeof useHitboxesStore> | undefined
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
-  let messengerStore: ReturnType<typeof useMessengerStore> | undefined
   let messengerWindowStore:
     | ReturnType<typeof useMessengerWindowStore>
     | undefined
@@ -286,6 +284,7 @@ export const ElectronMessengerWindow = () => {
     function initMouseInstance() {
       if (!mouseInstanceId)
         mouseInstanceId = startMouse('*', (type, x, y) => {
+          if (dialogsMap.size > 0) return blur()
           if (type === 'move') onMouseMove(x, y)
           if (['left-down', 'middle-down', 'right-down'].includes(type))
             onMouseClick(x, y)
@@ -333,7 +332,6 @@ export const ElectronMessengerWindow = () => {
   const start = (window: BrowserWindow) => {
     const localSettingsStore = useSettingsStore()
     settingsStore = localSettingsStore
-    messengerStore = useMessengerStore()
     messengerWindowStore = useMessengerWindowStore()
     hitboxesStore = useHitboxesStore()
     registeredWindow = window
