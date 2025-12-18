@@ -12,6 +12,9 @@ const RI_MOUSE_LEFT_BUTTON_UP = 0x0002
 const RI_MOUSE_RIGHT_BUTTON_DOWN = 0x0004
 const RI_MOUSE_RIGHT_BUTTON_UP = 0x0008
 
+const RI_MOUSE_MIDDLE_BUTTON_DOWN = 0x0010
+const RI_MOUSE_MIDDLE_BUTTON_UP = 0x0020
+
 const POINT = koffi.struct('POINT', {
   x: 'long',
   y: 'long',
@@ -163,6 +166,7 @@ const init = function (options) {
   var hwnd = null
   var left = false
   var right = false
+  var middle = false
   var windowProc = null
   var pumpTimer = null
   var lastDebugLog = 0
@@ -248,20 +252,27 @@ const init = function (options) {
 
                 // Process button events
                 var type = null
-                const buttonFlags = mouse.usButtonFlags
-
-                if (buttonFlags & RI_MOUSE_LEFT_BUTTON_DOWN) {
+                const usButtonData = mouse.usButtonData
+                if (usButtonData & RI_MOUSE_LEFT_BUTTON_DOWN) {
                   type = 'left-down'
                   left = true
-                } else if (buttonFlags & RI_MOUSE_LEFT_BUTTON_UP) {
+                } else if (usButtonData & RI_MOUSE_LEFT_BUTTON_UP) {
                   type = 'left-up'
                   left = false
-                } else if (buttonFlags & RI_MOUSE_RIGHT_BUTTON_DOWN) {
+                } else if (usButtonData & RI_MOUSE_RIGHT_BUTTON_DOWN) {
                   type = 'right-down'
                   right = true
-                } else if (buttonFlags & RI_MOUSE_RIGHT_BUTTON_UP) {
+                } else if (usButtonData & RI_MOUSE_RIGHT_BUTTON_UP) {
                   type = 'right-up'
                   right = false
+                } else if (usButtonData & RI_MOUSE_MIDDLE_BUTTON_DOWN) {
+                  type = 'middle-down'
+                  middle = true
+                } else if (usButtonData & RI_MOUSE_MIDDLE_BUTTON_UP) {
+                  type = 'middle-up'
+                  middle = false
+                } else if (middle) {
+                  type = 'middle-drag'
                 } else if (mouse.lLastX !== 0 || mouse.lLastY !== 0) {
                   if (left) {
                     type = 'left-drag'
@@ -281,6 +292,7 @@ const init = function (options) {
                     }
                   }
                   that.emit(type, x, y)
+                  that.emit('*', type, x, y)
                 }
               }
             }

@@ -1,4 +1,4 @@
-import { fork, ChildProcess } from 'child_process'
+import { ChildProcess, fork } from 'child_process'
 import { v4 as uuid } from 'uuid'
 import { onExit } from '@/electron/on-exit.ts'
 

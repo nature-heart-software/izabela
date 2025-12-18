@@ -4,17 +4,16 @@ import throttle from 'lodash/throttle'
 import { Hitbox } from '@/modules/vue-hitboxes/types'
 import { app, BrowserWindow, screen, shell } from 'electron'
 
-import {
-  useMessengerStore,
-  useMessengerWindowStore,
-} from '@/teams/messenger/store'
+import { useMessengerWindowStore } from '@/teams/messenger/store'
 import { useSettingsStore } from '@/features/settings/store'
 import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
 import { Deferred } from '@packages/toolbox'
 import { getNativeWindowHandleInt } from '@/utils/electron-window'
 import gameOverlay from '@/electron/game-overlay.ts'
+// @ts-ignore
 import { focusWindow } from 'forcefocus'
 import koffi from 'koffi'
+import { dialogsMap } from '@/modules/electron-dialog'
 
 export const ElectronMessengerWindow = () => {
   /* use isFocused as source of truth instead of window.isFocused() as in some instances
@@ -28,7 +27,6 @@ export const ElectronMessengerWindow = () => {
   let WinControl: any | null = null
   let hitboxesStore: ReturnType<typeof useHitboxesStore> | undefined
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
-  let messengerStore: ReturnType<typeof useMessengerStore> | undefined
   let messengerWindowStore:
     | ReturnType<typeof useMessengerWindowStore>
     | undefined
@@ -168,45 +166,60 @@ export const ElectronMessengerWindow = () => {
       }
     })
 
+  const isPosWithinHitbox = (x: number, y: number) => {
+    const window = getWindow()
+    if (!window) return false
+    if (!hitboxesStore) return false
+    const { hitboxes } = hitboxesStore
+    const [windowX, windowY] = window.getPosition()
+    return hitboxes
+      .filter(({ w, h }) => w && h)
+      .some((hitbox: Hitbox) => {
+        const { x: mouseX, y: mouseY } = screen.screenToDipPoint({
+          x,
+          y,
+        })
+        const scaleFactor = screen.getDisplayNearestPoint({
+          x: mouseX,
+          y: mouseY,
+        }).scaleFactor
+        const x1 = hitbox.x / scaleFactor
+        const y1 = hitbox.y / scaleFactor
+        const x2 = (hitbox.x + hitbox.w) / scaleFactor
+        const y2 = (hitbox.y + hitbox.h) / scaleFactor
+
+        const isWithinXHitbox = mouseX >= windowX + x1 && mouseX <= windowX + x2
+        const isWithinYHitbox = mouseY >= windowY + y1 && mouseY <= windowY + y2
+        // console.log(isWithinXHitbox && isWithinYHitbox, mouseX, mouseY, {
+        //   x1,
+        //   y1,
+        //   x2,
+        //   y2,
+        // })
+        return isWithinXHitbox && isWithinYHitbox
+      })
+  }
   const onMouseMove = (initialMouseX = 0, initialMouseY = 0) => {
-    if (!hitboxesStore) return
     const window = getWindow()
     if (window) {
       if (!window.isDestroyed() && window.isVisible()) {
-        const [windowX, windowY] = window.getPosition()
-        const { hitboxes } = hitboxesStore
-        const isWithinAnyHitboxes = hitboxes
-          .filter(({ w, h }) => w && h)
-          .some((hitbox: Hitbox) => {
-            const { x: mouseX, y: mouseY } = screen.screenToDipPoint({
-              x: initialMouseX,
-              y: initialMouseY,
-            })
-            const scaleFactor = screen.getDisplayNearestPoint({
-              x: mouseX,
-              y: mouseY,
-            }).scaleFactor
-            const x1 = hitbox.x / scaleFactor
-            const y1 = hitbox.y / scaleFactor
-            const x2 = (hitbox.x + hitbox.w) / scaleFactor
-            const y2 = (hitbox.y + hitbox.h) / scaleFactor
-
-            const isWithinXHitbox =
-              mouseX >= windowX + x1 && mouseX <= windowX + x2
-            const isWithinYHitbox =
-              mouseY >= windowY + y1 && mouseY <= windowY + y2
-            // console.log(isWithinXHitbox && isWithinYHitbox, mouseX, mouseY, {
-            //   x1,
-            //   y1,
-            //   x2,
-            //   y2,
-            // })
-            return isWithinXHitbox && isWithinYHitbox
-          })
-        if (isWithinAnyHitboxes) {
+        if (isPosWithinHitbox(initialMouseX, initialMouseY)) {
           focus('mouse')
         } else {
           blur()
+        }
+      }
+    }
+  }
+  const onMouseClick = (initialMouseX = 0, initialMouseY = 0) => {
+    const window = getWindow()
+    if (window) {
+      if (!window.isDestroyed() && window.isVisible()) {
+        if (
+          settingsStore?.hideWindowOnClickOutside &&
+          !isPosWithinHitbox(initialMouseX, initialMouseY)
+        ) {
+          hide(false)
         }
       }
     }
@@ -269,8 +282,13 @@ export const ElectronMessengerWindow = () => {
     let mouseInstanceId: string | null = null
 
     function initMouseInstance() {
-      if (mouseInstanceId) return
-      mouseInstanceId = startMouse('move', onMouseMove)
+      if (!mouseInstanceId)
+        mouseInstanceId = startMouse('*', (type, x, y) => {
+          if (dialogsMap.size > 0) return blur()
+          if (type === 'move') onMouseMove(x, y)
+          if (['left-down', 'middle-down', 'right-down'].includes(type))
+            onMouseClick(x, y)
+        })
     }
 
     function clearMouseInstance() {
@@ -314,7 +332,6 @@ export const ElectronMessengerWindow = () => {
   const start = (window: BrowserWindow) => {
     const localSettingsStore = useSettingsStore()
     settingsStore = localSettingsStore
-    messengerStore = useMessengerStore()
     messengerWindowStore = useMessengerWindowStore()
     hitboxesStore = useHitboxesStore()
     registeredWindow = window

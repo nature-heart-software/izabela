@@ -21,7 +21,6 @@ export const useHitboxesStore = defineStore(
     }
 
     function addHitbox(hitbox: Hitbox) {
-      // clear foreign sessions
       const newHitboxes = [...hitboxes.value]
       const hitboxIndex = newHitboxes.findIndex((i) => i.id === hitbox.id)
       if (hitboxIndex < 0) {

@@ -8,12 +8,13 @@ import {
   writeFile,
 } from 'fs/promises'
 import path from 'path'
-import { app, BrowserWindow, dialog } from 'electron'
+import { app, BrowserWindow } from 'electron'
 import { IzabelaMessagePayload } from '@/modules/izabela/types'
 import ElectronWindowManager from '@/modules/electron-window-manager'
 import { useSettingsStore } from '@/features/settings/store'
 import pkg from '@root/package.json'
 import mime from 'mime'
+import { ElectronDialog } from '@/modules/electron-dialog'
 
 // reusable arrow function to encode file data to base64 encoded string
 const convertFileToBase64 = async (filePath: string) => {
@@ -83,7 +84,7 @@ export const ElectronFilesystem = () => ({
       ],
     }
 
-    const res = await dialog.showSaveDialog(
+    const res = await ElectronDialog().showSaveDialog(
       ElectronWindowManager.getInstanceByName('messenger')
         ?.window as BrowserWindow,
       options,
