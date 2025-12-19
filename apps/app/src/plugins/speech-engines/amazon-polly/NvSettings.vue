@@ -15,7 +15,7 @@
           <NvDivider direction="horizontal" />
           <NvGroup :spacing="5" justify="apart" no-wrap>
             <NvStack>
-              <NvText type="label">Engine</NvText>
+              <NvText type="label">Voice engine</NvText>
             </NvStack>
             <NvSelect
               :modelValue="getProperty('selectedVoice').SupportedEngines[0]"
