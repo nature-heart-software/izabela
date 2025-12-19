@@ -24,18 +24,31 @@ export const useListVoicesQuery = (
       onSuccess(data) {
         if (Array.isArray(data)) {
           const selectedVoice = getProperty('selectedVoice')
+
+          const preferredEnginesSet = new Set(
+            selectedVoice ? selectedVoice.SupportedEngines : [],
+          )
+
           const defaultVoice =
             data.find(
               (voice) => getVoiceId(voice) === preferredDefaultVoiceId,
             ) || data[0]
-          if (!selectedVoice) {
-            setProperty('selectedVoice', defaultVoice)
-          } else {
-            const updatedVoice = data.find(
-              (voice) => getVoiceId(voice) === getVoiceId(selectedVoice),
-            )
-            setProperty('selectedVoice', updatedVoice || defaultVoice)
-          }
+
+          const updatedVoice = data.find(
+            (voice) =>
+              selectedVoice && getVoiceId(voice) === getVoiceId(selectedVoice),
+          )
+
+          const finalVoice = updatedVoice || defaultVoice
+
+          finalVoice.SupportedEngines.forEach((engine: string) =>
+            preferredEnginesSet.add(engine),
+          )
+
+          setProperty('selectedVoice', {
+            ...finalVoice,
+            SupportedEngines: Array.from(preferredEnginesSet.values()),
+          })
         }
       },
     },

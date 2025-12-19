@@ -5,7 +5,7 @@ export const useConfirmAdmin = () => {
   return () =>
     confirm({
       title: 'Action required',
-      description: `This feature requires Admin privileges to function properly. Enabling this feature will also enable "Run as Administrator" and a restart will be required. Do you want to continue?`,
+      description: `This feature requires Admin privileges to function properly. Enabling this feature will also enable "Run as administrator" and a restart will be required. Do you want to continue?`,
       actions: [
         {
           type: 'cancel',

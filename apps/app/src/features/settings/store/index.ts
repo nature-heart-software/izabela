@@ -42,6 +42,8 @@ export const useSettingsStore = defineStore(
     const messageMode = ref<'sentence' | 'word'>('sentence')
     const display = ref<Electron.Display['id'] | null>(null)
     const hideWindowOnMessage = ref(false)
+    const hideWindowOnClickOutside = ref(true)
+    const clearMessageOnWindowHide = ref(false)
     const universalApiKey = ref<string>('')
     const universalApiEndpoint = ref<string>('')
     const audioInputSensibility = ref(-50)
@@ -251,6 +253,8 @@ export const useSettingsStore = defineStore(
       speechProfanityFilter,
       soxPreRecordingChunks,
       soxPostRecordingChunks,
+      hideWindowOnClickOutside,
+      clearMessageOnWindowHide,
     }
   },
   {

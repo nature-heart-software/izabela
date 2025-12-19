@@ -38,8 +38,22 @@ const onBackgroundClick = () => {
   }
 }
 
-const isBackgroundShown = computed(
-  () => isGameOverlay || messengerWindowStore.isInputFocused,
+const showBackground = ref(false)
+
+const isBackgroundShown = computed(() => isGameOverlay || showBackground.value)
+
+// this prevents click outside to close immediately when the backdrop is still visible in some cases
+watch(
+  () => messengerWindowStore.isInputFocused,
+  (value) => {
+    if (value) {
+      showBackground.value = true
+    } else {
+      setTimeout(() => {
+        showBackground.value = false
+      }, 100)
+    }
+  },
 )
 
 watch(isBackgroundShown, (newValue) => {
@@ -56,6 +70,7 @@ onMounted(() => {
       opacity: 0,
       overwrite: true,
     })
+    showBackground.value = false
   })
 })
 </script>

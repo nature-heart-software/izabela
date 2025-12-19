@@ -13,12 +13,38 @@
           <NvDivider direction="horizontal" />
           <NvGroup :spacing="5" justify="apart" no-wrap>
             <NvStack>
-              <NvText type="label">Hide window after sending a message</NvText>
+              <NvText type="label">Hide window after a message is sent</NvText>
             </NvStack>
             <NvSwitch
               :modelValue="settingsStore.hideWindowOnMessage"
               @update:modelValue="
                 (value) => settingsStore.$patch({ hideWindowOnMessage: value })
+              "
+            />
+          </NvGroup>
+          <NvDivider direction="horizontal" />
+          <NvGroup :spacing="5" justify="apart" no-wrap>
+            <NvStack>
+              <NvText type="label">Hide window on outside click</NvText>
+            </NvStack>
+            <NvSwitch
+              :modelValue="settingsStore.hideWindowOnClickOutside"
+              @update:modelValue="
+                (value) =>
+                  settingsStore.$patch({ hideWindowOnClickOutside: value })
+              "
+            />
+          </NvGroup>
+          <NvDivider direction="horizontal" />
+          <NvGroup :spacing="5" justify="apart" no-wrap>
+            <NvStack>
+              <NvText type="label">Clear text input on window hide</NvText>
+            </NvStack>
+            <NvSwitch
+              :modelValue="settingsStore.clearMessageOnWindowHide"
+              @update:modelValue="
+                (value) =>
+                  settingsStore.$patch({ clearMessageOnWindowHide: value })
               "
             />
           </NvGroup>
@@ -97,8 +123,8 @@
             <NvStack>
               <NvText type="label">Enable Overlay window</NvText>
               <NvText
-                >Allow to open a window that doesn't take focus away from the
-                foreground application
+                >Opens a window that doesn't take focus away from the foreground
+                application
               </NvText>
               <NvText type="caption"
                 ><strong>NOTE:</strong> Keyboard support is limited.
@@ -186,6 +212,7 @@
               <NvText type="label">Theme</NvText>
             </NvStack>
             <NvSelect
+              :modelValue="settingsStore.theme"
               :options="[
                 {
                   label: 'Light',
@@ -196,7 +223,6 @@
                   value: 'dark',
                 },
               ]"
-              :modelValue="settingsStore.theme"
               @update:modelValue="
                 (value) => {
                   settingsStore.$patch({ theme: value })
@@ -210,7 +236,7 @@
           <NvDivider direction="horizontal" />
           <NvGroup :spacing="5" justify="apart" no-wrap>
             <NvStack>
-              <NvText type="label">Run as Administrator</NvText>
+              <NvText type="label">Run as administrator</NvText>
             </NvStack>
             <NvSwitch
               :modelValue="settingsStore.runAsAdmin"
@@ -240,7 +266,7 @@
           <NvDivider direction="horizontal" />
           <NvGroup :spacing="5" justify="apart" no-wrap>
             <NvStack>
-              <NvText type="label">Enable Auto-update</NvText>
+              <NvText type="label">Enable auto-update</NvText>
             </NvStack>
             <NvSwitch
               :modelValue="settingsStore.enableAutoUpdate"
@@ -305,10 +331,10 @@ import {
   NvGroup,
   NvNumberInput,
   NvRangeInput,
+  NvSelect,
   NvStack,
   NvSwitch,
   NvText,
-  NvSelect,
 } from '@packages/ui'
 import { useSettingsStore } from '@/features/settings/store'
 import NvDisplaySelect from '@/features/display/components/inputs/DisplaySelect.vue'
