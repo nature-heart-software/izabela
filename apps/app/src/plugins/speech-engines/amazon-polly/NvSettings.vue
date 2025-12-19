@@ -10,16 +10,15 @@
           @update:modelValue="(value) => setProperty('selectedVoice', value)"
         />
       </NvFormItem>
-      <template v-if="!form">
-        <template v-if="getProperty('selectedVoice')">
-          <NvDivider direction="horizontal" />
-          <NvGroup :spacing="5" justify="apart" no-wrap>
-            <NvStack>
-              <NvText type="label">Voice engine</NvText>
-            </NvStack>
-            <NvSelect
-              :modelValue="getProperty('selectedVoice').SupportedEngines[0]"
-              :options="
+      <template v-if="getProperty('selectedVoice')">
+        <NvDivider direction="horizontal" />
+        <NvGroup :spacing="5" justify="apart" no-wrap>
+          <NvStack>
+            <NvText type="label">Voice engine</NvText>
+          </NvStack>
+          <NvSelect
+            :modelValue="getProperty('selectedVoice').SupportedEngines[0]"
+            :options="
                 getProperty('selectedVoice').SupportedEngines.map(
                   (name: string) => ({
                     label: name,
@@ -27,22 +26,23 @@
                   }),
                 )
               "
-              @update:modelValue="
-                (value) => {
-                  const selectedVoice = getProperty('selectedVoice')
-                  const preferredEnginesSet = new Set([
-                    value,
-                    ...selectedVoice.SupportedEngines,
-                  ])
-                  setProperty('selectedVoice', {
-                    ...selectedVoice,
-                    SupportedEngines: Array.from(preferredEnginesSet.values()),
-                  })
-                }
-              "
-            />
-          </NvGroup>
-        </template>
+            @update:modelValue="
+              (value) => {
+                const selectedVoice = getProperty('selectedVoice')
+                const preferredEnginesSet = new Set([
+                  value,
+                  ...selectedVoice.SupportedEngines,
+                ])
+                setProperty('selectedVoice', {
+                  ...selectedVoice,
+                  SupportedEngines: Array.from(preferredEnginesSet.values()),
+                })
+              }
+            "
+          />
+        </NvGroup>
+      </template>
+      <template v-if="!form">
         <NvDivider direction="horizontal" />
         <NvGroup :spacing="5" align="start" justify="apart" no-wrap>
           <NvStack>
