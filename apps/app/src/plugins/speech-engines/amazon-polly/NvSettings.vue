@@ -11,6 +11,36 @@
         />
       </NvFormItem>
       <template v-if="!form">
+        <template v-if="getProperty('selectedVoice')">
+          <NvDivider direction="horizontal" />
+          <NvGroup :spacing="5" justify="apart" no-wrap>
+            <NvStack>
+              <NvText type="label">Engine</NvText>
+            </NvStack>
+            <NvSelect
+              :modelValue="getProperty('selectedVoice').SupportedEngines[0]"
+              :options="
+                getProperty('selectedVoice').SupportedEngines.map((name: string) => ({
+                  label: name,
+                  value: name,
+                }))
+              "
+              @update:modelValue="
+                (value) => {
+                  const selectedVoice = getProperty('selectedVoice')
+                  const preferredEnginesSet = new Set([
+                    value,
+                    ...selectedVoice.SupportedEngines,
+                  ])
+                  setProperty('selectedVoice', {
+                    ...selectedVoice,
+                    SupportedEngines: Array.from(preferredEnginesSet.values()),
+                  })
+                }
+              "
+            />
+          </NvGroup>
+        </template>
         <NvDivider direction="horizontal" />
         <NvGroup :spacing="5" align="start" justify="apart" no-wrap>
           <NvStack>
@@ -105,6 +135,7 @@ import {
   NvFormItem,
   NvGroup,
   NvInput,
+  NvSelect,
   NvStack,
   NvSwitch,
   NvText,
