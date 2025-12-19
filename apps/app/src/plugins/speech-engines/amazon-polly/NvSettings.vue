@@ -19,13 +19,13 @@
           <NvSelect
             :modelValue="getProperty('selectedVoice').SupportedEngines[0]"
             :options="
-                getProperty('selectedVoice').SupportedEngines.map(
-                  (name: string) => ({
-                    label: name,
-                    value: name,
-                  }),
-                )
-              "
+              getProperty('selectedVoice').SupportedEngines.map(
+                (name: string) => ({
+                  label: name,
+                  value: name,
+                }),
+              )
+            "
             @update:modelValue="
               (value) => {
                 const selectedVoice = getProperty('selectedVoice')
