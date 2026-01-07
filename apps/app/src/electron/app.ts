@@ -8,10 +8,7 @@ import { createApp, h } from 'vue'
 import { createPinia } from 'pinia'
 import createTray from '@/teams/tray/electron-tray'
 import ElectronWindowManager from '@/modules/electron-window-manager'
-import {
-  createMessengerGameOverlayWindow,
-  createMessengerWindow,
-} from '@/teams/messenger/electron/background'
+import { createMessengerGameOverlayWindow, createMessengerWindow, } from '@/teams/messenger/electron/background'
 import { createSpeechWorkerWindow } from '@/teams/speech-worker/electron/background'
 import { bridgeModules } from '@/electron/bridge'
 import registerElectronStartup from '@/modules/electron-startup/register'
@@ -20,13 +17,14 @@ import registerElectronDebug from '@/modules/electron-debug/register'
 import registerElectronDisplay from '@/modules/electron-display/register'
 import registerElectronKeybinding from '@/modules/electron-keybinding/register'
 import registerElectronCache from '@/modules/electron-cache/register'
+import registerElectronPushToTalk from '@/modules/electron-push-to-talk/register'
 import { stopMouse } from '@/modules/node-mouse'
 import { createOverlayWindow } from '@/teams/overlay/electron/background'
 import './game-overlay'
 import gameOverlay from '@/electron/game-overlay.ts'
 import { gkl } from '@/modules/electron-keybinding/utils.ts'
 import { loadStores } from '@/store/stores.ts'
-import { writeFileSync, mkdirSync, existsSync } from 'node:fs'
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 
 const App = () => {
   const isDevelopment = import.meta.env.DEV
@@ -222,6 +220,7 @@ const App = () => {
         exec('Start server', () => startAppServer()),
         exec('Register display', () => registerElectronDisplay()),
         exec('Register keybindings', () => registerElectronKeybinding()),
+        exec('Register push-to-talk', () => registerElectronPushToTalk()),
         exec('Handle Cache', () => registerElectronCache()),
       ])
     })
