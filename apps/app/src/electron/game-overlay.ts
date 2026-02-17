@@ -124,6 +124,7 @@ class GameOverlay {
     captionHeight: number = 0,
     transparent: boolean = false,
   ) {
+    if (!this.Overlay) return
     const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint())
 
     this.Overlay!.addWindow(window.id, {

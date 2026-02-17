@@ -8,8 +8,15 @@ import entries from 'lodash/entries'
 import keyBy from 'lodash/keyBy'
 import map from 'lodash/map'
 
-export const gkl =
-  typeof window === 'undefined' ? new GlobalKeyboardListener() : undefined
+let _gkl: GlobalKeyboardListener | undefined
+if (typeof window === 'undefined') {
+  try {
+    _gkl = new GlobalKeyboardListener()
+  } catch (e) {
+    console.warn('[keybinding] GlobalKeyboardListener not available on this platform:', e)
+  }
+}
+export const gkl = _gkl
 
 export const down: Partial<
   Record<IGlobalKeyEvent['rawKey']['_nameRaw'], boolean>

@@ -40,6 +40,6 @@
 
 ## 8. Verification
 
-- [ ] 8.1 Verify the app launches on Linux without crashes
+- [x] 8.1 Verify the app launches on Linux without crashes
 - [ ] 8.2 Verify core features work on Linux (TTS, tray, notifications)
 - [ ] 8.3 Verify electron-builder produces AppImage and deb artifacts on Linux
