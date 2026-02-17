@@ -126,16 +126,19 @@ The project requires the following in order to run:
 Install the following system dependencies before running `npm install`:
 
 **Debian/Ubuntu:**
+
 ```bash
 sudo apt install libx11-dev libxkbfile-dev libxdo-dev libasound2-dev sox
 ```
 
 **Fedora/RHEL:**
+
 ```bash
 sudo dnf install libX11-devel libxkbfile-devel libxdo-devel alsa-lib-devel sox
 ```
 
 **Known limitations on Linux:**
+
 - Game overlay is not available (requires DirectX)
 - Raw mouse tracking is not available (Windows Raw Input API)
 - Process watching is not available (Windows WMI)
