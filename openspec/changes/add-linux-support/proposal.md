@@ -20,9 +20,11 @@ Izabela is currently a Windows-only Electron app, limiting its reach to a single
 ## Capabilities
 
 ### New Capabilities
+
 - `linux-platform-support`: Platform detection, platform-gating of Windows-only modules, and Linux-specific configuration (audio, build targets, CI).
 
 ### Modified Capabilities
+
 <!-- No existing specs to modify -->
 
 ## Impact
