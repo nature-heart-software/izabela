@@ -90,6 +90,13 @@ The electron-builder configuration SHALL include Linux targets (`AppImage`, `deb
 - **WHEN** electron-builder produces a Linux build
 - **THEN** the `resources/sox/` and `resources/vbc/` directories are NOT included in the output
 
+### Requirement: Window transparency on Linux (future fix)
+Transparent windows do not work correctly on Linux (Wayland or XWayland). This is an upstream Electron/Chromium limitation. The app launches and is functional but windows have a black background instead of being transparent. This SHALL be tracked as a known limitation until Electron provides a fix.
+
+#### Scenario: Transparent windows on Linux
+- **WHEN** the app creates transparent overlay windows on Linux
+- **THEN** the windows MAY have a black background instead of being transparent (known limitation)
+
 ### Requirement: CI/CD builds for Linux
 The GitHub Actions release workflow SHALL include a Linux runner (`ubuntu-22.04`) in its build matrix. The Linux runner SHALL install required system dependencies and produce Linux release artifacts.
 

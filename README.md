@@ -144,3 +144,4 @@ sudo dnf install libX11-devel libxkbfile-devel libxdo-devel alsa-lib-devel sox
 - Process watching is not available (Windows WMI)
 - Virtual audio cable auto-installation is not available — use PulseAudio null sink (`pactl load-module module-null-sink`) or PipeWire equivalent instead
 - Global key listener and native keymap require X11 (Wayland support is limited)
+- Window transparency does not work (upstream Electron/Chromium limitation) — windows have a black background instead of being transparent
