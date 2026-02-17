@@ -33,6 +33,8 @@ const App = () => {
   const createWindows = () =>
     app
       .whenReady()
+      // On Linux, transparent visuals need time to initialize after app is ready
+      .then(() => process.platform === 'linux' ? new Promise((r) => setTimeout(r, 500)) : undefined)
       .then(async () =>
         Promise.all([
           ElectronWindowManager.registerInstance(
@@ -80,6 +82,10 @@ const App = () => {
 
   const configureAppDefaults = () => {
     if (process.platform === 'win32') app.setAppUserModelId(app.name)
+    if (process.platform === 'linux') {
+      app.commandLine.appendSwitch('enable-transparent-visuals')
+      app.commandLine.appendSwitch('disable-gpu')
+    }
     app.commandLine.appendSwitch('disable-renderer-backgrounding')
     app.commandLine.appendSwitch('ignore-certificate-errors')
     app.commandLine.appendSwitch('wm-window-animations-disabled')
@@ -89,8 +95,12 @@ const App = () => {
      * - fixes ui freeze in DevTools when unfocused
      * - fixes ui freeze on other hardware accelerated softwares (chrome, vs code, ...)
      * - fixes element selection in DevTools
+     * NOTE: On Linux, app.disableHardwareAcceleration() breaks transparent windows.
+     * We use --enable-transparent-visuals + --disable-gpu instead (set above).
      */
-    app.disableHardwareAcceleration()
+    if (process.platform !== 'linux') {
+      app.disableHardwareAcceleration()
+    }
 
     // Scheme must be registered before the app is ready
     protocol.registerSchemesAsPrivileged([
