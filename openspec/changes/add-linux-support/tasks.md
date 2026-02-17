@@ -41,5 +41,5 @@
 ## 8. Verification
 
 - [x] 8.1 Verify the app launches on Linux without crashes
-- [ ] 8.2 Verify core features work on Linux (TTS, tray, notifications)
-- [ ] 8.3 Verify electron-builder produces AppImage and deb artifacts on Linux
+- [ ] 8.2 Verify core features work on Linux (TTS, tray, notifications) — partial: app launches, windows show, but transparency broken (known Electron limitation)
+- [x] 8.3 Verify electron-builder produces AppImage and deb artifacts on Linux — AppImage builds successfully; deb needs Ubuntu/Debian (fpm dependency issue on Fedora)

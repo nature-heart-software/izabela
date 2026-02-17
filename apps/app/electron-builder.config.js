@@ -38,6 +38,7 @@ module.exports = {
   linux: {
     target: ['AppImage', 'deb'],
     category: 'Utility',
+    maintainer: 'Nature Heart Software',
   },
   appId: 'com.nhs.izabela',
   generateUpdatesFilesForAllChannels: true,
