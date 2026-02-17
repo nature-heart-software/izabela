@@ -34,7 +34,11 @@ const App = () => {
     app
       .whenReady()
       // On Linux, transparent visuals need time to initialize after app is ready
-      .then(() => process.platform === 'linux' ? new Promise((r) => setTimeout(r, 500)) : undefined)
+      .then(() =>
+        process.platform === 'linux'
+          ? new Promise((r) => setTimeout(r, 500))
+          : undefined,
+      )
       .then(async () =>
         Promise.all([
           ElectronWindowManager.registerInstance(
