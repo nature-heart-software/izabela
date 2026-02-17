@@ -116,4 +116,28 @@ The project requires the following in order to run:
 
 - Node 22
 - [Python 3.11](https://github.com/nodejs/node-gyp?tab=readme-ov-file#configuring-python-dependency)
+
+### Windows
+
 - [Visual Studio Build Tools 2022](https://github.com/nodejs/node-gyp?tab=readme-ov-file#on-windows)
+
+### Linux
+
+Install the following system dependencies before running `npm install`:
+
+**Debian/Ubuntu:**
+```bash
+sudo apt install libx11-dev libxkbfile-dev libxdo-dev libasound2-dev sox
+```
+
+**Fedora/RHEL:**
+```bash
+sudo dnf install libX11-devel libxkbfile-devel libxdo-devel alsa-lib-devel sox
+```
+
+**Known limitations on Linux:**
+- Game overlay is not available (requires DirectX)
+- Raw mouse tracking is not available (Windows Raw Input API)
+- Process watching is not available (Windows WMI)
+- Virtual audio cable auto-installation is not available — use PulseAudio null sink (`pactl load-module module-null-sink`) or PipeWire equivalent instead
+- Global key listener and native keymap require X11 (Wayland support is limited)

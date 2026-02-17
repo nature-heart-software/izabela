@@ -22,9 +22,6 @@
   ],
   "license": "MIT",
   "main": "index.js",
-  "os": [
-    "win32"
-  ],
   "repository": "kapetan/win-mouse.git",
   "scripts": {
     "install": "",

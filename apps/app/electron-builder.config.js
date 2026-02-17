@@ -26,11 +26,18 @@ module.exports = {
     output: 'dist_electron',
   },
   files: ['dist', 'dist-electron'],
+  win: {
+    extraFiles: ['./resources/**'],
+  },
   nsis: {
     oneClick: true,
     perMachine: false,
     allowToChangeInstallationDirectory: false,
     deleteAppDataOnUninstall: false,
+  },
+  linux: {
+    target: ['AppImage', 'deb'],
+    category: 'Utility',
   },
   appId: 'com.nhs.izabela',
   generateUpdatesFilesForAllChannels: true,
@@ -38,7 +45,6 @@ module.exports = {
   artifactName: '${name}-setup-${version}-${os}.${ext}',
   publish: ['github'],
   electronVersion: getElectronVersion(),
-  extraFiles: ['./resources/**'],
   asarUnpack: [
     'node_modules/@packages/process-watcher/**/*',
     'node_modules/wql-process-monitor/**/*',

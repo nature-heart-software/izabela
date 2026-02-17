@@ -26,13 +26,18 @@ export default () => {
     : 0
   const sampleRateHertz = 16000
 
-  const recorder = nodeRecorder.record({
+  const recorderOptions: Record<string, any> = {
     sampleRateHertz,
     recordProgram: 'rec',
-    binPath: path.join(EXTERNALS_DIR, '/sox/sox.exe'),
     device: settingsStore.soxDevice,
     audioType: 'raw',
-  })
+  }
+
+  if (process.platform === 'win32') {
+    recorderOptions.binPath = path.join(EXTERNALS_DIR, '/sox/sox.exe')
+  }
+
+  const recorder = nodeRecorder.record(recorderOptions)
 
   const recorderStream = recorder.stream()
 

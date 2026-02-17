@@ -302,6 +302,9 @@ class GameOverlay {
   }
 
   public start() {
+    if (process.platform !== 'win32') {
+      return ready.resolve(true)
+    }
     const databasesStore = useDatabasesStore()
     const gameOverlayStore = useGameOverlayStore()
     /* Importing win-control in preload breaks reload so we import it dynamically on start instead */

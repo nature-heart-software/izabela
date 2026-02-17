@@ -16,7 +16,6 @@ import {
 import keymap from '@packages/native-keymap'
 import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
 import { useOverlayWindowStore } from '@/teams/overlay/store'
-import koffi from 'koffi'
 
 export const ElectronOverlayWindow = () => {
   let waitingToShow = false
@@ -26,10 +25,16 @@ export const ElectronOverlayWindow = () => {
   const ready = Deferred<BrowserWindow>()
   const isReady = () => ready.promise
 
-  const user32 = koffi.load('user32.dll')
+  let user32Api: {
+    BlockInput: (fBlockIt: number) => number
+  } | null = null
 
-  const user32Api = {
-    BlockInput: user32.func('int BlockInput(int fBlockIt)'),
+  if (process.platform === 'win32') {
+    const koffi = require('koffi')
+    const user32 = koffi.load('user32.dll')
+    user32Api = {
+      BlockInput: user32.func('int BlockInput(int fBlockIt)'),
+    }
   }
 
   const getWindow = () =>
@@ -43,7 +48,7 @@ export const ElectronOverlayWindow = () => {
         window.hide()
         gkl?.removeListener(toggleOverlayWindowListener)
         setTimeout(() => {
-          user32Api.BlockInput(0)
+          user32Api?.BlockInput(0)
         }, 100)
         resolve(true)
       } else {
@@ -72,7 +77,7 @@ export const ElectronOverlayWindow = () => {
           .then(() => {
             gkl?.addListener(toggleOverlayWindowListener)
             setTimeout(() => {
-              user32Api.BlockInput(1)
+              user32Api?.BlockInput(1)
             }, 100)
             window.showInactive()
             waitingToShow = false

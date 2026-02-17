@@ -10,9 +10,6 @@ import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
 import { Deferred } from '@packages/toolbox'
 import { getNativeWindowHandleInt } from '@/utils/electron-window'
 import gameOverlay from '@/electron/game-overlay.ts'
-// @ts-ignore
-import { focusWindow } from 'forcefocus'
-import koffi from 'koffi'
 import { dialogsMap } from '@/modules/electron-dialog'
 
 export const ElectronMessengerWindow = () => {
@@ -34,11 +31,20 @@ export const ElectronMessengerWindow = () => {
   const isReady = () => ready.promise
   let foregroundWindow: string | number | null = null
 
-  const user32 = koffi.load('user32.dll')
+  let user32Api: {
+    SetForegroundWindow: (hWnd: any) => boolean
+    GetForegroundWindow: () => any
+  } | null = null
+  let focusWindowNative: ((window: BrowserWindow) => void) | null = null
 
-  const user32Api = {
-    SetForegroundWindow: user32.func('bool SetForegroundWindow(void* hWnd)'),
-    GetForegroundWindow: user32.func('void* GetForegroundWindow()'),
+  if (process.platform === 'win32') {
+    const koffi = require('koffi')
+    const user32 = koffi.load('user32.dll')
+    user32Api = {
+      SetForegroundWindow: user32.func('bool SetForegroundWindow(void* hWnd)'),
+      GetForegroundWindow: user32.func('void* GetForegroundWindow()'),
+    }
+    focusWindowNative = require('forcefocus').focusWindow
   }
 
   const getWindow = () =>
@@ -67,7 +73,11 @@ export const ElectronMessengerWindow = () => {
   const ensureNativeFocus = () => {
     const window = getWindow()
     if (window) {
-      focusWindow(window)
+      if (focusWindowNative) {
+        focusWindowNative(window)
+      } else {
+        window.focus()
+      }
     }
   }
 
@@ -93,10 +103,10 @@ export const ElectronMessengerWindow = () => {
               setTimeout(ensureNativeFocus, 200)
             })
           }
-          foregroundWindow = user32Api.GetForegroundWindow()
+          foregroundWindow = user32Api?.GetForegroundWindow() ?? null
           // to prevent shenanigans with some softwares (*coughs* League of Legends *coughs*)
           // this makes sure to blur first with ffi-napi for safe measures
-          user32Api.SetForegroundWindow(0)
+          user32Api?.SetForegroundWindow(0)
           isFocused = true
 
           /* order matters */
@@ -123,7 +133,7 @@ export const ElectronMessengerWindow = () => {
           window.setFocusable(false) // Fixes alwaysOnTop going in the background sometimes for some reasons
           if (foregroundWindow) {
             if (foregroundWindow !== windowNativeHandle && returnFocus) {
-              user32Api.SetForegroundWindow(foregroundWindow)
+              user32Api?.SetForegroundWindow(foregroundWindow)
             }
             foregroundWindow = null
           }
@@ -339,7 +349,9 @@ export const ElectronMessengerWindow = () => {
       setDisplay(localSettingsStore.display)
     })
     ready.resolve(window)
-    WinControl = require('win-control').Window
+    if (process.platform === 'win32') {
+      WinControl = require('win-control').Window
+    }
   }
 
   isReady().then(() => {

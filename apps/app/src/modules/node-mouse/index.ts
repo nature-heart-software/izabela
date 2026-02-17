@@ -7,6 +7,7 @@ let winMouseChildProcess: ChildProcess | null = null
 const instances = new Map()
 
 export function startMouse(event: string, callback: (...args: any[]) => void) {
+  if (process.platform !== 'win32') return ''
   const id = uuid()
   winMouseChildProcess = fork(require.resolve('@packages/win-mouse'), [event])
   winMouseChildProcess.on('message', (args: any) => {

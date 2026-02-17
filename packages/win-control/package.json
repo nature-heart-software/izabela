@@ -6,7 +6,7 @@
   "license": "MIT",
   "main": "src/js/index.js",
   "scripts": {
-    "install": "node-pre-gyp install --fallback-to-build",
+    "install": "node -e \"if(process.platform!=='win32')process.exit(0);require('child_process').execSync('node-pre-gyp install --fallback-to-build',{stdio:'inherit'})\"",
     "pack": "node-pre-gyp package"
   },
   "dependencies": {
@@ -31,9 +31,6 @@
     "type": "git",
     "url": "https://github.com/nosolosoftware/win-control.git"
   },
-  "os": [
-    "win32"
-  ],
   "binary": {
     "module_name": "wincontrol",
     "module_path": "./lib/binding/",

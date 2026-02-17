@@ -6,12 +6,15 @@ import { EXTERNALS_DIR } from '@/electron/utils'
 import { app } from 'electron'
 import { Deferred } from '@packages/toolbox'
 
-const VBCResourceExePath = path.join(
-  EXTERNALS_DIR,
-  process.arch === 'x64'
-    ? '/vbc/VBCABLE_Setup_x64.exe'
-    : '/vbc/VBCABLE_Setup.exe',
-)
+const VBCResourceExePath =
+  process.platform === 'win32'
+    ? path.join(
+        EXTERNALS_DIR,
+        process.arch === 'x64'
+          ? '/vbc/VBCABLE_Setup_x64.exe'
+          : '/vbc/VBCABLE_Setup.exe',
+      )
+    : ''
 
 export const ElectronResources = () => {
   const getSudoOptions = () => ({
@@ -20,6 +23,7 @@ export const ElectronResources = () => {
   })
   return {
     isVirtualAudioCableInstalled(): Promise<boolean> {
+      if (process.platform !== 'win32') return Promise.resolve(false)
       return si.audio().then((audioData) => {
         const vbcDevices = filter(
           audioData,
@@ -29,6 +33,7 @@ export const ElectronResources = () => {
       })
     },
     installVirtualAudioCable(): Promise<boolean> {
+      if (process.platform !== 'win32') return Promise.resolve(false)
       const deferred = Deferred<boolean>()
       return si.audio().then((audioData) => {
         const vbcDevices = filter(
@@ -51,6 +56,7 @@ export const ElectronResources = () => {
       })
     },
     uninstallVirtualAudioCable(): Promise<boolean> {
+      if (process.platform !== 'win32') return Promise.resolve(false)
       const deferred = Deferred<boolean>()
       return si.audio().then((audioData) => {
         const vbcDevices = filter(
