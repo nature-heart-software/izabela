@@ -171,7 +171,7 @@
     ]
   },
   "scripts": {
-    "build": "npm install && lerna run build",
+    "build": "npm install --ignore-scripts && npm run postinstall && npm rebuild && lerna run build",
     "build:app": "lerna run build --scope izabela-next --stream",
     "build:deps": "lerna run build --scope '{@packages/*,@apps/app-server}' --stream",
     "build:prod": "lerna run build:prod --stream",
