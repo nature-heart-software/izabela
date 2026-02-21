@@ -13,7 +13,8 @@
         'VCCLCompilerTool': {
           'AdditionalOptions': [
             '/Qspectre',
-            '/guard:cf'
+            '/guard:cf',
+            '/std:c++20'
           ]
         },
         'VCLinkerTool': {

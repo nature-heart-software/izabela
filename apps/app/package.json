@@ -46,8 +46,8 @@
   "productName": "Izabela Next",
   "repository": "https://github.com/nature-heart-software/izabela",
   "scripts": {
-    "build": "vite build && yarn electron:build",
-    "build:prod": "vue-tsc && yarn build",
+    "build": "vite build && npm run electron:build",
+    "build:prod": "vue-tsc && npm run build",
     "dev": "vite",
     "electron:build": "electron-builder --config electron-builder.config.js --publish never",
     "generate:app-icon": "npx electron-icon-builder --input=./assets/app-icon.png --output=./build --flatten && npx electron-icon-builder --input=./assets/app-icon.png --output=./public --flatten",

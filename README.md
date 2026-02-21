@@ -114,6 +114,8 @@ Find guides and API documentation on the [Wiki](https://github.com/nature-heart-
 
 The project requires the following in order to run:
 
-- Node 22
+- Node 22+
 - [Python 3.11](https://github.com/nodejs/node-gyp?tab=readme-ov-file#configuring-python-dependency)
-- [Visual Studio Build Tools 2022](https://github.com/nodejs/node-gyp?tab=readme-ov-file#on-windows)
+- [Visual Studio Build Tools 2022](https://github.com/nodejs/node-gyp?tab=readme-ov-file#on-windows) with the following components:
+  - **Desktop development with C++** workload (`Microsoft.VisualStudio.Workload.VCTools`)
+  - **C++ Clang Compiler for Windows** (`Microsoft.VisualStudio.ComponentGroup.NativeDesktop.Llvm.Clang`) — required for Node 24+
