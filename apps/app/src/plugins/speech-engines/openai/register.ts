@@ -31,6 +31,7 @@ export const engine = registerEngine({
     const customCommand = customCommands.find((e) => e.value === command)
     return {
       voice,
+      model: store.getProperty('model'),
       input: translatedText || text,
       instructions: store.getProperty('instructions'),
       userInstructions: store.getProperty('useCommandDescriptionAsInstruction')
