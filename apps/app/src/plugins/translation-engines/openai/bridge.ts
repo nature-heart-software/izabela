@@ -11,15 +11,15 @@ bridge.register([
         from,
         to,
         prompt,
+        model,
         credentials: { apiKey },
       }: any) {
         try {
           const openai = new OpenAI({
             apiKey,
           })
-
           const response = await openai.chat.completions.create({
-            model: 'gpt-4.1',
+            model: model || 'gpt-5.2',
             messages: [
               {
                 role: 'system',

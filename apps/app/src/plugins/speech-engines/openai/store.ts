@@ -4,6 +4,7 @@ import { ENGINE_ID, defaultModel } from './shared'
 const exposedProperties = {
   selectedVoice: null,
   instructions: '',
+  model: defaultModel,
 }
 
 export const store = definePluginStore(
@@ -15,7 +16,6 @@ export const store = definePluginStore(
     useCacheOnEveryRequest: true,
     streamAudio: true,
     useCommandDescriptionAsInstruction: true,
-    model: defaultModel,
     ...exposedProperties,
   },
   Object.keys(exposedProperties) as (keyof typeof exposedProperties)[],

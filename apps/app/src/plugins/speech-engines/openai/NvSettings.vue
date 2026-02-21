@@ -11,11 +11,11 @@
         />
       </NvFormItem>
       <NvDivider direction="horizontal" />
-      <NvFormItem label="Models">
+      <NvFormItem label="Model">
         <NvModelSelect
-          :modelValue="getProperty('model')"
+          :modelValue="getProperty('model_id')"
           placeholder="Select a model"
-          @update:modelValue="(value) => setProperty('model', value)"
+          @update:modelValue="(value) => setProperty('model_id', value)"
         />
       </NvFormItem>
       <NvDivider direction="horizontal" />
