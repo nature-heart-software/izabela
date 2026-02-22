@@ -187,7 +187,9 @@
     "packages/*"
   ],
   "devDependencies": {
-    "@types/ws": "^8.5.4"
+    "@infisical/cli": "^0.43.40",
+    "@types/ws": "^8.5.4",
+    "nushell": "^0.110.0"
   },
   "overrides": {
     "node-gyp": "^9.4.1"

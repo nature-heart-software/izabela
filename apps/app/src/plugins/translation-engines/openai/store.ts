@@ -1,10 +1,11 @@
 import { definePluginStore } from '@/store'
-import { ENGINE_ID } from './shared.ts'
+import { ENGINE_ID, defaultModel } from './shared.ts'
 
 const exposedProperties = {
   translateFrom: null,
   translateTo: null,
   prompt: '',
+  model: defaultModel,
 }
 
 export const store = definePluginStore(

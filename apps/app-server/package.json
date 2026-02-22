@@ -18,7 +18,7 @@
     "morgan": "^1.10.0",
     "node-cache": "^5.1.2",
     "object-hash": "^3.0.0",
-    "openai": "^6.9.1",
+    "openai": "^6.22.0",
     "say": "^0.16.0",
     "socket.io": "^4.5.4",
     "uuid": "^9.0.0"

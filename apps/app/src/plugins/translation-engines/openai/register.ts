@@ -38,6 +38,7 @@ export const engine = translationEngineManager.registerEngine(ENGINE_ID, {
         from: translateFrom,
         to: translateTo,
         prompt: store.getProperty('prompt'),
+        model: store.getProperty('model'),
         credentials,
       })
     } catch (e) {

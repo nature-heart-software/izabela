@@ -11,7 +11,7 @@
         />
       </NvFormItem>
       <NvDivider direction="horizontal" />
-      <NvFormItem label="Models">
+      <NvFormItem label="Model">
         <NvModelSelect
           :modelValue="getProperty('model_id')"
           placeholder="Select a model"
