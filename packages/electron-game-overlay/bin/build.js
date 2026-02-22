@@ -8,7 +8,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const require = createRequire(import.meta.url)
 const packagePath = path.parse(require.resolve('gelectron/package.json')).dir
-const install = spawn('yarn', ['install'], {
+const install = spawn('npm', ['install'], {
   cwd: packagePath,
   env: process.env,
   shell: true,
@@ -26,7 +26,7 @@ console.log(__dirname)
 install.on('exit', function (code) {
   console.log('child process exited with code ' + code.toString())
 
-  const ls = spawn('yarn', ['run', 'build:addon:x64'], {
+  const ls = spawn('npm', ['run', 'build:addon:x64'], {
     cwd: packagePath,
     env: process.env,
     shell: true,
