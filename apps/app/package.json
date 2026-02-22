@@ -9,7 +9,7 @@
     "@aws-sdk/client-translate": "^3.943.0",
     "@aws-sdk/credential-providers": "^3.943.0",
     "@azure-rest/ai-translation-text": "^1.0.1",
-    "@elevenlabs/elevenlabs-js": "^2.26.0",
+    "@elevenlabs/elevenlabs-js": "^2.36.0",
     "@nut-tree-fork/nut-js": "^4.2.1",
     "@packages/electron-game-overlay": "0.0.0",
     "@packages/native-keymap": "3.3.2",

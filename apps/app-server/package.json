@@ -5,7 +5,7 @@
     "@aws-sdk/client-cognito-identity": "^3.943.0",
     "@aws-sdk/client-polly": "^3.943.0",
     "@aws-sdk/credential-provider-cognito-identity": "^3.943.0",
-    "@elevenlabs/elevenlabs-js": "^2.26.0",
+    "@elevenlabs/elevenlabs-js": "^2.36.0",
     "@google-cloud/text-to-speech": "^6.4.0",
     "@types/object-hash": "^3.0.2",
     "axios": "^0.27.2",
