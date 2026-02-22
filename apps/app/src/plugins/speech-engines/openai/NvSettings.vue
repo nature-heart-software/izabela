@@ -11,6 +11,14 @@
         />
       </NvFormItem>
       <NvDivider direction="horizontal" />
+      <NvFormItem label="Model">
+        <NvModelSelect
+          :modelValue="getProperty('model')"
+          placeholder="Select a model"
+          @update:modelValue="(value) => setProperty('model', value)"
+        />
+      </NvFormItem>
+      <NvDivider direction="horizontal" />
       <NvFormItem label="Instructions">
         <NvTextarea
           :modelValue="getProperty('instructions')"
@@ -90,6 +98,7 @@ import {
 import NvVoiceSelect from './NvVoiceSelect'
 import { store } from './store'
 import { engine } from './register'
+import NvModelSelect from './NvModelSelect.vue'
 
 const props = defineProps({
   form: Object,

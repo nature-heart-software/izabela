@@ -32,11 +32,26 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
     }
   }
 
+  const listModelsHandler: RequestHandler = async (_req, res) => {
+    try {
+      res
+        .status(200)
+        .json([
+          'tts-1',
+          'tts-1-hd',
+          'gpt-4o-mini-tts',
+          'gpt-4o-mini-tts-2025-12-15',
+        ])
+    } catch (e: any) {
+      handleError(res, 'Internal server error', e.message, 500)
+    }
+  }
+
   const synthesizeSpeechHandler: RequestHandler = async (
     {
       body: {
         credentials: { apiKey },
-        payload: { input, voice, instructions, userInstructions },
+        payload: { input, voice, model, instructions, userInstructions },
         includeTimestamps,
       },
     },
@@ -54,7 +69,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
         .filter(Boolean)
         .join('. ')
       const mp3 = await openai.audio.speech.create({
-        model: 'gpt-4o-mini-tts',
+        model: model || 'gpt-4o-mini-tts',
         voice,
         input,
         instructions: concatenatedInstructions,
@@ -69,6 +84,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
   }
 
   app.post('/api/tts/openai/list-voices', listVoicesHandler)
+  app.post('/api/tts/openai/list-models', listModelsHandler)
   app.post('/api/tts/openai/synthesize-speech', synthesizeSpeechHandler)
   app.post('/api/tts/openai/synthesize-speech/stream', synthesizeSpeechHandler)
 }

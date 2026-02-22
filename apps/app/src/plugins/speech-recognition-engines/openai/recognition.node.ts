@@ -29,7 +29,7 @@ export default ({ useRecording }: any) => {
             session: {
               input_audio_format: 'pcm16',
               input_audio_transcription: {
-                model: 'gpt-4o-transcribe',
+                model: store.getProperty('model'),
                 prompt: store.getProperty('prompt'),
                 language: settingsStore.speechInputLanguage.split('-')[0],
               },

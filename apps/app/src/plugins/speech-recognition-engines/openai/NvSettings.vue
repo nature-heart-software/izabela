@@ -1,4 +1,12 @@
 <template>
+  <NvFormItem label="Model">
+    <NvModelSelect
+      :modelValue="store.getProperty('model')"
+      placeholder="Select a model"
+      @update:modelValue="(value) => store.setProperty('model', value)"
+    />
+  </NvFormItem>
+  <NvDivider direction="horizontal" />
   <NvFormItem label="Prompt">
     <NvTextarea
       placeholder="Example: The speaker may stutter or repeat syllables..."
@@ -19,4 +27,5 @@
 <script lang="ts" setup>
 import { NvDivider, NvFormItem, NvInput, NvTextarea } from '@packages/ui'
 import { store } from './store'
+import NvModelSelect from './NvModelSelect.vue'
 </script>

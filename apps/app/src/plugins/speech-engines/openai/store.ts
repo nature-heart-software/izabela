@@ -1,9 +1,10 @@
 import { definePluginStore } from '@/store'
-import { ENGINE_ID } from './shared'
+import { ENGINE_ID, defaultModel } from './shared'
 
 const exposedProperties = {
   selectedVoice: null,
   instructions: '',
+  model: defaultModel,
 }
 
 export const store = definePluginStore(
