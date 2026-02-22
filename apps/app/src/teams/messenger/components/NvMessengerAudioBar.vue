@@ -83,7 +83,9 @@
                 icon-name="direction"
                 size="sm"
                 >Outputs ({{
-                  audioOutputs.filter((audioOutput) => settingsStore.audioOutputs.includes(audioOutput.label)).length +
+                  audioOutputs.filter((audioOutput) =>
+                    settingsStore.audioOutputs.includes(audioOutput.label),
+                  ).length +
                   (settingsStore.playSpeechOnDefaultPlaybackDevice ? 1 : 0)
                 }})
               </NvButton>
