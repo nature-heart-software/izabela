@@ -83,7 +83,9 @@
                 icon-name="direction"
                 size="sm"
                 >Outputs ({{
-                  settingsStore.audioOutputs.length +
+                  audioOutputs.filter((audioOutput) =>
+                    settingsStore.audioOutputs.includes(audioOutput.label),
+                  ).length +
                   (settingsStore.playSpeechOnDefaultPlaybackDevice ? 1 : 0)
                 }})
               </NvButton>
@@ -139,11 +141,14 @@ import NvAudioOutputsSelect from '@/features/audio/components/inputs/NvAudioOutp
 import { inject } from 'vue'
 import { useRoute } from 'vue-router'
 import NvAudioInputForm from '@/features/speech/components/forms/NvAudioInputForm.vue'
+import { useDevicesList } from '@vueuse/core'
 
 const speechStore = useSpeechStore()
 const settingsStore = useSettingsStore()
 const messengerContext = inject('messenger')
 const route = useRoute()
+
+const { audioOutputs } = useDevicesList()
 
 function toggleSTTTS() {
   settingsStore.$patch({
