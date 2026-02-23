@@ -9,16 +9,16 @@ export default () =>
   app.whenReady().then(() => {
     const settingsStore = useSettingsStore()
     electronMessengerWindow.isReady().then(() => {
-      electronMessengerWindow.setDisplay(settingsStore.display)
-      electronOverlayWindow.setDisplay(settingsStore.display)
+      electronMessengerWindow.setDisplay(settingsStore.display, settingsStore.displayBounds)
+      electronOverlayWindow.setDisplay(settingsStore.display, settingsStore.displayBounds)
       electronSpeechWorkerWindow.setDisplay()
     })
 
     watch(
       () => settingsStore.display,
       () => {
-        electronMessengerWindow.setDisplay(settingsStore.display)
-        electronOverlayWindow.setDisplay(settingsStore.display)
+        electronMessengerWindow.setDisplay(settingsStore.display, settingsStore.displayBounds)
+        electronOverlayWindow.setDisplay(settingsStore.display, settingsStore.displayBounds)
         electronSpeechWorkerWindow.setDisplay()
       },
     )
@@ -26,8 +26,8 @@ export default () =>
     const screenEvents = ['display-added', 'display-removed', 'display-metrics-changed'] as const
     screenEvents.forEach((event) => {
       screen.on(event as any, () => {
-        electronMessengerWindow.setDisplay(settingsStore.display)
-        electronOverlayWindow.setDisplay(settingsStore.display)
+        electronMessengerWindow.setDisplay(settingsStore.display, settingsStore.displayBounds)
+        electronOverlayWindow.setDisplay(settingsStore.display, settingsStore.displayBounds)
         electronSpeechWorkerWindow.setDisplay()
       })
     })

@@ -67,6 +67,9 @@ export function isRunningAsAdmin(): boolean {
   return process.getuid?.() === 0
 }
 
+export const boundsMatch = (a: Electron.Rectangle, b: Electron.Rectangle) =>
+  a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height
+
 export const getLargestMonitorSize = () => {
   const displays = screen.getAllDisplays()
   let width = 0

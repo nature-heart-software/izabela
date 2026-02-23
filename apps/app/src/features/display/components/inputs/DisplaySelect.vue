@@ -33,6 +33,7 @@ const options = computed(() =>
 )
 
 const onUpdate = (value: Electron.Display['id']) => {
-  settingsStore.$patch({ display: value })
+  const display = displays.value.find((d) => d.id === value)
+  settingsStore.$patch({ display: value, displayBounds: display?.bounds ?? null })
 }
 </script>
