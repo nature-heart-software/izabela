@@ -251,14 +251,18 @@ export const ElectronMessengerWindow = () => {
     250,
   )
 
-  const setDisplay = (id?: Electron.Display['id'] | null, boundsHint?: Electron.Rectangle | null) => {
+  const setDisplay = (
+    id?: Electron.Display['id'] | null,
+    boundsHint?: Electron.Rectangle | null,
+  ) => {
     const window = getWindow()
     if (window) {
       const allDisplays = screen.getAllDisplays()
       const primaryDisplay = screen.getPrimaryDisplay()
       const display =
         (id != null && allDisplays.find((d) => d.id === id)) ||
-        (boundsHint && allDisplays.find((d) => boundsMatch(d.bounds, boundsHint))) ||
+        (boundsHint &&
+          allDisplays.find((d) => boundsMatch(d.bounds, boundsHint))) ||
         primaryDisplay
       window.setBounds(display.bounds)
     }

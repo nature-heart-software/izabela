@@ -105,7 +105,9 @@ export const ElectronSpeechWindow = () => {
       const display =
         allDisplays.find((d) => d.id === settingsStore?.display) ||
         (settingsStore?.displayBounds &&
-          allDisplays.find((d) => boundsMatch(d.bounds, settingsStore.displayBounds!))) ||
+          allDisplays.find((d) =>
+            boundsMatch(d.bounds, settingsStore.displayBounds!),
+          )) ||
         primaryDisplay
       const displayBounds = mapValues(display.bounds, (v) => v + 24)
       window.setPosition(displayBounds.x, displayBounds.y)
