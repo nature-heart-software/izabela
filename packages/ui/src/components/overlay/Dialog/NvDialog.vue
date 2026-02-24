@@ -11,7 +11,7 @@
     </StDialogTrigger>
     <Teleport :to="props.portalTarget" defer>
       <Transition class="transition">
-        <StDialogBackdrop v-show="dialogOpen" />
+        <StDialogBackdrop v-if="dialogOpen" />
       </Transition>
       <Transition class="transition">
         <!-- v-if causes this error:  https://github.com/vuejs/core/issues/5657-->

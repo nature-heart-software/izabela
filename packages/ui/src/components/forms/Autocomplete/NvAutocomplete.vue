@@ -44,7 +44,7 @@
             >
               <Transition>
                 <StAutocomplete
-                  v-show="props.visible"
+                  v-if="props.visible"
                   class="autocomplete"
                   v-bind="{ ...props, width: autocompleteWidth }"
                 >

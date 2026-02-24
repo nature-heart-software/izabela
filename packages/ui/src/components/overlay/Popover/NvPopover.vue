@@ -30,7 +30,7 @@
           <Popover.Content :hidden="false">
             <Transition>
               <Card
-                v-show="open"
+                v-if="open"
                 :size="props.size"
                 :style="{ maxWidth: rem(300) }"
               >

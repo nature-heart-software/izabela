@@ -31,7 +31,6 @@
                 <component
                   :is="speechEngine.voiceSelectComponent"
                   v-if="speechEngine.voiceSelectComponent"
-                  :key="form.states['settings.selectedSpeechEngine']"
                   v-model="
                     form.states[
                       speechEngine.store.getPropertyPath('selectedVoice')
@@ -96,14 +95,12 @@
                 <NvFormItem label="Speech engine">
                   <NvSpeechEngineSelect
                     v-model="form.states['settings.selectedSpeechEngine']"
-                    :key="form.states['settings.selectedSpeechEngine']"
                   />
                 </NvFormItem>
                 <NvDivider direction="horizontal" />
                 <template v-if="currentEngineSettingsComponent">
                   <component
                     :is="currentEngineSettingsComponent"
-                    :key="form.states['settings.selectedSpeechEngine']"
                     :form="form.states"
                   />
                 </template>
