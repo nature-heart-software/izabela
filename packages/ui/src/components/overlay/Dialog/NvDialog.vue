@@ -4,6 +4,8 @@
       ...props,
       open: dialogOpen,
       'onUpdate:open': (value) => (dialogOpen = value),
+      lazyMount: true,
+      unmountOnExit: true,
     }"
   >
     <StDialogTrigger>

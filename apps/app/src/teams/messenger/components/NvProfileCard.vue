@@ -64,7 +64,7 @@
           >
             <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm" />
           </NvContextMenu>
-          <NvDialog v-model:open="dialogOpen" portalTarget="#settings">
+          <NvDialog portalTarget="#settings">
             <template #reference>
               <NvTooltip>
                 <NvText>More settings</NvText>
@@ -75,7 +75,7 @@
             </template>
             <template #title>"{{ form.name }}" profile settings</template>
             <template #description>
-              <NvStack v-if="dialogOpen" spacing="5">
+              <NvStack spacing="5">
                 <NvFormItem label="Name">
                   <NvInput
                     v-model="form.name"
@@ -139,7 +139,7 @@ import {
   NvText,
   NvTooltip,
 } from '@packages/ui'
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, reactive, watch } from 'vue'
 import { useProfilesStore } from '@/features/profiles/store.ts'
 import { Profile } from '@/features/profiles/types.ts'
 import NvKeybinding from '@/features/app/components/inputs/NvKeybinding.vue'
@@ -160,7 +160,6 @@ const props = defineProps({
 const profilesStore = useProfilesStore()
 const settingsStore = useSettingsStore()
 const speechStore = useSpeechStore()
-const dialogOpen = ref(false)
 const profile = profilesStore.profiles.find(
   (profile) => profile.id === props.id,
 )
