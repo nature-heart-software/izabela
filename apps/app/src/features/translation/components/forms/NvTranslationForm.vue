@@ -51,13 +51,14 @@
           />
         </NvFormItem>
         <NvDivider direction="horizontal" />
-        <template v-if="currentEngineSettingsComponent">
+        <div v-show="currentEngineSettingsComponent">
           <component
+            v-if="currentEngineSettingsComponent"
             :is="currentEngineSettingsComponent"
             :form="form"
             :size="size"
           />
-        </template>
+        </div>
       </NvStack>
     </NvAccessBlocker>
   </NvStack>

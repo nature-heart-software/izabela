@@ -5,7 +5,7 @@
   >
     <slot />
     <Transition class="transition">
-      <StAccessBlockerReason v-if="!props.allowed">
+      <StAccessBlockerReason v-show="!props.allowed">
         <NkCenter class="w-full h-full">
           <slot name="reason">
             <NvAlert size="sm">
