@@ -12,6 +12,8 @@
           mainAxis: tokens.spacing['4'],
         },
       }"
+      lazyMount
+      unmountOnExit
       @open-change="(details) => emit('openChange', details)"
       @escape-key-down="(details) => emit('escapeKeyDown', details)"
       @focus-outside="(details) => emit('focusOutside', details)"
