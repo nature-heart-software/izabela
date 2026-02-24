@@ -12,8 +12,6 @@
     }"
     asChild
     portalled
-    lazyMount
-    unmountOnExit
   >
     <StPopover v-bind="props">
       <Popover.Trigger asChild>
