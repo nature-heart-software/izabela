@@ -10,46 +10,46 @@
       <slot name="reference" />
     </StDialogTrigger>
     <Teleport :to="props.portalTarget" defer>
-        <Transition class="transition">
-          <StDialogBackdrop v-if="dialogOpen" />
-        </Transition>
-        <Transition class="transition">
+      <Transition class="transition">
+        <StDialogBackdrop v-if="dialogOpen" />
+      </Transition>
+      <Transition class="transition">
         <!-- v-if causes this error:  https://github.com/vuejs/core/issues/5657 -->
-          <StDialogPositioner v-if="dialogOpen">
-            <StDialogContentWrapper
-              ref="portalTarget"
-              @mousedown.self="closeDialog"
-            >
-              <StDialogContent>
-                <NvCard>
-                  <NvStack spacing="5">
-                    <NvGroup justify="between">
-                      <StDialogTitle asChild>
-                        <NvText type="title">
-                          <slot name="title" />
-                        </NvText>
-                      </StDialogTitle>
-                      <StDialogCloseTrigger>
-                        <NvButton
-                          icon-name="times"
-                          size="xs"
-                          squared
-                          type="plain"
-                        />
-                      </StDialogCloseTrigger>
-                    </NvGroup>
-                    <StDialogDescription v-if="$slots.description">
-                      <NvText>
-                        <slot name="description" />
+        <StDialogPositioner v-if="dialogOpen">
+          <StDialogContentWrapper
+            ref="portalTarget"
+            @mousedown.self="closeDialog"
+          >
+            <StDialogContent>
+              <NvCard>
+                <NvStack spacing="5">
+                  <NvGroup justify="between">
+                    <StDialogTitle asChild>
+                      <NvText type="title">
+                        <slot name="title" />
                       </NvText>
-                    </StDialogDescription>
-                    <slot name="footer" />
-                  </NvStack>
-                </NvCard>
-              </StDialogContent>
-            </StDialogContentWrapper>
-          </StDialogPositioner>
-        </Transition>
+                    </StDialogTitle>
+                    <StDialogCloseTrigger>
+                      <NvButton
+                        icon-name="times"
+                        size="xs"
+                        squared
+                        type="plain"
+                      />
+                    </StDialogCloseTrigger>
+                  </NvGroup>
+                  <StDialogDescription v-if="$slots.description">
+                    <NvText>
+                      <slot name="description" />
+                    </NvText>
+                  </StDialogDescription>
+                  <slot name="footer" />
+                </NvStack>
+              </NvCard>
+            </StDialogContent>
+          </StDialogContentWrapper>
+        </StDialogPositioner>
+      </Transition>
     </Teleport>
   </StDialogRoot>
 </template>
