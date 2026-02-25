@@ -26,7 +26,7 @@ const createTray = (): Promise<Tray> =>
           submenu: [
             {
               label: 'Display',
-              submenu: allDisplays.map(({ id }) => ({
+              submenu: allDisplays.map(({ id, bounds }) => ({
                 label: `${(id === primaryDisplay.id && '(Primary) ') || ''}${id}`,
                 type: 'radio',
                 checked:
@@ -34,14 +34,14 @@ const createTray = (): Promise<Tray> =>
                     ? id === settingsStore.display
                     : primaryDisplay.id === id,
                 click: () => {
-                  settingsStore.$patch({ display: id })
+                  settingsStore.$patch({ display: id, displayBounds: bounds })
                 },
               })),
             },
             {
               label: 'Reset Display',
               click: () => {
-                settingsStore.$patch({ display: null })
+                settingsStore.$patch({ display: null, displayBounds: null })
               },
             },
           ],
