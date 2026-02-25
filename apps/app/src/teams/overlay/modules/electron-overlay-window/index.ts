@@ -17,6 +17,7 @@ import keymap from '@packages/native-keymap'
 import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
 import { useOverlayWindowStore } from '@/teams/overlay/store'
 import koffi from 'koffi'
+import { boundsMatch } from '@/electron/utils'
 
 export const ElectronOverlayWindow = () => {
   let waitingToShow = false
@@ -106,12 +107,19 @@ export const ElectronOverlayWindow = () => {
     }
   }
 
-  const setDisplay = (id?: Electron.Display['id'] | null) => {
+  const setDisplay = (
+    id?: Electron.Display['id'] | null,
+    boundsHint?: Electron.Rectangle | null,
+  ) => {
     const window = getWindow()
     if (window) {
       const allDisplays = screen.getAllDisplays()
       const primaryDisplay = screen.getPrimaryDisplay()
-      const display = allDisplays.find((d) => d.id === id) || primaryDisplay
+      const display =
+        (id != null && allDisplays.find((d) => d.id === id)) ||
+        (boundsHint &&
+          allDisplays.find((d) => boundsMatch(d.bounds, boundsHint))) ||
+        primaryDisplay
       window.setBounds(display.bounds)
     }
   }

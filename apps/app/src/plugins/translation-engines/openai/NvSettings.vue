@@ -4,6 +4,14 @@
     reason="Credentials required"
   >
     <NvStack :spacing="size === 'sm' ? 4 : 5">
+      <NvFormItem label="Model">
+        <NvModelSelect
+          :modelValue="getProperty('model')"
+          placeholder="Select a model"
+          @update:modelValue="(value) => setProperty('model', value)"
+        />
+      </NvFormItem>
+      <NvDivider direction="horizontal" />
       <NvFormItem label="Prompt">
         <NvTextarea
           :modelValue="getProperty('prompt')"
@@ -53,6 +61,7 @@ import NvTranslateFromSelect from './NvTranslateFromSelect.vue'
 import NvTranslateToSelect from './NvTranslateToSelect.vue'
 import { store } from './store.ts'
 import { engine } from './register.ts'
+import NvModelSelect from './NvModelSelect.vue'
 
 const props = defineProps({
   size: {

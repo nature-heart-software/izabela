@@ -41,6 +41,7 @@ export const useSettingsStore = defineStore(
     const debugMode = ref(import.meta.env.MODE === 'development')
     const messageMode = ref<'sentence' | 'word'>('sentence')
     const display = ref<Electron.Display['id'] | null>(null)
+    const displayBounds = ref<Electron.Rectangle | null>(null)
     const hideWindowOnMessage = ref(false)
     const hideWindowOnClickOutside = ref(true)
     const clearMessageOnWindowHide = ref(false)
@@ -239,6 +240,7 @@ export const useSettingsStore = defineStore(
       debugMode,
       messageMode,
       display,
+      displayBounds,
       keybindings,
       hideWindowOnMessage,
       universalApiKey,

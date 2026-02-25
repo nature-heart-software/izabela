@@ -69,6 +69,7 @@ export const useDictionaryStore = defineStore(
       if (!enableDictionary.value) return text
       const words = text.split(' ')
       const flags = caseSensitive.value ? 'g' : 'gi'
+      const testFlags = caseSensitive.value ? '' : 'i'
       const definitions = filteredDefinitions.value
 
       const deduplicatedDefinitions = new Map<string, string>()
@@ -89,10 +90,10 @@ export const useDictionaryStore = defineStore(
         const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
         const exactMatchRegexExpression = `(?<![\\w:])${escapedWord}(?![\\w:])`
         const boundaryMatchRegexExpression = `^${escapedWord}|${escapedWord}$`
-        const exactMatchRegex = new RegExp(exactMatchRegexExpression, flags)
+        const exactMatchRegex = new RegExp(exactMatchRegexExpression, testFlags)
         const boundaryMatchRegex = new RegExp(
           boundaryMatchRegexExpression,
-          flags,
+          testFlags,
         )
         words.forEach((currentWord, i) => {
           const evaluations = [
