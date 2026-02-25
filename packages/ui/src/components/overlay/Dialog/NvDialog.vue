@@ -14,7 +14,6 @@
           <StDialogBackdrop v-if="dialogOpen" />
         </Transition>
         <Transition class="transition">
-        <!-- v-if causes this error:  https://github.com/vuejs/core/issues/5657 -->
           <StDialogPositioner v-if="dialogOpen">
             <StDialogContentWrapper
               ref="portalTarget"
