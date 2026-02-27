@@ -55,7 +55,14 @@
   </StDialogRoot>
 </template>
 <script lang="ts" setup>
-import { computed, defineComponent, defineEmits, defineProps, provide, ref } from 'vue'
+import {
+  computed,
+  defineComponent,
+  defineEmits,
+  defineProps,
+  provide,
+  ref,
+} from 'vue'
 import { props as propsDefinition } from './dialog.shared'
 import NvCard from '@/components/display/Card/NvCard.vue'
 import NvButton from '@/components/forms/Button/NvButton.vue'
