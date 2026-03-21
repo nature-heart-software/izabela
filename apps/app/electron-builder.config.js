@@ -40,8 +40,10 @@ module.exports = {
   electronVersion: getElectronVersion(),
   extraFiles: ['./resources/**'],
   asarUnpack: [
+    'node_modules/@packages/native-keymap/**/*',
     'node_modules/@packages/process-watcher/**/*',
     'node_modules/wql-process-monitor/**/*',
+    'node_modules/win-control/**/*',
     'node_modules/@xan105/error/**/*',
     'node_modules/@xan105/ffi/**/*',
     'node_modules/@xan105/is/**/*',
