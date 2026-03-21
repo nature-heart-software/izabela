@@ -1,15 +1,17 @@
 #!/usr/bin/node
 
-const { exec } = require('child_process')
+const { spawn } = require('child_process')
 
-exec('npm run rebuild', (error, stdout, stderr) => {
-  if (error) {
-    console.log(`error: ${error.message}`)
-    return
-  }
-  if (stderr) {
-    console.log(`stderr: ${stderr}`)
-    return
-  }
-  console.log(`stdout: ${stdout}`)
+const child = spawn('npm', ['run', 'rebuild'], {
+  shell: true,
+  stdio: 'inherit',
+})
+
+child.on('error', (error) => {
+  console.error(error)
+  process.exit(1)
+})
+
+child.on('exit', (code) => {
+  process.exit(code ?? 1)
 })
