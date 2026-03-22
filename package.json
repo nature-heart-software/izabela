@@ -172,13 +172,15 @@
   },
   "scripts": {
     "prepare": "npm install && npm run postinstall && npm rebuild && npm run prepare:native",
+    "prepare:patched": "npm run patch && node node_modules/electron/install.js",
+    "prepare:dev": "npm run prepare:patched && npm run prepare:native",
     "prepare:native": "npm run install --workspace @packages/native-keymap && npm run install --workspace win-control",
     "build": "npm run prepare && lerna run build",
     "build:app": "lerna run build --scope izabela-next --stream",
     "build:deps": "lerna run build --scope '{@packages/*,@apps/app-server}' --stream",
     "build:prod": "lerna run build:prod --stream",
-    "dev": "lerna run dev --scope izabela-next --stream",
-    "infisical:dev": "infisical run --path=\"/apps/app\" -- nu -c \"lerna run dev --scope izabela-next --stream\"",
+    "dev": "npm run prepare:dev && lerna run dev --scope izabela-next --stream",
+    "infisical:dev": "npm run prepare:dev && infisical run --path=\"/apps/app\" -- nu -c \"lerna run dev --scope izabela-next --stream\"",
     "docker:build": "docker build -t izabela . && docker create --name dummy izabela && docker cp dummy:dist_electron dist_electron && docker rm -f dummy",
     "patch": "patch-package",
     "postinstall": "npm run patch"
