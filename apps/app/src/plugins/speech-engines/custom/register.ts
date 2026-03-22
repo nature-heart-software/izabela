@@ -39,7 +39,9 @@ export const engine = registerEngine({
       .post<Blob>(
         `${
           endpoint.endsWith('/') ? endpoint.slice(0, -1) : endpoint
-        }/synthesize-speech`,
+        }/synthesize-speech${
+          getProperty('streamAudio') ? '/stream' : ''
+        }`,
         {
           credentials,
           payload,
