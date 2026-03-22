@@ -10,50 +10,59 @@
       <slot name="reference" />
     </StDialogTrigger>
     <Teleport :to="props.portalTarget" defer>
-      <Transition class="transition">
-        <StDialogBackdrop v-if="dialogOpen" />
-      </Transition>
-      <Transition class="transition">
-        <StDialogPositioner v-if="dialogOpen">
-          <StDialogContentWrapper
-            ref="portalTarget"
-            @mousedown.self="closeDialog"
-          >
-            <StDialogContent>
-              <NvCard>
-                <NvStack spacing="5">
-                  <NvGroup justify="between">
-                    <StDialogTitle asChild>
-                      <NvText type="title">
-                        <slot name="title" />
+      <PortalTargetProvider :target="portalTarget">
+        <Transition class="transition">
+          <StDialogBackdrop v-if="dialogOpen" />
+        </Transition>
+        <Transition class="transition">
+          <StDialogPositioner v-if="dialogOpen">
+            <StDialogContentWrapper
+              ref="portalTarget"
+              @mousedown.self="closeDialog"
+            >
+              <StDialogContent>
+                <NvCard>
+                  <NvStack spacing="5">
+                    <NvGroup justify="between">
+                      <StDialogTitle asChild>
+                        <NvText type="title">
+                          <slot name="title" />
+                        </NvText>
+                      </StDialogTitle>
+                      <StDialogCloseTrigger>
+                        <NvButton
+                          icon-name="times"
+                          size="xs"
+                          squared
+                          type="plain"
+                        />
+                      </StDialogCloseTrigger>
+                    </NvGroup>
+                    <StDialogDescription v-if="$slots.description">
+                      <NvText>
+                        <slot name="description" />
                       </NvText>
-                    </StDialogTitle>
-                    <StDialogCloseTrigger>
-                      <NvButton
-                        icon-name="times"
-                        size="xs"
-                        squared
-                        type="plain"
-                      />
-                    </StDialogCloseTrigger>
-                  </NvGroup>
-                  <StDialogDescription v-if="$slots.description">
-                    <NvText>
-                      <slot name="description" />
-                    </NvText>
-                  </StDialogDescription>
-                  <slot name="footer" />
-                </NvStack>
-              </NvCard>
-            </StDialogContent>
-          </StDialogContentWrapper>
-        </StDialogPositioner>
-      </Transition>
+                    </StDialogDescription>
+                    <slot name="footer" />
+                  </NvStack>
+                </NvCard>
+              </StDialogContent>
+            </StDialogContentWrapper>
+          </StDialogPositioner>
+        </Transition>
+      </PortalTargetProvider>
     </Teleport>
   </StDialogRoot>
 </template>
 <script lang="ts" setup>
-import { computed, defineEmits, defineProps, provide, ref } from 'vue'
+import {
+  computed,
+  defineComponent,
+  defineEmits,
+  defineProps,
+  provide,
+  ref,
+} from 'vue'
 import { props as propsDefinition } from './dialog.shared'
 import NvCard from '@/components/display/Card/NvCard.vue'
 import NvButton from '@/components/forms/Button/NvButton.vue'
@@ -73,8 +82,21 @@ import {
 } from './dialog.styled'
 import { PORTAL_TARGET } from '@/consts'
 
+const PortalTargetProvider = defineComponent({
+  name: 'PortalTargetProvider',
+  props: {
+    target: {
+      type: Object,
+      required: true,
+    },
+  },
+  setup(props, { slots }) {
+    provide(PORTAL_TARGET, props.target)
+    return () => slots.default?.()
+  },
+})
+
 const portalTarget = ref()
-provide(PORTAL_TARGET, portalTarget)
 
 const props = defineProps({
   ...propsDefinition,

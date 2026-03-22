@@ -9,7 +9,7 @@
   "main": "index.js",
   "repository": "Microsoft/node-native-keymap.git",
   "scripts": {
-    "install": "",
+    "install": "node-gyp rebuild",
     "test": "node test/test.js"
   },
   "typings": "index.d.ts"
