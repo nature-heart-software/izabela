@@ -15,6 +15,14 @@ export default () =>
         title: `${app.name} update available`,
         body: `A new update has been downloaded and will install on exit.`,
       })
-      return autoUpdater.checkForUpdatesAndNotify(notification)
+      return autoUpdater
+        .checkForUpdatesAndNotify(notification)
+        .catch((error) => {
+          console.warn(
+            '[electron-updater] Failed to fetch updates:',
+            error instanceof Error ? error.message : error,
+          )
+          return null
+        })
     })
   })
