@@ -40,6 +40,7 @@ module.exports = {
   electronVersion: getElectronVersion(),
   extraFiles: ['./resources/**'],
   asarUnpack: [
+    'node_modules/@packages/electron-game-overlay/**/*',
     'node_modules/@packages/native-keymap/**/*',
     'node_modules/@packages/process-watcher/**/*',
     'node_modules/wql-process-monitor/**/*',
