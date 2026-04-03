@@ -30,7 +30,7 @@
   "author": "Yannic Lieder",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^10.1.2",
+    "electron": "^39.8.4",
     "eslint": "^7.10.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.21.2"
