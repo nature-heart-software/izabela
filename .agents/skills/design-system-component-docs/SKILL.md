@@ -7,7 +7,7 @@ description: Create or update design-system documentation for a code component s
 
 Use this skill to turn a component implementation into a design-spec document that a designer or design tool can use reliably.
 
-The goal is not a vague summary. The goal is a precise component document that captures the component's structure, variants, sizes, tokens, visual states, and any theme differences in a form that is easy to export into Figma or another design tool.
+The goal is not a vague summary. The goal is a precise component document that captures the component's structure, variants, sizes, tokens, visual states, layout behavior, fills, strokes, effects, and any theme differences in a form that is easy to export into Figma or another design tool.
 
 ## What to inspect
 
@@ -31,6 +31,7 @@ If the repo already has a design-system document, update the existing location a
 - Separate compound cases when readability would otherwise suffer. A few smaller tables are better than one unreadable mega-table.
 - Normalize state names so the document is easy to map into design software: `rest`, `hover`, `focus`, `active`, `selected`, `disabled`, `loading`, `open`, `invalid`, `checked`, `pressed`. Only include states that are actually supported or clearly implied by the implementation.
 - Capture booleans and enums as recommended Figma variant properties when that makes the component easier to reconstruct.
+- Think in Figma primitives, not just CSS property names. Capture the details needed to rebuild the component using component properties, auto layout, fills, strokes, effects, typography, and per-part layers.
 
 If you need an exhaustive checklist for design-tool export details, read `references/figma-export-checklist.md`.
 
@@ -45,16 +46,16 @@ If you need an exhaustive checklist for design-tool export details, read `refere
    - slots / children / icons / labels
    - theme dependencies
 4. Extract visual rules:
-   - typography
-   - dimensions
-   - padding / gap
-   - border radius
-   - border width
-   - border color
-   - background color
-   - text color
-   - shadow / focus ring
-   - opacity / visibility changes
+   - typography: family, size, weight, line height, letter spacing, text transform, text decoration
+   - dimensions: width, min-width, max-width, height, min-height, max-height where evidenced
+   - layout: auto-layout direction, alignment, justification, wrapping, padding, gap, and per-part spacing
+   - shape: border radius, including per-corner radius when it differs
+   - strokes: border width, border color, border style, stroke alignment if discernible
+   - fills: background color, gradient, transparency, and layered fills when present
+   - foreground colors: text color, icon color, placeholder color, caret color, helper-text color
+   - effects: box shadow, inset shadow, focus ring, outline, blur, backdrop blur, and other filter-like effects
+   - visibility: opacity, hidden/collapsed behavior, overflow/clipping, masking if present
+   - supporting visuals: icon size, divider thickness, overlay/backdrop color and opacity, decorative layers
 5. Extract interactive states and any compound states, such as `variant + selected` or `size + icon-only`.
 6. Translate the implementation into a documentation structure a designer can directly use.
 7. Add a short gaps section for anything a designer would need but the code does not define explicitly.
@@ -85,16 +86,16 @@ Use a table like:
 | Size | Height | Min width | Padding X | Padding Y | Gap | Radius | Border width | Typography | Icon size | Notes |
 | ---- | ------ | --------- | --------- | --------- | --- | ------ | ------------ | ---------- | --------- | ----- |
 
-If a field is not applicable, use `Not found` or `N/A`.
+If it helps reconstruction, add extra columns such as `Width`, `Alignment`, `Line height`, or `Letter spacing`. If a field is not applicable, use `Not found` or `N/A`.
 
 ### Variant and state style tables
 
-Prefer one table per theme when values differ by theme. If needed, split further by variant for readability.
+Prefer one table per theme when values differ by theme. If needed, split further by variant or by part for readability.
 
-| Theme | Variant | State | Text color | Background color | Border color | Border width | Shadow / focus ring | Radius | Opacity | Notes |
-| ----- | ------- | ----- | ---------- | ---------------- | ------------ | ------------ | ------------------- | ------ | ------- | ----- |
+| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Opacity | Notes |
+| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------- | ----- |
 
-Include every evidenced state the implementation supports. If focus is represented as a box shadow instead of a border change, document that exactly.
+Include every evidenced state the implementation supports. If focus is represented as a box shadow instead of a border change, document that exactly. If important values differ by part, add a companion table rather than flattening everything into one overloaded matrix.
 
 ### Structure / anatomy
 
@@ -130,6 +131,14 @@ This should convert the code model into a component-set model, for example:
 
 Only recommend properties that are justified by the implementation. Do not invent a Figma axis for something the code does not meaningfully vary.
 
+After the table, add short `Figma build notes` bullets when they would help a designer recreate the component, such as:
+
+- which layers should use Auto Layout and in what direction
+- which fills, strokes, or effect styles should be shared styles versus one-off values
+- whether box shadows, inset shadows, or focus rings belong on the root container or a nested part
+- whether overflow should be clipped
+- which part-level properties should stay detached content instead of becoming component properties
+
 ### Gaps / assumptions
 
 End with a short table or bullet list covering:
@@ -160,6 +169,7 @@ Before finishing, verify that the document answers these questions without forci
 - What are the supported variants?
 - What are the supported sizes and dimensions?
 - What visual values change across hover, focus, active, selected, disabled, or other supported states?
+- Can a designer rebuild the component's fills, strokes, shadows, focus treatments, typography, and layout behavior in Figma without reopening the code?
 - Which values come from tokens versus hard-coded values?
 - Which theme differences matter?
 - How should this be represented as a Figma component set?

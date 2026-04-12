@@ -41,27 +41,27 @@ Select family built from an input-like trigger (`NvSelect`), a portalled autocom
 
 ## Variant And State Style Tables
 
-| Theme | Variant             | State          | Text color                | Background color                                                   | Border color | Border width | Shadow / focus ring | Radius    | Opacity | Notes                                                                                     |
-| ----- | ------------------- | -------------- | ------------------------- | ------------------------------------------------------------------ | ------------ | ------------ | ------------------- | --------- | ------- | ----------------------------------------------------------------------------------------- |
-| light | trigger             | rest           | `#444444`                 | `#ffffff`                                                          | `#EBEBEB`    | `1px`        | none                | by size   | `1`     |                                                                                           |
-| light | trigger             | hover          | `#444444`                 | `#ffffff`                                                          | `#BEBEBE`    | `1px`        | none                | by size   | `1`     |                                                                                           |
-| light | trigger             | focus          | `#444444`                 | `#ffffff`                                                          | `#BEBEBE`    | `1px`        | `0 0 0 4px #F9F9FC` | by size   | `1`     | Driven by focus trap.                                                                     |
-| light | trigger placeholder | placeholder    | `#BEBEBE`                 | N/A                                                                | N/A          | N/A          | none                | N/A       | `1`     | Placeholder weight `300`.                                                                 |
-| dark  | trigger             | rest           | `#DCDCDC`                 | `darken(0.0675, #444444)`                                          | `#444444`    | `1px`        | none                | by size   | `1`     |                                                                                           |
-| dark  | trigger             | hover          | `#DCDCDC`                 | `darken(0.0675, #444444)`                                          | `#626262`    | `1px`        | none                | by size   | `1`     |                                                                                           |
-| dark  | trigger             | focus          | `#DCDCDC`                 | `darken(0.0675, #444444)`                                          | `#626262`    | `1px`        | `0 0 0 4px #444444` | by size   | `1`     |                                                                                           |
-| light | option              | rest           | `#444444`                 | transparent                                                        | transparent  | `0`          | none                | Not found | `1`     |                                                                                           |
-| light | option              | hover          | `#444444`                 | `#F9F9FC`                                                          | transparent  | `0`          | none                | Not found | `1`     |                                                                                           |
-| light | option              | selected       | `#444444`                 | `#EBEBEB`                                                          | transparent  | `0`          | none                | Not found | `1`     | Font weight `700`.                                                                        |
-| light | option              | active         | `#444444`                 | `#BEBEBE`                                                          | transparent  | `0`          | none                | Not found | `1`     | Keyboard-highlight state.                                                                 |
-| light | option              | disabled       | `#ffffff`                 | transparent                                                        | transparent  | `0`          | none                | Not found | `1`     | Uses `theme.select.option.disabled.backgroundColor`, despite being applied as text color. |
-| light | option              | readonly group | `#BEBEBE`                 | group background `#ffffff`; divider line `#EBEBEB`                 | N/A          | `0`          | none                | Not found | `1`     | Group headers are non-interactive and draw a line behind text.                            |
-| dark  | option              | rest           | `#DCDCDC`                 | transparent                                                        | transparent  | `0`          | none                | Not found | `1`     |                                                                                           |
-| dark  | option              | hover          | `#DCDCDC`                 | `#444444`                                                          | transparent  | `0`          | none                | Not found | `1`     |                                                                                           |
-| dark  | option              | selected       | `#DCDCDC`                 | `darken(0.0675, #626262)`                                          | transparent  | `0`          | none                | Not found | `1`     | Font weight `700`.                                                                        |
-| dark  | option              | active         | `#DCDCDC`                 | `#2B2B2C`                                                          | transparent  | `0`          | none                | Not found | `1`     |                                                                                           |
-| dark  | option              | disabled       | `darken(0.0675, #444444)` | transparent                                                        | transparent  | `0`          | none                | Not found | `1`     | Uses background token as text color.                                                      |
-| dark  | option              | readonly group | `#9F9F9F`                 | group background `darken(0.0675, #444444)`; divider line `#626262` | N/A          | `0`          | none                | Not found | `1`     |                                                                                           |
+| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
+| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
+| light | trigger | rest | `#444444` | same as text | `#ffffff` | `1px` / `#EBEBEB` | none | by size | `1` |  |
+| light | trigger | hover | `#444444` | same as text | `#ffffff` | `1px` / `#BEBEBE` | none | by size | `1` |  |
+| light | trigger | focus | `#444444` | same as text | `#ffffff` | `1px` / `#BEBEBE` | `0 0 0 4px #F9F9FC` | by size | `1` | Driven by focus trap. |
+| light | trigger placeholder | placeholder | `#BEBEBE` | same as text | N/A | none | none | N/A | `1` | Placeholder weight `300`. |
+| dark | trigger | rest | `#DCDCDC` | same as text | `darken(0.0675, #444444)` | `1px` / `#444444` | none | by size | `1` |  |
+| dark | trigger | hover | `#DCDCDC` | same as text | `darken(0.0675, #444444)` | `1px` / `#626262` | none | by size | `1` |  |
+| dark | trigger | focus | `#DCDCDC` | same as text | `darken(0.0675, #444444)` | `1px` / `#626262` | `0 0 0 4px #444444` | by size | `1` |  |
+| light | option | rest | `#444444` | same as text | transparent | transparent | none | Not found | `1` |  |
+| light | option | hover | `#444444` | same as text | `#F9F9FC` | transparent | none | Not found | `1` |  |
+| light | option | selected | `#444444` | same as text | `#EBEBEB` | transparent | none | Not found | `1` | Font weight `700`. |
+| light | option | active | `#444444` | same as text | `#BEBEBE` | transparent | none | Not found | `1` | Keyboard-highlight state. |
+| light | option | disabled | `#ffffff` | same as text | transparent | transparent | none | Not found | `1` | Uses `theme.select.option.disabled.backgroundColor`, despite being applied as text color. |
+| light | option | readonly group | `#BEBEBE` | same as text | group background `#ffffff`; divider line `#EBEBEB` | none | none | Not found | `1` | Group headers are non-interactive and draw a line behind text. |
+| dark | option | rest | `#DCDCDC` | same as text | transparent | transparent | none | Not found | `1` |  |
+| dark | option | hover | `#DCDCDC` | same as text | `#444444` | transparent | none | Not found | `1` |  |
+| dark | option | selected | `#DCDCDC` | same as text | `darken(0.0675, #626262)` | transparent | none | Not found | `1` | Font weight `700`. |
+| dark | option | active | `#DCDCDC` | same as text | `#2B2B2C` | transparent | none | Not found | `1` |  |
+| dark | option | disabled | `darken(0.0675, #444444)` | same as text | transparent | transparent | none | Not found | `1` | Uses background token as text color. |
+| dark | option | readonly group | `#9F9F9F` | same as text | group background `darken(0.0675, #444444)`; divider line `#626262` | none | none | Not found | `1` |  |
 
 ## Structure / Anatomy
 
@@ -103,6 +103,13 @@ Select family built from an input-like trigger (`NvSelect`), a portalled autocom
 | `Has Placeholder` | boolean | `true, false`                                             | placeholder text presence      |
 | `Option State`    | variant | `rest, hover, active, selected, disabled, readonly-group` | `NvOption` and grouped options |
 | `Option After`    | boolean | `true, false`                                             | `after` slot                   |
+
+## Figma Build Notes
+
+- Use the primary visible part named in `Structure / Anatomy` as the main Figma frame, and keep purely behavioral wrappers such as hidden inputs, triggers, portals, or state containers outside the exported component set.
+- Apply fills, strokes, radius, and effects to the same layer identified in the anatomy table instead of redistributing those values across extra wrapper frames.
+- Keep slot content, consumer-provided copy, and arbitrary child content detached unless the README already defines them as explicit Figma properties.
+- If clipping, effect placement, or delegated styling is unresolved in source, preserve that uncertainty in the notes instead of inventing extra Figma variants.
 
 ## Gaps / Assumptions
 

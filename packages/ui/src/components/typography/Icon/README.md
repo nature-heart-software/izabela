@@ -35,10 +35,10 @@
 
 ## Variant And State Styles
 
-| Theme | Variant | State | Text color                   | Background color | Border color | Border width | Shadow / focus ring | Radius | Opacity | Notes                                |
-| ----- | ------- | ----- | ---------------------------- | ---------------- | ------------ | ------------ | ------------------- | ------ | ------- | ------------------------------------ |
-| Light | Default | Rest  | Inherited via `currentColor` | None             | None         | 0            | None                | N/A    | 1       | Component itself does not set color. |
-| Dark  | Default | Rest  | Inherited via `currentColor` | None             | None         | 0            | None                | N/A    | 1       | Same as light theme.                 |
+| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
+| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
+| Light | Default | Rest | Inherited via `currentColor` | same as text | None | none | None | N/A | 1 | Component itself does not set color. |
+| Dark | Default | Rest | Inherited via `currentColor` | same as text | None | none | None | N/A | 1 | Same as light theme. |
 
 ## Structure / Anatomy
 
@@ -62,6 +62,13 @@
 | `Icon`         | Instance swap / enum | Exported icon names from `@packages/icons`              | `name` prop + runtime lookup                                                      |
 | `Size`         | Variant              | `1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16` | `size` prop                                                                       |
 | `Theme`        | Variant              | `light, dark`                                           | Color is inherited; include only if icon is previewed inside themed text contexts |
+
+## Figma Build Notes
+
+- Use the primary visible part named in `Structure / Anatomy` as the main Figma frame, and keep purely behavioral wrappers such as hidden inputs, triggers, portals, or state containers outside the exported component set.
+- Apply fills, strokes, radius, and effects to the same layer identified in the anatomy table instead of redistributing those values across extra wrapper frames.
+- Keep slot content, consumer-provided copy, and arbitrary child content detached unless the README already defines them as explicit Figma properties.
+- If clipping, effect placement, or delegated styling is unresolved in source, preserve that uncertainty in the notes instead of inventing extra Figma variants.
 
 ## Gaps / Assumptions
 

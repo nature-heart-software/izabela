@@ -32,14 +32,14 @@ Source files used:
 
 ## Variant And State Styles
 
-| Theme | Variant | State         | Text color | Background color                                                        | Border color                                                    | Border width | Shadow / focus ring                                         | Radius    | Opacity   | Notes                                                                                                   |
-| ----- | ------- | ------------- | ---------- | ----------------------------------------------------------------------- | --------------------------------------------------------------- | ------------ | ----------------------------------------------------------- | --------- | --------- | ------------------------------------------------------------------------------------------------------- |
-| light | default | rest          | Not found  | `theme.contextMenu.backgroundColor` -> `colors.white` (`#ffffff`)       | `theme.contextMenu.borderColor` -> `colors.gray.20` (`#EBEBEB`) | `1px`        | `boxShadow.lg` -> `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | `8px`     | Not found | Applied via `[data-theme="context-menu"]`.                                                              |
-| dark  | default | rest          | Not found  | `theme.contextMenu.backgroundColor` -> `darken(0.0675, colors.gray.80)` | `theme.contextMenu.borderColor` -> `colors.gray.80` (`#444444`) | `1px`        | `boxShadow.lg` -> `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | `8px`     | Not found | Dark background is computed in theme code, not stored as a literal token.                               |
-| light | default | open          | Not found  | Same as rest                                                            | Same as rest                                                    | `1px`        | Same as rest                                                | `8px`     | Not found | Open state is driven by tippy visibility; no separate open styling is defined.                          |
-| dark  | default | open          | Not found  | Same as rest                                                            | Same as rest                                                    | `1px`        | Same as rest                                                | `8px`     | Not found | Open state is driven by tippy visibility; no separate open styling is defined.                          |
-| light | default | disabled item | Not found  | Not found                                                               | Not found                                                       | Not found    | Not found                                                   | Not found | Not found | Disabled behavior is passed to nested `NvOption`; container-level disabled styles are not defined here. |
-| dark  | default | disabled item | Not found  | Not found                                                               | Not found                                                       | Not found    | Not found                                                   | Not found | Not found | Disabled behavior is passed to nested `NvOption`; container-level disabled styles are not defined here. |
+| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
+| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
+| light | default | rest | Not found | N/A | `theme.contextMenu.backgroundColor` -> `colors.white` (`#ffffff`) | `1px` / `theme.contextMenu.borderColor` -> `colors.gray.20` (`#EBEBEB`) | `boxShadow.lg` -> `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | `8px` | Not found | Applied via `[data-theme="context-menu"]`. |
+| dark | default | rest | Not found | N/A | `theme.contextMenu.backgroundColor` -> `darken(0.0675, colors.gray.80)` | `1px` / `theme.contextMenu.borderColor` -> `colors.gray.80` (`#444444`) | `boxShadow.lg` -> `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | `8px` | Not found | Dark background is computed in theme code, not stored as a literal token. |
+| light | default | open | Not found | N/A | Same as rest | `1px` / Same as rest | Same as rest | `8px` | Not found | Open state is driven by tippy visibility; no separate open styling is defined. |
+| dark | default | open | Not found | N/A | Same as rest | `1px` / Same as rest | Same as rest | `8px` | Not found | Open state is driven by tippy visibility; no separate open styling is defined. |
+| light | default | disabled item | Not found | N/A | Not found | none | Not found | Not found | Not found | Disabled behavior is passed to nested `NvOption`; container-level disabled styles are not defined here. |
+| dark | default | disabled item | Not found | N/A | Not found | none | Not found | Not found | Not found | Disabled behavior is passed to nested `NvOption`; container-level disabled styles are not defined here. |
 
 ## Structure / Anatomy
 
@@ -74,6 +74,13 @@ Source files used:
 | `Has Divider`   | Boolean | `true, false`    | `options` union includes divider rows                             |
 | `Item Disabled` | Boolean | `true, false`    | `option.disabled`                                                 |
 | `Item Icon`     | Boolean | `true, false`    | `option.icon`                                                     |
+
+## Figma Build Notes
+
+- Use the primary visible part named in `Structure / Anatomy` as the main Figma frame, and keep purely behavioral wrappers such as hidden inputs, triggers, portals, or state containers outside the exported component set.
+- Apply fills, strokes, radius, and effects to the same layer identified in the anatomy table instead of redistributing those values across extra wrapper frames.
+- Keep slot content, consumer-provided copy, and arbitrary child content detached unless the README already defines them as explicit Figma properties.
+- If clipping, effect placement, or delegated styling is unresolved in source, preserve that uncertainty in the notes instead of inventing extra Figma variants.
 
 ## Gaps / Assumptions
 

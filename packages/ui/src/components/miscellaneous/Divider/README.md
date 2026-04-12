@@ -19,12 +19,12 @@
 
 ## Variant And State Styles
 
-| Theme | Variant      | State | Text color | Background color | Border color                                               | Border width | Shadow / focus ring | Radius | Opacity | Notes                                           |
-| ----- | ------------ | ----- | ---------- | ---------------- | ---------------------------------------------------------- | ------------ | ------------------- | ------ | ------- | ----------------------------------------------- |
-| Light | `horizontal` | Rest  | N/A        | None             | `theme.divider.borderColor` = `colors.gray.20` (`#EBEBEB`) | 1px          | None                | N/A    | 1       | Renders `border-top`.                           |
-| Light | `vertical`   | Rest  | N/A        | None             | `theme.divider.borderColor` = `colors.gray.20` (`#EBEBEB`) | 1px          | None                | N/A    | 1       | Renders `border-right`; `display: inline-flex`. |
-| Dark  | `horizontal` | Rest  | N/A        | None             | `theme.divider.borderColor` = `colors.gray.80` (`#444444`) | 1px          | None                | N/A    | 1       | Renders `border-top`.                           |
-| Dark  | `vertical`   | Rest  | N/A        | None             | `theme.divider.borderColor` = `colors.gray.80` (`#444444`) | 1px          | None                | N/A    | 1       | Renders `border-right`; `display: inline-flex`. |
+| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
+| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
+| Light | `horizontal` | Rest | N/A | N/A | None | 1px / `theme.divider.borderColor` = `colors.gray.20` (`#EBEBEB`) | None | N/A | 1 | Renders `border-top`. |
+| Light | `vertical` | Rest | N/A | N/A | None | 1px / `theme.divider.borderColor` = `colors.gray.20` (`#EBEBEB`) | None | N/A | 1 | Renders `border-right`; `display: inline-flex`. |
+| Dark | `horizontal` | Rest | N/A | N/A | None | 1px / `theme.divider.borderColor` = `colors.gray.80` (`#444444`) | None | N/A | 1 | Renders `border-top`. |
+| Dark | `vertical` | Rest | N/A | N/A | None | 1px / `theme.divider.borderColor` = `colors.gray.80` (`#444444`) | None | N/A | 1 | Renders `border-right`; `display: inline-flex`. |
 
 ## Structure / Anatomy
 
@@ -47,6 +47,13 @@
 | -------------- | ------- | ---------------------- | ------------------- |
 | `Direction`    | Variant | `horizontal, vertical` | `direction` prop    |
 | `Theme`        | Variant | `light, dark`          | Theme divider color |
+
+## Figma Build Notes
+
+- Use the primary visible part named in `Structure / Anatomy` as the main Figma frame, and keep purely behavioral wrappers such as hidden inputs, triggers, portals, or state containers outside the exported component set.
+- Apply fills, strokes, radius, and effects to the same layer identified in the anatomy table instead of redistributing those values across extra wrapper frames.
+- Keep slot content, consumer-provided copy, and arbitrary child content detached unless the README already defines them as explicit Figma properties.
+- If clipping, effect placement, or delegated styling is unresolved in source, preserve that uncertainty in the notes instead of inventing extra Figma variants.
 
 ## Gaps / Assumptions
 

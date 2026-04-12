@@ -36,10 +36,10 @@
 
 ## Variant And State Styles
 
-| Theme | Variant | State | Text color | Background color | Border color | Border width | Shadow / focus ring | Radius | Opacity | Notes                                 |
-| ----- | ------- | ----- | ---------- | ---------------- | ------------ | ------------ | ------------------- | ------ | ------- | ------------------------------------- |
-| Light | any     | Rest  | Inherited  | None             | None         | 0            | None                | N/A    | 1       | Theme does not alter layout behavior. |
-| Dark  | any     | Rest  | Inherited  | None             | None         | 0            | None                | N/A    | 1       | Theme does not alter layout behavior. |
+| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
+| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
+| Light | any | Rest | Inherited | same as text | None | none | None | N/A | 1 | Theme does not alter layout behavior. |
+| Dark | any | Rest | Inherited | same as text | None | none | None | N/A | 1 | Theme does not alter layout behavior. |
 
 ## Structure / Anatomy
 
@@ -61,6 +61,13 @@
 | `Spacing`      | Variant | `1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16` | `spacing` prop |
 | `Align`        | Variant | `start, center, end, stretch`                           | `align` prop   |
 | `Justify`      | Variant | `left, center, right, apart, around`                    | `justify` prop |
+
+## Figma Build Notes
+
+- Use the primary visible part named in `Structure / Anatomy` as the main Figma frame, and keep purely behavioral wrappers such as hidden inputs, triggers, portals, or state containers outside the exported component set.
+- Apply fills, strokes, radius, and effects to the same layer identified in the anatomy table instead of redistributing those values across extra wrapper frames.
+- Keep slot content, consumer-provided copy, and arbitrary child content detached unless the README already defines them as explicit Figma properties.
+- If clipping, effect placement, or delegated styling is unresolved in source, preserve that uncertainty in the notes instead of inventing extra Figma variants.
 
 ## Gaps / Assumptions
 

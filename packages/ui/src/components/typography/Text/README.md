@@ -27,22 +27,22 @@
 
 ## Variant And State Styles
 
-| Theme | Variant               | State | Text color                                               | Background color                                               | Border color | Border width | Shadow / focus ring | Radius | Opacity | Notes                                                                                       |
-| ----- | --------------------- | ----- | -------------------------------------------------------- | -------------------------------------------------------------- | ------------ | ------------ | ------------------- | ------ | ------- | ------------------------------------------------------------------------------------------- |
-| Light | `caption`             | Rest  | `theme.text.captionColor` = `colors.gray.60` (`#818181`) | None                                                           | None         | 0            | None                | N/A    | 1       | Uses caption-specific color.                                                                |
-| Light | `label`               | Rest  | `theme.text.color` = `colors.gray.80` (`#444444`)        | None                                                           | None         | 0            | None                | N/A    | 1       | Weight 700.                                                                                 |
-| Light | `body-small`          | Rest  | `theme.text.color` = `colors.gray.80` (`#444444`)        | None                                                           | None         | 0            | None                | N/A    | 1       | Smaller text size.                                                                          |
-| Light | `body`                | Rest  | `theme.text.color` = `colors.gray.80` (`#444444`)        | None                                                           | None         | 0            | None                | N/A    | 1       | Base text style.                                                                            |
-| Light | `subtitle`            | Rest  | `theme.text.color` = `colors.gray.80` (`#444444`)        | None                                                           | None         | 0            | None                | N/A    | 1       | Weight 700.                                                                                 |
-| Light | `title`               | Rest  | `theme.text.color` = `colors.gray.80` (`#444444`)        | None                                                           | None         | 0            | None                | N/A    | 1       | Weight 700, larger text size.                                                               |
-| Dark  | `caption`             | Rest  | `theme.text.captionColor` = `colors.gray.40` (`#BEBEBE`) | None                                                           | None         | 0            | None                | N/A    | 1       | Uses caption-specific color.                                                                |
-| Dark  | `label`               | Rest  | `theme.text.color` = `colors.gray.30` (`#DCDCDC`)        | None                                                           | None         | 0            | None                | N/A    | 1       | Weight 700.                                                                                 |
-| Dark  | `body-small`          | Rest  | `theme.text.color` = `colors.gray.30` (`#DCDCDC`)        | None                                                           | None         | 0            | None                | N/A    | 1       | Smaller text size.                                                                          |
-| Dark  | `body`                | Rest  | `theme.text.color` = `colors.gray.30` (`#DCDCDC`)        | None                                                           | None         | 0            | None                | N/A    | 1       | Base text style.                                                                            |
-| Dark  | `subtitle`            | Rest  | `theme.text.color` = `colors.gray.30` (`#DCDCDC`)        | None                                                           | None         | 0            | None                | N/A    | 1       | Weight 700.                                                                                 |
-| Dark  | `title`               | Rest  | `theme.text.color` = `colors.gray.30` (`#DCDCDC`)        | None                                                           | None         | 0            | None                | N/A    | 1       | Weight 700, larger text size.                                                               |
-| Light | nested link underline | Rest  | Inherits parent text color                               | `theme.text.linkUnderlineColor` = `colors.gray.80` (`#444444`) | None         | 0            | None                | N/A    | 1       | Underline is an absolutely positioned block `2px` tall placed `-2px` below the anchor text. |
-| Dark  | nested link underline | Rest  | Inherits parent text color                               | `theme.text.linkUnderlineColor` = `colors.gray.30` (`#DCDCDC`) | None         | 0            | None                | N/A    | 1       | Same structure as light theme.                                                              |
+| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
+| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
+| Light | `caption` | Rest | `theme.text.captionColor` = `colors.gray.60` (`#818181`) | same as text | None | none | None | N/A | 1 | Uses caption-specific color. |
+| Light | `label` | Rest | `theme.text.color` = `colors.gray.80` (`#444444`) | same as text | None | none | None | N/A | 1 | Weight 700. |
+| Light | `body-small` | Rest | `theme.text.color` = `colors.gray.80` (`#444444`) | same as text | None | none | None | N/A | 1 | Smaller text size. |
+| Light | `body` | Rest | `theme.text.color` = `colors.gray.80` (`#444444`) | same as text | None | none | None | N/A | 1 | Base text style. |
+| Light | `subtitle` | Rest | `theme.text.color` = `colors.gray.80` (`#444444`) | same as text | None | none | None | N/A | 1 | Weight 700. |
+| Light | `title` | Rest | `theme.text.color` = `colors.gray.80` (`#444444`) | same as text | None | none | None | N/A | 1 | Weight 700, larger text size. |
+| Dark | `caption` | Rest | `theme.text.captionColor` = `colors.gray.40` (`#BEBEBE`) | same as text | None | none | None | N/A | 1 | Uses caption-specific color. |
+| Dark | `label` | Rest | `theme.text.color` = `colors.gray.30` (`#DCDCDC`) | same as text | None | none | None | N/A | 1 | Weight 700. |
+| Dark | `body-small` | Rest | `theme.text.color` = `colors.gray.30` (`#DCDCDC`) | same as text | None | none | None | N/A | 1 | Smaller text size. |
+| Dark | `body` | Rest | `theme.text.color` = `colors.gray.30` (`#DCDCDC`) | same as text | None | none | None | N/A | 1 | Base text style. |
+| Dark | `subtitle` | Rest | `theme.text.color` = `colors.gray.30` (`#DCDCDC`) | same as text | None | none | None | N/A | 1 | Weight 700. |
+| Dark | `title` | Rest | `theme.text.color` = `colors.gray.30` (`#DCDCDC`) | same as text | None | none | None | N/A | 1 | Weight 700, larger text size. |
+| Light | nested link underline | Rest | Inherits parent text color | same as text | `theme.text.linkUnderlineColor` = `colors.gray.80` (`#444444`) | none | None | N/A | 1 | Underline is an absolutely positioned block `2px` tall placed `-2px` below the anchor text. |
+| Dark | nested link underline | Rest | Inherits parent text color | same as text | `theme.text.linkUnderlineColor` = `colors.gray.30` (`#DCDCDC`) | none | None | N/A | 1 | Same structure as light theme. |
 
 ## Structure / Anatomy
 
@@ -76,6 +76,13 @@
 | `Theme`        | Variant             | `light, dark`                                       | Theme text slots in `text.styled.ts` |
 | `Align`        | Variant or property | `default, left, center, right, justify`             | `align` prop                         |
 | `Inline`       | Boolean             | `true, false`                                       | `as === 'span'` special case         |
+
+## Figma Build Notes
+
+- Use the primary visible part named in `Structure / Anatomy` as the main Figma frame, and keep purely behavioral wrappers such as hidden inputs, triggers, portals, or state containers outside the exported component set.
+- Apply fills, strokes, radius, and effects to the same layer identified in the anatomy table instead of redistributing those values across extra wrapper frames.
+- Keep slot content, consumer-provided copy, and arbitrary child content detached unless the README already defines them as explicit Figma properties.
+- If clipping, effect placement, or delegated styling is unresolved in source, preserve that uncertainty in the notes instead of inventing extra Figma variants.
 
 ## Gaps / Assumptions
 

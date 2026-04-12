@@ -27,18 +27,18 @@ Horizontal range slider with a custom WebKit track and thumb. This folder define
 
 ## Variant And State Style Tables
 
-| Theme | Variant | State  | Text color | Background color         | Border color             | Border width | Shadow / focus ring | Radius | Opacity | Notes                                                               |
-| ----- | ------- | ------ | ---------- | ------------------------ | ------------------------ | ------------ | ------------------- | ------ | ------- | ------------------------------------------------------------------- |
-| light | track   | rest   | N/A        | `#EBEBEB`                | N/A                      | `0`          | none                | `0`    | `1`     | WebKit track only.                                                  |
-| light | thumb   | rest   | N/A        | `#0E0E2C`                | `#0E0E2C`                | `0`          | none                | `8px`  | `1`     |                                                                     |
-| light | thumb   | hover  | N/A        | `#2B2B2C`                | `#2B2B2C`                | `0`          | none                | `8px`  | `1`     |                                                                     |
-| light | thumb   | active | N/A        | `#626262`                | `#626262`                | `0`          | none                | `8px`  | `1`     |                                                                     |
-| light | thumb   | focus  | N/A        | `#0E0E2C`                | `#2B2B2C`                | `1px`        | `0 0 0 4px #626262` | `8px`  | `1`     | Focus ring uses WebKit thumb focus plus separate border color rule. |
-| dark  | track   | rest   | N/A        | `#444444`                | N/A                      | `0`          | none                | `0`    | `1`     |                                                                     |
-| dark  | thumb   | rest   | N/A        | `lighten(0.05, #9F9F9F)` | `lighten(0.05, #9F9F9F)` | `0`          | none                | `8px`  | `1`     |                                                                     |
-| dark  | thumb   | hover  | N/A        | `#BEBEBE`                | `#BEBEBE`                | `0`          | none                | `8px`  | `1`     |                                                                     |
-| dark  | thumb   | active | N/A        | `#9F9F9F`                | `#9F9F9F`                | `0`          | none                | `8px`  | `1`     |                                                                     |
-| dark  | thumb   | focus  | N/A        | `lighten(0.05, #9F9F9F)` | `#EBEBEB`                | `1px`        | `0 0 0 4px #DCDCDC` | `8px`  | `1`     |                                                                     |
+| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
+| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
+| light | track | rest | N/A | N/A | `#EBEBEB` | none | none | `0` | `1` | WebKit track only. |
+| light | thumb | rest | N/A | N/A | `#0E0E2C` | `#0E0E2C` | none | `8px` | `1` |  |
+| light | thumb | hover | N/A | N/A | `#2B2B2C` | `#2B2B2C` | none | `8px` | `1` |  |
+| light | thumb | active | N/A | N/A | `#626262` | `#626262` | none | `8px` | `1` |  |
+| light | thumb | focus | N/A | N/A | `#0E0E2C` | `1px` / `#2B2B2C` | `0 0 0 4px #626262` | `8px` | `1` | Focus ring uses WebKit thumb focus plus separate border color rule. |
+| dark | track | rest | N/A | N/A | `#444444` | none | none | `0` | `1` |  |
+| dark | thumb | rest | N/A | N/A | `lighten(0.05, #9F9F9F)` | `lighten(0.05, #9F9F9F)` | none | `8px` | `1` |  |
+| dark | thumb | hover | N/A | N/A | `#BEBEBE` | `#BEBEBE` | none | `8px` | `1` |  |
+| dark | thumb | active | N/A | N/A | `#9F9F9F` | `#9F9F9F` | none | `8px` | `1` |  |
+| dark | thumb | focus | N/A | N/A | `lighten(0.05, #9F9F9F)` | `1px` / `#EBEBEB` | `0 0 0 4px #DCDCDC` | `8px` | `1` |  |
 
 ## Structure / Anatomy
 
@@ -65,6 +65,13 @@ Horizontal range slider with a custom WebKit track and thumb. This folder define
 | -------------- | ------- | ---------------------------- | ------------------ |
 | `State`        | variant | `rest, hover, active, focus` | thumb interactions |
 | `Theme`        | variant | `light, dark`                | theme files        |
+
+## Figma Build Notes
+
+- Use the primary visible part named in `Structure / Anatomy` as the main Figma frame, and keep purely behavioral wrappers such as hidden inputs, triggers, portals, or state containers outside the exported component set.
+- Apply fills, strokes, radius, and effects to the same layer identified in the anatomy table instead of redistributing those values across extra wrapper frames.
+- Keep slot content, consumer-provided copy, and arbitrary child content detached unless the README already defines them as explicit Figma properties.
+- If clipping, effect placement, or delegated styling is unresolved in source, preserve that uncertainty in the notes instead of inventing extra Figma variants.
 
 ## Gaps / Assumptions
 

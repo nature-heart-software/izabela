@@ -36,16 +36,16 @@ Source files used:
 
 ## Variant And State Styles
 
-| Theme | Variant | State     | Text color | Background color                                                    | Border color                                                | Border width | Shadow / focus ring                                         | Radius | Opacity      | Notes                                                              |
-| ----- | ------- | --------- | ---------- | ------------------------------------------------------------------- | ----------------------------------------------------------- | ------------ | ----------------------------------------------------------- | ------ | ------------ | ------------------------------------------------------------------ |
-| light | `sm`    | rest/open | Not found  | `theme.popover.backgroundColor` -> `colors.white` (`#ffffff`)       | `theme.popover.borderColor` -> `colors.gray.20` (`#EBEBEB`) | `1px`        | `boxShadow.lg` -> `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | `6px`  | `1`          | No separate hover/focus/active surface styles defined.             |
-| light | `md`    | rest/open | Not found  | `theme.popover.backgroundColor` -> `colors.white` (`#ffffff`)       | `theme.popover.borderColor` -> `colors.gray.20` (`#EBEBEB`) | `1px`        | `boxShadow.lg` -> `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | `8px`  | `1`          | Default size.                                                      |
-| light | `lg`    | rest/open | Not found  | `theme.popover.backgroundColor` -> `colors.white` (`#ffffff`)       | `theme.popover.borderColor` -> `colors.gray.20` (`#EBEBEB`) | `1px`        | `boxShadow.lg` -> `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | `8px`  | `1`          | `lg` shares local surface styling with `md` except the theme name. |
-| dark  | `sm`    | rest/open | Not found  | `theme.popover.backgroundColor` -> `darken(0.0675, colors.gray.80)` | `theme.popover.borderColor` -> `colors.gray.80` (`#444444`) | `1px`        | `boxShadow.lg` -> `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | `6px`  | `1`          | Dark background is computed in theme code.                         |
-| dark  | `md`    | rest/open | Not found  | `theme.popover.backgroundColor` -> `darken(0.0675, colors.gray.80)` | `theme.popover.borderColor` -> `colors.gray.80` (`#444444`) | `1px`        | `boxShadow.lg` -> `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | `8px`  | `1`          | Default size.                                                      |
-| dark  | `lg`    | rest/open | Not found  | `theme.popover.backgroundColor` -> `darken(0.0675, colors.gray.80)` | `theme.popover.borderColor` -> `colors.gray.80` (`#444444`) | `1px`        | `boxShadow.lg` -> `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | `8px`  | `1`          | `lg` shares local surface styling with `md` except the theme name. |
-| light | any     | closed    | N/A        | N/A                                                                 | N/A                                                         | N/A          | N/A                                                         | N/A    | `0` / hidden | Card is gated by `v-if="open"`.                                    |
-| dark  | any     | closed    | N/A        | N/A                                                                 | N/A                                                         | N/A          | N/A                                                         | N/A    | `0` / hidden | Card is gated by `v-if="open"`.                                    |
+| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
+| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
+| light | `sm` | rest/open | Not found | N/A | `theme.popover.backgroundColor` -> `colors.white` (`#ffffff`) | `1px` / `theme.popover.borderColor` -> `colors.gray.20` (`#EBEBEB`) | `boxShadow.lg` -> `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | `6px` | `1` | No separate hover/focus/active surface styles defined. |
+| light | `md` | rest/open | Not found | N/A | `theme.popover.backgroundColor` -> `colors.white` (`#ffffff`) | `1px` / `theme.popover.borderColor` -> `colors.gray.20` (`#EBEBEB`) | `boxShadow.lg` -> `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | `8px` | `1` | Default size. |
+| light | `lg` | rest/open | Not found | N/A | `theme.popover.backgroundColor` -> `colors.white` (`#ffffff`) | `1px` / `theme.popover.borderColor` -> `colors.gray.20` (`#EBEBEB`) | `boxShadow.lg` -> `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | `8px` | `1` | `lg` shares local surface styling with `md` except the theme name. |
+| dark | `sm` | rest/open | Not found | N/A | `theme.popover.backgroundColor` -> `darken(0.0675, colors.gray.80)` | `1px` / `theme.popover.borderColor` -> `colors.gray.80` (`#444444`) | `boxShadow.lg` -> `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | `6px` | `1` | Dark background is computed in theme code. |
+| dark | `md` | rest/open | Not found | N/A | `theme.popover.backgroundColor` -> `darken(0.0675, colors.gray.80)` | `1px` / `theme.popover.borderColor` -> `colors.gray.80` (`#444444`) | `boxShadow.lg` -> `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | `8px` | `1` | Default size. |
+| dark | `lg` | rest/open | Not found | N/A | `theme.popover.backgroundColor` -> `darken(0.0675, colors.gray.80)` | `1px` / `theme.popover.borderColor` -> `colors.gray.80` (`#444444`) | `boxShadow.lg` -> `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | `8px` | `1` | `lg` shares local surface styling with `md` except the theme name. |
+| light | any | closed | N/A | N/A | N/A | none | N/A | N/A | `0` / hidden | Card is gated by `v-if="open"`. |
+| dark | any | closed | N/A | N/A | N/A | none | N/A | N/A | `0` / hidden | Card is gated by `v-if="open"`. |
 
 ## Structure / Anatomy
 
@@ -86,6 +86,13 @@ Source files used:
 | `Size`         | Variant                        | `sm, md, lg`                          | `size` prop                  |
 | `State`        | Variant                        | `open, closed`                        | Internal `open` state        |
 | `Placement`    | Variant or documentation field | `top, top-start, top-end, right, ...` | `placement` prop passthrough |
+
+## Figma Build Notes
+
+- Use the primary visible part named in `Structure / Anatomy` as the main Figma frame, and keep purely behavioral wrappers such as hidden inputs, triggers, portals, or state containers outside the exported component set.
+- Apply fills, strokes, radius, and effects to the same layer identified in the anatomy table instead of redistributing those values across extra wrapper frames.
+- Keep slot content, consumer-provided copy, and arbitrary child content detached unless the README already defines them as explicit Figma properties.
+- If clipping, effect placement, or delegated styling is unresolved in source, preserve that uncertainty in the notes instead of inventing extra Figma variants.
 
 ## Gaps / Assumptions
 

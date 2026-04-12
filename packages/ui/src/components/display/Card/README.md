@@ -35,17 +35,17 @@ Purpose: container surface for display content with size-based padding and a `de
 
 ### Light Theme
 
-| Theme   | Variant       | State  | Text color      | Background color                                                                                                                                      | Border color | Border width | Shadow / focus ring                                             | Radius                                  | Opacity                 | Notes                                                                               |
-| ------- | ------------- | ------ | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ------------ | --------------------------------------------------------------- | --------------------------------------- | ----------------------- | ----------------------------------------------------------------------------------- |
-| `light` | `default`     | `rest` | Not set locally | `theme.card.backgroundColor` -> `colors.white` (`#ffffff`)                                                                                            | none         | `0`          | `boxShadow.DEFAULT` (`0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)`) | `borderRadius.DEFAULT` (8px / `0.5rem`) | `1`                     | No hover, focus, active, selected, disabled, or loading styles are defined locally. |
-| `light` | `transparent` | `rest` | Not set locally | `rgba(theme.card.transparent.backdropColor, theme.card.transparent.backdropOpacity)` -> `rgba(249,249,252,0.95)` from `gray.10` (`#F9F9FC`) at `0.95` | none         | `0`          | `boxShadow.DEFAULT` (`0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)`) | `borderRadius.DEFAULT` (8px / `0.5rem`) | `0.95` background alpha | Uses a translucent light backdrop.                                                  |
+| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
+| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
+| `light` | `default` | `rest` | Not set locally | N/A | `theme.card.backgroundColor` -> `colors.white` (`#ffffff`) | none | `boxShadow.DEFAULT` (`0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)`) | `borderRadius.DEFAULT` (8px / `0.5rem`) | `1` | No hover, focus, active, selected, disabled, or loading styles are defined locally. |
+| `light` | `transparent` | `rest` | Not set locally | N/A | `rgba(theme.card.transparent.backdropColor, theme.card.transparent.backdropOpacity)` -> `rgba(249,249,252,0.95)` from `gray.10` (`#F9F9FC`) at `0.95` | none | `boxShadow.DEFAULT` (`0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)`) | `borderRadius.DEFAULT` (8px / `0.5rem`) | `0.95` background alpha | Uses a translucent light backdrop. |
 
 ### Dark Theme
 
-| Theme  | Variant       | State  | Text color      | Background color                                                                                                                                   | Border color | Border width | Shadow / focus ring                                             | Radius                                  | Opacity                 | Notes                                 |
-| ------ | ------------- | ------ | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ------------ | --------------------------------------------------------------- | --------------------------------------- | ----------------------- | ------------------------------------- |
-| `dark` | `default`     | `rest` | Not set locally | `theme.card.backgroundColor` -> `darken(0.0675)(gray.80)` -> `#333`                                                                                | none         | `0`          | `boxShadow.DEFAULT` (`0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)`) | `borderRadius.DEFAULT` (8px / `0.5rem`) | `1`                     | Theme value is computed in `dark.ts`. |
-| `dark` | `transparent` | `rest` | Not set locally | `rgba(theme.card.transparent.backdropColor, theme.card.transparent.backdropOpacity)` -> `rgba(43,43,44,0.95)` from `gray.90` (`#2B2B2C`) at `0.95` | none         | `0`          | `boxShadow.DEFAULT` (`0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)`) | `borderRadius.DEFAULT` (8px / `0.5rem`) | `0.95` background alpha | Uses a translucent dark backdrop.     |
+| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
+| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
+| `dark` | `default` | `rest` | Not set locally | N/A | `theme.card.backgroundColor` -> `darken(0.0675)(gray.80)` -> `#333` | none | `boxShadow.DEFAULT` (`0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)`) | `borderRadius.DEFAULT` (8px / `0.5rem`) | `1` | Theme value is computed in `dark.ts`. |
+| `dark` | `transparent` | `rest` | Not set locally | N/A | `rgba(theme.card.transparent.backdropColor, theme.card.transparent.backdropOpacity)` -> `rgba(43,43,44,0.95)` from `gray.90` (`#2B2B2C`) at `0.95` | none | `boxShadow.DEFAULT` (`0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)`) | `borderRadius.DEFAULT` (8px / `0.5rem`) | `0.95` background alpha | Uses a translucent dark backdrop. |
 
 ## Structure / Anatomy
 
@@ -76,6 +76,13 @@ Purpose: container surface for display content with size-based padding and a `de
 | `Size`         | variant               | `xs`, `sm`, `md`         | `size` prop                       |
 | `Theme`        | variant               | `light`, `dark`          | Theme-dependent background values |
 | `Content`      | slot / nested content | freeform                 | Default slot in `NvCard.vue`      |
+
+## Figma Build Notes
+
+- Use the primary visible part named in `Structure / Anatomy` as the main Figma frame, and keep purely behavioral wrappers such as hidden inputs, triggers, portals, or state containers outside the exported component set.
+- Apply fills, strokes, radius, and effects to the same layer identified in the anatomy table instead of redistributing those values across extra wrapper frames.
+- Keep slot content, consumer-provided copy, and arbitrary child content detached unless the README already defines them as explicit Figma properties.
+- If clipping, effect placement, or delegated styling is unresolved in source, preserve that uncertainty in the notes instead of inventing extra Figma variants.
 
 ## Gaps / Assumptions
 

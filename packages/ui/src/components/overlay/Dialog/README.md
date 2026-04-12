@@ -35,14 +35,14 @@ Source files used:
 
 ## Variant And State Styles
 
-| Theme | Variant | State         | Text color | Background color                                                  | Border color | Border width | Shadow / focus ring          | Radius               | Opacity      | Notes                                                                |
-| ----- | ------- | ------------- | ---------- | ----------------------------------------------------------------- | ------------ | ------------ | ---------------------------- | -------------------- | ------------ | -------------------------------------------------------------------- |
-| light | default | open backdrop | Not found  | `rgba(theme.dialog.backdropColor, 0.95)` -> `rgba(#0E0E2C, 0.95)` | N/A          | N/A          | None                         | `0px`                | `0.95`       | Backdrop covers full viewport with `z-index: 9999`.                  |
-| dark  | default | open backdrop | Not found  | `rgba(theme.dialog.backdropColor, 0.95)` -> `rgba(#2B2B2C, 0.95)` | N/A          | N/A          | None                         | `0px`                | `0.95`       | Backdrop covers full viewport with `z-index: 9999`.                  |
-| light | default | open content  | Not found  | Delegated to nested `NvCard` / theme card background              | Not found    | Not found    | Delegated to nested `NvCard` | `8px` on nested card | `1`          | Dialog shell itself does not style the card border.                  |
-| dark  | default | open content  | Not found  | Delegated to nested `NvCard` / theme card background              | Not found    | Not found    | Delegated to nested `NvCard` | `8px` on nested card | `1`          | Dialog shell itself does not style the card border.                  |
-| light | default | closed        | N/A        | N/A                                                               | N/A          | N/A          | N/A                          | N/A                  | `0` / hidden | Backdrop is removed with `v-if`; positioner is hidden with `v-show`. |
-| dark  | default | closed        | N/A        | N/A                                                               | N/A          | N/A          | N/A                          | N/A                  | `0` / hidden | Backdrop is removed with `v-if`; positioner is hidden with `v-show`. |
+| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
+| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
+| light | default | open backdrop | Not found | N/A | `rgba(theme.dialog.backdropColor, 0.95)` -> `rgba(#0E0E2C, 0.95)` | none | None | `0px` | `0.95` | Backdrop covers full viewport with `z-index: 9999`. |
+| dark | default | open backdrop | Not found | N/A | `rgba(theme.dialog.backdropColor, 0.95)` -> `rgba(#2B2B2C, 0.95)` | none | None | `0px` | `0.95` | Backdrop covers full viewport with `z-index: 9999`. |
+| light | default | open content | Not found | N/A | Delegated to nested `NvCard` / theme card background | none | Delegated to nested `NvCard` | `8px` on nested card | `1` | Dialog shell itself does not style the card border. |
+| dark | default | open content | Not found | N/A | Delegated to nested `NvCard` / theme card background | none | Delegated to nested `NvCard` | `8px` on nested card | `1` | Dialog shell itself does not style the card border. |
+| light | default | closed | N/A | N/A | N/A | none | N/A | N/A | `0` / hidden | Backdrop is removed with `v-if`; positioner is hidden with `v-show`. |
+| dark | default | closed | N/A | N/A | N/A | none | N/A | N/A | `0` / hidden | Backdrop is removed with `v-if`; positioner is hidden with `v-show`. |
 
 ## Structure / Anatomy
 
@@ -82,6 +82,13 @@ Source files used:
 | `Description`  | Boolean | `true, false`    | Conditional description slot                         |
 | `Footer`       | Boolean | `true, false`    | Optional footer slot                                 |
 | `Close Button` | Boolean | `true`           | Always rendered in implementation                    |
+
+## Figma Build Notes
+
+- Use the primary visible part named in `Structure / Anatomy` as the main Figma frame, and keep purely behavioral wrappers such as hidden inputs, triggers, portals, or state containers outside the exported component set.
+- Apply fills, strokes, radius, and effects to the same layer identified in the anatomy table instead of redistributing those values across extra wrapper frames.
+- Keep slot content, consumer-provided copy, and arbitrary child content detached unless the README already defines them as explicit Figma properties.
+- If clipping, effect placement, or delegated styling is unresolved in source, preserve that uncertainty in the notes instead of inventing extra Figma variants.
 
 ## Gaps / Assumptions
 

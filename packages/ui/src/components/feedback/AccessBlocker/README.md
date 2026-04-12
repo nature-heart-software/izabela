@@ -33,12 +33,12 @@ Source files used:
 
 ## Variant And State Styles
 
-| Theme | Variant | State   | Text color                         | Background color                                                                                                                                                          | Border color | Border width | Shadow / focus ring | Radius    | Opacity           | Notes                                |
-| ----- | ------- | ------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ------------ | ------------------- | --------- | ----------------- | ------------------------------------ |
-| light | default | allowed | N/A                                | Transparent / inherited                                                                                                                                                   | N/A          | N/A          | None                | N/A       | 1                 | Only the wrapped content is visible. |
-| light | default | blocked | Inherited from reason slot content | `theme.disabledItemBackground.backdropColor` = `colors.white` (`#ffffff`), rendered via `rgba(..., 0.9)` = `rgba(255,255,255,0.9)`                                        | None         | 0            | None                | Not found | 0.9 overlay alpha | Overlay fills the component bounds.  |
-| dark  | default | allowed | N/A                                | Transparent / inherited                                                                                                                                                   | N/A          | N/A          | None                | N/A       | 1                 | Only the wrapped content is visible. |
-| dark  | default | blocked | Inherited from reason slot content | `theme.disabledItemBackground.backdropColor` = dark theme `backgroundColor` = `darken(0.0675, #444444)` = `#333333`, rendered via `rgba(..., 0.9)` = `rgba(51,51,51,0.9)` | None         | 0            | None                | Not found | 0.9 overlay alpha | Overlay fills the component bounds.  |
+| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
+| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
+| light | default | allowed | N/A | N/A | Transparent / inherited | none | None | N/A | 1 | Only the wrapped content is visible. |
+| light | default | blocked | Inherited from reason slot content | same as text | `theme.disabledItemBackground.backdropColor` = `colors.white` (`#ffffff`), rendered via `rgba(..., 0.9)` = `rgba(255,255,255,0.9)` | none | None | Not found | 0.9 overlay alpha | Overlay fills the component bounds. |
+| dark | default | allowed | N/A | N/A | Transparent / inherited | none | None | N/A | 1 | Only the wrapped content is visible. |
+| dark | default | blocked | Inherited from reason slot content | same as text | `theme.disabledItemBackground.backdropColor` = dark theme `backgroundColor` = `darken(0.0675, #444444)` = `#333333`, rendered via `rgba(..., 0.9)` = `rgba(51,51,51,0.9)` | none | None | Not found | 0.9 overlay alpha | Overlay fills the component bounds. |
 
 ## Structure / Anatomy
 
@@ -67,6 +67,13 @@ Source files used:
 | `Theme`          | Variant | `light`, `dark`                | Theme-driven overlay backdrop values |
 | `State`          | Variant | `allowed`, `blocked`           | `allowed` prop                       |
 | `Reason Content` | Variant | `default-alert`, `custom-slot` | Presence of custom `reason` slot     |
+
+## Figma Build Notes
+
+- Use the primary visible part named in `Structure / Anatomy` as the main Figma frame, and keep purely behavioral wrappers such as hidden inputs, triggers, portals, or state containers outside the exported component set.
+- Apply fills, strokes, radius, and effects to the same layer identified in the anatomy table instead of redistributing those values across extra wrapper frames.
+- Keep slot content, consumer-provided copy, and arbitrary child content detached unless the README already defines them as explicit Figma properties.
+- If clipping, effect placement, or delegated styling is unresolved in source, preserve that uncertainty in the notes instead of inventing extra Figma variants.
 
 ## Gaps / Assumptions
 

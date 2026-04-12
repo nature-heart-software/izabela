@@ -32,16 +32,16 @@ Text input wrapper around Element Plus `ElInput` with design-system sizing and t
 
 ## Variant And State Style Tables
 
-| Theme | Variant | State       | Text color | Background color          | Border color | Border width | Shadow / focus ring | Radius  | Opacity | Notes                     |
-| ----- | ------- | ----------- | ---------- | ------------------------- | ------------ | ------------ | ------------------- | ------- | ------- | ------------------------- |
-| light | base    | rest        | `#444444`  | `#ffffff`                 | `#EBEBEB`    | `1px`        | none                | by size | `1`     |                           |
-| light | base    | hover       | `#444444`  | `#ffffff`                 | `#BEBEBE`    | `1px`        | none                | by size | `1`     |                           |
-| light | base    | focus       | `#444444`  | `#ffffff`                 | `#BEBEBE`    | `1px`        | `0 0 0 4px #F9F9FC` | by size | `1`     |                           |
-| light | base    | placeholder | `#BEBEBE`  | N/A                       | N/A          | N/A          | none                | N/A     | `1`     | Placeholder weight `300`. |
-| dark  | base    | rest        | `#DCDCDC`  | `darken(0.0675, #444444)` | `#444444`    | `1px`        | none                | by size | `1`     |                           |
-| dark  | base    | hover       | `#DCDCDC`  | `darken(0.0675, #444444)` | `#626262`    | `1px`        | none                | by size | `1`     |                           |
-| dark  | base    | focus       | `#DCDCDC`  | `darken(0.0675, #444444)` | `#626262`    | `1px`        | `0 0 0 4px #444444` | by size | `1`     |                           |
-| dark  | base    | placeholder | `#818181`  | N/A                       | N/A          | N/A          | none                | N/A     | `1`     | Placeholder weight `300`. |
+| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
+| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
+| light | base | rest | `#444444` | same as text | `#ffffff` | `1px` / `#EBEBEB` | none | by size | `1` |  |
+| light | base | hover | `#444444` | same as text | `#ffffff` | `1px` / `#BEBEBE` | none | by size | `1` |  |
+| light | base | focus | `#444444` | same as text | `#ffffff` | `1px` / `#BEBEBE` | `0 0 0 4px #F9F9FC` | by size | `1` |  |
+| light | base | placeholder | `#BEBEBE` | same as text | N/A | none | none | N/A | `1` | Placeholder weight `300`. |
+| dark | base | rest | `#DCDCDC` | same as text | `darken(0.0675, #444444)` | `1px` / `#444444` | none | by size | `1` |  |
+| dark | base | hover | `#DCDCDC` | same as text | `darken(0.0675, #444444)` | `1px` / `#626262` | none | by size | `1` |  |
+| dark | base | focus | `#DCDCDC` | same as text | `darken(0.0675, #444444)` | `1px` / `#626262` | `0 0 0 4px #444444` | by size | `1` |  |
+| dark | base | placeholder | `#818181` | same as text | N/A | none | none | N/A | `1` | Placeholder weight `300`. |
 
 ## Structure / Anatomy
 
@@ -72,6 +72,13 @@ Text input wrapper around Element Plus `ElInput` with design-system sizing and t
 | `State`        | variant | `rest, hover, focus, placeholder` | local styling         |
 | `Theme`        | variant | `light, dark`                     | theme files           |
 | `Type`         | variant | `text, password`                  | password padding rule |
+
+## Figma Build Notes
+
+- Use the primary visible part named in `Structure / Anatomy` as the main Figma frame, and keep purely behavioral wrappers such as hidden inputs, triggers, portals, or state containers outside the exported component set.
+- Apply fills, strokes, radius, and effects to the same layer identified in the anatomy table instead of redistributing those values across extra wrapper frames.
+- Keep slot content, consumer-provided copy, and arbitrary child content detached unless the README already defines them as explicit Figma properties.
+- If clipping, effect placement, or delegated styling is unresolved in source, preserve that uncertainty in the notes instead of inventing extra Figma variants.
 
 ## Gaps / Assumptions
 

@@ -40,10 +40,10 @@ Autocomplete popover shell for searchable option lists. It renders a reference s
 
 ## Variant And State Style Tables
 
-| Theme | Variant | State | Text color   | Background color                                 | Border color                                 | Border width | Shadow / focus ring                                               | Radius    | Opacity | Notes                                                                         |
-| ----- | ------- | ----- | ------------ | ------------------------------------------------ | -------------------------------------------- | ------------ | ----------------------------------------------------------------- | --------- | ------- | ----------------------------------------------------------------------------- |
-| light | base    | rest  | Slot-defined | `theme.autocomplete.backgroundColor` = `#ffffff` | `theme.autocomplete.borderColor` = `#EBEBEB` | `1px`        | `tokens.boxShadow.lg` = `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | by `size` | `1`     | Popup shell only. Row styling is delegated to slot content / child component. |
-| dark  | base    | rest  | Slot-defined | `darken(0.0675, #444444)`                        | `#444444`                                    | `1px`        | `tokens.boxShadow.lg` = `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | by `size` | `1`     |                                                                               |
+| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
+| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
+| light | base | rest | Slot-defined | same as text | `theme.autocomplete.backgroundColor` = `#ffffff` | `1px` / `theme.autocomplete.borderColor` = `#EBEBEB` | `tokens.boxShadow.lg` = `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | by `size` | `1` | Popup shell only. Row styling is delegated to slot content / child component. |
+| dark | base | rest | Slot-defined | same as text | `darken(0.0675, #444444)` | `1px` / `#444444` | `tokens.boxShadow.lg` = `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | by `size` | `1` |  |
 
 ## Structure / Anatomy
 
@@ -82,6 +82,13 @@ Autocomplete popover shell for searchable option lists. It renders a reference s
 | `Has Results`  | boolean | `true, false`              | `options.length > 0` vs `fallback`    |
 | `Selection`    | variant | `none, active-row`         | keyboard highlight behavior           |
 | `Width Mode`   | variant | `auto-from-trigger, fixed` | reference measurement vs `width` prop |
+
+## Figma Build Notes
+
+- Use the primary visible part named in `Structure / Anatomy` as the main Figma frame, and keep purely behavioral wrappers such as hidden inputs, triggers, portals, or state containers outside the exported component set.
+- Apply fills, strokes, radius, and effects to the same layer identified in the anatomy table instead of redistributing those values across extra wrapper frames.
+- Keep slot content, consumer-provided copy, and arbitrary child content detached unless the README already defines them as explicit Figma properties.
+- If clipping, effect placement, or delegated styling is unresolved in source, preserve that uncertainty in the notes instead of inventing extra Figma variants.
 
 ## Gaps / Assumptions
 

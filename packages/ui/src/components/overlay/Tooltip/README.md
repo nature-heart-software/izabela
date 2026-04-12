@@ -33,14 +33,14 @@ Source files used:
 
 ## Variant And State Styles
 
-| Theme | Variant | State                | Text color                                                                   | Background color                                                                                    | Border color                                                                                | Border width | Shadow / focus ring                                         | Radius | Opacity         | Notes                                                                      |
-| ----- | ------- | -------------------- | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------ | ----------------------------------------------------------- | ------ | --------------- | -------------------------------------------------------------------------- |
-| light | default | rest/visible         | `theme.tooltip.color` -> `colors.white` (`#ffffff`)                          | `theme.tooltip.backgroundColor` -> `buttonPlain.backgroundColor` -> `colors.gray.100` (`#0E0E2C`)   | `theme.tooltip.borderColor` -> `buttonPlain.borderColor` -> `colors.gray.100` (`#0E0E2C`)   | `1px`        | `boxShadow.lg` -> `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | `4px`  | `1`             | All descendants inherit the tooltip text color.                            |
-| dark  | default | rest/visible         | `theme.tooltip.color` -> `buttonPlain.color` -> `colors.gray.80` (`#444444`) | `theme.tooltip.backgroundColor` -> `buttonPlain.backgroundColor` -> `lighten(0.05, colors.gray.50)` | `theme.tooltip.borderColor` -> `buttonPlain.borderColor` -> `lighten(0.05, colors.gray.50)` | `1px`        | `boxShadow.lg` -> `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | `4px`  | `1`             | Dark tooltip colors are computed from theme code.                          |
-| light | default | hidden               | same as visible                                                              | same as visible                                                                                     | same as visible                                                                             | `1px`        | same as visible                                             | `4px`  | `0`             | Global `[data-animation][data-state='hidden']` rule sets opacity to `0`.   |
-| dark  | default | hidden               | same as visible                                                              | same as visible                                                                                     | same as visible                                                                             | `1px`        | same as visible                                             | `4px`  | `0`             | Global `[data-animation][data-state='hidden']` rule sets opacity to `0`.   |
-| light | default | focus-within wrapper | N/A                                                                          | N/A                                                                                                 | N/A                                                                                         | N/A          | N/A                                                         | N/A    | hidden/disabled | `useFocusWithin` disables the tippy instance while the wrapper is focused. |
-| dark  | default | focus-within wrapper | N/A                                                                          | N/A                                                                                                 | N/A                                                                                         | N/A          | N/A                                                         | N/A    | hidden/disabled | `useFocusWithin` disables the tippy instance while the wrapper is focused. |
+| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
+| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
+| light | default | rest/visible | `theme.tooltip.color` -> `colors.white` (`#ffffff`) | same as text | `theme.tooltip.backgroundColor` -> `buttonPlain.backgroundColor` -> `colors.gray.100` (`#0E0E2C`) | `1px` / `theme.tooltip.borderColor` -> `buttonPlain.borderColor` -> `colors.gray.100` (`#0E0E2C`) | `boxShadow.lg` -> `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | `4px` | `1` | All descendants inherit the tooltip text color. |
+| dark | default | rest/visible | `theme.tooltip.color` -> `buttonPlain.color` -> `colors.gray.80` (`#444444`) | same as text | `theme.tooltip.backgroundColor` -> `buttonPlain.backgroundColor` -> `lighten(0.05, colors.gray.50)` | `1px` / `theme.tooltip.borderColor` -> `buttonPlain.borderColor` -> `lighten(0.05, colors.gray.50)` | `boxShadow.lg` -> `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | `4px` | `1` | Dark tooltip colors are computed from theme code. |
+| light | default | hidden | same as visible | same as text | same as visible | `1px` / same as visible | same as visible | `4px` | `0` | Global `[data-animation][data-state='hidden']` rule sets opacity to `0`. |
+| dark | default | hidden | same as visible | same as text | same as visible | `1px` / same as visible | same as visible | `4px` | `0` | Global `[data-animation][data-state='hidden']` rule sets opacity to `0`. |
+| light | default | focus-within wrapper | N/A | N/A | N/A | none | N/A | N/A | hidden/disabled | `useFocusWithin` disables the tippy instance while the wrapper is focused. |
+| dark | default | focus-within wrapper | N/A | N/A | N/A | none | N/A | N/A | hidden/disabled | `useFocusWithin` disables the tippy instance while the wrapper is focused. |
 
 ## Structure / Anatomy
 
@@ -76,6 +76,13 @@ Source files used:
 | `State`        | Variant                        | `visible, hidden`          | Global tippy animation state                          |
 | `Placement`    | Variant or documentation field | `top` plus tippy overrides | Default placement and `tippyOptions` override surface |
 | `Has Content`  | Boolean                        | `true, false`              | Default slot presence                                 |
+
+## Figma Build Notes
+
+- Use the primary visible part named in `Structure / Anatomy` as the main Figma frame, and keep purely behavioral wrappers such as hidden inputs, triggers, portals, or state containers outside the exported component set.
+- Apply fills, strokes, radius, and effects to the same layer identified in the anatomy table instead of redistributing those values across extra wrapper frames.
+- Keep slot content, consumer-provided copy, and arbitrary child content detached unless the README already defines them as explicit Figma properties.
+- If clipping, effect placement, or delegated styling is unresolved in source, preserve that uncertainty in the notes instead of inventing extra Figma variants.
 
 ## Gaps / Assumptions
 
