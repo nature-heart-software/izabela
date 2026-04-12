@@ -12,9 +12,11 @@ The `packages/ui` component READMEs were created before the `design-system-compo
 ## Capabilities
 
 ### New Capabilities
+
 - `ui-component-design-readmes-refresh`: Refresh and maintain component-local `packages/ui` design READMEs so they match the current Figma-oriented documentation contract defined by the `design-system-component-docs` skill.
 
 ### Modified Capabilities
+
 - None.
 
 ## Impact

@@ -28,10 +28,10 @@ Compact label chip with optional close action. The close affordance is a nested 
 
 ## Variant And State Style Tables
 
-| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
-| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
-| light | base | rest | inherited / Not found in this folder | same as text | `#ffffff` | `1px` / `#EBEBEB` | none | `6px` | `1` | Root tag itself has no local hover/focus state. |
-| dark | base | rest | inherited / Not found in this folder | same as text | `darken(0.0675, #444444)` | `1px` / `#444444` | none | `6px` | `1` |  |
+| Theme | Variant | State | Text color                           | Icon color   | Background / fill         | Border / stroke   | Shadow / effects | Radius | Opacity | Notes                                           |
+| ----- | ------- | ----- | ------------------------------------ | ------------ | ------------------------- | ----------------- | ---------------- | ------ | ------- | ----------------------------------------------- |
+| light | base    | rest  | inherited / Not found in this folder | same as text | `#ffffff`                 | `1px` / `#EBEBEB` | none             | `6px`  | `1`     | Root tag itself has no local hover/focus state. |
+| dark  | base    | rest  | inherited / Not found in this folder | same as text | `darken(0.0675, #444444)` | `1px` / `#444444` | none             | `6px`  | `1`     |                                                 |
 
 ## Structure / Anatomy
 

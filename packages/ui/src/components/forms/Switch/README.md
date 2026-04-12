@@ -27,16 +27,16 @@ Compact boolean switch with a bordered track, sliding thumb, and focus ring. The
 
 ## Variant And State Style Tables
 
-| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
-| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
-| light | unchecked | rest | N/A | N/A | track `#ffffff`, thumb `#EBEBEB` | `1px` / `#EBEBEB` | none | track `6px`, thumb `4px` | `1` |  |
-| light | unchecked | hover | N/A | N/A | track `#ffffff`, thumb `#EBEBEB` | `1px` / `#BEBEBE` | none | same | `1` | Hover only changes border. |
-| light | unchecked | focus | N/A | N/A | track `#ffffff`, thumb `#EBEBEB` | `1px` / `#BEBEBE` | `0 0 0 4px #F9F9FC` | same | `1` |  |
-| light | checked | rest | N/A | N/A | track `#ffffff`, thumb `#0E0E2C` | `1px` / `#EBEBEB` | none | same | `1` | Thumb offset `16px`. |
-| dark | unchecked | rest | N/A | N/A | track `darken(0.0675, #444444)`, thumb `#626262` | `1px` / `#444444` | none | same | `1` |  |
-| dark | unchecked | hover | N/A | N/A | track `darken(0.0675, #444444)`, thumb `#626262` | `1px` / `#626262` | none | same | `1` |  |
-| dark | unchecked | focus | N/A | N/A | track `darken(0.0675, #444444)`, thumb `#626262` | `1px` / `#626262` | `0 0 0 4px #444444` | same | `1` |  |
-| dark | checked | rest | N/A | N/A | track `darken(0.0675, #444444)`, thumb `lighten(0.05, #9F9F9F)` | `1px` / `#444444` | none | same | `1` | Thumb offset `16px`. |
+| Theme | Variant   | State | Text color | Icon color | Background / fill                                               | Border / stroke   | Shadow / effects    | Radius                   | Opacity | Notes                      |
+| ----- | --------- | ----- | ---------- | ---------- | --------------------------------------------------------------- | ----------------- | ------------------- | ------------------------ | ------- | -------------------------- |
+| light | unchecked | rest  | N/A        | N/A        | track `#ffffff`, thumb `#EBEBEB`                                | `1px` / `#EBEBEB` | none                | track `6px`, thumb `4px` | `1`     |                            |
+| light | unchecked | hover | N/A        | N/A        | track `#ffffff`, thumb `#EBEBEB`                                | `1px` / `#BEBEBE` | none                | same                     | `1`     | Hover only changes border. |
+| light | unchecked | focus | N/A        | N/A        | track `#ffffff`, thumb `#EBEBEB`                                | `1px` / `#BEBEBE` | `0 0 0 4px #F9F9FC` | same                     | `1`     |                            |
+| light | checked   | rest  | N/A        | N/A        | track `#ffffff`, thumb `#0E0E2C`                                | `1px` / `#EBEBEB` | none                | same                     | `1`     | Thumb offset `16px`.       |
+| dark  | unchecked | rest  | N/A        | N/A        | track `darken(0.0675, #444444)`, thumb `#626262`                | `1px` / `#444444` | none                | same                     | `1`     |                            |
+| dark  | unchecked | hover | N/A        | N/A        | track `darken(0.0675, #444444)`, thumb `#626262`                | `1px` / `#626262` | none                | same                     | `1`     |                            |
+| dark  | unchecked | focus | N/A        | N/A        | track `darken(0.0675, #444444)`, thumb `#626262`                | `1px` / `#626262` | `0 0 0 4px #444444` | same                     | `1`     |                            |
+| dark  | checked   | rest  | N/A        | N/A        | track `darken(0.0675, #444444)`, thumb `lighten(0.05, #9F9F9F)` | `1px` / `#444444` | none                | same                     | `1`     | Thumb offset `16px`.       |
 
 ## Structure / Anatomy
 

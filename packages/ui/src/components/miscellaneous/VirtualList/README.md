@@ -24,16 +24,16 @@
 
 ## Variant And State Styles
 
-| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
-| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
-| Light | container | Rest | Inherited | same as text | None | none | None | N/A | 1 | No theme styling in folder. |
-| Light | list | Rest | Inherited | same as text | None | none | None | N/A | 1 | No theme styling in folder. |
-| Dark | container | Rest | Inherited | same as text | None | none | None | N/A | 1 | No theme styling in folder. |
-| Dark | list | Rest | Inherited | same as text | None | none | None | N/A | 1 | No theme styling in folder. |
-| Light | list | `visible` | Inherited | same as text | None | none | None | N/A | 1 | Event emitted on mount after a timeout; no visual delta. |
-| Light | list | `hidden` | Inherited | same as text | None | none | None | N/A | 1 | Event emitted on unmount; no visual delta. |
-| Light | list | `change` | Inherited | same as text | None | none | None | N/A | 1 | Event emitted from virtualizer `onChange`; no visual delta. |
-| Dark | list | `visible` / `hidden` / `change` | Inherited | same as text | None | none | None | N/A | 1 | Same as light theme. |
+| Theme | Variant   | State                           | Text color | Icon color   | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes                                                       |
+| ----- | --------- | ------------------------------- | ---------- | ------------ | ----------------- | --------------- | ---------------- | ------ | ------- | ----------------------------------------------------------- |
+| Light | container | Rest                            | Inherited  | same as text | None              | none            | None             | N/A    | 1       | No theme styling in folder.                                 |
+| Light | list      | Rest                            | Inherited  | same as text | None              | none            | None             | N/A    | 1       | No theme styling in folder.                                 |
+| Dark  | container | Rest                            | Inherited  | same as text | None              | none            | None             | N/A    | 1       | No theme styling in folder.                                 |
+| Dark  | list      | Rest                            | Inherited  | same as text | None              | none            | None             | N/A    | 1       | No theme styling in folder.                                 |
+| Light | list      | `visible`                       | Inherited  | same as text | None              | none            | None             | N/A    | 1       | Event emitted on mount after a timeout; no visual delta.    |
+| Light | list      | `hidden`                        | Inherited  | same as text | None              | none            | None             | N/A    | 1       | Event emitted on unmount; no visual delta.                  |
+| Light | list      | `change`                        | Inherited  | same as text | None              | none            | None             | N/A    | 1       | Event emitted from virtualizer `onChange`; no visual delta. |
+| Dark  | list      | `visible` / `hidden` / `change` | Inherited  | same as text | None              | none            | None             | N/A    | 1       | Same as light theme.                                        |
 
 ## Structure / Anatomy
 

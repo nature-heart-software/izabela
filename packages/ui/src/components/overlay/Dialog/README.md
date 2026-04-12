@@ -35,14 +35,14 @@ Source files used:
 
 ## Variant And State Styles
 
-| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
-| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
-| light | default | open backdrop | Not found | N/A | `rgba(theme.dialog.backdropColor, 0.95)` -> `rgba(#0E0E2C, 0.95)` | none | None | `0px` | `0.95` | Backdrop covers full viewport with `z-index: 9999`. |
-| dark | default | open backdrop | Not found | N/A | `rgba(theme.dialog.backdropColor, 0.95)` -> `rgba(#2B2B2C, 0.95)` | none | None | `0px` | `0.95` | Backdrop covers full viewport with `z-index: 9999`. |
-| light | default | open content | Not found | N/A | Delegated to nested `NvCard` / theme card background | none | Delegated to nested `NvCard` | `8px` on nested card | `1` | Dialog shell itself does not style the card border. |
-| dark | default | open content | Not found | N/A | Delegated to nested `NvCard` / theme card background | none | Delegated to nested `NvCard` | `8px` on nested card | `1` | Dialog shell itself does not style the card border. |
-| light | default | closed | N/A | N/A | N/A | none | N/A | N/A | `0` / hidden | Backdrop is removed with `v-if`; positioner is hidden with `v-show`. |
-| dark | default | closed | N/A | N/A | N/A | none | N/A | N/A | `0` / hidden | Backdrop is removed with `v-if`; positioner is hidden with `v-show`. |
+| Theme | Variant | State         | Text color | Icon color | Background / fill                                                 | Border / stroke | Shadow / effects             | Radius               | Opacity      | Notes                                                                |
+| ----- | ------- | ------------- | ---------- | ---------- | ----------------------------------------------------------------- | --------------- | ---------------------------- | -------------------- | ------------ | -------------------------------------------------------------------- |
+| light | default | open backdrop | Not found  | N/A        | `rgba(theme.dialog.backdropColor, 0.95)` -> `rgba(#0E0E2C, 0.95)` | none            | None                         | `0px`                | `0.95`       | Backdrop covers full viewport with `z-index: 9999`.                  |
+| dark  | default | open backdrop | Not found  | N/A        | `rgba(theme.dialog.backdropColor, 0.95)` -> `rgba(#2B2B2C, 0.95)` | none            | None                         | `0px`                | `0.95`       | Backdrop covers full viewport with `z-index: 9999`.                  |
+| light | default | open content  | Not found  | N/A        | Delegated to nested `NvCard` / theme card background              | none            | Delegated to nested `NvCard` | `8px` on nested card | `1`          | Dialog shell itself does not style the card border.                  |
+| dark  | default | open content  | Not found  | N/A        | Delegated to nested `NvCard` / theme card background              | none            | Delegated to nested `NvCard` | `8px` on nested card | `1`          | Dialog shell itself does not style the card border.                  |
+| light | default | closed        | N/A        | N/A        | N/A                                                               | none            | N/A                          | N/A                  | `0` / hidden | Backdrop is removed with `v-if`; positioner is hidden with `v-show`. |
+| dark  | default | closed        | N/A        | N/A        | N/A                                                               | none            | N/A                          | N/A                  | `0` / hidden | Backdrop is removed with `v-if`; positioner is hidden with `v-show`. |
 
 ## Structure / Anatomy
 

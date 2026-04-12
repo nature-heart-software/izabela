@@ -35,16 +35,16 @@ Source files used:
 
 ## Variant And State Styles
 
-| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
-| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
-| light | `info` | rest | `colors.white` (`#ffffff`) | same as text | `colors.black` (`#0E0E2C`) | none | None | `6px` | 1 | Semantic inversion compared with other alert types in light theme. |
-| light | `success` | rest | `colors.black` (`#0E0E2C`) | same as text | `backgroundColor` = `colors.white` (`#ffffff`) | none | None | `6px` | 1 | No success-specific hue in theme. |
-| light | `warning` | rest | `colors.black` (`#0E0E2C`) | same as text | `backgroundColor` = `colors.white` (`#ffffff`) | none | None | `6px` | 1 | No warning-specific hue in theme. |
-| light | `error` | rest | `colors.black` (`#0E0E2C`) | same as text | `backgroundColor` = `colors.white` (`#ffffff`) | none | None | `6px` | 1 | No error-specific hue in theme. |
-| dark | `info` | rest | `colors.black` (`#0E0E2C`) | same as text | `colors.white` (`#ffffff`) | none | None | `6px` | 1 | Semantic inversion compared with other alert types in dark theme. |
-| dark | `success` | rest | `colors.white` (`#ffffff`) | same as text | `backgroundColor` = `darken(0.0675, colors.gray['80'])` = `#333333` | none | None | `6px` | 1 | No success-specific hue in theme. |
-| dark | `warning` | rest | `colors.white` (`#ffffff`) | same as text | `backgroundColor` = `darken(0.0675, colors.gray['80'])` = `#333333` | none | None | `6px` | 1 | No warning-specific hue in theme. |
-| dark | `error` | rest | `colors.white` (`#ffffff`) | same as text | `backgroundColor` = `darken(0.0675, colors.gray['80'])` = `#333333` | none | None | `6px` | 1 | No error-specific hue in theme. |
+| Theme | Variant   | State | Text color                 | Icon color   | Background / fill                                                   | Border / stroke | Shadow / effects | Radius | Opacity | Notes                                                              |
+| ----- | --------- | ----- | -------------------------- | ------------ | ------------------------------------------------------------------- | --------------- | ---------------- | ------ | ------- | ------------------------------------------------------------------ |
+| light | `info`    | rest  | `colors.white` (`#ffffff`) | same as text | `colors.black` (`#0E0E2C`)                                          | none            | None             | `6px`  | 1       | Semantic inversion compared with other alert types in light theme. |
+| light | `success` | rest  | `colors.black` (`#0E0E2C`) | same as text | `backgroundColor` = `colors.white` (`#ffffff`)                      | none            | None             | `6px`  | 1       | No success-specific hue in theme.                                  |
+| light | `warning` | rest  | `colors.black` (`#0E0E2C`) | same as text | `backgroundColor` = `colors.white` (`#ffffff`)                      | none            | None             | `6px`  | 1       | No warning-specific hue in theme.                                  |
+| light | `error`   | rest  | `colors.black` (`#0E0E2C`) | same as text | `backgroundColor` = `colors.white` (`#ffffff`)                      | none            | None             | `6px`  | 1       | No error-specific hue in theme.                                    |
+| dark  | `info`    | rest  | `colors.black` (`#0E0E2C`) | same as text | `colors.white` (`#ffffff`)                                          | none            | None             | `6px`  | 1       | Semantic inversion compared with other alert types in dark theme.  |
+| dark  | `success` | rest  | `colors.white` (`#ffffff`) | same as text | `backgroundColor` = `darken(0.0675, colors.gray['80'])` = `#333333` | none            | None             | `6px`  | 1       | No success-specific hue in theme.                                  |
+| dark  | `warning` | rest  | `colors.white` (`#ffffff`) | same as text | `backgroundColor` = `darken(0.0675, colors.gray['80'])` = `#333333` | none            | None             | `6px`  | 1       | No warning-specific hue in theme.                                  |
+| dark  | `error`   | rest  | `colors.white` (`#ffffff`) | same as text | `backgroundColor` = `darken(0.0675, colors.gray['80'])` = `#333333` | none            | None             | `6px`  | 1       | No error-specific hue in theme.                                    |
 
 ## Structure / Anatomy
 

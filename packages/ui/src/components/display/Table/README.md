@@ -36,8 +36,8 @@ Purpose: thin display wrappers around Element Plus `ElTable` and `ElTableColumn`
 
 ## Variant And State Styles
 
-| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
-| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
+| Theme     | Variant                     | State                       | Text color                  | Icon color   | Background / fill           | Border / stroke                                           | Shadow / effects            | Radius                      | Opacity                     | Notes                                                                      |
+| --------- | --------------------------- | --------------------------- | --------------------------- | ------------ | --------------------------- | --------------------------------------------------------- | --------------------------- | --------------------------- | --------------------------- | -------------------------------------------------------------------------- |
 | Not found | Inherited from Element Plus | Inherited from Element Plus | Inherited from Element Plus | same as text | Inherited from Element Plus | Inherited from Element Plus / Inherited from Element Plus | Inherited from Element Plus | Inherited from Element Plus | Inherited from Element Plus | Local source imports Element Plus CSS and adds no overriding visual rules. |
 
 ## Structure / Anatomy

@@ -19,12 +19,12 @@
 
 ## Variant And State Styles
 
-| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
-| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
-| Light | `horizontal` | Rest | N/A | N/A | None | 1px / `theme.divider.borderColor` = `colors.gray.20` (`#EBEBEB`) | None | N/A | 1 | Renders `border-top`. |
-| Light | `vertical` | Rest | N/A | N/A | None | 1px / `theme.divider.borderColor` = `colors.gray.20` (`#EBEBEB`) | None | N/A | 1 | Renders `border-right`; `display: inline-flex`. |
-| Dark | `horizontal` | Rest | N/A | N/A | None | 1px / `theme.divider.borderColor` = `colors.gray.80` (`#444444`) | None | N/A | 1 | Renders `border-top`. |
-| Dark | `vertical` | Rest | N/A | N/A | None | 1px / `theme.divider.borderColor` = `colors.gray.80` (`#444444`) | None | N/A | 1 | Renders `border-right`; `display: inline-flex`. |
+| Theme | Variant      | State | Text color | Icon color | Background / fill | Border / stroke                                                  | Shadow / effects | Radius | Opacity | Notes                                           |
+| ----- | ------------ | ----- | ---------- | ---------- | ----------------- | ---------------------------------------------------------------- | ---------------- | ------ | ------- | ----------------------------------------------- |
+| Light | `horizontal` | Rest  | N/A        | N/A        | None              | 1px / `theme.divider.borderColor` = `colors.gray.20` (`#EBEBEB`) | None             | N/A    | 1       | Renders `border-top`.                           |
+| Light | `vertical`   | Rest  | N/A        | N/A        | None              | 1px / `theme.divider.borderColor` = `colors.gray.20` (`#EBEBEB`) | None             | N/A    | 1       | Renders `border-right`; `display: inline-flex`. |
+| Dark  | `horizontal` | Rest  | N/A        | N/A        | None              | 1px / `theme.divider.borderColor` = `colors.gray.80` (`#444444`) | None             | N/A    | 1       | Renders `border-top`.                           |
+| Dark  | `vertical`   | Rest  | N/A        | N/A        | None              | 1px / `theme.divider.borderColor` = `colors.gray.80` (`#444444`) | None             | N/A    | 1       | Renders `border-right`; `display: inline-flex`. |
 
 ## Structure / Anatomy
 

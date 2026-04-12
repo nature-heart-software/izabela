@@ -36,10 +36,10 @@
 
 ## Variant And State Styles
 
-| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
-| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
-| Light | any | Rest | Inherited | same as text | None | none | None | N/A | 1 | Theme does not alter layout behavior. |
-| Dark | any | Rest | Inherited | same as text | None | none | None | N/A | 1 | Theme does not alter layout behavior. |
+| Theme | Variant | State | Text color | Icon color   | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes                                 |
+| ----- | ------- | ----- | ---------- | ------------ | ----------------- | --------------- | ---------------- | ------ | ------- | ------------------------------------- |
+| Light | any     | Rest  | Inherited  | same as text | None              | none            | None             | N/A    | 1       | Theme does not alter layout behavior. |
+| Dark  | any     | Rest  | Inherited  | same as text | None              | none            | None             | N/A    | 1       | Theme does not alter layout behavior. |
 
 ## Structure / Anatomy
 

@@ -20,12 +20,12 @@
 
 ## Variant And State Styles
 
-| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
-| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
-| Light | block | Rest | Inherited | same as text | None | none | None | N/A | 1 | `display: flex; align-items: center; justify-content: center`. |
-| Light | inline | Rest | Inherited | same as text | None | none | None | N/A | 1 | `display: inline-flex; align-items: center; justify-content: center`. |
-| Dark | block | Rest | Inherited | same as text | None | none | None | N/A | 1 | Same as light theme. |
-| Dark | inline | Rest | Inherited | same as text | None | none | None | N/A | 1 | Same as light theme. |
+| Theme | Variant | State | Text color | Icon color   | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes                                                                 |
+| ----- | ------- | ----- | ---------- | ------------ | ----------------- | --------------- | ---------------- | ------ | ------- | --------------------------------------------------------------------- |
+| Light | block   | Rest  | Inherited  | same as text | None              | none            | None             | N/A    | 1       | `display: flex; align-items: center; justify-content: center`.        |
+| Light | inline  | Rest  | Inherited  | same as text | None              | none            | None             | N/A    | 1       | `display: inline-flex; align-items: center; justify-content: center`. |
+| Dark  | block   | Rest  | Inherited  | same as text | None              | none            | None             | N/A    | 1       | Same as light theme.                                                  |
+| Dark  | inline  | Rest  | Inherited  | same as text | None              | none            | None             | N/A    | 1       | Same as light theme.                                                  |
 
 ## Structure / Anatomy
 

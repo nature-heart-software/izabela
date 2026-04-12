@@ -27,18 +27,18 @@ Horizontal range slider with a custom WebKit track and thumb. This folder define
 
 ## Variant And State Style Tables
 
-| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
-| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
-| light | track | rest | N/A | N/A | `#EBEBEB` | none | none | `0` | `1` | WebKit track only. |
-| light | thumb | rest | N/A | N/A | `#0E0E2C` | `#0E0E2C` | none | `8px` | `1` |  |
-| light | thumb | hover | N/A | N/A | `#2B2B2C` | `#2B2B2C` | none | `8px` | `1` |  |
-| light | thumb | active | N/A | N/A | `#626262` | `#626262` | none | `8px` | `1` |  |
-| light | thumb | focus | N/A | N/A | `#0E0E2C` | `1px` / `#2B2B2C` | `0 0 0 4px #626262` | `8px` | `1` | Focus ring uses WebKit thumb focus plus separate border color rule. |
-| dark | track | rest | N/A | N/A | `#444444` | none | none | `0` | `1` |  |
-| dark | thumb | rest | N/A | N/A | `lighten(0.05, #9F9F9F)` | `lighten(0.05, #9F9F9F)` | none | `8px` | `1` |  |
-| dark | thumb | hover | N/A | N/A | `#BEBEBE` | `#BEBEBE` | none | `8px` | `1` |  |
-| dark | thumb | active | N/A | N/A | `#9F9F9F` | `#9F9F9F` | none | `8px` | `1` |  |
-| dark | thumb | focus | N/A | N/A | `lighten(0.05, #9F9F9F)` | `1px` / `#EBEBEB` | `0 0 0 4px #DCDCDC` | `8px` | `1` |  |
+| Theme | Variant | State  | Text color | Icon color | Background / fill        | Border / stroke          | Shadow / effects    | Radius | Opacity | Notes                                                               |
+| ----- | ------- | ------ | ---------- | ---------- | ------------------------ | ------------------------ | ------------------- | ------ | ------- | ------------------------------------------------------------------- |
+| light | track   | rest   | N/A        | N/A        | `#EBEBEB`                | none                     | none                | `0`    | `1`     | WebKit track only.                                                  |
+| light | thumb   | rest   | N/A        | N/A        | `#0E0E2C`                | `#0E0E2C`                | none                | `8px`  | `1`     |                                                                     |
+| light | thumb   | hover  | N/A        | N/A        | `#2B2B2C`                | `#2B2B2C`                | none                | `8px`  | `1`     |                                                                     |
+| light | thumb   | active | N/A        | N/A        | `#626262`                | `#626262`                | none                | `8px`  | `1`     |                                                                     |
+| light | thumb   | focus  | N/A        | N/A        | `#0E0E2C`                | `1px` / `#2B2B2C`        | `0 0 0 4px #626262` | `8px`  | `1`     | Focus ring uses WebKit thumb focus plus separate border color rule. |
+| dark  | track   | rest   | N/A        | N/A        | `#444444`                | none                     | none                | `0`    | `1`     |                                                                     |
+| dark  | thumb   | rest   | N/A        | N/A        | `lighten(0.05, #9F9F9F)` | `lighten(0.05, #9F9F9F)` | none                | `8px`  | `1`     |                                                                     |
+| dark  | thumb   | hover  | N/A        | N/A        | `#BEBEBE`                | `#BEBEBE`                | none                | `8px`  | `1`     |                                                                     |
+| dark  | thumb   | active | N/A        | N/A        | `#9F9F9F`                | `#9F9F9F`                | none                | `8px`  | `1`     |                                                                     |
+| dark  | thumb   | focus  | N/A        | N/A        | `lighten(0.05, #9F9F9F)` | `1px` / `#EBEBEB`        | `0 0 0 4px #DCDCDC` | `8px`  | `1`     |                                                                     |
 
 ## Structure / Anatomy
 

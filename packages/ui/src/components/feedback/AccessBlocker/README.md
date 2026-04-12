@@ -33,12 +33,12 @@ Source files used:
 
 ## Variant And State Styles
 
-| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
-| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
-| light | default | allowed | N/A | N/A | Transparent / inherited | none | None | N/A | 1 | Only the wrapped content is visible. |
-| light | default | blocked | Inherited from reason slot content | same as text | `theme.disabledItemBackground.backdropColor` = `colors.white` (`#ffffff`), rendered via `rgba(..., 0.9)` = `rgba(255,255,255,0.9)` | none | None | Not found | 0.9 overlay alpha | Overlay fills the component bounds. |
-| dark | default | allowed | N/A | N/A | Transparent / inherited | none | None | N/A | 1 | Only the wrapped content is visible. |
-| dark | default | blocked | Inherited from reason slot content | same as text | `theme.disabledItemBackground.backdropColor` = dark theme `backgroundColor` = `darken(0.0675, #444444)` = `#333333`, rendered via `rgba(..., 0.9)` = `rgba(51,51,51,0.9)` | none | None | Not found | 0.9 overlay alpha | Overlay fills the component bounds. |
+| Theme | Variant | State   | Text color                         | Icon color   | Background / fill                                                                                                                                                         | Border / stroke | Shadow / effects | Radius    | Opacity           | Notes                                |
+| ----- | ------- | ------- | ---------------------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- | ---------------- | --------- | ----------------- | ------------------------------------ |
+| light | default | allowed | N/A                                | N/A          | Transparent / inherited                                                                                                                                                   | none            | None             | N/A       | 1                 | Only the wrapped content is visible. |
+| light | default | blocked | Inherited from reason slot content | same as text | `theme.disabledItemBackground.backdropColor` = `colors.white` (`#ffffff`), rendered via `rgba(..., 0.9)` = `rgba(255,255,255,0.9)`                                        | none            | None             | Not found | 0.9 overlay alpha | Overlay fills the component bounds.  |
+| dark  | default | allowed | N/A                                | N/A          | Transparent / inherited                                                                                                                                                   | none            | None             | N/A       | 1                 | Only the wrapped content is visible. |
+| dark  | default | blocked | Inherited from reason slot content | same as text | `theme.disabledItemBackground.backdropColor` = dark theme `backgroundColor` = `darken(0.0675, #444444)` = `#333333`, rendered via `rgba(..., 0.9)` = `rgba(51,51,51,0.9)` | none            | None             | Not found | 0.9 overlay alpha | Overlay fills the component bounds.  |
 
 ## Structure / Anatomy
 

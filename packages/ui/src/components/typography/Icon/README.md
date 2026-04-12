@@ -35,10 +35,10 @@
 
 ## Variant And State Styles
 
-| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
-| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
-| Light | Default | Rest | Inherited via `currentColor` | same as text | None | none | None | N/A | 1 | Component itself does not set color. |
-| Dark | Default | Rest | Inherited via `currentColor` | same as text | None | none | None | N/A | 1 | Same as light theme. |
+| Theme | Variant | State | Text color                   | Icon color   | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes                                |
+| ----- | ------- | ----- | ---------------------------- | ------------ | ----------------- | --------------- | ---------------- | ------ | ------- | ------------------------------------ |
+| Light | Default | Rest  | Inherited via `currentColor` | same as text | None              | none            | None             | N/A    | 1       | Component itself does not set color. |
+| Dark  | Default | Rest  | Inherited via `currentColor` | same as text | None              | none            | None             | N/A    | 1       | Same as light theme.                 |
 
 ## Structure / Anatomy
 

@@ -40,10 +40,10 @@ Autocomplete popover shell for searchable option lists. It renders a reference s
 
 ## Variant And State Style Tables
 
-| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
-| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
-| light | base | rest | Slot-defined | same as text | `theme.autocomplete.backgroundColor` = `#ffffff` | `1px` / `theme.autocomplete.borderColor` = `#EBEBEB` | `tokens.boxShadow.lg` = `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | by `size` | `1` | Popup shell only. Row styling is delegated to slot content / child component. |
-| dark | base | rest | Slot-defined | same as text | `darken(0.0675, #444444)` | `1px` / `#444444` | `tokens.boxShadow.lg` = `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | by `size` | `1` |  |
+| Theme | Variant | State | Text color   | Icon color   | Background / fill                                | Border / stroke                                      | Shadow / effects                                                  | Radius    | Opacity | Notes                                                                         |
+| ----- | ------- | ----- | ------------ | ------------ | ------------------------------------------------ | ---------------------------------------------------- | ----------------------------------------------------------------- | --------- | ------- | ----------------------------------------------------------------------------- |
+| light | base    | rest  | Slot-defined | same as text | `theme.autocomplete.backgroundColor` = `#ffffff` | `1px` / `theme.autocomplete.borderColor` = `#EBEBEB` | `tokens.boxShadow.lg` = `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | by `size` | `1`     | Popup shell only. Row styling is delegated to slot content / child component. |
+| dark  | base    | rest  | Slot-defined | same as text | `darken(0.0675, #444444)`                        | `1px` / `#444444`                                    | `tokens.boxShadow.lg` = `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | by `size` | `1`     |                                                                               |
 
 ## Structure / Anatomy
 

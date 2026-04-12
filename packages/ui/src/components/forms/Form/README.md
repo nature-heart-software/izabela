@@ -23,9 +23,9 @@ Simple field wrapper that pairs an optional label with slotted field content usi
 
 ## Variant And State Style Tables
 
-| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
-| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
-| light/dark | base | rest | Not found in this folder | same as text | transparent | none | none | N/A | `1` | Visual behavior comes from child field component. |
+| Theme      | Variant | State | Text color               | Icon color   | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes                                             |
+| ---------- | ------- | ----- | ------------------------ | ------------ | ----------------- | --------------- | ---------------- | ------ | ------- | ------------------------------------------------- |
+| light/dark | base    | rest  | Not found in this folder | same as text | transparent       | none            | none             | N/A    | `1`     | Visual behavior comes from child field component. |
 
 ## Structure / Anatomy
 

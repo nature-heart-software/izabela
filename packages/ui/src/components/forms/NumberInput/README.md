@@ -32,16 +32,16 @@ Numeric input wrapper around Element Plus `ElInput` with the same design languag
 
 ## Variant And State Style Tables
 
-| Theme | Variant | State | Text color | Icon color | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes |
-| ----- | ------- | ----- | ---------- | ---------- | ----------------- | --------------- | ---------------- | ------ | ------- | ----- |
-| light | base | rest | `#444444` | same as text | `#ffffff` | `1px` / `#EBEBEB` | none | by size | `1` |  |
-| light | base | hover | `#444444` | same as text | `#ffffff` | `1px` / `#BEBEBE` | none | by size | `1` |  |
-| light | base | focus | `#444444` | same as text | `#ffffff` | `1px` / `#BEBEBE` | `0 0 0 4px #F9F9FC` | by size | `1` |  |
-| light | base | placeholder | `#BEBEBE` | same as text | N/A | none | none | N/A | `1` | Placeholder weight `300`. |
-| dark | base | rest | `#DCDCDC` | same as text | `darken(0.0675, #444444)` | `1px` / `#444444` | none | by size | `1` |  |
-| dark | base | hover | `#DCDCDC` | same as text | `darken(0.0675, #444444)` | `1px` / `#626262` | none | by size | `1` |  |
-| dark | base | focus | `#DCDCDC` | same as text | `darken(0.0675, #444444)` | `1px` / `#626262` | `0 0 0 4px #444444` | by size | `1` |  |
-| dark | base | placeholder | `#818181` | same as text | N/A | none | none | N/A | `1` | Placeholder weight `300`. |
+| Theme | Variant | State       | Text color | Icon color   | Background / fill         | Border / stroke   | Shadow / effects    | Radius  | Opacity | Notes                     |
+| ----- | ------- | ----------- | ---------- | ------------ | ------------------------- | ----------------- | ------------------- | ------- | ------- | ------------------------- |
+| light | base    | rest        | `#444444`  | same as text | `#ffffff`                 | `1px` / `#EBEBEB` | none                | by size | `1`     |                           |
+| light | base    | hover       | `#444444`  | same as text | `#ffffff`                 | `1px` / `#BEBEBE` | none                | by size | `1`     |                           |
+| light | base    | focus       | `#444444`  | same as text | `#ffffff`                 | `1px` / `#BEBEBE` | `0 0 0 4px #F9F9FC` | by size | `1`     |                           |
+| light | base    | placeholder | `#BEBEBE`  | same as text | N/A                       | none              | none                | N/A     | `1`     | Placeholder weight `300`. |
+| dark  | base    | rest        | `#DCDCDC`  | same as text | `darken(0.0675, #444444)` | `1px` / `#444444` | none                | by size | `1`     |                           |
+| dark  | base    | hover       | `#DCDCDC`  | same as text | `darken(0.0675, #444444)` | `1px` / `#626262` | none                | by size | `1`     |                           |
+| dark  | base    | focus       | `#DCDCDC`  | same as text | `darken(0.0675, #444444)` | `1px` / `#626262` | `0 0 0 4px #444444` | by size | `1`     |                           |
+| dark  | base    | placeholder | `#818181`  | same as text | N/A                       | none              | none                | N/A     | `1`     | Placeholder weight `300`. |
 
 ## Structure / Anatomy
 
