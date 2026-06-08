@@ -195,6 +195,9 @@
     "nushell": "^0.110.0"
   },
   "overrides": {
-    "node-gyp": "^9.4.1"
+    "node-gyp": "^9.4.1",
+    "prebuild-install": {
+      "node-abi": "^4.17.0"
+    }
   }
 }
