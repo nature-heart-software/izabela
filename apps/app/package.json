@@ -55,6 +55,6 @@
     "postinstall": "node bin/rebuild.js",
     "postuninstall": "node bin/rebuild.js",
     "preview": "vite preview",
-    "rebuild": "electron-builder install-app-deps"
+    "rebuild": "electron-builder install-app-deps && electron-rebuild -f -w forcefocus"
   }
 }
