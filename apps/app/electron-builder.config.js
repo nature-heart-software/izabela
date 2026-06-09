@@ -40,9 +40,12 @@ module.exports = {
   electronVersion: getElectronVersion(),
   extraFiles: ['./resources/**'],
   asarUnpack: [
+    'node_modules/@nut-tree-fork/**/*',
     'node_modules/@packages/electron-game-overlay/**/*',
     'node_modules/@packages/native-keymap/**/*',
     'node_modules/@packages/process-watcher/**/*',
+    'node_modules/@packages/win-mouse/**/*',
+    'node_modules/forcefocus/**/*',
     'node_modules/wql-process-monitor/**/*',
     'node_modules/win-control/**/*',
     'node_modules/@xan105/error/**/*',
