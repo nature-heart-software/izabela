@@ -21,6 +21,7 @@ module.exports = {
   $schema:
     'https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json',
   asar: true,
+  npmRebuild: false,
   productName: pkg.productName,
   directories: {
     output: 'dist_electron',

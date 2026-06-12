@@ -3,10 +3,8 @@
   "version": "0.0.0",
   "$schema": "node_modules/lerna/schemas/lerna-schema.json",
   "useWorkspaces": true,
-  "npmClient": "npm",
+  "npmClient": "pnpm",
   "npmClientArgs": [
-    "--prefer-offline",
-    "--ignore-engines",
-    "--ignore-workspace-root-check"
+    "--prefer-offline"
   ]
 }

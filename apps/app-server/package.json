@@ -24,17 +24,18 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "@packages/generate-exports": "0.0.0",
+    "@packages/generate-exports": "workspace:*",
     "@types/body-parser": "^1.19.2",
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.13",
     "@types/lodash": "^4.14.184",
     "@types/morgan": "^1.9.3",
     "@types/uuid": "^8.3.4",
-    "microbundle": "^0.15.1",
     "nodemon": "^2.0.15",
     "typescript": "^5.4.5",
-    "vite": "^5.2.0"
+    "vite": "^5.2.0",
+    "@packages/vite-plugin-generate-exports": "workspace:*",
+    "vite-plugin-dts": "^5.0.2"
   },
   "files": [
     "./dist"
@@ -43,9 +44,9 @@
   "module": "./dist/main.cjs",
   "private": true,
   "scripts": {
-    "build": "node bin/generate-exports && microbundle --target=node --format=cjs --sourcemap=false",
-    "dev": "node bin/generate-exports && microbundle --target=node --format=cjs --sourcemap=false watch",
-    "start": "node bin/generate-exports && nodemon ./dist/main.js --start-server"
+    "build": "vite build",
+    "dev": "vite build --watch --mode development",
+    "start": "node bin/generate-exports && nodemon ./dist/main.cjs --start-server"
   },
   "source": "src/main.ts",
   "type": "module",

@@ -8,7 +8,7 @@
   "module": "./dist/index.js",
   "private": true,
   "scripts": {
-    "build": "node ./bin/build"
+    "build": "vite build && node ./bin/build"
   },
   "source": "src/main.ts",
   "type": "module",

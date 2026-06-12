@@ -38,10 +38,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version-file: '.nvmrc'
+          cache: 'pnpm'
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v2
@@ -51,19 +55,6 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
-
-      - name: Cache node modules
-        id: cache-npm
-        uses: actions/cache@v4
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
 
       - name: Set env variables
         shell: bash
@@ -79,10 +70,10 @@ jobs:
             ./apps/app/package.json
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: npm run build
+        run: pnpm run build
         env:
           NODE_OPTIONS: '--max_old_space_size=4096'
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
