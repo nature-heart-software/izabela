@@ -4,7 +4,5 @@
   "$schema": "node_modules/lerna/schemas/lerna-schema.json",
   "useWorkspaces": true,
   "npmClient": "pnpm",
-  "npmClientArgs": [
-    "--prefer-offline"
-  ]
+  "npmClientArgs": ["--prefer-offline"]
 }
