@@ -30,7 +30,8 @@
     "systeminformation": "^5.17.3",
     "win-control": "workspace:*",
     "windows-tlist": "workspace:*",
-    "wql-process-monitor": "3.0.1"
+    "wql-process-monitor": "3.0.1",
+    "ws": "^8.21.0"
   },
   "devDependencies": {
     "@packages/animalese": "workspace:*",

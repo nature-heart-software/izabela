@@ -1,8 +1,19 @@
 import { defineConfig } from 'vite'
 import dts from 'vite-plugin-dts'
 import { resolve } from 'path'
+import { createRequire } from 'node:module'
 import { generateExportsPlugin } from '@packages/vite-plugin-generate-exports'
 import { getNodeExternal } from '../../utils/vite'
+
+const require = createRequire(import.meta.url)
+const pkg = require('./package.json')
+const externalPackages = [
+  ...Object.keys(pkg.dependencies || {}),
+  ...Object.keys(pkg.peerDependencies || {}),
+  ...Object.keys(pkg.optionalDependencies || {}),
+]
+const escapeRegExp = (value: string) =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
 export default defineConfig(({ mode }) => ({
   plugins: [
@@ -27,7 +38,12 @@ export default defineConfig(({ mode }) => ({
       fileName: () => 'main.cjs',
     },
     rollupOptions: {
-      external: getNodeExternal(),
+      external: [
+        ...getNodeExternal(),
+        ...externalPackages.map(
+          (packageName) => new RegExp(`^${escapeRegExp(packageName)}(/.*)?`),
+        ),
+      ],
     },
   },
 }))

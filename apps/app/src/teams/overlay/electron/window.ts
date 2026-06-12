@@ -40,7 +40,7 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     electronOverlayWindow.start(window)
   })
 
-  if (import.meta.env.DEV) {
+  if (import.meta.env.DEV && import.meta.env.VITE_OPEN_DEVTOOLS === 'true') {
     window.webContents.openDevTools({ mode: 'undocked' })
   }
 
