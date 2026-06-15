@@ -28,8 +28,6 @@ RUN npm config set msvs_version 2022
 
 COPY ./ ./
 
-COPY ./lerna.json.prod ./lerna.json
-
 RUN yarn install
 
 RUN yarn build:deps
