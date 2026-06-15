@@ -16,6 +16,9 @@
         "{projectRoot}/dist-electron",
         "{projectRoot}/dist_electron"
       ]
+    },
+    "dev": {
+      "dependsOn": ["^build"]
     }
   },
   "tasksRunnerOptions": {
