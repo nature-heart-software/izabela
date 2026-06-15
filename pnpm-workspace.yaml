@@ -6,6 +6,9 @@ overrides:
   node-gyp: ^12.3.0
   prebuild-install>node-abi: ^4.17.0
 
+minimumReleaseAgeExclude:
+  - gelectron
+
 allowBuilds:
   '@infisical/cli': true
   '@parcel/watcher': true

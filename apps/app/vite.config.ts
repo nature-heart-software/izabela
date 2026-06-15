@@ -6,7 +6,6 @@ import path from 'path'
 import { getRootExternal } from '../../utils/vite'
 
 const pkg = require('./package.json')
-const extraExternalPackages = ['ws', 'bufferutil', 'utf-8-validate']
 const escapeRegExp = (value: string) =>
   value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
@@ -20,7 +19,6 @@ export default defineConfig(({ mode }) => {
     ...(mode === 'development'
       ? omitPackages(Object.keys(pkg.devDependencies || {}))
       : []),
-    ...extraExternalPackages,
   ]
   const external = [
     ...externalPackages.map(
@@ -37,6 +35,9 @@ export default defineConfig(({ mode }) => {
   }
   const rollupOptions = {
     external,
+    output: {
+      externalLiveBindings: false,
+    },
   }
   const plugins = () => [tsconfigPaths()]
   return {
