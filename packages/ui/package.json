@@ -2,9 +2,9 @@
   "name": "@packages/ui",
   "version": "0.0.0",
   "dependencies": {
-    "@packages/design-tokens": "*",
-    "@packages/icons": "*",
-    "@packages/vite-plugin-generate-exports": "*"
+    "@packages/design-tokens": "workspace:*",
+    "@packages/icons": "workspace:*",
+    "@packages/vite-plugin-generate-exports": "workspace:*"
   },
   "files": [
     "./dist"

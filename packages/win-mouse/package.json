@@ -27,6 +27,7 @@
   ],
   "repository": "kapetan/win-mouse.git",
   "scripts": {
+    "build": "node -e \"console.log('No build step required')\"",
     "install": "",
     "lint": "standard",
     "test": "node test/parallel-destroy && node test/parallel-unref && node test/sequence-destroy && node test/sequence-unref",

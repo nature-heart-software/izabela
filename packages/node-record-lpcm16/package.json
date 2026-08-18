@@ -21,6 +21,7 @@
   "main": "index.js",
   "repository": "gillesdemey/node-record-lpcm16",
   "scripts": {
+    "build": "node -e \"console.log('No build step required')\"",
     "test": "standard"
   }
 }

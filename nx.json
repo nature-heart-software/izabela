@@ -1,13 +1,26 @@
 {
   "extends": "nx/presets/npm.json",
-  "tasksRunnerOptions": {
-    "default": {
-      "runner": "nx/tasks-runners/default",
-      "options": {
-        "cacheableOperations": [
-          "build"
-        ]
-      }
+  "targetDefaults": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [
+        "{projectRoot}/dist",
+        "{projectRoot}/dist-electron",
+        "{projectRoot}/dist_electron"
+      ],
+      "cache": true
+    },
+    "build:prod": {
+      "dependsOn": ["^build:prod"],
+      "outputs": [
+        "{projectRoot}/dist",
+        "{projectRoot}/dist-electron",
+        "{projectRoot}/dist_electron"
+      ]
+    },
+    "dev": {
+      "dependsOn": ["^build"]
     }
-  }
+  },
+  "useInferencePlugins": false
 }
