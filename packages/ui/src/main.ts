@@ -116,7 +116,7 @@ export const GlobalStyles = styled('div')`
 
     .vjt-highlight {
         outline: ${() => rem(2)} solid ${({ theme }: any) =>
-  theme.button.plain.backgroundColor} !important;
+          theme.button.plain.backgroundColor} !important;
         border-radius: inherit !important;
     }
 `
