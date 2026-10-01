@@ -1,0 +1,25 @@
+packages:
+  - apps/*
+  - packages/*
+
+overrides:
+  node-gyp: ^12.3.0
+  prebuild-install>node-abi: ^4.17.0
+
+minimumReleaseAgeExclude:
+  - gelectron
+
+allowBuilds:
+  '@infisical/cli': true
+  '@parcel/watcher': true
+  bufferutil: true
+  electron: true
+  es5-ext: true
+  esbuild: true
+  forcefocus: true
+  koffi: true
+  nx: true
+  protobufjs: true
+  utf-8-validate: true
+  vue-demi: true
+  wql-process-monitor: true

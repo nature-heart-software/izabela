@@ -1,4 +1,7 @@
 import styled from 'vue3-styled-components'
+// Seed package-local type resolutions so pnpm paths stay out of declarations.
+import type {} from 'tippy.js'
+import type {} from '@zag-js/interact-outside'
 
 export * from './components'
 export * from './themes'
@@ -24,14 +27,17 @@ export const GlobalStyles = styled('div')`
     &::-webkit-scrollbar-thumb {
       border-left: ${() => rem(spacing['3'])} solid rgba(0, 0, 0, 0);
       background-clip: padding-box;
-      background-color: ${({ theme }: any) => theme.button.plain.backgroundColor};
+      background-color: ${({ theme }: any) =>
+        theme.button.plain.backgroundColor};
 
       &:hover {
-        background-color: ${({ theme }: any) => theme.button.plain.hover.backgroundColor};
+        background-color: ${({ theme }: any) =>
+          theme.button.plain.hover.backgroundColor};
       }
 
       &:active {
-        background-color: ${({ theme }: any) => theme.button.plain.active.backgroundColor};
+        background-color: ${({ theme }: any) =>
+          theme.button.plain.active.backgroundColor};
       }
     }
   }
@@ -71,7 +77,8 @@ export const GlobalStyles = styled('div')`
       border-color: ${({ theme }: any) => theme.tooltip.borderColor} !important;
       border-width: ${() => rem(borderWidth.DEFAULT)};
       color: ${({ theme }: any) => theme.tooltip.color} !important;
-      background-color: ${({ theme }: any) => theme.tooltip.backgroundColor} !important;
+      background-color: ${({ theme }: any) =>
+        theme.tooltip.backgroundColor} !important;
       padding: ${() => rem(spacing[1])} ${() => rem(spacing[2])};
       ${() => borderRadiusStyleBySize('xs')}
       * {
@@ -80,7 +87,8 @@ export const GlobalStyles = styled('div')`
     }
   
     #vjt-tooltip {
-        background-color: ${({ theme }: any) => theme.button.plain.backgroundColor} !important;
+        background-color: ${({ theme }: any) =>
+          theme.button.plain.backgroundColor} !important;
         box-shadow: ${() => boxShadow.DEFAULT};
         color: ${({ theme }: any) => theme.button.plain.color} !important;
         [type="body"] {
@@ -100,13 +108,15 @@ export const GlobalStyles = styled('div')`
 
     #vjt-arrow {
         &::before {
-            background-color: ${({ theme }: any) => theme.button.plain.backgroundColor} !important;
+            background-color: ${({ theme }: any) =>
+              theme.button.plain.backgroundColor} !important;
             box-shadow: ${() => boxShadow.DEFAULT};
         }
     }
 
     .vjt-highlight {
-        outline: ${() => rem(2)} solid ${({ theme }: any) => theme.button.plain.backgroundColor} !important;
+        outline: ${() => rem(2)} solid ${({ theme }: any) =>
+          theme.button.plain.backgroundColor} !important;
         border-radius: inherit !important;
     }
 `

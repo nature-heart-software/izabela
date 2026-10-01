@@ -147,7 +147,10 @@ const App = () => {
     })
 
     app.on('ready', async () => {
-      if (isDevelopment) {
+      if (
+        isDevelopment &&
+        import.meta.env.VITE_ENABLE_VUE_DEVTOOLS === 'true'
+      ) {
         try {
           await ((installExtension as any).default as typeof installExtension)(
             VUEJS_DEVTOOLS,

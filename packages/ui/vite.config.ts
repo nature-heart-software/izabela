@@ -9,7 +9,7 @@ import { getFileName, getFormats, getRootExternal } from '../../utils/vite'
 export default defineConfig(({ mode }) => ({
   plugins: [
     vue(),
-    dts(),
+    dts({ entryRoot: 'src', processor: 'vue' }),
     generateExportsPlugin({
       watch: mode === 'development',
       entries: [

@@ -2,7 +2,7 @@
   "name": "@packages/vite-plugin-generate-exports",
   "version": "0.0.0",
   "dependencies": {
-    "@packages/generate-exports": "*"
+    "@packages/generate-exports": "workspace:*"
   },
   "files": [
     "./dist"
@@ -12,7 +12,7 @@
   "private": true,
   "scripts": {
     "build": "vite build",
-    "build:prod": "tsc && yarn build",
+    "build:prod": "tsc && pnpm run build",
     "dev": "vite build --watch --mode development"
   },
   "source": "src/main.ts",

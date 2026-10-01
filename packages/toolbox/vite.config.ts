@@ -7,7 +7,7 @@ import { getFileName, getFormats, getRootExternal } from '../../utils/vite'
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   plugins: [
-    dts(),
+    dts({ entryRoot: 'src' }),
     generateExportsPlugin({
       watch: mode === 'development',
       entries: [

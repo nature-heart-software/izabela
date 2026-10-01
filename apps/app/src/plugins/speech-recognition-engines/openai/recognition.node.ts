@@ -1,6 +1,6 @@
 import once from 'lodash/once'
 import { Buffer } from 'buffer'
-import WebSocket from 'ws'
+import { WebSocket } from 'ws'
 import { useSettingsStore } from '@/features/settings/store'
 import { WebSocketSessionManager } from '@/teams/speech-worker/modules/electron-native-speech-recognition/websocket-session-manager.ts'
 import { store } from './store.ts'
