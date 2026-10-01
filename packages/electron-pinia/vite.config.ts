@@ -5,7 +5,7 @@ import { getFileName, getFormats, getRootExternal } from '../../utils/vite'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [dts()],
+  plugins: [dts({ entryRoot: 'src' })],
   build: {
     emptyOutDir: false,
     lib: {

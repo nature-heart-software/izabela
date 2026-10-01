@@ -56,7 +56,7 @@
   "scripts": {
     "build": "vite build && pnpm run rebuild && pnpm run electron:build",
     "build:prod": "vue-tsc && pnpm run build",
-    "dev": "vite",
+    "dev": "pnpm run rebuild && vite",
     "electron:build": "electron-builder --config electron-builder.config.js --publish never",
     "generate:app-icon": "pnpm dlx electron-icon-builder --input=./assets/app-icon.png --output=./build --flatten && pnpm dlx electron-icon-builder --input=./assets/app-icon.png --output=./public --flatten",
     "lint": "vue-tsc",

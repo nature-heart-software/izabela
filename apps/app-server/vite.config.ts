@@ -29,7 +29,7 @@ export default defineConfig(({ mode }) => ({
         },
       ],
     }),
-    dts(),
+    dts({ entryRoot: 'src' }),
   ],
   build: {
     lib: {

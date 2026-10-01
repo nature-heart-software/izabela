@@ -180,6 +180,8 @@
     "build:app": "pnpm nx build izabela-next",
     "build:deps": "pnpm nx run-many --target=build --projects=@packages/animalese,@packages/design-tokens,@packages/electron-bridger,@packages/electron-game-overlay,@packages/electron-pinia,electron-postman,@packages/generate-exports,@packages/icons,@packages/native-keymap,node-record-lpcm16,@packages/process-watcher,@packages/toolbox,@packages/ui,@packages/vite-plugin-generate-exports,win-control,@packages/win-mouse,windows-tlist,@apps/app-server",
     "build:prod": "pnpm nx run-many --target=build:prod --all --exclude=root",
+    "build:portable": "pnpm nx run-many --target=build --all --exclude=root,izabela-next,@packages/electron-game-overlay,@packages/native-keymap,win-control --parallel=1",
+    "test:build": "pnpm run build:portable && node --test tests/package-build.test.mjs",
     "dev": "pnpm run prepare:dev && pnpm nx dev izabela-next",
     "infisical:dev": "pnpm run prepare:dev && infisical run --path=\"/apps/app\" -- nu -c \"pnpm nx dev izabela-next\"",
     "docker:build": "docker build -t izabela . && docker create --name dummy izabela && docker cp dummy:dist_electron dist_electron && docker rm -f dummy",
@@ -193,6 +195,7 @@
   "devDependencies": {
     "@infisical/cli": "^0.43.40",
     "@types/ws": "^8.5.4",
+    "@vue/language-core": "~3.1.8",
     "nushell": "^0.110.0"
   },
   "packageManager": "pnpm@11.2.2"

@@ -4,7 +4,10 @@
   "dependencies": {
     "@packages/design-tokens": "workspace:*",
     "@packages/icons": "workspace:*",
-    "@packages/vite-plugin-generate-exports": "workspace:*"
+    "@packages/vite-plugin-generate-exports": "workspace:*",
+    "@zag-js/interact-outside": "0.71.0",
+    "csstype": "^3.2.3",
+    "tippy.js": "^6.3.7"
   },
   "files": [
     "./dist"

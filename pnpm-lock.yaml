@@ -374,7 +374,7 @@ importers:
         version: 5.4.21(@types/node@20.19.43)(sass@1.100.0)(terser@5.48.0)
       vite-plugin-dts:
         specifier: ^5.0.2
-        version: 5.0.2(esbuild@0.18.20)(rollup@4.61.1)(typescript@5.9.3)(vite@5.4.21(@types/node@20.19.43)(sass@1.100.0)(terser@5.48.0))
+        version: 5.0.2(@vue/language-core@3.1.8(typescript@5.9.3))(esbuild@0.18.20)(rollup@4.61.1)(typescript@5.9.3)(vite@5.4.21(@types/node@20.19.43)(sass@1.100.0))
       vite-plugin-electron:
         specifier: ^0.28.7
         version: 0.28.8
@@ -415,6 +415,9 @@ importers:
       '@types/ws':
         specifier: ^8.5.4
         version: 8.18.1
+      '@vue/language-core':
+        specifier: ~3.1.8
+        version: 3.1.8(typescript@5.9.3)
       nushell:
         specifier: ^0.110.0
         version: 0.110.0
@@ -611,6 +614,9 @@ importers:
       uuid:
         specifier: ^9.0.0
         version: 9.0.1
+      ws:
+        specifier: ^8.21.0
+        version: 8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     devDependencies:
       '@packages/generate-exports':
         specifier: workspace:*
@@ -647,7 +653,7 @@ importers:
         version: 5.4.21(@types/node@22.19.21)(sass@1.100.0)(terser@5.48.0)
       vite-plugin-dts:
         specifier: ^5.0.2
-        version: 5.0.2(esbuild@0.21.5)(rollup@4.61.1)(typescript@5.9.3)(vite@5.4.21(@types/node@22.19.21)(sass@1.100.0)(terser@5.48.0))
+        version: 5.0.2(@vue/language-core@3.1.8(typescript@5.9.3))(esbuild@0.18.20)(rollup@4.61.1)(typescript@5.9.3)(vite@5.4.21(@types/node@20.19.43)(sass@1.100.0))
 
   packages/animalese: {}
 
@@ -725,6 +731,15 @@ importers:
       '@packages/vite-plugin-generate-exports':
         specifier: workspace:*
         version: link:../vite-plugin-generate-exports
+      '@zag-js/interact-outside':
+        specifier: 0.71.0
+        version: 0.71.0
+      csstype:
+        specifier: ^3.2.3
+        version: 3.2.3
+      tippy.js:
+        specifier: ^6.3.7
+        version: 6.3.7
 
   packages/vite-plugin-generate-exports:
     dependencies:
@@ -11344,6 +11359,23 @@ packages:
   zip-stream@4.1.1:
     resolution: {integrity: sha512-9qv4rlDiopXg4E69k+vMHjNN63YFMe9sZMrdlvKnCjlCRWeCBswPPMPUfx+ipsAWq1LXHe70RcbaHdJJpS6hyQ==}
     engines: {node: '>= 10'}
+
+  '@volar/language-core@2.4.26':
+    resolution: {integrity: sha512-hH0SMitMxnB43OZpyF1IFPS9bgb2I3bpCh76m2WEK7BE0A0EzpYsRp0CCH2xNKshr7kacU5TQBLYn4zj7CG60A==}
+
+  '@volar/source-map@2.4.26':
+    resolution: {integrity: sha512-JJw0Tt/kSFsIRmgTQF4JSt81AUSI1aEye5Zl65EeZ8H35JHnTvFGmpDOBn5iOxd48fyGE+ZvZBp5FcgAy/1Qhw==}
+
+  '@vue/language-core@3.1.8':
+    resolution: {integrity: sha512-PfwAW7BLopqaJbneChNL6cUOTL3GL+0l8paYP5shhgY5toBNidWnMXWM+qDwL7MC9+zDtzCF2enT8r6VPu64iw==}
+    peerDependencies:
+      typescript: '*'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  alien-signals@3.2.1:
+    resolution: {integrity: sha512-I8FjmltrfnDFoZedi5CG8DghVYNhzb/Ijluz7tCSJH0xpd0484Kowhbb1XDYOxfJpU1p5wnM2X54dA+IfGyD1g==}
 
 snapshots:
 
@@ -24672,3 +24704,66 @@ snapshots:
       archiver-utils: 3.0.4
       compress-commons: 4.1.2
       readable-stream: 3.6.2
+
+  '@volar/language-core@2.4.26':
+    dependencies:
+      '@volar/source-map': 2.4.26
+
+  '@volar/source-map@2.4.26': {}
+
+  '@vue/language-core@3.1.8(typescript@5.9.3)':
+    dependencies:
+      '@volar/language-core': 2.4.26
+      '@vue/compiler-dom': 3.5.38
+      '@vue/shared': 3.5.38
+      alien-signals: 3.2.1
+      muggle-string: 0.4.1
+      path-browserify: 1.0.1
+      picomatch: 4.0.4
+    optionalDependencies:
+      typescript: 5.9.3
+
+  alien-signals@3.2.1: {}
+
+  unplugin-dts@1.0.2(@vue/language-core@3.1.8(typescript@5.9.3))(esbuild@0.18.20)(rollup@4.61.1)(typescript@5.9.3)(vite@5.4.21(@types/node@20.19.43)(sass@1.100.0)):
+    dependencies:
+      '@rollup/pluginutils': 5.4.0(rollup@4.61.1)
+      '@volar/typescript': 2.4.28
+      compare-versions: 6.1.1
+      debug: 4.4.3
+      kolorist: 1.8.0
+      local-pkg: 1.2.1
+      magic-string: 0.30.21
+      typescript: 5.9.3
+      unplugin: 2.3.11
+    optionalDependencies:
+      '@vue/language-core': 3.1.8(typescript@5.9.3)
+      esbuild: 0.18.20
+      rollup: 4.61.1
+      vite: 5.4.21(@types/node@20.19.43)(sass@1.100.0)
+    transitivePeerDependencies:
+      - supports-color
+
+  vite-plugin-dts@5.0.2(@vue/language-core@3.1.8(typescript@5.9.3))(esbuild@0.18.20)(rollup@4.61.1)(typescript@5.9.3)(vite@5.4.21(@types/node@20.19.43)(sass@1.100.0)):
+    dependencies:
+      unplugin-dts: 1.0.2(@vue/language-core@3.1.8(typescript@5.9.3))(esbuild@0.18.20)(rollup@4.61.1)(typescript@5.9.3)(vite@5.4.21(@types/node@20.19.43)(sass@1.100.0))
+    optionalDependencies:
+      rollup: 4.61.1
+      vite: 5.4.21(@types/node@20.19.43)(sass@1.100.0)
+    transitivePeerDependencies:
+      - '@rspack/core'
+      - '@vue/language-core'
+      - esbuild
+      - rolldown
+      - supports-color
+      - typescript
+      - webpack
+
+  vite@5.4.21(@types/node@20.19.43)(sass@1.100.0):
+    dependencies:
+      esbuild: 0.21.5
+      postcss: 8.5.15
+      rollup: 4.61.1
+    optionalDependencies:
+      '@types/node': 20.19.43
+      sass: 1.100.0

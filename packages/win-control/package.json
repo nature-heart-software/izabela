@@ -41,6 +41,13 @@
     "host": "https://github.com/nosolosoftware/win-control/releases/download/",
     "remote_path": "{version}"
   },
+  "nx": {
+    "targets": {
+      "build": {
+        "cache": false
+      }
+    }
+  },
   "files": [
     "binding.gyp",
     "src"
