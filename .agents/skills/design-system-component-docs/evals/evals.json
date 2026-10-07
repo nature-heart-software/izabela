@@ -1,0 +1,68 @@
+{
+  "skill_name": "design-system-component-docs",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "Create or update the design-system documentation for `packages/ui/src/components/forms/Button/NvButton.vue`. I need a Figma-ready component spec with readable tables for variants, size rules, fills, strokes, border and radius values, light and dark theme colors, box shadows or focus effects, and every supported interaction state like hover, focus, active, selected, loading, and icon-only if applicable. Reuse the repo's existing design-system doc style if there is one.",
+      "expected_output": "A Markdown documentation update or new component doc with tables covering button variants, sizes, theme-specific state styling, fill/stroke/effect details, token/value mapping, and recommended Figma variant properties.",
+      "expectations": [
+        "Includes a Figma mapping or Figma component-setup section",
+        "Documents all five button variants: default, plain, ghost, ghost-alt, and active",
+        "Documents both light and dark theme styling",
+        "Documents interactive states including hover, focus, selected, and loading or clearly explains unsupported states",
+        "Documents box shadow, focus ring, or other effect styling when present, or explicitly says it was not found"
+      ],
+      "files": [
+        "DESIGN_SYSTEM.md",
+        "packages/ui/src/components/forms/Button/NvButton.vue",
+        "packages/ui/src/components/forms/Button/button.shared.ts",
+        "packages/ui/src/components/forms/Button/button.styled.ts",
+        "packages/ui/src/components/forms/Button/button.stories.ts",
+        "packages/ui/src/themes/light.ts",
+        "packages/ui/src/themes/dark.ts"
+      ]
+    },
+    {
+      "id": 1,
+      "prompt": "Document `packages/ui/src/components/forms/Input/NvInput.vue` for design handoff. I want a per-size and per-state table that a designer can rebuild in Figma, including typography, padding, alignment, border width, border color, background fill, placeholder behavior, focus ring, box shadow or effect styling, and light/dark differences. If some values are inherited or come from tokens, show both the token and the resolved value when possible.",
+      "expected_output": "A Markdown design-system spec for the input component with size and state tables, layout/fill/stroke/effect details, token mapping, theme differences, and explicit notes for unresolved or inherited values.",
+      "expectations": [
+        "Includes a size table covering sm, md, and lg",
+        "Documents both light and dark theme state styling",
+        "Documents placeholder styling and the focus ring",
+        "Includes a Figma mapping or Figma build section",
+        "Documents layout or alignment details and any shadow/effect treatment that matters for Figma recreation"
+      ],
+      "files": [
+        "DESIGN_SYSTEM.md",
+        "packages/ui/src/components/forms/Input/NvInput.vue",
+        "packages/ui/src/components/forms/Input/input.shared.ts",
+        "packages/ui/src/components/forms/Input/input.styled.ts",
+        "packages/ui/src/components/forms/Input/input.stories.ts",
+        "packages/ui/src/themes/light.ts",
+        "packages/ui/src/themes/dark.ts"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Create a design-system doc section for `packages/ui/src/components/feedback/Alert/NvAlert.vue` that is good enough for a Figma component set. I need the component broken down by alert type, any size rules if they exist, anatomy and spacing, fill/stroke/effect differences by theme, and a clear recommendation for which Figma properties should exist versus which things should just be detached content. Prefer tables over prose.",
+      "expected_output": "A Markdown component spec for alert documenting alert variants, any supported sizing or structure rules, theme-aware fill/stroke/effect values, anatomy, and recommended Figma component-set properties in table form.",
+      "expectations": [
+        "Documents all four alert types: info, success, warning, and error",
+        "Includes size information for xs, sm, md, and lg",
+        "Explains that interactive states are unsupported or rest-only if that is what the code shows",
+        "Includes recommended Figma properties or component-set mapping",
+        "Documents effect styling such as shadow or explicitly marks it as not found"
+      ],
+      "files": [
+        "DESIGN_SYSTEM.md",
+        "packages/ui/src/components/feedback/Alert/NvAlert.vue",
+        "packages/ui/src/components/feedback/Alert/alert.shared.ts",
+        "packages/ui/src/components/feedback/Alert/alert.styled.ts",
+        "packages/ui/src/components/feedback/Alert/alert.stories.ts",
+        "packages/ui/src/themes/light.ts",
+        "packages/ui/src/themes/dark.ts"
+      ]
+    }
+  ]
+}
