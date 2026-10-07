@@ -1,83 +1,69 @@
 # NvTextarea
 
-Textarea field styled with the same token family as `NvInput`, but with a fixed taller height and a square bottom-right corner.
+Styled **native textarea**, not an Element Plus ElInput. It reuses `theme.input`, applies a final `64px` height for every size, and squares the bottom-right corner.
+
+## Units and source scope
+
+Geometry produced by `polished.rem()` and the CSS helpers is in **rem**, with pixel equivalents below assuming a **16px root font size**. Numeric positioning offsets and SVG dimensions are passed as CSS-pixel numbers; they do not automatically scale with rem geometry. Line-height `1.4` is unitless; tracking `0.32px` is emitted as `0.02rem`. The docs describe the existing implementation, including limitations, not a redesigned control. Theme values are resolved from the real token/theme/helper inventory; `darken(0.0675, #444444)` resolves to `#333` (`#333333`). Browser resets and third-party behavior are identified separately rather than assigned invented appearances.
 
 ## Source Files Used
 
-- `NvTextarea.vue`
-- `textarea.shared.ts`
-- `textarea.styled.ts`
-- `textarea.stories.ts`
-- `@/utils/css-in-js.ts`
-- `@/themes/light.ts`
-- `@/themes/dark.ts`
-- `@packages/design-tokens/src/main.ts`
+- [NvTextarea.vue](./NvTextarea.vue): native styled root, `defineModel()`, exposed input ref; imports Element Plus input CSS without rendering ElInput.
+- [textarea.shared.ts](./textarea.shared.ts), [textarea.styled.ts](./textarea.styled.ts): size prop, all geometry and local state rules.
+- [textarea.stories.ts](./textarea.stories.ts): `content` initializes the story model; it is not a public component prop.
+- [CSS helpers](../../../utils/css-in-js.ts): `fontSizeStyle`, radius/padding/icon-position helpers.
+- [Light theme](../../../themes/light.ts), [dark theme](../../../themes/dark.ts), [tokens](../../../../../design-tokens/src/main.ts), and [global stylesheet](../../../styles/main.scss).
 
-## Component Axes
+## Component Axes, Slots and Events
 
-| Property     | Kind        | Values                                 | Default     | Notes                                                           |
-| ------------ | ----------- | -------------------------------------- | ----------- | --------------------------------------------------------------- |
-| `size`       | enum        | `sm`, `md`, `lg`                       | `md`        | Controls typography, horizontal padding, and most corner radii. |
-| model        | model       | any                                    | `undefined` | `defineModel()` binding.                                        |
-| native attrs | passthrough | e.g. `placeholder`, `rows`, `disabled` | N/A         | Passed through to the textarea element.                         |
+| Contract                      | Type / values                                                                   | Default           | Actual behavior                                                                                                                   |
+| ----------------------------- | ------------------------------------------------------------------------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `size`                        | `sm`, `md`, `lg`                                                                | `md`              | Typography, horizontal padding and three corner radii. Does not change final height.                                              |
+| `modelValue` / `v-model`      | untyped `defineModel()`                                                         | undefined         | Vue generates `update:modelValue`; template applies `v-model` to the styled textarea component. No explicit numeric/coercion API. |
+| Native attributes / listeners | e.g. placeholder, id, name, rows, cols, disabled, readonly, maxlength, required | No local defaults | Vue root fallthrough to the styled/native textarea; native semantics are distinct from authored state visuals.                    |
+| exposed `input`               | computed styled-component `$el`                                                 | N/A               | Accesses the underlying textarea after mount; getter is not guarded before the ref exists.                                        |
+| Slots                         | none rendered                                                                   | N/A               | No label/prefix/suffix/helper/clear/icon slot forwarding.                                                                         |
+
+No type/variant, selected, invalid/error, disabled, readonly or loading props/styles are defined locally. Native disabled/readonly/required can affect interaction/validation; no special visual branch accompanies them. Imported Element Plus input CSS does not imply ElInput icons, autosize, clear behavior, disabled palette or ElInput events.
 
 ## Size Specification
 
-| Size | Height              | Min width | Padding X | Padding Y        | Gap | Radius                                                 | Border width | Typography                                                       | Icon size | Notes                                                          |
-| ---- | ------------------- | --------- | --------- | ---------------- | --- | ------------------------------------------------------ | ------------ | ---------------------------------------------------------------- | --------- | -------------------------------------------------------------- |
-| `sm` | final height `64px` | Not found | `8px`     | top/bottom `7px` | N/A | top-left/top-right/bottom-left `6px`; bottom-right `0` | `1px`        | `12px`, line-height `1.4`, letter-spacing `0.32px`, weight `600` | N/A       | Base size height (`24px`) is overridden by final fixed height. |
-| `md` | `64px`              | Not found | `16px`    | top/bottom `7px` | N/A | top-left/top-right/bottom-left `8px`; bottom-right `0` | `1px`        | `12px`, `1.4`, `0.32px`, weight `600`                            | N/A       |                                                                |
-| `lg` | `64px`              | Not found | `16px`    | top/bottom `7px` | N/A | top-left/top-right/bottom-left `8px`; bottom-right `0` | `1px`        | `14px`, `1.4`, `0.32px`, weight `600`                            | N/A       |                                                                |
+| Size | Final height        | Padding left / right   | Padding top / bottom      | Radius TL / TR / BL / BR | Border width        | Font / line-height / tracking / weight |
+| ---- | ------------------- | ---------------------- | ------------------------- | ------------------------ | ------------------- | -------------------------------------- |
+| `sm` | **`64px`** (`4rem`) | `8px / 8px` (`0.5rem`) | `7px / 7px` (`0.4375rem`) | `6px / 6px / 6px / 0`    | `1px` (`0.0625rem`) | `12px / 1.4 / 0.32px / 600`            |
+| `md` | **`64px`** (`4rem`) | `16px / 16px` (`1rem`) | `7px / 7px`               | `8px / 8px / 8px / 0`    | `1px`               | `12px / 1.4 / 0.32px / 600`            |
+| `lg` | **`64px`** (`4rem`) | `16px / 16px` (`1rem`) | `7px / 7px`               | `8px / 8px / 8px / 0`    | `1px`               | `14px / 1.4 / 0.32px / 600`            |
+
+Size branches first assign `24/32/40px` heights, then the later `spacing[10]` height overrides them to `64px`. Vertical padding is `spacing[3]-1 = 7px`. `border-bottom-right-radius: 0` overrides the full radius helper. These are CSS heights under the consuming reset/box-sizing, not a guarantee about an isolated content-box element's outer size. Width, minimum width/height, max-height, font family, resize and scrollbar appearance are not authored here. Font family is inherited from the consuming page; the shared font-size helper does not set Nunito. Root has `align-items:center` but no flex display, outline `0`, and transition `all .3s`.
 
 ## Variant And State Style Tables
 
-| Theme | Variant | State       | Text color | Icon color   | Background / fill         | Border / stroke   | Shadow / effects    | Radius                        | Opacity | Notes                     |
-| ----- | ------- | ----------- | ---------- | ------------ | ------------------------- | ----------------- | ------------------- | ----------------------------- | ------- | ------------------------- |
-| light | base    | rest        | `#444444`  | same as text | `#ffffff`                 | `1px` / `#EBEBEB` | none                | by size with bottom-right `0` | `1`     |                           |
-| light | base    | hover       | `#444444`  | same as text | `#ffffff`                 | `1px` / `#BEBEBE` | none                | same                          | `1`     |                           |
-| light | base    | focus       | `#444444`  | same as text | `#ffffff`                 | `1px` / `#BEBEBE` | `0 0 0 4px #F9F9FC` | same                          | `1`     |                           |
-| light | base    | placeholder | `#BEBEBE`  | same as text | N/A                       | none              | none                | N/A                           | `1`     | Placeholder weight `300`. |
-| dark  | base    | rest        | `#DCDCDC`  | same as text | `darken(0.0675, #444444)` | `1px` / `#444444` | none                | by size with bottom-right `0` | `1`     |                           |
-| dark  | base    | hover       | `#DCDCDC`  | same as text | `darken(0.0675, #444444)` | `1px` / `#626262` | none                | same                          | `1`     |                           |
-| dark  | base    | focus       | `#DCDCDC`  | same as text | `darken(0.0675, #444444)` | `1px` / `#626262` | `0 0 0 4px #444444` | same                          | `1`     |                           |
-| dark  | base    | placeholder | `#818181`  | same as text | N/A                       | none              | none                | N/A                           | `1`     | Placeholder weight `300`. |
+| Theme | State | Text      | Fill          | Border (`1px`) | Shadow              |
+| ----- | ----- | --------- | ------------- | -------------- | ------------------- |
+| light | rest  | `#444444` | `#ffffff`     | `#EBEBEB`      | None authored.      |
+| light | hover | `#444444` | `#ffffff`     | **`#DCDCDC`**  | None authored.      |
+| light | focus | `#444444` | `#ffffff`     | **`#DCDCDC`**  | `0 0 0 4px #F9F9FC` |
+| dark  | rest  | `#DCDCDC` | **`#333333`** | `#444444`      | None authored.      |
+| dark  | hover | `#DCDCDC` | `#333333`     | `#626262`      | None authored.      |
+| dark  | focus | `#DCDCDC` | `#333333`     | `#626262`      | `0 0 0 4px #444444` |
 
-## Structure / Anatomy
+The sources are **`theme.input`**, not `theme.textarea`: `.color`, `.backgroundColor`, `.borderColor`, `.hover.borderColor`, `.focus.borderColor` and `.focus.boxShadow`. All sizes retain their corner geometry in every state. There is no local opacity change. Hover and focus can coexist; focus is declared later, and both resolve to the same interaction border in each theme.
 
-| Part             | Source of truth | Visual role               | Relevant styling                                                                    | Export note             |
-| ---------------- | --------------- | ------------------------- | ----------------------------------------------------------------------------------- | ----------------------- |
-| textarea element | `StTextarea`    | Editable multi-line field | Border, background, typography, placeholder, fixed height, asymmetric corner radius | Main component surface. |
+| Theme | Placeholder source / color                  | Typography                                                           |
+| ----- | ------------------------------------------- | -------------------------------------------------------------------- |
+| light | `theme.input.placeholder.color` = `#BEBEBE` | Weight **`300`**, inherited size/line-height/tracking from textarea. |
+| dark  | same key = `#818181`                        | Same.                                                                |
 
-## Token Mapping
+Placeholder is pseudo-element text, not an alternate field fill/border. No icon is rendered; icon color/size is not applicable. Disabled/readonly fields still use these authored rules wherever native pseudo-class conditions apply, with any browser/reset effects additional rather than a locally defined state palette.
 
-| Concern           | Token                                      | Resolved value      | Where used                              |
-| ----------------- | ------------------------------------------ | ------------------- | --------------------------------------- |
-| fixed height      | `tokens.spacing[10]`                       | `64px`              | final textarea height                   |
-| vertical padding  | `tokens.spacing[3] - 1`                    | `7px`               | top and bottom padding                  |
-| radii             | `tokens.borderRadius.sm/md/DEFAULT`        | `6px`, `8px`, `8px` | size scale before bottom-right override |
-| border width      | `tokens.borderWidth.DEFAULT`               | `1px`               | textarea border                         |
-| focus ring spread | `tokens.borderWidth.lg`                    | `4px`               | focus box-shadow                        |
-| transition        | `tokens.transition.DEFAULT`                | `all .3s`           | hover / focus transitions               |
-| type scale        | `tokens.fontSize[1]`, `tokens.fontSize[2]` | `12px`, `14px`      | size scale                              |
+## Structure / Anatomy and delegated behavior
 
-## Recommended Figma Mapping
+The single `StTextarea` native element owns padding, text, placeholder, border, background, asymmetric radius and focus ring. It is the visible component surface and editing area, not an extra wrapper plus inner ElInput field. Native rows/cols, scrolling, validation, selection and disabled/readonly behavior are browser-dependent. There is **no local `resize`, overflow, autosize, clipping or scrollbar rule**. Global styles include Tailwind base/components/utilities, but exact generated reset behavior depends on the consuming build; the README does not invent vendor appearances or a guaranteed resize direction.
 
-| Figma property | Type    | Suggested values                  | Derived from  |
-| -------------- | ------- | --------------------------------- | ------------- |
-| `Size`         | variant | `sm, md, lg`                      | `size` prop   |
-| `State`        | variant | `rest, hover, focus, placeholder` | local styling |
-| `Theme`        | variant | `light, dark`                     | theme files   |
+The Vue template binds `v-model` to a styled-component root. The outer `defineModel()` establishes the public generated update event, but this file has no explicit native `@input` bridge. Actual styled-component model forwarding/display needs browser verification with the project's dependencies; do not equate the presence of `defineModel()` with a measured native typing result.
 
-## Figma Build Notes
+## Token Mapping / Recommended Figma Mapping
 
-- Use the primary visible part named in `Structure / Anatomy` as the main Figma frame, and keep purely behavioral wrappers such as hidden inputs, triggers, portals, or state containers outside the exported component set.
-- Apply fills, strokes, radius, and effects to the same layer identified in the anatomy table instead of redistributing those values across extra wrapper frames.
-- Keep slot content, consumer-provided copy, and arbitrary child content detached unless the README already defines them as explicit Figma properties.
-- If clipping, effect placement, or delegated styling is unresolved in source, preserve that uncertainty in the notes instead of inventing extra Figma variants.
+Final height `spacing[10]=64`; horizontal padding helper uses `spacing[3]=8` for sm and `spacing[5]=16` for md/lg; vertical padding `spacing[3]-1=7`; radius `borderRadius.sm/md/DEFAULT=6/8/8` with bottom-right override `0`; border/focus spread `borderWidth.DEFAULT/lg=1/4`; type `fontSize[1/2]=12/14`; transition `transition.DEFAULT=all .3s`.
 
-## Gaps / Assumptions
-
-| Item                                | Status                   | Notes                                                        |
-| ----------------------------------- | ------------------------ | ------------------------------------------------------------ |
-| Resizable behavior                  | Not found                | No local `resize` rule in this folder.                       |
-| Disabled, invalid, readonly visuals | Not found in this folder | May exist in browser defaults, but not source-authored here. |
+Use `Size=sm/md/lg`, `Theme=light/dark` and authored visual `State=rest/hover/focus`, plus placeholder text content. Keep height `64px` across sizes and bottom-right radius `0`. Apply the focus ring to the same native surface, not an invented wrapper. Native disabled/readonly may be annotated as behavior but should not acquire unsupported visual variants. Font family, resize-handle appearance and native model forwarding remain consumer/dependency/browser concerns, explicitly separated from the resolved local style specification.

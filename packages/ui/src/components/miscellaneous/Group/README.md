@@ -1,85 +1,77 @@
 # NvGroup Design Spec
 
-- Purpose: arrange children in a flex row or column with configurable spacing, wrapping, alignment, and optional child growth.
-- Source files used: `NvGroup.vue`, `group.shared.ts`, `group.styled.ts`, `group.stories.ts`
+Flex layout with optional wrapping and direct-child growth. Source: [NvGroup.vue](./NvGroup.vue), [props](./group.shared.ts), [styles](./group.styled.ts), [stories](./group.stories.ts).
 
 ## Component Axes
 
-| Property     | Kind              | Values                                       | Default   | Notes                                                                                                    |
-| ------------ | ----------------- | -------------------------------------------- | --------- | -------------------------------------------------------------------------------------------------------- |
-| `direction`  | enum              | `row`, `column`                              | `row`     | Controls main layout axis.                                                                               |
-| `spacing`    | numeric token key | `1`-`16` in Storybook                        | `3`       | Maps to `gap` using `tokens.spacing`.                                                                    |
-| `justify`    | enum              | `left`, `center`, `right`, `apart`, `around` | `left`    | In `row`, maps to `justify-content`; in `column`, it affects `align-items` instead.                      |
-| `align`      | enum              | `stretch`, `center`, `start`, `end`          | `center`  | Used only when `direction === 'row'`.                                                                    |
-| `noWrap`     | boolean           | `true`, `false`                              | `false`   | Switches flex wrap from `wrap` to `nowrap`.                                                              |
-| `grow`       | boolean           | `true`, `false`                              | `false`   | Makes direct children `flex-grow: 1`; when `direction === 'column'`, also forces `align-items: stretch`. |
-| `as`         | element selector  | Any HTML tag string                          | `div`     | Changes rendered tag only.                                                                               |
-| content mode | slot              | Arbitrary child content                      | Not found | Single default slot.                                                                                     |
+| Property    | Values                                       | Default  | Source behavior                                                                   |
+| ----------- | -------------------------------------------- | -------- | --------------------------------------------------------------------------------- |
+| `direction` | `row`, `column`                              | `row`    | Main axis of `flex-flow`.                                                         |
+| `spacing`   | Token keys `1`–`16`                          | `3`      | `gap: rem(tokens.spacing[spacing])`.                                              |
+| `justify`   | `left`, `center`, `right`, `apart`, `around` | `left`   | Direction-dependent mapping below.                                                |
+| `align`     | `stretch`, `center`, `start`, `end`          | `center` | Raw `align-items` value in row; entirely ignored in column.                       |
+| `noWrap`    | Boolean                                      | `false`  | False → `wrap`; true → `nowrap`.                                                  |
+| `grow`      | Boolean                                      | `false`  | Direct children receive `flex-grow: 0` or `1`; column growth also forces stretch. |
+| `as`        | HTML tag string                              | `div`    | Styled host tag, not a separate geometry variant.                                 |
 
-## Size Specification
+## Direction × Grow × Justify Matrix
 
-| Size / Spacing | Height                 | Min width              | Padding X | Padding Y | Gap   | Radius | Border width | Typography | Icon size | Notes               |
-| -------------- | ---------------------- | ---------------------- | --------- | --------- | ----- | ------ | ------------ | ---------- | --------- | ------------------- |
-| `spacing=1`    | Parent/content-defined | Parent/content-defined | 0         | 0         | 2px   | N/A    | 0            | N/A        | N/A       | `tokens.spacing.1`  |
-| `spacing=2`    | Parent/content-defined | Parent/content-defined | 0         | 0         | 4px   | N/A    | 0            | N/A        | N/A       | `tokens.spacing.2`  |
-| `spacing=3`    | Parent/content-defined | Parent/content-defined | 0         | 0         | 8px   | N/A    | 0            | N/A        | N/A       | Prop default        |
-| `spacing=4`    | Parent/content-defined | Parent/content-defined | 0         | 0         | 12px  | N/A    | 0            | N/A        | N/A       | `tokens.spacing.4`  |
-| `spacing=5`    | Parent/content-defined | Parent/content-defined | 0         | 0         | 16px  | N/A    | 0            | N/A        | N/A       | `tokens.spacing.5`  |
-| `spacing=6`    | Parent/content-defined | Parent/content-defined | 0         | 0         | 24px  | N/A    | 0            | N/A        | N/A       | `tokens.spacing.6`  |
-| `spacing=7`    | Parent/content-defined | Parent/content-defined | 0         | 0         | 32px  | N/A    | 0            | N/A        | N/A       | `tokens.spacing.7`  |
-| `spacing=8`    | Parent/content-defined | Parent/content-defined | 0         | 0         | 40px  | N/A    | 0            | N/A        | N/A       | `tokens.spacing.8`  |
-| `spacing=9`    | Parent/content-defined | Parent/content-defined | 0         | 0         | 48px  | N/A    | 0            | N/A        | N/A       | `tokens.spacing.9`  |
-| `spacing=10`   | Parent/content-defined | Parent/content-defined | 0         | 0         | 64px  | N/A    | 0            | N/A        | N/A       | `tokens.spacing.10` |
-| `spacing=11`   | Parent/content-defined | Parent/content-defined | 0         | 0         | 80px  | N/A    | 0            | N/A        | N/A       | `tokens.spacing.11` |
-| `spacing=12`   | Parent/content-defined | Parent/content-defined | 0         | 0         | 96px  | N/A    | 0            | N/A        | N/A       | `tokens.spacing.12` |
-| `spacing=13`   | Parent/content-defined | Parent/content-defined | 0         | 0         | 112px | N/A    | 0            | N/A        | N/A       | `tokens.spacing.13` |
-| `spacing=14`   | Parent/content-defined | Parent/content-defined | 0         | 0         | 128px | N/A    | 0            | N/A        | N/A       | `tokens.spacing.14` |
-| `spacing=15`   | Parent/content-defined | Parent/content-defined | 0         | 0         | 144px | N/A    | 0            | N/A        | N/A       | `tokens.spacing.15` |
-| `spacing=16`   | Parent/content-defined | Parent/content-defined | 0         | 0         | 160px | N/A    | 0            | N/A        | N/A       | `tokens.spacing.16` |
+The five entries in each cell are ordered **left / center / right / apart / around**. This covers all 20 direction × grow × justify combinations; every column combination ignores `align`.
+
+| Direction | Grow  | `justify-content` for the five values                           | `align-items` for the five values                                      | Direct-child rule |
+| --------- | ----- | --------------------------------------------------------------- | ---------------------------------------------------------------------- | ----------------- |
+| row       | false | `flex-start / center / flex-end / space-between / space-around` | Raw `align` for all five (default `center`)                            | `flex-grow: 0`    |
+| row       | true  | `flex-start / center / flex-end / space-between / space-around` | Raw `align` for all five (default `center`)                            | `flex-grow: 1`    |
+| column    | false | Not emitted for any value                                       | `flex-start / center / flex-end / flex-start / space-around (INVALID)` | `flex-grow: 0`    |
+| column    | true  | Not emitted for any value                                       | `stretch / stretch / stretch / stretch / stretch`                      | `flex-grow: 1`    |
+
+- Column `apart` is explicitly remapped to **flex-start**, not space-between. It does not distribute children vertically.
+- Column `around` without growth emits **`align-items: space-around`**, invalid CSS. The browser discards the declaration; another applicable cascade rule can win, otherwise initial `normal` applies (stretch-like in a flex context). `align-items` is **not inherited**. Do not draw horizontal space-around distribution as if the CSS worked.
+- Column `grow=true` overrides every justify value with stretch, including the invalid case; it still does not emit `justify-content`.
+- Row `align=start/end` is emitted literally, not normalized to flex-start/flex-end. These are valid CSS alignment values with logical alignment semantics.
+- `flex-grow: 1` distributes available main-axis free space in addition to each child’s flex basis. It does not set `flex-basis: 0`, force equal total sizes, or constrain intrinsic minimums.
+
+## Size Specification / Token Mapping
+
+All `rem()` values use Polished’s default 16px conversion base. Pixel equivalents below assume a 16px document root; a different root scales rem geometry, not literal px geometry. No fixed container size is implied.
+
+| Key  | Token number | Emitted gap | At 16px root |
+| ---- | ------------ | ----------- | ------------ |
+| `1`  | 2            | `0.125rem`  | 2px          |
+| `2`  | 4            | `0.25rem`   | 4px          |
+| `3`  | 8            | `0.5rem`    | 8px          |
+| `4`  | 12           | `0.75rem`   | 12px         |
+| `5`  | 16           | `1rem`      | 16px         |
+| `6`  | 24           | `1.5rem`    | 24px         |
+| `7`  | 32           | `2rem`      | 32px         |
+| `8`  | 40           | `2.5rem`    | 40px         |
+| `9`  | 48           | `3rem`      | 48px         |
+| `10` | 64           | `4rem`      | 64px         |
+| `11` | 80           | `5rem`      | 80px         |
+| `12` | 96           | `6rem`      | 96px         |
+| `13` | 112          | `7rem`      | 112px        |
+| `14` | 128          | `8rem`      | 128px        |
+| `15` | 144          | `9rem`      | 144px        |
+| `16` | 160          | `10rem`     | 160px        |
+
+Root CSS sets `display:flex`, `flex-flow`, alignment, and gap only. No fixed width, height, min-width, padding, radius, border, shadow, or clipping is specified. Story height `300px` and child `!h-auto` classes are demonstration context, not defaults. Gap applies between items and wrapped lines; distribution needs available space in the container.
 
 ## Variant And State Styles
 
-| Theme | Variant | State | Text color | Icon color   | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes                                 |
-| ----- | ------- | ----- | ---------- | ------------ | ----------------- | --------------- | ---------------- | ------ | ------- | ------------------------------------- |
-| Light | any     | Rest  | Inherited  | same as text | None              | none            | None             | N/A    | 1       | Theme does not alter layout behavior. |
-| Dark  | any     | Rest  | Inherited  | same as text | None              | none            | None             | N/A    | 1       | Theme does not alter layout behavior. |
+Light and dark use identical component layout rules. The wrapper assigns no text color, font, fill, border, opacity, icon treatment, or effects; text typography/color can inherit and slotted components style themselves. No interactive state styles or event-driven visual variants exist.
 
-## Structure / Anatomy
+## Structure / Anatomy And Contracts
 
-| Part                | Source of truth   | Visual role                    | Relevant styling                                                                   | Export note                                                                     |
-| ------------------- | ----------------- | ------------------------------ | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| root flex container | `group.styled.ts` | Wraps and distributes children | `display: flex`, `flex-flow`, `gap`, conditional `justify-content` / `align-items` | Figma equivalent is an auto-layout frame with optional wrap and adjustable gap. |
-| direct children     | `group.styled.ts` | Participating items            | `& > * { flex-grow: 1 }` when `grow` is true                                       | If `grow` is enabled, use fill-container behavior for immediate children.       |
-
-## Token Mapping
-
-| Concern       | Token                                  | Resolved value                                                                                                                  | Where used                 |
-| ------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
-| spacing scale | `tokens.spacing.1`-`tokens.spacing.16` | `2px`, `4px`, `8px`, `12px`, `16px`, `24px`, `32px`, `40px`, `48px`, `64px`, `80px`, `96px`, `112px`, `128px`, `144px`, `160px` | `gap` in `group.styled.ts` |
+`NvGroup.vue` passes props to the styled host and renders one unscoped default slot. Only immediate child elements receive the `flex-grow` selector; nested descendants do not. No custom emits or exposed methods are declared.
 
 ## Recommended Figma Mapping
 
-| Figma property  | Type    | Suggested values                                        | Derived from        |
-| --------------- | ------- | ------------------------------------------------------- | ------------------- |
-| `Direction`     | Variant | `row, column`                                           | `direction` prop    |
-| `Spacing`       | Variant | `1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16` | `spacing` prop      |
-| `Justify`       | Variant | `left, center, right, apart, around`                    | `justify` prop      |
-| `Align`         | Variant | `stretch, center, start, end`                           | `align` prop        |
-| `Wrap`          | Boolean | `true, false`                                           | Inverse of `noWrap` |
-| `Grow Children` | Boolean | `true, false`                                           | `grow` prop         |
+Use an auto-layout frame with Direction, spacing, Wrap (inverse of `noWrap`), and child growth annotations. Apply Justify and Align according to the matrix, not their names. In columns, suppress Align as an effective visual control; `apart` looks like `left`, and growing columns share stretch regardless of Justify. Annotate the invalid non-growing `around` rule rather than repairing it in the design. Child grow is free-space growth, not a promise of identical child dimensions.
 
-## Figma Build Notes
+## Context / Remaining Uncertainties
 
-- Use the primary visible part named in `Structure / Anatomy` as the main Figma frame, and keep purely behavioral wrappers such as hidden inputs, triggers, portals, or state containers outside the exported component set.
-- Apply fills, strokes, radius, and effects to the same layer identified in the anatomy table instead of redistributing those values across extra wrapper frames.
-- Keep slot content, consumer-provided copy, and arbitrary child content detached unless the README already defines them as explicit Figma properties.
-- If clipping, effect placement, or delegated styling is unresolved in source, preserve that uncertainty in the notes instead of inventing extra Figma variants.
+Invalid column-around appearance depends on applicable consumer CSS; the source exception itself is resolved. Final dimensions, child intrinsic sizes, logical writing context, and available free space are consumer-defined. No missing theme values remain.
 
-## Gaps / Assumptions
+## Supporting Sources
 
-| Item                   | Status      | Notes                                                                                                                                   |
-| ---------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| Column-axis semantics  | Ambiguous   | When `direction === 'column'`, `justify` affects `align-items`, and `justify-content` is not set. This differs from the `row` behavior. |
-| `align` mapping in row | Ambiguous   | `align-items` receives raw values like `start` and `end` instead of normalized `flex-start` / `flex-end`.                               |
-| Theme differences      | Unsupported | No theme-specific styling is implemented in this folder.                                                                                |
-| Interactive states     | Unsupported | No hover, focus, active, disabled, or selected styling.                                                                                 |
+Mapping and precedence: `group.styled.ts:8–38`; all defaults: `group.shared.ts:18–40`; preview geometry: `group.stories.ts:57–60`. Spacing: [design tokens](../../../../../design-tokens/src/main.ts), lines 51–68.

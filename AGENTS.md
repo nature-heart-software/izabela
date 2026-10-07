@@ -8,7 +8,7 @@ and routes audio through virtual audio cables for use in Discord/games.
 
 ## Monorepo Structure
 
-Lerna + Nx + npm workspaces. Two workspace roots: `apps/*` and `packages/*`.
+Workspace roots are `apps/*` and `packages/*`. On the legacy npm checkout, Lerna runs workspace tasks and uses Nx; on a checkout whose root `package.json` declares `packageManager: "pnpm@…"`, pnpm and Nx run the tasks directly. Treat the checked-in manifest, lockfile and task configuration as authoritative rather than carrying npm/Lerna commands across a migration.
 
 ```
 apps/
@@ -36,36 +36,50 @@ packages/
 
 ## Build / Dev / Lint Commands
 
+Run commands from the repository root with the package manager selected by the current manifest. The legacy branch has no `packageManager` field and uses npm; a pnpm declaration means use that declared pnpm version instead. The scripts below exist on both layouts; their bodies decide whether Lerna or Nx performs the work.
+
 ```bash
-# Install dependencies (also runs patch-package via postinstall)
-npm install
+PM=$(node -p "(require('./package.json').packageManager || 'npm').split('@')[0]")
 
-# Build all packages then the app
-npm run build
+# If packageManager declares a version, verify the installed version matches it
+node -p "require('./package.json').packageManager || 'npm (no version declared)'"
+"$PM" --version
 
-# Build only shared packages (dependencies)
-npm run build:deps          # lerna run build --scope '{@packages/*,@apps/app-server}'
+# Install dependencies; postinstall runs patch-package
+"$PM" install
 
-# Build only the main app
-npm run build:app           # lerna run build --scope izabela-next
+# Build all packages and the app
+"$PM" run build
 
-# Production build (type-check then build)
-npm run build:prod          # lerna run build:prod (runs vue-tsc then vite build)
+# Build shared packages or the main app
+"$PM" run build:deps
+"$PM" run build:app
 
-# Dev mode (starts Vite + Electron)
-npm run dev                 # lerna run dev --scope izabela-next
+# Production builds and development mode
+"$PM" run build:prod
+"$PM" run dev
 
-# Type-check only (no emit, the project's "lint" command)
-cd apps/app && npx vue-tsc
-
-# Format code with Prettier
-npx prettier --write "**/*.{ts,vue,json,js}"
+# Format source with the repository's explicit configuration
+if [ "$PM" = pnpm ]; then
+  pnpm exec prettier --write "**/*.{ts,vue,json,js}" --config .prettier.json
+else
+  npm exec -- prettier --write "**/*.{ts,vue,json,js}" --config .prettier.json
+fi
 ```
+
+For a direct app type check, run the installed `vue-tsc` in `apps/app` with no emit (for example `npm exec vue-tsc -- --noEmit` on the npm layout, or `pnpm exec vue-tsc --noEmit` on the pnpm layout). Windows-native preparation, Electron setup and portability restrictions are governed by the actual scripts; do not bypass them by assuming a generic workspace command performs preparation.
 
 ## Testing
 
-**No test framework is configured.** There are no jest/vitest/mocha configs or test files.
-Type checking via `vue-tsc` serves as the primary static validation.
+The design-system documentation has source-parity checks using Node's built-in test runner; no Jest/Vitest/Mocha configuration is needed for them. With Node 22 and the installed root dependencies:
+
+```bash
+node --test tests/design-system-docs.test.cjs tests/design-system-docs-checker.test.cjs
+```
+
+The parity suite executes the token, theme and exported size-helper modules and verifies their exact root documentation entries plus the public-component README/index inventory. The checker suite uses isolated copied-checkout mutations to exercise rejection of documentation drift and unsupported source values. Run these suites only against trusted checkout code; the restricted loader and Node VM are not a security sandbox. It does not prove every prose claim or rendered vendor behavior: review the component source and README together when changing a component.
+
+Type checking via `vue-tsc` is a separate static check, not a substitute for tests. If the current root manifest also contains `test:build` and `tests/package-build.test.mjs`, run that manifest's `test:build` script with the selected package manager; those portable-build regression tests are a distinct suite.
 
 ## Path Aliases
 
@@ -73,7 +87,7 @@ In `apps/app`:
 
 - `@/*` → `src/*`
 - `@root/*` → `apps/app/*`
-- `@packages/*` → workspace packages (resolved by npm workspaces)
+- `@packages/*` → workspace packages (resolved by the checked-in npm/pnpm workspace layout)
 - `@apps/*` → workspace apps
 
 ## Code Style

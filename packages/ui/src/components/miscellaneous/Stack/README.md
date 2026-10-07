@@ -1,78 +1,78 @@
 # NvStack Design Spec
 
-- Purpose: arrange children in a vertical flex stack with configurable spacing, alignment, and distribution.
-- Source files used: `NvStack.vue`, `stack.shared.ts`, `stack.styled.ts`, `stack.stories.ts`
+A vertical flex layout, not an overlay or z-axis stack. Source: [NvStack.vue](./NvStack.vue), [props](./stack.shared.ts), [styles](./stack.styled.ts), [stories](./stack.stories.ts).
 
 ## Component Axes
 
-| Property     | Kind              | Values                                       | Default   | Notes                                                                             |
-| ------------ | ----------------- | -------------------------------------------- | --------- | --------------------------------------------------------------------------------- |
-| `spacing`    | numeric token key | `1`-`16` in Storybook                        | `3`       | Maps to `gap` using `tokens.spacing`.                                             |
-| `align`      | enum              | `start`, `center`, `end`, `stretch`          | `stretch` | Maps to `align-items` via the local `POSITIONS` table.                            |
-| `justify`    | enum              | `left`, `center`, `right`, `apart`, `around` | `left`    | Maps to `justify-content`; `left` behaves as `flex-start`, `right` as `flex-end`. |
-| `as`         | element selector  | Any HTML tag string                          | `div`     | Changes rendered tag only.                                                        |
-| content mode | slot              | Arbitrary child content                      | Not found | Single default slot.                                                              |
+| Property  | Values                                       | Default   | Effect                                      |
+| --------- | -------------------------------------------- | --------- | ------------------------------------------- |
+| `spacing` | Token keys `1`–`16`                          | `3`       | Gap between children.                       |
+| `align`   | `start`, `center`, `end`, `stretch`          | `stretch` | Cross-axis (normally horizontal) alignment. |
+| `justify` | `left`, `center`, `right`, `apart`, `around` | `left`    | Main-axis (normally vertical) distribution. |
+| `as`      | HTML tag string                              | `div`     | Styled host tag.                            |
 
-## Size Specification
+## Exact Layout Mapping
 
-| Size / Spacing | Height                 | Min width              | Padding X | Padding Y | Gap   | Radius | Border width | Typography | Icon size | Notes               |
-| -------------- | ---------------------- | ---------------------- | --------- | --------- | ----- | ------ | ------------ | ---------- | --------- | ------------------- |
-| `spacing=1`    | Parent/content-defined | Parent/content-defined | 0         | 0         | 2px   | N/A    | 0            | N/A        | N/A       | `tokens.spacing.1`  |
-| `spacing=2`    | Parent/content-defined | Parent/content-defined | 0         | 0         | 4px   | N/A    | 0            | N/A        | N/A       | `tokens.spacing.2`  |
-| `spacing=3`    | Parent/content-defined | Parent/content-defined | 0         | 0         | 8px   | N/A    | 0            | N/A        | N/A       | Prop default        |
-| `spacing=4`    | Parent/content-defined | Parent/content-defined | 0         | 0         | 12px  | N/A    | 0            | N/A        | N/A       | `tokens.spacing.4`  |
-| `spacing=5`    | Parent/content-defined | Parent/content-defined | 0         | 0         | 16px  | N/A    | 0            | N/A        | N/A       | `tokens.spacing.5`  |
-| `spacing=6`    | Parent/content-defined | Parent/content-defined | 0         | 0         | 24px  | N/A    | 0            | N/A        | N/A       | `tokens.spacing.6`  |
-| `spacing=7`    | Parent/content-defined | Parent/content-defined | 0         | 0         | 32px  | N/A    | 0            | N/A        | N/A       | `tokens.spacing.7`  |
-| `spacing=8`    | Parent/content-defined | Parent/content-defined | 0         | 0         | 40px  | N/A    | 0            | N/A        | N/A       | `tokens.spacing.8`  |
-| `spacing=9`    | Parent/content-defined | Parent/content-defined | 0         | 0         | 48px  | N/A    | 0            | N/A        | N/A       | `tokens.spacing.9`  |
-| `spacing=10`   | Parent/content-defined | Parent/content-defined | 0         | 0         | 64px  | N/A    | 0            | N/A        | N/A       | `tokens.spacing.10` |
-| `spacing=11`   | Parent/content-defined | Parent/content-defined | 0         | 0         | 80px  | N/A    | 0            | N/A        | N/A       | `tokens.spacing.11` |
-| `spacing=12`   | Parent/content-defined | Parent/content-defined | 0         | 0         | 96px  | N/A    | 0            | N/A        | N/A       | `tokens.spacing.12` |
-| `spacing=13`   | Parent/content-defined | Parent/content-defined | 0         | 0         | 112px | N/A    | 0            | N/A        | N/A       | `tokens.spacing.13` |
-| `spacing=14`   | Parent/content-defined | Parent/content-defined | 0         | 0         | 128px | N/A    | 0            | N/A        | N/A       | `tokens.spacing.14` |
-| `spacing=15`   | Parent/content-defined | Parent/content-defined | 0         | 0         | 144px | N/A    | 0            | N/A        | N/A       | `tokens.spacing.15` |
-| `spacing=16`   | Parent/content-defined | Parent/content-defined | 0         | 0         | 160px | N/A    | 0            | N/A        | N/A       | `tokens.spacing.16` |
+The root always emits `display:flex; flex-direction:column`. It does not declare `flex-wrap`; absent an override, flex wrapping is the initial `nowrap`. There are no direction, wrap, or grow props.
+
+| `justify` | Emitted `justify-content` | Meaning in normal horizontal writing mode |
+| --------- | ------------------------- | ----------------------------------------- |
+| `left`    | `flex-start`              | Start/top                                 |
+| `center`  | `center`                  | Center                                    |
+| `right`   | `flex-end`                | End/bottom                                |
+| `apart`   | `space-between`           | Free space between children               |
+| `around`  | `space-around`            | Free space around children                |
+
+| `align`   | Emitted `align-items` |
+| --------- | --------------------- |
+| `start`   | `flex-start`          |
+| `center`  | `center`              |
+| `end`     | `flex-end`            |
+| `stretch` | `stretch`             |
+
+Unlike Group’s raw row alignment and exceptional column justification, Stack normalizes both axes through `POSITIONS`; all listed mappings are valid. Stretch fills the cross axis only where child sizing constraints allow. Distribution requires free main-axis space; content-height stacks will not acquire story-sized space automatically.
+
+## Size Specification / Token Mapping
+
+All `rem()` values use Polished’s default 16px conversion base. Pixel equivalents below assume a 16px document root; a different root scales rem geometry, not literal px geometry. No fixed container size is implied.
+
+| Key  | Token number | Emitted gap | At 16px root |
+| ---- | ------------ | ----------- | ------------ |
+| `1`  | 2            | `0.125rem`  | 2px          |
+| `2`  | 4            | `0.25rem`   | 4px          |
+| `3`  | 8            | `0.5rem`    | 8px          |
+| `4`  | 12           | `0.75rem`   | 12px         |
+| `5`  | 16           | `1rem`      | 16px         |
+| `6`  | 24           | `1.5rem`    | 24px         |
+| `7`  | 32           | `2rem`      | 32px         |
+| `8`  | 40           | `2.5rem`    | 40px         |
+| `9`  | 48           | `3rem`      | 48px         |
+| `10` | 64           | `4rem`      | 64px         |
+| `11` | 80           | `5rem`      | 80px         |
+| `12` | 96           | `6rem`      | 96px         |
+| `13` | 112          | `7rem`      | 112px        |
+| `14` | 128          | `8rem`      | 128px        |
+| `15` | 144          | `9rem`      | 144px        |
+| `16` | 160          | `10rem`     | 160px        |
+
+Default gap is `0.5rem` (8px at a 16px root). Width, height, min-width, padding, border, radius, fill, shadow, opacity, typography, and clipping are not assigned by Stack CSS. Story height `300px` and button `!h-auto` are preview-only. Children keep their own flex sizing; this component adds no child selector or growth rule.
 
 ## Variant And State Styles
 
-| Theme | Variant | State | Text color | Icon color   | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes                                 |
-| ----- | ------- | ----- | ---------- | ------------ | ----------------- | --------------- | ---------------- | ------ | ------- | ------------------------------------- |
-| Light | any     | Rest  | Inherited  | same as text | None              | none            | None             | N/A    | 1       | Theme does not alter layout behavior. |
-| Dark  | any     | Rest  | Inherited  | same as text | None              | none            | None             | N/A    | 1       | Theme does not alter layout behavior. |
+The component has no theme-specific styles or interactive visual states. Text color and typography are inherited where children do not override them; child icons, backgrounds, and effects are their own contracts, not Stack defaults.
 
-## Structure / Anatomy
+## Structure / Anatomy And Contracts
 
-| Part                | Source of truth   | Visual role                | Relevant styling                                                                   | Export note                                             |
-| ------------------- | ----------------- | -------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| root flex container | `stack.styled.ts` | Vertical auto layout frame | `display: flex`, `flex-direction: column`, `justify-content`, `align-items`, `gap` | Figma equivalent is a vertical auto-layout frame.       |
-| slotted children    | `NvStack.vue`     | Participating stack items  | No child-specific styling                                                          | Child sizing comes from content and parent constraints. |
-
-## Token Mapping
-
-| Concern       | Token                                  | Resolved value                                                                                                                  | Where used                 |
-| ------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
-| spacing scale | `tokens.spacing.1`-`tokens.spacing.16` | `2px`, `4px`, `8px`, `12px`, `16px`, `24px`, `32px`, `40px`, `48px`, `64px`, `80px`, `96px`, `112px`, `128px`, `144px`, `160px` | `gap` in `stack.styled.ts` |
+One styled host with one unscoped default slot. No declared custom emits or exposed methods. No implied width or intrinsic component row height is assigned to child content.
 
 ## Recommended Figma Mapping
 
-| Figma property | Type    | Suggested values                                        | Derived from   |
-| -------------- | ------- | ------------------------------------------------------- | -------------- |
-| `Spacing`      | Variant | `1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16` | `spacing` prop |
-| `Align`        | Variant | `start, center, end, stretch`                           | `align` prop   |
-| `Justify`      | Variant | `left, center, right, apart, around`                    | `justify` prop |
+Use vertical auto layout with spacing, mapped cross-axis Align, and mapped vertical Justify. Annotate `left=top` and `right=bottom` rather than treating them as unresolved naming. Do not create Direction, Grow, Wrap, Theme, or interactive-state variants absent from this primitive’s visual contract. Child fill-width behavior should respect actual stretch and size constraints.
 
-## Figma Build Notes
+## Context / Remaining Uncertainties
 
-- Use the primary visible part named in `Structure / Anatomy` as the main Figma frame, and keep purely behavioral wrappers such as hidden inputs, triggers, portals, or state containers outside the exported component set.
-- Apply fills, strokes, radius, and effects to the same layer identified in the anatomy table instead of redistributing those values across extra wrapper frames.
-- Keep slot content, consumer-provided copy, and arbitrary child content detached unless the README already defines them as explicit Figma properties.
-- If clipping, effect placement, or delegated styling is unresolved in source, preserve that uncertainty in the notes instead of inventing extra Figma variants.
+Final frame dimensions, child constraints, and available free space come from the consumer. Logical axis direction can vary with writing mode. These are integration inputs, not unresolved token values.
 
-## Gaps / Assumptions
+## Supporting Sources
 
-| Item                       | Status      | Notes                                                                                                                               |
-| -------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| Naming of `justify` values | Ambiguous   | The prop uses `left` / `right` labels even though the component is always vertical. Runtime maps them to `flex-start` / `flex-end`. |
-| Theme differences          | Unsupported | No theme-specific styling is implemented in this folder.                                                                            |
-| Interactive states         | Unsupported | No hover, focus, active, disabled, or selected styling.                                                                             |
+`stack.shared.ts:5–34`; `stack.styled.ts:8–26`; `stack.stories.ts:36–45`. [Design tokens](../../../../../design-tokens/src/main.ts), lines 51–68, provide the spacing scale.

@@ -1,65 +1,52 @@
 # NvFormItem
 
-Simple field wrapper that pairs an optional label with slotted field content using vertical stack spacing.
+A label-and-content layout wrapper. This folder exports **NvFormItem only**; there is no `NvForm` wrapper, form model, submit API or built-in validation system.
+
+## Units and source scope
+
+Geometry produced by `polished.rem()` and the CSS helpers is in **rem**, with pixel equivalents below assuming a **16px root font size**. Numeric positioning offsets and SVG dimensions are passed as CSS-pixel numbers; they do not automatically scale with rem geometry. Line-height `1.4` is unitless; tracking `0.32px` is emitted as `0.02rem`. The docs describe the existing implementation, including limitations, not a redesigned control. Theme values are resolved from the real token/theme/helper inventory; `darken(0.0675, #444444)` resolves to `#333` (`#333333`). Browser resets and third-party behavior are identified separately rather than assigned invented appearances.
 
 ## Source Files Used
 
-- `NvFormItem.vue`
-- `@packages/design-tokens/src/main.ts`
+- [NvFormItem.vue](./NvFormItem.vue): both stacks, label condition and props.
+- [NvStack.vue](../../miscellaneous/Stack/NvStack.vue), [stack.shared.ts](../../miscellaneous/Stack/stack.shared.ts), [stack.styled.ts](../../miscellaneous/Stack/stack.styled.ts): delegated layout defaults.
+- [NvText.vue](../../typography/Text/NvText.vue), [text.shared.ts](../../typography/Text/text.shared.ts), [text.styled.ts](../../typography/Text/text.styled.ts): delegated label typography.
+- [CSS helpers](../../../utils/css-in-js.ts): `fontSizeStyle`, radius/padding/icon-position helpers.
+- [Light theme](../../../themes/light.ts), [dark theme](../../../themes/dark.ts), [tokens](../../../../../design-tokens/src/main.ts), and [global stylesheet](../../../styles/main.scss).
 
 ## Component Axes
 
-| Property     | Kind   | Values        | Default | Notes                             |
-| ------------ | ------ | ------------- | ------- | --------------------------------- |
-| `label`      | string | any string    | `''`    | When empty, label row is omitted. |
-| `name`       | string | any string    | `''`    | Applied to `<label for>`.         |
-| default slot | slot   | field content | N/A     | Required for practical use.       |
+| Property / contract | Type                           | Default | Actual use                                                                    |
+| ------------------- | ------------------------------ | ------- | ----------------------------------------------------------------------------- |
+| `label`             | string                         | `''`    | Truthy value renders label row; empty string omits it.                        |
+| `name`              | string                         | `''`    | Sets `<label for="name">`; does not assign an id or name to slotted controls. |
+| default slot        | arbitrary field/helper content | empty   | Rendered inside the inner Stack.                                              |
 
-## Size Specification
+No declared events, model, size, variant, required, invalid, disabled, readonly, selected or loading axis. Child controls own their states; attributes/listeners fall through to the root Stack rather than being distributed to slot children.
 
-| Size | Height         | Min width   | Padding X | Padding Y | Gap                                                                | Radius | Border width | Typography                                                                       | Icon size | Notes                                              |
-| ---- | -------------- | ----------- | --------- | --------- | ------------------------------------------------------------------ | ------ | ------------ | -------------------------------------------------------------------------------- | --------- | -------------------------------------------------- |
-| base | content-driven | slot-driven | `0`       | `0`       | outer stack `tokens.spacing[3]` = `8px`; inner stack gap Not found | N/A    | `0`          | label uses `NvText type='label'`; resolved typography not defined in this folder | N/A       | This folder does not define field surface styling. |
+## Size Specification / delegated defaults
+
+| Part                                          | Display / alignment                                                               | Gap                                        | Geometry / typography                                                                                                                                                       |
+| --------------------------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Outer `NvStack spacing="3"`                   | flex column; align stretch; justify `left` → flex-start                           | `spacing[3]` = `8px` (`0.5rem`)            | Content-driven height/width; no authored padding, border, radius or shadow.                                                                                                 |
+| Inner `NvStack`                               | default flex column; align stretch; justify `left` → flex-start; default `as=div` | **Default spacing `3` = `8px`** (`0.5rem`) | Separates slotted field/helper children; defaults are not inherited from an unknown layout.                                                                                 |
+| `NvText type="label"` containing native label | Text wrapper defaults are delegated to NvText                                     | N/A                                        | `fontSize[2]` = **`14px`** (`0.875rem`), line-height **`1.4`**, tracking **`0.32px`** (`0.02rem`), **weight `700`**, `fontFamily.sans` (Nunito then system sans fallbacks). |
+
+No control surface, icon, explicit minimum width/height, clipping or transition is authored by FormItem. Omission of the label also removes the label-to-content gap: the outer stack then has only the content stack.
 
 ## Variant And State Style Tables
 
-| Theme      | Variant | State | Text color               | Icon color   | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes                                             |
-| ---------- | ------- | ----- | ------------------------ | ------------ | ----------------- | --------------- | ---------------- | ------ | ------- | ------------------------------------------------- |
-| light/dark | base    | rest  | Not found in this folder | same as text | transparent       | none            | none             | N/A    | `1`     | Visual behavior comes from child field component. |
+| Theme  | State                                                    | Label color source / value                   | Wrapper surface            | Effects                                                                                          |
+| ------ | -------------------------------------------------------- | -------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------ |
+| light  | label present                                            | `theme.text.color` = `#444444`               | No authored fill or border | None authored.                                                                                   |
+| dark   | label present                                            | `theme.text.color` = `#DCDCDC`               | No authored fill or border | None authored.                                                                                   |
+| either | label absent                                             | No label rendered                            | Same layout wrapper        | No additional gap for missing label.                                                             |
+| either | child disabled / readonly / invalid / required / loading | Label typography/color unchanged by FormItem | Child-dependent            | No local state propagation, validation indicator, required mark or error/helper text generation. |
 
 ## Structure / Anatomy
 
-| Part          | Source of truth                          | Visual role                          | Relevant styling                          | Export note                    |
-| ------------- | ---------------------------------------- | ------------------------------------ | ----------------------------------------- | ------------------------------ |
-| root stack    | `NvStack spacing='3'`                    | Vertical field wrapper               | Creates label-to-control spacing          | Model as vertical auto-layout. |
-| label row     | `NvText type='label'` wrapping `<label>` | Field label                          | Only rendered when `label` prop is truthy | Optional text layer.           |
-| content stack | inner `NvStack`                          | Holds field control / helper content | No local styling in this folder           | Optional slot container.       |
+Outer Stack is the main vertical layout frame. Its first optional child is NvText wrapping `<label :for="name">`; its second child is a nested Stack containing the default slot. Labels become associated only if the consumer gives a field an **id matching `name`**. Slot content can contain helpers/errors, but FormItem neither generates nor styles them.
 
-## Token Mapping
+## Token Mapping / Recommended Figma Mapping
 
-| Concern                | Token                    | Resolved value | Where used                            |
-| ---------------------- | ------------------------ | -------------- | ------------------------------------- |
-| outer vertical spacing | `tokens.spacing[3]`      | `8px`          | space between label and content stack |
-| label typography       | Not found in this folder | Not found      | delegated to `NvText`                 |
-
-## Recommended Figma Mapping
-
-| Figma property | Type    | Suggested values | Derived from          |
-| -------------- | ------- | ---------------- | --------------------- |
-| `Label`        | boolean | `true, false`    | `label` prop presence |
-| `Content`      | slot    | consumer-defined | default slot          |
-
-## Figma Build Notes
-
-- Use the primary visible part named in `Structure / Anatomy` as the main Figma frame, and keep purely behavioral wrappers such as hidden inputs, triggers, portals, or state containers outside the exported component set.
-- Apply fills, strokes, radius, and effects to the same layer identified in the anatomy table instead of redistributing those values across extra wrapper frames.
-- Keep slot content, consumer-provided copy, and arbitrary child content detached unless the README already defines them as explicit Figma properties.
-- If clipping, effect placement, or delegated styling is unresolved in source, preserve that uncertainty in the notes instead of inventing extra Figma variants.
-
-## Gaps / Assumptions
-
-| Item                      | Status      | Notes                                                    |
-| ------------------------- | ----------- | -------------------------------------------------------- |
-| Helper text / error text  | Unsupported | Not implemented in this folder.                          |
-| Invalid / required states | Unsupported | No props or styles for these states.                     |
-| Inner stack spacing       | Not found   | `NvStack` default spacing is not defined in this folder. |
+Use `Has label` as a Boolean and `Label` as consumer text, `Theme=light/dark`, and a field/helper-content slot. Both layout gaps resolve from `spacing[3]=8`; label size comes from `fontSize[2]=14` and `defaultTextStyle`, not from the slot control size. Reconstruct two vertical auto-layout frames with stretch alignment and content-driven height. Use the actual themed 14px/700 label; do not invent wrapper size or validation variants. Nunito requires the consuming application to load the font asset; system sans fallbacks apply otherwise.

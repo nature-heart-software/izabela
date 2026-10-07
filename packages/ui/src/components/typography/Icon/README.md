@@ -1,80 +1,105 @@
 # NvIcon Design Spec
 
-- Purpose: render an icon from `@packages/icons` at a token-driven square size using `currentColor`.
-- Source files used: `NvIcon.vue`, `icon.shared.ts`, `icon.styled.ts`, `icon.stories.ts`
+Purpose: render an exported icon component with square width/height derived from **`tokens.fontSize`**, inheriting foreground via `currentColor`. Source baseline: `3390fc0378a7f6e055d4cd4804d765599b4adeb6`.
+
+## Source Evidence
+
+- [NvIcon.vue](./NvIcon.vue), lines 1–21: dynamic component, width/height, currentColor and name lookup.
+- [icon.shared.ts](./icon.shared.ts), lines 4–12: complete declared props and type mismatch.
+- [icon.styled.ts](./icon.styled.ts), lines 9–15: legacy **unused** wrapper; [story](./icon.stories.ts), lines 11–20 and 31–33: controls and inconsistent template/default.
+- [Design tokens](../../../../../design-tokens/src/main.ts), lines 70–86: font-size scale; [icons package entry](../../../../../icons/src/main.ts), [icon assets / exports](../../../../../icons/src/components/icons), and [default asset](../../../../../icons/src/components/icons/NvTimesSquare.vue), lines 1–10.
 
 ## Component Axes
 
-| Property | Kind              | Values                                   | Default        | Notes                                                                                                                                                                     |
-| -------- | ----------------- | ---------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`   | enum-like string  | Icon names exported by `@packages/icons` | `times-square` | Runtime lookup accepts both `name` and `nv-${name}`. Storybook exposes the exported icon names without the `nv-` prefix.                                                  |
-| `size`   | numeric token key | `1`-`16` in Storybook                    | `5`            | `NvIcon.vue` resolves this through `tokens.fontSize[size][0]`. `icon.shared.ts` types it as `keyof typeof tokens.spacing`, which is inconsistent with the runtime lookup. |
-| `color`  | inherited style   | Unsupported as a prop                    | Not found      | SVG fill is hard-coded to `currentColor`, so color is driven by parent text color / CSS.                                                                                  |
-| `state`  | visual state      | Rest only                                | Rest           | No hover, focus, active, disabled, or selected styling in this folder.                                                                                                    |
+| Property   | Kind                          | Values                                                        | Default                  | Notes                                                                                                                                  |
+| ---------- | ----------------------------- | ------------------------------------------------------------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`     | Icon-name lookup              | Exported component `name` or corresponding name without `nv-` | **`times-square`**       | Finds first export where `[props.name, 'nv-' + props.name]` includes component name. No name normalization or fallback is implemented. |
+| `size`     | Numeric token key             | **Font-size keys 1–16**, complete table below                 | **5 → 24px**             | Runtime `tokens.fontSize[props.size][0]`; NOT the spacing scale.                                                                       |
+| Foreground | CSS context, not a color prop | Parent/consumer `color`                                       | No component color value | Root asset receives `fill="currentColor"`.                                                                                             |
+
+No slots are invoked, no component emit or exposed API is declared, and there are no local state, variant, disabled, loading, selected, radius or stroke props. Dynamic asset attrs/events supplied by a consumer are not named NvIcon props or a fixed interactivity contract. `name` definition literally contains `String` rather than `type: String`; do not imply a correctly enforced runtime enum/string validator.
 
 ## Size Specification
 
-| Size | Height | Min width | Padding X | Padding Y | Gap | Radius | Border width | Typography           | Icon size | Notes                     |
-| ---- | ------ | --------- | --------- | --------- | --- | ------ | ------------ | -------------------- | --------- | ------------------------- |
-| `1`  | 12px   | 12px      | N/A       | N/A       | N/A | N/A    | N/A          | `tokens.fontSize.1`  | 12px      | Square SVG viewport size. |
-| `2`  | 14px   | 14px      | N/A       | N/A       | N/A | N/A    | N/A          | `tokens.fontSize.2`  | 14px      | Square SVG viewport size. |
-| `3`  | 16px   | 16px      | N/A       | N/A       | N/A | N/A    | N/A          | `tokens.fontSize.3`  | 16px      | Square SVG viewport size. |
-| `4`  | 18px   | 18px      | N/A       | N/A       | N/A | N/A    | N/A          | `tokens.fontSize.4`  | 18px      | Square SVG viewport size. |
-| `5`  | 24px   | 24px      | N/A       | N/A       | N/A | N/A    | N/A          | `tokens.fontSize.5`  | 24px      | Prop default.             |
-| `6`  | 28px   | 28px      | N/A       | N/A       | N/A | N/A    | N/A          | `tokens.fontSize.6`  | 28px      | Square SVG viewport size. |
-| `7`  | 32px   | 32px      | N/A       | N/A       | N/A | N/A    | N/A          | `tokens.fontSize.7`  | 32px      | Square SVG viewport size. |
-| `8`  | 36px   | 36px      | N/A       | N/A       | N/A | N/A    | N/A          | `tokens.fontSize.8`  | 36px      | Square SVG viewport size. |
-| `9`  | 42px   | 42px      | N/A       | N/A       | N/A | N/A    | N/A          | `tokens.fontSize.9`  | 42px      | Square SVG viewport size. |
-| `10` | 48px   | 48px      | N/A       | N/A       | N/A | N/A    | N/A          | `tokens.fontSize.10` | 48px      | Square SVG viewport size. |
-| `11` | 54px   | 54px      | N/A       | N/A       | N/A | N/A    | N/A          | `tokens.fontSize.11` | 54px      | Square SVG viewport size. |
-| `12` | 60px   | 60px      | N/A       | N/A       | N/A | N/A    | N/A          | `tokens.fontSize.12` | 60px      | Square SVG viewport size. |
-| `13` | 68px   | 68px      | N/A       | N/A       | N/A | N/A    | N/A          | `tokens.fontSize.13` | 68px      | Square SVG viewport size. |
-| `14` | 76px   | 76px      | N/A       | N/A       | N/A | N/A    | N/A          | `tokens.fontSize.14` | 76px      | Square SVG viewport size. |
-| `15` | 84px   | 84px      | N/A       | N/A       | N/A | N/A    | N/A          | `tokens.fontSize.15` | 84px      | Square SVG viewport size. |
-| `16` | 92px   | 92px      | N/A       | N/A       | N/A | N/A    | N/A          | `tokens.fontSize.16` | 92px      | Square SVG viewport size. |
+| Size key      | Width attribute | Height attribute | Runtime token    |
+| ------------- | --------------- | ---------------- | ---------------- |
+| `1`           | 12px            | 12px             | `fontSize.1[0]`  |
+| `2`           | 14px            | 14px             | `fontSize.2[0]`  |
+| `3`           | 16px            | 16px             | `fontSize.3[0]`  |
+| `4`           | 18px            | 18px             | `fontSize.4[0]`  |
+| `5` (default) | 24px            | 24px             | `fontSize.5[0]`  |
+| `6`           | 28px            | 28px             | `fontSize.6[0]`  |
+| `7`           | 32px            | 32px             | `fontSize.7[0]`  |
+| `8`           | 36px            | 36px             | `fontSize.8[0]`  |
+| `9`           | 42px            | 42px             | `fontSize.9[0]`  |
+| `10`          | 48px            | 48px             | `fontSize.10[0]` |
+| `11`          | 54px            | 54px             | `fontSize.11[0]` |
+| `12`          | 60px            | 60px             | `fontSize.12[0]` |
+| `13`          | 68px            | 68px             | `fontSize.13[0]` |
+| `14`          | 76px            | 76px             | `fontSize.14[0]` |
+| `15`          | 84px            | 84px             | `fontSize.15[0]` |
+| `16`          | 92px            | 92px             | `fontSize.16[0]` |
+
+Widths and heights are numeric SVG attributes using the raw font-size number, not rem-based layout CSS. No min-width or min-height is declared: square width/height attributes are **not** CSS minimum sizes. No component padding, gap, background, stroke, corner radius, outline, shadow, blur or explicit opacity is set. SVG viewBox and paths belong to each asset and the viewport is not the glyph's actual painted bounding box. Default times-square asset has `viewBox="0 0 24 24"`; retain original asset paths when recreating it.
+
+The runtime consumes only tuple `[0]`; it does **not** apply the fontSize tuple's line-height 1.4 or letter-spacing 0.32px, and does not apply text font family/weight. Assets may have their own geometry or paint attributes; `fill=currentColor` at the root is not proof that every exported asset path has identical stroke/fill construction.
 
 ## Variant And State Styles
 
-| Theme | Variant | State | Text color                   | Icon color   | Background / fill | Border / stroke | Shadow / effects | Radius | Opacity | Notes                                |
-| ----- | ------- | ----- | ---------------------------- | ------------ | ----------------- | --------------- | ---------------- | ------ | ------- | ------------------------------------ |
-| Light | Default | Rest  | Inherited via `currentColor` | same as text | None              | none            | None             | N/A    | 1       | Component itself does not set color. |
-| Dark  | Default | Rest  | Inherited via `currentColor` | same as text | None              | none            | None             | N/A    | 1       | Same as light theme.                 |
+| Context | State                                                  | Foreground / paint                                                    | Surface / effects                                | Notes                                                                       |
+| ------- | ------------------------------------------------------ | --------------------------------------------------------------------- | ------------------------------------------------ | --------------------------------------------------------------------------- |
+| Light   | Default                                                | SVG root `fill=currentColor`; actual color inherited/consumer-defined | No local surface, border, shadow or opacity rule | No theme import or fixed light color.                                       |
+| Dark    | Default                                                | Same                                                                  | Same                                             | No intrinsic theme switch or dark-specific value.                           |
+| Either  | Hover / focus / active / disabled / selected / loading | No local state-specific change                                        | None declared                                    | Consumer parent or icon asset can change appearance; not an NvIcon variant. |
+
+Do not state opacity 1 as a forced property or call asset paths a component background. Icon has no locally imposed keyboard focusability, role, accessible label or button behavior; clickable/focusable affordances belong to consuming components and their attributes.
 
 ## Structure / Anatomy
 
-| Part                   | Source of truth  | Visual role                                   | Relevant styling                                               | Export note                                                                         |
-| ---------------------- | ---------------- | --------------------------------------------- | -------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| root dynamic component | `NvIcon.vue`     | Renders the resolved icon component           | `height` and `width` set to `sizeValue`; `fill="currentColor"` | Figma component should inherit color from context instead of baking per-icon fills. |
-| icon asset lookup      | `NvIcon.vue`     | Maps prop name to one exported icon component | Matches `name` or `nv-${name}` against icon component names    | Keep icon asset names aligned with the exported package naming.                     |
-| legacy styled wrapper  | `icon.styled.ts` | Historical square icon wrapper                | Defines inline-flex square sizing from `tokens.fontSize`       | Not used by `NvIcon.vue` at runtime.                                                |
+| Part                   | Source                           | Role / export note                                                                                                                                                                 |
+| ---------------------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dynamic root component | NvIcon template                  | Receives width=sizeValue, height=sizeValue, fill=currentColor; no additional wrapper frame.                                                                                        |
+| Export lookup          | `Object.values(Icons).find(...)` | Resolves asset by component `name`, not export identifier or an arbitrary SVG path/string.                                                                                         |
+| Asset                  | `@packages/icons`                | Owns viewBox, SVG paths and any asset-level painting; use exact package export for instance swap.                                                                                  |
+| Legacy `StIcon`        | icon.styled.ts                   | Inline-flex `<i>` with rem width/height/font-size/line-height, **not imported or rendered by NvIcon.vue**. Never apply its inline-flex or line-height as current runtime geometry. |
+
+## Interaction And Error Cases
+
+- There is no local hover/focus/active/disabled/loading handler or transition; Icon is a visual asset, not a standalone action control.
+- Invalid size keys are not guarded: the computed lookup accesses `[0]` on the selected fontSize entry. A key absent from the font-size record can fail; do not document arbitrary spacing keys as valid.
+- Unknown names yield no match from `.find`; no local missing-icon fallback, warning label or placeholder shape is defined. Exact Vue handling of an unresolved dynamic component is not a browser-verified output claim here.
+- Prefix lookup accepts actual `nv-*` component names or corresponding unprefixed names; no case-folding, trimming or alias inference is performed.
 
 ## Token Mapping
 
-| Concern         | Token                                    | Resolved value                                                                                                                 | Where used                                                                                |
-| --------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
-| icon size scale | `tokens.fontSize.1`-`tokens.fontSize.16` | `12px`, `14px`, `16px`, `18px`, `24px`, `28px`, `32px`, `36px`, `42px`, `48px`, `54px`, `60px`, `68px`, `76px`, `84px`, `92px` | `sizeValue` in `NvIcon.vue`; width / height / font-size / line-height in `icon.styled.ts` |
-| icon color      | Not found                                | Inherited from surrounding `color` CSS                                                                                         | SVG `fill` in `NvIcon.vue`                                                                |
+| Concern               | Token / source                              | Resolved value                                                   |
+| --------------------- | ------------------------------------------- | ---------------------------------------------------------------- |
+| Square viewport       | `tokens.fontSize.1`–`.16`, tuple `[0]` only | 12, 14, 16, 18, 24, 28, 32, 36, 42, 48, 54, 60, 68, 76, 84, 92px |
+| Default viewport      | `tokens.fontSize.5[0]`                      | 24px × 24px                                                      |
+| Context foreground    | `currentColor`                              | No component-specific light/dark color token                     |
+| Legacy wrapper sizing | Same font-size scale through `rem()`        | Unused code, not the dynamic SVG output                          |
 
 ## Recommended Figma Mapping
 
-| Figma property | Type                 | Suggested values                                        | Derived from                                                                      |
-| -------------- | -------------------- | ------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `Icon`         | Instance swap / enum | Exported icon names from `@packages/icons`              | `name` prop + runtime lookup                                                      |
-| `Size`         | Variant              | `1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16` | `size` prop                                                                       |
-| `Theme`        | Variant              | `light, dark`                                           | Color is inherited; include only if icon is previewed inside themed text contexts |
+| Property   | Type                    | Values                         | Derived from                      |
+| ---------- | ----------------------- | ------------------------------ | --------------------------------- |
+| Icon       | Instance swap           | Package asset names            | Exported component names / lookup |
+| Size       | Variant                 | 1–16, numeric dimensions above | Runtime font-size keys, default 5 |
+| Foreground | Inherited/context style | Consumer color                 | currentColor                      |
+
+Theme preview can demonstrate consumer colors but is not an intrinsic Icon axis. Do not add local hover/disabled variants, label slots, padding frames, minimum widths or focus rings.
 
 ## Figma Build Notes
 
-- Use the primary visible part named in `Structure / Anatomy` as the main Figma frame, and keep purely behavioral wrappers such as hidden inputs, triggers, portals, or state containers outside the exported component set.
-- Apply fills, strokes, radius, and effects to the same layer identified in the anatomy table instead of redistributing those values across extra wrapper frames.
-- Keep slot content, consumer-provided copy, and arbitrary child content detached unless the README already defines them as explicit Figma properties.
-- If clipping, effect placement, or delegated styling is unresolved in source, preserve that uncertainty in the notes instead of inventing extra Figma variants.
+- Keep a square viewport at the selected pixel dimensions and retain the exact SVG viewBox/path; preserve paint inset instead of stretching the painted glyph to fill the viewport.
+- Use inherited foreground styles. Do not insert the unused `<i>` wrapper's rem text metrics into the asset frame.
+- Maintain package asset names for instance swaps; use the package exports as the canonical catalog, not Storybook's default as an API default.
 
 ## Gaps / Assumptions
 
-| Item                        | Status      | Notes                                                                 |
-| --------------------------- | ----------- | --------------------------------------------------------------------- |
-| Prop typing for `size`      | Ambiguous   | Type points at `tokens.spacing`, but runtime reads `tokens.fontSize`. |
-| Storybook default `name`    | Ambiguous   | Story default is `github`, prop default is `times-square`.            |
-| Missing resolved asset list | Not found   | The full icon set lives in `@packages/icons`, outside this folder.    |
-| Interactive states          | Unsupported | No state-specific styling is implemented in this folder.              |
+| Topic                         | Current evidence                                                                                                                                                                                                  |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Type annotation mismatch      | `size` is typed as `keyof typeof tokens.spacing`, but runtime and story use fontSize. Keys currently overlap 1–16; **values do not** (size 5 is 24px, not spacing.5's 16px). No type/runtime repair is made here. |
+| Story default / template      | Story name control defaults to `github`, runtime prop defaults to `times-square`. Story template closes `</nv-text>` despite opening NvIcon; not evidence of a label slot or a different renderer.                |
+| Asset variety                 | Full catalog and intrinsic paths are in linked package exports/assets; arbitrary name geometry or universal stroke behavior is not asserted.                                                                      |
+| Accessibility / unknown names | No local labeling/fallback contract; consumer attributes and asset behavior require separate verification. No browser values were guessed.                                                                        |

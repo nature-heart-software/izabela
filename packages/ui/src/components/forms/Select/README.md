@@ -1,121 +1,152 @@
-# NvSelect / NvOption
+# NvSelect and NvOption
 
-Select family built from an input-like trigger (`NvSelect`), a portalled autocomplete popup (`NvAutocomplete`), and row components (`NvOption`). Supports single and multiple selection, grouped options, search filtering, and removable selected tags.
+Searchable single/multiple selector built from a styled trigger, `NvAutocomplete`, standalone `NvOption` rows and fixed-size `NvTag` chips. This document distinguishes public props, option data and styled/fallthrough states; they are not interchangeable.
+
+## Units and source scope
+
+Geometry produced by `polished.rem()` and the CSS helpers is in **rem**, with pixel equivalents below assuming a **16px root font size**. Numeric positioning offsets and SVG dimensions are passed as CSS-pixel numbers; they do not automatically scale with rem geometry. Line-height `1.4` is unitless; tracking `0.32px` is emitted as `0.02rem`. The docs describe the existing implementation, including limitations, not a redesigned control. Theme values are resolved from the real token/theme/helper inventory; `darken(0.0675, #444444)` resolves to `#333` (`#333333`). Browser resets and third-party behavior are identified separately rather than assigned invented appearances.
 
 ## Source Files Used
 
-- `NvSelect.vue`
-- `NvOption.vue`
-- `select.shared.ts`
-- `select.styled.ts`
-- `select.stories.ts`
-- `@/utils/css-in-js.ts`
-- `@/themes/light.ts`
-- `@/themes/dark.ts`
-- `@packages/design-tokens/src/main.ts`
+- [NvSelect.vue](./NvSelect.vue): trigger composition, search, grouping, models and event wiring.
+- [NvOption.vue](./NvOption.vue): independent option component and hover slot scope.
+- [select.shared.ts](./select.shared.ts), [select.styled.ts](./select.styled.ts): prop/type surfaces and state branches.
+- [select.stories.ts](./select.stories.ts): single and multiple examples; `labelKey` is not a declared prop.
+- [Autocomplete](../Autocomplete/README.md), [Tag](../Tag/README.md), [NvIcon.vue](../../typography/Icon/NvIcon.vue), [Stack](../../miscellaneous/Stack/stack.shared.ts), [Group](../../miscellaneous/Group/group.shared.ts): delegated contracts.
+- [CSS helpers](../../../utils/css-in-js.ts): `fontSizeStyle`, radius/padding/icon-position helpers.
+- [Light theme](../../../themes/light.ts), [dark theme](../../../themes/dark.ts), [tokens](../../../../../design-tokens/src/main.ts), and [global stylesheet](../../../styles/main.scss).
 
-## Component Axes
+## Component Axes: NvSelect
 
-| Property            | Kind         | Values                   | Default     | Notes                                                                                            |
-| ------------------- | ------------ | ------------------------ | ----------- | ------------------------------------------------------------------------------------------------ |
-| `size`              | enum         | `sm`, `md`, `lg`         | `md`        | Controls trigger min-height, trigger/input height, radius, padding, type, icon offset.           |
-| `multiple`          | boolean      | `true`, `false`          | `false`     | Multiple mode renders removable `NvTag` chips and emits arrays.                                  |
-| `modelValue`        | model        | scalar, object, or array | `undefined` | Array only in multiple mode.                                                                     |
-| `options`           | array        | `Option[]`               | `[]`        | Supports flat or grouped options.                                                                |
-| `valueKey`          | string       | any string               | `''`        | Used for stable comparisons when values are objects.                                             |
-| `autocompleteWidth` | number       | any number               | `undefined` | Passed through to popup width override.                                                          |
-| `isFocused`         | boolean      | `true`, `false`          | `false`     | Public prop exists, but local focus trap drives the actual styled focus state in this component. |
-| grouped option      | content mode | `true`, `false`          | false       | Parent option with `children` becomes readonly group header and flattens child rows.             |
-| option `disabled`   | boolean      | `true`, `false`          | false       | Row-level disabled state.                                                                        |
-| option `active`     | boolean      | `true`, `false`          | false       | Keyboard-highlighted row state.                                                                  |
-| option `selected`   | boolean      | `true`, `false`          | false       | Applied when row value matches current selection.                                                |
+| Property                | Type / values        | Default          | Actual use                                                                                                                                      |
+| ----------------------- | -------------------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `size`                  | `sm`, `md`, `lg`     | `md`             | Trigger geometry/type and direction icon; not popup, rows or tags.                                                                              |
+| `multiple`              | boolean              | `false`          | Scalar selection vs array toggle. **Initialize model to `[]` before enabling multiple.**                                                        |
+| `modelValue`            | `Value` or `Value[]` | undefined        | `Value = string \| number \| boolean \| object \| null \| undefined`; runtime constructors are String, Number, Object, Array (Boolean missing). |
+| `options`               | `Option[]`           | fresh `[]`       | Group-aware source flattened one level.                                                                                                         |
+| `valueKey`              | string               | `''`             | Lodash path used for identity comparisons; fallback differences are documented below.                                                           |
+| `isFocused`             | boolean              | `false`          | Declared, but visible trigger styling is bound to local focus-trap `hasFocus`, overriding this value.                                           |
+| `autocompleteWidth`     | number               | undefined        | Passed to Autocomplete minimum-width calculation, **not fixed popup width**.                                                                    |
+| `placeholder` attribute | not a declared prop  | no local default | Explicitly read from `$attrs.placeholder` for the styled native input.                                                                          |
+
+Whole-select disabled, readonly, loading, invalid and selected Boolean variants are not authored. Arbitrary attributes fall through to the Autocomplete root wrapper; they are **not** all bound to the input. A root `disabled` or `readonly` attribute does not establish supported native input semantics.
+
+### Option data fields
+
+| Field in exported `Option` | Type                                        | Actual interpretation                                                                                     |
+| -------------------------- | ------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `label`                    | required string                             | Row text and title; selected single label/chip label.                                                     |
+| `value`                    | optional `Value`                            | Model payload.                                                                                            |
+| `id`                       | optional `Value` excluding object           | Explicit id retained; otherwise generated from truthy extracted value / value / UUID.                     |
+| `disabled`                 | optional boolean                            | Passed to row CSS; keyboard selection is **not** guarded.                                                 |
+| `readonly`                 | optional boolean                            | Exported data field but **ignored by normal Select row binding**. Readonly binds `item.children` instead. |
+| `category`, `searchValue`  | optional strings                            | Fuse search keys along with label.                                                                        |
+| `children`                 | optional `Omit<Option, 'children'>[]`       | Parent becomes header; children flattened below it, one level only. Even empty array is truthy.           |
+| `attr`                     | optional `Record<string, number \| string>` | Declared singular spelling; Vue actually reads **`item.attrs`**, plural. Source mismatch.                 |
+
+Runtime `item.attrs` is bound after explicit row flags/title and can override those props. Such overrides change styled appearance, not the selection callbacks: those guard only `item.children` and do not check `item.disabled` or readonly. No undocumented guarantee of readonly behavior should be inferred from attribute overrides.
+
+### Standalone NvOption states
+
+| Input      | Declared by `NvOption` / `OptionProps`? | Styled child default | Delivery                                       |
+| ---------- | --------------------------------------- | -------------------- | ---------------------------------------------- |
+| `active`   | Yes, Boolean default `false`            | `false`              | Explicitly forwarded props.                    |
+| `selected` | No                                      | Boolean `false`      | Vue fallthrough attribute to `StSelectOption`. |
+| `disabled` | No                                      | Boolean `false`      | Same fallthrough route.                        |
+| `readonly` | No                                      | Boolean `false`      | Same fallthrough route.                        |
+
+Standalone Option has no size, value/model or selection event API. Its state flags are visual controls, not a complete accessible selection primitive. Native row listeners/attributes fall through; `NvOption` declares no emits.
 
 ## Size Specification
 
-| Size         | Height                         | Min width | Padding X                   | Padding Y            | Gap                                         | Radius    | Border width | Typography                                                       | Icon size                   | Notes                     |
-| ------------ | ------------------------------ | --------- | --------------------------- | -------------------- | ------------------------------------------- | --------- | ------------ | ---------------------------------------------------------------- | --------------------------- | ------------------------- |
-| `sm` trigger | min `24px`; inner input `20px` | Not found | `8px / 20px` (icon reserve) | `4px` top and bottom | tag/group spacing external                  | `6px`     | `1px`        | `12px`, line-height `1.4`, letter-spacing `0.32px`, weight `600` | `tokens.spacing[3]` = `8px` | Icon right offset `4px`.  |
-| `md` trigger | min `32px`; inner input `24px` | Not found | `16px / 28px`               | `4px` top and bottom | external                                    | `8px`     | `1px`        | `12px`, `1.4`, `0.32px`, weight `600`                            | `16px`                      | Icon right offset `4px`.  |
-| `lg` trigger | min `40px`; inner input `32px` | Not found | `24px / 36px`               | `4px` top and bottom | external                                    | `8px`     | `1px`        | `14px`, `1.4`, `0.32px`, weight `600`                            | `16px`                      | Icon right offset `8px`.  |
-| option row   | `32px`                         | Not found | `16px`                      | `0`                  | `8px` min between content and trailing slot | Not found | `0`          | `NvText` default = `14px`, `1.4`, `0.32px`                       | N/A                         | Same across select sizes. |
+| Trigger size | Min-height        | Native styled input height | Padding left / right | Padding top / bottom | Radius | Font / line-height / tracking | Direction icon    | Icon right |
+| ------------ | ----------------- | -------------------------- | -------------------- | -------------------- | ------ | ----------------------------- | ----------------- | ---------- |
+| `sm`         | `24px` (`1.5rem`) | **`16px`** (`1rem`)        | **`8px / 24px`**     | `4px / 4px`          | `6px`  | `12px / 1.4 / 0.32px`         | **`16px × 16px`** | `4px`      |
+| `md`         | `32px` (`2rem`)   | `24px` (`1.5rem`)          | **`16px / 32px`**    | `4px / 4px`          | `8px`  | `12px / 1.4 / 0.32px`         | **`24px × 24px`** | `4px`      |
+| `lg`         | `40px` (`2.5rem`) | `32px` (`2rem`)            | **`24px / 40px`**    | `4px / 4px`          | `8px`  | `14px / 1.4 / 0.32px`         | **`24px × 24px`** | `8px`      |
+
+These are authored minimum heights, not guaranteed fixed outer heights: chips/content can grow the trigger. Trigger is relative inline-flex, center-aligned, pointer cursor, `w-full`, border width `1px`, `transition: all .3s`. Wrapper has `margin-top/bottom: -1px`, flex center and weight `600`; input inherits font size/weight/tracking, width 100%, outline none and pointer cursor. Font family is inherited on the trigger/input, not explicitly set by Select. Direction icon uses `currentColor`; its wrapper is absolute inline-flex with pointer events none, no authored top/transform offset.
+
+### Nested geometry (all trigger sizes)
+
+| Part            | Actual defaults / geometry                                                                                                                                                                                                                                                    |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Popup           | Select does not forward `size`: **Autocomplete `md` radius `8px`**. `bottom-end`, flip, collision padding `8px`, offset `12px`, z-index `9999`; minimum `max(reference, 300px)` absent truthy override, reference CSS width, border `1px`, shadow token and rounded clipping. |
+| Popup list      | Maximum `200px`; virtual estimate `32px`, overscan `5`.                                                                                                                                                                                                                       |
+| Option row      | Width 100%, height **`32px !important`**, padding **`0 16px !important`**, flex center / space-between, min-width 0, nowrap, overflow hidden and text-overflow ellipsis. No authored border, radius or shadow.                                                                |
+| Option type     | `defaultTextStyle`: Nunito/system sans, **`14px`**, line-height `1.4`, tracking `0.32px`, theme.text.color. No normal font-weight authored; selected adds `700`.                                                                                                              |
+| Content / after | Content relative, min-width 0, z-index 0; Select's inner label has `w-full text-ellipsis overflow-hidden`. After wrapper flex-shrink 0; each direct child has left margin `8px`.                                                                                              |
+| Chips           | NvTag fixed `24px` high, closable padding `8px / 24px`; **tag wrapper margin-left `-12px`** (`-spacing[4]`). Group gap `4px`, row direction, wrapping enabled, center aligned, no grow.                                                                                       |
+| Inner Stack     | spacing `2` = **`4px`**, column, stretch, flex-start; contains chips and input wrapper.                                                                                                                                                                                       |
+| No Data         | StSelectOption empty-result row with `justify-center pointer-events-none`; literal `No Data`; no separate disabled text style.                                                                                                                                                |
 
 ## Variant And State Style Tables
 
-| Theme | Variant             | State          | Text color                | Icon color   | Background / fill                                                  | Border / stroke   | Shadow / effects    | Radius    | Opacity | Notes                                                                                     |
-| ----- | ------------------- | -------------- | ------------------------- | ------------ | ------------------------------------------------------------------ | ----------------- | ------------------- | --------- | ------- | ----------------------------------------------------------------------------------------- |
-| light | trigger             | rest           | `#444444`                 | same as text | `#ffffff`                                                          | `1px` / `#EBEBEB` | none                | by size   | `1`     |                                                                                           |
-| light | trigger             | hover          | `#444444`                 | same as text | `#ffffff`                                                          | `1px` / `#BEBEBE` | none                | by size   | `1`     |                                                                                           |
-| light | trigger             | focus          | `#444444`                 | same as text | `#ffffff`                                                          | `1px` / `#BEBEBE` | `0 0 0 4px #F9F9FC` | by size   | `1`     | Driven by focus trap.                                                                     |
-| light | trigger placeholder | placeholder    | `#BEBEBE`                 | same as text | N/A                                                                | none              | none                | N/A       | `1`     | Placeholder weight `300`.                                                                 |
-| dark  | trigger             | rest           | `#DCDCDC`                 | same as text | `darken(0.0675, #444444)`                                          | `1px` / `#444444` | none                | by size   | `1`     |                                                                                           |
-| dark  | trigger             | hover          | `#DCDCDC`                 | same as text | `darken(0.0675, #444444)`                                          | `1px` / `#626262` | none                | by size   | `1`     |                                                                                           |
-| dark  | trigger             | focus          | `#DCDCDC`                 | same as text | `darken(0.0675, #444444)`                                          | `1px` / `#626262` | `0 0 0 4px #444444` | by size   | `1`     |                                                                                           |
-| light | option              | rest           | `#444444`                 | same as text | transparent                                                        | transparent       | none                | Not found | `1`     |                                                                                           |
-| light | option              | hover          | `#444444`                 | same as text | `#F9F9FC`                                                          | transparent       | none                | Not found | `1`     |                                                                                           |
-| light | option              | selected       | `#444444`                 | same as text | `#EBEBEB`                                                          | transparent       | none                | Not found | `1`     | Font weight `700`.                                                                        |
-| light | option              | active         | `#444444`                 | same as text | `#BEBEBE`                                                          | transparent       | none                | Not found | `1`     | Keyboard-highlight state.                                                                 |
-| light | option              | disabled       | `#ffffff`                 | same as text | transparent                                                        | transparent       | none                | Not found | `1`     | Uses `theme.select.option.disabled.backgroundColor`, despite being applied as text color. |
-| light | option              | readonly group | `#BEBEBE`                 | same as text | group background `#ffffff`; divider line `#EBEBEB`                 | none              | none                | Not found | `1`     | Group headers are non-interactive and draw a line behind text.                            |
-| dark  | option              | rest           | `#DCDCDC`                 | same as text | transparent                                                        | transparent       | none                | Not found | `1`     |                                                                                           |
-| dark  | option              | hover          | `#DCDCDC`                 | same as text | `#444444`                                                          | transparent       | none                | Not found | `1`     |                                                                                           |
-| dark  | option              | selected       | `#DCDCDC`                 | same as text | `darken(0.0675, #626262)`                                          | transparent       | none                | Not found | `1`     | Font weight `700`.                                                                        |
-| dark  | option              | active         | `#DCDCDC`                 | same as text | `#2B2B2C`                                                          | transparent       | none                | Not found | `1`     |                                                                                           |
-| dark  | option              | disabled       | `darken(0.0675, #444444)` | same as text | transparent                                                        | transparent       | none                | Not found | `1`     | Uses background token as text color.                                                      |
-| dark  | option              | readonly group | `#9F9F9F`                 | same as text | group background `darken(0.0675, #444444)`; divider line `#626262` | none              | none                | Not found | `1`     |                                                                                           |
+### Trigger surface
 
-## Structure / Anatomy
+| Theme | State       | Text / icon | Fill      | Border (`1px`) | Shadow              |
+| ----- | ----------- | ----------- | --------- | -------------- | ------------------- |
+| light | rest        | `#444444`   | `#ffffff` | `#EBEBEB`      | None authored.      |
+| light | hover       | `#444444`   | `#ffffff` | **`#DCDCDC`**  | None authored.      |
+| light | local focus | `#444444`   | `#ffffff` | **`#DCDCDC`**  | `0 0 0 4px #F9F9FC` |
+| dark  | rest        | `#DCDCDC`   | `#333333` | `#444444`      | None authored.      |
+| dark  | hover       | `#DCDCDC`   | `#333333` | `#626262`      | None authored.      |
+| dark  | local focus | `#DCDCDC`   | `#333333` | `#626262`      | `0 0 0 4px #444444` |
 
-| Part          | Source of truth                 | Visual role                    | Relevant styling                                                  | Export note                                |
-| ------------- | ------------------------------- | ------------------------------ | ----------------------------------------------------------------- | ------------------------------------------ |
-| trigger shell | `StSelect`                      | Input-like container           | Border, radius, focus ring, padding, min-height                   | Main select frame.                         |
-| inner wrapper | `StSelectWrapper`               | Holds chips + input            | `display: flex`, negative vertical margins to absorb border width | Auto-layout wrapper inside trigger.        |
-| chips area    | `StSelectTagsWrapper` + `NvTag` | Multiple-selection summary     | Left offset `-16px`; tags wrap in `NvGroup`                       | Separate nested component family in Figma. |
-| text input    | `StSelectInput`                 | Search field / displayed label | Inherits trigger type style and placeholder colors                | Model as text field region within trigger. |
-| caret icon    | `StSelectIcon`                  | Dropdown affordance            | Absolute positioned trailing icon                                 | Boolean-visible part.                      |
-| popup shell   | `NvAutocomplete`                | Portalled options surface      | Documented in Autocomplete README                                 | Reference linked spec if needed.           |
-| option row    | `StSelectOption` / `NvOption`   | Selectable item row            | Fixed height, horizontal padding, ellipsis, state fills           | Separate row component set.                |
-| trailing slot | `option__after`                 | Secondary affordance or meta   | Left margin `8px` between extra content items                     | Optional sub-slot.                         |
+Sources are `theme.select.color/backgroundColor/borderColor/hover.borderColor/focus.borderColor/focus.boxShadow`; placeholder source is `theme.select.placeholder.color`: light `#BEBEBE`, dark `#818181`, weight `300`, inherited size/tracking. Focus is local `hasFocus`, not `:focus` on the div. Hover is a pseudo-class and the two interactions can coexist (their borders resolve equally here). No pressed or selected trigger fill is authored.
 
-## Token Mapping
+### Option surface (standalone or in Select)
 
-| Concern                    | Token                                  | Resolved value                       | Where used           |
-| -------------------------- | -------------------------------------- | ------------------------------------ | -------------------- |
-| trigger radii              | `tokens.borderRadius.sm/md/DEFAULT`    | `6px`, `8px`, `8px`                  | trigger by size      |
-| trigger min heights        | `tokens.spacing[6..8]`                 | `24px`, `32px`, `40px`               | trigger by size      |
-| trigger input heights      | `tokens.spacing[5..7]`                 | `20px`, `24px`, `32px`               | text input by size   |
-| trigger horizontal padding | `tokens.spacing[3/5/6]` + icon reserve | `8/16/24px` left, `20/28/36px` right | trigger by size      |
-| trigger vertical padding   | `tokens.spacing[2]`                    | `4px`                                | trigger by size      |
-| trigger border width       | `tokens.borderWidth.DEFAULT`           | `1px`                                | trigger border       |
-| focus ring spread          | `tokens.borderWidth.lg`                | `4px`                                | trigger focus ring   |
-| option height              | `tokens.spacing[7]`                    | `32px`                               | option rows          |
-| option horizontal padding  | `tokens.spacing[5]`                    | `16px`                               | option rows          |
-| option trailing slot gap   | `tokens.spacing[3]`                    | `8px`                                | `.option__after > *` |
+| Theme | State                  | Text          | Fill                                         | Weight                         | Additional effects                         |
+| ----- | ---------------------- | ------------- | -------------------------------------------- | ------------------------------ | ------------------------------------------ |
+| light | rest                   | `#444444`     | No authored row fill; transparent over popup | Inherited                      | None.                                      |
+| light | hover                  | `#444444`     | `#F9F9FC`                                    | Inherited                      | None.                                      |
+| light | selected               | `#444444`     | `#EBEBEB`                                    | `700`                          | None.                                      |
+| light | active (keyboard flag) | `#444444`     | **`#DCDCDC`**                                | Inherited unless also selected | None.                                      |
+| light | disabled               | **`#BEBEBE`** | No authored row fill                         | Inherited                      | Pointer-events none; user-select none.     |
+| light | readonly               | `#BEBEBE`     | No authored row fill                         | Inherited                      | Separator `#EBEBEB`; label mask `#ffffff`. |
+| dark  | rest                   | `#DCDCDC`     | No authored row fill; transparent over popup | Inherited                      | None.                                      |
+| dark  | hover                  | `#DCDCDC`     | `#444444`                                    | Inherited                      | None.                                      |
+| dark  | selected               | `#DCDCDC`     | `#515151`                                    | `700`                          | None.                                      |
+| dark  | active (keyboard flag) | `#DCDCDC`     | `#2B2B2C`                                    | Inherited unless also selected | None.                                      |
+| dark  | disabled               | **`#9F9F9F`** | No authored row fill                         | Inherited                      | Pointer-events none; user-select none.     |
+| dark  | readonly               | `#9F9F9F`     | No authored row fill                         | Inherited                      | Separator `#626262`; label mask `#333333`. |
 
-## Recommended Figma Mapping
+`defaultTextStyle` supplies normal text from `theme.text.color`; row interaction fills use `theme.select.option.hover/selected/active.backgroundColor`. Disabled styling unusually assigns **`theme.select.option.disabled.backgroundColor` to CSS color**, not fill. Readonly uses `.readonly.color/borderColor`; the mask uses `.option.backgroundColor`. Theme option border/focus keys exist but are not applied as a general row border/focus ring. Interaction fills and disabled/readonly colors are `!important`.
 
-| Figma property    | Type    | Suggested values                                          | Derived from                   |
-| ----------------- | ------- | --------------------------------------------------------- | ------------------------------ |
-| `Size`            | variant | `sm, md, lg`                                              | `size` prop                    |
-| `Mode`            | variant | `single, multiple`                                        | `multiple` prop                |
-| `Trigger State`   | variant | `rest, hover, focus`                                      | trigger styling                |
-| `Theme`           | variant | `light, dark`                                             | theme files                    |
-| `Has Selection`   | boolean | `true, false`                                             | selected values                |
-| `Has Placeholder` | boolean | `true, false`                                             | placeholder text presence      |
-| `Option State`    | variant | `rest, hover, active, selected, disabled, readonly-group` | `NvOption` and grouped options |
-| `Option After`    | boolean | `true, false`                                             | `after` slot                   |
+### Compound precedence
 
-## Figma Build Notes
+1. **Readonly first**, then **disabled**, then the normal interaction branch. Readonly+disabled gets readonly appearance and **does not get the disabled pointer-events/user-select rule**. Neither branch gets the selected 700 weight or selected/active/hover fills from the normal branch.
+2. In the normal branch, selected+active has **active fill** (later declaration) and weight `700` from selected.
+3. The normal `:hover` selector has greater specificity than base selected/active declarations; while pointer-hovered, **hover fill wins**, including over keyboard-active or selected fill. Selected weight remains `700`.
+4. Readonly adds a full-width `1px` line at top `50%`, translated `-50%`, z-index `-1` inside a relative z-index-0 row. Content has a mask pseudo-element inset `-4px`, z-index `-1`; it covers the line beneath the label. Cursor becomes auto. No pointer-event blocking is authored for readonly alone.
 
-- Use the primary visible part named in `Structure / Anatomy` as the main Figma frame, and keep purely behavioral wrappers such as hidden inputs, triggers, portals, or state containers outside the exported component set.
-- Apply fills, strokes, radius, and effects to the same layer identified in the anatomy table instead of redistributing those values across extra wrapper frames.
-- Keep slot content, consumer-provided copy, and arbitrary child content detached unless the README already defines them as explicit Figma properties.
-- If clipping, effect placement, or delegated styling is unresolved in source, preserve that uncertainty in the notes instead of inventing extra Figma variants.
+## Slots, Events and model flow
 
-## Gaps / Assumptions
+| Component / contract         | Payload / scope                   | Actual behavior                                                                                                                                 |
+| ---------------------------- | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| NvSelect `optionAfter` slot  | `{ option, hover }`               | Consumer trailing row content; hover is NvOption's `useElementHover` state. No Select default/reference/fallback forwarding contract.           |
+| NvSelect `update:modelValue` | scalar value or updated array     | Single emits value then clears search, deactivates focus trap and closes; multiple toggles value without automatically clearing search/closing. |
+| NvOption default slot        | no scope                          | Row label/content.                                                                                                                              |
+| NvOption `after` slot        | `{ hover }`                       | Always renders after wrapper; content consumer-defined.                                                                                         |
+| NvOption native listeners    | normal DOM events via fallthrough | No declared select/change event or model.                                                                                                       |
 
-| Item                          | Status         | Notes                                                                               |
-| ----------------------------- | -------------- | ----------------------------------------------------------------------------------- |
-| `labelKey` story arg          | Found mismatch | Story passes `labelKey`, but there is no such prop in `select.shared.ts`.           |
-| Option radius / separators    | Not found      | Rows use fills only; no local border or radius tokens.                              |
-| Invalid / error trigger state | Unsupported    | No local styling for validation state.                                              |
-| Disabled whole-select state   | Unsupported    | Option-level disabled exists; trigger-level disabled is not defined in this folder. |
+Clicking trigger or focusing input activates focus trap. It allows outside clicks, prevents scroll and does not restore focus on deactivate. Local `hasFocus=true` opens popup; `blurInput` clears search, deactivates and hides it. Outside pointer/focus/interact events invoke blur; Escape and Tab key hooks invoke blur, without a local `preventDefault` in that handler. Autocomplete's default `selectOnTab=false` is not overridden. Group headers are not selected by Select's pointer or keyboard callbacks because those only check `!item.children`. Tag close toggles its option; tag mousedown blurs first and click is stopped, so chip close can close the popup despite the general multiple selection flow.
+
+Fuse keys are `label`, `category`, `searchValue`, threshold `0.3`, `shouldSort=false`. No search returns all flattened rows; search retains original option order and includes a header only when a child result matches. Unfocused single `inputValue` is the selected option label or search; focused/multiple uses search. Auto-scroll is the minimum matching index over selected values; `findIndex=-1` is not filtered out (only undefined is removed), and an empty multiple selection yields a falsy value rather than a valid numeric index.
+
+## Existing implementation quirks / reconstruction caveats
+
+- **Disabled keyboard selection:** disabled CSS prevents pointer events, but Autocomplete highlights disabled rows and Select's keyboard callback does not check `item.disabled`. Enter can emit a disabled option's value. Do not describe disabled as unselectable in all input modes.
+- **Falsy selected appearance:** row `selected` receives `.find(...)`'s returned value, not a Boolean match. Selected `0`, `false`, `''`, `null` or `undefined` can lack selected styling. Boolean values are included in TS but not runtime prop constructors.
+- **Readonly mismatch:** exported `Option.readonly` is not used by normal row bindings. Only truthy `children` marks a normal group header readonly; handlers guard children, not readonly. Standalone readonly styling itself does not prevent native handlers.
+- **Multiple model precondition:** there is no undefined-to-array normalization. `.map`, `.length` and spread expect an array; undefined/null/non-array multiple models can fail. Initialize `[]` and update the controlled model from the event.
+- **Identity quirks:** row selected comparisons/generated ids/chip keys use truthy `get(...) || value` fallbacks; selectedOptions and toggle matching use Lodash's default-value form instead. Falsy path values and UUID-generated ids can therefore behave differently. Invalid selection indices and an empty keyboard result can emit undefined from Autocomplete; Select dereferences `item.children` without an undefined guard.
+- **Native input binding caveat:** template passes `modelValue` and listens for `update:modelValue` on `StSelectInput`, which is a styled native `input`; there is no authored native `@input` handler or explicit `value` binding here. Source alone does not prove the intended displayed-label/search update wiring works in a browser. Do not treat the computed search/label values as a browser-verified contract.
+- Imported Element Plus option CSS does not make these rows `ElOption`; they are styled divs. No vendor option padding, focus ring, ARIA roles, selected checkmark or whole-select disabled appearance is inferred. No row tab index/keyboard handler or local ARIA selection semantics is authored by NvOption.
+
+## Token Mapping / Recommended Figma Mapping
+
+Trigger geometry resolves from `spacing[6/7/8]=24/32/40`, input heights `spacing[5/6/7]=16/24/32`, vertical padding `spacing[2]=4`, horizontal reserves via the shared icon-padding helper, radii `sm/md/DEFAULT=6/8/8`, type `fontSize[1/2]=12/14`, wrapper offsets `-borderWidth.DEFAULT=-1` and chips `-spacing[4]=-12`. NvIcon keys `3/5/5` resolve through **fontSize**, not spacing: `16/24/24px`. Border/focus spread are `borderWidth.DEFAULT/lg=1/4`.
+
+Use Trigger `Size`, `Theme`, local `State=rest/hover/focus`, and `Mode=single/multiple`; preserve growing height and the actual nested defaults instead of propagating trigger size. Build Option separately with active/selected/disabled/readonly controls and compound precedence above, consumer after slot, clipping and masked readonly separator. Reproduce existing model/appearance quirks as caveats, not idealized additional supported variants. Keep popup clipping/shadow on the shell, scroll viewport separate, and chips on a wrapping 4px-gap row with the actual -12px offset.

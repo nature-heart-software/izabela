@@ -77,12 +77,19 @@ Purpose: container surface for display content with size-based padding and a `de
 | `Theme`        | variant               | `light`, `dark`          | Theme-dependent background values |
 | `Content`      | slot / nested content | freeform                 | Default slot in `NvCard.vue`      |
 
+## Layout, Typography And Effects Context
+
+- `card.shared.ts:6–15` declares exactly `size` and `variant`; `NvCard.vue:1–12` renders one `StCard` and one default slot. There is no header/title/footer/icon/action anatomy, named slot or interactive behavior. Consumer attrs/classes/styles can still override the shell.
+- Root is a block div by default (`card.styled.ts:24–38`), not a flex/stack layout. No width/height/min/max dimensions, margin, gap, internal alignment or border is declared; normal block sizing follows parent/content. Padding applies on all four sides. Radius **stays `borderRadius.DEFAULT = .5rem` (8px at a 16px document root) at xs, sm and md**; sizes only change padding.
+- The `//overflow: hidden;` line is commented out, not an active clipping rule. Pinned `vue3-styled-components@1.2.1` `src/models/ComponentStyle.js:24–32` strips `//` comment lines before generating CSS. Default overflow is visible; the rounded background does not clip children. There is no blur/backdrop-filter, focus outline, transition or whole-card opacity rule. Transparent mode changes **fill alpha .95**, not the opacity of card or children (element opacity remains 1 absent consumer overrides).
+- `boxShadow.DEFAULT` is the exact string `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` for every size/variant/theme. Preserve `.063rem` rather than rounding it to a presumed 1px. Rem geometry scales with document root size; pixel labels throughout this README assume 16px root. Shared Tailwind preflight applies border-box sizing when package global styles are loaded.
+- Root explicitly sets **font-size 0**. Raw text/default-story interpolation can therefore have zero-sized glyphs; a child merely inheriting font-size is not restored automatically. An NvText or another child with explicit font-size establishes its own text style. Do not claim arbitrary slot children have a fixed font or visible text size.
+- Root does not declare font-family, line-height, weight, letter-spacing, transform, decoration, text-align or foreground. Package Tailwind preflight plus `packages/ui/tailwind.config.cjs` supplies the sans stack `Nunito, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"` and default root line-height 1.5; parent context can replace them. Color is the nearest ancestor/native context, not `theme.text.color` unless such a parent/child explicitly uses it. Weight/spacing default normal, no transform/decoration and start alignment apply absent ancestor overrides; no icon styling is imposed. This inheritance is intentionally not assigned a fake light/dark Card foreground.
+- Storybook's provider in `packages/ui/.storybook/preview.js` supplies dark theme as demo context, not a default Card theme prop. The story exposes size and raw content; source additionally supports transparent variant.
+
 ## Figma Build Notes
 
-- Use the primary visible part named in `Structure / Anatomy` as the main Figma frame, and keep purely behavioral wrappers such as hidden inputs, triggers, portals, or state containers outside the exported component set.
-- Apply fills, strokes, radius, and effects to the same layer identified in the anatomy table instead of redistributing those values across extra wrapper frames.
-- Keep slot content, consumer-provided copy, and arbitrary child content detached unless the README already defines them as explicit Figma properties.
-- If clipping, effect placement, or delegated styling is unresolved in source, preserve that uncertainty in the notes instead of inventing extra Figma variants.
+Use one block surface frame with four-sided padding and fixed 8px radius across sizes. Apply the fill and shadow to that frame; keep content freeform, without inventing a stack direction/gap or clip. Keep `.95` on transparent fill only. Explicitly set typography on visible nested content rather than inheriting root font-size 0. No interactive state, fixed height, icon or semantic region should be inferred from generic Card conventions.
 
 ## Gaps / Assumptions
 

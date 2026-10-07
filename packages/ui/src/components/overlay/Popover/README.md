@@ -1,104 +1,123 @@
 # NvPopover Design Spec
 
-Purpose: anchored popover surface rendered in a portal with selectable content padding size.
+Purpose: an anchored Ark popover with a nested Card surface and a custom pointer shield. This documents baseline `3390fc0378a7f6e055d4cd4804d765599b4adeb6`; inactive styling is not promoted to current output.
 
-Source files used:
+## Source Evidence
 
-- `NvPopover.vue`
-- `popover.shared.ts`
-- `popover.styled.ts`
-- `popover.stories.ts`
-- `@/utils/css-in-js.ts`
-- `@/themes/light.ts`
-- `@/themes/dark.ts`
-- `@/styles/tokens`
-- `packages/design-tokens/src/main.ts`
-- `@/components/display/Card/*`
+- [NvPopover.vue](./NvPopover.vue), lines 2–43 and 57–60: local state, positioning, portal, shield, slots, nested Card.
+- [popover.shared.ts](./popover.shared.ts), lines 4–16: public axes; [popover.styled.ts](./popover.styled.ts), lines 13–38: conditional injected selector.
+- [Card shared props](../../display/Card/card.shared.ts), lines 3–15, and [Card styles](../../display/Card/card.styled.ts), lines 10–37: actual surface.
+- [CSS helpers](../../../utils/css-in-js.ts), lines 40–85; [tokens](../../../../../design-tokens/src/main.ts); [light](../../../themes/light.ts) and [dark](../../../themes/dark.ts) themes.
+- [Shared Vue transitions](../../../styles/main.scss), lines 5–13, imported through [styles index](../../../styles/index.ts) / [UI entry](../../../main.ts); [story](./popover.stories.ts).
+- Pinned dependency evidence: `@ark-ui/vue@3.11.0/dist/components/popover/use-popover.js`, lines 13–30; `popover-content.vue.js`, lines 9–22; `@zag-js/popover@0.65.1/src/popover.machine.ts`, lines 18–29, 134–207, 231–249; `@floating-ui/vue@0.2.1/src/types.d.ts`, lines 1–5: re-export of the placement/configuration types used by local props. Versions are pinned in repository `package-lock.json`. Installed vendor files are under `../audit-tools/node_modules` relative to the repository root.
+- Default host retention evidence: `@ark-ui/vue@3.11.0/dist/components/popover/popover-root.vue.js`, lines 21–22 and 38–40; `popover-positioner.vue.js`, lines 15–29; `dist/components/presence/use-presence.js`, lines 32–39.
+- Positioner evidence: `@zag-js/popover@0.65.1/src/popover.connect.ts`, lines 15–18 and 85–91; `@zag-js/popper@0.65.1/src/get-styles.ts`, lines 16–54: floating-layer geometry, separate from Card sizing.
 
 ## Component Axes
 
-| Property           | Kind     | Values                               | Default                  | Notes                                                                    |
-| ------------------ | -------- | ------------------------------------ | ------------------------ | ------------------------------------------------------------------------ |
-| `placement`        | enum     | `ComputePositionConfig['placement']` | `'bottom-end'`           | Forwarded into Ark positioning config.                                   |
-| `size`             | enum     | `sm, md, lg`                         | `md`                     | Controls surface padding and radius theme name (`popover-${size}`).      |
-| `reference`        | slot     | content                              | required to open from UI | Rendered inside `Popover.Trigger`.                                       |
-| Default slot       | slot     | content                              | optional                 | Rendered inside nested `NvCard`.                                         |
-| Open state         | behavior | `true, false`                        | local only               | Internal `ref(false)`; no public `open` prop.                            |
-| Modal click shield | behavior | `true`                               | `true`                   | Fixed full-screen div is shown while open and intercepts pointer events. |
+| Property     | Kind                               | Values                                                                                                                                       | Default      | Notes                                                                                                 |
+| ------------ | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ----------------------------------------------------------------------------------------------------- |
+| `placement`  | String, Floating UI placement type | `top`, `top-start`, `top-end`, `right`, `right-start`, `right-end`, `bottom`, `bottom-start`, `bottom-end`, `left`, `left-start`, `left-end` | `bottom-end` | Requested placement; automatic flip is enabled. Imported config property is optional at the TS level. |
+| `size`       | String union                       | `sm`, `md`, `lg`                                                                                                                             | `md`         | Passed directly to Card; Card supports only `xs`, `sm`, `md`, so `lg` uses base fallback padding.     |
+| `reference`  | Named slot                         | Trigger content                                                                                                                              | Empty        | Rendered inside `Popover.Trigger asChild`; appearance belongs to consumer.                            |
+| Default slot | Content                            | Consumer content                                                                                                                             | Empty        | Inside Card; no dedicated content prop.                                                               |
+| Open state   | Internal behavior                  | Open / closed                                                                                                                                | `ref(false)` | Root `v-model:open` updates local state; no declared public `open` prop or component emit.            |
 
-## Size Specification
+`autoFocus=false`, `portalled` and Root `asChild` are explicit internal settings, not public axes. There is no local variant, disabled, loading, arrow, title or footer prop/slot. Undeclared fallthrough attributes are not a documented public Ark configuration API.
 
-| Size | Height         | Min width | Max width | Padding X | Padding Y | Gap       | Radius | Border width | Typography | Icon size | Notes                                                                                                     |
-| ---- | -------------- | --------- | --------- | --------- | --------- | --------- | ------ | ------------ | ---------- | --------- | --------------------------------------------------------------------------------------------------------- |
-| `sm` | content-driven | Not found | `300px`   | `8px`     | `8px`     | Not found | `6px`  | `1px`        | Not found  | N/A       | Surface is a nested `NvCard` with additional popover theme styles applied by `[data-theme="popover-sm"]`. |
-| `md` | content-driven | Not found | `300px`   | `16px`    | `16px`    | Not found | `8px`  | `1px`        | Not found  | N/A       | Default size.                                                                                             |
-| `lg` | content-driven | Not found | `300px`   | `16px`    | `16px`    | Not found | `8px`  | `1px`        | Not found  | N/A       | `lg` currently matches `md` for documented local padding and radius.                                      |
+## Size Specification — Actual Card Surface
 
-## Variant And State Styles
+| Popover size   | Height / width                               | Padding on all sides                | Radius                       | Stroke             | Shadow              | Typography                   |
+| -------------- | -------------------------------------------- | ----------------------------------- | ---------------------------- | ------------------ | ------------------- | ---------------------------- |
+| `sm`           | Content-driven; inline `max-width: rem(300)` | `spacing.3 = 8px`                   | `borderRadius.DEFAULT = 8px` | No border declared | `boxShadow.DEFAULT` | Card declares `font-size: 0` |
+| `md` (default) | Same                                         | `spacing.5 = 16px`                  | 8px                          | No border declared | Same                | Same                         |
+| `lg`           | Same                                         | **`spacing.3 = 8px` base fallback** | 8px                          | No border declared | Same                | Same                         |
 
-| Theme | Variant | State     | Text color | Icon color | Background / fill                                                   | Border / stroke                                                     | Shadow / effects                                            | Radius | Opacity      | Notes                                                              |
-| ----- | ------- | --------- | ---------- | ---------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ----------------------------------------------------------- | ------ | ------------ | ------------------------------------------------------------------ |
-| light | `sm`    | rest/open | Not found  | N/A        | `theme.popover.backgroundColor` -> `colors.white` (`#ffffff`)       | `1px` / `theme.popover.borderColor` -> `colors.gray.20` (`#EBEBEB`) | `boxShadow.lg` -> `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | `6px`  | `1`          | No separate hover/focus/active surface styles defined.             |
-| light | `md`    | rest/open | Not found  | N/A        | `theme.popover.backgroundColor` -> `colors.white` (`#ffffff`)       | `1px` / `theme.popover.borderColor` -> `colors.gray.20` (`#EBEBEB`) | `boxShadow.lg` -> `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | `8px`  | `1`          | Default size.                                                      |
-| light | `lg`    | rest/open | Not found  | N/A        | `theme.popover.backgroundColor` -> `colors.white` (`#ffffff`)       | `1px` / `theme.popover.borderColor` -> `colors.gray.20` (`#EBEBEB`) | `boxShadow.lg` -> `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | `8px`  | `1`          | `lg` shares local surface styling with `md` except the theme name. |
-| dark  | `sm`    | rest/open | Not found  | N/A        | `theme.popover.backgroundColor` -> `darken(0.0675, colors.gray.80)` | `1px` / `theme.popover.borderColor` -> `colors.gray.80` (`#444444`) | `boxShadow.lg` -> `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | `6px`  | `1`          | Dark background is computed in theme code.                         |
-| dark  | `md`    | rest/open | Not found  | N/A        | `theme.popover.backgroundColor` -> `darken(0.0675, colors.gray.80)` | `1px` / `theme.popover.borderColor` -> `colors.gray.80` (`#444444`) | `boxShadow.lg` -> `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | `8px`  | `1`          | Default size.                                                      |
-| dark  | `lg`    | rest/open | Not found  | N/A        | `theme.popover.backgroundColor` -> `darken(0.0675, colors.gray.80)` | `1px` / `theme.popover.borderColor` -> `colors.gray.80` (`#444444`) | `boxShadow.lg` -> `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | `8px`  | `1`          | `lg` shares local surface styling with `md` except the theme name. |
-| light | any     | closed    | N/A        | N/A        | N/A                                                                 | none                                                                | N/A                                                         | N/A    | `0` / hidden | Card is gated by `v-if="open"`.                                    |
-| dark  | any     | closed    | N/A        | N/A        | N/A                                                                 | none                                                                | N/A                                                         | N/A    | `0` / hidden | Card is gated by `v-if="open"`.                                    |
+The `lg` value is accepted by Popover's union but absent from Card's size-style record: lookup returns undefined, leaving the Card base 8px padding. It is **not** a 16px duplicate of `md`. The Card has no min-width, fixed width, fixed height, content gap or layout direction. The separate Ark Positioner has vendor `min-width: max-content`; do not confuse this floating-layer minimum with a numeric Card minimum. Token `rem()` equivalents assume a 16px root. Card does not clip content: its `overflow: hidden` line is commented out. Children must supply usable text styles; raw inherited text is not guaranteed to display because the Card sets font-size 0. Story supplies `NvText`, but arbitrary slot content has no fixed typography, dimensions or icon size.
+
+## Variant And State Styles — Active Baseline
+
+| Theme | State / part         | Fill                                                             | Text / icon                     | Stroke        | Effects                                                                                          |
+| ----- | -------------------- | ---------------------------------------------------------------- | ------------------------------- | ------------- | ------------------------------------------------------------------------------------------------ |
+| Light | Open Card, all sizes | `theme.card.backgroundColor = colors.white = #ffffff`            | Child-defined; Card font-size 0 | None declared | 8px radius; `boxShadow.DEFAULT`                                                                  |
+| Dark  | Open Card, all sizes | `theme.card.backgroundColor = darken(0.0675, gray.80) = #333`    | Child-defined; Card font-size 0 | None declared | Same                                                                                             |
+| Both  | Pointer shield open  | No fill declared                                                 | N/A                             | None          | Fixed inset 0, pointer-events auto, z-index 9999; transparent interaction layer, not a dim scrim |
+| Both  | Closed               | Card removed after leave transition; shield hidden with `v-show` | N/A                             | N/A           | No local alternate closed skin                                                                   |
+| Both  | Enter / leave Card   | Same fill                                                        | Same                            | Same          | Shared 300ms fade, detailed below                                                                |
+
+`boxShadow.DEFAULT = 0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)`; no spread specified. There is no local hover/focus/active/selected/disabled/loading surface appearance or focus ring. Child components may provide their own states.
+
+## Inactive / Conditional Styling — Not Current Surface Output
+
+`StPopover` calls `injectGlobal` for `[data-theme="popover-${props.size}"]`. **No such attribute is attached to the Root, Positioner, Content or Card in `NvPopover.vue`.** Ark's Content implementation does not supply this custom theme name. These rules only affect an element that some other code explicitly gives the matching attribute; injecting a rule is not attaching its selector.
+
+| Selector / rule               | Conditional value                                                                                                  | Current baseline status                                                                        |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| `popover-sm` padding / radius | Helper `paddingStyleBySize('sm')` = 8px; `borderRadius.sm` = 6px                                                   | Inactive; actual Card radius is 8px                                                            |
+| `popover-md` padding / radius | Helper padding = 16px; `borderRadius.md` = 8px                                                                     | Inactive                                                                                       |
+| `popover-lg` padding / radius | Helper padding = 16px; `borderRadius.DEFAULT` = 8px                                                                | Inactive; actual `lg` Card fallback padding is 8px                                             |
+| Theme fill                    | `theme.popover.backgroundColor`: light `#ffffff`, dark `#333`                                                      | Inactive; actual owner is `theme.card.backgroundColor`                                         |
+| Border color / width          | `theme.popover.borderColor`: light `gray.20 #EBEBEB`, dark `gray.80 #444444`, important; `borderWidth.DEFAULT=1px` | Inactive; no visible popover stroke established; selector does not declare border-style either |
+| Shadow                        | `boxShadow.lg`, important, same current literal as DEFAULT                                                         | Inactive; actual owner is Card `boxShadow.DEFAULT`                                             |
+
+Matching fill/shadow literals do not make their token ownership interchangeable. Do not apply this table to Figma's baseline component.
 
 ## Structure / Anatomy
 
-| Part         | Source of truth                      | Visual role                          | Relevant styling                                                          | Export note                                                  |
-| ------------ | ------------------------------------ | ------------------------------------ | ------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| Root         | `Popover.Root`                       | Open state and positioning context   | `autoFocus=false`, `portalled`, `asChild`                                 | Non-visual wrapper.                                          |
-| Trigger      | `Popover.Trigger` + `reference` slot | Anchor element                       | No local visual styling                                                   | Model separately from surface.                               |
-| Click shield | fixed `div` in teleport              | Intercepts pointer events while open | Full-screen fixed layer, `z-index: 9999`                                  | Include as invisible interaction layer if modeling behavior. |
-| Positioner   | `Popover.Positioner`                 | Anchored placement container         | `z-index: 9999`                                                           | Non-visual position frame.                                   |
-| Content      | `Popover.Content`                    | Popover content host                 | Always present while mounted; child card handles visible surface          | Non-visual shell unless exporting behavior details.          |
-| Surface      | nested `NvCard`                      | Visible popover panel                | `max-width: 300px`, size-driven padding/radius theme, token border/shadow | Primary Figma export target.                                 |
-| Body content | default slot                         | Consumer-defined content             | No local typography or layout rules                                       | Treat as content slot region.                                |
+| Part                   | Source                                                                 | Role                                                                                                                                                                                                                                        |
+| ---------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ark Root + `StPopover` | Root `asChild`, styled div                                             | State/context wrapper; styled div has no direct visual box-model rules.                                                                                                                                                                     |
+| Trigger                | `reference` slot, Trigger `asChild`                                    | Consumer reference anchor.                                                                                                                                                                                                                  |
+| Teleport               | Injected `PORTAL_TARGET` resolved via `getElement`, otherwise `'body'` | Actual DOM ancestry can differ from component ancestry.                                                                                                                                                                                     |
+| Pointer shield         | Fixed full-screen div, `v-show="open"`                                 | Stops/prevents click, mouseup and mousedown; no explicit close handler.                                                                                                                                                                     |
+| Positioner             | Ark Positioner                                                         | Vendor `position:absolute`, `isolation:isolate`, `min-width:max-content`, `top:0px`, `left:0px`; transform described below. Local inline z-index 9999 overrides vendor `var(--z-index)`. No same-width or fit-viewport sizing is requested. |
+| Content                | Ark Content `:hidden="false"`                                          | Default retained semantic host with local hidden=false override; visible Card is `v-if="open"`. No custom data-theme is added.                                                                                                              |
+| Card + default slot    | Card default variant, explicit size and max width                      | The sole panel surface. No explicit Arrow, Title, Description or CloseTrigger is rendered.                                                                                                                                                  |
+
+## Interaction And Motion
+
+| Concern           | Proven source behavior                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Positioning       | `flip: true`, `overflowPadding: spacing.3 = 8px`, `offset.mainAxis: spacing.4 = 12px`. Positioner uses `translate3d(var(--x), var(--y), 0)` when current placement exists; before placement, `translate3d(0, -100vh, 0)` moves it off-screen. Its minimum is `max-content`, not a fixed pixel width; Card still has its independent 18.75rem maximum. Placement may change near boundaries; do not promise bottom-end is always the resulting side. |
+| Focus on open     | Explicit `autoFocus=false` overrides Zag's true default; no initial focus move is requested.                                                                                                                                                                                                                                                                                                                                                        |
+| Keyboard modality | Zag `modal=false` default is unchanged. Thus modal-only focus trapping, body-scroll prevention and hiding other content are **not** enabled by this component. Nonmodal portalled tab-focus proxying is in the pinned machine.                                                                                                                                                                                                                      |
+| Dismissal         | Pinned Zag defaults `closeOnEscape=true`, `closeOnInteractOutside=true`; outside pointer/focus interaction is tracked and trigger excluded. Root `v-model` receives the Ark `update:open` event internally.                                                                                                                                                                                                                                         |
+| Custom shield     | Pointer-blocking div is separate from keyboard-modal behavior. Its stop/prevent handlers do not themselves set `open=false`. Do not equate it to Ark `modal=true` or promise exact outside-click event ordering.                                                                                                                                                                                                                                    |
+| Focus after close | Zag conditionally restores trigger focus based on the dismissal event's `restoreFocus` flag; outside interaction sets it based on focusable/contextmenu status. This is not unconditional focus restoration.                                                                                                                                                                                                                                        |
+| Shared Vue fade   | Unnamed Transition around `Card v-if="open"` uses `.v-enter-active/.v-leave-active { transition: all 0.3s }` and `.v-enter-from/.v-leave-to { opacity: 0 }` from `styles/main.scss`. This is hard-coded shared 300ms motion, **not** a local `tokens.motion` lookup. Shield is outside that Transition.                                                                                                                                             |
+
+Inherited defaults were verified against pinned Ark/Zag source, not inferred from modern documentation. They describe the state-machine contract; exact shield/capture ordering and focus behavior were not browser-tested. Pinned Ark defaults `lazyMount=false` and `unmountOnExit=false` retain Positioner and Content while closed; the local `:hidden="false"` overrides the semantic host hidden attribute, while Card uses its own `v-if` leave. This is the default host lifecycle, not a promise under explicit caller render-strategy/CSS overrides.
 
 ## Token Mapping
 
-| Concern                  | Token                                                            | Resolved value                            | Where used                         |
-| ------------------------ | ---------------------------------------------------------------- | ----------------------------------------- | ---------------------------------- |
-| Placement offset         | `tokens.spacing.4`                                               | `12px`                                    | Floating `mainAxis` offset         |
-| Overflow padding         | `tokens.spacing.3`                                               | `8px`                                     | Floating viewport overflow padding |
-| Surface shadow           | `tokens.boxShadow.lg`                                            | `0 0.125rem 0.063rem rgba(0, 0, 0, 0.05)` | Popover surface box shadow         |
-| Surface border width     | `tokens.borderWidth.DEFAULT`                                     | `1px`                                     | Popover surface border width       |
-| `sm` padding             | `paddingStyleBySize('sm')` -> `tokens.spacing.3`                 | `8px` on all sides                        | `size="sm"` surface padding        |
-| `md` padding             | `paddingStyleBySize('md')` -> `tokens.spacing.5`                 | `16px` on all sides                       | `size="md"` surface padding        |
-| `lg` padding             | `paddingStyleBySize('lg')` -> `tokens.spacing.5`                 | `16px` on all sides                       | `size="lg"` surface padding        |
-| `sm` radius              | `borderRadiusStyleBySize('sm')` -> `tokens.borderRadius.sm`      | `6px`                                     | `size="sm"` surface radius         |
-| `md` radius              | `borderRadiusStyleBySize('md')` -> `tokens.borderRadius.md`      | `8px`                                     | `size="md"` surface radius         |
-| `lg` radius              | `borderRadiusStyleBySize('lg')` -> `tokens.borderRadius.DEFAULT` | `8px`                                     | `size="lg"` surface radius         |
-| Light surface background | `theme.popover.backgroundColor`                                  | `colors.white` (`#ffffff`)                | Light theme surface fill           |
-| Light surface border     | `theme.popover.borderColor`                                      | `colors.gray.20` (`#EBEBEB`)              | Light theme border                 |
-| Dark surface background  | `theme.popover.backgroundColor`                                  | `darken(0.0675, colors.gray.80)`          | Dark theme surface fill            |
-| Dark surface border      | `theme.popover.borderColor`                                      | `colors.gray.80` (`#444444`)              | Dark theme border                  |
+| Concern               | Active owner                        | Value                              |
+| --------------------- | ----------------------------------- | ---------------------------------- |
+| Card padding          | `spacing.3` / `.5`                  | `sm/md/lg` = **8/16/8px**          |
+| Card radius           | `borderRadius.DEFAULT`              | 8px, all sizes                     |
+| Card fill             | `theme.card.backgroundColor`        | Light #ffffff / dark #333          |
+| Card shadow           | `boxShadow.DEFAULT`                 | Exact literal in state table       |
+| Max width             | Hard-coded `rem(300)`               | 18.75rem; 300px at 16px root       |
+| Placement clearance   | `spacing.4` / `.3`                  | 12px offset / 8px overflow padding |
+| Fade / shield z-index | Shared CSS literal / inline literal | 0.3s / 9999                        |
 
 ## Recommended Figma Mapping
 
-| Figma property | Type                           | Suggested values                      | Derived from                 |
-| -------------- | ------------------------------ | ------------------------------------- | ---------------------------- |
-| `Theme`        | Variant                        | `light, dark`                         | Theme object branches        |
-| `Size`         | Variant                        | `sm, md, lg`                          | `size` prop                  |
-| `State`        | Variant                        | `open, closed`                        | Internal `open` state        |
-| `Placement`    | Variant or documentation field | `top, top-start, top-end, right, ...` | `placement` prop passthrough |
+| Property            | Values                      | Notes                                                                                            |
+| ------------------- | --------------------------- | ------------------------------------------------------------------------------------------------ |
+| Theme               | Light / dark                | Active Card fill, not inactive popover selector                                                  |
+| Size                | sm / md / lg                | Padding 8 / 16 / 8px; constant radius                                                            |
+| Visibility          | Open / closed               | Card presence and shared fade                                                                    |
+| Requested placement | All 12 values in axes table | Annotate floating-layer max-content minimum and transform; flip makes final placement contextual |
+| Body content        | Instance/content region     | No fixed text or icon contract                                                                   |
 
 ## Figma Build Notes
 
-- Use the primary visible part named in `Structure / Anatomy` as the main Figma frame, and keep purely behavioral wrappers such as hidden inputs, triggers, portals, or state containers outside the exported component set.
-- Apply fills, strokes, radius, and effects to the same layer identified in the anatomy table instead of redistributing those values across extra wrapper frames.
-- Keep slot content, consumer-provided copy, and arbitrary child content detached unless the README already defines them as explicit Figma properties.
-- If clipping, effect placement, or delegated styling is unresolved in source, preserve that uncertainty in the notes instead of inventing extra Figma variants.
+- Build a content-sized Card capped at 18.75rem with no Card min-width, no stroke, 8px corners and the actual shadow. Represent the outer Positioner separately with its `max-content` minimum rather than inventing a fixed panel width. Keep `lg` as the evidenced fallback, not an invented larger panel.
+- Keep anchor, invisible shield and positioner outside the visible panel. Do not draw a dark backdrop or a keyboard-modal layer.
+- Keep child text/components detached; require explicit typography rather than assuming a bubble text style.
 
 ## Gaps / Assumptions
 
-| Topic                            | Status             | Notes                                                                                                                          |
-| -------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
-| Typography                       | Not found          | This folder does not define any text styles for popover contents.                                                              |
-| Min width                        | Not found          | Only `max-width: 300px` is specified locally.                                                                                  |
-| Size delta between `md` and `lg` | Confirmed limited  | In this folder, `md` and `lg` resolve to the same local padding and radius values.                                             |
-| Dismiss behavior details         | Partially implicit | The component uses Ark Popover plus a full-screen click shield, but close-on-outside-click specifics are not restated locally. |
+- `lg` mismatches Card's supported type/size record; the fallback is source truth, not a fix made here.
+- Story's `content` control is not a declared prop; body content is the default slot.
+- No browser measurement, exact shield-dismiss ordering or arbitrary slot geometry is claimed. Inactive selectors remain documented separately and no app changes are proposed.

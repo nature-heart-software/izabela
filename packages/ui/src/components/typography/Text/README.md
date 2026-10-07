@@ -1,94 +1,62 @@
 # NvText Design Spec
 
-- Purpose: render theme-aware body and heading-style text with a small set of semantic `type` variants.
-- Source files used: `NvText.vue`, `text.shared.ts`, `text.styled.ts`, `text.stories.ts`
+Theme-aware text wrapper with six type styles. Source: [NvText.vue](./NvText.vue), [props](./text.shared.ts), [styles](./text.styled.ts), [story](./text.stories.ts), [typography helper](../../../utils/css-in-js.ts).
 
 ## Component Axes
 
-| Property        | Kind                    | Values                                                        | Default   | Notes                                                                  |
-| --------------- | ----------------------- | ------------------------------------------------------------- | --------- | ---------------------------------------------------------------------- |
-| `type`          | enum                    | `caption`, `label`, `body-small`, `body`, `subtitle`, `title` | `body`    | Primary visual variant axis.                                           |
-| `as`            | element selector        | Any HTML tag string                                           | `div`     | When `as="span"`, the component adds `display: inline-flex`.           |
-| `align`         | text alignment          | CSS `text-align` values                                       | `''`      | Empty string means no explicit alignment style is emitted.             |
-| `size`          | numeric token key       | `1`-`16` in Storybook                                         | `2`       | Exposed as a prop and story control, but not used in `text.styled.ts`. |
-| content mode    | slot                    | Arbitrary inline / text content                               | Not found | Default slot only.                                                     |
-| link decoration | embedded child selector | `a` descendants                                               | Not found | Nested anchors get an underline block via `::before`.                  |
+| Property | Values                                                        | Default             | Actual behavior                                                                                                                                 |
+| -------- | ------------------------------------------------------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type`   | `caption`, `label`, `body-small`, `body`, `subtitle`, `title` | `body`              | Complete typography matrix below.                                                                                                               |
+| `size`   | Font token keys `1`–`16`                                      | `2`                 | Declared and shown in Storybook, but **unused by component styling**. Changing it does not select a font size; do not expose a Figma Size axis. |
+| `as`     | HTML tag string                                               | `div`               | Host tag; exact `span` adds `display:inline-flex`. No semantic tag is automatically selected from `type`.                                       |
+| `align`  | CSS `text-align` value                                        | Empty string `''`   | Truthy value emits `text-align`; empty string emits no declaration, so alignment follows cascade/inheritance. No runtime enumeration validator. |
+| Content  | Unscoped default slot                                         | No fallback content | Consumer text/inline content, including links. No custom emits or exposed methods.                                                              |
 
-## Size Specification
+## Complete Typography Matrix
 
-| Size / Type  | Height | Min width | Padding X | Padding Y | Gap | Radius | Border width | Typography                                                   | Icon size | Notes                                             |
-| ------------ | ------ | --------- | --------- | --------- | --- | ------ | ------------ | ------------------------------------------------------------ | --------- | ------------------------------------------------- |
-| `caption`    | N/A    | N/A       | N/A       | N/A       | N/A | N/A    | N/A          | `tokens.fontSize.1` = 12px / 1.4 / 0.32px                    | N/A       | Caption color override applied.                   |
-| `label`      | N/A    | N/A       | N/A       | N/A       | N/A | N/A    | N/A          | Base typography with `fontWeight: 700`                       | N/A       | Inherits base font size from `tokens.fontSize.2`. |
-| `body-small` | N/A    | N/A       | N/A       | N/A       | N/A | N/A    | N/A          | `tokens.fontSize.1` = 12px / 1.4 / 0.32px                    | N/A       | Same size as caption without caption color.       |
-| `body`       | N/A    | N/A       | N/A       | N/A       | N/A | N/A    | N/A          | `tokens.fontSize.2` = 14px / 1.4 / 0.32px                    | N/A       | Default variant.                                  |
-| `subtitle`   | N/A    | N/A       | N/A       | N/A       | N/A | N/A    | N/A          | `tokens.fontSize.2` = 14px / 1.4 / 0.32px; `fontWeight: 700` | N/A       | Same size as body, heavier weight.                |
-| `title`      | N/A    | N/A       | N/A       | N/A       | N/A | N/A    | N/A          | `tokens.fontSize.4` = 18px / 1.4 / 0.32px; `fontWeight: 700` | N/A       | Largest documented text style in this folder.     |
+All `rem()` values use Polished’s default 16px conversion base. Pixel equivalents below assume a 16px document root; a different root scales rem geometry, not literal px geometry. No fixed container size is implied.
 
-## Variant And State Styles
+All types set the same sans font-family stack and `letter-spacing:0.02rem` (0.32px at a 16px root). Line height is **unitless 1.4**, not 1.4rem. Computed line heights below assume the specified font size and a 16px root.
 
-| Theme | Variant               | State | Text color                                               | Icon color   | Background / fill                                              | Border / stroke | Shadow / effects | Radius | Opacity | Notes                                                                                       |
-| ----- | --------------------- | ----- | -------------------------------------------------------- | ------------ | -------------------------------------------------------------- | --------------- | ---------------- | ------ | ------- | ------------------------------------------------------------------------------------------- |
-| Light | `caption`             | Rest  | `theme.text.captionColor` = `colors.gray.60` (`#818181`) | same as text | None                                                           | none            | None             | N/A    | 1       | Uses caption-specific color.                                                                |
-| Light | `label`               | Rest  | `theme.text.color` = `colors.gray.80` (`#444444`)        | same as text | None                                                           | none            | None             | N/A    | 1       | Weight 700.                                                                                 |
-| Light | `body-small`          | Rest  | `theme.text.color` = `colors.gray.80` (`#444444`)        | same as text | None                                                           | none            | None             | N/A    | 1       | Smaller text size.                                                                          |
-| Light | `body`                | Rest  | `theme.text.color` = `colors.gray.80` (`#444444`)        | same as text | None                                                           | none            | None             | N/A    | 1       | Base text style.                                                                            |
-| Light | `subtitle`            | Rest  | `theme.text.color` = `colors.gray.80` (`#444444`)        | same as text | None                                                           | none            | None             | N/A    | 1       | Weight 700.                                                                                 |
-| Light | `title`               | Rest  | `theme.text.color` = `colors.gray.80` (`#444444`)        | same as text | None                                                           | none            | None             | N/A    | 1       | Weight 700, larger text size.                                                               |
-| Dark  | `caption`             | Rest  | `theme.text.captionColor` = `colors.gray.40` (`#BEBEBE`) | same as text | None                                                           | none            | None             | N/A    | 1       | Uses caption-specific color.                                                                |
-| Dark  | `label`               | Rest  | `theme.text.color` = `colors.gray.30` (`#DCDCDC`)        | same as text | None                                                           | none            | None             | N/A    | 1       | Weight 700.                                                                                 |
-| Dark  | `body-small`          | Rest  | `theme.text.color` = `colors.gray.30` (`#DCDCDC`)        | same as text | None                                                           | none            | None             | N/A    | 1       | Smaller text size.                                                                          |
-| Dark  | `body`                | Rest  | `theme.text.color` = `colors.gray.30` (`#DCDCDC`)        | same as text | None                                                           | none            | None             | N/A    | 1       | Base text style.                                                                            |
-| Dark  | `subtitle`            | Rest  | `theme.text.color` = `colors.gray.30` (`#DCDCDC`)        | same as text | None                                                           | none            | None             | N/A    | 1       | Weight 700.                                                                                 |
-| Dark  | `title`               | Rest  | `theme.text.color` = `colors.gray.30` (`#DCDCDC`)        | same as text | None                                                           | none            | None             | N/A    | 1       | Weight 700, larger text size.                                                               |
-| Light | nested link underline | Rest  | Inherits parent text color                               | same as text | `theme.text.linkUnderlineColor` = `colors.gray.80` (`#444444`) | none            | None             | N/A    | 1       | Underline is an absolutely positioned block `2px` tall placed `-2px` below the anchor text. |
-| Dark  | nested link underline | Rest  | Inherits parent text color                               | same as text | `theme.text.linkUnderlineColor` = `colors.gray.30` (`#DCDCDC`) | none            | None             | N/A    | 1       | Same structure as light theme.                                                              |
+| Type             | Font token        | Emitted font size | At 16px root | Line height | Computed line box | Font weight                   | Color slot                |
+| ---------------- | ----------------- | ----------------- | ------------ | ----------- | ----------------- | ----------------------------- | ------------------------- |
+| `caption`        | `fontSize.1`      | `0.75rem`         | 12px         | 1.4         | 16.8px            | **Inherited**, no declaration | `theme.text.captionColor` |
+| `label`          | Base `fontSize.2` | `0.875rem`        | 14px         | 1.4         | 19.6px            | **700**                       | `theme.text.color`        |
+| `body-small`     | `fontSize.1`      | `0.75rem`         | 12px         | 1.4         | 16.8px            | **Inherited**, no declaration | `theme.text.color`        |
+| `body` (default) | Base `fontSize.2` | `0.875rem`        | **14px**     | 1.4         | 19.6px            | **Inherited**, no declaration | `theme.text.color`        |
+| `subtitle`       | `fontSize.2`      | `0.875rem`        | 14px         | 1.4         | 19.6px            | **700**                       | `theme.text.color`        |
+| `title`          | `fontSize.4`      | `1.125rem`        | 18px         | 1.4         | 25.2px            | **700**                       | `theme.text.color`        |
 
-## Structure / Anatomy
+`defaultTextStyle` sets color, font family, and typography from token 2, **not font weight**. Caption, body-small, and body do not impose regular/400: they follow the applicable cascade and inherited parent weight. For example, under an otherwise unoverridden 700 parent, body remains 700. Label, subtitle, and title explicitly assign 700. An `as` tag’s UA rules or consumer overrides can still affect cascade; no universally fixed inherited numeric weight is promised.
 
-| Part              | Source of truth                 | Visual role                                             | Relevant styling                                                    | Export note                                                                     |
-| ----------------- | ------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| root text element | `NvText.vue` + `text.styled.ts` | Wrapper that carries semantic tag and typography styles | Base color, font family, font size, line height, letter spacing     | Figma base component should expose `Type`, `Theme`, and optional `Align`.       |
-| inline mode       | `text.styled.ts`                | Keeps text inline when rendered as `span`               | `display: inline-flex` only when `as === 'span'`                    | Represent as an optional boolean or note; it does not change typography tokens. |
-| anchor underline  | `text.styled.ts`                | Decorative underline block for descendant links         | `::before`, absolute positioning, 2px height, theme underline color | Model as a nested text style / annotation rather than a separate component.     |
+Font-family CSS: `Nunito, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`. Nunito is the first requested family, not a guarantee that the font is loaded in every consumer. All types share tracking and family; `size` has no effect on this matrix.
 
-## Token Mapping
+## Variant And State Styles / Token Mapping
 
-| Concern                           | Token                           | Resolved value                                                                                                                                                                                             | Where used                                 |
-| --------------------------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| base font family                  | `tokens.fontFamily.sans`        | `Nunito, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"` | `defaultTextStyle`                         |
-| body / label / subtitle base size | `tokens.fontSize.2`             | 14px / 1.4 / 0.32px                                                                                                                                                                                        | `defaultTextStyle`, `subtitle`             |
-| caption and body-small size       | `tokens.fontSize.1`             | 12px / 1.4 / 0.32px                                                                                                                                                                                        | `caption`, `body-small`                    |
-| title size                        | `tokens.fontSize.4`             | 18px / 1.4 / 0.32px                                                                                                                                                                                        | `title`                                    |
-| link underline offset / thickness | `tokens.spacing.1`              | 2px                                                                                                                                                                                                        | Anchor `::before` bottom offset and height |
-| light text color                  | `theme.text.color`              | `colors.gray.80` (`#444444`)                                                                                                                                                                               | All non-caption text in light theme        |
-| dark text color                   | `theme.text.color`              | `colors.gray.30` (`#DCDCDC`)                                                                                                                                                                               | All non-caption text in dark theme         |
-| light caption color               | `theme.text.captionColor`       | `colors.gray.60` (`#818181`)                                                                                                                                                                               | `caption` in light theme                   |
-| dark caption color                | `theme.text.captionColor`       | `colors.gray.40` (`#BEBEBE`)                                                                                                                                                                               | `caption` in dark theme                    |
-| light link underline color        | `theme.text.linkUnderlineColor` | `colors.gray.80` (`#444444`)                                                                                                                                                                               | Nested anchor underline in light theme     |
-| dark link underline color         | `theme.text.linkUnderlineColor` | `colors.gray.30` (`#DCDCDC`)                                                                                                                                                                               | Nested anchor underline in dark theme      |
+| Concern                                                   | Light                        | Dark                         |
+| --------------------------------------------------------- | ---------------------------- | ---------------------------- |
+| Body/label/body-small/subtitle/title `theme.text.color`   | `colors.gray.80` → `#444444` | `colors.gray.30` → `#DCDCDC` |
+| Caption `theme.text.captionColor`                         | `colors.gray.60` → `#818181` | `colors.gray.40` → `#BEBEBE` |
+| Descendant link underline `theme.text.linkUnderlineColor` | `colors.gray.80` → `#444444` | `colors.gray.30` → `#DCDCDC` |
+
+No component fill, border, radius, padding, fixed width/height, opacity, shadow, or icon color is assigned. Text wraps and sizes according to host, content, and consumer constraints. No hover, focus, active, disabled, selected, or link-state overrides are implemented here; absence of custom styling does not remove native link behavior or focus styling.
+
+## Structure / Descendant Links
+
+The styled root carries typography and the selected host tag. `as="span"` uses inline-flex, not ordinary inline text flow; no other tag gets this display override. Consumers own arbitrary slotted children, including their color/font overrides.
+
+Each descendant `a` gets `position:relative`. Its `::before` has `content:''`, `position:absolute`, `left:0`, `right:0`, `bottom:-0.125rem`, `height:0.125rem`, and the link-underline theme color. Offset and thickness use `tokens.spacing.1 = 2`: −2px and 2px respectively at a 16px root. Geometry is measured from the anchor box, not from a guaranteed font baseline. It is a decorative block, not a border/text-decoration or a separate visual state. No clipping or pointer-event override is set on the pseudo-element.
+
+Shared [main.scss](../../../styles/main.scss) additionally makes all anchors `display:inline-flex`; that rule is application/shared CSS context, not a local NvText declaration. Anchor color/weight can follow inheritance or other applicable styles; the NvText selector does not explicitly force them.
 
 ## Recommended Figma Mapping
 
-| Figma property | Type                | Suggested values                                    | Derived from                         |
-| -------------- | ------------------- | --------------------------------------------------- | ------------------------------------ |
-| `Type`         | Variant             | `caption, label, body-small, body, subtitle, title` | `type` prop                          |
-| `Theme`        | Variant             | `light, dark`                                       | Theme text slots in `text.styled.ts` |
-| `Align`        | Variant or property | `default, left, center, right, justify`             | `align` prop                         |
-| `Inline`       | Boolean             | `true, false`                                       | `as === 'span'` special case         |
+Expose Type (all six), Theme, content, and a documented alignment control. Default Type is body/14px at a 16px root. For caption/body-small/body, annotate **inherited weight** and select the preview weight from its actual context instead of defining an intrinsic 400 variant. Keep `size` as an implementation caveat, not a working visual axis. Annotate exact span inline-flex behavior; it is not a generic boolean prop. Model links as nested content with the static underline geometry, without invented hover/focus or hidden-state variants.
 
-## Figma Build Notes
+## Context / Remaining Uncertainties
 
-- Use the primary visible part named in `Structure / Anatomy` as the main Figma frame, and keep purely behavioral wrappers such as hidden inputs, triggers, portals, or state containers outside the exported component set.
-- Apply fills, strokes, radius, and effects to the same layer identified in the anatomy table instead of redistributing those values across extra wrapper frames.
-- Keep slot content, consumer-provided copy, and arbitrary child content detached unless the README already defines them as explicit Figma properties.
-- If clipping, effect placement, or delegated styling is unresolved in source, preserve that uncertainty in the notes instead of inventing extra Figma variants.
+Typography tokens, all six weights, colors, and unused-size behavior are resolved. Actual inherited weight, font availability, host tag/reset rules, alignment, and child overrides depend on the embedding. Link focus/hover appearance outside this component is consumer/native CSS, not a missing local theme value.
 
-## Gaps / Assumptions
+## Supporting Sources
 
-| Item                     | Status      | Notes                                                                              |
-| ------------------------ | ----------- | ---------------------------------------------------------------------------------- |
-| `size` prop behavior     | Ambiguous   | Prop exists and is exposed in Storybook, but `text.styled.ts` never reads it.      |
-| Semantic tag matrix      | Not found   | Any string is accepted for `as`; no constrained list is documented in this folder. |
-| Interactive states       | Unsupported | No hover, focus, active, disabled, or selected text-state styles are defined here. |
-| Link hover/focus styling | Not found   | Only the static underline block is defined for descendant anchors.                 |
+`text.shared.ts:5–31`; `text.styled.ts:10–57`; `css-in-js.ts:16–38`; [design tokens](../../../../../design-tokens/src/main.ts), lines 4–20,51–58,70–86; [light theme](../../../themes/light.ts), [dark theme](../../../themes/dark.ts).

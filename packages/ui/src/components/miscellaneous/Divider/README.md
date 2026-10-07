@@ -1,64 +1,48 @@
 # NvDivider Design Spec
 
-- Purpose: render a 1px separator line in either horizontal or vertical orientation using the theme divider border color.
-- Source files used: `NvDivider.vue`, `divider.shared.ts`, `divider.styled.ts`, `divider.stories.ts`
+An empty separator host, not an interactive component. Source: [NvDivider.vue](./NvDivider.vue), [props](./divider.shared.ts), [styles](./divider.styled.ts), [stories](./divider.stories.ts).
 
 ## Component Axes
 
-| Property    | Kind         | Values                   | Default    | Notes                                                                 |
-| ----------- | ------------ | ------------------------ | ---------- | --------------------------------------------------------------------- |
-| `direction` | enum         | `vertical`, `horizontal` | `vertical` | Changes whether the component renders a right border or a top border. |
-| state       | visual state | Rest only                | Rest       | No interactive states are implemented.                                |
+| Property    | Values                   | Runtime default | Effect                          |
+| ----------- | ------------------------ | --------------- | ------------------------------- |
+| `direction` | `vertical`, `horizontal` | `vertical`      | Right border versus top border. |
+
+The Storybook control starts at `horizontal`; this is a preview choice, not an ambiguous runtime default. The Vertical story supplies `class="h-64"`; that class is consumer sizing, not intrinsic separator length.
 
 ## Size Specification
 
-| Size         | Height                 | Min width | Padding X | Padding Y | Gap | Radius | Border width | Typography | Icon size | Notes                                                                                       |
-| ------------ | ---------------------- | --------- | --------- | --------- | --- | ------ | ------------ | ---------- | --------- | ------------------------------------------------------------------------------------------- |
-| `horizontal` | Parent/content-defined | 0         | 0         | 0         | N/A | N/A    | 1px          | N/A        | N/A       | Uses `border-top`. Width must come from parent layout.                                      |
-| `vertical`   | Parent/content-defined | 0         | 0         | 0         | N/A | N/A    | 1px          | N/A        | N/A       | Uses `border-right`; also sets `display: inline-flex`. Height must come from parent layout. |
+All `rem()` values use Polished’s default 16px conversion base. Pixel equivalents below assume a 16px document root; a different root scales rem geometry, not literal px geometry. No fixed container size is implied.
 
-## Variant And State Styles
+| Orientation          | Emitted border                                | Display                                            | Length / sizing                                                                                                                                           |
+| -------------------- | --------------------------------------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `vertical` (default) | `border-right: 0.0625rem solid <theme color>` | `inline-flex`                                      | No explicit height or width; supply height or let surrounding layout stretch the host. An empty un-sized host does not guarantee a visible vertical line. |
+| `horizontal`         | `border-top: 0.0625rem solid <theme color>`   | No explicit display override; default div is block | No explicit width or height; block width normally follows containing layout.                                                                              |
 
-| Theme | Variant      | State | Text color | Icon color | Background / fill | Border / stroke                                                  | Shadow / effects | Radius | Opacity | Notes                                           |
-| ----- | ------------ | ----- | ---------- | ---------- | ----------------- | ---------------------------------------------------------------- | ---------------- | ------ | ------- | ----------------------------------------------- |
-| Light | `horizontal` | Rest  | N/A        | N/A        | None              | 1px / `theme.divider.borderColor` = `colors.gray.20` (`#EBEBEB`) | None             | N/A    | 1       | Renders `border-top`.                           |
-| Light | `vertical`   | Rest  | N/A        | N/A        | None              | 1px / `theme.divider.borderColor` = `colors.gray.20` (`#EBEBEB`) | None             | N/A    | 1       | Renders `border-right`; `display: inline-flex`. |
-| Dark  | `horizontal` | Rest  | N/A        | N/A        | None              | 1px / `theme.divider.borderColor` = `colors.gray.80` (`#444444`) | None             | N/A    | 1       | Renders `border-top`.                           |
-| Dark  | `vertical`   | Rest  | N/A        | N/A        | None              | 1px / `theme.divider.borderColor` = `colors.gray.80` (`#444444`) | None             | N/A    | 1       | Renders `border-right`; `display: inline-flex`. |
+Thickness is 1px only at a 16px root. No padding, gap, radius, background, shadow, or typography is assigned by component CSS; shared reset and consumer styles remain contextual.
 
-## Structure / Anatomy
+## Variant And State Styles / Token Mapping
 
-| Part         | Source of truth     | Visual role           | Relevant styling                      | Export note                                                                   |
-| ------------ | ------------------- | --------------------- | ------------------------------------- | ----------------------------------------------------------------------------- |
-| divider line | `divider.styled.ts` | The separator stroke  | 1px solid border on top or right edge | In Figma, model as a line or 1px frame stroke rather than a filled rectangle. |
-| root wrapper | `NvDivider.vue`     | Empty structural host | No content, no slot                   | Keep as a simple non-slotted primitive.                                       |
+| Theme | Token                                                 | Resolved color | Applies to        |
+| ----- | ----------------------------------------------------- | -------------- | ----------------- |
+| Light | `theme.divider.borderColor` → `tokens.colors.gray.20` | `#EBEBEB`      | Both orientations |
+| Dark  | `theme.divider.borderColor` → `tokens.colors.gray.80` | `#444444`      | Both orientations |
 
-## Token Mapping
+The width is hard-coded `rem(1)`, not a spacing token. No hover, focus, active, disabled, selected, or visibility styles are implemented. Rest is the only documented appearance.
 
-| Concern             | Token                       | Resolved value               | Where used               |
-| ------------------- | --------------------------- | ---------------------------- | ------------------------ |
-| border width        | Hard-coded `rem(1)`         | 1px                          | Divider border thickness |
-| light divider color | `theme.divider.borderColor` | `colors.gray.20` (`#EBEBEB`) | Light theme border color |
-| dark divider color  | `theme.divider.borderColor` | `colors.gray.80` (`#444444`) | Dark theme border color  |
+## Structure / Anatomy And Contracts
+
+`NvDivider.vue` renders `StDivider`, an empty styled `div`. It declares no slots, emits, or exposed methods; no separator ARIA role is assigned by source. Theme changes border color only.
 
 ## Recommended Figma Mapping
 
-| Figma property | Type    | Suggested values       | Derived from        |
-| -------------- | ------- | ---------------------- | ------------------- |
-| `Direction`    | Variant | `horizontal, vertical` | `direction` prop    |
-| `Theme`        | Variant | `light, dark`          | Theme divider color |
+Expose Direction (`vertical`, `horizontal`) and Theme (`light`, `dark`); default Direction is vertical. Put the stroke on the matching right or top edge and set separator length from the consuming layout. Do not add text, icons, interactive state variants, or a fixed length derived from a story.
 
-## Figma Build Notes
+## Context / Remaining Uncertainties
 
-- Use the primary visible part named in `Structure / Anatomy` as the main Figma frame, and keep purely behavioral wrappers such as hidden inputs, triggers, portals, or state containers outside the exported component set.
-- Apply fills, strokes, radius, and effects to the same layer identified in the anatomy table instead of redistributing those values across extra wrapper frames.
-- Keep slot content, consumer-provided copy, and arbitrary child content detached unless the README already defines them as explicit Figma properties.
-- If clipping, effect placement, or delegated styling is unresolved in source, preserve that uncertainty in the notes instead of inventing extra Figma variants.
+- Length is deliberately layout-defined, not an unresolved token. A final screen must specify its containing layout or sizing class.
+- Shared CSS reset and consumer overrides may affect the host box. This spec records component declarations rather than promising zero values in every embedding.
 
-## Gaps / Assumptions
+## Supporting Sources
 
-| Item                          | Status      | Notes                                                                 |
-| ----------------------------- | ----------- | --------------------------------------------------------------------- |
-| Prop default vs story default | Ambiguous   | Prop default is `vertical`, Storybook arg default is `horizontal`.    |
-| Intrinsic length              | Not found   | Width / height must be supplied by layout context or utility classes. |
-| Interactive states            | Unsupported | No hover, focus, active, selected, or disabled states.                |
+Theme values: [light theme](../../../themes/light.ts), [dark theme](../../../themes/dark.ts). Conversion and primitives: [design tokens](../../../../../design-tokens/src/main.ts). Key rules: `divider.shared.ts:3–10`, `divider.styled.ts:8–16`, `divider.stories.ts:12–16,35–39`.
