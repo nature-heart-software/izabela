@@ -1,7 +1,11 @@
 import { defineConfig } from 'vite'
-import dts from 'vite-plugin-dts'
 import { resolve } from 'path'
-import { getFileName, getFormats, getRootExternal } from '../../utils/vite'
+import {
+  declarations as dts,
+  getFileName,
+  getFormats,
+  getRootExternal,
+} from '../../utils/vite'
 
 // https://vitejs.dev/config/
 export default defineConfig({

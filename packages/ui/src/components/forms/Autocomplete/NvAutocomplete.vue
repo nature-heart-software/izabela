@@ -12,11 +12,11 @@
           mainAxis: tokens.spacing['4'],
         },
       }"
-      @open-change="(details) => emit('openChange', details)"
-      @escape-key-down="(details) => emit('escapeKeyDown', details)"
-      @focus-outside="(details) => emit('focusOutside', details)"
-      @interact-outside="(details) => emit('interactOutside', details)"
-      @pointer-down-outside="(details) => emit('pointerDownOutside', details)"
+      @open-change="emit('openChange', $event)"
+      @escape-key-down="emit('escapeKeyDown', $event)"
+      @focus-outside="emit('focusOutside', $event)"
+      @interact-outside="emit('interactOutside', $event)"
+      @pointer-down-outside="emit('pointerDownOutside', $event)"
     >
       <Popover.Trigger
         ref="reference"
@@ -60,7 +60,7 @@
                       :count="props.options.length"
                       :estimateSize="() => props.estimateSize"
                       :options="{
-                        getItemKey: (index) =>
+                        getItemKey: (index: number) =>
                           get(
                             props.options[index],
                             props.valueKey,
@@ -93,7 +93,7 @@
 </template>
 <script lang="ts" setup>
 import { Popover } from '@ark-ui/vue'
-import { computed, defineProps, inject, ref, unref, watch } from 'vue'
+import { computed, inject, ref, unref, watch } from 'vue'
 import { StAutocomplete } from './autocomplete.styled'
 import { defaultWidth, props as propsDefinition } from './autocomplete.shared'
 import { tokens } from '@/styles/tokens'

@@ -52,6 +52,16 @@
   "main": "dist-electron/background.js",
   "private": true,
   "productName": "Izabela Next",
+  "nx": {
+    "targets": {
+      "build": {
+        "cache": false
+      },
+      "build:prod": {
+        "cache": false
+      }
+    }
+  },
   "repository": "https://github.com/nature-heart-software/izabela",
   "scripts": {
     "build": "vite build && pnpm run rebuild && pnpm run electron:build",

@@ -1,9 +1,8 @@
 import { defineConfig } from 'vite'
-import dts from 'vite-plugin-dts'
 import { resolve } from 'path'
 import { createRequire } from 'node:module'
 import { generateExportsPlugin } from '@packages/vite-plugin-generate-exports'
-import { getNodeExternal } from '../../utils/vite'
+import { declarations as dts, getNodeExternal } from '../../utils/vite'
 
 const require = createRequire(import.meta.url)
 const pkg = require('./package.json')

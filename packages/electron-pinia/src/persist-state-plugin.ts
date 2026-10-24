@@ -22,9 +22,10 @@ function getElectronStore(name: string) {
         require('electron').app.getPath('userData'),
         `${ELECTRON_STORAGE_NAME}.json`,
       )
-      const globalDefaults: Record<string, any> = require(
-        electronPiniaDefaultFile,
-      )
+      const globalDefaults: Record<
+        string,
+        any
+      > = require(electronPiniaDefaultFile)
       if (globalDefaults) {
         defaults = {
           [name]: globalDefaults[name],
@@ -50,7 +51,7 @@ const storageSetState = (name: string, state: any) =>
 const storageDelete = (name: string) => getStorage(name).delete(name)
 
 if (isMain) {
-  const { ipcMain } = require('electron')
+  const { ipcMain } = require('electron') as typeof import('electron')
   ipcMain.handle(IPC_EVENT_STORE_GET, (_, { name }) => {
     return storageGetState(name)
   })

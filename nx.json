@@ -1,7 +1,18 @@
 {
   "extends": "nx/presets/npm.json",
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "sharedGlobals": [
+      "{workspaceRoot}/utils/**/*",
+      "{workspaceRoot}/tsconfig.base.json",
+      "{workspaceRoot}/package.json",
+      "{workspaceRoot}/pnpm-workspace.yaml",
+      "{workspaceRoot}/patches/**/*.patch"
+    ]
+  },
   "targetDefaults": {
     "build": {
+      "inputs": ["default", "^default"],
       "dependsOn": ["^build"],
       "outputs": [
         "{projectRoot}/dist",

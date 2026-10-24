@@ -5,12 +5,8 @@
     :valueKey="props.valueKey"
     :visible="isAutocompleteVisible"
     :width="props.autocompleteWidth"
-    @select="(item) => !item.children && handleValue(item.value)"
-    @positioner-change="
-      ($event) => {
-        autocomplete = $event
-      }
-    "
+    @select="(item: Option) => !item.children && handleValue(item.value)"
+    @positioner-change="autocomplete = $event"
     @pointer-down-outside="blurInput"
     @focus-outside="blurInput"
     @interact-outside="blurInput"
@@ -18,7 +14,6 @@
     <template #reference>
       <StSelect
         ref="select"
-        :isFocused="hasFocus"
         class="w-full"
         v-bind="{ ...props, isFocused: hasFocus }"
         @click="activate"
@@ -71,7 +66,7 @@
         :readonly="item.children"
         :selected="
           selectedValues.find(
-            (v) =>
+            (v: Value) =>
               (get(item.value, props.valueKey) || item.value) ===
               (get(v, props.valueKey) || v),
           )
@@ -99,7 +94,7 @@
   </NvAutocomplete>
 </template>
 <script lang="ts" setup>
-import { computed, defineProps, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useFocusTrap } from '@vueuse/integrations/useFocusTrap'
 import { useFuse, UseFuseOptions } from '@vueuse/integrations/useFuse'
 import { onClickOutside, onKeyStroke } from '@vueuse/core'
@@ -207,7 +202,7 @@ watch(
   },
 )
 
-const fuseOptions = computed<UseFuseOptions<(typeof options.value)[number]>>(
+const fuseOptions = computed<UseFuseOptions<typeof options.value[number]>>(
   () => ({
     fuseOptions: {
       keys: ['label', 'category', 'searchValue'],
