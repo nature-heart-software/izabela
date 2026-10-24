@@ -11,6 +11,7 @@ const nx = require.resolve('nx/bin/nx.js')
 const environment = {
   ...process.env,
   NX_CACHE_DIRECTORY: path.join(temporary, 'cache'),
+  NX_WORKSPACE_DATA_DIRECTORY: path.join(temporary, 'workspace-data'),
   NX_SKIP_NX_CACHE: 'false',
   NX_SKIP_REMOTE_CACHE: 'true',
   NX_DAEMON: 'false',

@@ -47,6 +47,7 @@ const environment = Object.fromEntries(
 )
 
 const key = {
+  schema: 1,
   platform: process.platform,
   arch: process.arch,
   os: os.release(),
