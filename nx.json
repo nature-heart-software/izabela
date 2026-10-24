@@ -2,6 +2,21 @@
   "extends": "nx/presets/npm.json",
   "namedInputs": {
     "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "nativeEnvironment": [
+      "sharedGlobals",
+      "{workspaceRoot}/tools/native-cache-key.cjs",
+      "{workspaceRoot}/pnpm-lock.yaml",
+      "{workspaceRoot}/apps/app/package.json",
+      { "runtime": "node tools/native-cache-key.cjs" }
+    ],
+    "nativeBuild": [
+      "default",
+      "nativeEnvironment",
+      "!{projectRoot}/build/**/*",
+      "!{projectRoot}/dist/**/*",
+      "!{projectRoot}/lib/binding/**/*",
+      "!{projectRoot}/node_modules/**/*"
+    ],
     "sharedGlobals": [
       "{workspaceRoot}/utils/**/*",
       "{workspaceRoot}/tsconfig.base.json",

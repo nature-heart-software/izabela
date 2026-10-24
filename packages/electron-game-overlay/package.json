@@ -20,7 +20,13 @@
   "nx": {
     "targets": {
       "build": {
-        "cache": false
+        "cache": true,
+        "inputs": [
+          "nativeBuild"
+        ],
+        "outputs": [
+          "{projectRoot}/dist"
+        ]
       }
     }
   }

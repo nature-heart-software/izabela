@@ -44,7 +44,14 @@
   "nx": {
     "targets": {
       "build": {
-        "cache": false
+        "cache": true,
+        "inputs": [
+          "nativeBuild"
+        ],
+        "outputs": [
+          "{projectRoot}/build/Release/wincontrol.node",
+          "{projectRoot}/lib/binding/wincontrol.node"
+        ]
       }
     }
   },

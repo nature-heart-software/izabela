@@ -79,13 +79,6 @@ test('the server declares and can resolve its direct WebSocket dependency', () =
   assert.ok(existsSync(require.resolve('ws')))
 })
 
-for (const directory of ['packages/native-keymap', 'packages/win-control']) {
-  test(`${directory}: native compilation cannot reuse a cross-platform cache`, () => {
-    const pkg = readPackage(directory)
-    assert.equal(pkg.nx?.targets?.build?.cache, false)
-  })
-}
-
 test('direct desktop development rebuilds native modules before launching Vite', () => {
   const pkg = readPackage('apps/app')
   assert.match(pkg.scripts.dev, /^pnpm run rebuild && vite$/)

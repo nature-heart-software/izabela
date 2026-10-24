@@ -59,6 +59,20 @@
       },
       "build:prod": {
         "cache": false
+      },
+      "rebuild-native": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "electron-rebuild -f --only forcefocus",
+          "cwd": "apps/app"
+        },
+        "cache": true,
+        "inputs": [
+          "nativeEnvironment"
+        ],
+        "outputs": [
+          "{projectRoot}/node_modules/forcefocus/build/Release/forcefocus.node"
+        ]
       }
     }
   },
@@ -71,6 +85,6 @@
     "generate:app-icon": "pnpm dlx electron-icon-builder --input=./assets/app-icon.png --output=./build --flatten && pnpm dlx electron-icon-builder --input=./assets/app-icon.png --output=./public --flatten",
     "lint": "vue-tsc",
     "preview": "vite preview",
-    "rebuild": "electron-rebuild -f -w forcefocus"
+    "rebuild": "pnpm nx run izabela-next:rebuild-native"
   }
 }

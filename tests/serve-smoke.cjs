@@ -49,7 +49,7 @@ async function main() {
         env: {
           ...process.env,
           ELECTRON_ENABLE_LOGGING: '1',
-          NX_SKIP_NX_CACHE: 'true',
+          NX_SKIP_NX_CACHE: process.env.NX_SKIP_NX_CACHE || 'true',
           IZABELA_SMOKE_DEBUG_PORT: String(debugPort),
         },
         windowsHide: true,
@@ -59,7 +59,7 @@ async function main() {
         env: {
           ...process.env,
           ELECTRON_ENABLE_LOGGING: '1',
-          NX_SKIP_NX_CACHE: 'true',
+          NX_SKIP_NX_CACHE: process.env.NX_SKIP_NX_CACHE || 'true',
           IZABELA_SMOKE_DEBUG_PORT: String(debugPort),
         },
         shell: true,
