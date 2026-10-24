@@ -3,7 +3,7 @@
     v-bind="{
       ...props,
       open: dialogOpen,
-      'onUpdate:open': (value) => (dialogOpen = value),
+      'onUpdate:open': (value: boolean) => (dialogOpen = value),
     }"
   >
     <StDialogTrigger>
@@ -55,14 +55,7 @@
   </StDialogRoot>
 </template>
 <script lang="ts" setup>
-import {
-  computed,
-  defineComponent,
-  defineEmits,
-  defineProps,
-  provide,
-  ref,
-} from 'vue'
+import { computed, defineComponent, provide, ref } from 'vue'
 import { props as propsDefinition } from './dialog.shared'
 import NvCard from '@/components/display/Card/NvCard.vue'
 import NvButton from '@/components/forms/Button/NvButton.vue'

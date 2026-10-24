@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "main": "index.js",
   "scripts": {
+    "build": "node -e \"console.log('No build step required')\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

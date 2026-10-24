@@ -9,7 +9,7 @@
   "private": true,
   "scripts": {
     "build": "vite build",
-    "build:prod": "yarn build",
+    "build:prod": "pnpm run build",
     "dev": "vite build --watch --mode development"
   },
   "type": "module",

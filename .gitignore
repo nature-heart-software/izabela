@@ -26,3 +26,9 @@ lerna-debug.log
 *.sln
 *.sw?
 /.parcel-cache/
+
+.nx/cache
+.nx/workspace-data
+.claude/worktrees
+.nx/polygraph
+.nx/self-healing

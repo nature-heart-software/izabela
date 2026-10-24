@@ -18,7 +18,6 @@
   </StAccessBlocker>
 </template>
 <script lang="ts" setup>
-import { defineProps } from 'vue'
 import NkCenter from '@/components/miscellaneous/Center/NvCenter.vue'
 import NvAlert from '@/components/feedback/Alert/NvAlert.vue'
 import { StAccessBlocker, StAccessBlockerReason } from './access-blocker.styled'

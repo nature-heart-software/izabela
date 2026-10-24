@@ -6,8 +6,9 @@
   "license": "MIT",
   "main": "src/js/index.js",
   "scripts": {
-    "install": "node-pre-gyp install --fallback-to-build",
-    "pack": "node-pre-gyp package"
+    "install": "node-pre-gyp rebuild",
+    "pack": "node-pre-gyp package",
+    "build": "node-pre-gyp rebuild"
   },
   "dependencies": {
     "node-addon-api": "^3.0.0",
@@ -39,6 +40,20 @@
     "module_path": "./lib/binding/",
     "host": "https://github.com/nosolosoftware/win-control/releases/download/",
     "remote_path": "{version}"
+  },
+  "nx": {
+    "targets": {
+      "build": {
+        "cache": true,
+        "inputs": [
+          "nativeBuild"
+        ],
+        "outputs": [
+          "{projectRoot}/build/Release/wincontrol.node",
+          "{projectRoot}/lib/binding/wincontrol.node"
+        ]
+      }
+    }
   },
   "files": [
     "binding.gyp",

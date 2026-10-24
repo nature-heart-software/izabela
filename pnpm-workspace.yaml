@@ -1,0 +1,32 @@
+packages:
+  - apps/*
+  - packages/*
+
+patchedDependencies:
+  '@tanstack/virtual-core@3.0.0-beta.26': patches/pnpm/@tanstack+virtual-core+3.0.0-beta.26.patch
+  forcefocus@1.1.0: patches/pnpm/forcefocus+1.1.0.patch
+  vite-plugin-electron@0.28.7: patches/pnpm/vite-plugin-electron+0.28.7.patch
+  wql-process-monitor@3.0.1: patches/pnpm/wql-process-monitor+3.0.1.patch
+
+overrides:
+  node-gyp: ^12.3.0
+  prebuild-install>node-abi: ^4.17.0
+
+minimumReleaseAgeExclude:
+  - gelectron
+
+allowBuilds:
+  '@infisical/cli': true
+  '@parcel/watcher': true
+  bufferutil: true
+  electron: true
+  electron-winstaller: true
+  es5-ext: true
+  esbuild: true
+  forcefocus: true
+  koffi: true
+  nx: true
+  protobufjs: true
+  utf-8-validate: true
+  vue-demi: true
+  wql-process-monitor: true

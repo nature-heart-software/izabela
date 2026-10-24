@@ -1,9 +1,6 @@
-const binary = require('node-pre-gyp')
 const path = require('path')
 
-const bindingPath = binary.find(
-  path.resolve(path.join(__dirname, '../../package.json')),
-)
+const bindingPath = path.resolve(__dirname, '../../lib/binding/wincontrol.node')
 const { Window } = require(bindingPath) // eslint-disable-line
 
 module.exports = {

@@ -18,7 +18,7 @@
   </StButton>
 </template>
 <script lang="ts" setup>
-import { computed, defineProps } from 'vue'
+import { computed } from 'vue'
 import { isVNodeEmpty } from '@/utils/vue'
 import { tokens } from '@/styles/tokens'
 import { StButton } from './button.styled'

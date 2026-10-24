@@ -44,7 +44,7 @@
   </Popover.Root>
 </template>
 <script lang="ts" setup>
-import { computed, defineProps, inject, ref } from 'vue'
+import { computed, inject, ref } from 'vue'
 import { StPopover } from './popover.styled'
 import { props as propsDefinition } from './popover.shared'
 import { tokens } from '@/styles/tokens'

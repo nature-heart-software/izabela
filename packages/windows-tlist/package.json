@@ -8,6 +8,7 @@
     "url": "git://github.com/widget2143/windows-tlist.git"
   },
   "scripts": {
+    "build": "node -e \"console.log('No build step required')\"",
     "test": "mocha tests/test.spec.js",
     "lint": "eslint . --quiet",
     "lint:loud": "eslint ."
