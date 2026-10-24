@@ -10,6 +10,15 @@ const escapeRegExp = (value: string) =>
   value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
 export default defineConfig(({ mode }) => {
+  const debugPort = process.env.IZABELA_SMOKE_DEBUG_PORT
+  const smokeArgs = debugPort
+    ? [
+        '.',
+        '--no-sandbox',
+        `--remote-debugging-port=${debugPort}`,
+        '--remote-debugging-address=127.0.0.1',
+      ]
+    : undefined
   const packagesToOmit = []
   const omitPackages = (keys: string[]) =>
     keys.filter((key) => !packagesToOmit.includes(key))
@@ -61,6 +70,9 @@ export default defineConfig(({ mode }) => {
       electron({
         main: {
           entry: 'src/electron/background.ts',
+          onstart({ startup }) {
+            return startup(smokeArgs)
+          },
           vite: {
             resolve,
             build: {
@@ -72,6 +84,9 @@ export default defineConfig(({ mode }) => {
         },
         preload: {
           input: path.join(__dirname, 'src/electron/preload.ts'),
+          onstart({ startup, reload }) {
+            return smokeArgs ? startup(smokeArgs) : reload()
+          },
           vite: {
             resolve,
             build: {

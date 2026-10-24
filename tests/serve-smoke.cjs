@@ -4,6 +4,7 @@ const { spawn, execFileSync } = require('node:child_process')
 const failure =
   /error TS\d+|gyp ERR!|\[(?:error|ELIFECYCLE)\]|Couldn't (?:register|unregister)|Unable to load preload|Error sending from webFrameMain|Invalid watch source|Uncaught|UnhandledPromiseRejection|(?:^|\n)\s*(?:TypeError|ReferenceError|Error):|:ERROR:/i
 const page = 'http://localhost:3000/src/teams/messenger/index.html'
+const debugPort = 9229
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 let child
 let stopping = false
@@ -27,7 +28,7 @@ function stop() {
 
 async function main() {
   assert.equal(process.platform, 'win32', 'desktop validation requires Windows')
-  for (const port of [3000, 7070]) {
+  for (const port of [3000, 7070, debugPort]) {
     const { createConnection } = require('node:net')
     const occupied = await new Promise((resolve) => {
       const socket = createConnection({ host: 'localhost', port })
@@ -49,6 +50,7 @@ async function main() {
           ...process.env,
           ELECTRON_ENABLE_LOGGING: '1',
           NX_SKIP_NX_CACHE: 'true',
+          IZABELA_SMOKE_DEBUG_PORT: String(debugPort),
         },
         windowsHide: true,
         stdio: ['ignore', 'pipe', 'pipe'],
@@ -58,6 +60,7 @@ async function main() {
           ...process.env,
           ELECTRON_ENABLE_LOGGING: '1',
           NX_SKIP_NX_CACHE: 'true',
+          IZABELA_SMOKE_DEBUG_PORT: String(debugPort),
         },
         shell: true,
         windowsHide: true,
@@ -108,13 +111,23 @@ async function main() {
     'Timed out waiting for the development app to initialize',
   )
   const closed = new Promise((resolve) => child.once('close', resolve))
-  stop()
+  const response = await fetch(`http://127.0.0.1:${debugPort}/json/version`)
+  const { webSocketDebuggerUrl } = await response.json()
+  const socket = new WebSocket(webSocketDebuggerUrl)
+  await new Promise((resolve, reject) => {
+    socket.addEventListener('open', resolve, { once: true })
+    socket.addEventListener('error', reject, { once: true })
+  })
+  socket.send(JSON.stringify({ id: 1, method: 'Browser.close' }))
   await Promise.race([
     closed,
-    wait(5000).then(() => {
+    wait(10000).then(() => {
       throw new Error('Development process did not stop')
     }),
   ])
+  stopping = true
+  socket.close()
+  assert.equal(child.exitCode, 0, 'pnpm serve did not exit cleanly')
   assert.doesNotMatch(
     output,
     failure,

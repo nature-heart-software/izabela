@@ -11,7 +11,7 @@ overrides:
 patchedDependencies:
   '@tanstack/virtual-core@3.0.0-beta.26': 96d2825be44652a1f8db94f1725ddf62da729018e871163fed9a01b4f6caa5e9
   forcefocus@1.1.0: c583e9b3cf3778b62a939047e17c8afccc52f6802917936f90a41d83b4fcee37
-  vite-plugin-electron@0.28.7: fe690c0b2b30979ca2c3de21a6cffcb2a8312ffdfd542310c06d6ae2a65ff667
+  vite-plugin-electron@0.28.7: f024f423cd0b1b52b35c25d8fb84e4368f2064798a6842faf15f24d910a42897
   wql-process-monitor@3.0.1: 800318da45cad7115886e741806df275aa579df0f10cad8d1ba1bd6d726b6054
 
 importers:
@@ -380,7 +380,7 @@ importers:
         version: 5.0.2(@vue/language-core@3.1.8(typescript@5.9.3))(esbuild@0.18.20)(rollup@4.61.1)(typescript@5.9.3)(vite@5.4.21(@types/node@20.19.43)(sass@1.100.0)(terser@5.48.0))
       vite-plugin-electron:
         specifier: 0.28.7
-        version: 0.28.7(patch_hash=fe690c0b2b30979ca2c3de21a6cffcb2a8312ffdfd542310c06d6ae2a65ff667)
+        version: 0.28.7(patch_hash=f024f423cd0b1b52b35c25d8fb84e4368f2064798a6842faf15f24d910a42897)
       vite-plugin-node-polyfills:
         specifier: ^0.21.0
         version: 0.21.0(rollup@4.61.1)(vite@5.4.21(@types/node@20.19.43)(sass@1.100.0)(terser@5.48.0))
@@ -6742,7 +6742,7 @@ packages:
     engines: {node: '>=18'}
 
   gelectron@https://github.com/hiitiger/goverlay/tarball/3ca1f040b180dc6ce84baca093c6f726748461ad:
-    resolution: {integrity: sha512-omqir8ZK9RoQ2Vgl8peON5d1MtcKoE5ck5gcUTQO2TJpOBGmGpU2SabIfTnwIibOfiAgKmGF03MMbCd+4FshDA==, tarball: https://github.com/hiitiger/goverlay/tarball/3ca1f040b180dc6ce84baca093c6f726748461ad}
+    resolution: {tarball: https://github.com/hiitiger/goverlay/tarball/3ca1f040b180dc6ce84baca093c6f726748461ad}
     version: 1.0.1
 
   generate-function@2.3.1:
@@ -24436,7 +24436,7 @@ snapshots:
       - typescript
       - webpack
 
-  vite-plugin-electron@0.28.7(patch_hash=fe690c0b2b30979ca2c3de21a6cffcb2a8312ffdfd542310c06d6ae2a65ff667): {}
+  vite-plugin-electron@0.28.7(patch_hash=f024f423cd0b1b52b35c25d8fb84e4368f2064798a6842faf15f24d910a42897): {}
 
   vite-plugin-node-polyfills@0.21.0(rollup@4.61.1)(vite@5.4.21(@types/node@20.19.43)(sass@1.100.0)(terser@5.48.0)):
     dependencies:
