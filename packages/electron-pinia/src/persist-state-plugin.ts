@@ -22,10 +22,9 @@ function getElectronStore(name: string) {
         require('electron').app.getPath('userData'),
         `${ELECTRON_STORAGE_NAME}.json`,
       )
-      const globalDefaults: Record<
-        string,
-        any
-      > = require(electronPiniaDefaultFile)
+      const globalDefaults: Record<string, any> = require(
+        electronPiniaDefaultFile,
+      )
       if (globalDefaults) {
         defaults = {
           [name]: globalDefaults[name],

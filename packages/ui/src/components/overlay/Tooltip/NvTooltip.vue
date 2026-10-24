@@ -35,7 +35,7 @@ const tippyProps = computed<TippyOptions>(
       theme: `tooltip`,
       maxWidth: 300,
       ...props.tippyOptions,
-    } as TippyOptions),
+    }) as TippyOptions,
 )
 const tooltip = ref<MaybeElement>()
 const tippyInstance = ref<TippyInstance>()
