@@ -26,7 +26,11 @@ module.exports = {
   directories: {
     output: 'dist_electron',
   },
-  files: ['dist', 'dist-electron'],
+  files: [
+    'dist',
+    'dist-electron',
+    '!node_modules/@packages/electron-game-overlay/build/**/*',
+  ],
   nsis: {
     oneClick: true,
     perMachine: false,
@@ -49,6 +53,7 @@ module.exports = {
     'node_modules/forcefocus/**/*',
     'node_modules/wql-process-monitor/**/*',
     'node_modules/win-control/**/*',
+    'node_modules/windows-tlist/**/*',
     'node_modules/@xan105/error/**/*',
     'node_modules/@xan105/ffi/**/*',
     'node_modules/@xan105/is/**/*',

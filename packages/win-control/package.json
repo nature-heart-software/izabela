@@ -6,9 +6,9 @@
   "license": "MIT",
   "main": "src/js/index.js",
   "scripts": {
-    "install": "node-pre-gyp install --fallback-to-build",
+    "install": "node-pre-gyp rebuild",
     "pack": "node-pre-gyp package",
-    "build": "node-pre-gyp install --fallback-to-build"
+    "build": "node-pre-gyp rebuild"
   },
   "dependencies": {
     "node-addon-api": "^3.0.0",

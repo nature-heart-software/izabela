@@ -1,7 +1,7 @@
-diff --git a/node_modules/forcefocus/binding.gyp b/node_modules/forcefocus/binding.gyp
+diff --git a/binding.gyp b/binding.gyp
 index d74dab9..1c319ae 100644
---- a/node_modules/forcefocus/binding.gyp
-+++ b/node_modules/forcefocus/binding.gyp
+--- a/binding.gyp
++++ b/binding.gyp
 @@ -5,6 +5,12 @@
        "sources": [
          "src/bindings.cc"

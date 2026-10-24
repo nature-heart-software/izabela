@@ -1,6 +1,10 @@
 {
   "name": "@packages/electron-game-overlay",
   "version": "0.0.0",
+  "devDependencies": {
+    "cmake-js": "^7.4.0",
+    "node-addon-api": "^8.5.0"
+  },
   "files": [
     "./dist"
   ],
@@ -12,5 +16,12 @@
   },
   "source": "src/main.ts",
   "type": "module",
-  "types": "./dist/index.d.ts"
+  "types": "./dist/index.d.ts",
+  "nx": {
+    "targets": {
+      "build": {
+        "cache": false
+      }
+    }
+  }
 }

@@ -112,10 +112,37 @@ Find guides and API documentation on the [Wiki](https://github.com/nature-heart-
 
 ## Development
 
-The project requires the following in order to run:
+Desktop development and packaging are supported on Windows x64. Install these prerequisites:
 
-- Node 22+
+- Node 24 (see `.nvmrc`)
+- pnpm 11 (`npm install --global pnpm@11.2.2`); the repository pins its package manager version
 - [Python 3.11](https://github.com/nodejs/node-gyp?tab=readme-ov-file#configuring-python-dependency)
 - [Visual Studio Build Tools 2022](https://github.com/nodejs/node-gyp?tab=readme-ov-file#on-windows) with the following components:
   - **Desktop development with C++** workload (`Microsoft.VisualStudio.Workload.VCTools`)
   - **C++ Clang Compiler for Windows** (`Microsoft.VisualStudio.ComponentGroup.NativeDesktop.Llvm.Clang`) — required for Node 24+
+- [CMake 3.15+](https://cmake.org/download/) on `PATH`, required to compile the game overlay
+
+From the repository root, start development with:
+
+```sh
+pnpm install
+pnpm serve
+```
+
+To build the Electron app and Windows installer:
+
+```sh
+pnpm install
+pnpm build
+```
+
+The output is in `apps/app/dist_electron` (installer and `win-unpacked` app).
+Workspace packages build automatically in dependency order. Installation applies
+dependency patches and compiles native workspace modules; serving and packaging
+rebuild native modules for the app's Electron version. No separate preparation,
+package build, environment file, or credential setup is required to launch the app.
+Credentials are only needed for speech services that require them.
+
+To verify native modules in Electron, run `pnpm test:native`. After packaging, run
+`pnpm test:native apps/app/dist_electron/win-unpacked/resources/app.asar` to verify
+the packaged dependencies and unpacked native binaries.

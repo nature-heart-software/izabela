@@ -14,7 +14,10 @@ const directories = readdirSync(resolve(root, 'packages'), {
   withFileTypes: true,
 })
   .filter(
-    (entry) => entry.isDirectory() && entry.name !== 'electron-game-overlay',
+    (entry) =>
+      entry.isDirectory() &&
+      entry.name !== 'electron-game-overlay' &&
+      existsSync(resolve(root, 'packages', entry.name, 'package.json')),
   )
   .map((entry) => `packages/${entry.name}`)
   .sort()

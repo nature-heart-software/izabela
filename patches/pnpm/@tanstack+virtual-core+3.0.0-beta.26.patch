@@ -1,0 +1,12 @@
+diff --git a/build/lib/index.d.ts b/build/lib/index.d.ts
+--- a/build/lib/index.d.ts
++++ b/build/lib/index.d.ts
+@@ -21,7 +21,7 @@ export interface VirtualItem {
+     end: number;
+     size: number;
+ }
+-interface Rect {
++export interface Rect {
+     width: number;
+     height: number;
+ }
