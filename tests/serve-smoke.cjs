@@ -2,7 +2,7 @@ const assert = require('node:assert/strict')
 const { spawn, execFileSync } = require('node:child_process')
 
 const failure =
-  /error TS\d+|gyp ERR!|\[(?:error|ELIFECYCLE)\]|Couldn't (?:register|unregister)|Unable to load preload|Invalid watch source|Uncaught|UnhandledPromiseRejection|(?:^|\n)\s*(?:TypeError|ReferenceError|Error):|:ERROR:/i
+  /error TS\d+|gyp ERR!|\[(?:error|ELIFECYCLE)\]|Couldn't (?:register|unregister)|Unable to load preload|Error sending from webFrameMain|Invalid watch source|Uncaught|UnhandledPromiseRejection|(?:^|\n)\s*(?:TypeError|ReferenceError|Error):|:ERROR:/i
 const page = 'http://localhost:3000/src/teams/messenger/index.html'
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 let child
@@ -45,12 +45,20 @@ async function main() {
   let spawnError
   child = process.env.npm_execpath
     ? spawn(process.execPath, [process.env.npm_execpath, 'serve'], {
-        env: { ...process.env, ELECTRON_ENABLE_LOGGING: '1' },
+        env: {
+          ...process.env,
+          ELECTRON_ENABLE_LOGGING: '1',
+          NX_SKIP_NX_CACHE: 'true',
+        },
         windowsHide: true,
         stdio: ['ignore', 'pipe', 'pipe'],
       })
     : spawn('pnpm', ['serve'], {
-        env: { ...process.env, ELECTRON_ENABLE_LOGGING: '1' },
+        env: {
+          ...process.env,
+          ELECTRON_ENABLE_LOGGING: '1',
+          NX_SKIP_NX_CACHE: 'true',
+        },
         shell: true,
         windowsHide: true,
         stdio: ['ignore', 'pipe', 'pipe'],
@@ -71,6 +79,7 @@ async function main() {
 
   const deadline = Date.now() + 15 * 60 * 1000
   let readySince
+  let initialized = false
   while (Date.now() < deadline) {
     if (spawnError) throw spawnError
     assert.equal(exited, false, 'pnpm serve exited before validation completed')
@@ -88,15 +97,32 @@ async function main() {
       assert.equal(response.status, 200)
       readySince ??= Date.now()
       if (Date.now() - readySince >= 10000) {
-        console.log(
-          'PASS serve: HTTP 200, API and overlay initialized, four renderer connections, no startup errors',
-        )
-        return
+        initialized = true
+        break
       }
     }
     await wait(1000)
   }
-  throw new Error('Timed out waiting for the development app to initialize')
+  assert.ok(
+    initialized,
+    'Timed out waiting for the development app to initialize',
+  )
+  const closed = new Promise((resolve) => child.once('close', resolve))
+  stop()
+  await Promise.race([
+    closed,
+    wait(5000).then(() => {
+      throw new Error('Development process did not stop')
+    }),
+  ])
+  assert.doesNotMatch(
+    output,
+    failure,
+    'an application error was logged during shutdown',
+  )
+  console.log(
+    'PASS serve: HTTP 200, API and overlay initialized, four renderer connections, no startup or shutdown errors',
+  )
 }
 
 for (const signal of ['SIGINT', 'SIGTERM']) {

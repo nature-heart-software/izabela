@@ -148,6 +148,7 @@ To verify native modules in Electron, run `pnpm test:native`. After packaging, r
 the packaged dependencies and unpacked native binaries.
 
 `pnpm test:serve` starts the development app, checks its HTTP response, local API,
-overlay and renderer connections, rejects startup errors, and stops its processes.
+overlay and renderer connections, rejects startup/shutdown errors, and stops its processes.
+It bypasses Nx's task cache so that packages are compiled during validation.
 The Windows CI jobs run serve and build in separate fresh checkouts, then check
 package declarations, keyboard routing, and native runtime dependencies.
