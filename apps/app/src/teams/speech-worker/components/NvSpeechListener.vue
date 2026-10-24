@@ -29,7 +29,7 @@ const stream = computedAsync(async () => {
 
 const speech = computed<any>((oldValue) => {
   oldValue?.stop()
-  if (realTime.value) {
+  if (settingsStore.enableSTTTS && realTime.value && stream.value) {
     return hark(stream.value, {
       threshold: settingsStore.audioInputSensibility,
       interval: settingsStore.speechDetectionPolling,
@@ -61,7 +61,7 @@ function onSpeechStop() {
   })
 }
 
-watch([settingsStore.enableSTTTS, realTime], () => {
+watch([() => settingsStore.enableSTTTS, realTime], () => {
   if (settingsStore.enableSTTTS) {
     if (realTime.value) {
       console.log('Starting web speech recognition...')
