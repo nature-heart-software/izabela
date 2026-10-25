@@ -1,0 +1,55 @@
+name: Desktop workflows
+
+on:
+  pull_request:
+  push:
+    branches:
+      - dev
+
+permissions:
+  contents: read
+
+env:
+  NX_SKIP_NX_CACHE: 'true'
+
+concurrency:
+  group: desktop-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  desktop:
+    name: Clean ${{ matrix.flow }}
+    runs-on: windows-2022
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        flow: [serve, build]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Serve and check application startup
+        if: matrix.flow == 'serve'
+        run: pnpm test:serve
+      - name: Build the Electron installer
+        if: matrix.flow == 'build'
+        run: pnpm build
+      - name: Check packages and keyboard routing
+        run: node --test tests/package-build.test.mjs tests/keyboard-accelerator.test.mjs
+      - name: Check native dependencies in Electron
+        run: pnpm test:native
+      - name: Check packaged native dependencies
+        if: matrix.flow == 'build'
+        run: pnpm test:native apps/app/dist_electron/win-unpacked/resources/app.asar
+      - name: Check native cache restoration and invalidation
+        if: matrix.flow == 'build'
+        run: pnpm test:native-cache

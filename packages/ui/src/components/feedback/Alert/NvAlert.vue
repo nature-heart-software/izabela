@@ -6,7 +6,6 @@
   </StAlert>
 </template>
 <script lang="ts" setup>
-import { defineProps } from 'vue'
 import NvText from '@/components/typography/Text/NvText.vue'
 import { StAlert } from './alert.styled'
 import { props as propsDefinition } from './alert.shared'

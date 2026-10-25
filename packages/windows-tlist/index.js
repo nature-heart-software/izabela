@@ -48,7 +48,11 @@ function getProcessInfo(pid) {
   return new Promise(promiseBody)
 
   function promiseBody(resolve, reject) {
-    exec('"' + path.join(__dirname, 'tlist.exe') + '" "' + pid + '"', afterExec)
+    // A shell cannot execute a file inside ASAR; use its unpacked location.
+    const executable = path
+      .join(__dirname, 'tlist.exe')
+      .replace(/([\\/])app\.asar([\\/])/, '$1app.asar.unpacked$2')
+    exec('"' + executable + '" "' + pid + '"', afterExec)
 
     function afterExec(err, stdout, stderr) {
       var opt = 'gim',

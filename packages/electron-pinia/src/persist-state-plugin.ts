@@ -50,7 +50,7 @@ const storageSetState = (name: string, state: any) =>
 const storageDelete = (name: string) => getStorage(name).delete(name)
 
 if (isMain) {
-  const { ipcMain } = require('electron')
+  const { ipcMain } = require('electron') as typeof import('electron')
   ipcMain.handle(IPC_EVENT_STORE_GET, (_, { name }) => {
     return storageGetState(name)
   })

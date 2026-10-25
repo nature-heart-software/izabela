@@ -8,11 +8,6 @@
           "src/c++/window.cpp",
         "src/c++/main.cpp"
         ],
-        'msvs_settings': {
-          'VCCLCompilerTool': {
-            'ObjectFile': "$(IntDir)/%(Directory)/"
-          }
-        },
         'include_dirs': [
           "<!@(node -p \"require('node-addon-api').include\")"
         ],

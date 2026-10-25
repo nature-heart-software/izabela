@@ -9,7 +9,7 @@
   </StTooltip>
 </template>
 <script lang="ts" setup>
-import { computed, defineProps, inject, ref, watch } from 'vue'
+import { computed, inject, ref, watch } from 'vue'
 import { StTooltip } from './tooltip.styled'
 import { props as propsDefinition } from './tooltip.shared'
 import { Tippy, TippyInstance, TippyOptions } from 'vue-tippy'

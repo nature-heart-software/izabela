@@ -26,7 +26,7 @@
   </StContextMenu>
 </template>
 <script lang="ts" setup>
-import { computed, defineProps, inject, ref, watch } from 'vue'
+import { computed, inject, ref, watch } from 'vue'
 import { StContextMenu } from './context-menu.styled'
 import { props as propsDefinition } from './context-menu.shared'
 import { Tippy, TippyOptions } from 'vue-tippy'

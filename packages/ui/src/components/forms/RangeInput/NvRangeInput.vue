@@ -7,7 +7,6 @@
   />
 </template>
 <script lang="ts" setup>
-import { defineEmits, defineProps } from 'vue'
 import { StRangeInput } from './range-input.styled'
 import { props as propsDefinition } from './range-input.shared'
 

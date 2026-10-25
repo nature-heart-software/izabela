@@ -1,7 +1,7 @@
-diff --git a/node_modules/wql-process-monitor/lib/util/ffi.js b/node_modules/wql-process-monitor/lib/util/ffi.js
+diff --git a/lib/util/ffi.js b/lib/util/ffi.js
 index bff0e2b..b7d0f96 100644
---- a/node_modules/wql-process-monitor/lib/util/ffi.js
-+++ b/node_modules/wql-process-monitor/lib/util/ffi.js
+--- a/lib/util/ffi.js
++++ b/lib/util/ffi.js
 @@ -13,7 +13,7 @@ const file = join(
    dirname(fileURLToPath(import.meta.url)), 
    "../dist/", 

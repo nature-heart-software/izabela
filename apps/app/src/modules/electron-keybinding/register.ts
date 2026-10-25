@@ -21,6 +21,7 @@ import {
 } from '@/electron/events/main'
 import electronOverlayWindow from '@/teams/overlay/modules/electron-overlay-window'
 import { useProfilesStore } from '@/features/profiles/store.ts'
+import { canRegisterElectronShortcut } from './accelerator'
 
 export default () =>
   app.whenReady().then(async () => {
@@ -48,6 +49,7 @@ export default () =>
       accelerator: string,
       callback: () => void,
     ) => {
+      if (!canRegisterElectronShortcut(accelerator)) return
       try {
         globalShortcut.register(accelerator, callback)
         console.log('[electron-shortcuts] Registered shortcut', accelerator)
@@ -59,6 +61,7 @@ export default () =>
       }
     }
     const unregisterElectronShortcut = (accelerator: string) => {
+      if (!canRegisterElectronShortcut(accelerator)) return
       try {
         globalShortcut.unregister(accelerator)
       } catch (e: any) {
@@ -68,74 +71,94 @@ export default () =>
         )
       }
     }
-    const getShortcuts: () => {
+    type Shortcuts = {
       electron: [Key[], () => void][]
       gkl: [Key[], IGlobalKeyListener][]
-    } = () => ({
-      electron: [
-        [
-          settingsStore.keybindings.toggleMessengerWindow,
-          multiKeysKeybindings.toggleMessengerWindow,
+    }
+    const getShortcuts = (): Shortcuts => {
+      const shortcuts: Shortcuts = {
+        electron: [
+          [
+            settingsStore.keybindings.toggleMessengerWindow,
+            multiKeysKeybindings.toggleMessengerWindow,
+          ],
         ],
-      ],
-      gkl: [
-        [
-          settingsStore.keybindings.toggleMessengerWindowAlt,
-          (e) => {
-            if (e.state === 'DOWN') {
-              if (
-                keybindingTriggered(
-                  settingsStore.keybindings.toggleMessengerWindowAlt,
-                )
-              ) {
-                multiKeysKeybindings.toggleMessengerWindowAlt()
+        gkl: [
+          [
+            settingsStore.keybindings.toggleMessengerWindowAlt,
+            (e) => {
+              if (e.state === 'DOWN') {
+                if (
+                  keybindingTriggered(
+                    settingsStore.keybindings.toggleMessengerWindowAlt,
+                  )
+                ) {
+                  multiKeysKeybindings.toggleMessengerWindowAlt()
+                }
               }
-            }
-          },
-        ],
-        [
-          settingsStore.keybindings.toggleOverlayWindow,
-          (e) => {
-            if (e.state === 'DOWN') {
-              if (
-                settingsStore?.enableOverlayWindow &&
-                keybindingTriggered(
-                  settingsStore.keybindings.toggleOverlayWindow,
-                )
-              ) {
-                multiKeysKeybindings.toggleOverlayWindow()
+            },
+          ],
+          [
+            settingsStore.keybindings.toggleOverlayWindow,
+            (e) => {
+              if (e.state === 'DOWN') {
+                if (
+                  settingsStore?.enableOverlayWindow &&
+                  keybindingTriggered(
+                    settingsStore.keybindings.toggleOverlayWindow,
+                  )
+                ) {
+                  multiKeysKeybindings.toggleOverlayWindow()
+                }
               }
-            }
-          },
-        ],
-        [
-          settingsStore.keybindings.cancelCurrentMessage,
-          (e) => {
-            if (e.state === 'DOWN') {
-              if (
-                keybindingTriggered(
-                  settingsStore.keybindings.cancelCurrentMessage,
-                )
-              ) {
-                multiKeysKeybindings.cancelCurrentMessage()
+            },
+          ],
+          [
+            settingsStore.keybindings.cancelCurrentMessage,
+            (e) => {
+              if (e.state === 'DOWN') {
+                if (
+                  keybindingTriggered(
+                    settingsStore.keybindings.cancelCurrentMessage,
+                  )
+                ) {
+                  multiKeysKeybindings.cancelCurrentMessage()
+                }
               }
-            }
-          },
-        ],
-        [
-          settingsStore.keybindings.cancelAllMessages,
-          (e) => {
-            if (e.state === 'DOWN') {
-              if (
-                keybindingTriggered(settingsStore.keybindings.cancelAllMessages)
-              ) {
-                multiKeysKeybindings.cancelAllMessages()
+            },
+          ],
+          [
+            settingsStore.keybindings.cancelAllMessages,
+            (e) => {
+              if (e.state === 'DOWN') {
+                if (
+                  keybindingTriggered(
+                    settingsStore.keybindings.cancelAllMessages,
+                  )
+                ) {
+                  multiKeysKeybindings.cancelAllMessages()
+                }
               }
-            }
-          },
+            },
+          ],
         ],
-      ],
-    })
+      }
+      const electron: Shortcuts['electron'] = []
+      for (const [shortcut, callback] of shortcuts.electron) {
+        if (canRegisterElectronShortcut(getAccelerator(shortcut))) {
+          electron.push([shortcut, callback])
+        } else {
+          shortcuts.gkl.push([
+            shortcut,
+            (event) => {
+              if (event.state === 'DOWN' && keybindingTriggered(shortcut))
+                callback()
+            },
+          ])
+        }
+      }
+      return { electron, gkl: shortcuts.gkl }
+    }
 
     let shortcuts = getShortcuts()
 
