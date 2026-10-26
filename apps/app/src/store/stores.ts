@@ -37,7 +37,7 @@ const hooks = {
 
 export const stores = new Map<
   keyof typeof hooks,
-  typeof hooks[keyof typeof hooks]
+  (typeof hooks)[keyof typeof hooks]
 >()
 Object.entries(hooks).forEach(([key, value]) =>
   stores.set(key as keyof typeof hooks, value),
