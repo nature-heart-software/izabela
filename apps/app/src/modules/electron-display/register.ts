@@ -21,7 +21,7 @@ export default () =>
     })
 
     watch(
-      () => settingsStore.display,
+      () => [settingsStore.display, settingsStore.displayBounds],
       () => {
         electronMessengerWindow.setDisplay(
           settingsStore.display,
@@ -33,6 +33,7 @@ export default () =>
         )
         electronSpeechWorkerWindow.setDisplay()
       },
+      { deep: true },
     )
 
     const screenEvents = [

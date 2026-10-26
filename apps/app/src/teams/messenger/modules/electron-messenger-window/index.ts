@@ -14,7 +14,7 @@ import gameOverlay from '@/electron/game-overlay.ts'
 import { focusWindow } from 'forcefocus'
 import koffi from 'koffi'
 import { dialogsMap } from '@/modules/electron-dialog'
-import { boundsMatch } from '@/electron/utils'
+import { findDisplay } from '@/features/display/utils'
 
 export const ElectronMessengerWindow = () => {
   /* use isFocused as source of truth instead of window.isFocused() as in some instances
@@ -259,11 +259,7 @@ export const ElectronMessengerWindow = () => {
     if (window) {
       const allDisplays = screen.getAllDisplays()
       const primaryDisplay = screen.getPrimaryDisplay()
-      const display =
-        (id != null && allDisplays.find((d) => d.id === id)) ||
-        (boundsHint &&
-          allDisplays.find((d) => boundsMatch(d.bounds, boundsHint))) ||
-        primaryDisplay
+      const display = findDisplay(allDisplays, id, boundsHint) || primaryDisplay
       window.setBounds(display.bounds)
     }
   }

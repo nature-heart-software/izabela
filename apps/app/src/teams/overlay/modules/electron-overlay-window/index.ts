@@ -17,7 +17,7 @@ import keymap from '@packages/native-keymap'
 import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
 import { useOverlayWindowStore } from '@/teams/overlay/store'
 import koffi from 'koffi'
-import { boundsMatch } from '@/electron/utils'
+import { findDisplay } from '@/features/display/utils'
 
 export const ElectronOverlayWindow = () => {
   let waitingToShow = false
@@ -115,11 +115,7 @@ export const ElectronOverlayWindow = () => {
     if (window) {
       const allDisplays = screen.getAllDisplays()
       const primaryDisplay = screen.getPrimaryDisplay()
-      const display =
-        (id != null && allDisplays.find((d) => d.id === id)) ||
-        (boundsHint &&
-          allDisplays.find((d) => boundsMatch(d.bounds, boundsHint))) ||
-        primaryDisplay
+      const display = findDisplay(allDisplays, id, boundsHint) || primaryDisplay
       window.setBounds(display.bounds)
     }
   }
@@ -165,10 +161,10 @@ export const ElectronOverlayWindow = () => {
               hasRightAlt && hasShift
                 ? nativeKey.withShiftAltGr
                 : hasRightAlt
-                  ? nativeKey.withAltGr
-                  : hasShift
-                    ? nativeKey.withShift
-                    : nativeKey.value
+                ? nativeKey.withAltGr
+                : hasShift
+                ? nativeKey.withShift
+                : nativeKey.value
             if (key) {
               emitIPCOverlayInputCharacter(key)
             }
