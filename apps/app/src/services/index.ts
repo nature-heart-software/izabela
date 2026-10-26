@@ -28,13 +28,9 @@ export const api = (type?: 'remote' | 'local') => {
       '/api',
       settingsStore.universalApiEndpoint,
     ).toString()
-    remoteAxiosApi.interceptors.request.use((config) => ({
-      ...config,
-      params: {
-        ...config.params,
-        apiKey: decrypt(settingsStore.universalApiKey),
-      },
-    }))
+    remoteAxiosApi.defaults.headers.common.Authorization = `Bearer ${decrypt(
+      settingsStore.universalApiKey,
+    )}`
     return remoteAxiosApi
   }
   return localAxiosApi
@@ -54,12 +50,13 @@ export const fetchApi = (
 ) => {
   const settingsStore = useSettingsStore()
   const speechStore = useSpeechStore()
+  const headers = new Headers(options.headers)
+  if (!headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json')
+  }
   const newOptions = {
     ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
+    headers,
   }
   if (type === 'local') {
     return fetch(
@@ -68,11 +65,12 @@ export const fetchApi = (
     ).then(throwIfError)
   }
   if (speechStore.hasUniversalApiCredentials) {
+    headers.set(
+      'Authorization',
+      `Bearer ${decrypt(settingsStore.universalApiKey)}`,
+    )
     return fetch(
-      new URL(
-        `/api${endpoint}`,
-        settingsStore.universalApiEndpoint,
-      ).toString() + `?apiKey=${decrypt(settingsStore.universalApiKey)}`,
+      new URL(`/api${endpoint}`, settingsStore.universalApiEndpoint).toString(),
       newOptions,
     ).then(throwIfError)
   }
