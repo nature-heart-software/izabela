@@ -47,6 +47,7 @@ export const fetchApi = (
   type: 'remote' | 'local',
   endpoint: string,
   options: RequestInit = {},
+  region?: string,
 ) => {
   const settingsStore = useSettingsStore()
   const speechStore = useSpeechStore()
@@ -69,10 +70,9 @@ export const fetchApi = (
       'Authorization',
       `Bearer ${decrypt(settingsStore.universalApiKey)}`,
     )
-    return fetch(
-      new URL(`/api${endpoint}`, settingsStore.universalApiEndpoint).toString(),
-      newOptions,
-    ).then(throwIfError)
+    const url = new URL(`/api${endpoint}`, settingsStore.universalApiEndpoint)
+    if (region && region !== 'auto') url.searchParams.set('region', region)
+    return fetch(url.toString(), newOptions).then(throwIfError)
   }
   return fetch(
     new URL(`/api${endpoint}`, localApiBaseUrl).toString(),

@@ -1,4 +1,4 @@
-import { fetchApi } from '@/services'
+import { api, fetchApi } from '@/services'
 import { registerEngine } from '@/modules/speech-engine-manager'
 import type { SpeechEngine } from '@/modules/speech-engine-manager/types'
 import { useSpeechStore } from '@/features/speech/store'
@@ -33,6 +33,10 @@ export const engine = registerEngine({
   id: ENGINE_ID,
   name: ENGINE_NAME,
   category: 'cloud',
+  getRegions: () =>
+    api('remote')
+      .get('/tts/microsoft-azure/list-regions')
+      .then(({ data }) => data),
   getSelectedVoice,
   getVoiceName,
   getCredentials,
@@ -73,7 +77,7 @@ export const engine = registerEngine({
   getLanguageCode(voice) {
     return (voice || getSelectedVoice()).Locale
   },
-  synthesizeSpeech({ credentials, payload }) {
+  synthesizeSpeech({ credentials, payload: { region, ...payload } }) {
     return fetchApi(
       getProperty('useLocalCredentials') ? 'local' : 'remote',
       `/tts/microsoft-azure/synthesize-speech${
@@ -87,6 +91,7 @@ export const engine = registerEngine({
           includeTimestamps: getProperty('includeTimestamps'),
         }),
       },
+      region,
     )
   },
   getUseCacheOnEveryRequest() {
