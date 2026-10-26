@@ -151,8 +151,8 @@ the packaged dependencies and unpacked native binaries.
 overlay and renderer connections, rejects startup/shutdown errors, and stops its processes.
 It bypasses Nx's task cache so that packages are compiled during validation.
 Set `NX_SKIP_NX_CACHE=false` to check startup with caching enabled.
-The Windows CI jobs run serve and build in separate fresh checkouts, then check
-package declarations, keyboard routing, and native runtime dependencies.
+Windows CI builds the installer in a fresh checkout, then checks package
+declarations, keyboard routing, and native runtime dependencies.
 
 Native workspace builds and the Electron forcefocus rebuild are cached by their
 source, lockfile, Node/Electron versions, OS/architecture, compiler options and
