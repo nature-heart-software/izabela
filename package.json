@@ -178,7 +178,7 @@
     "build:prod": "pnpm nx run-many --target=build:prod --all --exclude=root",
     "build:portable": "pnpm nx run-many --target=build --all --exclude=root,izabela-next,@packages/electron-game-overlay,@packages/native-keymap,win-control --parallel=1",
     "test:build": "pnpm run build:portable && node --test tests/package-build.test.mjs tests/keyboard-accelerator.test.mjs && pnpm run test:regions",
-    "test:regions": "node --test apps/app/src/modules/speech-engine-manager/regions.test.mjs apps/app/src/services/index.test.mjs apps/app/src/features/speech/components/inputs/NvSpeechRegionSelect.test.mjs",
+    "test:regions": "node --test apps/app/src/modules/speech-engine-manager/regions.test.mjs apps/app/src/services/index.test.mjs apps/app/src/features/speech/components/inputs/NvSpeechRegionSelect.test.mjs apps/app/src/features/settings/store/migrations.test.mjs",
     "test:serve": "node tests/serve-smoke.cjs",
     "serve": "pnpm nx dev izabela-next",
     "dev": "pnpm run serve",
