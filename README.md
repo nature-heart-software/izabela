@@ -166,9 +166,9 @@ and loads the restored modules in Electron.
 
 In GitHub **Actions → Downloadable app build → Run workflow**, select the branch
 and run the workflow. After it succeeds, download
-`izabela-windows-no-update-<commit SHA>` from the run's **Artifacts** section and
-extract the Windows installer. Artifacts are retained for 14 days and require a
-GitHub login to download.
+`izabela-next-setup-<version>-win.exe` directly from the run's **Artifacts** section.
+The installer keeps its original filename and is not wrapped in a ZIP. Artifacts
+are retained for 14 days and require a GitHub login to download.
 
 These builds disable both normal update checks and startup-error recovery updates.
 Update controls are unavailable without changing your saved preference; regular

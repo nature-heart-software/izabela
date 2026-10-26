@@ -43,10 +43,9 @@ jobs:
       - name: Check packaged native dependencies
         run: pnpm test:native apps/app/dist_electron/win-unpacked/resources/app.asar
       - name: Upload Windows installer
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7.0.2
         with:
-          name: izabela-windows-no-update-${{ github.sha }}
           path: apps/app/dist_electron/*.exe
+          archive: false
           if-no-files-found: error
           retention-days: 14
-          compression-level: 0
