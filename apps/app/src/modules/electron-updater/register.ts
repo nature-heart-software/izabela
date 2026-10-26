@@ -5,6 +5,7 @@ import { useSettingsStore } from '@/features/settings/store'
 
 export default () =>
   app.whenReady().then(() => {
+    if (import.meta.env.VITE_DISABLE_AUTO_UPDATE === 'true') return
     const settingsStore = useSettingsStore()
     return settingsStore.$whenReady().then(() => {
       if (!settingsStore.enableAutoUpdate) return

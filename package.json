@@ -187,7 +187,8 @@
     "test:native": "electron tests/native-runtime.cjs",
     "test:native-cache": "node tests/native-cache.cjs",
     "test:auth": "node --test apps/app/src/services/auth.test.mjs",
-    "test:display": "node --test apps/app/src/features/display/utils.test.mjs apps/app/src/features/display/components/inputs/DisplaySelect.test.mjs"
+    "test:display": "node --test apps/app/src/features/display/utils.test.mjs apps/app/src/features/display/components/inputs/DisplaySelect.test.mjs",
+    "test:updates": "node --test apps/app/src/modules/electron-updater/register.test.mjs apps/app/src/teams/messenger/views/NvSettingsGeneral.test.mjs"
   },
   "workspaces": [
     "apps/*",

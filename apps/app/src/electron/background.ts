@@ -4,6 +4,7 @@ import { app } from 'electron'
 
 const fallback = async (...args: unknown[]) => {
   console.log('[error]', ...args)
+  if (import.meta.env.VITE_DISABLE_AUTO_UPDATE === 'true') return
   const version = app.getVersion()
   const channelPart = version.split('-')[1]
   const channel = channelPart ? channelPart.split('.')[0] : 'latest'

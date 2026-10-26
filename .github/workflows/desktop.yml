@@ -43,6 +43,8 @@ jobs:
         run: pnpm test:auth
       - name: Check monitor restoration
         run: pnpm test:display
+      - name: Check update policy
+        run: pnpm test:updates
       - name: Serve and check application startup
         if: matrix.flow == 'serve'
         run: pnpm test:serve
