@@ -267,18 +267,25 @@
           <NvGroup :spacing="5" justify="apart" no-wrap>
             <NvStack>
               <NvText type="label">Enable auto-update</NvText>
+              <NvText v-if="autoUpdateDisabled" type="caption">
+                Updates are disabled for this build.
+              </NvText>
             </NvStack>
             <NvSwitch
+              v-if="!autoUpdateDisabled"
               :modelValue="settingsStore.enableAutoUpdate"
               @update:modelValue="
                 (value) =>
+                  !autoUpdateDisabled &&
                   settingsStore.$patch({
                     enableAutoUpdate: value,
                   })
               "
             />
           </NvGroup>
-          <template v-if="settingsStore.enableAutoUpdate">
+          <template
+            v-if="!autoUpdateDisabled && settingsStore.enableAutoUpdate"
+          >
             <NvDivider direction="horizontal" />
             <NvGroup :spacing="5" class="pl-6" justify="apart" no-wrap>
               <NvStack>
@@ -287,7 +294,9 @@
               <NvUpdateChannelSelect
                 :modelValue="settingsStore.updateChannel"
                 @update:modelValue="
-                  (value) => settingsStore.$patch({ updateChannel: value })
+                  (value) =>
+                    !autoUpdateDisabled &&
+                    settingsStore.$patch({ updateChannel: value })
                 "
               />
             </NvGroup>
@@ -345,6 +354,7 @@ import { useClearCacheMutation } from '@/features/app/queries.ts'
 import { useMessengerStateStore } from '@/teams/messenger/store'
 
 const confirmAdmin = useConfirmAdmin()
+const autoUpdateDisabled = import.meta.env.VITE_DISABLE_AUTO_UPDATE === 'true'
 const settingsStore = useSettingsStore()
 const messengerStateStore = useMessengerStateStore()
 

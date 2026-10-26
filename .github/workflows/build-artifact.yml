@@ -1,0 +1,51 @@
+name: Downloadable app build
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: artifact-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: windows-2022
+    timeout-minutes: 45
+    env:
+      NX_SKIP_NX_CACHE: 'true'
+      NX_DAEMON: 'false'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Check update policy
+        run: pnpm test:updates
+      - name: Build app without updates
+        run: pnpm build
+        env:
+          NODE_OPTIONS: '--max_old_space_size=4096'
+          VITE_DISABLE_AUTO_UPDATE: 'true'
+          VITE_APP_ENCRYPTION_KEY: ${{ secrets.APP_ENCRYPTION_KEY }}
+      - name: Check packaged native dependencies
+        run: pnpm test:native apps/app/dist_electron/win-unpacked/resources/app.asar
+      - name: Upload Windows installer
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          path: apps/app/dist_electron/*.exe
+          archive: false
+          if-no-files-found: error
+          retention-days: 14

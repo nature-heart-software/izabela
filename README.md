@@ -151,8 +151,8 @@ the packaged dependencies and unpacked native binaries.
 overlay and renderer connections, rejects startup/shutdown errors, and stops its processes.
 It bypasses Nx's task cache so that packages are compiled during validation.
 Set `NX_SKIP_NX_CACHE=false` to check startup with caching enabled.
-The Windows CI jobs run serve and build in separate fresh checkouts, then check
-package declarations, keyboard routing, and native runtime dependencies.
+Windows CI builds the installer in a fresh checkout, then checks package
+declarations, keyboard routing, and native runtime dependencies.
 
 Native workspace builds and the Electron forcefocus rebuild are cached by their
 source, lockfile, Node/Electron versions, OS/architecture, compiler options and
@@ -161,3 +161,20 @@ generated compiler projects and intermediate files are rebuilt on a cache miss.
 `pnpm test:native-cache` builds with an empty Nx cache, deletes the outputs, checks
 that cache hits restore identical binaries, verifies compiler-option invalidation,
 and loads the restored modules in Electron.
+
+### Downloadable builds without updates
+
+In GitHub **Actions → Downloadable app build → Run workflow**, select the branch
+and run the workflow. After it succeeds, download
+`izabela-next-setup-<version>-win.exe` directly from the run's **Artifacts** section.
+The installer keeps its original filename and is not wrapped in a ZIP. Artifacts
+are retained for 14 days and require a GitHub login to download.
+
+These builds disable both normal update checks and startup-error recovery updates.
+Update controls are unavailable without changing your saved preference; regular
+builds retain their usual update behavior. The installer uses the normal app
+identity and settings, so installing it can replace an existing installation.
+Install a newer build manually when needed.
+
+The workflow runs only on demand, uses the existing `APP_ENCRYPTION_KEY` repository
+secret for settings compatibility, and does not publish a release.
