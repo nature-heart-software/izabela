@@ -5,15 +5,12 @@
         <NvText type="label">Region</NvText>
         <NvSelect
           v-model="selectedRegion"
+          v-loading="isLoading"
           :options="options"
           :aria-busy="isLoading"
         />
       </NvStack>
     </label>
-    <NvText v-if="isLoading" role="status">Loading regions…</NvText>
-    <NvText v-else-if="hasError" role="status">
-      Regions could not be loaded. Auto is still available.
-    </NvText>
   </NvStack>
 </template>
 <script lang="ts" setup>
@@ -28,7 +25,6 @@ const regions = ref<
   Awaited<ReturnType<NonNullable<SpeechEngine['getRegions']>>>
 >([])
 const isLoading = ref(false)
-const hasError = ref(false)
 const selectedRegion = computed({
   get: () => props.engine.store.getProperty('remoteRegion') || 'auto',
   set: (value) =>
@@ -63,7 +59,6 @@ watch(
     })
     regions.value = []
     isLoading.value = true
-    hasError.value = false
     try {
       const data = await props.engine.getRegions?.()
       if (active && Array.isArray(data)) {
@@ -75,7 +70,7 @@ watch(
         )
       }
     } catch {
-      if (active) hasError.value = true
+      // Region discovery is optional; keep Auto available if it fails.
     } finally {
       if (active) isLoading.value = false
     }

@@ -97,6 +97,7 @@ const textContent = (node) =>
 
 async function renderRegion(getRegions, selectedRegion = '') {
   const updates = []
+  const loadingStates = []
   let select
   const component = loadVue(
     new URL('./NvSpeechRegionSelect.vue', import.meta.url),
@@ -136,10 +137,18 @@ async function renderRegion(getRegions, selectedRegion = '') {
       },
     },
   })
+  app.directive('loading', {
+    mounted(_, binding) {
+      loadingStates.push(binding.value)
+    },
+    updated(_, binding) {
+      loadingStates.push(binding.value)
+    },
+  })
   app.mount(host)
   mountedApps.push(app)
   await new Promise(setImmediate)
-  return { html: textContent(host), select, updates }
+  return { html: textContent(host), select, updates, loadingStates }
 }
 
 test('region choices use server labels and default to Auto without storing a selection', async () => {
@@ -171,7 +180,7 @@ test('an unavailable optional catalog preserves the saved choice and allows Auto
   const { html, select } = await renderRegion(async () => {
     throw new Error('404')
   }, 'eu-west-2')
-  assert.match(html, /Regions could not be loaded/)
+  assert.doesNotMatch(html, /Regions could not be loaded|Loading regions/)
   assert.equal(select.props.modelValue, 'eu-west-2')
   assert.ok(select.props.options.some(({ value }) => value === 'auto'))
   assert.ok(select.props.options.some(({ value }) => value === 'eu-west-2'))
@@ -181,6 +190,19 @@ test('an empty optional catalog still offers Auto', async () => {
   const { select } = await renderRegion(async () => [])
   assert.equal(select.props.options.length, 1)
   assert.equal(select.props.options[0].value, 'auto')
+})
+
+test('the select shows its loading indicator without a status message', async () => {
+  let finish
+  const pending = new Promise((resolve) => {
+    finish = resolve
+  })
+  const { html, loadingStates } = await renderRegion(() => pending)
+  assert.equal(loadingStates.at(-1), true)
+  assert.doesNotMatch(html, /Loading regions|Regions could not be loaded/)
+  finish([])
+  await new Promise(setImmediate)
+  assert.equal(loadingStates.at(-1), false)
 })
 
 test('provider settings expose the optional remote region selector', async () => {
