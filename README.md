@@ -64,36 +64,6 @@ fullscreen.
 You can press `Ctrl` + `Enter` (or `Esc` if the text input is focused) to close the window.
 Pressing `Enter` while the text input is focused and no text is present will also close the window.
 
-## Troubleshooting
-
-<details>
-<summary>YouTube videos turn black when Izabela opens (Windows / Chrome)</summary>
-
-Chrome's [native window occlusion detection](https://chromium.googlesource.com/chromium/src/+/main/docs/windows_native_window_occlusion_tracking.md)
-can treat the browser as covered when Izabela appears, causing YouTube videos to
-turn black. A workaround is to disable this detection in **Chrome**, not Izabela:
-
-1. Right-click your Chrome shortcut and open **Properties**. For a pinned taskbar
-   shortcut, right-click its icon, then right-click **Google Chrome** in the menu
-   and choose **Properties**.
-2. In **Target**, append the following flag after the closing quote, separated by
-   a space. Keep your existing Chrome executable path:
-
-   ```text
-   "C:\Program Files\Google\Chrome\Application\chrome.exe" --disable-features=CalculateNativeWinOcclusion
-   ```
-
-3. Click **Apply**, fully exit Chrome (including any background Chrome processes),
-   and reopen it using that shortcut. The flag will not take effect if Chrome
-   reuses an already-running browser process.
-
-This is a browser-side workaround, not an Izabela fix. It applies to Chrome windows
-started with that flag and may increase resource usage while they are covered by
-other windows. To undo it, remove `--disable-features=CalculateNativeWinOcclusion`
-from the shortcut, fully exit Chrome, and reopen it.
-
-</details>
-
 ## Support
 
 Credentials for the more advanced text-to-speech engines are not provided by default. If you don't want to bother
@@ -130,6 +100,36 @@ Here's a list of all the text-to-speech engines that are supported in Izabela:
 ## Guides
 
 Find guides and API documentation on the [Wiki](https://github.com/nature-heart-software/izabela/wiki) page.
+
+## Troubleshooting
+
+<details>
+<summary>YouTube videos turn black when Izabela opens (Windows / Chrome)</summary>
+
+Chrome's [native window occlusion detection](https://chromium.googlesource.com/chromium/src/+/main/docs/windows_native_window_occlusion_tracking.md)
+can treat the browser as covered when Izabela appears, causing YouTube videos to
+turn black. A workaround is to disable this detection in **Chrome**, not Izabela:
+
+1. Right-click your Chrome shortcut and open **Properties**. For a pinned taskbar
+   shortcut, right-click its icon, then right-click **Google Chrome** in the menu
+   and choose **Properties**.
+2. In **Target**, append the following flag after the closing quote, separated by
+   a space. Keep your existing Chrome executable path:
+
+   ```text
+   "C:\Program Files\Google\Chrome\Application\chrome.exe" --disable-features=CalculateNativeWinOcclusion
+   ```
+
+3. Click **Apply**, fully exit Chrome (including any background Chrome processes),
+   and reopen it using that shortcut. The flag will not take effect if Chrome
+   reuses an already-running browser process.
+
+This is a browser-side workaround, not an Izabela fix. It applies to Chrome windows
+started with that flag and may increase resource usage while they are covered by
+other windows. To undo it, remove `--disable-features=CalculateNativeWinOcclusion`
+from the shortcut, fully exit Chrome, and reopen it.
+
+</details>
 
 ## More from the community
 
