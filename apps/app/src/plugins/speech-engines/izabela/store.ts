@@ -9,6 +9,7 @@ export const store = definePluginStore(
   ENGINE_ID,
   {
     favoriteVoiceIds: [],
+    remoteRegion: '',
     useCacheOnEveryRequest: true,
     streamAudio: true,
     ...exposedProperties,

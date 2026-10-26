@@ -11,11 +11,18 @@ const SpeechEngineManager = () => {
     const dictionaryStore = useDictionaryStore()
     return {
       ...speechEngine,
-      getPayload: (options) =>
-        speechEngine.getPayload({
+      getPayload: (options) => {
+        const payload = speechEngine.getPayload({
           ...options,
           text: dictionaryStore.translateText(options.text),
-        }),
+        })
+        const region =
+          speechEngine.getRegions &&
+          !speechEngine.store.getProperty('useLocalCredentials')
+            ? speechEngine.store.getProperty('remoteRegion')
+            : undefined
+        return region && region !== 'auto' ? { ...payload, region } : payload
+      },
     }
   }
 
