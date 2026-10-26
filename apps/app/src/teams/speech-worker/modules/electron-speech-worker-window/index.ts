@@ -27,8 +27,7 @@ export const ElectronSpeechWindow = () => {
   const isReady = () => ready.promise
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
   let speechRecognitionStore:
-    | ReturnType<typeof useSpeechRecognitionStore>
-    | undefined
+    ReturnType<typeof useSpeechRecognitionStore> | undefined
   let deferredRecording: ReturnType<typeof Deferred> | null = null
   // eslint-disable-next-line prefer-const
   let electronNativeSpeechRecognitionCallback: ReturnType<

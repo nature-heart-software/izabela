@@ -29,8 +29,7 @@ export const ElectronMessengerWindow = () => {
   let hitboxesStore: ReturnType<typeof useHitboxesStore> | undefined
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
   let messengerWindowStore:
-    | ReturnType<typeof useMessengerWindowStore>
-    | undefined
+    ReturnType<typeof useMessengerWindowStore> | undefined
   const ready = Deferred<BrowserWindow>()
   const isReady = () => ready.promise
   let foregroundWindow: string | number | null = null
