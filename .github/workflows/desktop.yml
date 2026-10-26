@@ -39,6 +39,8 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Check optional provider regions
         run: pnpm test:regions
+      - name: Check universal credential transport
+        run: pnpm test:auth
       - name: Serve and check application startup
         if: matrix.flow == 'serve'
         run: pnpm test:serve

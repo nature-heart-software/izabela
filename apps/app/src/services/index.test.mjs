@@ -22,6 +22,7 @@ function loadServices(hasUniversalApiCredentials = true) {
       '@/utils/security': { decrypt: () => 'test-key' },
     },
     {
+      Headers,
       __importMetaEnv: { VITE_SERVER_PORT: '7070' },
       fetch: async (url, options) => {
         calls.push({ url: new URL(url), options })
@@ -45,7 +46,8 @@ test('remote synthesis forwards an explicit region in the gateway query', async 
     'eu-west-2',
   )
   assert.equal(calls[0].url.searchParams.get('region'), 'eu-west-2')
-  assert.equal(calls[0].url.searchParams.get('apiKey'), 'test-key')
+  assert.equal(calls[0].url.searchParams.has('apiKey'), false)
+  assert.equal(calls[0].options.headers.get('Authorization'), 'Bearer test-key')
   assert.equal(calls[0].options.body, body)
 })
 
