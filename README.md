@@ -66,7 +66,8 @@ Pressing `Enter` while the text input is focused and no text is present will als
 
 ## Troubleshooting
 
-### YouTube videos turn black when Izabela opens (Windows / Chrome)
+<details>
+<summary>YouTube videos turn black when Izabela opens (Windows / Chrome)</summary>
 
 Chrome's [native window occlusion detection](https://chromium.googlesource.com/chromium/src/+/main/docs/windows_native_window_occlusion_tracking.md)
 can treat the browser as covered when Izabela appears, causing YouTube videos to
@@ -90,6 +91,8 @@ This is a browser-side workaround, not an Izabela fix. It applies to Chrome wind
 started with that flag and may increase resource usage while they are covered by
 other windows. To undo it, remove `--disable-features=CalculateNativeWinOcclusion`
 from the shortcut, fully exit Chrome, and reopen it.
+
+</details>
 
 ## Support
 
