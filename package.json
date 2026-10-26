@@ -186,7 +186,8 @@
     "docker:build": "docker build -t izabela . && docker create --name dummy izabela && docker cp dummy:dist_electron dist_electron && docker rm -f dummy",
     "test:native": "electron tests/native-runtime.cjs",
     "test:native-cache": "node tests/native-cache.cjs",
-    "test:auth": "node --test apps/app/src/services/auth.test.mjs"
+    "test:auth": "node --test apps/app/src/services/auth.test.mjs",
+    "test:display": "node --test apps/app/src/features/display/utils.test.mjs apps/app/src/features/display/components/inputs/DisplaySelect.test.mjs"
   },
   "workspaces": [
     "apps/*",

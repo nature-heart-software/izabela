@@ -41,6 +41,8 @@ jobs:
         run: pnpm test:regions
       - name: Check universal credential transport
         run: pnpm test:auth
+      - name: Check monitor restoration
+        run: pnpm test:display
       - name: Serve and check application startup
         if: matrix.flow == 'serve'
         run: pnpm test:serve

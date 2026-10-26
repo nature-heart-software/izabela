@@ -17,7 +17,8 @@ import ElectronWindowManager from '@/modules/electron-window-manager'
 import mapValues from 'lodash/mapValues'
 import { getTime } from '@/utils/time'
 import { windowHeight, windowWidth } from '@/teams/speech-worker/electron/const'
-import { getTopLeftWindow, boundsMatch } from '@/electron/utils'
+import { getTopLeftWindow } from '@/electron/utils'
+import { findDisplay } from '@/features/display/utils'
 import speechRecognitionEngineManager from '@/modules/speech-recognition-engine-manager'
 
 export const ElectronSpeechWindow = () => {
@@ -26,8 +27,7 @@ export const ElectronSpeechWindow = () => {
   const isReady = () => ready.promise
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
   let speechRecognitionStore:
-    | ReturnType<typeof useSpeechRecognitionStore>
-    | undefined
+    ReturnType<typeof useSpeechRecognitionStore> | undefined
   let deferredRecording: ReturnType<typeof Deferred> | null = null
   // eslint-disable-next-line prefer-const
   let electronNativeSpeechRecognitionCallback: ReturnType<
@@ -103,12 +103,11 @@ export const ElectronSpeechWindow = () => {
       const allDisplays = screen.getAllDisplays()
       const primaryDisplay = screen.getPrimaryDisplay()
       const display =
-        allDisplays.find((d) => d.id === settingsStore?.display) ||
-        (settingsStore?.displayBounds &&
-          allDisplays.find((d) =>
-            boundsMatch(d.bounds, settingsStore.displayBounds!),
-          )) ||
-        primaryDisplay
+        findDisplay(
+          allDisplays,
+          settingsStore?.display,
+          settingsStore?.displayBounds,
+        ) || primaryDisplay
       const displayBounds = mapValues(display.bounds, (v) => v + 24)
       window.setPosition(displayBounds.x, displayBounds.y)
     }
