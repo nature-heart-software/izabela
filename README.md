@@ -176,6 +176,5 @@ builds retain their usual update behavior. The installer uses the normal app
 identity and settings, so installing it can replace an existing installation.
 Install a newer build manually when needed.
 
-The workflow uses the existing `APP_ENCRYPTION_KEY` repository secret for settings
-compatibility and does not publish a release. Changes to this workflow are also
-built on same-repository pull requests so the installer can be tested before merge.
+The workflow runs only on demand, uses the existing `APP_ENCRYPTION_KEY` repository
+secret for settings compatibility, and does not publish a release.

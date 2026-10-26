@@ -2,20 +2,17 @@ name: Downloadable app build
 
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - .github/workflows/build-artifact.yml
 
 permissions:
   contents: read
 
 concurrency:
-  group: artifact-build-${{ github.event.pull_request.number || github.ref }}
+  group: artifact-build-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   build:
-    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event_name == 'workflow_dispatch'
     runs-on: windows-2022
     timeout-minutes: 45
     env:
