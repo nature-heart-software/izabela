@@ -1,0 +1,55 @@
+name: Package regression tests
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [dev]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: packages-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  packages:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    name: Packages (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    env:
+      NX_DAEMON: 'false'
+      NX_NO_CLOUD: 'true'
+      NX_TUI: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Install dependencies without native lifecycle scripts
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Prepare portable build tooling
+        run: pnpm rebuild vue-demi esbuild
+      - name: Build portable package entrypoints
+        run: pnpm build:portable
+      - name: Test every non-app package
+        run: pnpm test:packages
+      - name: Upload package test reports
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: package-tests-${{ matrix.os }}
+          path: coverage/package-results/*.json
+          if-no-files-found: warn
+          retention-days: 14
