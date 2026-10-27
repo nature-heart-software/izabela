@@ -1,4 +1,4 @@
-import { PiniaPlugin } from 'pinia'
+import { PiniaPlugin, StoreGeneric } from 'pinia'
 import { persistStatePlugin } from './persist-state-plugin'
 import { shareStatePlugin } from './share-state-plugin'
 import { PluginCustomProperties, StoreOptions } from './types'
@@ -6,7 +6,14 @@ import 'pinia'
 import { Deferred } from '@packages/toolbox'
 
 export const storesStates: PluginCustomProperties['storesStates'] = {}
-export const stores = new Map()
+/** Stores registered by id; entries remain available after disposal.
+ * @example
+ * ```ts
+ * import { stores } from '@packages/electron-pinia'
+ * const state = stores.get('settings')?.$state
+ * ```
+ */
+export const stores = new Map<string, StoreGeneric>()
 
 export const plugin = (() => {
   const plugin: () => PiniaPlugin =

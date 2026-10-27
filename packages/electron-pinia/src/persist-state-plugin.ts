@@ -44,7 +44,9 @@ function getElectronStore(name: string) {
   return electronStores[name]
 }
 
-function getStorage(name: string): ElectronStore {
+function getStorage(
+  name: string,
+): ElectronStore | Window['ElectronPiniaStorage'] {
   return isMain ? getElectronStore(name) : window.ElectronPiniaStorage
 }
 

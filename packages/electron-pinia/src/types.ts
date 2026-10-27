@@ -1,5 +1,4 @@
 import { PiniaPluginContext } from 'pinia'
-import type ElectronStore from 'electron-store'
 import type Electron from 'electron'
 
 export type StoreOptions = PiniaPluginContext['options'] & {
@@ -44,10 +43,14 @@ declare global {
       ) => void
       SEND_IPC_EVENT_NOTIFY_MAIN: (payload: ShareStatePayload) => void
     }
-    ElectronPiniaStorage: ElectronStore
+    ElectronPiniaStorage: {
+      get: (name: string) => Promise<unknown>
+      set: (name: string, state: unknown) => void
+      delete: (name: string) => void
+    }
     ElectronPiniaIsPreload?: boolean
   }
 
-  var ElectronPiniaStorage: ElectronStore
+  var ElectronPiniaStorage: Window['ElectronPiniaStorage']
   var ipcMain: Electron.IpcMain
 }
