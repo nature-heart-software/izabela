@@ -1,4 +1,5 @@
 import express from 'express'
+import type { ServerConfig, ServerContext } from './types'
 import bodyParser from 'body-parser'
 import cors from 'cors'
 import logger from 'morgan'
@@ -21,9 +22,9 @@ app.use((_, res, next) => {
 })
 
 class Server {
-  public server?: Izabela.Server.Context['server']
-  private config?: Izabela.Server.Config
-  private defaultConfig: Izabela.Server.Config = {
+  public server?: ServerContext['server']
+  private config?: ServerConfig
+  private defaultConfig: ServerConfig = {
     tempPath: path.resolve('temp'),
     port: 7070,
     ws: {
@@ -57,17 +58,21 @@ class Server {
     })
   }
 
-  async start(config = {}) {
+  async start(
+    config: Partial<Omit<ServerConfig, 'ws'>> & {
+      ws?: Partial<ServerConfig['ws']>
+    } = {},
+  ) {
     this.config = defaultsDeep(config, this.defaultConfig)
     await this.startRouter()
     await this.startServer()
   }
 
-  getContext(): Izabela.Server.Context {
+  getContext(): ServerContext {
     return { app, server: this.server, config: this.config }
   }
 
-  getConfig(): Izabela.Server.Config {
+  getConfig(): ServerConfig {
     return this.config || this.defaultConfig
   }
 }

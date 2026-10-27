@@ -46,6 +46,7 @@
   "private": true,
   "scripts": {
     "build": "vite build",
+    "test:types": "node tests/build-types.mjs && tsc --noEmit -p tests/tsconfig.consumer.json && tsc --noEmit -p tests/tsconfig.suite.json",
     "dev": "vite build --watch --mode development",
     "start": "node bin/generate-exports && nodemon ./dist/main.cjs --start-server"
   },
