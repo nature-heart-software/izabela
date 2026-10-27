@@ -1,6 +1,8 @@
 import { bridge } from '@packages/electron-bridger'
 import { electronModuleName } from './shared.ts'
-import azure, { InputTextItem } from '@azure-rest/ai-translation-text'
+import TextTranslationClient, {
+  isUnexpected,
+} from '@azure-rest/ai-translation-text'
 
 bridge.register([
   [
@@ -13,27 +15,29 @@ bridge.register([
         credentials: { apiKey: key, region },
       }: any) {
         try {
-          const { default: TextTranslationClient, isUnexpected } = azure as any
           const endpoint = `https://api.cognitive.microsofttranslator.com/`
           const translationClient = TextTranslationClient(endpoint, {
             key,
             region,
           })
 
-          const inputText: InputTextItem[] = [{ text }]
           const translateResponse = await translationClient
             .path('/translate')
             .post({
-              body: inputText,
-              queryParameters: {
-                to,
-                from,
+              body: {
+                inputs: [
+                  {
+                    text,
+                    ...(from ? { language: from } : {}),
+                    targets: [{ language: to }],
+                  },
+                ],
               },
             })
           if (isUnexpected(translateResponse)) {
             throw translateResponse.body.error
           }
-          const translations = translateResponse.body
+          const translations = translateResponse.body.value
           return translations[0]?.translations[0]?.text
         } catch (e) {
           return text

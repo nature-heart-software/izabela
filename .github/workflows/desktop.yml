@@ -37,6 +37,8 @@ jobs:
         run: pnpm test:regions
       - name: Check universal credential transport
         run: pnpm test:auth
+      - name: Check translation adapter
+        run: pnpm test:translation
       - name: Check monitor restoration
         run: pnpm test:display
       - name: Check update policy
