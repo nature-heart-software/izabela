@@ -10,9 +10,9 @@
   "scripts": {
     "build": "vite build",
     "build:prod": "pnpm run build",
-    "test:types": "tsc --noEmit -p tests/tsconfig.json",
+    "test:types": "vite build && tsc --noEmit -p tests/tsconfig.json",
     "dev": "vite build --watch --mode development"
   },
   "type": "module",
-  "types": "./dist/animalese.d.ts"
+  "types": "./dist/main.d.ts"
 }

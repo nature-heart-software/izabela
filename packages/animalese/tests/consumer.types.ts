@@ -1,4 +1,4 @@
-import animalese from '../src/main'
+import animalese from '..'
 
 type Assert<T extends true> = T
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B
