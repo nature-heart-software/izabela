@@ -1,4 +1,5 @@
 import { promises as fs } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -19,9 +20,7 @@ afterEach(async () => {
 })
 
 async function tree(files: Record<string, string>) {
-  const directory = await fs.mkdtemp(
-    join(process.env.TMPDIR!, 'generate-exports-'),
-  )
+  const directory = await fs.mkdtemp(join(tmpdir(), 'generate-exports-'))
   directories.push(directory)
   for (const [file, content] of Object.entries(files)) {
     const target = join(directory, file)

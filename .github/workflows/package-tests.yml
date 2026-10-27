@@ -27,6 +27,7 @@ jobs:
       NX_DAEMON: 'false'
       NX_NO_CLOUD: 'true'
       NX_TUI: 'false'
+      pnpm_config_verify_deps_before_run: 'false'
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -46,6 +47,8 @@ jobs:
       - name: Check package runner contracts
         run: pnpm test:packages:runner
       - name: Test every non-app package
+        env:
+          npm_config_ignore_scripts: 'true'
         run: pnpm test:packages
       - name: Upload package test reports
         if: always()
