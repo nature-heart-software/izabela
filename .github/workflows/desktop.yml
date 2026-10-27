@@ -2,12 +2,20 @@ name: Desktop workflows
 
 on:
   pull_request:
+  workflow_dispatch:
+    inputs:
+      installer_artifact_run:
+        description: 'Existing workflow run containing installer-test-input; leave blank for a full build'
+        required: false
+        default: ''
+        type: string
   push:
     branches:
       - dev
 
 permissions:
   contents: read
+  actions: read
 
 env:
   NX_SKIP_NX_CACHE: 'true'
@@ -19,6 +27,7 @@ concurrency:
 jobs:
   desktop:
     name: Clean build
+    if: github.event_name != 'workflow_dispatch' || inputs.installer_artifact_run == ''
     runs-on: windows-2022
     timeout-minutes: 30
     steps:
@@ -41,6 +50,8 @@ jobs:
         run: pnpm test:translation
       - name: Check speech capture and providers
         run: pnpm test:speech
+      - name: Check app test contracts
+        run: pnpm test:app:unit
       - name: Check transcription adapters and startup
         run: pnpm test:stt
       - name: Check OpenAI SDK model catalogs
@@ -49,6 +60,8 @@ jobs:
         run: pnpm test:recovery
       - name: Check provider failures, audio routing, and lifecycle
         run: pnpm test:resilience
+      - name: Check keyboard edges, renderer recovery and interrupted saves
+        run: pnpm test:edges
       - name: Check speech detection in Electron
         run: pnpm test:speech:runtime
       - name: Check monitor restoration
@@ -60,7 +73,34 @@ jobs:
       - name: Check update policy
         run: pnpm test:updates
       - name: Build the Electron installer
+        env:
+          VITE_DISABLE_AUTO_UPDATE: 'true'
         run: pnpm build
+      - name: Upload installer for disposable upgrade tests
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: installer-test-input
+          path: apps/app/dist_electron/*setup*.exe
+          if-no-files-found: error
+          retention-days: 3
+      - name: Package the next version for actual auto-update tests
+        run: pnpm --filter izabela-next exec electron-builder --config ../../tests/app/updater-builder.cjs --publish never
+      - name: Upload automatic update candidate
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: updater-test-input
+          path: apps/app/dist_updater/*setup*.exe
+          if-no-files-found: error
+          retention-days: 3
+      - name: Check packaged production app end to end
+        run: pnpm test:app:packaged
+      - name: Upload app test diagnostics
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: app-test-diagnostics
+          path: coverage/app-results/offline-packaged
+          if-no-files-found: ignore
       - name: Check packages and keyboard routing
         run: node --test tests/package-build.test.mjs tests/keyboard-accelerator.test.mjs
       - name: Check native dependencies in Electron
@@ -69,3 +109,74 @@ jobs:
         run: pnpm test:native apps/app/dist_electron/win-unpacked/resources/app.asar
       - name: Check native cache restoration and invalidation
         run: pnpm test:native-cache
+
+  installer:
+    name: Installed application upgrade
+    needs: desktop
+    if: always() && (needs.desktop.result == 'success' || (github.event_name == 'workflow_dispatch' && inputs.installer_artifact_run != ''))
+    runs-on: windows-2022
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Install JavaScript probe dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - uses: actions/download-artifact@v4
+        with:
+          name: installer-test-input
+          path: coverage/installer-input
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.installer_artifact_run || github.run_id }}
+      - name: Install released version, upgrade, launch, and uninstall
+        run: node tests/app/installer.cjs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INSTALLER_BUILD_RUN_ID: ${{ inputs.installer_artifact_run || github.run_id }}
+      - name: Upload installed-app diagnostics
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: installer-test-diagnostics
+          path: coverage/installer-results
+          if-no-files-found: ignore
+
+  updater:
+    name: Automatic update and recovery
+    needs: desktop
+    if: always() && (needs.desktop.result == 'success' || (github.event_name == 'workflow_dispatch' && inputs.installer_artifact_run != ''))
+    runs-on: windows-2022
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Install JavaScript probe dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - uses: actions/download-artifact@v4
+        with:
+          name: installer-test-input
+          path: coverage/installer-input
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.installer_artifact_run || github.run_id }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: updater-test-input
+          path: coverage/updater-input
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.installer_artifact_run || github.run_id }}
+      - name: Verify interrupted, corrupt and successful in-app updates
+        run: node tests/app/updater.cjs
+      - name: Upload updater diagnostics
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: updater-test-diagnostics
+          path: coverage/updater-results
+          if-no-files-found: ignore

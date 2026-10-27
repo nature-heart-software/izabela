@@ -5,8 +5,11 @@ import test from 'node:test'
 const workspace = readFileSync(
   new URL('../pnpm-workspace.yaml', import.meta.url),
   'utf8',
-)
-const lock = readFileSync(new URL('../pnpm-lock.yaml', import.meta.url), 'utf8')
+).replaceAll('\r\n', '\n')
+const lock = readFileSync(
+  new URL('../pnpm-lock.yaml', import.meta.url),
+  'utf8',
+).replaceAll('\r\n', '\n')
 const productionUndici = '7.30.1'
 
 // Inspect pnpm's generated top-level sections and two-space entry blocks only;

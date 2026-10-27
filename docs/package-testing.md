@@ -1,6 +1,6 @@
 # Package regression tests
 
-The package suite covers workspace libraries and the local API server. The desktop application (`apps/app`) is excluded from this suite; its existing application and native-runtime checks remain separate.
+The package suite covers workspace libraries and the local API server. The desktop application (`apps/app`) has a separate Windows end-to-end suite described in [app-testing.md](app-testing.md).
 
 ## Running tests
 
