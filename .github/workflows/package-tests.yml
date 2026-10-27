@@ -43,6 +43,8 @@ jobs:
         run: pnpm rebuild vue-demi esbuild
       - name: Build portable package entrypoints
         run: pnpm build:portable
+      - name: Check package runner contracts
+        run: pnpm test:packages:runner
       - name: Test every non-app package
         run: pnpm test:packages
       - name: Upload package test reports

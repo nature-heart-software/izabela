@@ -57,6 +57,7 @@ mkdirSync(output, { recursive: true })
 const results = []
 for (const pkg of selected) {
   const report = join(output, pkg.directory.replace(/[\\/]/g, '-') + '.json')
+  rmSync(report, { force: true })
   const files = readdirSync(join(root, pkg.directory), { recursive: true })
     .filter(
       (name) =>
@@ -78,7 +79,6 @@ for (const pkg of selected) {
   console.log(
     `\nTesting ${pkg.name} (${relative(root, join(root, pkg.directory))})`,
   )
-  rmSync(report, { force: true })
   const run = spawnSync(
     process.execPath,
     [vitest, 'run', pkg.directory, '--reporter=json', `--outputFile=${report}`],
@@ -90,9 +90,30 @@ for (const pkg of selected) {
     },
   )
   let assertions = []
+  let reportError
   if (existsSync(report)) {
-    const data = JSON.parse(readFileSync(report, 'utf8'))
-    assertions = data.testResults.flatMap((file) => file.assertionResults)
+    try {
+      const data = JSON.parse(readFileSync(report, 'utf8'))
+      assertions = data.testResults.flatMap((file) => file.assertionResults)
+      if (
+        !assertions.every(
+          (item) =>
+            typeof item?.fullName === 'string' &&
+            [
+              'passed',
+              'failed',
+              'pending',
+              'skipped',
+              'todo',
+              'disabled',
+            ].includes(item.status),
+        )
+      )
+        throw new Error('Invalid assertion shape')
+    } catch {
+      assertions = []
+      reportError = 'Invalid Vitest JSON report'
+    }
   }
   const expectedFailures = assertions.filter((item) =>
     item.fullName.includes('[known issue]'),
@@ -124,6 +145,7 @@ for (const pkg of selected) {
     assertions.length > 0 &&
     passed > 0 &&
     failed === 0 &&
+    skipped === 0 &&
     typecheck !== 'failed'
   results.push({
     name: pkg.name,
@@ -136,7 +158,7 @@ for (const pkg of selected) {
     expectedFailures: expectedFailures.map((item) => item.fullName),
     exitCode: run.status,
     typecheck,
-    error: run.error?.message,
+    error: run.error?.message || reportError,
   })
   console.log(
     `${success ? 'PASS' : 'FAIL'} ${pkg.name}: ${passed} ordinary passes, ${
