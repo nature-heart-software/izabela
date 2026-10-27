@@ -37,11 +37,18 @@ export interface IMacKeyboardMapping {
 }
 
 export type IKeyboardMapping =
-  | IWindowsKeyboardMapping
-  | ILinuxKeyboardMapping
-  | IMacKeyboardMapping
+  IWindowsKeyboardMapping | ILinuxKeyboardMapping | IMacKeyboardMapping
 
-export function getKeyMap(): IKeyboardMapping
+/**
+ * Reads the native key map, or an empty array when native loading or retrieval fails.
+ * @returns The platform key mapping or the failure sentinel.
+ * @example
+ * ```ts
+ * const mapping = getKeyMap()
+ * if (!Array.isArray(mapping)) console.log(mapping.KeyA.value)
+ * ```
+ */
+export function getKeyMap(): IKeyboardMapping | []
 
 export interface IWindowsKeyboardLayoutInfo {
   name: string
@@ -65,12 +72,36 @@ export interface IMacKeyboardLayoutInfo {
 }
 
 export type IKeyboardLayoutInfo =
-  | IWindowsKeyboardLayoutInfo
-  | ILinuxKeyboardLayoutInfo
-  | IMacKeyboardLayoutInfo
+  IWindowsKeyboardLayoutInfo | ILinuxKeyboardLayoutInfo | IMacKeyboardLayoutInfo
 
-export function getCurrentKeyboardLayout(): IKeyboardLayoutInfo
+/**
+ * Reads the active platform layout, returning null on native errors.
+ * @returns The current native layout or null.
+ * @example
+ * ```ts
+ * const layout = getCurrentKeyboardLayout()
+ * if (layout) console.log(layout)
+ * ```
+ */
+export function getCurrentKeyboardLayout(): IKeyboardLayoutInfo | null
 
+/**
+ * Registers a callback for native layout changes. No unsubscribe handle is exposed.
+ * @param callback - Invoked when the native layout changes.
+ * @returns Nothing; native listener disposal is owned by the native environment.
+ * @example
+ * ```ts
+ * onDidChangeKeyboardLayout(() => console.log(getCurrentKeyboardLayout()))
+ * ```
+ */
 export function onDidChangeKeyboardLayout(callback: () => void): void
 
+/**
+ * Reports native ISO keyboard detection, undefined on unsupported platforms, or false on errors.
+ * @returns Native ISO detection result.
+ * @example
+ * ```ts
+ * const iso = isISOKeyboard()
+ * ```
+ */
 export function isISOKeyboard(): boolean | undefined

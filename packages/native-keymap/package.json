@@ -11,7 +11,8 @@
   "scripts": {
     "install": "node-gyp rebuild",
     "test": "node test/test.js",
-    "build": "node-gyp rebuild"
+    "build": "node-gyp rebuild",
+    "test:types": "tsc --noEmit -p tests/tsconfig.json"
   },
   "typings": "index.d.ts",
   "nx": {
