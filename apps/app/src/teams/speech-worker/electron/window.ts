@@ -41,10 +41,6 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     window.webContents.setBackgroundThrottling(false)
   }
 
-  window.once('ready-to-show', () => {
-    electronSpeechWorkerWindow.start(window)
-  })
-
   if (import.meta.env.DEV && import.meta.env.VITE_OPEN_DEVTOOLS === 'true') {
     window.webContents.openDevTools({ mode: 'undocked' })
   }
@@ -59,6 +55,9 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     await window.loadURL(`app://${filePath}`)
   }
 
+  // This transparent worker lives outside the displays until speech is
+  // detected. Its first paint is not a reliable signal for starting capture.
+  electronSpeechWorkerWindow.start(window)
   return window
 }
 

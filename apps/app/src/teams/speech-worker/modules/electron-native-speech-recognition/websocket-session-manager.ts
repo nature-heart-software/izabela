@@ -13,6 +13,7 @@ export class WebSocketSessionManager {
   private secondaryTimer: ReturnType<typeof setInterval> | null = null
   private secondaryTimeout: ReturnType<typeof setTimeout> | null = null
   private readonly factory: () => Promise<WebSocket>
+  public readonly ready: Promise<WebSocketSession | null>
 
   constructor({
     factory,
@@ -26,7 +27,10 @@ export class WebSocketSessionManager {
       this.sessionMaxAge = sessionMaxAge
     }
 
-    this.handleSessions()
+    this.ready = this.handleSessions().catch((error) => {
+      console.error('Unable to establish transcription session', error)
+      return null
+    })
   }
 
   getStaleAfter() {

@@ -41,6 +41,8 @@ jobs:
         run: pnpm test:translation
       - name: Check speech capture and providers
         run: pnpm test:speech
+      - name: Check transcription adapters and startup
+        run: pnpm test:stt
       - name: Check speech detection in Electron
         run: pnpm test:speech:runtime
       - name: Check monitor restoration

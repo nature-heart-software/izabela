@@ -17,7 +17,6 @@ export default ({ useRecording }: any) => {
         {
           headers: {
             Authorization: 'Bearer ' + apiKey,
-            'OpenAI-Beta': 'realtime=v1',
           },
         },
       )
@@ -25,22 +24,21 @@ export default ({ useRecording }: any) => {
       ws.on('open', function open() {
         ws.send(
           JSON.stringify({
-            type: 'transcription_session.update',
+            type: 'session.update',
             session: {
-              input_audio_format: 'pcm16',
-              input_audio_transcription: {
-                model: store.getProperty('model'),
-                prompt: store.getProperty('prompt'),
-                language: settingsStore.speechInputLanguage.split('-')[0],
-              },
-              turn_detection: {
-                type: 'server_vad',
-                threshold: 0.5,
-                prefix_padding_ms: 300,
-                silence_duration_ms: 200,
-              },
-              input_audio_noise_reduction: {
-                type: 'near_field',
+              type: 'transcription',
+              audio: {
+                input: {
+                  format: { type: 'audio/pcm', rate: 24000 },
+                  transcription: {
+                    model: store.getProperty('model'),
+                    prompt: store.getProperty('prompt'),
+                    language: settingsStore.speechInputLanguage.split('-')[0],
+                  },
+                  // The application already detects turns (Hark or hold-to-record).
+                  turn_detection: null,
+                  noise_reduction: { type: 'near_field' },
+                },
               },
             },
           }),
@@ -54,7 +52,7 @@ export default ({ useRecording }: any) => {
 
   return {
     async startStream() {
-      const ws = manager.getActiveSession()?.socket
+      const ws = (manager.getActiveSession() || (await manager.ready))?.socket
       if (!ws) return
       ws.on('close', onClose)
       ws.on('error', onError)
@@ -73,11 +71,12 @@ export default ({ useRecording }: any) => {
           }
         },
         onEnded() {
-          ws.send(
-            JSON.stringify({
-              type: 'input_audio_buffer.commit',
-            }),
-          )
+          if (!ended && ws.readyState === WebSocket.OPEN)
+            ws.send(
+              JSON.stringify({
+                type: 'input_audio_buffer.commit',
+              }),
+            )
         },
       })
 
@@ -88,11 +87,12 @@ export default ({ useRecording }: any) => {
         ws.off('close', onClose)
         ws.off('error', onError)
         ws.off('message', onMessage)
-        ws.send(
-          JSON.stringify({
-            type: 'input_audio_buffer.clear',
-          }),
-        )
+        if (ws.readyState === WebSocket.OPEN)
+          ws.send(
+            JSON.stringify({
+              type: 'input_audio_buffer.clear',
+            }),
+          )
       })
 
       function onMessage(message: any) {
@@ -104,6 +104,7 @@ export default ({ useRecording }: any) => {
           if (transcript) resolve(transcript)
         }
         if (msg.type === 'error') {
+          console.error('OpenAI transcription failed', msg.error?.message)
           resolve()
         }
       }

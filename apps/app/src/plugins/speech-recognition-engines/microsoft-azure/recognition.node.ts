@@ -30,7 +30,9 @@ export default ({ useRecording }: any) => {
           }
         },
         onEnded() {
-          speechRecognizer.close()
+          // Finishing input must not dispose a recognizer that has already
+          // returned a result, nor prevent a pending final result arriving.
+          if (!ended) stream.close()
         },
       })
 

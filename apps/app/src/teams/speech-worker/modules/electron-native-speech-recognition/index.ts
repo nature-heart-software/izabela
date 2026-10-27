@@ -24,7 +24,10 @@ export default () => {
   const postRecordingChunksCount = isVAD
     ? settingsStore.soxPostRecordingChunks
     : 0
-  const sampleRateHertz = 16000
+  const selectedEngine = speechRecognitionEngineManager.getEngineById(
+    settingsStore.selectedSpeechRecognitionEngine,
+  )
+  const sampleRateHertz = selectedEngine?.sampleRateHertz || 16000
 
   const recorder = nodeRecorder.record({
     sampleRate: sampleRateHertz,
@@ -130,9 +133,7 @@ export default () => {
     },
   }
 
-  const speechRecognitionEngine = speechRecognitionEngineManager
-    .getEngineById(settingsStore.selectedSpeechRecognitionEngine)
-    ?.recognitionFn?.(context)
+  const speechRecognitionEngine = selectedEngine?.recognitionFn?.(context)
 
   const stopWatch = watch(
     () => speechRecognitionStore.recording,
