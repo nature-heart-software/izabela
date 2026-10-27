@@ -47,6 +47,8 @@ Positive assertions check usable return values and options. Negative assertions 
 
 Type-only improvements must preserve the implementation's emitted JavaScript. Public contracts should describe actual behavior, including nullable or unchecked results where appropriate, rather than introducing unsupported guarantees.
 
+The UI consumer check uses the repository-compatible Node module resolver and `skipLibCheck` because upstream Element Plus declarations currently fail an unfiltered check. Its positive, negative, and non-`any` consumer assertions remain active against the real emitted package declarations. This is not a claim that all upstream declarations or the existing full-source Vue template check are error-free.
+
 ## Existing defects and expected failures
 
 A successful command does not mean that every desired contract already works. Retained baseline defects have:
