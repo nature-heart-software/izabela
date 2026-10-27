@@ -16,6 +16,7 @@ bridge.register([
         to,
         credentials: { identityPoolId, region },
       }: any) {
+        let client: TranslateClient | undefined
         try {
           const getCredentials = fromCognitoIdentityPool({
             clientConfig: {
@@ -25,7 +26,7 @@ bridge.register([
           })
 
           const credentials = await getCredentials()
-          const client = new TranslateClient({
+          client = new TranslateClient({
             region,
             credentials,
           })
@@ -39,7 +40,10 @@ bridge.register([
           const response = await client.send(command)
           return response.TranslatedText
         } catch (e) {
+          console.error('Amazon Translate failed', e)
           return text
+        } finally {
+          client?.destroy()
         }
       },
     }),

@@ -36,6 +36,11 @@ app
       `Electron ${process.versions.electron}, ABI ${process.versions.modules}: ${appRoot}`,
     )
 
+    // Storage must remain a real module: bundling conf into the application
+    // lets its self-cache invalidation evict the application entrypoint.
+    assert.equal(typeof load('electron-store'), 'function')
+    console.log('PASS electron-store: isolated storage dependency loaded')
+
     const keymap = load('@packages/native-keymap')
     assert.ok(Object.keys(keymap.getKeyMap()).length > 0)
     assert.ok(keymap.getCurrentKeyboardLayout())

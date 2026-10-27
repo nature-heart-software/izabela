@@ -11,6 +11,7 @@
     "@packages/win-mouse": "workspace:*",
     "bindings": "1.5.0",
     "electron-postman": "workspace:*",
+    "electron-store": "^8.1.0",
     "file-uri-to-path": "1.0.0",
     "forcefocus": "^1.1.0",
     "koffi": "^2.9.1",

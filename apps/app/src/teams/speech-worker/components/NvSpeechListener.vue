@@ -1,91 +1,81 @@
 <template></template>
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, watch } from 'vue'
+import { watch } from 'vue'
 import { getSoxMediaDeviceByIndex } from '@/utils/media-devices'
 import { useSettingsStore } from '@/features/settings/store'
 import hark from 'hark'
 import { useSpeechRecognitionStore } from '@/features/speech/store'
-import { computedAsync } from '@vueuse/core'
 
 const settingsStore = useSettingsStore()
 const speechRecognitionStore = useSpeechRecognitionStore()
-const mediaDevice = await getSoxMediaDeviceByIndex(settingsStore.soxDevice)
-const realTime = computed(
-  () => settingsStore.speechRecognitionStrategy === 'continuous',
-)
 
-const stream = computedAsync(async () => {
-  if (!settingsStore.enableSTTTS) return null
-  return await navigator.mediaDevices.getUserMedia({
-    audio: {
-      deviceId: mediaDevice?.deviceId,
-      sampleRate: 48000,
-      sampleSize: 16,
-      channelCount: 1,
-    },
-    video: false,
-  })
-}, null)
+watch(
+  () =>
+    [
+      settingsStore.enableSTTTS,
+      settingsStore.speechRecognitionStrategy,
+      settingsStore.soxDevice,
+      settingsStore.audioInputSensibility,
+      settingsStore.speechDetectionPolling,
+    ] as const,
+  async (
+    [enabled, strategy, deviceIndex, threshold, interval],
+    _,
+    onCleanup,
+  ) => {
+    if (!enabled || strategy !== 'continuous') return
 
-const speech = computed<any>((oldValue) => {
-  oldValue?.stop()
-  if (settingsStore.enableSTTTS && realTime.value && stream.value) {
-    return hark(stream.value, {
-      threshold: settingsStore.audioInputSensibility,
-      interval: settingsStore.speechDetectionPolling,
+    let cancelled = false
+    let stream: MediaStream | undefined
+    let speech: ReturnType<typeof hark> | undefined
+    const onSpeechStarted = () =>
+      speechRecognitionStore.$patch({ recording: true })
+    const onSpeechStopped = () =>
+      speechRecognitionStore.$patch({ recording: false })
+    const stopTracks = () =>
+      stream?.getTracks().forEach((track) => track.stop())
+    const stop = () => {
+      speech?.off('speaking', onSpeechStarted)
+      speech?.off('stopped_speaking', onSpeechStopped)
+      speech?.stop()
+      stopTracks()
+      onSpeechStopped()
+    }
+
+    // Register before either await: a device change or unmount can happen while
+    // device enumeration or the microphone permission request is still pending.
+    onCleanup(() => {
+      cancelled = true
+      stop()
     })
-  }
-  return null
-})
 
-watch(speech, (_1, _2, onCleanup) => {
-  speech.value?.on('speaking', onSpeechStarted)
-  speech.value?.on('stopped_speaking', onSpeechStop)
-  onCleanup(() => {
-    speech.value?.off('speaking', onSpeechStarted)
-    speech.value?.off('stopped_speaking', onSpeechStop)
-  })
-})
-
-function onSpeechStarted() {
-  console.log('Started speaking')
-  speechRecognitionStore.$patch({
-    recording: true,
-  })
-}
-
-function onSpeechStop() {
-  console.log('Stopped speaking')
-  speechRecognitionStore.$patch({
-    recording: false,
-  })
-}
-
-watch([() => settingsStore.enableSTTTS, realTime], () => {
-  if (settingsStore.enableSTTTS) {
-    if (realTime.value) {
-      console.log('Starting web speech recognition...')
-    } else {
-      console.log('Starting push-to-record speech recognition...')
+    try {
+      const device = await getSoxMediaDeviceByIndex(deviceIndex)
+      if (cancelled) return
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          deviceId: device ? { exact: device.deviceId } : undefined,
+          sampleRate: 48000,
+          sampleSize: 16,
+          channelCount: 1,
+        },
+        video: false,
+      })
+      if (cancelled) {
+        stopTracks()
+        return
+      }
+      speech = hark(stream, { threshold, interval })
+      speech.on('speaking', onSpeechStarted)
+      speech.on('stopped_speaking', onSpeechStopped)
+      await speech.resume()
+    } catch (error) {
+      if (!cancelled) {
+        stop()
+        console.error('Unable to start microphone speech detection', error)
+      }
     }
-  }
-})
-
-onBeforeUnmount(() => {
-  stream.value?.getTracks().forEach((track) => {
-    if (track.readyState === 'live') {
-      track.stop()
-    }
-  })
-
-  speech.value?.stop()
-  speech.value?.off('speaking', onSpeechStarted)
-  speech.value?.off('stopped_speaking', onSpeechStop)
-
-  if (realTime.value) {
-    console.log('Stopping web speech recognition...')
-  } else {
-    console.log('Stopping push-to-record speech recognition...')
-  }
-})
+  },
+  { immediate: true },
+)
 </script>

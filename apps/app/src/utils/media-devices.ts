@@ -22,14 +22,21 @@ export const getMediaDeviceByLabel = (
 
 export const soxMediaInputsFilter = (inputs: MediaDeviceInfo[]) =>
   inputs.filter((d) => {
-    const defaultDevice = inputs.find((device) => device.deviceId === 'default')
+    const defaultDevice = inputs.find(
+      (device) => device.kind === 'audioinput' && device.deviceId === 'default',
+    )
     return (
+      d.kind === 'audioinput' &&
       d.deviceId !== 'communications' &&
-      (defaultDevice?.label === d.label ? true : !defaultDevice?.label.includes(d.label))
+      (defaultDevice?.label === d.label
+        ? true
+        : !defaultDevice?.label.includes(d.label))
     )
   })
 
-export const getSoxMediaDeviceByIndex = (index: number): Promise<MediaDeviceInfo | null> =>
+export const getSoxMediaDeviceByIndex = (
+  index: number,
+): Promise<MediaDeviceInfo | null> =>
   new Promise((resolve) => {
     navigator.mediaDevices
       .enumerateDevices()
