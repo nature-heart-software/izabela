@@ -1,11 +1,10 @@
 import animalese from '..'
 
 type Assert<T extends true> = T
-type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B
-  ? 1
-  : 2
-  ? true
-  : false
+type Equal<A, B> =
+  (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2
+    ? true
+    : false
 type IsAny<T> = 0 extends 1 & T ? true : false
 type Audio = ReturnType<typeof animalese.getAudio>
 
