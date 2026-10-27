@@ -8,12 +8,12 @@ import vue from '@vitejs/plugin-vue'
 import dts from 'vite-plugin-dts'
 import ts, { DiagnosticCategory } from 'typescript'
 import { normalizeDiagnosticSpan } from './diagnostic-spans.mjs'
+import { createUiParsedCommandLine } from './vue-config.mjs'
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const require = createRequire(import.meta.url)
 const processorRequire = createRequire(require.resolve('vite-plugin-dts'))
-const { createParsedCommandLine, createGlobalTypesWriter } =
-  processorRequire('@vue/language-core')
-const { vueOptions } = createParsedCommandLine(
+const { createGlobalTypesWriter } = processorRequire('@vue/language-core')
+const { vueOptions } = createUiParsedCommandLine(
   ts,
   ts.sys,
   join(root, 'tests/tsconfig.build.json'),

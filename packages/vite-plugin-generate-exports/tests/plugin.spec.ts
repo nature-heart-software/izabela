@@ -4,6 +4,7 @@ import { dirname, join } from 'node:path'
 import { afterEach, expect, it, vi } from 'vitest'
 import { build } from 'vite'
 import { generateExportsPlugin } from '../src/main'
+import { isSameFilePath } from '../../generate-exports/tests/fs-path'
 
 const directories: string[] = []
 afterEach(async () => {
@@ -123,7 +124,9 @@ it('characterizes fire-and-forget filesystem failures leaving a blocked output d
   })
   expect(plugin.buildStart()).toBeUndefined()
   await vi.waitFor(() =>
-    expect(read.mock.calls.some(([file]) => file === output)).toBe(true),
+    expect(read.mock.calls.some(([file]) => isSameFilePath(file, output))).toBe(
+      true,
+    ),
   )
   await Promise.allSettled(read.mock.results.map(({ value }) => value))
   await new Promise(setImmediate)

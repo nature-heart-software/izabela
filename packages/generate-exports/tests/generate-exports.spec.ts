@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import chokidar from 'chokidar'
 import ts from 'typescript'
 import { generateExports } from '../src/main'
+import { isSameFilePath } from './fs-path'
 
 const directories: string[] = []
 const watchers: ReturnType<typeof chokidar.watch>[] = []
@@ -273,7 +274,9 @@ describe('generate-exports real filesystem generation', () => {
       entries: [{ directories: [directory], include: ['*.ts'] }],
     }).start()
     await vi.waitFor(() =>
-      expect(read.mock.calls.some((args) => args[0] === output)).toBe(true),
+      expect(
+        read.mock.calls.some(([file]) => isSameFilePath(file, output)),
+      ).toBe(true),
     )
     await Promise.allSettled(read.mock.results.map((result) => result.value))
     await new Promise(setImmediate)
@@ -291,7 +294,9 @@ describe('generate-exports real filesystem generation', () => {
     })
     expect(generator.start()).toBeUndefined()
     await vi.waitFor(() =>
-      expect(read.mock.calls.some((args) => args[0] === output)).toBe(true),
+      expect(
+        read.mock.calls.some(([file]) => isSameFilePath(file, output)),
+      ).toBe(true),
     )
     const reads = await Promise.allSettled(
       read.mock.results.map((result) => result.value),

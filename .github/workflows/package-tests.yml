@@ -62,3 +62,16 @@ jobs:
           path: coverage/package-results/*.json
           if-no-files-found: warn
           retention-days: 14
+      - name: Report UI declaration diagnostics
+        if: failure()
+        run: node tools/report-ui-type-diagnostics.mjs
+      - name: Upload UI declaration diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: ui-declarations-${{ matrix.os }}
+          path: |
+            packages/ui/dist/**/*.d.ts
+            coverage/ui-types/vue-global-types.d.ts
+          if-no-files-found: warn
+          retention-days: 14
