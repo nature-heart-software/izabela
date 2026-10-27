@@ -10,10 +10,12 @@ patchedDependencies:
 
 overrides:
   node-gyp: ^12.3.0
-  prebuild-install>node-abi: ^4.17.0
+  '@electron/rebuild>node-abi': ^4.40.0
+  prebuild-install>node-abi: ^4.40.0
 
 minimumReleaseAgeExclude:
   - gelectron
+  - electron@46.0.0-alpha.2
 
 allowBuilds:
   '@infisical/cli': true

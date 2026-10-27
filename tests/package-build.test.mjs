@@ -79,6 +79,20 @@ test('the server declares and can resolve its direct WebSocket dependency', () =
   assert.ok(existsSync(require.resolve('ws')))
 })
 
+test('native rebuild tooling recognizes the application Electron ABI', () => {
+  const appRequire = createRequire(resolve(root, 'apps/app/package.json'))
+  const rebuildRequire = createRequire(
+    createRequire(import.meta.url).resolve('@electron/rebuild'),
+  )
+  const version = appRequire('electron/package.json').version
+  const expectedAbi = appRequire('node-abi').getAbi(version, 'electron')
+
+  assert.equal(
+    rebuildRequire('node-abi').getAbi(version, 'electron'),
+    expectedAbi,
+  )
+})
+
 test('direct desktop development rebuilds native modules before launching Vite', () => {
   const pkg = readPackage('apps/app')
   assert.match(pkg.scripts.dev, /^pnpm run rebuild && vite$/)
