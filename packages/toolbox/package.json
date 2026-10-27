@@ -5,16 +5,19 @@
     "@packages/vite-plugin-generate-exports": "workspace:*"
   },
   "files": [
-    "./dist"
+    "./dist",
+    "./index.d.ts",
+    "./src/index.d.ts"
   ],
   "main": "./dist/main.cjs",
   "module": "./dist/main.js",
   "private": true,
   "scripts": {
+    "test:types": "tsc -p tests/tsconfig.build.json && tsc --noEmit -p tests/tsconfig.json",
     "build": "vite build",
     "build:prod": "tsc && pnpm run build",
     "dev": "vite build --watch --mode development"
   },
   "type": "module",
-  "types": "./dist/main.d.ts"
+  "types": "./index.d.ts"
 }
