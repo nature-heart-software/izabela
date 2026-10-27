@@ -5,10 +5,12 @@
   "author": "Francisco Padillo <fpadillo@nosolosoftware.es>",
   "license": "MIT",
   "main": "src/js/index.js",
+  "types": "src/js/index.d.ts",
   "scripts": {
     "install": "node-pre-gyp rebuild",
     "pack": "node-pre-gyp package",
-    "build": "node-pre-gyp rebuild"
+    "build": "node-pre-gyp rebuild",
+    "test:types": "tsc -p tests/tsconfig.json"
   },
   "dependencies": {
     "node-addon-api": "^3.0.0",
