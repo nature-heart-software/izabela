@@ -24,6 +24,9 @@ export async function buildClient() {
       },
     },
     build: {
+      outDir: fileURLToPath(
+        new URL('../../../coverage/ui-client', import.meta.url),
+      ),
       emptyOutDir: false,
       minify: false,
       lib: {

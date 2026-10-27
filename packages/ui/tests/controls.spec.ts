@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mount, flushPromises, type VueWrapper } from '@vue/test-utils'
 import { h, nextTick, ref, Comment } from 'vue'
 import { execFileSync } from 'node:child_process'
+import { existsSync, readdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 
@@ -11,7 +12,7 @@ execFileSync(
   [resolve(dirname(fileURLToPath(import.meta.url)), 'build-client.mjs')],
   { stdio: 'pipe' },
 )
-const clientPath = '../dist/test-client.js'
+const clientPath = '../../../coverage/ui-client/test-client.js'
 const ui = await import(/* @vite-ignore */ clientPath)
 const wrappers: VueWrapper[] = []
 const hadScrollTo = 'scrollTo' in Element.prototype
@@ -36,6 +37,24 @@ afterEach(() => {
   vi.restoreAllMocks()
   vi.unstubAllGlobals()
   if (!hadScrollTo) delete (Element.prototype as any).scrollTo
+})
+
+describe('client build artifact isolation', () => {
+  it('keeps the real client bundle outside the production artifact directory', () => {
+    const dist = resolve(dirname(fileURLToPath(import.meta.url)), '../dist')
+    const artifacts = existsSync(dist)
+      ? readdirSync(dist, { recursive: true }).map(String)
+      : []
+    expect(artifacts.filter((name) => /test-client/i.test(name))).toEqual([])
+    expect(
+      existsSync(
+        resolve(
+          dirname(fileURLToPath(import.meta.url)),
+          '../../../coverage/ui-client/test-client.js',
+        ),
+      ),
+    ).toBe(true)
+  })
 })
 
 describe('real shared controls', () => {

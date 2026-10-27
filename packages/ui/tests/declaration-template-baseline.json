@@ -1,0 +1,247 @@
+[
+  {
+    "file": "src/components/feedback/AccessBlocker/NvAccessBlocker.vue",
+    "start": 160,
+    "length": 21,
+    "code": 2345,
+    "message": "Argument of type '{}' is not assignable to parameter of type 'Partial<{ class?: any; inlist?: any; }> & Omit<{ readonly as: string; readonly allowed: boolean; readonly reason: string; readonly innerHTML?: string | undefined; readonly class?: any; ... 169 more ...; readonly onTransitionstart?: ((payload: TransitionEvent) => void) | undefined; } & VNodeProps & AllowedComponentPr...'.\n  Type '{}' is missing the following properties from type 'Omit<{ readonly as: string; readonly allowed: boolean; readonly reason: string; readonly innerHTML?: string | undefined; readonly class?: any; readonly style?: StyleValue; ... 168 more ...; readonly onTransitionstart?: ((payload: TransitionEvent) => void) | undefined; } & VNodeProps & AllowedComponentProps & Compone...': as, allowed, reason"
+  },
+  {
+    "file": "src/components/forms/Autocomplete/NvAutocomplete.vue",
+    "start": 2097,
+    "length": 10,
+    "code": 2322,
+    "message": "Type '(index: number) => unknown' is not assignable to type '(index: number) => Key'.\n  Type 'unknown' is not assignable to type 'Key'."
+  },
+  {
+    "file": "src/components/forms/Autocomplete/NvAutocomplete.vue",
+    "start": 2237,
+    "length": 14,
+    "code": 2769,
+    "message": "No overload matches this call.\n  The last overload gave the following error.\n    Argument of type 'string | undefined' is not assignable to parameter of type 'PropertyPath'.\n      Type 'undefined' is not assignable to type 'PropertyPath'."
+  },
+  {
+    "file": "src/components/forms/Button/NvButton.vue",
+    "start": 14,
+    "length": 8,
+    "code": 2345,
+    "message": "Argument of type '{ squared: boolean; size: \"xs\" | \"sm\" | \"md\" | \"lg\"; type: \"default\" | \"active\" | \"plain\" | \"ghost\" | \"ghost-alt\"; loading: boolean; selected: boolean; align: Property.TextAlign | undefined; iconName: string; }' is not assignable to parameter of type 'never'."
+  },
+  {
+    "file": "src/components/forms/Button/NvButton.vue",
+    "start": 128,
+    "length": 14,
+    "code": 2345,
+    "message": "Argument of type 'Slot<any> | undefined' is not assignable to parameter of type '(d: object) => VNode<RendererNode, RendererElement, { [key: string]: any; }> | VNode<RendererNode, RendererElement, { ...; }>[] | null | undefined'.\n  Type 'undefined' is not assignable to type '(d: object) => VNode<RendererNode, RendererElement, { [key: string]: any; }> | VNode<RendererNode, RendererElement, { ...; }>[] | null | undefined'."
+  },
+  {
+    "file": "src/components/forms/Button/NvButton.vue",
+    "start": 186,
+    "length": 14,
+    "code": 2345,
+    "message": "Argument of type 'Slot<any> | undefined' is not assignable to parameter of type '(d: object) => VNode<RendererNode, RendererElement, { [key: string]: any; }> | VNode<RendererNode, RendererElement, { ...; }>[] | null | undefined'.\n  Type 'undefined' is not assignable to type '(d: object) => VNode<RendererNode, RendererElement, { [key: string]: any; }> | VNode<RendererNode, RendererElement, { ...; }>[] | null | undefined'."
+  },
+  {
+    "file": "src/components/forms/Form/NvFormItem.vue",
+    "start": 22,
+    "length": 7,
+    "code": 2322,
+    "message": "Type 'string' is not assignable to type '2 | 1 | 3 | 8 | 4 | 16 | 5 | 6 | 7 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | undefined'."
+  },
+  {
+    "file": "src/components/forms/Input/NvInput.vue",
+    "start": 112,
+    "length": 11,
+    "code": 2322,
+    "message": "Type 'unknown' is not assignable to type 'BuildPropType<PropWrapper<string | number | null | undefined>, unknown, unknown>'."
+  },
+  {
+    "file": "src/components/forms/NumberInput/NvNumberInput.vue",
+    "start": 118,
+    "length": 11,
+    "code": 2322,
+    "message": "Type 'unknown' is not assignable to type 'BuildPropType<PropWrapper<string | number | null | undefined>, unknown, unknown>'."
+  },
+  {
+    "file": "src/components/forms/RangeInput/NvRangeInput.vue",
+    "start": 139,
+    "length": 13,
+    "code": 18047,
+    "message": "'$event.target' is possibly 'null'."
+  },
+  {
+    "file": "src/components/forms/RangeInput/NvRangeInput.vue",
+    "start": 153,
+    "length": 5,
+    "code": 2339,
+    "message": "Property 'value' does not exist on type 'EventTarget'."
+  },
+  {
+    "file": "src/components/forms/Select/NvOption.vue",
+    "start": 14,
+    "length": 14,
+    "code": 2345,
+    "message": "Argument of type '{ active: boolean; ref: string; }' is not assignable to parameter of type 'Partial<{ class?: any; inlist?: any; }> & Omit<{ readonly active: boolean; readonly disabled: boolean; readonly readonly: boolean; readonly selected: boolean; readonly innerHTML?: string | undefined; ... 170 more ...; readonly onTransitionstart?: ((payload: TransitionEvent) => void) | undefined; } & VNodeProps & All...'.\n  Type '{ active: boolean; ref: string; }' is missing the following properties from type 'Omit<{ readonly active: boolean; readonly disabled: boolean; readonly readonly: boolean; readonly selected: boolean; readonly innerHTML?: string | undefined; readonly class?: any; readonly style?: StyleValue; ... 168 more ...; readonly onTransitionstart?: ((payload: TransitionEvent) => void) | undefined; } & VNodePr...': disabled, readonly, selected"
+  },
+  {
+    "file": "src/components/forms/Select/NvSelect.vue",
+    "start": 34,
+    "length": 15,
+    "code": 2322,
+    "message": "Type 'number | false' is not assignable to type 'number | undefined'.\n  Type 'boolean' is not assignable to type 'number'."
+  },
+  {
+    "file": "src/components/forms/Select/NvSelect.vue",
+    "start": 576,
+    "length": 5,
+    "code": 2322,
+    "message": "Type '(opts?: ActivateOptions | undefined) => void' is not assignable to type '(payload: MouseEvent) => void'.\n  Types of parameters 'opts' and 'payload' are incompatible.\n    Type 'MouseEvent' has no properties in common with type 'ActivateOptions'."
+  },
+  {
+    "file": "src/components/forms/Select/NvSelect.vue",
+    "start": 1635,
+    "length": 21,
+    "code": 2783,
+    "message": "'isFocused' is specified more than once, so this usage will be overwritten."
+  },
+  {
+    "file": "src/components/forms/Select/NvSelect.vue",
+    "start": 1715,
+    "length": 11,
+    "code": 2322,
+    "message": "Type 'unknown' is not assignable to type 'string | undefined'."
+  },
+  {
+    "file": "src/components/forms/Select/NvSelect.vue",
+    "start": 1818,
+    "length": 5,
+    "code": 2322,
+    "message": "Type '(opts?: ActivateOptions | undefined) => void' is not assignable to type '(payload: FocusEvent) => void'.\n  Types of parameters 'opts' and 'payload' are incompatible.\n    Type 'FocusEvent' has no properties in common with type 'ActivateOptions'."
+  },
+  {
+    "file": "src/components/forms/Select/NvSelect.vue",
+    "start": 2251,
+    "length": 8,
+    "code": 2339,
+    "message": "Property 'disabled' does not exist on type '{}'."
+  },
+  {
+    "file": "src/components/forms/Select/NvSelect.vue",
+    "start": 2285,
+    "length": 8,
+    "code": 2339,
+    "message": "Property 'children' does not exist on type '{}'."
+  },
+  {
+    "file": "src/components/forms/Select/NvSelect.vue",
+    "start": 2396,
+    "length": 5,
+    "code": 2339,
+    "message": "Property 'value' does not exist on type '{}'."
+  },
+  {
+    "file": "src/components/forms/Select/NvSelect.vue",
+    "start": 2427,
+    "length": 5,
+    "code": 2339,
+    "message": "Property 'value' does not exist on type '{}'."
+  },
+  {
+    "file": "src/components/forms/Select/NvSelect.vue",
+    "start": 2526,
+    "length": 5,
+    "code": 2339,
+    "message": "Property 'label' does not exist on type '{}'."
+  },
+  {
+    "file": "src/components/forms/Select/NvSelect.vue",
+    "start": 2554,
+    "length": 5,
+    "code": 2339,
+    "message": "Property 'attrs' does not exist on type '{}'."
+  },
+  {
+    "file": "src/components/forms/Select/NvSelect.vue",
+    "start": 2593,
+    "length": 8,
+    "code": 2339,
+    "message": "Property 'children' does not exist on type '{}'."
+  },
+  {
+    "file": "src/components/forms/Select/NvSelect.vue",
+    "start": 2622,
+    "length": 5,
+    "code": 2339,
+    "message": "Property 'value' does not exist on type '{}'."
+  },
+  {
+    "file": "src/components/forms/Select/NvSelect.vue",
+    "start": 2715,
+    "length": 5,
+    "code": 2339,
+    "message": "Property 'label' does not exist on type '{}'."
+  },
+  {
+    "file": "src/components/forms/Select/NvSelect.vue",
+    "start": 2927,
+    "length": 14,
+    "code": 2345,
+    "message": "Argument of type '{ class: string; }' is not assignable to parameter of type 'Partial<{ class?: any; inlist?: any; }> & Omit<{ readonly active: boolean; readonly disabled: boolean; readonly readonly: boolean; readonly selected: boolean; readonly innerHTML?: string | undefined; ... 170 more ...; readonly onTransitionstart?: ((payload: TransitionEvent) => void) | undefined; } & VNodeProps & All...'.\n  Type '{ class: string; }' is missing the following properties from type 'Omit<{ readonly active: boolean; readonly disabled: boolean; readonly readonly: boolean; readonly selected: boolean; readonly innerHTML?: string | undefined; readonly class?: any; readonly style?: StyleValue; ... 168 more ...; readonly onTransitionstart?: ((payload: TransitionEvent) => void) | undefined; } & VNodePr...': active, disabled, readonly, selected"
+  },
+  {
+    "file": "src/components/forms/Switch/NvSwitch.vue",
+    "start": 242,
+    "length": 13,
+    "code": 18047,
+    "message": "'$event.target' is possibly 'null'."
+  },
+  {
+    "file": "src/components/forms/Switch/NvSwitch.vue",
+    "start": 256,
+    "length": 5,
+    "code": 2339,
+    "message": "Property 'value' does not exist on type 'EventTarget'."
+  },
+  {
+    "file": "src/components/forms/Tag/NvTag.vue",
+    "start": 99,
+    "length": 9,
+    "code": 2345,
+    "message": "Argument of type '{}' is not assignable to parameter of type 'Partial<{ class?: any; inlist?: any; }> & Omit<{ readonly closable: boolean; readonly innerHTML?: string | undefined; readonly class?: any; readonly style?: StyleValue; ... 168 more ...; readonly onTransitionstart?: ((payload: TransitionEvent) => void) | undefined; } & VNodeProps & AllowedComponentProps & ComponentC...'.\n  Property 'closable' is missing in type '{}' but required in type 'Omit<{ readonly closable: boolean; readonly innerHTML?: string | undefined; readonly class?: any; readonly style?: StyleValue; readonly accesskey?: string | undefined; readonly contenteditable?: \"inherit\" | ... 2 more ... | undefined; ... 166 more ...; readonly onTransitionstart?: ((payload: TransitionEvent) => void...'."
+  },
+  {
+    "file": "src/components/overlay/ContextMenu/NvContextMenu.vue",
+    "start": 49,
+    "length": 5,
+    "code": 2345,
+    "message": "Argument of type '{ maxWidth?: string | number | undefined; zIndex?: number | undefined; animation?: string | boolean | undefined; offset?: [number, number] | (({ placement, popper, reference, }: { placement: Placement; popper: Rect; reference: Rect; }) => [number, number]) | undefined; ... 41 more ...; ref: string; }' is not assignable to parameter of type 'Partial<{ content: Content; triggerTarget: Element | Element[]; getReferenceClientRect: GetReferenceClientRect; animateFill: boolean; ... 43 more ...; contentClass: string; }> & Omit<...> & Record<...>'.\n  Type '{ maxWidth?: string | number | undefined; zIndex?: number | undefined; animation?: string | boolean | undefined; offset?: [number, number] | (({ placement, popper, reference, }: { placement: Placement; popper: Rect; reference: Rect; }) => [number, number]) | undefined; ... 41 more ...; ref: string; }' is not assignable to type 'Partial<{ content: Content; triggerTarget: Element | Element[]; getReferenceClientRect: GetReferenceClientRect; animateFill: boolean; ... 43 more ...; contentClass: string; }>'.\n    Types of property 'content' are incompatible.\n      Type 'TippyContent | undefined' is not assignable to type 'Content | undefined'.\n        Type 'ComponentOptions<any, any, any, ComputedOptions, MethodOptions, any, any, any, string, {}, {}, string, {}, {}, {}, string, ComponentProvideOptions>' is not assignable to type 'Content | undefined'.\n          Type 'ComponentOptionsBase<any, any, any, ComputedOptions, MethodOptions, any, any, any, string, {}, {}, string, {}, {}, {}, string, ComponentProvideOptions> & ThisType<...>' is missing the following properties from type 'Element': attributes, classList, className, clientHeight, and 181 more."
+  },
+  {
+    "file": "src/components/overlay/Dialog/NvDialog.vue",
+    "start": 743,
+    "length": 7,
+    "code": 2322,
+    "message": "Type 'string' is not assignable to type '2 | 1 | 3 | 8 | 4 | 16 | 5 | 6 | 7 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | undefined'."
+  },
+  {
+    "file": "src/components/overlay/Dialog/NvDialog.vue",
+    "start": 785,
+    "length": 7,
+    "code": 2322,
+    "message": "Type '\"between\"' is not assignable to type '\"left\" | \"right\" | \"center\" | \"apart\" | \"around\" | undefined'."
+  },
+  {
+    "file": "src/components/overlay/Popover/NvPopover.vue",
+    "start": 876,
+    "length": 4,
+    "code": 2322,
+    "message": "Type '\"sm\" | \"md\" | \"lg\"' is not assignable to type '\"xs\" | \"sm\" | \"md\" | undefined'.\n  Type '\"lg\"' is not assignable to type '\"xs\" | \"sm\" | \"md\" | undefined'."
+  },
+  {
+    "file": "src/components/overlay/Tooltip/NvTooltip.vue",
+    "start": 59,
+    "length": 5,
+    "code": 2345,
+    "message": "Argument of type '{ maxWidth?: string | number | undefined; zIndex?: number | undefined; animation?: string | boolean | undefined; offset?: [number, number] | (({ placement, popper, reference, }: { placement: Placement; popper: Rect; reference: Rect; }) => [number, number]) | undefined; ... 41 more ...; ref: string; }' is not assignable to parameter of type 'Partial<{ content: Content; triggerTarget: Element | Element[]; getReferenceClientRect: GetReferenceClientRect; animateFill: boolean; ... 43 more ...; contentClass: string; }> & Omit<...> & Record<...>'.\n  Type '{ maxWidth?: string | number | undefined; zIndex?: number | undefined; animation?: string | boolean | undefined; offset?: [number, number] | (({ placement, popper, reference, }: { placement: Placement; popper: Rect; reference: Rect; }) => [number, number]) | undefined; ... 41 more ...; ref: string; }' is not assignable to type 'Partial<{ content: Content; triggerTarget: Element | Element[]; getReferenceClientRect: GetReferenceClientRect; animateFill: boolean; ... 43 more ...; contentClass: string; }>'.\n    Types of property 'content' are incompatible.\n      Type 'TippyContent | undefined' is not assignable to type 'Content | undefined'.\n        Type 'ComponentOptions<any, any, any, ComputedOptions, MethodOptions, any, any, any, string, {}, {}, string, {}, {}, {}, string, ComponentProvideOptions>' is not assignable to type 'Content | undefined'.\n          Type 'ComponentOptionsBase<any, any, any, ComputedOptions, MethodOptions, any, any, any, string, {}, {}, string, {}, {}, {}, string, ComponentProvideOptions> & ThisType<...>' is missing the following properties from type 'Element': attributes, classList, className, clientHeight, and 181 more."
+  }
+]
