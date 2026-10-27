@@ -12,6 +12,10 @@ overrides:
   node-gyp: ^12.3.0
   '@electron/rebuild>node-abi': ^4.40.0
   prebuild-install>node-abi: ^4.40.0
+  # Keep the SDK's optional peer independent of jsdom's undici 8 dependency.
+  'openai@7.45.0>undici': 7.30.1
+  # Preserve c12's declared peer graph; coverage keeps its own magicast dependency.
+  'c12@3.3.4>magicast': '-'
 
 minimumReleaseAgeExclude:
   - gelectron

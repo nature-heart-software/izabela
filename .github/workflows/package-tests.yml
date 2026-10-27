@@ -29,6 +29,8 @@ jobs:
       NX_TUI: 'false'
       pnpm_config_verify_deps_before_run: 'false'
     steps:
+      - name: Preserve canonical source line endings
+        run: git config --global core.autocrlf false
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
@@ -46,6 +48,8 @@ jobs:
         run: pnpm build:portable
       - name: Check package runner contracts
         run: pnpm test:packages:runner
+      - name: Verify dependency peer isolation
+        run: pnpm test:dependencies
       - name: Test every non-app package
         env:
           npm_config_ignore_scripts: 'true'

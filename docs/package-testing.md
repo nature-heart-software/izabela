@@ -7,10 +7,13 @@ The package suite covers workspace libraries and the local API server. The deskt
 Use the repository's pinned Node and pnpm versions, then install from the lockfile:
 
 ```sh
-pnpm install --frozen-lockfile
+pnpm install --frozen-lockfile --ignore-scripts
+pnpm rebuild vue-demi esbuild
 pnpm build:portable
 pnpm test:packages
 ```
+
+This prepares the portable suites without compiling or running native modules. Native build/runtime checks remain separate.
 
 The runner discovers packages from their manifests and executes them sequentially. A missing suite, an empty or malformed result, a skipped case, an unexpected test failure, or a failed declared type check fails the command. Independent packages are still checked after another package fails.
 
@@ -39,6 +42,8 @@ pnpm test:packages:runner
 
 These controls use isolated, explicitly synthetic reporter results and package-manager exit statuses to check inventory selection, failure reporting, continuation, and stale-report cleanup. They do not run real package behavior or compile consumer types; `pnpm test:packages` performs that separate verification.
 
+Run `pnpm test:dependencies` to check that test tooling does not change the isolated production dependency peers. Intentional SDK or peer upgrades should update the scoped dependency policies and their assertions together.
+
 ## Consumer type checks
 
 Packages can declare a `test:types` script. The sequential runner executes it after their runtime suite. Consumer fixtures should resolve the package root through its real `types` or `typings` entry, building declarations first where required. Importing a source file alone does not establish that published declaration metadata works.
@@ -47,7 +52,9 @@ Positive assertions check usable return values and options. Negative assertions 
 
 Type-only improvements must preserve the implementation's emitted JavaScript. Public contracts should describe actual behavior, including nullable or unchecked results where appropriate, rather than introducing unsupported guarantees.
 
-The UI consumer check uses the repository-compatible Node module resolver and `skipLibCheck` because upstream Element Plus declarations currently fail an unfiltered check. Its positive, negative, and non-`any` consumer assertions remain active against the real emitted package declarations. This is not a claim that all upstream declarations or the existing full-source Vue template check are error-free.
+The UI consumer check uses the repository-compatible Node module resolver and `skipLibCheck` because upstream Element Plus declarations currently fail an unfiltered check. Its positive, negative, and non-`any` consumer assertions remain active against the real emitted package declarations. The helper uses the production Vue declaration processor, excludes stories, and normalizes package-local aliases; this verifies the consumer contract, not byte-for-byte parity with the normal production declaration build. Declaration generation permits only an exact baseline of existing template diagnostics and rejects new diagnostics and script errors. This is not a claim that all upstream declarations or the existing full-source Vue template check are error-free.
+
+The local server's package-root consumer is checked with `skipLibCheck: false`. Its separate implementation/test-suite check uses `skipLibCheck: true` for existing upstream ElevenLabs declaration errors; that compatibility setting does not relax the strict public consumer check.
 
 ## Existing defects and expected failures
 

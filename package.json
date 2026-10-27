@@ -188,6 +188,7 @@
     "test:native-cache": "node tests/native-cache.cjs",
     "test:packages": "node tools/test-packages.mjs",
     "test:packages:runner": "node --test tests/package-runner.test.mjs",
+    "test:dependencies": "node --test tests/dependency-peers.test.mjs",
     "test:packages:coverage": "pnpm test:packages && vitest run --coverage",
     "test:auth": "node --test apps/app/src/services/auth.test.mjs",
     "test:translation": "node --test apps/app/src/plugins/translation-engines/microsoft-azure/bridge.test.mjs apps/app/src/plugins/translation-engines/amazon-translation/bridge.test.mjs apps/app/src/plugins/translation-engines/amazon-translation/register.test.mjs",
