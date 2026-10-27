@@ -187,7 +187,7 @@
     "test:native": "electron tests/native-runtime.cjs",
     "test:native-cache": "node tests/native-cache.cjs",
     "test:packages": "node tools/test-packages.mjs",
-    "test:packages:coverage": "vitest run --coverage",
+    "test:packages:coverage": "pnpm test:packages && vitest run --coverage",
     "test:auth": "node --test apps/app/src/services/auth.test.mjs",
     "test:translation": "node --test apps/app/src/plugins/translation-engines/microsoft-azure/bridge.test.mjs apps/app/src/plugins/translation-engines/amazon-translation/bridge.test.mjs apps/app/src/plugins/translation-engines/amazon-translation/register.test.mjs",
     "test:speech": "node --test tests/speech-bundle.test.mjs tests/speech-providers.test.mjs apps/app/src/plugins/speech-engines/amazon-polly/hooks.test.mjs apps/app/src/utils/media-devices.test.mjs apps/app/src/teams/speech-worker/components/NvSpeechListener.test.mjs apps/app/src/teams/speech-worker/modules/electron-native-speech-recognition/index.test.mjs",
