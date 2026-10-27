@@ -7,7 +7,8 @@
   "scripts": {
     "build": "vite build",
     "build:prod": "tsc && pnpm run build",
-    "dev": "vite build --watch --mode development"
+    "dev": "vite build --watch --mode development",
+    "test:types": "pnpm run build && tsc -p tests/tsconfig.json"
   },
   "type": "module",
   "types": "./dist/main.d.ts"
