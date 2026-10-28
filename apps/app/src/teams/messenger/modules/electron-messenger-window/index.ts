@@ -66,7 +66,8 @@ export const ElectronMessengerWindow = () => {
 
   const ensureNativeFocus = () => {
     const window = getWindow()
-    if (window) {
+    // The delayed native-focus workaround may outlive a quick send or Escape.
+    if (window && !window.isDestroyed() && window.isVisible() && isFocused) {
       focusWindow(window)
     }
   }
