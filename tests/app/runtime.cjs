@@ -9,6 +9,7 @@ const config = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'))
 process.argv = process.argv.slice(0, 2)
 const root = path.resolve(__dirname, '../..')
 const fixture = path.join(__dirname, 'fixtures/speech.wav')
+let captureFixture = fixture
 const failures = []
 const unhandled = []
 const captures = []
@@ -49,7 +50,7 @@ childProcess.spawn = function (command, args, options) {
       process.execPath,
       [
         path.join(__dirname, 'audio-source.cjs'),
-        fixture,
+        captureFixture,
         String(args[args.indexOf('--rate') + 1]),
       ],
       {
@@ -783,6 +784,7 @@ async function main() {
     captures,
     root,
     keyEvent,
+    instrument,
   })
 
   if (config.live)
@@ -1140,6 +1142,23 @@ async function main() {
         },
       )
       await patch('speech', { customCommands: [] })
+    })
+  if (config.live)
+    await require('./language-journeys.cjs').runLanguages({
+      config,
+      check,
+      evaluate,
+      patch,
+      until,
+      sleep,
+      worker,
+      events,
+      selectTts,
+      keyEvent,
+      captures,
+      setCaptureFixture: (filename) => {
+        captureFixture = filename
+      },
     })
   await check('persistence: save restart fixture', async () => {
     await selectTts('samtts')

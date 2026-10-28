@@ -69,7 +69,9 @@ function redactor(environment) {
       .replace(/Bearer\s+[^\s"']+/gi, 'Bearer [REDACTED]')
 }
 function additionalCases(providers) {
-  const cases = []
+  const cases = require('./language-journeys.cjs')
+    .languageCases(providers)
+    .map((entry) => entry.name)
   if (
     providers.some((p) => p.id === 'matts') &&
     providers.some((p) => p.id === 'amazon-translate-translation')

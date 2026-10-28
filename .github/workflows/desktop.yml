@@ -101,6 +101,15 @@ jobs:
           name: app-test-diagnostics
           path: coverage/app-results/offline-packaged
           if-no-files-found: ignore
+      - name: Package the next version for actual auto-update tests
+        run: pnpm --filter izabela-next exec electron-builder --config electron-builder.config.js --publish never -c.extraMetadata.version=6.6.7 -c.directories.output=dist_updater
+      - name: Upload automatic update candidate
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: updater-test-input
+          path: apps/app/dist_updater/*setup*.exe
+          if-no-files-found: error
+          retention-days: 3
       - name: Check packages and keyboard routing
         run: node --test tests/package-build.test.mjs tests/keyboard-accelerator.test.mjs
       - name: Check native dependencies in Electron

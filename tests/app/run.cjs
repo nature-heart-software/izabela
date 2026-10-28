@@ -219,6 +219,7 @@ function releaseTestKeys() {
       )
     for (let number = 13; number <= 21; number++)
       keyEvent(111 + number, 0, 2, 0)
+    for (const virtualKey of [133, 162]) keyEvent(virtualKey, 0, 2, 0)
   } catch {}
 }
 for (const signal of ['SIGINT', 'SIGTERM'])

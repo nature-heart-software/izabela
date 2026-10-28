@@ -29,6 +29,39 @@ Infisical also retains an Uberduck key, but this branch has no Uberduck app impl
 
 ## Coverage
 
+The final edge-case batch adds `pnpm test:edges` for keyboard layouts/modifiers,
+shortcut conflicts, bounded renderer recovery, and real atomic settings writes.
+A subprocess is killed immediately before committing a save; EACCES and ENOSPC
+are injected at the atomic replacement boundary. Reopening the actual storage
+library must recover the previous complete data and accept a subsequent save.
+The app suite also crashes each real renderer, checks capture cleanup and speech
+after reload, and blocks its isolated cache directory without changing host ACLs.
+
+Provider tests preserve accents, combining marks, emoji, Japanese, Arabic and
+multiline text through payload construction and SDK result handling. Large text
+must reach transport intact; this does not assert that every provider accepts
+the same maximum length. Existing rejection/recovery tests cover service errors.
+Live recognition adds the matrix documented in
+[`tests/app/fixtures/README.md`](../tests/app/fixtures/README.md).
+
+The `Automatic update and recovery` GitHub-hosted Windows job installs version
+6.6.6, then exercises the actual packaged updater against a loopback feed serving
+a second build of this branch labelled 6.6.7. It rejects an interrupted download
+and an incorrect SHA-512 digest, then downloads the valid installer, applies it,
+checks the executable version, waits for the automatic relaunch, speaks through
+the application and checks saved settings/dictionary data. It calls the real
+updater through the main-process debugger because CI builds disable scheduled
+release checks. Production update-policy tests separately check that wiring.
+The probe refuses execution outside a disposable GitHub-hosted Windows runner.
+Both installers are retained as workflow artifacts; reruns can reuse that run's
+`installer_artifact_run` input. The older direct-install upgrade job remains.
+
+Virtual cable and game overlay coverage is intentionally not expanded in this
+batch. Physical device routing, game compatibility and OS keyboard layout
+switching remain outside this automated matrix; AZERTY/AltGr mapping is checked
+at the native keymap boundary and a real Windows modifier chord is exercised end
+to end.
+
 - Local TTS: Sam, Animalese, and Windows voices; real messenger submission, IPC, synthesis, audio decoding, playback, and completion.
 - Configured cloud TTS: Polly, Google Cloud, Azure, IBM Watson, ElevenLabs, and OpenAI; streaming and buffered settings.
 - Configured STT: Amazon Transcribe, Google Cloud, Azure, IBM Watson, ElevenLabs, and OpenAI; real recorder package, PCM buffering, recognition SDK/service, returned transcript, IPC, and subsequent TTS. The transcript must contain words from the known fixture.
@@ -64,9 +97,9 @@ The routing E2E fixture supplies device enumeration and `setSinkId` at the Chrom
 
 The desktop workflow uploads its built installer to a separate fresh `windows-2022` job. `tests/app/installer.cjs` refuses to run unless it is on a GitHub-hosted Windows runner. It downloads the current published Windows release, installs it silently, launches the actual executable and checks its persisted profile through the Chromium debugging protocol. It then installs the candidate over that release, checks saved data and speech again, and uninstalls while verifying that user data remains.
 
-Installed-app diagnostics go to `coverage/installer-results` and are uploaded even on failure. These checks are separate from the ASAR suite and their success must be read from the installer job. They require no external VM service. Interactive installer dialogs, reboot behavior, actual automatic-update downloads and physical device testing remain separate checks.
+Installed-app diagnostics go to `coverage/installer-results` and are uploaded even on failure. These checks are separate from the ASAR suite and their success must be read from the installer job. They require no external VM service. Automatic-update downloads run in the separate updater job described above. Interactive installer dialogs, reboot behavior and physical device testing remain separate checks.
 
-The desktop workflow can also be started manually with `installer_artifact_run` set to an earlier run ID. This reruns only the installed-app tests using that run's `installer-test-input` artifact; the result records the build run ID. Leave the input empty to build and test everything.
+The desktop workflow can also be started manually with `installer_artifact_run` set to an earlier run ID. This reruns the installed-app and updater jobs using that run's `installer-test-input` and `updater-test-input` artifacts. Leave the input empty to build and test everything.
 
 The WAV is synthetic English speech generated with Windows SAPI, 16 kHz, mono, signed 16-bit PCM: “The quick brown fox jumps over the lazy dog. This is a speech recognition test.”
 

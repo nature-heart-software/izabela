@@ -1,0 +1,35 @@
+[
+  {
+    "language": "fr-FR",
+    "text": "Bonjour le monde. Ceci est un test de reconnaissance vocale.",
+    "words": [
+      "bonjour",
+      "monde",
+      "reconnaissance",
+      "vocale"
+    ],
+    "voice": "fr-FR-Vivienne:DragonHDLatestNeural"
+  },
+  {
+    "language": "ja-JP",
+    "text": "こんにちは。これは音声認識のテストです。",
+    "words": [
+      "こんにちは",
+      "音声",
+      "認識",
+      "テスト"
+    ],
+    "voice": "ja-JP-Nanami:DragonHDLatestNeural"
+  },
+  {
+    "language": "ar-SA",
+    "text": "مرحبا بالعالم. هذا اختبار للتعرف على الكلام.",
+    "words": [
+      "مرحبا",
+      "بالعالم",
+      "اختبار",
+      "الكلام"
+    ],
+    "voice": "ar-SA-ZariyahNeural"
+  }
+]

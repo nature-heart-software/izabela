@@ -4,6 +4,7 @@ const path = require('node:path')
 const http = require('node:http')
 const { recoveryCases, runRecovery } = require('./recovery-journeys.cjs')
 const { resilienceCases, runResilience } = require('./resilience-journeys.cjs')
+const { edgeCases, runEdges } = require('./edge-journeys.cjs')
 
 // These names are also the runner's required-result contract.
 const journeyCases = [
@@ -30,6 +31,7 @@ const journeyCases = [
   'help: guided tour and release update policy',
   ...recoveryCases,
   ...resilienceCases,
+  ...edgeCases,
 ]
 
 async function runJourneys(context) {
@@ -1179,6 +1181,7 @@ async function runJourneys(context) {
       dialog,
     })
     await runResilience({ ...context, endpoint })
+    await runEdges({ ...context, endpoint })
   } finally {
     holds.forEach((held) => held.release())
     failSpeech = false
