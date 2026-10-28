@@ -49,6 +49,8 @@ jobs:
         run: pnpm test:display
       - name: Check native focus restoration
         run: pnpm test:focus
+      - name: Check saved history voices
+        run: pnpm test:history
       - name: Check update policy
         run: pnpm test:updates
       - name: Build the Electron installer
