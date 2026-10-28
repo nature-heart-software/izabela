@@ -15,6 +15,7 @@ const {
   additionalCases,
 } = require('./contracts.cjs')
 const { checklistReport } = require('./checklist.cjs')
+const { seedProfile } = require('./profile-upgrades.cjs')
 
 const root = path.resolve(__dirname, '../..')
 const live = process.argv.includes('--live')
@@ -125,10 +126,10 @@ async function run() {
     }
     fs.writeFileSync(path.join(reportDirectory, 'app.log'), output)
   }
-  async function launch(resume) {
+  async function launch(resume, phase) {
     fs.writeFileSync(
       path.join(directory, 'run.json'),
-      JSON.stringify({ ...config, resume }),
+      JSON.stringify({ ...config, resume, phase }),
     )
     child = spawn(
       executable,
@@ -152,7 +153,13 @@ async function run() {
       clearTimeout(timeout)
     }
   }
-  let code = await launch(false)
+  let code = 0
+  for (const phase of ['legacy', 'split', 'damaged']) {
+    seedProfile(directory, phase)
+    code = await launch(false, phase)
+    if (code !== 0) break
+  }
+  if (code === 0) code = await launch(false)
   if (
     code === 0 &&
     results.every((r) => r.pass) &&

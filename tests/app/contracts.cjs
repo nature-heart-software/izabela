@@ -1,5 +1,6 @@
 const assert = require('node:assert/strict')
 const { journeyCases } = require('./journeys.cjs')
+const { profileCases } = require('./profile-upgrades.cjs')
 const coreCases = [
   'app: production boot and cross-process settings',
   'tts: Sam',
@@ -12,6 +13,7 @@ const coreCases = [
   'stt: push-to-record capture, PCM, indicator, and release',
   'stt: continuous detection and disabling microphone',
   ...journeyCases,
+  ...profileCases,
   'persistence: save restart fixture',
   'persistence: configuration survives full application relaunch',
   'app: no uncaught errors or leaked capture processes',

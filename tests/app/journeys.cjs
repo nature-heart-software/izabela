@@ -2,6 +2,7 @@ const assert = require('node:assert/strict')
 const fs = require('node:fs')
 const path = require('node:path')
 const http = require('node:http')
+const { recoveryCases, runRecovery } = require('./recovery-journeys.cjs')
 
 // These names are also the runner's required-result contract.
 const journeyCases = [
@@ -26,6 +27,7 @@ const journeyCases = [
   'voices: search, favorite, select preset, and personalize Sam',
   'desktop: drag messenger and retain placement after reopening',
   'help: guided tour and release update policy',
+  ...recoveryCases,
 ]
 
 async function runJourneys(context) {
@@ -264,6 +266,7 @@ async function runJourneys(context) {
   const requests = []
   let failSpeech = false
   let failTranslation = false
+  const holds = new Map()
   const source = fs.readFileSync(path.join(__dirname, 'fixtures/speech.wav'))
   let dataOffset = 12
   while (source.toString('ascii', dataOffset, dataOffset + 4) !== 'data') {
@@ -288,6 +291,8 @@ async function runJourneys(context) {
       body: body ? JSON.parse(body) : {},
     }
     requests.push(entry)
+    const held = holds.get(entry.body.payload?.text) || holds.get(req.url)
+    if (held) await held.promise
     if (req.url.includes('list-regions')) {
       res.setHeader('Content-Type', 'application/json')
       res.end('[]')
@@ -310,6 +315,30 @@ async function runJourneys(context) {
               ],
         ),
       )
+    } else if (req.url.endsWith('/languages')) {
+      res.setHeader('Content-Type', 'application/json')
+      const allowed = ['catalog-key', 'replacement-key'].includes(
+        entry.body.credentials?.apiKey,
+      )
+      res.statusCode = allowed ? 200 : 401
+      res.end(
+        JSON.stringify(
+          allowed
+            ? {
+                from: [{ id: 'en', name: 'Fixture English' }],
+                to: [
+                  {
+                    id: 'fr',
+                    name:
+                      req.url === '/slow/languages'
+                        ? 'Stale French'
+                        : 'Fixture French',
+                  },
+                ],
+              }
+            : { error: 'Credentials required' },
+        ),
+      )
     } else if (req.url.endsWith('/translate')) {
       res.setHeader('Content-Type', 'application/json')
       res.statusCode = failTranslation ? 503 : 200
@@ -327,7 +356,11 @@ async function runJourneys(context) {
       req.url === '/audio.wav' ||
       req.url.includes('synthesize-speech')
     ) {
-      res.statusCode = failSpeech && req.url !== '/audio.wav' ? 503 : 200
+      res.statusCode =
+        (failSpeech || entry.body.payload?.text === 'Queued failure.') &&
+        req.url !== '/audio.wav'
+          ? 503
+          : 200
       res.setHeader(
         'Content-Type',
         res.statusCode === 200 ? 'audio/wav' : 'application/json',
@@ -348,11 +381,13 @@ async function runJourneys(context) {
   const originalClipboard = await Promise.all(
     (
       await clipboard.read()
-    ).map(async (item) => {
-      const data = {}
-      for (const type of item.types) data[type] = await item.getType(type)
-      return new ClipboardItem(data)
-    }),
+    )
+      .filter((item) => item.types.length > 0)
+      .map(async (item) => {
+        const data = {}
+        for (const type of item.types) data[type] = await item.getType(type)
+        return new ClipboardItem(data)
+      }),
   )
   try {
     await selectTts('samtts')
@@ -1121,7 +1156,18 @@ async function runJourneys(context) {
       )
       await patch('settings', { enableAutoUpdate: false })
     })
+    await runRecovery({
+      ...context,
+      holds,
+      endpoint,
+      requests,
+      route,
+      type,
+      clickText,
+      dialog,
+    })
   } finally {
+    holds.forEach((held) => held.release())
     failSpeech = false
     failTranslation = false
     if (originalClipboard.length) await clipboard.write(originalClipboard)

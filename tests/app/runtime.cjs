@@ -19,7 +19,13 @@ let socket
 let current = 'startup'
 
 app.setName('Izabela App Regression Tests')
-app.setPath('userData', path.join(config.directory, 'profile'))
+app.setPath(
+  'userData',
+  path.join(
+    config.directory,
+    config.phase ? 'profile-' + config.phase : 'profile',
+  ),
+)
 fs.mkdirSync(path.join(config.directory, 'temp'), { recursive: true })
 app.setPath('temp', path.join(config.directory, 'temp'))
 fs.mkdirSync(path.join(config.directory, 'logs'), { recursive: true })
@@ -386,6 +392,19 @@ async function main() {
     await instrument(window)
   }
   const settings = await read('settings', '$state')
+  if (config.phase) {
+    await require('./profile-upgrades.cjs').checkProfile({
+      phase: config.phase,
+      check,
+      read,
+      evaluate,
+      messenger,
+      worker,
+      unhandled,
+      profile: app.getPath('userData'),
+    })
+    return
+  }
   if (config.resume) {
     await check(
       'persistence: configuration survives full application relaunch',

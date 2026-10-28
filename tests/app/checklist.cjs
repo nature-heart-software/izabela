@@ -1,5 +1,6 @@
 const { journeyCases: j } = require('./journeys.cjs')
 const { providers } = require('./providers.cjs')
+const { profileCases } = require('./profile-upgrades.cjs')
 const tts = providers
   .filter((p) => p.kind === 'tts')
   .map((p) => 'tts: ' + p.name)
@@ -16,7 +17,7 @@ const checklist = [
   ['Speak word by word', [j[0]]],
   [
     'Queue and cancel speech',
-    [j[1], 'shortcut: cancel current and cancel queued messages'],
+    [j[1], j[21], j[22], 'shortcut: cancel current and cancel queued messages'],
   ],
   ['Recall recent text', [j[2]]],
   ['Message history', [j[3]], 'Translated-text copy remains manual.'],
@@ -66,7 +67,7 @@ const checklist = [
   ],
   [
     'Translate typed text',
-    [...translation, j[13]],
+    [...translation, j[13], j[24]],
     'Only configured providers run; unavailable providers are reported as not run.',
   ],
   [
@@ -76,8 +77,8 @@ const checklist = [
   ],
   [
     'Recognition recovery',
-    [j[15]],
-    'Native server restart is tested; real device/provider interruption remains manual.',
+    [j[15], j[23]],
+    'Native restart and disable/re-enable during held recording are tested; physical device interruption remains manual.',
   ],
   [
     'Default Windows output',
@@ -149,8 +150,9 @@ const checklist = [
     [
       'persistence: save restart fixture',
       'persistence: configuration survives full application relaunch',
+      ...profileCases,
     ],
-    'Fresh profile relaunch; installer upgrade/migration remains manual.',
+    'Legacy and split-file profiles, new defaults, and damaged-settings recovery are tested. Installing an upgrade over an installed app remains manual.',
   ],
   [
     'Startup and administrator mode',
@@ -186,7 +188,7 @@ const checklist = [
   ],
   [
     'Custom recognition round trip',
-    [j[15]],
+    [j[15], j[23]],
     'Controlled recognizer consumes exported PCM and returns text via say.',
   ],
   [

@@ -1,6 +1,6 @@
 # Windows application tests
 
-The app suite launches the production main/preload/renderer bundles in Electron with fresh temporary user-data and cache directories. It never loads your normal profile or changes Windows startup registration. Playback is muted at the web-contents output while an analyser checks that decoded audio has a nonzero signal. The runner then exits and launches a second Electron process using the same disposable profile to verify persistence and speak again.
+The app suite launches the production main/preload/renderer bundles in Electron with disposable user-data and cache directories. It never loads your normal profile or changes Windows startup registration. Three independent launches exercise legacy combined, split-file, and damaged-settings profiles. The main suite then uses a fresh profile and relaunches it to verify persistence and speak again. Playback is muted while an analyser checks that decoded audio has a nonzero signal.
 
 ## Commands
 
@@ -8,6 +8,7 @@ Run on Windows with an unlocked desktop and no other Izabela instance using the 
 
 ```sh
 pnpm test:app:unit
+pnpm test:recovery
 pnpm test:app
 ```
 
@@ -40,14 +41,20 @@ Infisical also retains an Uberduck key, but this branch has no Uberduck app impl
 - Controlled HTTP custom TTS/translation and universal-auth endpoints; real app requests, catalog selection, language options, speech decoding, failure/fallback/recovery, cache reuse, General's Clear cache button, and regeneration without losing saved data.
 - External Socket.IO `say`/`audio:play`, audio cancellation, and Custom recognition PCM export → external transcription response via `say` after restarting the native recognition server.
 - Full process relaunch preserves preferences, dictionary, profiles, saved phrases, history and Messenger placement; a changed theme must render after relaunch, and the saved dictionary must still affect speech.
+- Delayed synthesis cancellation, cancellation of prefetched messages, queued provider failures, exactly-once lifecycle events, and working speech after recovery.
+- Disabling recognition while the native record shortcut is held, re-enabling it, and restarting capture while held; the new capture must receive PCM and leave exactly one active recorder.
+- Authenticated custom language catalogs, valid language IDs, credential changes, and endpoint changes while an earlier catalog response is delayed. Google account imports use a generated test key: cancellation and invalid JSON must preserve the previously imported file and show errors in the form.
+- Older combined and split profiles retain saved phrases, history voices, dictionary entries, profiles, custom endpoints, empty arrays and explicit settings while receiving new defaults. Damaged settings are backed up byte for byte before defaults are restored; unrelated stores must survive.
 - Additional live journeys combine recognition → translation → speech, Azure expressive style SSML and audio, and OpenAI instructions/custom-command descriptions and audio. These are required when their providers are configured.
 
 For microphone tests, Chromium reads a fixed WAV, and the recorder's SoX process is replaced by a paced PCM process using that same WAV. Live provider clients and application functions are not replaced. Custom/universal endpoint tests use a controlled localhost service. The export test supplies a destination at the native save-dialog boundary, checks the real saved WAV and plays those saved bytes through the external-audio integration. Native Windows dialog interaction and playback in another installed application remain manual checks. Clipboard formats are materialized and restored around copy tests using Electron 46's asynchronous clipboard API.
 
 This certifies the application pipeline with fixture audio; physical device drivers, real-microphone quality, and the audible output hardware still require manual testing. Normal builds are tested without modifying startup, installing drivers, invoking UAC, injecting games, or replacing an installed app. See [the 44-journey coverage map](windows-e2e-coverage.md) for each boundary. A partial or manual journey is never counted as a fully passed macro journey.
 
+`pnpm test:recovery` runs focused source tests without Windows UI or provider credentials. It additionally covers connection retry/coalescing, closed sockets, handshake timeout, stop during connection startup, failed background renewal, late transcripts after cleanup, playback rejection, atomic credential replacement, and filesystem error handling. Buffered OpenAI audio during connection startup and wire-protocol assertions are also part of `pnpm test:stt`. These tests use controlled sockets and clocks; live service availability remains the job of the live suite.
+
 The WAV is synthetic English speech generated with Windows SAPI, 16 kHz, mono, signed 16-bit PCM: “The quick brown fox jumps over the lazy dog. This is a speech recognition test.”
 
 ## Reports
 
-Reports, redacted logs, and failure screenshots are written under `coverage/app-results/`: `offline`, `live`, or the corresponding `-packaged` directory. `summary.json` includes Windows/environment details and a result for each of the 44 macro journeys: Pass, Partial, Manual, Not fully run, or Fail, with the underlying case results and any manual boundary. The runner rejects missing or duplicated automated cases, and a green partial run cannot pass. The CI workflow uploads only the offline packaged diagnostic directory. The temporary profile, including provider-created credential files, is removed after both processes exit.
+Reports, redacted logs, and failure screenshots are written under `coverage/app-results/`: `offline`, `live`, or the corresponding `-packaged` directory. `summary.json` includes Windows/environment details and a result for each of the 44 macro journeys: Pass, Partial, Manual, Not fully run, or Fail, with the underlying case results and any manual boundary. The runner rejects missing or duplicated automated cases, and a green partial run cannot pass. The CI workflow uploads only the offline packaged diagnostic directory. The temporary profiles, including provider-created credential files, are removed after all processes exit.
