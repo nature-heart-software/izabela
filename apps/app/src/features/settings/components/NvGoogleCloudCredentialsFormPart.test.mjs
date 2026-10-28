@@ -12,7 +12,8 @@ const { descriptor } = parse(readFileSync(filename, 'utf8'), { filename })
 const { content } = compileScript(descriptor, { id: filename })
 function setup(result, fail = false) {
   const imported = [],
-    refreshed = []
+    refreshed = [],
+    errors = []
   const component = loadTypescript(
     filename,
     {
@@ -31,6 +32,7 @@ function setup(result, fail = false) {
       },
     },
     {
+      console: { error: (...args) => errors.push(args) },
       window: {
         ElectronDialog: { showOpenDialog: async () => result },
         ElectronFilesystem: {
@@ -43,7 +45,7 @@ function setup(result, fail = false) {
     },
     content,
   ).default
-  return { ...component.setup({}, { expose() {} }), imported, refreshed }
+  return { ...component.setup({}, { expose() {} }), imported, refreshed, errors }
 }
 
 test('canceling the credential dialog preserves credentials and makes no import request', async () => {
@@ -52,16 +54,18 @@ test('canceling the credential dialog preserves credentials and makes no import 
     await f.importGoogleCloudSpeechCredentials()
     assert.deepEqual(f.imported, [])
     assert.deepEqual(f.refreshed, [])
-    assert.equal(f.importError.value, '')
+    assert.deepEqual(f.errors, [])
   }
 })
-test('invalid import is shown and a later valid import refreshes credentials', async () => {
+test('invalid import is handled without replacing working credentials and a valid import refreshes them', async () => {
   const bad = setup({ filePaths: ['bad.json'] }, true)
-  await bad.importGoogleCloudSpeechCredentials()
-  assert.match(bad.importError.value, /Could not import/)
+  await assert.doesNotReject(bad.importGoogleCloudSpeechCredentials())
+  assert.equal(bad.errors.length, 1)
+  assert.equal(bad.googleCloudSpeechCredentialsPath.value, 'saved.json')
   assert.equal(bad.refreshed.length, 0)
   const good = setup({ filePaths: ['good.json'] })
   await good.importGoogleCloudSpeechCredentials()
   assert.deepEqual(good.imported, ['good.json'])
   assert.equal(good.refreshed.length, 1)
+  assert.deepEqual(good.errors, [])
 })

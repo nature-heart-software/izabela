@@ -24,7 +24,6 @@
           </NvGroup>
         </NvText>
       </template>
-      <NvText v-if="importError" role="alert">{{ importError }}</NvText>
     </NvStack>
     <NvButton @click="importGoogleCloudSpeechCredentials">Import</NvButton>
   </NvGroup>
@@ -37,13 +36,10 @@ import {
   useGetGoogleCloudSpeechCredentialsPath,
 } from '@/features/settings/hooks'
 import { useQueryClient } from 'vue-query'
-import { ref } from 'vue'
 
 const { ElectronDialog, ElectronFilesystem } = window
 const queryClient = useQueryClient()
-const importError = ref('')
 const importGoogleCloudSpeechCredentials = async () => {
-  importError.value = ''
   try {
     const { canceled, filePaths } = await ElectronDialog.showOpenDialog({
       properties: ['openFile'],
@@ -55,8 +51,7 @@ const importGoogleCloudSpeechCredentials = async () => {
       getGoogleCloudSpeechCredentialsPathQueryKey,
     )
   } catch {
-    importError.value =
-      'Could not import credentials. Choose a valid Google Cloud service account JSON file.'
+    console.error('Could not import Google Cloud credentials.')
   }
 }
 const { data: googleCloudSpeechCredentialsPath } =
