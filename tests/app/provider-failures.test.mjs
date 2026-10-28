@@ -8,7 +8,7 @@ import test from 'node:test'
 import loadTypescript from '../load-typescript.cjs'
 const root = new URL('../../apps/app/src/', import.meta.url)
 const flush = () => new Promise((resolve) => setImmediate(resolve))
-function fixture(provider) {
+function fixture(provider, options = {}) {
   const streams = [],
     turns = [],
     clients = [],
@@ -84,7 +84,9 @@ function fixture(provider) {
   }
   const mocks = {
     '@/features/settings/store': {
-      useSettingsStore: () => ({ speechInputLanguage: 'en-US' }),
+      useSettingsStore: () => ({
+        speechInputLanguage: options.language || 'en-US',
+      }),
     },
     './register.node.ts': credentials,
     './store.ts': { store: { getProperty: () => false } },
@@ -94,7 +96,8 @@ function fixture(provider) {
           constructor() {
             clients.push(this)
           }
-          streamingRecognize() {
+          streamingRecognize(options) {
+            this.options = options
             return newStream()
           }
           close() {
@@ -111,9 +114,10 @@ function fixture(provider) {
       }
       async listModels() {
         if (modelFailure) throw Error('catalog unavailable')
-        return { result: { models: [] } }
+        return { result: { models: options.models || [] } }
       }
-      recognizeUsingWebSocket() {
+      recognizeUsingWebSocket(options) {
+        this.options = options
         return newStream()
       }
     },
@@ -287,7 +291,12 @@ function fixture(provider) {
                   Results: [
                     {
                       IsPartial: false,
-                      Alternatives: [{ Items: [{ Content: text }] }],
+                      Alternatives: [
+                        {
+                          Transcript: options.transcript,
+                          Items: [{ Content: text }],
+                        },
+                      ],
                     },
                   ],
                 },
@@ -346,7 +355,60 @@ const providers = [
   'elevenlabs',
   'openai',
 ]
+test('Amazon preserves the service transcript instead of reconstructing punctuation and Japanese spacing', async () => {
+  const text = 'こんにちは。音声認識のテストです。'
+  const f = fixture('amazon-transcribe', { transcript: text })
+  f.create()
+  try {
+    await f.begin()
+    f.success('こんにちは 。 音声 認識 の テスト です 。')
+    await flush()
+    assert.deepEqual(f.turns[0].results, [text])
+  } finally {
+    await f.dispose()
+  }
+})
+test('IBM first non-English turn waits for its catalog without dropping initial PCM', async () => {
+  const f = fixture('ibm-watson', {
+    language: 'fr-FR',
+    models: [{ name: 'fr-FR_Multimedia' }],
+  })
+  f.create()
+  try {
+    await f.begin()
+    assert.equal(f.clients[0].options.model, 'fr-FR_Multimedia')
+    assert.deepEqual(f.streams[0].writes[0], Buffer.from([1, 2, 3, 4]))
+    f.success('Bonjour le monde.')
+    await flush()
+    assert.deepEqual(f.turns[0].results, ['Bonjour le monde.'])
+  } finally {
+    await f.dispose()
+  }
+})
 for (const provider of providers) {
+  test(`${provider}: French, Japanese, Arabic and Unicode transcripts survive the SDK boundary`, async () => {
+    const f = fixture(provider)
+    f.create()
+    try {
+      for (const text of [
+        'Ça va, élève ?\nDeuxième ligne.',
+        'こんにちは。音声認識のテストです。',
+        'مرحبًا بالعالم، هذا اختبار.',
+        'cafe\u0301 👩🏽‍💻 & <hello>',
+      ]) {
+        const turn = await f.begin()
+        if (provider === 'elevenlabs') {
+          f.end()
+          await flush()
+        }
+        f.success(text)
+        await flush()
+        assert.deepEqual(turn.results, [text])
+      }
+    } finally {
+      await f.dispose()
+    }
+  })
   for (const code of [401, 429, 'ECONNRESET'])
     test(`${provider}: ${code} releases the turn and the next request works`, async () => {
       const f = fixture(provider)

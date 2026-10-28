@@ -80,7 +80,17 @@ function fixture(options = {}) {
     {
       Audio,
       document: { createElement: () => new Audio() },
-      window: { ElectronFilesystem: { getCachedAudio: async () => null } },
+      window: {
+        ElectronFilesystem: {
+          getCachedAudio: async () => {
+            if (options.cacheError)
+              throw Object.assign(Error('cache unavailable'), {
+                code: options.cacheError,
+              })
+            return null
+          },
+        },
+      },
       URL: {
         createObjectURL: () => {
           const url = 'blob:' + urls.size
@@ -123,6 +133,17 @@ test('actual audio playback rejection propagates to the queue', async () => {
   f.audios[0].failure = Error('device removed')
   await assert.rejects(f.message.play(), /device removed/)
 })
+
+for (const code of ['EACCES', 'ENOSPC', 'EPERM'])
+  test(`unavailable cache (${code}) still synthesizes and completes playback`, async () => {
+    const f = fixture({ cacheError: code })
+    f.supply(new Blob(['audio']))
+    await f.message.isReady()
+    await f.message.play()
+    f.audios[0].emit('ended')
+    assert.deepEqual(f.events, ['ended'])
+    assert.equal(f.urls.size, 0)
+  })
 
 test('repeated media errors and a later ended event finish the message once', async () => {
   const f = fixture()

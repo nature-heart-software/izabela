@@ -27,9 +27,11 @@ export const ElectronSpeechWindow = () => {
   const isReady = () => ready.promise
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
   let speechRecognitionStore:
-    ReturnType<typeof useSpeechRecognitionStore> | undefined
+    | ReturnType<typeof useSpeechRecognitionStore>
+    | undefined
   let deferredRecording: ReturnType<typeof Deferred> | null = null
   let suspended = false
+  let rendererAvailable = true
   // eslint-disable-next-line prefer-const
   let electronNativeSpeechRecognitionCallback: ReturnType<
     typeof electronNativeSpeechRecognition
@@ -159,7 +161,7 @@ export const ElectronSpeechWindow = () => {
       electronNativeSpeechRecognitionCallback()
       electronNativeSpeechRecognitionCallback = null
     }
-    if (settingsStore?.enableSTTTS && !suspended) {
+    if (settingsStore?.enableSTTTS && !suspended && rendererAvailable) {
       electronNativeSpeechRecognitionCallback =
         electronNativeSpeechRecognition()
     } else {
@@ -208,6 +210,14 @@ export const ElectronSpeechWindow = () => {
 
   const start = (window: BrowserWindow) => {
     registeredWindow = window
+    window.webContents?.on('render-process-gone', () => {
+      rendererAvailable = false
+      restartNativeSpeechRecognition()
+    })
+    window.webContents?.on('did-finish-load', () => {
+      rendererAvailable = true
+      restartNativeSpeechRecognition()
+    })
     ready.resolve(window)
     addEventListeners()
   }

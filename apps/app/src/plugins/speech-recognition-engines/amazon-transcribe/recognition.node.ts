@@ -80,9 +80,11 @@ export default ({ useRecording }: any) => {
             )
             if (result) {
               turn.finish(
-                result.Alternatives?.[0]?.Items?.map(
-                  (item) => item.Content || '',
-                ).join(' ') || '',
+                result.Alternatives?.[0]?.Transcript ||
+                  result.Alternatives?.[0]?.Items?.map(
+                    (item) => item.Content || '',
+                  ).join(' ') ||
+                  '',
               )
               break
             }

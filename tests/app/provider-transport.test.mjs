@@ -17,7 +17,7 @@ function registration(kind, provider, mocks, globals = {}) {
       apiKey: 'fixture',
       region: 'fixture',
       identityPoolId: 'fixture',
-      selectedVoice: { name: 'fixture' },
+      selectedVoice: { name: 'fixture', languageCodes: ['fr-FR'] },
     }[name] ?? false)
   const store = { getProperty }
   mocks['./store'] = mocks['./store.ts'] = { store, getProperty }
@@ -147,3 +147,106 @@ for (const provider of [
       )
       assert.equal(calls.length, 2)
     })
+
+for (const provider of [
+  'amazon-polly',
+  'google-cloud',
+  'microsoft-azure',
+  'ibm-watson',
+  'elevenlabs',
+  'openai',
+])
+  test(`TTS ${provider}: Unicode, multiline and large text reach transport without truncation`, async () => {
+    const calls = [],
+      speech = { customCommands: [] }
+    const engine = registration('speech-engines', provider, {
+      '@/services': {
+        fetchApi: async (...args) => {
+          calls.push(JSON.parse(args[2].body))
+          return new Response('audio')
+        },
+      },
+      '@/modules/speech-engine-manager': { registerEngine: (value) => value },
+      '@/features/speech/store': { useSpeechStore: () => speech },
+      '@/consts': { DEFAULT_LANGUAGE_CODE: 'en-US' },
+      '@/consts.ts': { DEFAULT_LANGUAGE_CODE: 'en-US' },
+      '@/utils/text': { capitalize: (text) => text },
+    })
+    const voice = {
+      name: 'fixture',
+      Id: 'fixture',
+      SupportedEngines: ['neural'],
+      languageCodes: ['fr-FR'],
+      ShortName: 'fixture',
+      Locale: 'fr-FR',
+    }
+    for (const text of [
+      'Ça va ?\nこんにちは\nمرحبًا 👩🏽‍💻 & < > "',
+      'é'.repeat(6000),
+    ]) {
+      const payload = engine.getPayload({ text, voice })
+      assert.equal(
+        payload.text ?? payload.Text ?? payload.input?.text ?? payload.input,
+        text,
+      )
+      await engine.synthesizeSpeech({ credentials: {}, payload })
+      const sent = calls.at(-1).payload
+      assert.equal(
+        sent.text ?? sent.Text ?? sent.input?.text ?? sent.input,
+        text,
+      )
+    }
+  })
+
+test('Azure expressive SSML escapes text and translation while preserving plain text', () => {
+  const engine = registration('speech-engines', 'microsoft-azure', {
+    '@/services': {},
+    '@/modules/speech-engine-manager': { registerEngine: (value) => value },
+    '@/features/speech/store': {},
+  })
+  const voice = { ShortName: 'fr-FR-DeniseNeural', StyleList: ['cheerful'] }
+  for (const translatedText of [undefined, '日本語 & <翻訳> "مرحبًا"']) {
+    const payload = engine.getPayload({
+      text: '/cheerful Ça va & <hello> "yes"?',
+      translatedText,
+      voice,
+    })
+    assert.ok(payload.ssml.includes('&amp;'))
+    assert.ok(payload.ssml.includes('&lt;'))
+    assert.ok(
+      !payload.ssml.includes('<hello>') && !payload.ssml.includes('<翻訳>'),
+    )
+    assert.equal(payload.text, translatedText || ' Ça va & <hello> "yes"?')
+  }
+})
+
+for (const provider of [
+  'amazon-translation',
+  'microsoft-azure',
+  'openai',
+  'google-cloud',
+  'google-translate',
+])
+  test(`translation ${provider}: Unicode and multiline input/output are preserved`, async () => {
+    const text = 'Ça va ?\nこんにちは 👩🏽‍💻',
+      translated = 'مرحبًا بالعالم\n日本語 & < >'
+    const inputs = []
+    const bridge = {
+      async translate(...args) {
+        inputs.push(args)
+        return translated
+      },
+    }
+    const engine = registration(
+      'translation-engines',
+      provider,
+      {
+        '@/modules/translation-engine-manager': {
+          registerEngine: (...args) => args.at(-1),
+        },
+      },
+      { window: new Proxy({}, { get: () => bridge }) },
+    )
+    assert.equal(await engine.translate(text, 'ar-SA'), translated)
+    assert.ok(JSON.stringify(inputs).includes('Ça va'))
+  })

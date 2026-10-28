@@ -23,6 +23,9 @@ test('production Cognito lazy loading does not reinitialize the app entrypoint',
     import Store from 'electron-store'
     import { fromCognitoIdentityPool } from '@aws-sdk/credential-provider-cognito-identity'
     import { Readable } from 'node:stream'
+    import { SpeechConfig, SpeechRecognizer } from 'microsoft-cognitiveservices-speech-sdk'
+    export const recognizerClass = SpeechRecognizer
+    export const speechConfig = SpeechConfig.fromSubscription('fixture', 'westus')
     export const storageClass = Store
     const key = ${JSON.stringify(key)}
     globalThis[key] = (globalThis[key] || 0) + 1
@@ -77,6 +80,9 @@ test('production Cognito lazy loading does not reinitialize the app entrypoint',
     })
     const fixture = require(resolve(output, 'entry.cjs'))
     assert.equal(typeof fixture.storageClass, 'function')
+    assert.equal(typeof fixture.recognizerClass, 'function')
+    assert.equal(fixture.speechConfig.region, 'westus')
+    fixture.speechConfig.close()
     const credentials = await fixture.getCredentials()
     assert.equal(credentials.accessKeyId, 'synthetic-id')
     assert.equal(credentials.secretAccessKey, 'synthetic-secret')

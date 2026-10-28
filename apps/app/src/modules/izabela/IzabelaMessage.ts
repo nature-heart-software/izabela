@@ -274,7 +274,14 @@ export default (messagePayload: IzabelaMessagePayload) => {
   async function downloadAudio(): Promise<DownloadResponse> {
     if (typeof window !== 'undefined') {
       const { ElectronFilesystem } = window
-      const cachedAudio = await ElectronFilesystem.getCachedAudio(getCacheId())
+      // Cache storage is optional. A locked/full temporary directory must not
+      // prevent synthesizing an otherwise valid message.
+      const cachedAudio = await ElectronFilesystem.getCachedAudio(
+        getCacheId(),
+      ).catch((error) => {
+        console.error(error)
+        return null
+      })
       if (cachedAudio) {
         const res = await fetch(cachedAudio)
         const blob = await res.blob()

@@ -15,12 +15,22 @@ export const down: Partial<
   Record<IGlobalKeyEvent['rawKey']['_nameRaw'], boolean>
 > = {}
 
-// Makes sure down is reset when a shortcut is triggered
-export const handleShortcut = <C extends (...args: any[]) => void>(c: C) => {
-  Object.keys(down).forEach((key) => {
-    delete down[key]
-  })
-  return (...args: any[]) => c(...args)
+export const handleShortcut =
+  <C extends (...args: any[]) => void>(c: C) =>
+  (...args: any[]) =>
+    c(...args)
+
+// Native hooks also emit DOWN for keyboard autorepeat. Keep physical key state
+// intact (push-to-record shares it), and rearm only after this chord is released.
+export const createShortcutListener = (keys: Key[], callback: () => void) => {
+  let pressed = false
+  return (event: IGlobalKeyEvent) => {
+    if (keybindingReleased(keys)) pressed = false
+    if (event.state === 'DOWN' && !pressed && keybindingTriggered(keys)) {
+      pressed = true
+      callback()
+    }
+  }
 }
 
 export const registeredEvents: Partial<

@@ -71,13 +71,15 @@ async function fixture() {
     },
   ).ElectronSpeechWindow
   const controller = scope.run(create)
-  controller.start({ setPosition() {} })
+  const contents = new EventEmitter()
+  controller.start({ setPosition() {}, webContents: contents })
   await flush()
   return {
     power,
     settings,
     speech,
     controller,
+    contents,
     active: () => started - stopped,
     counts: () => [started, stopped],
     dispose() {
@@ -87,6 +89,23 @@ async function fixture() {
     },
   }
 }
+
+test('renderer crash stops capture and clears held recording until the replacement renderer loads', async () => {
+  const f = await fixture()
+  try {
+    f.speech.recording = true
+    f.contents.emit('render-process-gone')
+    assert.equal(f.active(), 0)
+    assert.equal(f.speech.recording, false)
+    f.controller.restartNativeSpeechRecognition()
+    assert.equal(f.active(), 0)
+    f.contents.emit('did-finish-load')
+    assert.equal(f.active(), 1)
+    assert.equal(f.speech.recording, false)
+  } finally {
+    f.dispose()
+  }
+})
 test('suspend releases capture and held recording; settings changes wait until resume', async () => {
   const f = await fixture()
   try {
