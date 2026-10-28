@@ -13,6 +13,13 @@ const failures = []
 const unhandled = []
 const captures = []
 const events = []
+const trayRecords = []
+const { Tray } = require('electron')
+const originalSetContextMenu = Tray.prototype.setContextMenu
+Tray.prototype.setContextMenu = function (menu) {
+  trayRecords.push({ tray: this, menu })
+  return originalSetContextMenu.call(this, menu)
+}
 let worker
 let messenger
 let socket
@@ -166,6 +173,19 @@ async function instrument(window) {
         return store
       },
     })
+    const objectUrls = new Set()
+    state.objectUrls = objectUrls
+    const createObjectURL = URL.createObjectURL.bind(URL)
+    const revokeObjectURL = URL.revokeObjectURL.bind(URL)
+    URL.createObjectURL = (...args) => {
+      const url = createObjectURL(...args)
+      objectUrls.add(url)
+      return url
+    }
+    URL.revokeObjectURL = (url) => {
+      objectUrls.delete(url)
+      return revokeObjectURL(url)
+    }
     window.addEventListener('error', (event) =>
       state.errors.push(String(event.error?.stack || event.message)),
     )
@@ -196,10 +216,11 @@ async function instrument(window) {
         }, 20)
         this.addEventListener('playing', () => {
           record.playing = true
+          record.duration = this.duration
         })
         this.addEventListener('ended', () => {
           record.ended = true
-          record.duration = this.duration
+          if (Number.isFinite(this.duration)) record.duration = this.duration
           clearInterval(timer)
           context.close()
         })
@@ -207,6 +228,10 @@ async function instrument(window) {
           record.error = this.error?.message || 'Audio error'
           clearInterval(timer)
           context.close()
+        })
+        this.addEventListener('emptied', () => {
+          clearInterval(timer)
+          void context.close().catch(() => {})
         })
       }
       return original.apply(this, args)
@@ -739,6 +764,7 @@ async function main() {
   )
 
   await runJourneys({
+    trayRecords,
     check,
     evaluate,
     patch,

@@ -9,6 +9,7 @@ Run on Windows with an unlocked desktop and no other Izabela instance using the 
 ```sh
 pnpm test:app:unit
 pnpm test:recovery
+pnpm test:resilience
 pnpm test:app
 ```
 
@@ -46,12 +47,24 @@ Infisical also retains an Uberduck key, but this branch has no Uberduck app impl
 - Authenticated custom language catalogs, valid language IDs, credential changes, and endpoint changes while an earlier catalog response is delayed. Google account imports use a generated test key: cancellation and invalid JSON must preserve the previously imported file and show errors in the form.
 - Older combined and split profiles retain saved phrases, history voices, dictionary entries, profiles, custom endpoints, empty arrays and explicit settings while receiving new defaults. Damaged settings are backed up byte for byte before defaults are restored; unrelated stores must survive.
 - Additional live journeys combine recognition → translation → speech, Azure expressive style SSML and audio, and OpenAI instructions/custom-command descriptions and audio. These are required when their providers are configured.
+- Browser-boundary output routing and reconnecting device IDs, completion across selected outputs, truncated streaming audio recovery, 50 queued playbacks, 10 cancellation waves, and 20 native recognition restarts. Audio URLs must be released and recorder counts must return to zero.
+- Simulated Electron suspend/resume events, native tray callbacks, display-metrics changes and launching a second actual Electron process against the same profile. The original process must retain its windows and still speak.
 
 For microphone tests, Chromium reads a fixed WAV, and the recorder's SoX process is replaced by a paced PCM process using that same WAV. Live provider clients and application functions are not replaced. Custom/universal endpoint tests use a controlled localhost service. The export test supplies a destination at the native save-dialog boundary, checks the real saved WAV and plays those saved bytes through the external-audio integration. Native Windows dialog interaction and playback in another installed application remain manual checks. Clipboard formats are materialized and restored around copy tests using Electron 46's asynchronous clipboard API.
 
 This certifies the application pipeline with fixture audio; physical device drivers, real-microphone quality, and the audible output hardware still require manual testing. Normal builds are tested without modifying startup, installing drivers, invoking UAC, injecting games, or replacing an installed app. See [the 44-journey coverage map](windows-e2e-coverage.md) for each boundary. A partial or manual journey is never counted as a fully passed macro journey.
 
 `pnpm test:recovery` runs focused source tests without Windows UI or provider credentials. It additionally covers connection retry/coalescing, closed sockets, handshake timeout, stop during connection startup, failed background renewal, late transcripts after cleanup, playback rejection, atomic credential replacement, and filesystem error handling. Buffered OpenAI audio during connection startup and wire-protocol assertions are also part of `pnpm test:stt`. These tests use controlled sockets and clocks; live service availability remains the job of the live suite.
+
+`pnpm test:resilience` checks all six STT adapters against SDK-boundary failures, silent final results, teardown and recovery; all six cloud TTS registrations against real failed/disconnected/truncated HTTP responses; and all five translators against rejected IPC calls. Translator fallback behavior is preserved. It also runs 200 turns per recognizer, 500 audio-message completions, device selection and suspend/resume source tests. Recognition waits up to 60 seconds for a final result after input ends, then releases that turn so later speech can proceed. These tests add no error UI.
+
+The routing E2E fixture supplies device enumeration and `setSinkId` at the Chromium boundary. It verifies app routing and real audio playback, not physical delivery to two devices. Suspend/resume and display events are emitted inside the test app; the host computer is not suspended or reconfigured. Tray menu callbacks are exercised without actually invoking Restart/Exit; full relaunch is covered separately.
+
+## Installed application CI
+
+The desktop workflow uploads its built installer to a separate fresh `windows-2022` job. `tests/app/installer.cjs` refuses to run unless it is on a GitHub-hosted Windows runner. It downloads the current published Windows release, installs it silently, launches the actual executable and checks its persisted profile through the Chromium debugging protocol. It then installs the candidate over that release, checks saved data and speech again, and uninstalls while verifying that user data remains.
+
+Installed-app diagnostics go to `coverage/installer-results` and are uploaded even on failure. These checks are separate from the ASAR suite and their success must be read from the installer job. They require no external VM service. Interactive installer dialogs, reboot behavior, actual automatic-update downloads and physical device testing remain separate checks.
 
 The WAV is synthetic English speech generated with Windows SAPI, 16 kHz, mono, signed 16-bit PCM: “The quick brown fox jumps over the lazy dog. This is a speech recognition test.”
 

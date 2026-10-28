@@ -3,6 +3,7 @@ const fs = require('node:fs')
 const path = require('node:path')
 const http = require('node:http')
 const { recoveryCases, runRecovery } = require('./recovery-journeys.cjs')
+const { resilienceCases, runResilience } = require('./resilience-journeys.cjs')
 
 // These names are also the runner's required-result contract.
 const journeyCases = [
@@ -28,6 +29,7 @@ const journeyCases = [
   'desktop: drag messenger and retain placement after reopening',
   'help: guided tour and release update policy',
   ...recoveryCases,
+  ...resilienceCases,
 ]
 
 async function runJourneys(context) {
@@ -276,6 +278,9 @@ async function runJourneys(context) {
   const wav = Buffer.from(source.subarray(0, dataOffset + 8 + 32000 * 2))
   wav.writeUInt32LE(wav.length - 8, 4)
   wav.writeUInt32LE(wav.length - dataOffset - 8, dataOffset + 4)
+  const shortWav = Buffer.from(wav.subarray(0, dataOffset + 8 + 4800))
+  shortWav.writeUInt32LE(shortWav.length - 8, 4)
+  shortWav.writeUInt32LE(shortWav.length - dataOffset - 8, dataOffset + 4)
   const server = http.createServer(async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*')
     res.setHeader('Access-Control-Allow-Headers', '*')
@@ -349,6 +354,13 @@ async function runJourneys(context) {
             : 'Bonjour renard.',
         ),
       )
+    } else if (req.url === '/short.wav') {
+      res.setHeader('Content-Type', 'audio/wav')
+      res.end(shortWav)
+    } else if (req.url === '/broken.mp3') {
+      res.setHeader('Content-Type', 'audio/mpeg')
+      res.write(Buffer.from([0xff, 0xfb, 0x90, 0x64]))
+      setTimeout(() => res.destroy(), 75)
     } else if (req.url === '/export.wav') {
       res.setHeader('Content-Type', 'audio/wav')
       res.end(fs.readFileSync(path.join(config.directory, 'export.wav')))
@@ -1166,6 +1178,7 @@ async function runJourneys(context) {
       clickText,
       dialog,
     })
+    await runResilience({ ...context, endpoint })
   } finally {
     holds.forEach((held) => held.release())
     failSpeech = false

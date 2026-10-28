@@ -77,7 +77,7 @@ const checklist = [
   ],
   [
     'Recognition recovery',
-    [j[15], j[23]],
+    [j[15], j[23], j[29], j[30]],
     'Native restart and disable/re-enable during held recording are tested; physical device interruption remains manual.',
   ],
   [
@@ -188,12 +188,12 @@ const checklist = [
   ],
   [
     'Custom recognition round trip',
-    [j[15], j[23]],
+    [j[15], j[23], j[29], j[30]],
     'Controlled recognizer consumes exported PCM and returns text via say.',
   ],
   [
     'Service failure recovery',
-    [j[16]],
+    [j[16], j[27]],
     'Controlled HTTP outages; physical network disconnection remains manual.',
   ],
 ].map(([name, cases, boundary], index) => ({
