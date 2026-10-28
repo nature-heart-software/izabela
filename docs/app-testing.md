@@ -15,7 +15,7 @@ pnpm test:app
 
 `test:app` builds workspace dependencies and the production app before running. `pnpm test:app:built` runs against an existing production build. `pnpm test:app:packaged` loads the actual installer `app.asar`; the desktop CI workflow uses it after packaging. The tests fail if the app ports are occupied, rather than connecting to an unrelated running instance.
 
-Packaged mode loads the shipped ASAR in an Electron test host and checks that the accompanying SoX executable is present. It exercises the shipped application modules, preloads, and assets; installing the NSIS installer and checking its Windows shell integration remain manual checks.
+Packaged mode loads the shipped ASAR in an Electron test host and checks that the accompanying SoX executable is present. It exercises the shipped application modules, preloads, and assets. Actual installation is covered by the separate hosted installer job below; interactive installer dialogs and Windows shell integration remain separate checks.
 
 For live services, use your existing Infisical dev login:
 
