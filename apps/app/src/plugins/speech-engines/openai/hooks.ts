@@ -20,7 +20,10 @@ export const useListModelsQuery = (
   )
 
 export const useListVoicesQuery = (
-  params: Ref<{ credentials: ReturnType<typeof engine.getCredentials> }>,
+  params: Ref<{
+    credentials: ReturnType<typeof engine.getCredentials>
+    model?: string
+  }>,
   options?: UseQueryOptions,
 ) =>
   useQuery<any>(

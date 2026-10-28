@@ -5,6 +5,7 @@ import { useSettingsStore } from '@/features/settings/store'
 import { WebSocketSessionManager } from '@/teams/speech-worker/modules/electron-native-speech-recognition/websocket-session-manager.ts'
 import { store } from './store.ts'
 import engine from './register.node.ts'
+import { getTranscriptionOptions } from './shared.ts'
 
 export default ({ useRecording }: any) => {
   if (!engine.hasCredentials()) return
@@ -30,11 +31,11 @@ export default ({ useRecording }: any) => {
               audio: {
                 input: {
                   format: { type: 'audio/pcm', rate: 24000 },
-                  transcription: {
-                    model: store.getProperty('model'),
-                    prompt: store.getProperty('prompt'),
-                    language: settingsStore.speechInputLanguage.split('-')[0],
-                  },
+                  transcription: getTranscriptionOptions(
+                    store.getProperty('model'),
+                    store.getProperty('prompt'),
+                    settingsStore.speechInputLanguage.split('-')[0],
+                  ),
                   // The application already detects turns (Hark or hold-to-record).
                   turn_detection: null,
                   noise_reduction: { type: 'near_field' },
