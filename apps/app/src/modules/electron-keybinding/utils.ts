@@ -23,7 +23,7 @@ export const handleShortcut =
 // Native hooks also emit DOWN for keyboard autorepeat. Keep physical key state
 // intact (push-to-record shares it), and rearm only after this chord is released.
 export const createShortcutListener = (keys: Key[], callback: () => void) => {
-  let pressed = false
+  let pressed = keybindingTriggered(keys)
   return (event: IGlobalKeyEvent) => {
     if (keybindingReleased(keys)) pressed = false
     if (event.state === 'DOWN' && !pressed && keybindingTriggered(keys)) {

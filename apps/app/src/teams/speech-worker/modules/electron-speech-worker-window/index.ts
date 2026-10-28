@@ -124,6 +124,8 @@ export const ElectronSpeechWindow = () => {
     gkl?.addListener((e) => {
       if (
         settingsStore &&
+        rendererAvailable &&
+        !suspended &&
         settingsStore.enableSTTTS &&
         settingsStore.speechRecognitionStrategy === 'ptr' &&
         e.state === 'DOWN' &&

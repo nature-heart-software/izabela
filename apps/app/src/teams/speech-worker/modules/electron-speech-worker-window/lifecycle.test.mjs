@@ -6,11 +6,13 @@ import * as vue from 'vue'
 import loadTypescript from '../../../../../../../tests/load-typescript.cjs'
 const flush = () => new Promise((resolve) => setImmediate(resolve))
 async function fixture() {
+  const keyboard = []
   const power = new EventEmitter(),
     scope = vue.effectScope()
   const settings = vue.reactive({
     enableSTTTS: true,
     speechRecognitionStrategy: 'ptr',
+    keybindings: { recordAudio: [] },
   })
   const speech = vue.reactive({
     recording: false,
@@ -36,7 +38,11 @@ async function fixture() {
       '@/utils/electron-notification': {},
       '@/features/speech/store': { useSpeechRecognitionStore: () => speech },
       '@/features/settings/store': { useSettingsStore: () => settings },
-      '@/modules/electron-keybinding/utils': { gkl: { addListener() {} } },
+      '@/modules/electron-keybinding/utils': {
+        gkl: { addListener: (fn) => keyboard.push(fn) },
+        keybindingTriggered: () => true,
+        keybindingReleased: () => true,
+      },
       '@packages/toolbox': {
         Deferred() {
           let resolve
@@ -58,7 +64,7 @@ async function fixture() {
           }
         },
       '@/modules/electron-window-manager': {},
-      '@/utils/time': {},
+      '@/utils/time': { getTime: () => 'fixture' },
       '@/teams/speech-worker/electron/const': {
         windowHeight: 1,
         windowWidth: 1,
@@ -80,6 +86,7 @@ async function fixture() {
     speech,
     controller,
     contents,
+    press: () => keyboard.forEach((fn) => fn({ state: 'DOWN' })),
     active: () => started - stopped,
     counts: () => [started, stopped],
     dispose() {
@@ -97,6 +104,12 @@ test('renderer crash stops capture and clears held recording until the replaceme
     f.contents.emit('render-process-gone')
     assert.equal(f.active(), 0)
     assert.equal(f.speech.recording, false)
+    f.press()
+    assert.equal(
+      f.speech.recording,
+      false,
+      'Key repeat during reload must not restore held recording',
+    )
     f.controller.restartNativeSpeechRecognition()
     assert.equal(f.active(), 0)
     f.contents.emit('did-finish-load')

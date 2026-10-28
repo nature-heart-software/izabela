@@ -49,8 +49,17 @@ function getStorage(name: string): ElectronStore {
 }
 
 const storageGetState = (name: string) => getStorage(name).get(name)
-const storageSetState = (name: string, state: any) =>
-  getStorage(name).set(name, state)
+const storageSetState = (name: string, state: any) => {
+  try {
+    getStorage(name).set(name, state)
+    return true
+  } catch (error) {
+    // Keep the live store usable and the previous atomic save intact. A later
+    // state change retries persistence after a locked/full disk recovers.
+    console.error(`[electron-pinia] Unable to save ${name}:`, error)
+    return false
+  }
+}
 const storageDelete = (name: string) => getStorage(name).delete(name)
 
 if (isMain) {
@@ -59,8 +68,7 @@ if (isMain) {
     return storageGetState(name)
   })
   ipcMain.on(IPC_EVENT_STORE_SET, (_, { name, state }) => {
-    storageSetState(name, state)
-    return true
+    return storageSetState(name, state)
   })
   ipcMain.on(IPC_EVENT_STORE_DELETE, (_, { name }) => {
     storageDelete(name)

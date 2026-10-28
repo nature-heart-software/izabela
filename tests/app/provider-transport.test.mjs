@@ -31,7 +31,7 @@ for (const provider of [
   'elevenlabs',
   'openai',
 ])
-  for (const fault of [401, 429, 503, 'disconnect', 'truncated'])
+  for (const fault of [401, 413, 429, 503, 'disconnect', 'truncated'])
     test(`TTS ${provider}: ${fault} rejects and the next HTTP request succeeds`, async (t) => {
       let failure = fault
       const requests = []

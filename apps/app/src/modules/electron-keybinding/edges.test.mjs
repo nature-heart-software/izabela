@@ -70,6 +70,20 @@ test('autorepeat fires once, focus changes do not discard held keys, and release
   f.emit('VK_LCONTROL', 'UP')
   assert.equal(f.api.keybindingAllReleased(keys), true)
 })
+test('rebinding a held chord waits for release instead of treating repeat as a new press', () => {
+  const f = fixture(),
+    keys = f.keys('ControlLeft', 'KeyQ')
+  f.emit('VK_LCONTROL')
+  f.emit('VK_A')
+  let calls = 0
+  f.add(f.api.createShortcutListener(keys, () => calls++))
+  f.emit('VK_A')
+  assert.equal(calls, 0)
+  f.emit('VK_A', 'UP')
+  f.emit('VK_A')
+  assert.equal(calls, 1)
+})
+
 test('conflicting saved phrase/profile chords leave no listeners behind after rebind', async () => {
   const f = fixture(),
     watches = [],
