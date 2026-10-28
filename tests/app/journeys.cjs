@@ -1020,6 +1020,22 @@ async function runJourneys(context) {
     })
     await run(18, async () => {
       const selector = '[data-v-step="engine-voice-select"] input'
+      await evaluate(messenger, () =>
+        document
+          .querySelector(
+            '.settings > div > div:first-child > :last-child button',
+          )
+          ?.click(),
+      )
+      await until(
+        () => evaluate(messenger, () => !document.querySelector('.settings')),
+        'settings closed before voice picker',
+      )
+      await evaluate(
+        messenger,
+        (selector) => document.querySelector(selector).click(),
+        selector,
+      )
       await type('Elf', selector)
       await until(
         () =>
