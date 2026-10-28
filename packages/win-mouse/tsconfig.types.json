@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "target": "ES2022",
+    "rootDir": "types",
+    "outDir": "dist",
+    "types": ["node"],
+    "skipLibCheck": false
+  },
+  "include": ["types/index.ts"]
+}

@@ -55,6 +55,7 @@ import { purify } from '@packages/toolbox'
 const queryClient = useQueryClient()
 const computedParams = computed(() => ({
   credentials: engine.getCredentials(),
+  model: getProperty('model'),
 }))
 const canFetch = computed(() => engine.hasCredentials?.())
 const { data, isFetching } = useListVoicesQuery(computedParams, {
@@ -92,7 +93,7 @@ const favoriteVoiceIds = computed<string[]>(() =>
   getProperty('favoriteVoiceIds'),
 )
 watch(
-  () => getProperty('apiKey'),
+  () => [getProperty('apiKey'), getProperty('model')],
   () => canFetch.value && queryClient.refetchQueries(LIST_VOICES_QUERY_KEY),
 )
 </script>

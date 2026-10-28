@@ -22,12 +22,18 @@
   ],
   "license": "MIT",
   "main": "index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "index.js",
+    "dist"
+  ],
   "os": [
     "win32"
   ],
   "repository": "kapetan/win-mouse.git",
   "scripts": {
-    "build": "node -e \"console.log('No build step required')\"",
+    "build": "tsc -p tsconfig.types.json",
+    "test:types": "pnpm run build && tsc -p tests/tsconfig.json",
     "install": "",
     "lint": "standard",
     "test": "node test/parallel-destroy && node test/parallel-unref && node test/sequence-destroy && node test/sequence-unref",

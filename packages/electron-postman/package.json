@@ -15,8 +15,10 @@
     "electron-security"
   ],
   "main": "index.js",
+  "types": "index.d.ts",
   "files": [
     "index.js",
+    "index.d.ts",
     "src"
   ],
   "repository": {
@@ -30,12 +32,13 @@
   "author": "Yannic Lieder",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^41.10.6",
+    "electron": "46.0.0-alpha.2",
     "eslint": "^7.10.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.21.2"
   },
   "scripts": {
+    "test:types": "tsc -p tests/tsconfig.json",
     "build": "node -e \"console.log('No build step required')\""
   }
 }

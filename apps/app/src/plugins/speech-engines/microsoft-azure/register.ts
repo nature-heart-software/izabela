@@ -7,6 +7,19 @@ import NvSettings from './NvSettings.vue'
 import { Credentials, ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, store } from './store'
 
+const escapeXml = (value: string) =>
+  value.replace(
+    /[<>&"']/g,
+    (character) =>
+      ({
+        '<': '&lt;',
+        '>': '&gt;',
+        '&': '&amp;',
+        '"': '&quot;',
+        "'": '&apos;',
+      }[character] as string),
+  )
+
 const getCredentials: SpeechEngine<Credentials>['getCredentials'] = () => {
   const speechStore = useSpeechStore()
   return speechStore.hasUniversalApiCredentials &&
@@ -62,11 +75,11 @@ export const engine = registerEngine({
       }
     }
     const ssml = expression
-      ? `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US"><voice name="${
-          voice.ShortName
-        }"><mstts:express-as style="${expression}">${
-          translatedText || newText
-        }</mstts:express-as></voice></speak>`
+      ? `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US"><voice name="${escapeXml(
+          voice.ShortName,
+        )}"><mstts:express-as style="${escapeXml(expression)}">${escapeXml(
+          translatedText || newText,
+        )}</mstts:express-as></voice></speak>`
       : null
     return {
       ssml,

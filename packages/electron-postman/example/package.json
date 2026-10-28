@@ -8,7 +8,7 @@
     "start": "electron ."
   },
   "devDependencies": {
-    "electron": "^41.10.6"
+    "electron": "46.0.0-alpha.2"
   },
   "dependencies": {
     "electron-postman": "^0.1.0"

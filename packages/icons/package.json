@@ -13,7 +13,8 @@
   "scripts": {
     "build": "vite build",
     "build:prod": "tsc && pnpm run build",
-    "dev": "vite build --watch --mode development"
+    "dev": "vite build --watch --mode development",
+    "test:types": "vue-tsc -p tsconfig.json --declaration --emitDeclarationOnly --outDir dist --rootDir src && tsc --noEmit -p tests/tsconfig.json"
   },
   "sideEffects": false,
   "type": "module",

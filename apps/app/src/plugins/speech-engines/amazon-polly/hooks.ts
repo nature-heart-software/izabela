@@ -25,10 +25,6 @@ export const useListVoicesQuery = (
         if (Array.isArray(data)) {
           const selectedVoice = getProperty('selectedVoice')
 
-          const preferredEnginesSet = new Set(
-            selectedVoice ? selectedVoice.SupportedEngines : [],
-          )
-
           const defaultVoice =
             data.find(
               (voice) => getVoiceId(voice) === preferredDefaultVoiceId,
@@ -40,10 +36,18 @@ export const useListVoicesQuery = (
           )
 
           const finalVoice = updatedVoice || defaultVoice
-
-          finalVoice.SupportedEngines.forEach((engine: string) =>
-            preferredEnginesSet.add(engine),
-          )
+          if (!finalVoice) {
+            setProperty('selectedVoice', null)
+            return
+          }
+          // A saved voice may advertise engines unavailable in the new region
+          // or voice listing. Preserve preference only among supported engines.
+          const preferredEnginesSet = new Set([
+            ...(selectedVoice?.SupportedEngines || []).filter(
+              (engine: string) => finalVoice.SupportedEngines.includes(engine),
+            ),
+            ...finalVoice.SupportedEngines,
+          ])
 
           setProperty('selectedVoice', {
             ...finalVoice,

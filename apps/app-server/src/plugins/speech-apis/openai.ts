@@ -1,12 +1,50 @@
 import { RequestHandler } from 'express'
 import { handleError } from '../../utils/requests'
 import OpenAI from 'openai'
+import type { SpeechModel } from 'openai/resources/audio/speech'
+
+// The speech endpoint's model/voice unions in the installed OpenAI SDK.
+export const speechModels: SpeechModel[] = [
+  'tts-1',
+  'tts-1-hd',
+  'gpt-4o-mini-tts',
+  'gpt-4o-mini-tts-2025-12-15',
+]
+
+export const speechVoices = [
+  'alloy',
+  'ash',
+  'ballad',
+  'coral',
+  'echo',
+  'fable',
+  'onyx',
+  'nova',
+  'sage',
+  'shimmer',
+  'verse',
+  'marin',
+  'cedar',
+]
+
+const legacyVoices = new Set([
+  'alloy',
+  'ash',
+  'coral',
+  'echo',
+  'fable',
+  'onyx',
+  'nova',
+  'sage',
+  'shimmer',
+])
 
 const plugin: Izabela.Server.Plugin = ({ app }) => {
   const listVoicesHandler: RequestHandler = async (
     {
       body: {
         credentials: { apiKey },
+        model,
       },
     },
     res,
@@ -14,19 +52,11 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
     try {
       res
         .status(200)
-        .json([
-          'alloy',
-          'ash',
-          'ballad',
-          'coral',
-          'echo',
-          'fable',
-          'onyx',
-          'nova',
-          'sage',
-          'shimmer',
-          'verse',
-        ])
+        .json(
+          model === 'tts-1' || model === 'tts-1-hd'
+            ? speechVoices.filter((voice) => legacyVoices.has(voice))
+            : speechVoices,
+        )
     } catch (e: any) {
       handleError(res, 'Internal server error', e.message, 500)
     }
@@ -34,14 +64,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
 
   const listModelsHandler: RequestHandler = async (_req, res) => {
     try {
-      res
-        .status(200)
-        .json([
-          'tts-1',
-          'tts-1-hd',
-          'gpt-4o-mini-tts',
-          'gpt-4o-mini-tts-2025-12-15',
-        ])
+      res.status(200).json(speechModels)
     } catch (e: any) {
       handleError(res, 'Internal server error', e.message, 500)
     }

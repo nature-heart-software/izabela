@@ -39,15 +39,21 @@ import { useQueryClient } from 'vue-query'
 
 const { ElectronDialog, ElectronFilesystem } = window
 const queryClient = useQueryClient()
-const importGoogleCloudSpeechCredentials = () => {
-  ElectronDialog.showOpenDialog({
-    properties: ['openFile'],
-    filters: [{ name: 'JSON', extensions: ['json'] }],
-  })
-    .then(({ filePaths }) => ElectronFilesystem.importGoogleCloudSpeechCredentials(filePaths[0]))
-    .then(() => {
-      queryClient.refetchQueries(getGoogleCloudSpeechCredentialsPathQueryKey)
+const importGoogleCloudSpeechCredentials = async () => {
+  try {
+    const { canceled, filePaths } = await ElectronDialog.showOpenDialog({
+      properties: ['openFile'],
+      filters: [{ name: 'JSON', extensions: ['json'] }],
     })
+    if (canceled || !filePaths?.[0]) return
+    await ElectronFilesystem.importGoogleCloudSpeechCredentials(filePaths[0])
+    await queryClient.refetchQueries(
+      getGoogleCloudSpeechCredentialsPathQueryKey,
+    )
+  } catch {
+    console.error('Could not import Google Cloud credentials.')
+  }
 }
-const { data: googleCloudSpeechCredentialsPath } = useGetGoogleCloudSpeechCredentialsPath()
+const { data: googleCloudSpeechCredentialsPath } =
+  useGetGoogleCloudSpeechCredentialsPath()
 </script>

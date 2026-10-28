@@ -1,0 +1,9 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": { "noEmit": true, "strict": true, "types": ["node"] },
+  "include": [
+    "../index.d.ts",
+    "./*.ts",
+    "../../electron-pinia/tests/source-loader.ts"
+  ]
+}

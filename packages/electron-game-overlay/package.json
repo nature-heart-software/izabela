@@ -12,11 +12,12 @@
   "module": "./dist/index.js",
   "private": true,
   "scripts": {
-    "build": "vite build && node ./bin/build"
+    "build": "vite build && node ./bin/build",
+    "test:types": "vite build && node tests/prepare-types.mjs && tsc -p tests/tsconfig.json"
   },
   "source": "src/main.ts",
   "type": "module",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/main.d.ts",
   "nx": {
     "targets": {
       "build": {

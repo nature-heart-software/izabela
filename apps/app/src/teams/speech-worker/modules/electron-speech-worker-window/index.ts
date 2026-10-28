@@ -1,6 +1,6 @@
 // see: https://tipsfordev.com/stream-audio-with-websocket-and-get-back-audio-transcription-obtained-with-google-speech-api
 import speech from '@google-cloud/speech'
-import { BrowserWindow, screen } from 'electron'
+import { BrowserWindow, screen, powerMonitor } from 'electron'
 import { ipcMain } from 'electron-postman'
 import { createNotification } from '@/utils/electron-notification'
 import { useSpeechRecognitionStore } from '@/features/speech/store'
@@ -29,6 +29,8 @@ export const ElectronSpeechWindow = () => {
   let speechRecognitionStore:
     ReturnType<typeof useSpeechRecognitionStore> | undefined
   let deferredRecording: ReturnType<typeof Deferred> | null = null
+  let suspended = false
+  let rendererAvailable = true
   // eslint-disable-next-line prefer-const
   let electronNativeSpeechRecognitionCallback: ReturnType<
     typeof electronNativeSpeechRecognition
@@ -121,6 +123,8 @@ export const ElectronSpeechWindow = () => {
     gkl?.addListener((e) => {
       if (
         settingsStore &&
+        rendererAvailable &&
+        !suspended &&
         settingsStore.enableSTTTS &&
         settingsStore.speechRecognitionStrategy === 'ptr' &&
         e.state === 'DOWN' &&
@@ -156,16 +160,29 @@ export const ElectronSpeechWindow = () => {
   const restartNativeSpeechRecognition = () => {
     if (electronNativeSpeechRecognitionCallback) {
       electronNativeSpeechRecognitionCallback()
+      electronNativeSpeechRecognitionCallback = null
     }
-    if (settingsStore?.enableSTTTS) {
+    if (settingsStore?.enableSTTTS && !suspended && rendererAvailable) {
       electronNativeSpeechRecognitionCallback =
         electronNativeSpeechRecognition()
+    } else {
+      deferredRecording?.resolve(true)
+      deferredRecording = null
+      speechRecognitionStore?.$patch({ recording: false })
     }
   }
 
   isReady().then(() => {
     settingsStore = useSettingsStore()
     speechRecognitionStore = useSpeechRecognitionStore()
+    powerMonitor.on('suspend', () => {
+      suspended = true
+      restartNativeSpeechRecognition()
+    })
+    powerMonitor.on('resume', () => {
+      suspended = false
+      restartNativeSpeechRecognition()
+    })
 
     watch(
       () => [
@@ -194,6 +211,14 @@ export const ElectronSpeechWindow = () => {
 
   const start = (window: BrowserWindow) => {
     registeredWindow = window
+    window.webContents?.on('render-process-gone', () => {
+      rendererAvailable = false
+      restartNativeSpeechRecognition()
+    })
+    window.webContents?.on('did-finish-load', () => {
+      rendererAvailable = true
+      restartNativeSpeechRecognition()
+    })
     ready.resolve(window)
     addEventListeners()
   }

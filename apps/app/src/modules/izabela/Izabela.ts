@@ -6,11 +6,15 @@ export default () => {
   let currentlyPlayingMessage: ReturnType<typeof IzabelaMessage> | null = null
 
   let messageQueue: ReturnType<typeof IzabelaMessage>[] = []
+  const readiness = new WeakMap<
+    ReturnType<typeof IzabelaMessage>,
+    ReturnType<ReturnType<typeof IzabelaMessage>['isReady']>
+  >()
 
   function clearQueue() {
-    if (messageQueue.length > 0) {
-      messageQueue = []
-    }
+    const queued = messageQueue
+    messageQueue = []
+    queued.forEach((message) => message.cancel())
   }
 
   function onMessageEnd() {
@@ -30,7 +34,11 @@ export default () => {
 
   function playMessage(message: ReturnType<typeof IzabelaMessage>) {
     const socketPayload = message.getSocketPayload()
+    let completed = false
     const onEnd = (hasError?: boolean) => {
+      if (completed || currentlyPlayingMessage !== message) return
+      completed = true
+      if (hasError) message.cancel()
       if (hasError) socket.emit('message:error', socketPayload)
       socket.emit('message:end', socketPayload)
       onMessageEnd()
@@ -55,9 +63,9 @@ export default () => {
       })
     })
     socket.emit('message:load', socketPayload)
-    message
-      .isReady()
+    ;(readiness.get(message) || message.isReady())
       .then(() => {
+        if (completed || currentlyPlayingMessage !== message) return
         socket.emit('message:start', socketPayload)
         return message.play()
       })
@@ -67,8 +75,7 @@ export default () => {
 
   function playNextMessage() {
     if (messageQueue.length > 0) {
-      playMessage(messageQueue[0])
-      messageQueue.splice(0, 1)
+      playMessage(messageQueue.shift()!)
     }
   }
 
@@ -76,7 +83,7 @@ export default () => {
     messagePayload: Partial<IzabelaMessagePayload> &
       Pick<IzabelaMessagePayload, 'engine'>,
   ) {
-    return IzabelaMessage({
+    const message = IzabelaMessage({
       message: '',
       originalMessage: '',
       translatedMessage: null,
@@ -88,6 +95,11 @@ export default () => {
       voice: null,
       ...messagePayload,
     })
+    const ready = message.isReady()
+    // Prefetching can fail before this message reaches the front of the queue.
+    ready.catch(() => {})
+    readiness.set(message, ready)
+    return message
   }
 
   function queueMessage(message: ReturnType<typeof IzabelaMessage>) {

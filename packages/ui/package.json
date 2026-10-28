@@ -16,6 +16,7 @@
   "module": "./dist/main.js",
   "private": true,
   "scripts": {
+    "test:types": "node tests/build-types.mjs && vue-tsc --noEmit -p tests/tsconfig.json",
     "build": "vite build",
     "build-storybook": "storybook build",
     "build:prod": "vue-tsc && vite build",

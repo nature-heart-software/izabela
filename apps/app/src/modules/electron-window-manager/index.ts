@@ -1,3 +1,5 @@
+import { recoverRenderer } from './recovery'
+
 export type ElectronWindowManagerInstance = {
   name: string
   window: Electron.BrowserWindow
@@ -14,6 +16,7 @@ const ElectronWindowManager = () => {
     createWindow: (winName: string) => Promise<Electron.BrowserWindow>,
   ): Promise<ElectronWindowManagerInstance> {
     const window = await createWindow(name)
+    recoverRenderer(window)
     instances[name] = {
       name,
       window,
@@ -21,7 +24,9 @@ const ElectronWindowManager = () => {
     return instances[name]
   }
 
-  function getInstanceByName(name: string): ElectronWindowManagerInstance | undefined {
+  function getInstanceByName(
+    name: string,
+  ): ElectronWindowManagerInstance | undefined {
     return instances[name]
   }
 

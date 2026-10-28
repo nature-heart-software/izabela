@@ -19,9 +19,11 @@
   ],
   "license": "ISC",
   "main": "index.js",
+  "types": "index.d.ts",
   "repository": "gillesdemey/node-record-lpcm16",
   "scripts": {
     "build": "node -e \"console.log('No build step required')\"",
-    "test": "standard"
+    "test": "standard",
+    "test:types": "tsc --noEmit -p tests/tsconfig.json"
   }
 }
