@@ -166,6 +166,17 @@ test('all unavailable selected outputs fail through the existing error path when
     assert.deepEqual(f.events, ['error'])
   }
 })
+
+test('intentionally disabling all local outputs still permits muted playback', async () => {
+  const f = fixture({ defaultOutput: false })
+  f.supply(new Blob(['audio']))
+  await f.message.isReady()
+  await f.message.play()
+  assert.equal(f.audios[0].volume, 0)
+  f.audios[0].emit('ended')
+  assert.deepEqual(f.events, ['ended'])
+  assert.equal(f.urls.size, 0)
+})
 test('cancel and auxiliary playback errors release every object URL once', async () => {
   for (const failure of [false, true]) {
     const f = fixture({ outputs: ['headset'] })

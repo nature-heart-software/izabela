@@ -169,6 +169,7 @@ export default (messagePayload: IzabelaMessagePayload) => {
       .then((resolvedAudioElements) => {
         audioElements = resolvedAudioElements
         if (
+          settingsStore.audioOutputs.length > 0 &&
           !settingsStore.playSpeechOnDefaultPlaybackDevice &&
           !audioElements.some(Boolean)
         )
