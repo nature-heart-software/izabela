@@ -53,6 +53,8 @@ export default () => {
   })
 
   const pendingMessages = new Map()
+  let disposed = false
+  const pumps = new Set<(chunk: any) => void>()
 
   const context = {
     recorder,
@@ -64,6 +66,7 @@ export default () => {
       clearOnEnd,
     }: {
       queueMessages?: boolean
+      clearOnEnd?: boolean
       onChunk: (chunk: any) => void
       onEnded?: () => void
     }) {
@@ -83,7 +86,7 @@ export default () => {
             await previousPendingMessage.done
           }
         }
-        if (messageWithoutProfanityFilter) {
+        if (!disposed && messageWithoutProfanityFilter) {
           ipcMain.sendTo('speech-worker', 'say', messageWithoutProfanityFilter)
         }
         pendingMessages.delete(id)
@@ -91,17 +94,21 @@ export default () => {
       })
 
       function onData(chunk: any) {
+        if (disposed) return
         onChunk(chunk)
         if (ending) {
           endingChunksCount += 1
           if (endingChunksCount >= postRecordingChunksCount) {
             recorderStream?.off('data', onData)
+            pumps.delete(onData)
             onEnded?.()
           }
         }
       }
 
       function startPumping() {
+        if (disposed || pumps.has(onData)) return
+        pumps.add(onData)
         recorderStream.on('data', onData)
         rollingBuffer.forEach((chunk) => {
           onChunk(chunk)
@@ -121,6 +128,10 @@ export default () => {
           }
         },
         done: deferredDone.promise,
+        cancel: () => {
+          deferredMessage.resolve('')
+          deferredDone.resolve('')
+        },
       })
 
       return {
@@ -139,7 +150,13 @@ export default () => {
     () => speechRecognitionStore.recording,
     () => {
       if (speechRecognitionStore.recording) {
-        speechRecognitionEngine?.startStream?.()
+        Promise.resolve()
+          .then(() => {
+            if (!disposed) return speechRecognitionEngine?.startStream?.()
+          })
+          .catch((error) =>
+            console.error('Unable to start speech recognition', error),
+          )
       } else {
         speechRecognitionEngine?.stopStream?.()
         // console.log(Array.from(pendingMessages.values()).map((m) => m.id))
@@ -147,12 +164,19 @@ export default () => {
         rollingBuffer = []
       }
     },
+    { immediate: true },
   )
 
   return () => {
+    if (disposed) return
+    disposed = true
     console.log('Stopping native speech recognition...')
+    stopWatch()
+    pumps.forEach((pump) => recorderStream.off('data', pump))
+    pumps.clear()
+    pendingMessages.forEach((message) => message.cancel())
+    pendingMessages.clear()
     recorder.stop()
     speechRecognitionEngine?.cleanup?.()
-    stopWatch()
   }
 }

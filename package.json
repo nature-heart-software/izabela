@@ -191,6 +191,7 @@
     "test:speech": "node --test tests/speech-bundle.test.mjs tests/speech-providers.test.mjs apps/app/src/plugins/speech-engines/amazon-polly/hooks.test.mjs apps/app/src/utils/media-devices.test.mjs apps/app/src/teams/speech-worker/components/NvSpeechListener.test.mjs apps/app/src/teams/speech-worker/modules/electron-native-speech-recognition/index.test.mjs",
     "test:speech:runtime": "node tests/speech-runtime.cjs",
     "test:openai-models": "node --test tests/openai-models.test.mjs",
+    "test:recovery": "node --test apps/app/src/modules/izabela/*.test.mjs apps/app/src/modules/electron-filesystem/index.test.mjs apps/app/src/features/settings/components/NvGoogleCloudCredentialsFormPart.test.mjs apps/app/src/plugins/translation-engines/custom/queries.test.mjs apps/app/src/plugins/speech-recognition-engines/custom/recognition.test.mjs apps/app/src/teams/speech-worker/modules/electron-native-speech-recognition/recovery.test.mjs apps/app/src/teams/speech-worker/modules/electron-native-speech-recognition/websocket-session-manager.test.mjs packages/electron-pinia/src/create-store.test.mjs",
     "test:stt": "node --test tests/app/recognition-adapters.test.mjs apps/app/src/teams/speech-worker/electron/window.test.mjs apps/app/src/teams/speech-worker/modules/electron-native-speech-recognition/index.test.mjs",
     "test:history": "node --test apps/app/src/features/messages/store.test.mjs",
     "test:focus": "node --test apps/app/src/teams/messenger/modules/electron-messenger-window/index.test.mjs",

@@ -2,6 +2,7 @@ import { PiniaPlugin, PiniaPluginContext } from 'pinia'
 import defaults from 'lodash/defaults'
 import cloneDeep from 'lodash/cloneDeep'
 import type ElectronStore from 'electron-store'
+import { createStore } from './create-store'
 
 import {
   ELECTRON_STORAGE_NAME,
@@ -22,8 +23,8 @@ function getElectronStore(name: string) {
         require('electron').app.getPath('userData'),
         `${ELECTRON_STORAGE_NAME}.json`,
       )
-      const globalDefaults: Record<string, any> = require(
-        electronPiniaDefaultFile,
+      const globalDefaults: Record<string, any> = JSON.parse(
+        require('fs').readFileSync(electronPiniaDefaultFile, 'utf8'),
       )
       if (globalDefaults) {
         defaults = {
@@ -31,11 +32,14 @@ function getElectronStore(name: string) {
         }
       }
     } catch (e) {}
-    electronStores[name] = new (require('electron-store'))({
+    const options = {
       name,
       defaults,
       cwd: ELECTRON_STORAGE_NAME,
-    })
+    }
+    electronStores[name] = createStore(require('electron-store'), options, () =>
+      require('electron').app.getPath('userData'),
+    )
   }
   return electronStores[name]
 }

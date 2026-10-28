@@ -45,6 +45,8 @@ jobs:
         run: pnpm test:stt
       - name: Check OpenAI SDK model catalogs
         run: pnpm test:openai-models
+      - name: Check queue, recognition, credentials, and profile recovery
+        run: pnpm test:recovery
       - name: Check speech detection in Electron
         run: pnpm test:speech:runtime
       - name: Check monitor restoration

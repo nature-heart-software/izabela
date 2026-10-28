@@ -9,6 +9,7 @@ test('OpenAI waits for its session, sends GA transcription config, and commits c
   const sockets = []
   class WebSocket extends EventEmitter {
     static OPEN = 1
+    static CONNECTING = 0
     constructor(url, options) {
       super()
       this.url = url
@@ -87,7 +88,10 @@ test('OpenAI waits for its session, sends GA transcription config, and commits c
     },
   })
   t.after(() => recognizer.cleanup())
-  await recognizer.startStream()
+  const starting = recognizer.startStream()
+  // A short utterance may be released before the reconnect finishes.
+  recording.onEnded()
+  await starting
   const socket = sockets[0]
   const config = socket.sent[0]
   assert.equal(config.type, 'session.update')
@@ -118,6 +122,29 @@ test('OpenAI waits for its session, sends GA transcription config, and commits c
       .length,
     1,
   )
+  socket.close()
+  await recognizer.startStream()
+  assert.equal(
+    sockets.length,
+    2,
+    'Closed sessions must reconnect for the next turn',
+  )
+  const replacement = sockets[1]
+  replacement.emit(
+    'message',
+    Buffer.from(
+      JSON.stringify({
+        type: 'conversation.item.input_audio_transcription.completed',
+        transcript: '',
+      }),
+    ),
+  )
+  assert.deepEqual(
+    transcripts,
+    ['Known fixture speech', ''],
+    'Empty final results must release the recording',
+  )
+  replacement.emit('message', Buffer.from('{bad frame'))
 })
 
 function azure(t) {

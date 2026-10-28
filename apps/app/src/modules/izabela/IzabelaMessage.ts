@@ -31,6 +31,10 @@ export default (messagePayload: IzabelaMessagePayload) => {
   const playingMessageStore = usePlayingMessageStore()
   let audioElements: (HTMLAudioElement | null)[] = []
   let cancelled = false
+  let finished = false
+  // Both deferred promises can reject while a prefetched message is still queued.
+  audioDownloaded.promise.catch(() => {})
+  audioLoaded.promise.catch(() => {})
   if (!excludeFromHistory) {
     const messageStore = useMessagesStore()
     messageStore.$whenReady().then(() => {
@@ -64,14 +68,19 @@ export default (messagePayload: IzabelaMessagePayload) => {
   }
 
   function cancel() {
+    if (finished) return
     cancelled = true
+    finished = true
     audio.pause()
     audioElements.forEach((audioEl) => audioEl?.pause())
-    playingMessageStore.$patch({
-      id: null,
-      isPlaying: false,
-      progress: 0,
-    })
+    if (playingMessageStore.id === id)
+      playingMessageStore.$patch({
+        id: null,
+        isPlaying: false,
+        progress: 0,
+      })
+    audioDownloaded.resolve(false)
+    audioLoaded.resolve(false)
     emitter.emit('ended')
   }
 
@@ -122,17 +131,16 @@ export default (messagePayload: IzabelaMessagePayload) => {
 
   async function play() {
     const settingsStore = useSettingsStore()
-    return settingsStore
-      .$whenReady()
-      .then(() => {
-        if (cancelled) return
-        if (!settingsStore.playSpeechOnDefaultPlaybackDevice) {
-          audio.volume = 0
-        }
-        audio.play()
-        audioElements.forEach((audioEl) => audioEl && audioEl.play())
-      })
-      .catch(console.error)
+    return settingsStore.$whenReady().then(() => {
+      if (cancelled) return
+      if (!settingsStore.playSpeechOnDefaultPlaybackDevice) {
+        audio.volume = 0
+      }
+      return Promise.all([
+        audio.play(),
+        ...audioElements.map((audioEl) => audioEl?.play()),
+      ])
+    })
   }
 
   function isReady() {
@@ -231,7 +239,7 @@ export default (messagePayload: IzabelaMessagePayload) => {
         console.error(e)
       }
       audioDownloaded.resolve(true)
-      cacheAudio(res)
+      cacheAudio(res).catch(console.error)
       return Promise.resolve(res)
     })
   }
@@ -262,12 +270,23 @@ export default (messagePayload: IzabelaMessagePayload) => {
   }
 
   async function loadAudio(res: DownloadResponse, audioEls = audioElements) {
+    if (cancelled) return
     for (const audioElement of audioEls) {
       if (!audioElement) continue
-      audioElement.src = await createAudioSrc(res)
+      const src = await createAudioSrc(res)
+      if (cancelled) {
+        URL.revokeObjectURL(src)
+        return
+      }
+      audioElement.src = src
       audioElement.load()
     }
-    audio.src = await createAudioSrc(res)
+    const src = await createAudioSrc(res)
+    if (cancelled) {
+      URL.revokeObjectURL(src)
+      return
+    }
+    audio.src = src
     audio.load()
   }
 
@@ -277,7 +296,7 @@ export default (messagePayload: IzabelaMessagePayload) => {
 
   function addEventListeners() {
     audio.addEventListener('timeupdate', () => {
-      if (cancelled) return
+      if (finished) return
       emitter.emit('timeupdate', {
         currentTime: audio.currentTime,
         duration: audio.duration,
@@ -288,7 +307,7 @@ export default (messagePayload: IzabelaMessagePayload) => {
       })
     })
     audio.addEventListener('ended', () => {
-      if (cancelled) return
+      if (finished) return
       playingMessageStore.$patch({
         id: null,
         isPlaying: false,
@@ -296,14 +315,14 @@ export default (messagePayload: IzabelaMessagePayload) => {
       })
     })
     audio.addEventListener('play', () => {
-      if (cancelled) return
+      if (finished) return
       playingMessageStore.$patch({
         id,
         isPlaying: true,
       })
     })
     audio.addEventListener('pause', () => {
-      if (cancelled) return
+      if (finished) return
       playingMessageStore.$patch({
         id,
         isPlaying: false,
@@ -314,11 +333,21 @@ export default (messagePayload: IzabelaMessagePayload) => {
       audioLoaded.resolve(true)
     })
     audio.addEventListener('started', () => emitter.emit('started'))
-    audio.addEventListener('ended', () => emitter.emit('ended'))
+    audio.addEventListener('ended', () => {
+      if (finished) return
+      finished = true
+      emitter.emit('ended')
+    })
     audio.addEventListener('error', (e) => onError(e))
   }
 
   function onError(e: ErrorEvent) {
+    if (finished) return
+    finished = true
+    audio.pause()
+    audioElements.forEach((audioEl) => audioEl?.pause())
+    if (playingMessageStore.id === id)
+      playingMessageStore.$patch({ id: null, isPlaying: false, progress: 0 })
     emitter.emit('error')
     audioDownloaded.reject(e)
     audioLoaded.reject(e)
