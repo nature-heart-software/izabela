@@ -10,6 +10,7 @@ const { once } = require('node:events')
 const { seedProfile } = require('./profile-upgrades.cjs')
 const { connect } = require('./cdp.cjs')
 const pkg = require('../../apps/app/package.json')
+const versions = require('./update-versions.cjs')
 const root = path.resolve(__dirname, '../..')
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 const results = []
@@ -102,7 +103,7 @@ async function run() {
           : sha512
       res.setHeader('content-type', 'text/yaml')
       res.end(
-        `version: 6.6.7\nfiles:\n  - url: update.exe\n    sha512: ${digest}\n    size: ${bytes.length}\npath: update.exe\nsha512: ${digest}\nreleaseDate: '2026-10-28T00:00:00.000Z'\n`,
+        `version: ${versions.candidate}\nfiles:\n  - url: update.exe\n    sha512: ${digest}\n    size: ${bytes.length}\npath: update.exe\nsha512: ${digest}\nreleaseDate: '2026-10-28T00:00:00.000Z'\n`,
       )
     } else if (
       req.url.startsWith('/update.exe') &&
@@ -174,7 +175,7 @@ async function run() {
             await debuggerClient.evaluate(
               `process.mainModule.require('electron').app.getVersion()`,
             ),
-            '6.6.6',
+            versions.baseline,
           )
         },
       )
@@ -192,7 +193,7 @@ async function run() {
         )
         assert.deepEqual(
           downloaded.map((item) => item.version),
-          ['6.6.7'],
+          [versions.candidate],
         )
         await debuggerClient.evaluate(
           `setTimeout(() => __updaterTest.updater.quitAndInstall(true, true), 250); true`,
@@ -215,7 +216,7 @@ async function run() {
                 encoding: 'utf8',
               },
             ).trim()
-            return version === '6.6.7'
+            return version === versions.candidate
           } catch {
             return false
           }

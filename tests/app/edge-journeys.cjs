@@ -86,6 +86,12 @@ async function runEdges(c) {
       keyEvent(133, 0, 2, 0)
       keyEvent(162, 0, 2, 0)
       await patch('messages', { shortcutMessages: saved })
+      // The scenario deliberately hides the native window. Restore through its
+      // controller so later UI tests also have correct focus state.
+      await evaluate(messenger, async () => {
+        await window.ElectronMessengerWindow.hide(false)
+        await window.ElectronMessengerWindow.show()
+      })
     }
   })
   await check(edgeCases[1], async () => {
@@ -137,6 +143,14 @@ async function runEdges(c) {
   await check(edgeCases[2], async () => {
     await patch('settings', { theme: 'dark' })
     await crash(messenger)
+    await evaluate(messenger, async () => {
+      await window.ElectronMessengerWindow.hide(false)
+      await window.ElectronMessengerWindow.show()
+    })
+    await until(
+      () => messenger.isVisible() && messenger.isFocused(),
+      'recovered messenger native focus',
+    )
     assert.equal(await read('settings', 'theme'), 'dark')
     await selectTts('samtts')
     await audioMessage('Messenger recovered.', 'samtts')

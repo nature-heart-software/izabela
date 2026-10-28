@@ -932,6 +932,14 @@ async function main() {
         await evaluate(messenger, () => {
           location.hash = '/'
         })
+        await evaluate(messenger, async () => {
+          await window.ElectronMessengerWindow.hide(false)
+          await window.ElectronMessengerWindow.show()
+        })
+        await until(
+          () => messenger.isVisible() && messenger.isFocused(),
+          'voice picker native focus',
+        )
         await sleep(300)
         await selectTts('matts')
         // Select from the rendered catalog, after the credential/catalog refresh,
