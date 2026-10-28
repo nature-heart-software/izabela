@@ -87,7 +87,7 @@ const checklist = [
   ],
   [
     'Several selected outputs',
-    [],
+    [j[26]],
     'Requires physical playback devices and verification at each destination.',
   ],
   [
@@ -97,7 +97,7 @@ const checklist = [
   ],
   [
     'Audio device reconnection',
-    [],
+    [j[26]],
     'Requires physical device unplug/reconnect; microphone replacement has separate runtime coverage.',
   ],
   ['Saved phrases', [j[6], 'shortcut: saved message and profile']],
@@ -142,8 +142,13 @@ const checklist = [
   ],
   [
     'Launch, tray, restart and exit',
-    [j[9], 'persistence: configuration survives full application relaunch'],
-    'Close-without-quit and full relaunch are tested; tray clicks, second instance and installed shell integration remain manual.',
+    [
+      j[9],
+      j[31],
+      j[32],
+      'persistence: configuration survives full application relaunch',
+    ],
+    'Tray callbacks, second-instance rejection and full relaunch are tested; physical tray clicks and installed shell integration remain separate checks.',
   ],
   [
     'Persist configuration',

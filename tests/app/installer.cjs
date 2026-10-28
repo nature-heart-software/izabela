@@ -4,9 +4,11 @@ const fs = require('node:fs')
 const path = require('node:path')
 const { spawn, execFileSync } = require('node:child_process')
 const { once } = require('node:events')
+const { createRequire } = require('node:module')
 const { seedProfile } = require('./profile-upgrades.cjs')
 const pkg = require('../../apps/app/package.json')
 const root = path.resolve(__dirname, '../..')
+const appRequire = createRequire(path.join(root, 'apps/app/package.json'))
 const results = []
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 async function until(fn, label, timeout = 45000) {
@@ -73,7 +75,7 @@ async function inspectInstalled(executable, expected, logPath) {
         return null
       }
     }, 'installed messenger debugger')
-    const WebSocket = require('ws')
+    const WebSocket = appRequire('ws')
     socket = new WebSocket(target.webSocketDebuggerUrl)
     await once(socket, 'open')
     let id = 0
@@ -306,6 +308,7 @@ async function run() {
       path.join(report, 'summary.json'),
       JSON.stringify(
         {
+          buildRunId: process.env.INSTALLER_BUILD_RUN_ID,
           baseline: release.tag_name,
           candidate: candidates[0],
           installDirectory,

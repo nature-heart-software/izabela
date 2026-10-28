@@ -66,6 +66,8 @@ The desktop workflow uploads its built installer to a separate fresh `windows-20
 
 Installed-app diagnostics go to `coverage/installer-results` and are uploaded even on failure. These checks are separate from the ASAR suite and their success must be read from the installer job. They require no external VM service. Interactive installer dialogs, reboot behavior, actual automatic-update downloads and physical device testing remain separate checks.
 
+The desktop workflow can also be started manually with `installer_artifact_run` set to an earlier run ID. This reruns only the installed-app tests using that run's `installer-test-input` artifact; the result records the build run ID. Leave the input empty to build and test everything.
+
 The WAV is synthetic English speech generated with Windows SAPI, 16 kHz, mono, signed 16-bit PCM: “The quick brown fox jumps over the lazy dog. This is a speech recognition test.”
 
 ## Reports
