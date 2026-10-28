@@ -138,7 +138,7 @@ async function run() {
   try {
     await command(baseline, ['/S', '/currentuser', '/D=' + installDirectory])
     await launch('baseline')
-    const setup = `globalThis.__updaterTest = { updater: process.mainModule.require('electron-updater').autoUpdater, events: [] };
+    const setup = `globalThis.__updaterTest = { updater: process.mainModule.require('module').createRequire(process.mainModule.require('electron').app.getAppPath() + '/package.json')('electron-updater').autoUpdater, events: [] };
       __updaterTest.updater.autoDownload = false;
       __updaterTest.updater.autoInstallOnAppQuit = false;
       __updaterTest.updater.setFeedURL({ provider: 'generic', url: ${JSON.stringify(
