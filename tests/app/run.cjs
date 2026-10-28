@@ -14,6 +14,7 @@ const {
   redactor,
   additionalCases,
 } = require('./contracts.cjs')
+const { checklistReport } = require('./checklist.cjs')
 
 const root = path.resolve(__dirname, '../..')
 const live = process.argv.includes('--live')
@@ -102,18 +103,7 @@ async function run() {
     ],
   }
   // This file contains paths and provider names, never credential values.
-  fs.writeFileSync(path.join(directory, 'run.json'), JSON.stringify(config))
   const executable = require('electron')
-  child = spawn(
-    executable,
-    [path.join(__dirname, 'runtime.cjs'), path.join(directory, 'run.json')],
-    {
-      cwd: path.join(root, 'apps/app'),
-      env: { ...process.env, ELECTRON_ENABLE_LOGGING: '' },
-      windowsHide: true,
-      stdio: ['ignore', 'pipe', 'pipe'],
-    },
-  )
   let pending = ''
   const consume = (chunk) => {
     pending += chunk.toString()
@@ -135,19 +125,40 @@ async function run() {
     }
     fs.writeFileSync(path.join(reportDirectory, 'app.log'), output)
   }
-  child.stdout.on('data', consume)
-  child.stderr.on('data', consume)
-  const timeout = setTimeout(
-    () => {
-      stop()
-    },
-    live ? 20 * 60000 : 3 * 60000,
+  async function launch(resume) {
+    fs.writeFileSync(
+      path.join(directory, 'run.json'),
+      JSON.stringify({ ...config, resume }),
+    )
+    child = spawn(
+      executable,
+      [path.join(__dirname, 'runtime.cjs'), path.join(directory, 'run.json')],
+      {
+        cwd: path.join(root, 'apps/app'),
+        env: { ...process.env, ELECTRON_ENABLE_LOGGING: '' },
+        windowsHide: true,
+        stdio: ['ignore', 'pipe', 'pipe'],
+      },
+    )
+    child.stdout.on('data', consume)
+    child.stderr.on('data', consume)
+    const timeout = setTimeout(stop, live ? 26 * 60000 : 10 * 60000)
+    try {
+      return await new Promise((resolve, reject) => {
+        child.once('error', reject)
+        child.once('close', resolve)
+      })
+    } finally {
+      clearTimeout(timeout)
+    }
+  }
+  let code = await launch(false)
+  if (
+    code === 0 &&
+    results.every((r) => r.pass) &&
+    fs.existsSync(path.join(directory, 'checkpoint.json'))
   )
-  const code = await new Promise((resolve, reject) => {
-    child.once('error', reject)
-    child.once('close', resolve)
-  })
-  clearTimeout(timeout)
+    code = await launch(true)
   const expected = [
     ...coreCases,
     ...(live
@@ -158,12 +169,19 @@ async function run() {
       : []),
   ]
   const report = {
+    environment: {
+      windows: os.release(),
+      architecture: process.arch,
+      appRoot,
+      node: process.versions.node,
+    },
     live,
     packaged,
     expected,
     results,
     excluded: config.excluded,
     exitCode: code,
+    checklist: checklistReport(results),
   }
   fs.writeFileSync(
     path.join(reportDirectory, 'summary.json'),

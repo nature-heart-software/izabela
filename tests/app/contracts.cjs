@@ -1,4 +1,5 @@
 const assert = require('node:assert/strict')
+const { journeyCases } = require('./journeys.cjs')
 const coreCases = [
   'app: production boot and cross-process settings',
   'tts: Sam',
@@ -10,6 +11,9 @@ const coreCases = [
   'shortcut: cancel current and cancel queued messages',
   'stt: push-to-record capture, PCM, indicator, and release',
   'stt: continuous detection and disabling microphone',
+  ...journeyCases,
+  'persistence: save restart fixture',
+  'persistence: configuration survives full application relaunch',
   'app: no uncaught errors or leaked capture processes',
 ]
 function validateResults(results, expected) {
@@ -63,9 +67,21 @@ function redactor(environment) {
       .replace(/Bearer\s+[^\s"']+/gi, 'Bearer [REDACTED]')
 }
 function additionalCases(providers) {
-  return providers.some((p) => p.id === 'matts') &&
+  const cases = []
+  if (
+    providers.some((p) => p.id === 'matts') &&
     providers.some((p) => p.id === 'amazon-translate-translation')
-    ? ['translation: Amazon Translate with Nanami Auto/Auto']
-    : []
+  )
+    cases.push('translation: Amazon Translate with Nanami Auto/Auto')
+  if (
+    providers.some((p) => p.kind === 'stt') &&
+    providers.some((p) => p.kind === 'translation')
+  )
+    cases.push('stt: microphone recognition through translation and speech')
+  if (providers.some((p) => p.id === 'matts'))
+    cases.push('tts: Azure expressive style command')
+  if (providers.some((p) => p.id === 'openai-tts'))
+    cases.push('tts: OpenAI instructions and custom command')
+  return cases
 }
 module.exports = { coreCases, validateResults, redactor, additionalCases }

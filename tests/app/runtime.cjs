@@ -4,6 +4,7 @@ const path = require('node:path')
 const childProcess = require('node:child_process')
 const { app, BrowserWindow } = require('electron')
 const { additionalCases } = require('./contracts.cjs')
+const { runJourneys } = require('./journeys.cjs')
 const config = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'))
 process.argv = process.argv.slice(0, 2)
 const root = path.resolve(__dirname, '../..')
@@ -19,6 +20,8 @@ let current = 'startup'
 
 app.setName('Izabela App Regression Tests')
 app.setPath('userData', path.join(config.directory, 'profile'))
+fs.mkdirSync(path.join(config.directory, 'temp'), { recursive: true })
+app.setPath('temp', path.join(config.directory, 'temp'))
 fs.mkdirSync(path.join(config.directory, 'logs'), { recursive: true })
 app.setAppLogsPath(path.join(config.directory, 'logs'))
 app.setLoginItemSettings = () => {} // No startup-registry changes from test runs.
@@ -73,10 +76,18 @@ async function until(check, label, timeout = 15000) {
 }
 const evaluate = (window, fn, ...args) =>
   Promise.race([
-    window.webContents.executeJavaScript(
-      `(${fn.toString()})(...${JSON.stringify(args)})`,
-      true,
-    ),
+    window.webContents
+      .executeJavaScript(
+        `(async () => { try { return await (${fn.toString()})(...${JSON.stringify(
+          args,
+        )}) }
+        catch (error) { return { __appTestThrown: String(error.stack || error) } } })()`,
+        true,
+      )
+      .then((result) => {
+        if (result?.__appTestThrown) throw new Error(result.__appTestThrown)
+        return result
+      }),
     sleep(8000).then(() => {
       throw new Error(
         'Renderer did not respond: ' + window.webContents.getURL(),
@@ -92,7 +103,7 @@ const patch = (id, values) =>
   )
 const read = (id, property) =>
   evaluate(
-    id === 'messenger-window' ? messenger : worker,
+    ['messenger-window', 'messenger'].includes(id) ? messenger : worker,
     (id, key) => JSON.parse(JSON.stringify(window.__appTest.store(id)[key])),
     id,
     property,
@@ -140,6 +151,7 @@ async function instrument(window) {
   await evaluate(window, () => {
     const state = (window.__appTest = {
       audio: [],
+      errors: [],
       store(id) {
         const store = document
           .querySelector('#app')
@@ -148,6 +160,12 @@ async function instrument(window) {
         return store
       },
     })
+    window.addEventListener('error', (event) =>
+      state.errors.push(String(event.error?.stack || event.message)),
+    )
+    window.addEventListener('unhandledrejection', (event) =>
+      state.errors.push(String(event.reason?.stack || event.reason)),
+    )
     const original = HTMLMediaElement.prototype.play
     HTMLMediaElement.prototype.play = function (...args) {
       if (!this.__appTestAudio) {
@@ -248,7 +266,7 @@ async function submit(text) {
     },
     text,
   )
-  await sleep(30)
+  await sleep(80) // The production Enter handler intentionally throttles at 40 ms.
   messenger.webContents.sendInputEvent({ type: 'keyDown', keyCode: 'Enter' })
   messenger.webContents.sendInputEvent({ type: 'keyUp', keyCode: 'Enter' })
 }
@@ -368,6 +386,81 @@ async function main() {
     await instrument(window)
   }
   const settings = await read('settings', '$state')
+  if (config.resume) {
+    await check(
+      'persistence: configuration survives full application relaunch',
+      async () => {
+        const checkpoint = JSON.parse(
+          fs.readFileSync(
+            path.join(config.directory, 'checkpoint.json'),
+            'utf8',
+          ),
+        )
+        for (const [id, properties] of Object.entries(checkpoint.state))
+          for (const [property, value] of Object.entries(properties)) {
+            const actual = await read(id, property)
+            if (id === 'messages' && property === 'history') {
+              // Shared actions run in each process, whose creation timestamps
+              // differ slightly. All saved content/voices must remain identical.
+              assert.equal(actual.length, value.length)
+              for (let i = 0; i < actual.length; i++)
+                assert.ok(
+                  Math.abs(
+                    Date.parse(actual[i].createdAt) -
+                      Date.parse(value[i].createdAt),
+                  ) < 1000,
+                  'History timestamp changed after relaunch',
+                )
+              const contents = (messages) =>
+                messages.map(({ createdAt, ...message }) => message)
+              assert.deepEqual(
+                contents(actual),
+                contents(value),
+                'Persisted history content and voice',
+              )
+            } else
+              assert.deepEqual(
+                actual,
+                value,
+                'Persisted ' + id + '.' + property,
+              )
+          }
+        const { io } = require('socket.io-client')
+        socket = io(
+          'http://localhost:' + (process.env.VITE_SERVER_WS_PORT || '7071'),
+          { transports: ['websocket'], reconnection: false },
+        )
+        socket.onAny((name, payload) => events.push({ name, payload }))
+        await until(() => socket.connected, 'relaunch socket')
+        messenger.show()
+        await audioMessage('brb', 'samtts', (message) =>
+          assert.equal(message.payload.text, 'hello after restart'),
+        )
+        const color = await evaluate(
+          messenger,
+          () =>
+            getComputedStyle(
+              document.querySelector(
+                '[data-v-step="messenger-text-input"] input, input[data-v-step="messenger-text-input"]',
+              ),
+            ).backgroundColor,
+        )
+        assert.notEqual(
+          color,
+          checkpoint.lightInputColor,
+          'Dark theme did not render after relaunch',
+        )
+        assert.deepEqual(unhandled, [])
+        for (const window of [worker, messenger])
+          assert.deepEqual(
+            await evaluate(window, () => window.__appTest.errors),
+            [],
+            'Unhandled renderer error after relaunch',
+          )
+      },
+    )
+    return
+  }
   // All configuration is in this run's disposable profile.
   await patch('settings', {
     enableSTTTS: false,
@@ -626,6 +719,27 @@ async function main() {
     },
   )
 
+  await runJourneys({
+    check,
+    evaluate,
+    patch,
+    read,
+    until,
+    sleep,
+    worker,
+    messenger,
+    events,
+    selectTts,
+    audioMessage,
+    submit,
+    press,
+    socket,
+    config,
+    captures,
+    root,
+    keyEvent,
+  })
+
   if (config.live)
     for (const provider of config.providers) {
       await check(provider.kind + ': ' + provider.name, async () => {
@@ -757,42 +871,52 @@ async function main() {
         5000,
       ).catch(() => {})
     }
-  if (config.live && additionalCases(config.providers).length)
+  if (
+    config.live &&
+    additionalCases(config.providers).includes(
+      'translation: Amazon Translate with Nanami Auto/Auto',
+    )
+  )
     await check(
       'translation: Amazon Translate with Nanami Auto/Auto',
       async () => {
         await selectTts('matts')
-        await evaluate(
-          worker,
-          async (port) => {
-            const engine = window.__appTest.store('speech').currentSpeechEngine
-            const response = await fetch(
-              'http://localhost:' +
-                port +
-                '/api/tts/microsoft-azure/list-voices',
-              {
-                method: 'POST',
-                headers: { 'content-type': 'application/json' },
-                body: JSON.stringify({ credentials: engine.getCredentials() }),
-              },
-            )
-            if (!response.ok)
-              throw new Error('Azure voice listing failed: ' + response.status)
-            const voices = await response.json()
-            const voice = voices.find(
-              (voice) => voice.ShortName === 'ja-JP-NanamiNeural',
-            )
-            if (!voice) throw new Error('Nanami was not returned by Azure')
-            window.__appTest
-              .store('plugin-matts')
-              .$patch({ pluginState: { selectedVoice: voice } })
-            window.__appTest
-              .store('plugin-amazon-translate-translation')
-              .$patch({
-                pluginState: { translateFrom: null, translateTo: null },
-              })
-          },
-          process.env.VITE_SERVER_PORT || 7070,
+        // Select from the rendered catalog, after the credential/catalog refresh,
+        // rather than racing an independent fetch against the voice picker.
+        await sleep(200)
+        await until(
+          () =>
+            evaluate(messenger, () => {
+              const query = Object.values(
+                document.querySelector('#app').__vue_app__._context.provides,
+              ).find((value) => value && typeof value.isFetching === 'function')
+              if (!query) throw new Error('Application query client not found')
+              return query.isFetching('matts-list-voices') === 0
+            }),
+          'Azure catalog refresh completed',
+          30000,
+        )
+        await evaluate(messenger, () => {
+          const input = document.querySelector(
+            '[data-v-step="engine-voice-select"] input',
+          )
+          input.focus()
+          input.value = 'Nanami'
+          input.dispatchEvent(new Event('input', { bubbles: true }))
+        })
+        await until(
+          () =>
+            evaluate(messenger, () =>
+              Boolean(
+                document.querySelector('[title="ja-JP Nanami - Female"]'),
+              ),
+            ),
+          'Nanami in voice picker',
+        )
+        await evaluate(messenger, () =>
+          document
+            .querySelector('[title="ja-JP Nanami - Female"]')
+            .dispatchEvent(new MouseEvent('mousedown', { bubbles: true })),
         )
         await until(
           () =>
@@ -804,6 +928,19 @@ async function main() {
             ),
           'Nanami selection synchronized to UI',
         )
+        await until(
+          () =>
+            evaluate(
+              worker,
+              () =>
+                window.__appTest.store('plugin-matts').pluginState.selectedVoice
+                  ?.Locale === 'ja-JP',
+            ),
+          'Nanami active in speech worker',
+        )
+        await patch('plugin-amazon-translate-translation', {
+          pluginState: { translateFrom: null, translateTo: null },
+        })
         await patch('settings', {
           selectedTranslationEngine: 'amazon-translate-translation',
           enableTranslation: true,
@@ -822,10 +959,193 @@ async function main() {
         await patch('settings', { enableTranslation: false })
       },
     )
+  if (
+    config.live &&
+    additionalCases(config.providers).includes(
+      'stt: microphone recognition through translation and speech',
+    )
+  )
+    await check(
+      'stt: microphone recognition through translation and speech',
+      async () => {
+        await selectTts('samtts')
+        const recognition = config.providers.find((p) => p.kind === 'stt')
+        const translator = config.providers.find(
+          (p) => p.kind === 'translation',
+        )
+        await patch('plugin-' + translator.id, {
+          pluginState: { translateFrom: 'en', translateTo: 'fr' },
+        })
+        await patch('settings', {
+          selectedTranslationEngine: translator.id,
+          enableTranslation: true,
+          selectedSpeechRecognitionEngine: recognition.id,
+          speechRecognitionStrategy: 'ptr',
+          enableSTTTS: true,
+        })
+        await until(
+          () => captures.some((c) => !c.closed && c.bytes > 0),
+          'microphone for translated recognition',
+        )
+        await sleep(1200)
+        const start = events.length
+        keyEvent(129, 0, 0, 0)
+        try {
+          await sleep(11500)
+        } finally {
+          keyEvent(129, 0, 2, 0)
+        }
+        const spoken = await until(
+          () => events.slice(start).find((e) => e.name === 'message:start'),
+          'translated transcription playback',
+          45000,
+        )
+        assert.match(spoken.payload.originalMessage, /fox|speech|recognition/i)
+        assert.match(spoken.payload.translatedMessage, /renard|reconnaissance/i)
+        assert.notEqual(
+          spoken.payload.translatedMessage,
+          spoken.payload.originalMessage,
+        )
+        await until(
+          () =>
+            events
+              .slice(start)
+              .some(
+                (e) =>
+                  e.name === 'message:end' &&
+                  e.payload.id === spoken.payload.id,
+              ),
+          'translated speech completed',
+          45000,
+        )
+        await patch('settings', {
+          enableSTTTS: false,
+          enableTranslation: false,
+        })
+        await until(
+          () => captures.every((c) => c.closed),
+          'translated recording cleanup',
+        )
+      },
+    )
+  if (config.live && config.providers.some((p) => p.id === 'matts'))
+    await check('tts: Azure expressive style command', async () => {
+      await selectTts('matts')
+      const style = await evaluate(
+        worker,
+        async (port) => {
+          const engine = window.__appTest.store('speech').currentSpeechEngine
+          const response = await fetch(
+            'http://localhost:' + port + '/api/tts/microsoft-azure/list-voices',
+            {
+              method: 'POST',
+              headers: { 'content-type': 'application/json' },
+              body: JSON.stringify({ credentials: engine.getCredentials() }),
+            },
+          )
+          if (!response.ok) throw new Error('Azure voice listing failed')
+          const voice = (await response.json()).find(
+            (v) => v.Locale === 'en-US' && v.StyleList?.includes('cheerful'),
+          )
+          if (!voice)
+            throw new Error('No expressive Azure English voice available')
+          window.__appTest
+            .store('plugin-matts')
+            .$patch({ pluginState: { selectedVoice: voice } })
+          return 'cheerful'
+        },
+        process.env.VITE_SERVER_PORT || 7070,
+      )
+      await sleep(300)
+      await audioMessage(
+        '/' + style + ' Hello, welcome to the application test.',
+        'matts',
+        (m) => assert.ok(m.payload.ssml.includes('style="' + style + '"')),
+      )
+    })
+  if (config.live && config.providers.some((p) => p.id === 'openai-tts'))
+    await check('tts: OpenAI instructions and custom command', async () => {
+      await selectTts('openai-tts')
+      await patch('speech', {
+        customCommands: [
+          {
+            name: 'Warm',
+            value: 'warm',
+            description: 'Speak in a friendly, welcoming tone.',
+          },
+        ],
+      })
+      await patch('plugin-openai-tts', {
+        pluginState: {
+          model: 'gpt-4o-mini-tts',
+          instructions: 'Speak clearly.',
+          useCommandDescriptionAsInstruction: true,
+        },
+      })
+      await audioMessage(
+        '/warm Hello, welcome to the test.',
+        'openai-tts',
+        (m) => {
+          assert.equal(m.payload.instructions, 'Speak clearly.')
+          assert.equal(
+            m.payload.userInstructions,
+            'Speak in a friendly, welcoming tone.',
+          )
+          assert.equal(m.payload.input, 'Hello, welcome to the test.')
+        },
+      )
+      await patch('speech', { customCommands: [] })
+    })
+  await check('persistence: save restart fixture', async () => {
+    await selectTts('samtts')
+    await patch('settings', { theme: 'light' })
+    const lightInputColor = await evaluate(
+      messenger,
+      () =>
+        getComputedStyle(
+          document.querySelector(
+            '[data-v-step="messenger-text-input"] input, input[data-v-step="messenger-text-input"]',
+          ),
+        ).backgroundColor,
+    )
+    await patch('settings', {
+      theme: 'dark',
+      messageMode: 'sentence',
+      enableSTTTS: false,
+      enableTranslation: false,
+    })
+    await patch('dictionary', {
+      enableDictionary: true,
+      definitions: [['brb', 'hello after restart']],
+    })
+    const expected = {}
+    for (const [id, properties] of Object.entries({
+      settings: ['theme', 'messageMode', 'selectedSpeechEngine'],
+      dictionary: ['enableDictionary', 'definitions'],
+      profiles: ['profiles'],
+      messages: ['shortcutMessages', 'history'],
+      messenger: ['position'],
+    })) {
+      expected[id] = {}
+      for (const property of properties)
+        expected[id][property] = await read(id, property)
+    }
+    fs.writeFileSync(
+      path.join(config.directory, 'checkpoint.json'),
+      JSON.stringify({ state: expected, lightInputColor }),
+    )
+    await sleep(500)
+  })
   await check(
     'app: no uncaught errors or leaked capture processes',
     async () => {
       assert.deepEqual(unhandled, [])
+      for (const window of [worker, messenger])
+        assert.deepEqual(
+          await evaluate(window, () => window.__appTest.errors),
+          [],
+          'Unhandled renderer error',
+        )
       assert.ok(
         captures.every((c) => c.closed),
         'Microphone process still running',
@@ -846,7 +1166,7 @@ const deadline = setTimeout(
     )
     app.exit(1)
   },
-  config.live ? 18 * 60000 : 150000,
+  config.live ? 24 * 60000 : 9 * 60000,
 )
 main()
   .catch((error) => {

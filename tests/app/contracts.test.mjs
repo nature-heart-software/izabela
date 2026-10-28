@@ -9,6 +9,29 @@ const {
   assertInventoryCoverage,
 } = require('./providers.cjs')
 const { coreCases, validateResults, redactor } = require('./contracts.cjs')
+const { checklist, checklistReport } = require('./checklist.cjs')
+
+test('all 44 macro journeys map to known tests or explicit manual boundaries', () => {
+  assert.equal(checklist.length, 44)
+  assert.equal(new Set(checklist.map((entry) => entry.id)).size, 44)
+  const { additionalCases } = require('./contracts.cjs')
+  const known = new Set([
+    ...coreCases,
+    ...providers.map((p) => `${p.kind}: ${p.name}`),
+    ...additionalCases(providers),
+  ])
+  for (const entry of checklist) {
+    assert.ok(entry.cases.length || entry.boundary, entry.id)
+    for (const name of entry.cases)
+      assert.ok(known.has(name), entry.id + ': ' + name)
+  }
+  assert.ok(checklistReport([]).every((entry) => entry.status !== 'Pass'))
+  const report = checklistReport(
+    [...known].map((name) => ({ name, pass: true })),
+  )
+  assert.equal(report.find((entry) => entry.id === 'E2E-21').status, 'Manual')
+  assert.equal(report.find((entry) => entry.id === 'E2E-13').status, 'Partial')
+})
 
 test('the live provider inventory refers to real application registrations', () => {
   const registrations = new Map()
