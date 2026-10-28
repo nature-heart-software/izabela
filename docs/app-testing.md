@@ -10,6 +10,7 @@ Run on Windows with an unlocked desktop and no other Izabela instance using the 
 pnpm test:app:unit
 pnpm test:recovery
 pnpm test:resilience
+pnpm test:edges
 pnpm test:app
 ```
 

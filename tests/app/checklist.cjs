@@ -138,6 +138,7 @@ const checklist = [
     [
       'shortcut: native messenger toggle and rebind',
       'shortcut: saved message and profile',
+      j[33],
     ],
   ],
   [
@@ -146,6 +147,8 @@ const checklist = [
       j[9],
       j[31],
       j[32],
+      j[35],
+      j[36],
       'persistence: configuration survives full application relaunch',
     ],
     'Tray callbacks, second-instance rejection and full relaunch are tested; physical tray clicks and installed shell integration remain separate checks.',
@@ -157,7 +160,7 @@ const checklist = [
       'persistence: configuration survives full application relaunch',
       ...profileCases,
     ],
-    'Legacy and split-file profiles, new defaults, and damaged-settings recovery are tested. Installing an upgrade over an installed app remains manual.',
+    'Legacy and split-file profiles, new defaults, and damaged-settings recovery are tested. Installed upgrades and automatic update/relaunch run in separate GitHub-hosted Windows jobs.',
   ],
   [
     'Startup and administrator mode',
@@ -174,11 +177,11 @@ const checklist = [
     ],
     'Theme rendering after relaunch and keyboard controls are tested; full accessibility audit remains manual.',
   ],
-  ['Clear speech cache', [j[17]]],
+  ['Clear speech cache', [j[17], j[34]]],
   [
     'Updater policy',
     [j[20]],
-    'No-update build policy only; actual update/replacement installs remain manual.',
+    'The app report checks no-update build policy. Actual interrupted/corrupt downloads, verified replacement and relaunch are checked in the separate Automatic update and recovery CI job.',
   ],
   [
     'Help and diagnostics',

@@ -927,6 +927,12 @@ async function main() {
     await check(
       'translation: Amazon Translate with Nanami Auto/Auto',
       async () => {
+        // Crash recovery restores the last URL, which may be the Settings
+        // dialog. Close it before interacting with the voice picker outside it.
+        await evaluate(messenger, () => {
+          location.hash = '/'
+        })
+        await sleep(300)
         await selectTts('matts')
         // Select from the rendered catalog, after the credential/catalog refresh,
         // rather than racing an independent fetch against the voice picker.
