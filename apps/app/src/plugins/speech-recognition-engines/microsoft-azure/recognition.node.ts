@@ -1,6 +1,6 @@
 import { useSettingsStore } from '@/features/settings/store'
-import once from 'lodash/once'
 import sdk from 'microsoft-cognitiveservices-speech-sdk'
+import { createRecognitionLifecycle } from '../../../modules/speech-recognition-engine-manager/lifecycle'
 import engine from './register.node.ts'
 
 export default ({ useRecording }: any) => {
@@ -9,60 +9,39 @@ export default ({ useRecording }: any) => {
   const settingsStore = useSettingsStore()
   const speechConfig = sdk.SpeechConfig.fromSubscription(apiKey, region)
   speechConfig.speechRecognitionLanguage = settingsStore.speechInputLanguage
-
+  const lifecycle = createRecognitionLifecycle()
   return {
     startStream() {
-      let ended = false
-
+      if (lifecycle.stopped) return
       const stream = sdk.AudioInputStream.createPushStream()
       const audioConfig = sdk.AudioConfig.fromStreamInput(stream)
-      const speechRecognizer = new sdk.SpeechRecognizer(
-        speechConfig,
-        audioConfig,
+      const recognizer = new sdk.SpeechRecognizer(speechConfig, audioConfig)
+      const turn = lifecycle.create({
+        useRecording,
+        onChunk: (chunk) => stream.write(chunk),
+        onEnded: () => stream.close(),
+        cleanup() {
+          recognizer.close()
+          audioConfig.close()
+        },
+      })
+      recognizer.canceled = () => turn.finish('', 'error')
+      recognizer.recognizeOnceAsync(
+        (result) => {
+          turn.finish(
+            result.reason === sdk.ResultReason.RecognizedSpeech
+              ? result.text
+              : '',
+          )
+        },
+        () => turn.finish('', 'error'),
       )
-
-      speechRecognizer.recognizeOnceAsync(onRecognizeOnceAsync)
-
-      const recording = useRecording({
-        onChunk(chunk: any) {
-          if (!ended) {
-            stream.write(chunk)
-          }
-        },
-        onEnded() {
-          // Finishing input must not dispose a recognizer that has already
-          // returned a result, nor prevent a pending final result arriving.
-          if (!ended) stream.close()
-        },
-      })
-
-      const resolve = once((text: string = '') => {
-        recording.resolve(text)
-        ended = true
-        recording.stopPumping()
-        speechRecognizer.close()
-      })
-
-      speechRecognizer.canceled = () => resolve()
-
-      function onRecognizeOnceAsync(result: sdk.SpeechRecognitionResult) {
-        switch (result.reason) {
-          case sdk.ResultReason.RecognizedSpeech:
-            resolve(result.text)
-            break
-          case sdk.ResultReason.NoMatch:
-            resolve()
-            break
-          case sdk.ResultReason.Canceled:
-            resolve()
-            break
-        }
-      }
-
-      recording.startPumping()
+      turn.start()
     },
     stopStream() {},
     cleanup() {
+      if (lifecycle.stopped) return
+      lifecycle.stop()
       speechConfig.close()
     },
   }

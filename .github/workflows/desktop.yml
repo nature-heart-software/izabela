@@ -47,6 +47,8 @@ jobs:
         run: pnpm test:openai-models
       - name: Check queue, recognition, credentials, and profile recovery
         run: pnpm test:recovery
+      - name: Check provider failures, audio routing, and lifecycle
+        run: pnpm test:resilience
       - name: Check speech detection in Electron
         run: pnpm test:speech:runtime
       - name: Check monitor restoration

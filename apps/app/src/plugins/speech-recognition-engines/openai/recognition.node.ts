@@ -1,4 +1,4 @@
-import once from 'lodash/once'
+import { createRecognitionLifecycle } from '../../../modules/speech-recognition-engine-manager/lifecycle'
 import { Buffer } from 'buffer'
 import { WebSocket } from 'ws'
 import { useSettingsStore } from '@/features/settings/store'
@@ -11,6 +11,8 @@ export default ({ useRecording }: any) => {
   if (!engine.hasCredentials()) return
   const { apiKey } = engine.getCredentials()
   const settingsStore = useSettingsStore()
+  const lifecycle = createRecognitionLifecycle()
+  let pendingTurn = Promise.resolve()
   const manager = new WebSocketSessionManager({
     sessionMaxAge: 30 * 60 * 1000,
     async factory() {
@@ -48,6 +50,7 @@ export default ({ useRecording }: any) => {
 
   return {
     async startStream() {
+      if (lifecycle.stopped) return
       let ws: WebSocket | undefined
       let ended = false
       let inputEnded = false
@@ -66,7 +69,8 @@ export default ({ useRecording }: any) => {
           ws.send(JSON.stringify({ type: 'input_audio_buffer.commit' }))
       }
       // Capture immediately, including a short turn released while connecting.
-      const recording = useRecording({
+      const turn = lifecycle.create({
+        useRecording,
         onChunk(chunk: any) {
           if (ended) return
           if (!ws) buffered.push(Buffer.from(chunk))
@@ -77,40 +81,46 @@ export default ({ useRecording }: any) => {
           inputEnded = true
           commit()
         },
+        cleanup(reason) {
+          ended = true
+          buffered = []
+          ws?.off('close', onClose)
+          ws?.off('error', onClose)
+          ws?.off('message', onMessage)
+          if (reason === 'timeout' || reason === 'cleanup') ws?.close()
+          else if (ws?.readyState === WebSocket.OPEN)
+            ws.send(JSON.stringify({ type: 'input_audio_buffer.clear' }))
+        },
       })
-      const resolve = once((text: string = '') => {
-        ended = true
-        buffered = []
-        recording.resolve(text)
-        recording.stopPumping()
-        ws?.off('close', onClose)
-        ws?.off('error', onClose)
-        ws?.off('message', onMessage)
-        if (ws?.readyState === WebSocket.OPEN)
-          ws.send(JSON.stringify({ type: 'input_audio_buffer.clear' }))
-      })
+      const previousTurn = pendingTurn
+      pendingTurn = previousTurn.then(() => turn.done)
       function onMessage(message: any) {
         try {
           const msg = JSON.parse(message.toString())
           if (
             msg.type === 'conversation.item.input_audio_transcription.completed'
           )
-            resolve(msg.transcript || '')
+            turn.finish(msg.transcript || '')
           if (msg.type === 'error') {
             console.error('OpenAI transcription failed', msg.error?.message)
-            resolve()
+            turn.finish('', 'error')
           }
         } catch {
-          resolve()
+          turn.finish('', 'error')
         }
       }
       function onClose() {
-        resolve()
+        turn.finish()
       }
-      recording.startPumping()
+      turn.start()
+      // Each session has one input buffer. Buffer subsequent turns locally until
+      // the previous final result has been consumed and its input cleared.
+      await previousTurn
+      if (turn.ended) return
       ws = (await manager.getSession())?.socket
+      if (turn.ended) return
       if (!ws) {
-        resolve()
+        turn.finish()
         return
       }
       ws.on('close', onClose)
@@ -122,6 +132,7 @@ export default ({ useRecording }: any) => {
     },
     stopStream() {},
     cleanup() {
+      lifecycle.stop()
       manager.stop()
     },
   }

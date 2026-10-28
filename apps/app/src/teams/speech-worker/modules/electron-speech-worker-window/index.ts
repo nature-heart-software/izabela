@@ -1,6 +1,6 @@
 // see: https://tipsfordev.com/stream-audio-with-websocket-and-get-back-audio-transcription-obtained-with-google-speech-api
 import speech from '@google-cloud/speech'
-import { BrowserWindow, screen } from 'electron'
+import { BrowserWindow, screen, powerMonitor } from 'electron'
 import { ipcMain } from 'electron-postman'
 import { createNotification } from '@/utils/electron-notification'
 import { useSpeechRecognitionStore } from '@/features/speech/store'
@@ -29,6 +29,7 @@ export const ElectronSpeechWindow = () => {
   let speechRecognitionStore:
     ReturnType<typeof useSpeechRecognitionStore> | undefined
   let deferredRecording: ReturnType<typeof Deferred> | null = null
+  let suspended = false
   // eslint-disable-next-line prefer-const
   let electronNativeSpeechRecognitionCallback: ReturnType<
     typeof electronNativeSpeechRecognition
@@ -158,7 +159,7 @@ export const ElectronSpeechWindow = () => {
       electronNativeSpeechRecognitionCallback()
       electronNativeSpeechRecognitionCallback = null
     }
-    if (settingsStore?.enableSTTTS) {
+    if (settingsStore?.enableSTTTS && !suspended) {
       electronNativeSpeechRecognitionCallback =
         electronNativeSpeechRecognition()
     } else {
@@ -171,6 +172,14 @@ export const ElectronSpeechWindow = () => {
   isReady().then(() => {
     settingsStore = useSettingsStore()
     speechRecognitionStore = useSpeechRecognitionStore()
+    powerMonitor.on('suspend', () => {
+      suspended = true
+      restartNativeSpeechRecognition()
+    })
+    powerMonitor.on('resume', () => {
+      suspended = false
+      restartNativeSpeechRecognition()
+    })
 
     watch(
       () => [

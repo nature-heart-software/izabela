@@ -136,6 +136,8 @@ export default () => {
 
       return {
         resolve(message: string) {
+          recorderStream.off('data', onData)
+          pumps.delete(onData)
           deferredMessage.resolve(message)
         },
         startPumping,

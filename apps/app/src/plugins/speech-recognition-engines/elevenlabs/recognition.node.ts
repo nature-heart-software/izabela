@@ -1,4 +1,4 @@
-import once from 'lodash/once'
+import { createRecognitionLifecycle } from '../../../modules/speech-recognition-engine-manager/lifecycle'
 import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js'
 import path from 'path'
 import { app } from 'electron'
@@ -39,67 +39,56 @@ function createWavBuffer(
 export default ({ useRecording }: any) => {
   if (!engine.hasCredentials()) return
   const { apiKey } = engine.getCredentials()
-  const client = new ElevenLabsClient({
-    apiKey,
-  })
-
+  const client = new ElevenLabsClient({ apiKey })
+  const lifecycle = createRecognitionLifecycle()
   return {
     startStream() {
-      let streamEnded = false
-      const audioChunks: any[] = []
-
+      if (lifecycle.stopped) return
+      const audioChunks: Buffer[] = []
       const wavPath = path.join(
         app.getPath('temp'),
         pkg.productName,
         'cache',
         `${uuid()}.wav`,
       )
-
-      const recording = useRecording({
-        onChunk(chunk: any) {
-          if (!streamEnded) {
-            audioChunks.push(chunk)
-          }
-        },
-        onEnded() {
-          onRecordingEnd()
-        },
-      })
-
-      const resolve = once((text = '') => {
-        recording.resolve(text)
-        streamEnded = true
-        recording.stopPumping()
-        unlinkAsync(wavPath).catch(() => {})
-      })
-
-      async function onRecordingEnd() {
-        try {
-          const pcmData = Buffer.concat(audioChunks)
-          const wavBuffer = createWavBuffer(pcmData, 16000, 1)
-
+      const controller = new AbortController()
+      let file: ReturnType<typeof createReadStream> | undefined
+      const removeFile = () => {
+        void unlinkAsync(wavPath).catch(() => {})
+      }
+      const turn = lifecycle.create({
+        useRecording,
+        onChunk: (chunk) => audioChunks.push(Buffer.from(chunk)),
+        async onEnded() {
+          const wavBuffer = createWavBuffer(
+            Buffer.concat(audioChunks),
+            16000,
+            1,
+          )
           mkdirSync(path.dirname(wavPath), { recursive: true })
           writeFileSync(wavPath, wavBuffer)
-
-          const response = await client.speechToText.convert({
-            file: createReadStream(wavPath),
-            modelId: 'scribe_v1',
-            tagAudioEvents: false,
-          })
-
-          if ('text' in response) {
-            resolve(response.text)
-          } else {
-            resolve()
-          }
-        } catch (err) {
-          resolve()
-        }
-      }
-
-      recording.startPumping()
+          file = createReadStream(wavPath)
+          file.on('error', () => turn.finish('', 'error'))
+          const response = await client.speechToText.convert(
+            { file, modelId: 'scribe_v1', tagAudioEvents: false },
+            { abortSignal: controller.signal },
+          )
+          turn.finish('text' in response ? response.text : '')
+        },
+        cleanup() {
+          controller.abort()
+          audioChunks.length = 0
+          if (file && !file.closed) {
+            file.once('close', removeFile)
+            file.destroy()
+          } else removeFile()
+        },
+      })
+      turn.start()
     },
     stopStream() {},
-    cleanup() {},
+    cleanup() {
+      lifecycle.stop()
+    },
   }
 }

@@ -44,3 +44,27 @@ test('enumeration failure has a null fallback', async () => {
     null,
   )
 })
+
+test('output lookup refreshes stale IDs, disappearance, and same-label input/output devices', async () => {
+  let devices = [device('old-output', 'Headset', 'audiooutput')]
+  const a = api(async () => devices)
+  assert.equal(
+    (await a.getMediaDeviceByLabel('Headset', 'audiooutput')).deviceId,
+    'old-output',
+  )
+  devices = [
+    device('new-output', 'Headset', 'audiooutput'),
+    device('mic', 'Headset', 'audioinput'),
+  ]
+  assert.equal(
+    (await a.getMediaDeviceByLabel('Headset', 'audiooutput')).deviceId,
+    'new-output',
+  )
+  devices = []
+  assert.equal(await a.getMediaDeviceByLabel('Headset', 'audiooutput'), null)
+  devices = [device('returned', 'Headset', 'audiooutput')]
+  assert.equal(
+    (await a.getMediaDeviceByLabel('Headset', 'audiooutput')).deviceId,
+    'returned',
+  )
+})

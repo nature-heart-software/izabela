@@ -154,3 +154,19 @@ test('an asynchronous provider startup failure stays handled and a later recordi
     f.close()
   }
 })
+
+test('completed turns immediately detach PCM pumps during a long capture session', async () => {
+  const f = fixture()
+  try {
+    for (let index = 0; index < 500; index++) {
+      const recording = f.context().useRecording({ onChunk() {} })
+      recording.startPumping()
+      recording.resolve('')
+      assert.equal(f.stream.listenerCount('data'), 1)
+    }
+    await flush()
+    assert.deepEqual(f.sent, [])
+  } finally {
+    f.close()
+  }
+})

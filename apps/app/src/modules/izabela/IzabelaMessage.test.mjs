@@ -4,7 +4,8 @@ import { fileURLToPath } from 'node:url'
 import test from 'node:test'
 import loadTypescript from '../../../../../tests/load-typescript.cjs'
 const flush = () => new Promise((r) => setTimeout(r, 15))
-function fixture() {
+function fixture(options = {}) {
+  const urls = new Set()
   const audios = [],
     events = []
   let supply
@@ -29,6 +30,13 @@ function fixture() {
     }
     pause() {
       this.emit('pause')
+    }
+    removeAttribute(name) {
+      delete this[name]
+    }
+    async setSinkId(id) {
+      this.sinkId = id
+      if (options.sinkError) throw Error('device unavailable')
     }
     play() {
       return this.failure ? Promise.reject(this.failure) : Promise.resolve()
@@ -55,11 +63,14 @@ function fixture() {
           synthesizeSpeech: () => synthesis,
         }),
       },
-      '@/utils/media-devices': { getMediaDeviceByLabel() {} },
+      '@/utils/media-devices': {
+        getMediaDeviceByLabel: async (label) =>
+          options.missing ? null : { deviceId: label },
+      },
       '@/features/settings/store': {
         useSettingsStore: () => ({
-          audioOutputs: [],
-          playSpeechOnDefaultPlaybackDevice: true,
+          audioOutputs: options.outputs || [],
+          playSpeechOnDefaultPlaybackDevice: options.defaultOutput !== false,
           $whenReady: async () => {},
         }),
       },
@@ -68,8 +79,16 @@ function fixture() {
     },
     {
       Audio,
+      document: { createElement: () => new Audio() },
       window: { ElectronFilesystem: { getCachedAudio: async () => null } },
-      URL: { createObjectURL: () => 'blob:test', revokeObjectURL() {} },
+      URL: {
+        createObjectURL: () => {
+          const url = 'blob:' + urls.size
+          urls.add(url)
+          return url
+        },
+        revokeObjectURL: (url) => urls.delete(url),
+      },
       console: { error() {} },
     },
   ).default
@@ -81,7 +100,7 @@ function fixture() {
   })
   message.on('ended', () => events.push('ended'))
   message.on('error', () => events.push('error'))
-  return { message, audios, supply, events, playing }
+  return { message, audios, supply, events, playing, urls }
 }
 
 test('cancelled prefetch never loads late audio or clears another playing message', async () => {
@@ -114,4 +133,59 @@ test('repeated media errors and a later ended event finish the message once', as
   f.audios[0].emit('error', Error('duplicate'))
   f.audios[0].emit('ended')
   assert.deepEqual(f.events, ['error'])
+})
+
+test('selected outputs receive the audio, muted default stays muted, and every output finishes before completion', async () => {
+  const f = fixture({ outputs: ['headset', 'cable'], defaultOutput: false })
+  f.supply(new Blob(['audio']))
+  await flush()
+  await f.message.isReady()
+  await f.message.play()
+  assert.deepEqual(
+    f.audios.slice(1).map((audio) => audio.sinkId),
+    ['headset', 'cable'],
+  )
+  assert.equal(f.audios[0].volume, 0)
+  f.audios[0].emit('ended')
+  assert.deepEqual(f.events, [])
+  f.audios[1].emit('ended')
+  assert.deepEqual(f.events, [])
+  f.audios[2].emit('ended')
+  assert.deepEqual(f.events, ['ended'])
+  assert.equal(f.urls.size, 0)
+})
+test('all unavailable selected outputs fail through the existing error path when default playback is disabled', async () => {
+  for (const options of [{ missing: true }, { sinkError: true }]) {
+    const f = fixture({
+      outputs: ['headset'],
+      defaultOutput: false,
+      ...options,
+    })
+    f.supply(new Blob(['audio']))
+    await assert.rejects(f.message.isReady(), /output|device/i)
+    assert.deepEqual(f.events, ['error'])
+  }
+})
+test('cancel and auxiliary playback errors release every object URL once', async () => {
+  for (const failure of [false, true]) {
+    const f = fixture({ outputs: ['headset'] })
+    f.supply(new Blob(['audio']))
+    await flush()
+    await f.message.isReady()
+    assert.equal(f.urls.size, 2)
+    if (failure) f.audios[1].emit('error', Error('output disconnected'))
+    else f.message.cancel()
+    assert.equal(f.urls.size, 0)
+    assert.deepEqual(f.events, [failure ? 'error' : 'ended'])
+  }
+})
+test('500 completed messages do not retain blob URLs', async () => {
+  for (let index = 0; index < 500; index++) {
+    const f = fixture()
+    f.supply(new Blob(['audio']))
+    await f.message.isReady()
+    await f.message.play()
+    f.audios[0].emit('ended')
+    assert.equal(f.urls.size, 0, 'URL leak at message ' + index)
+  }
 })

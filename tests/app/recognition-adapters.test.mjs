@@ -159,7 +159,7 @@ function azure(t) {
   const sdk = {
     SpeechConfig: { fromSubscription: () => ({ close() {} }) },
     AudioInputStream: { createPushStream: () => stream },
-    AudioConfig: { fromStreamInput: () => ({}) },
+    AudioConfig: { fromStreamInput: () => ({ close() {} }) },
     ResultReason: { RecognizedSpeech: 1, NoMatch: 2, Canceled: 3 },
     SpeechRecognizer: class {
       constructor() {
@@ -191,6 +191,7 @@ function azure(t) {
         getCredentials: () => ({ apiKey: 'synthetic-key', region: 'westus' }),
       },
     },
+    { setTimeout, clearTimeout },
   ).default
   const transcripts = []
   const engine = create({
