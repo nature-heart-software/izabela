@@ -357,6 +357,14 @@ async function runRecovery(c) {
       private_key: privateKey,
     })
     try {
+      await evaluate(messenger, () => {
+        window.__credentialImportFixture = { errors: [], error: console.error }
+        console.error = (...args) => {
+          if (args[0] === 'Could not import Google Cloud credentials.')
+            window.__credentialImportFixture.errors.push(args[0])
+          window.__credentialImportFixture.error.apply(console, args)
+        }
+      })
       await patch('settings', {
         selectedSpeechRecognitionEngine: 'google-cloud-speech-recognition',
         enableSTTTS: false,
@@ -397,24 +405,30 @@ async function runRecovery(c) {
       await clickText('Import')
       await until(
         () =>
-          evaluate(messenger, () =>
-            document.body.innerText.includes('Could not import credentials'),
-          ),
-        'visible credential import error',
-      )
-      assert.equal(fs.readFileSync(destination, 'utf8'), valid)
-      fs.writeFileSync(selected, valid)
-      await clickText('Import')
-      await until(
-        () =>
           evaluate(
             messenger,
-            () =>
-              !document.body.innerText.includes('Could not import credentials'),
+            () => window.__credentialImportFixture.errors.length === 1,
           ),
-        'credential form recovers after an invalid file',
+        'invalid credential import handled',
+      )
+      assert.equal(fs.readFileSync(destination, 'utf8'), valid)
+      const recovered = valid.replace(
+        'fixture@example.invalid',
+        'recovered@example.invalid',
+      )
+      fs.writeFileSync(selected, recovered)
+      await clickText('Import')
+      await until(
+        () => fs.readFileSync(destination, 'utf8') === recovered,
+        'valid import succeeds after an invalid file',
       )
     } finally {
+      await evaluate(messenger, () => {
+        if (window.__credentialImportFixture) {
+          console.error = window.__credentialImportFixture.error
+          delete window.__credentialImportFixture
+        }
+      }).catch(() => {})
       dialog.showOpenDialog = originalDialog
       if (previous) fs.writeFileSync(destination, previous)
       else fs.rmSync(destination, { force: true })
