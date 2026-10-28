@@ -1168,16 +1168,39 @@ async function main() {
     })
   await check('persistence: save restart fixture', async () => {
     await selectTts('samtts')
-    await patch('settings', { theme: 'light' })
-    const lightInputColor = await evaluate(
-      messenger,
-      () =>
-        getComputedStyle(
-          document.querySelector(
-            '[data-v-step="messenger-text-input"] input, input[data-v-step="messenger-text-input"]',
+    const renderedColor = async (theme, previousColor) => {
+      await patch('settings', { theme })
+      await until(
+        () =>
+          evaluate(
+            messenger,
+            (theme) => window.__appTest.store('settings').theme === theme,
+            theme,
           ),
-        ).backgroundColor,
-    )
+        'theme synchronized to messenger',
+      )
+      let last,
+        stableSince = Date.now()
+      return until(async () => {
+        const color = await evaluate(
+          messenger,
+          () =>
+            getComputedStyle(
+              document.querySelector(
+                '[data-v-step="messenger-text-input"] input, input[data-v-step="messenger-text-input"]',
+              ),
+            ).backgroundColor,
+        )
+        if (color === previousColor || color !== last) {
+          last = color
+          stableSince = Date.now()
+          return false
+        }
+        return Date.now() - stableSince >= 200 ? color : false
+      }, 'stable rendered ' + theme + ' theme')
+    }
+    const darkInputColor = await renderedColor('dark')
+    const lightInputColor = await renderedColor('light', darkInputColor)
     await patch('settings', {
       theme: 'dark',
       messageMode: 'sentence',
@@ -1188,6 +1211,7 @@ async function main() {
       enableDictionary: true,
       definitions: [['brb', 'hello after restart']],
     })
+    await renderedColor('dark', lightInputColor)
     const expected = {}
     for (const [id, properties] of Object.entries({
       settings: ['theme', 'messageMode', 'selectedSpeechEngine'],
