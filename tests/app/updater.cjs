@@ -216,7 +216,9 @@ async function run() {
                 encoding: 'utf8',
               },
             ).trim()
-            return version === versions.candidate
+            return (
+              version.split('.').slice(0, 3).join('.') === versions.candidate
+            )
           } catch {
             return false
           }
