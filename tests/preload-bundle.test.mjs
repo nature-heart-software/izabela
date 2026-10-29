@@ -19,7 +19,23 @@ test('the production preload graph excludes native window controllers and provid
     configFile: false,
     publicDir: false,
     logLevel: 'error',
-    resolve: loaded.config.resolve,
+    // Unit checks run before workspace packages are built on a clean runner.
+    // Compile their actual preload sources rather than relying on cached dist.
+    resolve: {
+      ...loaded.config.resolve,
+      alias: {
+        ...loaded.config.resolve.alias,
+        '@packages/electron-pinia/preload': resolve(
+          root,
+          'packages/electron-pinia/src/preload.ts',
+        ),
+        '@packages/electron-bridger': resolve(
+          root,
+          'packages/electron-bridger/src/main.ts',
+        ),
+        '@packages/toolbox': resolve(root, 'packages/toolbox/src/main.ts'),
+      },
+    },
     define: { 'process.env': 'process.env' },
     build: {
       write: false,
@@ -62,7 +78,7 @@ test('the production preload graph excludes native window controllers and provid
     'compile every translation preload registration',
   )
   t.diagnostic(
-    `Compiled preload: ${chunks.reduce(
+    `Preload boundary check using workspace sources: ${chunks.reduce(
       (total, chunk) => total + Buffer.byteLength(chunk.code),
       0,
     )} bytes; ${modules.length} modules; no main-only or provider SDK imports`,

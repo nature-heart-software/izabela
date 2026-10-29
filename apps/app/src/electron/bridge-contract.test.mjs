@@ -4,6 +4,8 @@ import test from 'node:test'
 import ts from 'typescript'
 
 const source = (path) => fileURLToPath(new URL(path, import.meta.url))
+const samePath = (left, right) =>
+  left.replaceAll('\\', '/') === right.replaceAll('\\', '/')
 const directory = source('../..')
 const ownedFiles = [
   source('./bridge-contract.ts'),
@@ -40,7 +42,7 @@ function checkTypes({ addImplementationMethod = false } = {}) {
     const text = readFile(filename)
     if (
       addImplementationMethod &&
-      filename === source('../modules/electron-display/index.ts')
+      samePath(filename, source('../modules/electron-display/index.ts'))
     )
       return text.replace(
         'export const ElectronDisplay = () => ({',
@@ -75,7 +77,7 @@ test('adding a real implementation method requires updating the preload contract
   assert.ok(
     diagnostics.some(
       ({ file, message }) =>
-        file === source('./bridge-contract.ts') &&
+        samePath(file, source('./bridge-contract.ts')) &&
         message.includes('getDisplayCount') &&
         message.includes('missing'),
     ),
