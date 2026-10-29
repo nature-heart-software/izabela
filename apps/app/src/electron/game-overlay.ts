@@ -37,6 +37,8 @@ class GameOverlay {
   public Overlay: any = null
   public detectedProcesses: ProcessInfo[] = []
   public intercepting = false
+  private interceptRequested = false
+  private gameViewport?: { width: number; height: number }
   private windows: Map<string, Electron.BrowserWindow> = new Map()
   private markQuit = false
   private scaleFactor = 1.0
@@ -66,6 +68,14 @@ class GameOverlay {
       if (event === 'graphics.fps') this.hookedProcesses[payload.pid] = true
       if (['graphics.window.event.resize', 'graphics.window'].includes(event)) {
         const { width, height } = payload
+        this.gameViewport = { width, height }
+        const window = this.windows.get('messenger-game-overlay')
+        if (
+          !window ||
+          window.isDestroyed() ||
+          window.webContents.isLoadingMainFrame()
+        )
+          return
         emitIPCGameOverlayResize({
           width,
           height,
@@ -86,6 +96,13 @@ class GameOverlay {
       }
 
       if (event === 'game.input.intercept') {
+        if (
+          payload.intercepting &&
+          (!this.interceptRequested || !this.canIntercept())
+        ) {
+          this.stopIntercept()
+          return
+        }
         this.intercepting = payload.intercepting
       }
 
@@ -105,11 +122,17 @@ class GameOverlay {
           const width = right - left
           const height = bottom - top
 
+          const canFocus = () =>
+            this.interceptRequested &&
+            this.intercepting &&
+            this.canIntercept() &&
+            this.windows.get('messenger-game-overlay') === focusWin
           mouse.getPosition().then(async (initialPosition) => {
+            if (!canFocus()) return
             await mouse.setPosition(
               new Point(left + width / 2, top + height / 2),
             )
-            await mouse.leftClick()
+            if (canFocus()) await mouse.leftClick()
             await mouse.setPosition(initialPosition)
           })
         }
@@ -262,12 +285,9 @@ class GameOverlay {
         this.injectByProcess(processInfo)
       }
     }, 1000)
-    setTimeout(
-      () => {
-        clearInterval(interval)
-      },
-      5 * 60 * 1000,
-    )
+    setTimeout(() => {
+      clearInterval(interval)
+    }, 5 * 60 * 1000)
   }
 
   /* Some games needs to be hooked quickly for the overlay to work so favor this method. E.g. FragPunk */
@@ -283,12 +303,9 @@ class GameOverlay {
         this.injectByProcess(processInfo)
       }
     }, 1000)
-    setTimeout(
-      () => {
-        clearInterval(interval)
-      },
-      5 * 60 * 1000,
-    )
+    setTimeout(() => {
+      clearInterval(interval)
+    }, 5 * 60 * 1000)
   }
 
   public injectByProcess(processInfo: ProcessInfo) {
@@ -427,8 +444,22 @@ class GameOverlay {
     }
   }
 
+  private canIntercept() {
+    const window = this.windows.get('messenger-game-overlay')
+    return (
+      !!this.Overlay &&
+      !this.markQuit &&
+      useGameOverlayStore().enableGameOverlay &&
+      !!window &&
+      !window.isDestroyed() &&
+      !window.webContents.isLoadingMainFrame()
+    )
+  }
+
   public startIntercept() {
+    if (!this.canIntercept()) return
     console.log('[game-overlay] startIntercept')
+    this.interceptRequested = true
     this.Overlay!.sendCommand({
       command: 'input.intercept',
       intercept: true,
@@ -437,7 +468,9 @@ class GameOverlay {
 
   public stopIntercept() {
     console.log('[game-overlay] stopIntercept')
-    this.Overlay!.sendCommand({
+    this.interceptRequested = false
+    this.intercepting = false
+    this.Overlay?.sendCommand({
       command: 'input.intercept',
       intercept: false,
     })
@@ -449,6 +482,22 @@ class GameOverlay {
   ) {
     const window = new BrowserWindow(option)
     this.windows.set(name, window)
+
+    if (name === 'messenger-game-overlay') {
+      window.webContents.on('did-finish-load', () => {
+        // electron-postman registers this window later in the same load event.
+        queueMicrotask(() => {
+          if (
+            this.windows.get(name) !== window ||
+            window.isDestroyed() ||
+            !this.gameViewport
+          )
+            return
+          const { width, height } = this.gameViewport
+          emitIPCGameOverlayResize({ width, height })
+        })
+      })
+    }
 
     window.on('closed', () => {
       this.windows.delete(name)
@@ -474,7 +523,13 @@ class GameOverlay {
   }
 
   public isProcessHooked(pid: number) {
-    return !!this.hookedProcesses[pid]
+    const window = this.windows.get('messenger-game-overlay')
+    return (
+      !!this.hookedProcesses[pid] &&
+      !!window &&
+      !window.isDestroyed() &&
+      !window.webContents.isLoadingMainFrame()
+    )
   }
 
   private removeProcess(pid: number) {

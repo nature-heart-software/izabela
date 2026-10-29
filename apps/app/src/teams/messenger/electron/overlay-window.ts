@@ -4,13 +4,12 @@ import { createProtocol, getLargestMonitorSize } from '@/electron/utils'
 import { ipcMain } from 'electron-postman'
 import gameOverlay from '@/electron/game-overlay'
 
-let window: BrowserWindow
 const createWindow = async (name: string): Promise<BrowserWindow> => {
   const overlayDebug = import.meta.env.DEV ? false : false
 
   const { width, height } = getLargestMonitorSize()
 
-  window = gameOverlay.createWindow(name, {
+  const window = gameOverlay.createWindow(name, {
     x: 0,
     y: 0,
     height,
@@ -35,7 +34,7 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
   window.webContents.setFrameRate(240)
   ipcMain.registerBrowserWindow(name, window)
 
-  screen.on('display-metrics-changed', () => {
+  const updateDisplay = () => {
     const { width, height } = getLargestMonitorSize()
     window.setBounds({
       x: 0,
@@ -44,6 +43,10 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
       height,
     })
     window.setSize(width, height)
+  }
+  screen.on('display-metrics-changed', updateDisplay)
+  window.once('closed', () => {
+    screen.removeListener('display-metrics-changed', updateDisplay)
   })
 
   if (import.meta.env.DEV && import.meta.env.VITE_OPEN_DEVTOOLS === 'true') {
@@ -51,19 +54,27 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
   }
 
   const filePath = `./src/teams/messenger/index.html?game-overlay`
-  if (import.meta.env.VITE_DEV_SERVER_URL) {
-    const url = new URL(filePath, import.meta.env.VITE_DEV_SERVER_URL as string)
-      .href
-    await window.loadURL(url)
-  } else {
-    createProtocol('app')
-    await window.loadURL(`app://${filePath}`)
+  try {
+    if (import.meta.env.VITE_DEV_SERVER_URL) {
+      const url = new URL(
+        filePath,
+        import.meta.env.VITE_DEV_SERVER_URL as string,
+      ).href
+      await window.loadURL(url)
+    } else {
+      createProtocol('app')
+      await window.loadURL(`app://${filePath}`)
+    }
+  } catch (error) {
+    window.destroy()
+    throw error
   }
 
   if (!overlayDebug) {
-    gameOverlay
-      .isReady()
-      .then(() => gameOverlay.addOverlayWindow(name, window, 0, 0))
+    gameOverlay.isReady().then(() => {
+      if (!window.isDestroyed())
+        gameOverlay.addOverlayWindow(name, window, 0, 0)
+    })
   }
 
   return window

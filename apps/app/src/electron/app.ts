@@ -4,7 +4,7 @@ import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import path from 'path'
 import server from '@apps/app-server'
 import { electronPiniaPlugin } from '@packages/electron-pinia/main'
-import { createApp, h } from 'vue'
+import { createApp, h, watch, type WatchStopHandle } from 'vue'
 import { createPinia } from 'pinia'
 import createTray from '@/teams/tray/electron-tray'
 import ElectronWindowManager from '@/modules/electron-window-manager'
@@ -27,9 +27,57 @@ import gameOverlay from '@/electron/game-overlay.ts'
 import { gkl } from '@/modules/electron-keybinding/utils.ts'
 import { loadStores } from '@/store/stores.ts'
 import { writeFileSync, mkdirSync, existsSync } from 'node:fs'
+import { useGameOverlayStore } from '@/features/game-overlay/store'
 
 const App = () => {
   const isDevelopment = import.meta.env.DEV
+  let quitting = false
+  let gameOverlayWindow: BrowserWindow | undefined
+  let gameOverlayWindowTask: Promise<void> | undefined
+  let stopGameOverlayWindowWatch: WatchStopHandle | undefined
+
+  const registerGameOverlayWindow = async () => {
+    const store = useGameOverlayStore()
+    await store.$whenReady()
+    if (quitting || stopGameOverlayWindowWatch) return
+
+    stopGameOverlayWindowWatch = watch(
+      () => store.enableGameOverlay,
+      (enabled) => {
+        if (!enabled) {
+          // Native interception may still be awaiting its acknowledgement.
+          gameOverlay.stopIntercept()
+          gameOverlayWindow?.destroy()
+          gameOverlayWindow = undefined
+          return
+        }
+        if (gameOverlayWindow || gameOverlayWindowTask) return
+        gameOverlayWindowTask = ElectronWindowManager.registerInstance(
+          'messenger-game-overlay',
+          createMessengerGameOverlayWindow,
+        )
+          .then(({ window }) => {
+            if (quitting || !store.enableGameOverlay) {
+              window.destroy()
+              return
+            }
+            gameOverlayWindow = window
+            window.once('closed', () => {
+              if (gameOverlayWindow === window) gameOverlayWindow = undefined
+            })
+          })
+          .catch((error) =>
+            console.error('Failed to create game overlay', error),
+          )
+          .finally(() => {
+            gameOverlayWindowTask = undefined
+          })
+      },
+      { immediate: true },
+    )
+    await gameOverlayWindowTask
+  }
+
   const createWindows = () =>
     app
       .whenReady()
@@ -47,10 +95,7 @@ const App = () => {
             'speech-worker',
             createSpeechWorkerWindow,
           ),
-          ElectronWindowManager.registerInstance(
-            'messenger-game-overlay',
-            createMessengerGameOverlayWindow,
-          ),
+          registerGameOverlayWindow(),
         ]),
       )
 
@@ -104,6 +149,8 @@ const App = () => {
   }
 
   const onQuit = () => {
+    quitting = true
+    stopGameOverlayWindowWatch?.()
     gkl?.kill()
     gameOverlay.quit()
     /* fixes app.quit(): https://stackoverflow.com/a/75369483 */
