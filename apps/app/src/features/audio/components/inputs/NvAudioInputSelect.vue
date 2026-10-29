@@ -9,13 +9,14 @@
 </template>
 <script lang="ts" setup>
 import { NvSelect } from '@packages/ui'
-import { useDevicesList, useElementSize } from '@vueuse/core'
+import { useElementSize } from '@vueuse/core'
+import { useAudioDevices } from '@/features/audio/hooks'
 import { computed, ref } from 'vue'
 import { useSettingsStore } from '@/features/settings/store'
 
 const settingsStore = useSettingsStore()
 
-const { audioInputs } = useDevicesList()
+const { audioInputs } = useAudioDevices()
 
 const options = computed(() =>
   audioInputs.value.map((input) => ({

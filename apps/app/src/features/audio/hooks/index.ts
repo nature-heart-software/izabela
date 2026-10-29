@@ -1,6 +1,7 @@
 import { useQuery } from 'vue-query'
-import { useDevicesList } from '@vueuse/core'
-import { computed } from 'vue'
+import { computed, type MaybeRef } from 'vue'
+import { useAudioDevices } from './devices'
+export { useAudioDevices } from './devices'
 import { soxMediaInputsFilter } from '@/utils/media-devices'
 
 export const useIsVirtualAudioCableInstalled = () =>
@@ -8,7 +9,7 @@ export const useIsVirtualAudioCableInstalled = () =>
     window.ElectronResources.isVirtualAudioCableInstalled(),
   )
 
-export const useSoxDevicesList = () => {
-  const { audioInputs } = useDevicesList()
+export const useSoxDevicesList = (enabled: MaybeRef<boolean> = true) => {
+  const { audioInputs } = useAudioDevices(enabled)
   return computed(() => soxMediaInputsFilter(audioInputs.value))
 }

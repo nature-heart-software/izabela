@@ -573,6 +573,17 @@ async function main() {
       'F18',
     )
     assert.equal(settings.enableSTTTS, false)
+    await sleep(300)
+    assert.equal(
+      app
+        .getAppMetrics()
+        .some(
+          (metric) =>
+            metric.serviceName === 'video_capture.mojom.VideoCaptureService',
+        ),
+      false,
+      'Idle default configuration must not enumerate media devices',
+    )
   })
   for (const [id, name] of [
     ['samtts', 'Sam'],
