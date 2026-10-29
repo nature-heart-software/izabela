@@ -39,6 +39,13 @@ function fixture() {
         },
       },
       '@/features/settings/store': { useSettingsStore: () => settings },
+      '@packages/toolbox': {
+        Deferred() {
+          let resolve
+          const promise = new Promise((done) => (resolve = done))
+          return { promise, resolve }
+        },
+      },
       '@/modules/electron-keybinding/utils': {
         gkl,
         keybindingAllReleased: () => released,
