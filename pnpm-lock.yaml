@@ -741,6 +741,9 @@ importers:
 
   packages/process-watcher:
     dependencies:
+      koffi:
+        specifier: ^2.9.1
+        version: 2.16.2
       wql-process-monitor:
         specifier: 3.0.1
         version: 3.0.1(patch_hash=800318da45cad7115886e741806df275aa579df0f10cad8d1ba1bd6d726b6054)

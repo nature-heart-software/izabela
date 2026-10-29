@@ -77,6 +77,7 @@ to end.
 - External Socket.IO `say`/`audio:play`, audio cancellation, and Custom recognition PCM export → external transcription response via `say` after restarting the native recognition server.
 - Full process relaunch preserves preferences, dictionary, profiles, saved phrases, history and Messenger placement; a changed theme must render after relaunch, and the saved dictionary must still affect speech.
 - Repeated General-settings navigation keeps global hitbox listeners bounded and checks for retained detached DOM trees after garbage collection in the production renderer.
+- Native watcher checks load the lightweight binding in its isolated Node process, observe real process creation/deletion, and stop the subscription; packaged runs resolve its DLL from the shipped ASAR resources.
 - Delayed synthesis cancellation, cancellation of prefetched messages, queued provider failures, exactly-once lifecycle events, and working speech after recovery.
 - Disabling recognition while the native record shortcut is held, re-enabling it, and restarting capture while held; the new capture must receive PCM and leave exactly one active recorder.
 - Authenticated custom language catalogs, valid language IDs, credential changes, and endpoint changes while an earlier catalog response is delayed. Google account imports use a generated test key: cancellation and invalid JSON must preserve the previously imported file and allow a subsequent valid import.

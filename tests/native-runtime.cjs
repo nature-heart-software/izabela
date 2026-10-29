@@ -89,26 +89,33 @@ app
 
     // The application uses a separate Node child for WMI. Initializing WMI in
     // Electron's main process conflicts with Chromium's COM security setup.
-    await new Promise((resolve, reject) => {
-      const child = spawn(
-        process.execPath,
-        [
-          path.join(__dirname, 'native-watcher.cjs'),
-          resolvePackage('wql-process-monitor'),
-        ],
-        {
-          env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' },
-          stdio: 'inherit',
-          windowsHide: true,
-        },
-      )
-      child.on('error', reject)
-      child.on('exit', (code) =>
-        code === 0
-          ? resolve()
-          : reject(new Error(`WMI child exited with ${code}`)),
-      )
-    })
+    for (const [entry, mode] of [
+      [resolvePackage('wql-process-monitor'), ''],
+      [
+        path.join(
+          path.dirname(resolvePackage('@packages/process-watcher')),
+          'native.js',
+        ),
+        '--light',
+      ],
+    ])
+      await new Promise((resolve, reject) => {
+        const child = spawn(
+          process.execPath,
+          [path.join(__dirname, 'native-watcher.cjs'), entry, mode],
+          {
+            env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' },
+            stdio: 'inherit',
+            windowsHide: true,
+          },
+        )
+        child.on('error', reject)
+        child.on('exit', (code) =>
+          code === 0
+            ? resolve()
+            : reject(new Error(`WMI child exited with ${code}`)),
+        )
+      })
 
     clearTimeout(timeout)
     app.exit(0)

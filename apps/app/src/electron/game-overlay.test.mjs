@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { EventEmitter } from 'node:events'
 import { fileURLToPath } from 'node:url'
 import test from 'node:test'
-import { reactive, watch } from 'vue'
+import { reactive, watch, nextTick, onWatcherCleanup } from 'vue'
 import loadTypescript from '../../../../tests/load-typescript.cjs'
 
 function fixture({
@@ -17,6 +17,12 @@ function fixture({
   const moves = []
   const commands = []
   const sizes = []
+  const forks = [],
+    injections = [],
+    intervals = new Map(),
+    timeouts = new Map()
+  let nextTimer = 0,
+    topWindows = []
   class BrowserWindow extends EventEmitter {
     constructor() {
       super()
@@ -47,6 +53,8 @@ function fixture({
     stop() {},
     setEventCallback: (callback) => (nativeEvent = callback),
     sendCommand: (command) => commands.push({ ...command }),
+    getTopWindows: () => topWindows,
+    injectProcess: (window) => injections.push(window),
   }
   const overlay = loadTypescript(
     fileURLToPath(new URL('./game-overlay.ts', import.meta.url)),
@@ -78,7 +86,16 @@ function fixture({
         Point: class {},
       },
       child_process: {
-        fork: () => Object.assign(new EventEmitter(), { kill() {} }),
+        fork: () => {
+          const child = Object.assign(new EventEmitter(), {
+            killed: false,
+            kill() {
+              this.killed = true
+            },
+          })
+          forks.push(child)
+          return child
+        },
       },
       '@packages/toolbox': {
         Deferred() {
@@ -88,7 +105,7 @@ function fixture({
         },
       },
       '@/features/game-overlay/store': { useGameOverlayStore: () => store },
-      vue: { watch, onWatcherCleanup() {} },
+      vue: { watch, onWatcherCleanup },
       '@/features/databases/store': { useDatabasesStore: () => ({ data: {} }) },
       '@packages/electron-game-overlay': native,
       'win-control': {
@@ -101,10 +118,25 @@ function fixture({
               bottom: 1080,
             }),
           }),
+          getForeground: () => ({ getPid: () => 123 }),
         },
       },
     },
-    { queueMicrotask, console: { log() {} } },
+    {
+      queueMicrotask,
+      process: { resourcesPath: 'C:/fixture/resources' },
+      console: { log() {}, error() {} },
+      setInterval: (fn) => {
+        intervals.set(++nextTimer, fn)
+        return nextTimer
+      },
+      clearInterval: (id) => intervals.delete(id),
+      setTimeout: (fn) => {
+        timeouts.set(++nextTimer, fn)
+        return nextTimer
+      },
+      clearTimeout: (id) => timeouts.delete(id),
+    },
   ).default
   return {
     overlay,
@@ -116,6 +148,14 @@ function fixture({
     moves,
     clicks: () => clicks,
     focuses: () => focuses,
+    forks,
+    injections,
+    intervals,
+    timeouts,
+    topWindows: (value) => {
+      topWindows = value
+    },
+    poll: () => [...intervals.values()].forEach((fn) => fn()),
     loadedRenderer() {
       const window = {
         isDestroyed: () => false,
@@ -149,6 +189,83 @@ test('an enabled loaded overlay still focuses and clicks before restoring the cu
   assert.equal(f.overlay.intercepting, false)
   f.event('game.input.intercept', { pid: 123, intercepting: false })
   assert.equal(f.overlay.intercepting, false)
+})
+
+test('quit stops the native watcher and prevents subsequent watcher creation', async () => {
+  const f = fixture()
+  await f.overlay.start()
+  f.store.enableGameOverlay = true
+  await nextTick()
+  assert.equal(f.forks.length, 1)
+  f.overlay.quit()
+  assert.equal(f.forks[0].killed, true)
+  f.store.enableGameOverlay = false
+  await nextTick()
+  f.store.enableGameOverlay = true
+  await nextTick()
+  assert.equal(f.forks.length, 1)
+})
+
+test('quit while store readiness is pending prevents native startup', async () => {
+  const f = fixture()
+  let ready
+  f.store.$whenReady = () => new Promise((resolve) => (ready = resolve))
+  f.store.enableGameOverlay = true
+  const starting = f.overlay.start()
+  f.overlay.quit()
+  ready()
+  await starting
+  assert.equal(f.forks.length, 0)
+  assert.equal(f.intervals.size, 0)
+})
+
+test('injection completion and feature disable release polling and deadline timers', async () => {
+  const f = fixture()
+  await f.overlay.start()
+  f.store.enableGameOverlay = true
+  await nextTick()
+  const process = {
+    pid: 123,
+    process: 'game.exe',
+    filepath: 'C:\\game.exe',
+    user: 'test',
+  }
+  f.topWindows([{ processId: 123 }])
+  f.overlay.injectByProcessOnceCreated(process)
+  f.poll()
+  assert.equal(f.injections.length, 1)
+  assert.equal(f.intervals.size, 0)
+  assert.equal(f.timeouts.size, 0)
+  f.topWindows([])
+  f.overlay.injectByProcessOnceCreated(process)
+  assert.equal(f.intervals.size, 1)
+  assert.equal(f.timeouts.size, 1)
+  f.store.enableGameOverlay = false
+  await nextTick()
+  assert.equal(f.intervals.size, 0)
+  assert.equal(f.timeouts.size, 0)
+  f.overlay.quit()
+})
+
+test('deleted games and duplicate injection requests do not retain timer jobs', async () => {
+  const f = fixture()
+  await f.overlay.start()
+  f.store.enableGameOverlay = true
+  await nextTick()
+  const process = {
+    pid: 123,
+    process: 'game.exe',
+    filepath: 'C:\\game.exe',
+    user: 'test',
+  }
+  f.overlay.injectByProcessOnceCreated(process)
+  f.overlay.injectByProcessOnceCreated(process)
+  assert.equal(f.intervals.size, 1)
+  assert.equal(f.timeouts.size, 1)
+  f.forks[0].emit('message', { type: 'process-deletion', payload: process })
+  assert.equal(f.intervals.size, 0)
+  assert.equal(f.timeouts.size, 0)
+  f.overlay.quit()
 })
 
 test('cancelling interception is safe before native startup', () => {

@@ -8,7 +8,7 @@ import { mouse, Point } from '@nut-tree-fork/nut-js'
 import { fork } from 'child_process'
 import { Deferred } from '@packages/toolbox'
 import { useGameOverlayStore } from '@/features/game-overlay/store'
-import { onWatcherCleanup, watch } from 'vue'
+import { onWatcherCleanup, watch, type WatchStopHandle } from 'vue'
 import micromatch from 'micromatch'
 import { useDatabasesStore } from '@/features/databases/store'
 import path from 'path'
@@ -43,6 +43,8 @@ class GameOverlay {
   private markQuit = false
   private scaleFactor = 1.0
   private hookedProcesses: Record<number, boolean> = {}
+  private stopProcessWatch?: WatchStopHandle
+  private pendingInjections = new Map<number, () => void>()
 
   constructor() {}
 
@@ -274,44 +276,44 @@ class GameOverlay {
   }
 
   public injectByProcessOnceFocused(processInfo: ProcessInfo) {
-    const { pid } = processInfo
-    let timeout: ReturnType<typeof setTimeout>
-    let interval: ReturnType<typeof setInterval>
-    interval = setInterval(() => {
+    this.waitToInject(processInfo, () => {
       const foregroundWindow = this.WinControl.getForeground()
-      if (pid === foregroundWindow?.getPid()) {
-        clearInterval(interval)
-        clearTimeout(timeout)
-        this.injectByProcess(processInfo)
-      }
-    }, 1000)
-    setTimeout(
-      () => {
-        clearInterval(interval)
-      },
-      5 * 60 * 1000,
-    )
+      return processInfo.pid === foregroundWindow?.getPid()
+    })
   }
 
   /* Some games needs to be hooked quickly for the overlay to work so favor this method. E.g. FragPunk */
   public injectByProcessOnceCreated(processInfo: ProcessInfo) {
+    this.waitToInject(processInfo, () =>
+      this.Overlay.getTopWindows().some(
+        (window: any) => window.processId === processInfo.pid,
+      ),
+    )
+  }
+
+  private waitToInject(processInfo: ProcessInfo, ready: () => boolean) {
     const { pid } = processInfo
-    let timeout: ReturnType<typeof setTimeout>
-    let interval: ReturnType<typeof setInterval>
-    interval = setInterval(() => {
-      const foregroundWindows = this.Overlay.getTopWindows()
-      if (foregroundWindows.find((window: any) => window.processId === pid)) {
-        clearInterval(interval)
-        clearTimeout(timeout)
+    this.pendingInjections.get(pid)?.()
+    const cancel = () => {
+      clearInterval(interval)
+      clearTimeout(timeout)
+      if (this.pendingInjections.get(pid) === cancel)
+        this.pendingInjections.delete(pid)
+    }
+    const interval = setInterval(() => {
+      if (this.markQuit || !useGameOverlayStore().enableGameOverlay) {
+        cancel()
+      } else if (ready()) {
+        cancel()
         this.injectByProcess(processInfo)
       }
     }, 1000)
-    setTimeout(
-      () => {
-        clearInterval(interval)
-      },
-      5 * 60 * 1000,
-    )
+    const timeout = setTimeout(cancel, 5 * 60 * 1000)
+    this.pendingInjections.set(pid, cancel)
+  }
+
+  private cancelPendingInjections() {
+    this.pendingInjections.forEach((cancel) => cancel())
   }
 
   public injectByProcess(processInfo: ProcessInfo) {
@@ -333,6 +335,7 @@ class GameOverlay {
       require('win-control'),
       gameOverlayStore.$whenReady(),
     ]).then(([Overlay, WinControl]) => {
+      if (this.markQuit) return
       this.WinControl = WinControl.Window
       this.Overlay = Overlay
       this.scaleFactor = screen.getDisplayNearestPoint({
@@ -342,7 +345,7 @@ class GameOverlay {
 
       this.startOverlay()
 
-      watch(
+      this.stopProcessWatch = watch(
         () => [
           gameOverlayStore.enableGameOverlay,
           gameOverlayStore.allowlist,
@@ -415,6 +418,7 @@ class GameOverlay {
             onWatcherCleanup(() => {
               console.log('[game-overlay] Destroying process-watcher process')
               child.kill()
+              this.cancelPendingInjections()
             })
           } catch (e) {
             console.log(
@@ -443,6 +447,9 @@ class GameOverlay {
 
   public quit() {
     this.markQuit = true
+    this.stopProcessWatch?.()
+    this.stopProcessWatch = undefined
+    this.cancelPendingInjections()
     this.closeAllWindows()
 
     if (this.Overlay) {
@@ -539,6 +546,7 @@ class GameOverlay {
   }
 
   private removeProcess(pid: number) {
+    this.pendingInjections.get(pid)?.()
     this.detectedProcesses = this.detectedProcesses.filter(
       (process) => process.pid !== pid,
     )

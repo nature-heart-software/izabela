@@ -10,7 +10,8 @@ function boot(load?: () => Promise<unknown>) {
   const send = vi.fn()
   const interval = vi.fn()
   const source = readFileSync(new URL('../index.js', import.meta.url), 'utf8')
-    .replace("import('wql-process-monitor')", 'load()')
+    .replaceAll('\r\n', '\n')
+    .replace("require('./native')", 'load()')
     .replace('wqlImport\n  .then', 'const completion = wqlImport\n  .then')
   const completion = new Function(
     'load',

@@ -12,6 +12,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "koffi": "^2.9.1",
     "wql-process-monitor": "3.0.1"
   }
 }
