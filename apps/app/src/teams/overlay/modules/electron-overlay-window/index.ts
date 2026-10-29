@@ -283,7 +283,7 @@ export const ElectronOverlayWindow = () => {
     overlayWindowStore = useOverlayWindowStore()
     registeredWindow = window
     settingsStore.$whenReady().then(() => {
-      setDisplay(localSettingsStore.display)
+      setDisplay(localSettingsStore.display, localSettingsStore.displayBounds)
     })
     ready.resolve(window)
     addEventListeners()

@@ -4,7 +4,13 @@ import { fileURLToPath } from 'node:url'
 import test from 'node:test'
 import loadTypescript from '../../../../../../../tests/load-typescript.cjs'
 
-function fixture() {
+const displayUtils = loadTypescript(
+  fileURLToPath(
+    new URL('../../../../features/display/utils.ts', import.meta.url),
+  ),
+)
+
+function fixture({ displays = [{ id: 1, bounds: {} }] } = {}) {
   const keys = new Set(),
     timers = new Map(),
     blocks = [],
@@ -34,8 +40,8 @@ function fixture() {
       },
       electron: {
         screen: {
-          getAllDisplays: () => [],
-          getPrimaryDisplay: () => ({ bounds: {} }),
+          getAllDisplays: () => displays,
+          getPrimaryDisplay: () => displays[0],
         },
       },
       '@/features/settings/store': { useSettingsStore: () => settings },
@@ -61,7 +67,7 @@ function fixture() {
       },
       '@/teams/overlay/store': { useOverlayWindowStore: () => state },
       koffi: { load: () => ({ func: () => (value) => blocks.push(value) }) },
-      '@/features/display/utils': { findDisplay: () => undefined },
+      '@/features/display/utils': displayUtils,
     },
     {
       setTimeout: (fn) => {
@@ -90,7 +96,9 @@ function fixture() {
         this.visible = true
         this.emit('show')
       },
-      setBounds() {},
+      setBounds(bounds) {
+        this.bounds = { ...bounds }
+      },
       destroy() {
         this.destroyed = true
         this.emit('closed')
@@ -165,4 +173,37 @@ test('closing before the delayed block cancels it and replacement shortcuts work
   assert.equal(f.state.isShown, false)
   replacement.destroy()
   assert.equal(f.keys.size, 0)
+})
+
+test('recreating the overlay restores saved monitor bounds after display IDs change', async () => {
+  const primary = {
+    id: 1,
+    bounds: { x: 0, y: 0, width: 1920, height: 1080 },
+  }
+  const secondary = {
+    id: 2,
+    bounds: { x: -1920, y: 0, width: 1920, height: 1080 },
+  }
+  const f = fixture({ displays: [primary, secondary] })
+  Object.assign(f.settings, {
+    display: secondary.id,
+    displayBounds: { ...secondary.bounds },
+  })
+  const original = f.makeWindow()
+  f.controller.start(original)
+  await new Promise(setImmediate)
+  assert.deepEqual(original.bounds, secondary.bounds)
+
+  // Windows can reuse the saved ID for another monitor after reconnection.
+  primary.id = 2
+  secondary.id = 3
+  f.controller.setDisplay(f.settings.display, f.settings.displayBounds)
+  assert.deepEqual(original.bounds, secondary.bounds)
+  original.destroy()
+
+  const replacement = f.makeWindow()
+  f.controller.start(replacement)
+  await new Promise(setImmediate)
+  assert.deepEqual(replacement.bounds, secondary.bounds)
+  replacement.destroy()
 })
