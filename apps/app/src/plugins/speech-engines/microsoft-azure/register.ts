@@ -16,7 +16,7 @@ const escapeXml = (value: string) =>
         '&': '&amp;',
         '"': '&quot;',
         "'": '&apos;',
-      }[character] as string),
+      })[character] as string,
   )
 
 const getCredentials: SpeechEngine<Credentials>['getCredentials'] = () => {

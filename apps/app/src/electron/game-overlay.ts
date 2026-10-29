@@ -285,9 +285,12 @@ class GameOverlay {
         this.injectByProcess(processInfo)
       }
     }, 1000)
-    setTimeout(() => {
-      clearInterval(interval)
-    }, 5 * 60 * 1000)
+    setTimeout(
+      () => {
+        clearInterval(interval)
+      },
+      5 * 60 * 1000,
+    )
   }
 
   /* Some games needs to be hooked quickly for the overlay to work so favor this method. E.g. FragPunk */
@@ -303,9 +306,12 @@ class GameOverlay {
         this.injectByProcess(processInfo)
       }
     }, 1000)
-    setTimeout(() => {
-      clearInterval(interval)
-    }, 5 * 60 * 1000)
+    setTimeout(
+      () => {
+        clearInterval(interval)
+      },
+      5 * 60 * 1000,
+    )
   }
 
   public injectByProcess(processInfo: ProcessInfo) {

@@ -1,10 +1,9 @@
 import type { AppBridgeModules, BridgeMethods } from './bridge-contract'
 
-type Equal<Left, Right> = (<T>() => T extends Left ? 1 : 2) extends <
-  T,
->() => T extends Right ? 1 : 2
-  ? true
-  : false
+type Equal<Left, Right> =
+  (<T>() => T extends Left ? 1 : 2) extends <T>() => T extends Right ? 1 : 2
+    ? true
+    : false
 type Assert<Value extends true> = Value
 
 export type WindowTypesAreUnchanged = Assert<

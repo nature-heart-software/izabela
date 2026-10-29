@@ -24,11 +24,13 @@ export interface AppBridgeModules {
 
 export type BridgeMethods<Modules> = {
   [Name in keyof Modules]: {
-    [Method in keyof Modules[Name] as Modules[Name][Method] extends (
-      ...args: any[]
-    ) => any
-      ? Method
-      : never]: true
+    [
+      Method in keyof Modules[Name] as Modules[Name][Method] extends (
+        ...args: any[]
+      ) => any
+        ? Method
+        : never
+    ]: true
   }
 }
 
