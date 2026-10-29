@@ -4,9 +4,8 @@ import { createProtocol } from '@/electron/utils'
 import { ipcMain } from 'electron-postman'
 import electronOverlayWindow from '@/teams/overlay/modules/electron-overlay-window'
 
-let window: BrowserWindow
 const createWindow = async (name: string): Promise<BrowserWindow> => {
-  window = new BrowserWindow({
+  const window = new BrowserWindow({
     show: false,
     fullscreen: true,
     transparent: true,
@@ -36,23 +35,27 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
     window.setIgnoreMouseEvents(true)
   }
 
-  window.once('ready-to-show', () => {
-    electronOverlayWindow.start(window)
-  })
-
   if (import.meta.env.DEV && import.meta.env.VITE_OPEN_DEVTOOLS === 'true') {
     window.webContents.openDevTools({ mode: 'undocked' })
   }
 
   const filePath = `./src/teams/${name}/index.html`
-  if (import.meta.env.VITE_DEV_SERVER_URL) {
-    const url = new URL(filePath, import.meta.env.VITE_DEV_SERVER_URL as string)
-      .href
-    await window.loadURL(url)
-  } else {
-    createProtocol('app')
-    await window.loadURL(`app://${filePath}`)
+  try {
+    if (import.meta.env.VITE_DEV_SERVER_URL) {
+      const url = new URL(
+        filePath,
+        import.meta.env.VITE_DEV_SERVER_URL as string,
+      ).href
+      await window.loadURL(url)
+    } else {
+      createProtocol('app')
+      await window.loadURL(`app://${filePath}`)
+    }
+  } catch (error) {
+    window.destroy()
+    throw error
   }
+  electronOverlayWindow.start(window)
 
   return window
 }

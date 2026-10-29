@@ -11,7 +11,7 @@ const settle = async () => {
   await new Promise(setImmediate)
 }
 
-function fixture(enabled = false) {
+function fixture(enabled = false, overlayEnabled = false) {
   const instances = new Map()
   const created = []
   const app = new EventEmitter()
@@ -25,8 +25,13 @@ function fixture(enabled = false) {
     enableGameOverlay: enabled,
     $whenReady: () => Promise.resolve(),
   })
+  const settings = reactive({
+    enableOverlayWindow: overlayEnabled,
+    $whenReady: async () => {},
+  })
   let releaseCreation
   let delayCreation = false
+  let delayedName = 'messenger-game-overlay'
   const create = async (name) => {
     const window = new EventEmitter()
     Object.assign(window, {
@@ -42,7 +47,7 @@ function fixture(enabled = false) {
       removeAllListeners() {},
     })
     created.push({ name, window })
-    if (name === 'messenger-game-overlay' && delayCreation)
+    if (name === delayedName && delayCreation)
       await new Promise((resolve) => (releaseCreation = resolve))
     return window
   }
@@ -93,6 +98,10 @@ function fixture(enabled = false) {
     '@/modules/electron-keybinding/utils.ts': {},
     '@/store/stores.ts': { loadStores: noop },
     '@/features/game-overlay/store': { useGameOverlayStore: () => store },
+    '@/features/settings/store': { useSettingsStore: () => settings },
+    '@/teams/overlay/modules/electron-overlay-window': {
+      hide: async () => false,
+    },
   }
   for (const name of [
     'startup',
@@ -117,11 +126,15 @@ function fixture(enabled = false) {
   return {
     app,
     store,
+    settings,
     controller,
     nativeOverlay,
     instances,
     created,
-    delay: () => (delayCreation = true),
+    delay: (name = 'messenger-game-overlay') => {
+      delayCreation = true
+      delayedName = name
+    },
     release: () => releaseCreation(),
   }
 }
@@ -133,9 +146,57 @@ test('startup keeps speech available without allocating a disabled game-overlay 
   await settle()
   assert.deepEqual(f.created.map(({ name }) => name).sort(), [
     'messenger',
-    'overlay',
     'speech-worker',
   ])
+})
+
+test('regular overlay is created only while enabled and can be recreated', async (t) => {
+  const f = fixture()
+  t.after(() => f.app.emit('before-quit'))
+  await f.controller.start()
+  assert.equal(
+    f.created.some((w) => w.name === 'overlay'),
+    false,
+  )
+  for (let i = 0; i < 2; i++) {
+    f.settings.enableOverlayWindow = true
+    await settle()
+    const current = f.created.filter((w) => w.name === 'overlay').at(-1)
+    assert.equal(current.window.isDestroyed(), false)
+    f.settings.enableOverlayWindow = false
+    await settle()
+    assert.equal(current.window.isDestroyed(), true)
+  }
+  assert.equal(f.created.filter((w) => w.name === 'overlay').length, 2)
+})
+
+test('an enabled regular-overlay profile creates one initial renderer', async (t) => {
+  const f = fixture(false, true)
+  t.after(() => f.app.emit('before-quit'))
+  await f.controller.start()
+  assert.equal(f.created.filter((w) => w.name === 'overlay').length, 1)
+})
+
+test('disabling or quitting while the regular overlay loads destroys the late window', async () => {
+  for (const quitting of [false, true]) {
+    const f = fixture()
+    await f.controller.start()
+    f.delay('overlay')
+    f.settings.enableOverlayWindow = true
+    await settle()
+    if (quitting) f.app.emit('before-quit')
+    else {
+      f.settings.enableOverlayWindow = false
+      await settle()
+    }
+    f.release()
+    await settle()
+    assert.equal(
+      f.created.find((w) => w.name === 'overlay').window.isDestroyed(),
+      true,
+    )
+    f.app.emit('before-quit')
+  }
 })
 
 test('enabling the game overlay creates its renderer and disabling releases it', async (t) => {

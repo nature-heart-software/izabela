@@ -617,8 +617,14 @@ async function main() {
       'native alternate shortcut',
     )
     await patch('settings', { enableOverlayWindow: true })
-    const overlay = BrowserWindow.getAllWindows().find((w) =>
-      w.webContents.getURL().includes('/overlay/'),
+    const overlay = await until(
+      () =>
+        BrowserWindow.getAllWindows().find(
+          (w) =>
+            w.webContents.getURL().includes('/overlay/') &&
+            !w.webContents.isLoadingMainFrame(),
+        ),
+      'optional overlay created',
     )
     const visible = overlay.isVisible()
     await press(15)

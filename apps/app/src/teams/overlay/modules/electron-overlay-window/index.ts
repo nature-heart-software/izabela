@@ -8,7 +8,7 @@ import {
   keybindingAllReleased,
   keybindingTriggered,
 } from '@/modules/electron-keybinding/utils'
-import { IGlobalKeyEvent } from 'node-global-key-listener'
+import { IGlobalKeyListener } from 'node-global-key-listener'
 import {
   emitIPCOverlayInputCharacter,
   emitIPCOverlayInputCommand,
@@ -24,8 +24,14 @@ export const ElectronOverlayWindow = () => {
   let registeredWindow: BrowserWindow | null = null
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
   let overlayWindowStore: ReturnType<typeof useOverlayWindowStore> | undefined
-  const ready = Deferred<BrowserWindow>()
-  const isReady = () => ready.promise
+  let ready = Deferred<BrowserWindow>()
+  const isReady = () => {
+    const window = getWindow()
+    return window ? Promise.resolve(window) : ready.promise
+  }
+  let cancelPendingShow: (() => void) | undefined
+  let blockInputTimer: ReturnType<typeof setTimeout> | undefined
+  let showGeneration = 0
 
   const user32 = koffi.load('user32.dll')
 
@@ -33,59 +39,78 @@ export const ElectronOverlayWindow = () => {
     BlockInput: user32.func('int BlockInput(int fBlockIt)'),
   }
 
-  const getWindow = () =>
-    registeredWindow ||
-    ElectronWindowManager.getInstanceByName('messenger')?.window
+  const getWindow = () => {
+    const window =
+      registeredWindow ||
+      ElectronWindowManager.getInstanceByName('overlay')?.window
+    return window && !window.isDestroyed() ? window : undefined
+  }
 
-  const hide = () =>
-    new Promise((resolve, reject) => {
-      const window = getWindow()
-      if (window) {
-        window.hide()
-        gkl?.removeListener(toggleOverlayWindowListener)
-        setTimeout(() => {
-          user32Api.BlockInput(0)
-        }, 100)
-        resolve(true)
-      } else {
-        reject()
-      }
-    })
+  const releaseInput = () => {
+    showGeneration++
+    cancelPendingShow?.()
+    cancelPendingShow = undefined
+    clearTimeout(blockInputTimer)
+    gkl?.removeListener(toggleOverlayWindowListener)
+    user32Api.BlockInput(0)
+    waitingToShow = false
+  }
 
-  const show = () =>
-    new Promise((resolve, reject) => {
-      const window = getWindow()
-      if (window) {
-        new Promise((r) => {
-          const callback = () => {
-            if (
-              settingsStore &&
-              keybindingAllReleased(
-                settingsStore.keybindings.toggleOverlayWindow,
-              )
-            ) {
-              gkl?.removeListener(callback)
-              r(true)
-            }
-          }
-          gkl?.addListener(callback)
-        })
-          .then(() => {
-            gkl?.addListener(toggleOverlayWindowListener)
-            setTimeout(() => {
-              user32Api.BlockInput(1)
-            }, 100)
-            window.showInactive()
-            waitingToShow = false
-            resolve(true)
-          })
-          .catch(() => reject())
-      } else {
-        reject()
+  const hide = async () => {
+    releaseInput()
+    const window = getWindow()
+    window?.hide()
+    return !!window
+  }
+
+  const show = async () => {
+    const window = getWindow()
+    if (!window || !settingsStore?.enableOverlayWindow) return false
+    releaseInput()
+    const generation = showGeneration
+    waitingToShow = true
+    const released = await new Promise<boolean>((resolve) => {
+      const callback = () => {
+        if (
+          settingsStore &&
+          keybindingAllReleased(settingsStore.keybindings.toggleOverlayWindow)
+        ) {
+          gkl?.removeListener(callback)
+          cancelPendingShow = undefined
+          resolve(true)
+        }
       }
+      cancelPendingShow = () => {
+        gkl?.removeListener(callback)
+        resolve(false)
+      }
+      gkl?.addListener(callback)
+      callback()
     })
+    if (
+      !released ||
+      generation !== showGeneration ||
+      window !== getWindow() ||
+      !settingsStore.enableOverlayWindow
+    )
+      return false
+    gkl?.addListener(toggleOverlayWindowListener)
+    window.showInactive()
+    waitingToShow = false
+    blockInputTimer = setTimeout(() => {
+      if (
+        generation === showGeneration &&
+        window === getWindow() &&
+        window.isVisible() &&
+        settingsStore?.enableOverlayWindow
+      )
+        user32Api.BlockInput(1)
+    }, 100)
+    return true
+  }
 
   const toggleWindow = throttle(() => {
+    if (!settingsStore?.enableOverlayWindow) return Promise.resolve()
     electronMessengerWindow.hide(false)
     const window = getWindow()
     if (window) {
@@ -140,7 +165,7 @@ export const ElectronOverlayWindow = () => {
 
   const addEventListeners = () => {
     const window = getWindow()
-    gkl?.addListener((e: IGlobalKeyEvent, down) => {
+    const onKey: IGlobalKeyListener = (e, down) => {
       if (
         settingsStore &&
         !keybindingTriggered(settingsStore.keybindings.toggleOverlayWindow) &&
@@ -161,10 +186,10 @@ export const ElectronOverlayWindow = () => {
               hasRightAlt && hasShift
                 ? nativeKey.withShiftAltGr
                 : hasRightAlt
-                  ? nativeKey.withAltGr
-                  : hasShift
-                    ? nativeKey.withShift
-                    : nativeKey.value
+                ? nativeKey.withAltGr
+                : hasShift
+                ? nativeKey.withShift
+                : nativeKey.value
             if (key) {
               emitIPCOverlayInputCharacter(key)
             }
@@ -228,7 +253,8 @@ export const ElectronOverlayWindow = () => {
           }
         }
       }
-    })
+    }
+    gkl?.addListener(onKey)
 
     if (window) {
       window.on('show', () => {
@@ -238,6 +264,15 @@ export const ElectronOverlayWindow = () => {
       window.on('hide', () => {
         if (!overlayWindowStore) return
         overlayWindowStore.$patch({ isShown: false })
+      })
+      window.once('closed', () => {
+        gkl?.removeListener(onKey)
+        if (registeredWindow === window) {
+          releaseInput()
+          registeredWindow = null
+          overlayWindowStore?.$patch({ isShown: false })
+          ready = Deferred<BrowserWindow>()
+        }
       })
     }
   }
@@ -251,11 +286,8 @@ export const ElectronOverlayWindow = () => {
       setDisplay(localSettingsStore.display)
     })
     ready.resolve(window)
-  }
-
-  isReady().then(() => {
     addEventListeners()
-  })
+  }
 
   return {
     show,

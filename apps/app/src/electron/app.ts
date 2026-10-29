@@ -28,6 +28,8 @@ import { gkl } from '@/modules/electron-keybinding/utils.ts'
 import { loadStores } from '@/store/stores.ts'
 import { writeFileSync, mkdirSync, existsSync } from 'node:fs'
 import { useGameOverlayStore } from '@/features/game-overlay/store'
+import { useSettingsStore } from '@/features/settings/store'
+import electronOverlayWindow from '@/teams/overlay/modules/electron-overlay-window'
 
 const App = () => {
   const isDevelopment = import.meta.env.DEV
@@ -35,6 +37,47 @@ const App = () => {
   let gameOverlayWindow: BrowserWindow | undefined
   let gameOverlayWindowTask: Promise<void> | undefined
   let stopGameOverlayWindowWatch: WatchStopHandle | undefined
+  let overlayWindow: BrowserWindow | undefined
+  let overlayWindowTask: Promise<void> | undefined
+  let stopOverlayWindowWatch: WatchStopHandle | undefined
+
+  const registerOverlayWindow = async () => {
+    const store = useSettingsStore()
+    await store.$whenReady()
+    if (quitting || stopOverlayWindowWatch) return
+    stopOverlayWindowWatch = watch(
+      () => store.enableOverlayWindow,
+      (enabled) => {
+        if (!enabled) {
+          void electronOverlayWindow.hide()
+          overlayWindow?.destroy()
+          overlayWindow = undefined
+          return
+        }
+        if (overlayWindow || overlayWindowTask) return
+        overlayWindowTask = ElectronWindowManager.registerInstance(
+          'overlay',
+          createOverlayWindow,
+        )
+          .then(({ window }) => {
+            if (quitting || !store.enableOverlayWindow) {
+              window.destroy()
+              return
+            }
+            overlayWindow = window
+            window.once('closed', () => {
+              if (overlayWindow === window) overlayWindow = undefined
+            })
+          })
+          .catch((error) => console.error('Failed to create overlay', error))
+          .finally(() => {
+            overlayWindowTask = undefined
+          })
+      },
+      { immediate: true },
+    )
+    await overlayWindowTask
+  }
 
   const registerGameOverlayWindow = async () => {
     const store = useGameOverlayStore()
@@ -87,10 +130,7 @@ const App = () => {
             'messenger',
             createMessengerWindow,
           ),
-          ElectronWindowManager.registerInstance(
-            'overlay',
-            createOverlayWindow,
-          ),
+          registerOverlayWindow(),
           ElectronWindowManager.registerInstance(
             'speech-worker',
             createSpeechWorkerWindow,
@@ -151,6 +191,8 @@ const App = () => {
   const onQuit = () => {
     quitting = true
     stopGameOverlayWindowWatch?.()
+    stopOverlayWindowWatch?.()
+    void electronOverlayWindow.hide()
     gkl?.kill()
     gameOverlay.quit()
     /* fixes app.quit(): https://stackoverflow.com/a/75369483 */
