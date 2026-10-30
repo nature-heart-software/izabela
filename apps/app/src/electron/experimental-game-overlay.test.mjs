@@ -32,6 +32,7 @@ function fixture({
   prepared,
   storeReady,
   failAt,
+  pathApi = path,
 } = {}) {
   const calls = [],
     children = [],
@@ -228,7 +229,8 @@ function fixture({
       },
     }
     if (Object.hasOwn(mocks, id)) return mocks[id]
-    if (['path', 'node:path', 'micromatch'].includes(id)) return require(id)
+    if (['path', 'node:path'].includes(id)) return pathApi
+    if (id === 'micromatch') return require(id)
     throw new Error(`Forbidden dependency: ${id}`)
   }
   boundary.resolve = (id) => {
@@ -287,50 +289,64 @@ function fixture({
   }
 }
 
-test('prewarms one session and launcher before arming only the new-process watcher', async () => {
-  const ready = deferred(),
-    prepared = deferred(),
-    storeReady = deferred()
-  const f = fixture({ enabled: true, ready, prepared, storeReady })
-  const starting = f.overlay.start()
-  assert.deepEqual(f.calls, [])
-  storeReady.resolve()
-  await drain()
-  assert.equal(f.sessions.length, 1)
-  assert.ok(f.calls.includes('session.start'))
-  assert.equal(f.children.length, 0)
-  prepared.resolve()
-  await drain()
-  assert.equal(
-    f.children.length,
-    0,
-    'session readiness is independently required',
-  )
-  ready.resolve()
-  assert.equal(await starting, true)
-  assert.equal(await f.overlay.isReady(), true)
-  assert.equal(f.children.length, 1)
-  const parse = f.calls.find((call) => call[0] === 'parse')
-  assert.deepEqual(parse.slice(1), [
-    ['--reshade-overlay'],
-    {
-      bundledRuntimeDirectory:
-        '/app/resources/app.asar.unpacked/node_modules/electron-game-overlay/dist/runtime/win32-x64/reshade',
-      runsRootDirectory: '/private/userData/experimental-game-overlay/runs',
-    },
-  ])
-  assert.deepEqual(f.calls.find((call) => call[0] === 'owner')[1], {
-    allowPrereleaseBroker: true,
+for (const [pathName, pathApi] of [
+  ['host', path],
+  ['win32', path.win32],
+]) {
+  test(`prewarms one session and launcher before arming only the new-process watcher (${pathName})`, async () => {
+    const ready = deferred(),
+      prepared = deferred(),
+      storeReady = deferred()
+    const f = fixture({ enabled: true, ready, prepared, storeReady, pathApi })
+    const starting = f.overlay.start()
+    assert.deepEqual(f.calls, [])
+    storeReady.resolve()
+    await drain()
+    assert.equal(f.sessions.length, 1)
+    assert.ok(f.calls.includes('session.start'))
+    assert.equal(f.children.length, 0)
+    prepared.resolve()
+    await drain()
+    assert.equal(
+      f.children.length,
+      0,
+      'session readiness is independently required',
+    )
+    ready.resolve()
+    assert.equal(await starting, true)
+    assert.equal(await f.overlay.isReady(), true)
+    assert.equal(f.children.length, 1)
+    const parse = f.calls.find((call) => call[0] === 'parse')
+    assert.deepEqual(parse.slice(1), [
+      ['--reshade-overlay'],
+      {
+        bundledRuntimeDirectory: pathApi.join(
+          '/app/resources/app.asar.unpacked/node_modules/electron-game-overlay',
+          'dist',
+          'runtime',
+          'win32-x64',
+          'reshade',
+        ),
+        runsRootDirectory: pathApi.join(
+          '/private/userData',
+          'experimental-game-overlay',
+          'runs',
+        ),
+      },
+    ])
+    assert.deepEqual(f.calls.find((call) => call[0] === 'owner')[1], {
+      allowPrereleaseBroker: true,
+    })
+    assert.equal(
+      f.children[0].file,
+      '/app/resources/app.asar.unpacked/node_modules/@packages/process-watcher/index.js',
+    )
+    assert.equal(f.children[0].options.stdio[3], 'ipc')
+    await f.overlay.start()
+    assert.equal(f.sessions.length, 1)
+    f.overlay.quit()
   })
-  assert.equal(
-    f.children[0].file,
-    '/app/resources/app.asar.unpacked/node_modules/@packages/process-watcher/index.js',
-  )
-  assert.equal(f.children[0].options.stdio[3], 'ipc')
-  await f.overlay.start()
-  assert.equal(f.sessions.length, 1)
-  f.overlay.quit()
-})
+}
 
 test('new-PID policy combines database rules, deduplicates failures, and cleans exact deletions', async () => {
   const f = fixture({ enabled: true })
