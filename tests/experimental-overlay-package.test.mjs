@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
-import { readFileSync } from 'node:fs'
+import { readFileSync, mkdtempSync, rmSync, readdirSync } from 'node:fs'
+import path from 'node:path'
+import os from 'node:os'
 import { createRequire } from 'node:module'
 import test from 'node:test'
 
@@ -58,6 +60,77 @@ test('Windows artifact builds exercise the experimental consumer inside packaged
       'pnpm test:experimental-overlay:runtime apps/app/dist_electron/win-unpacked/resources/app.asar',
     ),
   )
+})
+
+test('afterPack preserves every actual SDK file including sealed dependency notices', async () => {
+  const builder = require('../apps/app/electron-builder.config.js')
+  assert.equal(typeof builder.afterPack, 'function')
+  const temporary = mkdtempSync(path.join(os.tmpdir(), 'izabela-sdk-pack-'))
+  try {
+    const consumer = createRequire(new URL('apps/app/package.json', root))
+    const sdk = path.dirname(
+      consumer.resolve('electron-game-overlay/package.json'),
+    )
+    await builder.afterPack({
+      electronPlatformName: 'win32',
+      appOutDir: temporary,
+    })
+    const destination = path.join(
+      temporary,
+      'resources/app.asar.unpacked/node_modules/electron-game-overlay',
+    )
+    const files = readdirSync(sdk, { recursive: true, withFileTypes: true })
+      .filter((entry) => entry.isFile())
+      .map((entry) =>
+        path.relative(sdk, path.join(entry.parentPath, entry.name)),
+      )
+      .filter(
+        (file) =>
+          !file.startsWith(path.join('node_modules', '.bin') + path.sep),
+      )
+    assert.equal(files.length, 152)
+    assert.deepEqual(
+      readdirSync(destination, { recursive: true, withFileTypes: true })
+        .filter((entry) => entry.isFile())
+        .map((entry) =>
+          path.relative(destination, path.join(entry.parentPath, entry.name)),
+        )
+        .sort(),
+      [...files].sort(),
+    )
+    assert.ok(
+      files.includes(
+        path.join(
+          'dist/broker/win32-x64/node_modules/tslib/CopyrightNotice.txt',
+        ),
+      ),
+    )
+    for (const file of files)
+      assert.deepEqual(
+        readFileSync(path.join(destination, file)),
+        readFileSync(path.join(sdk, file)),
+        file,
+      )
+    const manifest = JSON.parse(
+      readFileSync(
+        path.join(destination, 'dist/broker/win32-x64/broker-manifest.json'),
+        'utf8',
+      ),
+    )
+    for (const file of manifest.files) {
+      const bytes = readFileSync(
+        path.join(destination, 'dist/broker/win32-x64', file.path),
+      )
+      assert.equal(
+        createHash('sha256').update(bytes).digest('hex'),
+        file.sha256,
+        file.path,
+      )
+    }
+    assert.equal(manifest.files.length, 48)
+  } finally {
+    rmSync(temporary, { recursive: true, force: true })
+  }
 })
 
 test('packaged experimental SDK remains outside ASAR for sealed broker and native executables', () => {
