@@ -43,7 +43,7 @@ import { useSpeechStore } from '@/features/speech/store'
 import { useSettingsStore } from '@/features/settings/store'
 import NvSpeechEngineInput from '@/features/speech/components/inputs/NvSpeechEngineInput.vue'
 import { socket } from '@/services'
-import { isGameOverlay } from '@/consts.ts'
+import { isGameOverlay, isExperimentalGameOverlay } from '@/consts.ts'
 import { useEventListener } from '@vueuse/core'
 
 const { ElectronMessengerWindow } = window
@@ -54,6 +54,13 @@ const settingsStore = useSettingsStore()
 const speechStore = useSpeechStore()
 const inputValue = ref('')
 const inputRef = computed(() => messengerInput.value?.input)
+
+if (isExperimentalGameOverlay) {
+  watch(inputRef, (input) => input?.focus(), {
+    flush: 'post',
+    immediate: true,
+  })
+}
 
 const onInputEsc = () => {
   ElectronMessengerWindow.hide()
@@ -114,11 +121,11 @@ useEventListener(offscreenFocusFix, 'click', () => {
 })
 
 if (isGameOverlay) {
-  window.addEventListener('focus', () => {
-    inputRef.value.focus()
+  useEventListener(window, 'focus', () => {
+    inputRef.value?.focus()
   })
-  window.addEventListener('blur', () => {
-    inputRef.value.blur()
+  useEventListener(window, 'blur', () => {
+    inputRef.value?.blur()
     if (settingsStore.clearMessageOnWindowHide) {
       inputValue.value = ''
     }

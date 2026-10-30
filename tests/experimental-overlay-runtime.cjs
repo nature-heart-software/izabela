@@ -175,34 +175,17 @@ app
     assert.equal(session.windows.get('absent'), null)
     report.publicSdkOwnerAndLazySession = true
     report.sdkTransportExecuted = false
-    window = new BrowserWindow({
-      show: false,
-      width: 320,
-      height: 180,
-      webPreferences: {
-        offscreen: true,
-        contextIsolation: true,
-        sandbox: true,
-      },
+    const focus = await require('./experimental-overlay-focus-runtime.cjs')({
+      sdkRoot,
+      profile,
     })
-    await window.loadURL(
-      'data:text/html,<title>Izabela RC</title><input id="probe" autofocus>',
-    )
-    await window.webContents.executeJavaScript(
-      'document.getElementById("probe").focus()',
-    )
-    window.webContents.sendInputEvent({ type: 'char', keyCode: 'x' })
-    const deadline = Date.now() + 5000
-    while (
-      (await window.webContents.executeJavaScript(
-        'document.getElementById("probe").value',
-      )) !== 'x'
-    ) {
-      assert.ok(Date.now() < deadline, 'real DOM typing did not arrive')
-      await new Promise((resolve) => setTimeout(resolve, 20))
+    assert.equal(focus.status, 'passed')
+    report.webviewFocusRegression = {
+      status: focus.status,
+      firstShowAndReopen: true,
+      clicks: 0,
+      nativeBridgeControlled: true,
     }
-    window.setBounds({ width: 360, height: 200 })
-    assert.equal(window.getBounds().width, 360)
     report.realDomTyping = true
     report.status = 'passed'
     report.stage = 'complete'

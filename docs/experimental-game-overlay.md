@@ -23,6 +23,15 @@ legacy, stop the game, select the existing **Game Overlay** option, and restart
 Izabela before launching it again. The legacy administrator confirmation is
 unchanged.
 
+## Keyboard focus
+
+The Experimental backend focuses the offscreen web view through the SDK and
+selects the messenger input directly when it becomes available, including the
+first opening. It does not use the invisible fullscreen focus button or move and
+click the system cursor. The legacy backend retains its existing workaround.
+The renderer uses the backend chosen when its window was created; changing a
+setting does not switch focus behavior before a restart.
+
 ## Boundary
 
 - Windows x64 host, supported Direct3D 9/10/11/12 games; x86/x64 runtime payloads

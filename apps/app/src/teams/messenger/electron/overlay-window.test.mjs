@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 import test from 'node:test'
 import loadTypescript from '../../../../../../tests/load-typescript.cjs'
 
-function fixture() {
+function fixture(experimental = false) {
   const screen = new EventEmitter()
   const windows = []
   const attached = []
@@ -25,6 +25,7 @@ function fixture() {
         getLargestMonitorSize: () => ({ width: 1920, height: 1080 }),
       },
       '@/electron/game-overlay-backend': {
+        isExperimental: experimental,
         createWindow() {
           const window = new EventEmitter()
           Object.assign(window, {
@@ -43,7 +44,8 @@ function fixture() {
             setSize() {
               assert.equal(this.destroyed, false)
             },
-            async loadURL() {
+            async loadURL(url) {
+              this.loadedURL = url
               if (failLoad) throw new Error('controlled load failure')
             },
           })
@@ -66,6 +68,17 @@ function fixture() {
     fail: () => (failLoad = true),
   }
 }
+
+test('only the experimental renderer gets an immutable backend query marker', async () => {
+  for (const experimental of [false, true]) {
+    const f = fixture(experimental)
+    const window = await f.createWindow('messenger-game-overlay')
+    const query = new URL(window.loadedURL).searchParams
+    assert.equal(query.has('game-overlay'), true)
+    assert.equal(query.has('experimental-game-overlay'), experimental)
+    window.destroy()
+  }
+})
 
 test('destroying an optional overlay removes its display listener', async () => {
   const f = fixture()

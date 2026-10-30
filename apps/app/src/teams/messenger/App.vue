@@ -2,6 +2,7 @@
   <ThemeProvider :theme="theme">
     <GlobalStyles ref="globalStyles">
       <button
+        v-if="!isExperimentalGameOverlay"
         v-show="displayOffscreenFocusFix"
         data-offscreen-focus-fix
         ref="offscreenFocusFix"
@@ -48,9 +49,9 @@ import {
 } from '@/teams/messenger/store'
 import NvDebug from '@/teams/messenger/components/NvDebug.vue'
 import { useSettingsStore } from '@/features/settings/store'
-import { ref, watch, provide, computed } from 'vue'
+import { ref, watch, provide, computed, onUnmounted } from 'vue'
 import { socket } from '@/services'
-import { isGameOverlay } from '@/consts.ts'
+import { isGameOverlay, isExperimentalGameOverlay } from '@/consts.ts'
 import { useDatabasesStore } from '@/features/databases/store'
 import takeRight from 'lodash/takeRight'
 import pkg from '@root/package.json'
@@ -93,10 +94,12 @@ window.addEventListener('keydown', (event) => {
   }
 })
 
-if (isGameOverlay) {
-  window.addEventListener('blur', () => {
+if (isGameOverlay && !isExperimentalGameOverlay) {
+  const rearmOffscreenFocusFix = () => {
     displayOffscreenFocusFix.value = true
-  })
+  }
+  window.addEventListener('blur', rearmOffscreenFocusFix)
+  onUnmounted(() => window.removeEventListener('blur', rearmOffscreenFocusFix))
 }
 
 const databasesStore = useDatabasesStore()

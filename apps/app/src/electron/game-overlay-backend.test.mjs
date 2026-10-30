@@ -74,6 +74,16 @@ test('backend choice stays frozen until restart and disabled input cannot leak',
   assert.deepEqual(f.calls, ['legacy:start'])
 })
 
+test('renderer backend identity remains frozen when settings change before restart', async () => {
+  for (const enabled of [false, true]) {
+    const f = fixture(enabled)
+    await f.overlay.start()
+    assert.equal(f.overlay.isExperimental, enabled)
+    f.store.enableExperimentalGameOverlay = !enabled
+    assert.equal(f.overlay.isExperimental, enabled)
+  }
+})
+
 test('experimental startup failure does not start legacy or reject app startup', async () => {
   const f = fixture(true)
   f.rc.start = async () => {

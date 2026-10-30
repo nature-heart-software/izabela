@@ -19,6 +19,11 @@ function choose() {
 }
 
 const gameOverlay = {
+  get isExperimental() {
+    return selected
+      ? experimentalSelected
+      : useGameOverlayStore().enableExperimentalGameOverlay
+  },
   get enabled() {
     if (quitting || failed) return false
     const store = useGameOverlayStore()
