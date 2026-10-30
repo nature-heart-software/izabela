@@ -9,7 +9,7 @@ import { useSettingsStore } from '@/features/settings/store'
 import { useHitboxesStore } from '@/modules/vue-hitboxes/hitboxes.store'
 import { Deferred } from '@packages/toolbox'
 import { getNativeWindowHandleInt } from '@/utils/electron-window'
-import gameOverlay from '@/electron/game-overlay.ts'
+import gameOverlay from '@/electron/game-overlay-backend'
 // @ts-ignore
 import { focusWindow } from 'forcefocus'
 import koffi from 'koffi'
@@ -29,7 +29,8 @@ export const ElectronMessengerWindow = () => {
   let hitboxesStore: ReturnType<typeof useHitboxesStore> | undefined
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
   let messengerWindowStore:
-    ReturnType<typeof useMessengerWindowStore> | undefined
+    | ReturnType<typeof useMessengerWindowStore>
+    | undefined
   const ready = Deferred<BrowserWindow>()
   const isReady = () => ready.promise
   let foregroundWindow: string | number | null = null

@@ -8,9 +8,11 @@ export const useGameOverlayStore = defineStore(
     const denylist = ref<string[]>([])
     const ignorelist = ref<string[]>([])
     const enableGameOverlay = ref(false)
+    const enableExperimentalGameOverlay = ref(false)
     /* OK THE ISSUE IS THAT THE FILE IS WRITTEN TWICE BECAUSE ALL STORES WRITE IN THE SAME FILE OH OH */
     return {
       enableGameOverlay,
+      enableExperimentalGameOverlay,
       allowlist,
       denylist,
       ignorelist,

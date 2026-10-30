@@ -418,6 +418,9 @@ importers:
       '@infisical/cli':
         specifier: ^0.43.40
         version: 0.43.91
+      '@types/micromatch':
+        specifier: 4.0.10
+        version: 4.0.10
       '@types/ws':
         specifier: ^8.5.4
         version: 8.18.1
@@ -460,6 +463,9 @@ importers:
       bindings:
         specifier: 1.5.0
         version: 1.5.0
+      electron-game-overlay:
+        specifier: file:../../vendor/electron-game-overlay-0.1.0-rc.1.tgz
+        version: file:vendor/electron-game-overlay-0.1.0-rc.1.tgz(electron@46.0.0-alpha.2)
       electron-postman:
         specifier: workspace:*
         version: link:../../packages/electron-postman
@@ -3675,6 +3681,9 @@ packages:
   '@types/body-parser@1.19.6':
     resolution: {integrity: sha512-HLFeCYgz89uk22N5Qg3dvGvsv46B8GLvKKo1zKG4NybA8U2DiEO3w9lqGg29t/tfLRJpJ6iQxnVw4OnB7MoM9g==}
 
+  '@types/braces@3.0.5':
+    resolution: {integrity: sha512-SQFof9H+LXeWNz8wDe7oN5zu7ket0qwMu5vZubW4GCJ8Kkeh6nBWUz87+KTz/G3Kqsrp0j/W253XJb3KMEeg3w==}
+
   '@types/cacheable-request@6.0.3':
     resolution: {integrity: sha512-IQ3EbTzGxIigb1I3qPZc1rWJnH0BmSKv5QYTalEwweFvyBDLSAe24zP0le/hyi7ecGfZVlIVAg4BZqb8WBwKqw==}
 
@@ -3782,6 +3791,9 @@ packages:
 
   '@types/mdx@2.0.14':
     resolution: {integrity: sha512-T48PeuJtvLosNTPVhfnIp3i/n3a4g4Bad7YCq5k64D4u7NwDrAotikQ+5+sjtUvBmxCMlbo3dVL+C2dP0rWHzg==}
+
+  '@types/micromatch@4.0.10':
+    resolution: {integrity: sha512-5jOhFDElqr4DKTrTEbnW8DZ4Hz5LRUEmyrGpCMrD/NphYv3nUnaF08xmSLx1rGGnyEs/kFnhiw6dCgcDqMr5PQ==}
 
   '@types/mime-types@2.1.4':
     resolution: {integrity: sha512-lfU4b34HOri+kAY5UheuFMWPDOI+OPceBSHZKp69gEyTL/mmJ4cnU6Y/rlme3UL3GyOn6Y42hyIEw0/q8sWx5w==}
@@ -5928,6 +5940,12 @@ packages:
 
   electron-devtools-installer@3.2.1:
     resolution: {integrity: sha512-FaCi+oDCOBTw0gJUsuw5dXW32b2Ekh5jO8lI1NRCQigo3azh2VogsIi0eelMVrP1+LkN/bewyH3Xoo1USjO0eQ==}
+
+  electron-game-overlay@file:vendor/electron-game-overlay-0.1.0-rc.1.tgz:
+    resolution: {integrity: sha512-flycqbYP7KzWiTTE0JCweLpeIS099Aprf6J/4+XGpwnIukw7+vX2wx1KxuGEPxWDoD10RpJG6ev4zcwVn5DWsw==, tarball: file:vendor/electron-game-overlay-0.1.0-rc.1.tgz}
+    version: 0.1.0-rc.1
+    peerDependencies:
+      electron: '>=39.1.0 <40'
 
   electron-log@4.4.8:
     resolution: {integrity: sha512-QQ4GvrXO+HkgqqEOYbi+DHL7hj5JM+nHi/j+qrN9zeeXVKy8ZABgbu4CnG+BBqDZ2+tbeq9tUC4DZfIWFU5AZA==}
@@ -15017,6 +15035,8 @@ snapshots:
       '@types/connect': 3.4.38
       '@types/node': 20.19.43
 
+  '@types/braces@3.0.5': {}
+
   '@types/cacheable-request@6.0.3':
     dependencies:
       '@types/http-cache-semantics': 4.2.0
@@ -15132,6 +15152,10 @@ snapshots:
   '@types/lodash@4.17.24': {}
 
   '@types/mdx@2.0.14': {}
+
+  '@types/micromatch@4.0.10':
+    dependencies:
+      '@types/braces': 3.0.5
 
   '@types/mime-types@2.1.4': {}
 
@@ -17870,6 +17894,11 @@ snapshots:
       semver: 7.8.4
       tslib: 2.8.1
       unzip-crx-3: 0.2.0
+
+  electron-game-overlay@file:vendor/electron-game-overlay-0.1.0-rc.1.tgz(electron@46.0.0-alpha.2):
+    dependencies:
+      electron: 46.0.0-alpha.2
+      tslib: 2.8.1
 
   electron-log@4.4.8: {}
 

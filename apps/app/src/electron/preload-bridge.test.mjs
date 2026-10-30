@@ -103,7 +103,7 @@ function mainFixture() {
     '@/features/speech/store': {},
     '@/modules/vue-hitboxes/hitboxes.store': {},
     '@/utils/electron-window': {},
-    '@/electron/game-overlay.ts': {},
+    '@/electron/game-overlay-backend': {},
     '@/features/display/utils': {},
     '@/modules/electron-keybinding/utils': {},
     '@/electron/events/main': {},

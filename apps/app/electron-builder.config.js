@@ -47,6 +47,7 @@ module.exports = {
   asarUnpack: [
     'node_modules/@nut-tree-fork/**/*',
     'node_modules/@packages/electron-game-overlay/**/*',
+    'node_modules/electron-game-overlay/**/*',
     'node_modules/@packages/native-keymap/**/*',
     'node_modules/@packages/process-watcher/**/*',
     'node_modules/@packages/win-mouse/**/*',

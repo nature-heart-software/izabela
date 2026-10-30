@@ -2,7 +2,7 @@ import { app, BrowserWindow, screen } from 'electron'
 import path from 'path'
 import { createProtocol, getLargestMonitorSize } from '@/electron/utils'
 import { ipcMain } from 'electron-postman'
-import gameOverlay from '@/electron/game-overlay'
+import gameOverlay from '@/electron/game-overlay-backend'
 
 const createWindow = async (name: string): Promise<BrowserWindow> => {
   const overlayDebug = import.meta.env.DEV ? false : false
@@ -71,10 +71,16 @@ const createWindow = async (name: string): Promise<BrowserWindow> => {
   }
 
   if (!overlayDebug) {
-    gameOverlay.isReady().then(() => {
-      if (!window.isDestroyed())
-        gameOverlay.addOverlayWindow(name, window, 0, 0)
-    })
+    gameOverlay
+      .isReady()
+      .then(() => {
+        if (!window.isDestroyed())
+          gameOverlay.addOverlayWindow(name, window, 0, 0)
+      })
+      .catch(() => {
+        if (!window.isDestroyed()) window.destroy()
+        console.error('[game-overlay] Backend unavailable; restart required')
+      })
   }
 
   return window

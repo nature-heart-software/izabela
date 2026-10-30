@@ -34,6 +34,8 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Check update policy
         run: pnpm test:updates
+      - name: Check experimental overlay integration
+        run: pnpm test:experimental-overlay
       - name: Build app without updates
         run: pnpm build
         env:
@@ -42,6 +44,15 @@ jobs:
           VITE_APP_ENCRYPTION_KEY: ${{ secrets.APP_ENCRYPTION_KEY }}
       - name: Check packaged native dependencies
         run: pnpm test:native apps/app/dist_electron/win-unpacked/resources/app.asar
+      - name: Check packaged experimental SDK and Electron
+        run: pnpm test:experimental-overlay:runtime apps/app/dist_electron/win-unpacked/resources/app.asar
+      - name: Upload experimental overlay results
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: experimental-overlay-results
+          path: coverage/experimental-overlay/*.json
+          if-no-files-found: warn
       - name: Upload Windows installer
         uses: actions/upload-artifact@v7.0.2
         with:

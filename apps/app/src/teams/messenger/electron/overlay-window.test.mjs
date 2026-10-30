@@ -9,8 +9,12 @@ function fixture() {
   const windows = []
   const attached = []
   let ready
+  let rejectReady
   let failLoad = false
-  const nativeReady = new Promise((resolve) => (ready = resolve))
+  const nativeReady = new Promise((resolve, reject) => {
+    ready = resolve
+    rejectReady = reject
+  })
   const createWindow = loadTypescript(
     fileURLToPath(new URL('./overlay-window.ts', import.meta.url)),
     {
@@ -20,7 +24,7 @@ function fixture() {
         createProtocol() {},
         getLargestMonitorSize: () => ({ width: 1920, height: 1080 }),
       },
-      '@/electron/game-overlay': {
+      '@/electron/game-overlay-backend': {
         createWindow() {
           const window = new EventEmitter()
           Object.assign(window, {
@@ -50,7 +54,7 @@ function fixture() {
         addOverlayWindow: (...args) => attached.push(args),
       },
     },
-    { __dirname: 'fixture' },
+    { __dirname: 'fixture', console: { error() {} } },
   ).default
   return {
     createWindow,
@@ -58,6 +62,7 @@ function fixture() {
     windows,
     attached,
     ready,
+    rejectReady,
     fail: () => (failLoad = true),
   }
 }
@@ -91,5 +96,15 @@ test('failed renderer loading destroys its window and removes display listeners'
     /controlled load failure/,
   )
   assert.equal(f.windows[0].isDestroyed(), true)
+  assert.equal(f.screen.listenerCount('display-metrics-changed'), 0)
+})
+
+test('failed backend readiness destroys the renderer instead of retaining it', async () => {
+  const f = fixture()
+  const window = await f.createWindow('messenger-game-overlay')
+  f.rejectReady(new Error('controlled startup failure'))
+  await new Promise(setImmediate)
+  assert.equal(window.isDestroyed(), true)
+  assert.equal(f.attached.length, 0)
   assert.equal(f.screen.listenerCount('display-metrics-changed'), 0)
 })

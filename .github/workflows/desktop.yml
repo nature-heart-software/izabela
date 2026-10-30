@@ -52,6 +52,8 @@ jobs:
         run: pnpm test:speech
       - name: Check app test contracts
         run: pnpm test:app:unit
+      - name: Check experimental overlay integration
+        run: pnpm test:experimental-overlay
       - name: Check transcription adapters and startup
         run: pnpm test:stt
       - name: Check OpenAI SDK model catalogs
@@ -107,6 +109,8 @@ jobs:
         run: pnpm test:native
       - name: Check packaged native dependencies
         run: pnpm test:native apps/app/dist_electron/win-unpacked/resources/app.asar
+      - name: Check packaged experimental SDK and Electron
+        run: pnpm test:experimental-overlay:runtime apps/app/dist_electron/win-unpacked/resources/app.asar
       - name: Check native cache restoration and invalidation
         run: pnpm test:native-cache
 

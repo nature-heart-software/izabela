@@ -9,25 +9,16 @@
               <NvGroup justify="apart">
                 <NvText type="label">Enable Game Overlay</NvText>
                 <NvSwitch
+                  role="switch"
+                  aria-label="Enable Game Overlay"
+                  :aria-checked="gameOverlayStore.enableGameOverlay"
                   :modelValue="gameOverlayStore.enableGameOverlay"
-                  @update:modelValue="
-                    (value) => {
-                      if (value) {
-                        confirmAdmin().then(({ type, close }) => {
-                          if (type === 'confirm') {
-                            gameOverlayStore.$patch({
-                              enableGameOverlay: value,
-                            })
-                            settingsStore.enableRunAsAdmin()
-                          }
-                          close()
-                        })
-                      } else {
-                        gameOverlayStore.$patch({
-                          enableGameOverlay: value,
-                        })
-                      }
-                    }
+                  @update:modelValue="setGameOverlay"
+                  @keydown.space.prevent="
+                    setGameOverlay(!gameOverlayStore.enableGameOverlay)
+                  "
+                  @keydown.enter.prevent="
+                    setGameOverlay(!gameOverlayStore.enableGameOverlay)
                   "
                 />
               </NvGroup>
@@ -37,9 +28,50 @@
             </NvStack>
           </NvGroup>
         </NvCard>
+        <NvCard>
+          <NvStack>
+            <NvGroup justify="apart">
+              <NvText type="label">Enable Experimental Game Overlay</NvText>
+              <NvSwitch
+                role="switch"
+                aria-label="Enable Experimental Game Overlay"
+                :aria-checked="gameOverlayStore.enableExperimentalGameOverlay"
+                :modelValue="gameOverlayStore.enableExperimentalGameOverlay"
+                @update:modelValue="setExperimentalGameOverlay"
+                @keydown.space.prevent="
+                  setExperimentalGameOverlay(
+                    !gameOverlayStore.enableExperimentalGameOverlay,
+                  )
+                "
+                @keydown.enter.prevent="
+                  setExperimentalGameOverlay(
+                    !gameOverlayStore.enableExperimentalGameOverlay,
+                  )
+                "
+              />
+            </NvGroup>
+            <NvText>
+              Experimental release candidate (RC) for supported Direct3D Windows
+              games. Enable before launching the game. Restart Izabela after
+              switching overlay backends or turning an overlay off.
+            </NvText>
+            <NvText>
+              Do not use with anti-cheat games or elevated game processes. This
+              option disables Run as Administrator. If Izabela is currently
+              elevated, quit and reopen it normally before using this backend.
+              Keep any existing ReShade installation; do not overwrite or
+              replace its files.
+            </NvText>
+          </NvStack>
+        </NvCard>
         <div class="pl-8">
           <NvStack spacing="4">
-            <template v-if="gameOverlayStore.enableGameOverlay">
+            <template
+              v-if="
+                gameOverlayStore.enableGameOverlay ||
+                gameOverlayStore.enableExperimentalGameOverlay
+              "
+            >
               <NvCard>
                 <NvStack spacing="5">
                   <NvText type="label">Allowlist</NvText>
@@ -131,6 +163,7 @@ import { computed } from 'vue'
 import { useConfirmStore } from '@/store/use-confirm-store.ts'
 import { useSettingsStore } from '@/features/settings/store'
 import { useConfirmAdmin } from '@/hooks/use-confirm-admin.ts'
+import { useMessengerStateStore } from '@/teams/messenger/store'
 
 const gameOverlayStore = useGameOverlayStore()
 const databasesStore = useDatabasesStore()
@@ -150,4 +183,33 @@ const gameOverlayAllowlistData = computed(
 
 const confirmAdmin = useConfirmAdmin()
 const settingsStore = useSettingsStore()
+const messengerStateStore = useMessengerStateStore()
+
+const setGameOverlay = (value: boolean) => {
+  if (value) {
+    confirmAdmin().then(({ type, close }) => {
+      if (type === 'confirm') {
+        gameOverlayStore.$patch({
+          enableGameOverlay: value,
+          enableExperimentalGameOverlay: false,
+        })
+        messengerStateStore.$patch({ markForRestart: true })
+        settingsStore.enableRunAsAdmin()
+      }
+      close()
+    })
+  } else {
+    gameOverlayStore.$patch({ enableGameOverlay: value })
+    messengerStateStore.$patch({ markForRestart: true })
+  }
+}
+
+const setExperimentalGameOverlay = (value: boolean) => {
+  if (value) settingsStore.disableRunAsAdmin()
+  gameOverlayStore.$patch({
+    enableExperimentalGameOverlay: value,
+    ...(value ? { enableGameOverlay: false } : {}),
+  })
+  messengerStateStore.$patch({ markForRestart: true })
+}
 </script>

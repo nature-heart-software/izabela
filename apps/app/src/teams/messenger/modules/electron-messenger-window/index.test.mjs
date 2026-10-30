@@ -47,7 +47,7 @@ function fixture() {
         },
       },
       '@/utils/electron-window': { getNativeWindowHandleInt: () => 1 },
-      '@/electron/game-overlay.ts': { isProcessHooked: () => false },
+      '@/electron/game-overlay-backend': { isProcessHooked: () => false },
       forcefocus: {
         focusWindow: () => {
           nativeFocuses++

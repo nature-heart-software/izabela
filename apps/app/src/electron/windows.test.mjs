@@ -11,7 +11,11 @@ const settle = async () => {
   await new Promise(setImmediate)
 }
 
-function fixture(enabled = false, overlayEnabled = false) {
+function fixture(
+  enabled = false,
+  overlayEnabled = false,
+  experimentalEnabled = false,
+) {
   const instances = new Map()
   const created = []
   const app = new EventEmitter()
@@ -23,6 +27,7 @@ function fixture(enabled = false, overlayEnabled = false) {
   })
   const store = reactive({
     enableGameOverlay: enabled,
+    enableExperimentalGameOverlay: experimentalEnabled,
     $whenReady: () => Promise.resolve(),
   })
   const settings = reactive({
@@ -53,6 +58,9 @@ function fixture(enabled = false, overlayEnabled = false) {
   }
   const noop = () => {}
   const nativeOverlay = {
+    get enabled() {
+      return store.enableGameOverlay || store.enableExperimentalGameOverlay
+    },
     start: noop,
     quit: noop,
     intercepting: false,
@@ -95,6 +103,7 @@ function fixture(enabled = false, overlayEnabled = false) {
     '@/teams/overlay/electron/background': { createOverlayWindow: create },
     './game-overlay': nativeOverlay,
     '@/electron/game-overlay.ts': nativeOverlay,
+    '@/electron/game-overlay-backend': nativeOverlay,
     '@/modules/electron-keybinding/utils.ts': {},
     '@/store/stores.ts': { loadStores: noop },
     '@/features/game-overlay/store': { useGameOverlayStore: () => store },
@@ -220,6 +229,20 @@ test('enabling the game overlay creates its renderer and disabling releases it',
     f.created.filter(({ name }) => name === 'messenger-game-overlay').length,
     2,
   )
+})
+
+test('experimental opt-in allocates its renderer while the legacy flag is off', async (t) => {
+  const f = fixture(false, false, true)
+  t.after(() => f.app.emit('before-quit'))
+  await f.controller.start()
+  await settle()
+  const windows = f.created.filter(
+    ({ name }) => name === 'messenger-game-overlay',
+  )
+  assert.equal(windows.length, 1)
+  f.store.enableExperimentalGameOverlay = false
+  await settle()
+  assert.equal(windows[0].window.isDestroyed(), true)
 })
 
 test('an enabled profile starts one overlay renderer', async (t) => {

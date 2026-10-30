@@ -195,6 +195,8 @@
     "test:speech": "node --test tests/speech-bundle.test.mjs tests/speech-providers.test.mjs apps/app/src/plugins/speech-engines/amazon-polly/hooks.test.mjs apps/app/src/utils/media-devices.test.mjs apps/app/src/teams/speech-worker/components/NvSpeechListener.test.mjs apps/app/src/teams/speech-worker/modules/electron-native-speech-recognition/index.test.mjs",
     "test:speech:runtime": "node tests/speech-runtime.cjs",
     "test:app:unit": "node --test packages/process-watcher/native.test.mjs apps/app/src/features/audio/hooks/devices.test.mjs apps/app/src/electron/events/renderer.test.mjs apps/app/src/teams/overlay/modules/electron-overlay-window/index.test.mjs apps/app/src/modules/vue-hitboxes/index.test.mjs tests/app/contracts.test.mjs apps/app/src/features/messages/store.test.mjs tests/app/recognition-adapters.test.mjs apps/app/src/teams/speech-worker/electron/window.test.mjs apps/app/src/teams/messenger/modules/electron-messenger-window/index.test.mjs apps/app/src/electron/windows.test.mjs apps/app/src/electron/game-overlay.test.mjs apps/app/src/modules/electron-window-manager/index.test.mjs apps/app/src/teams/messenger/electron/overlay-window.test.mjs apps/app/src/electron/preload-bridge.test.mjs apps/app/src/electron/bridge-contract.test.mjs tests/preload-plugins.test.mjs tests/preload-bundle.test.mjs tests/renderer-bundles.test.mjs packages/electron-game-overlay/bin/build.test.mjs",
+    "test:experimental-overlay": "node --test apps/app/src/electron/experimental-game-overlay.test.mjs apps/app/src/electron/game-overlay-backend.test.mjs apps/app/src/features/game-overlay/store/index.test.mjs apps/app/src/teams/messenger/views/NvSettingsGameOverlay.test.mjs tests/experimental-overlay-package.test.mjs",
+    "test:experimental-overlay:runtime": "node tests/experimental-overlay-runtime.cjs",
     "test:app": "node tests/app/run.cjs --build",
     "test:app:built": "node tests/app/run.cjs",
     "test:app:packaged": "node tests/app/run.cjs --app-root=apps/app/dist_electron/win-unpacked/resources/app.asar",
@@ -214,14 +216,15 @@
     "packages/*"
   ],
   "devDependencies": {
+    "@infisical/cli": "^0.43.40",
+    "@types/micromatch": "4.0.10",
+    "@types/ws": "^8.5.4",
     "@vitest/coverage-v8": "3.2.7",
+    "@vue/language-core": "~3.1.8",
     "@vue/test-utils": "2.5.1",
     "jsdom": "30.1.3",
-    "vitest": "3.2.7",
-    "@infisical/cli": "^0.43.40",
-    "@types/ws": "^8.5.4",
-    "@vue/language-core": "~3.1.8",
-    "nushell": "^0.110.0"
+    "nushell": "^0.110.0",
+    "vitest": "3.2.7"
   },
   "packageManager": "pnpm@11.2.2"
 }

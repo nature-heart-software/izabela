@@ -22,8 +22,7 @@ import registerElectronKeybinding from '@/modules/electron-keybinding/register'
 import registerElectronCache from '@/modules/electron-cache/register'
 import { stopMouse } from '@/modules/node-mouse'
 import { createOverlayWindow } from '@/teams/overlay/electron/background'
-import './game-overlay'
-import gameOverlay from '@/electron/game-overlay.ts'
+import gameOverlay from '@/electron/game-overlay-backend'
 import { gkl } from '@/modules/electron-keybinding/utils.ts'
 import { loadStores } from '@/store/stores.ts'
 import { writeFileSync, mkdirSync, existsSync } from 'node:fs'
@@ -85,7 +84,7 @@ const App = () => {
     if (quitting || stopGameOverlayWindowWatch) return
 
     stopGameOverlayWindowWatch = watch(
-      () => store.enableGameOverlay,
+      () => gameOverlay.enabled,
       (enabled) => {
         if (!enabled) {
           // Native interception may still be awaiting its acknowledgement.
@@ -100,7 +99,7 @@ const App = () => {
           createMessengerGameOverlayWindow,
         )
           .then(({ window }) => {
-            if (quitting || !store.enableGameOverlay) {
+            if (quitting || !gameOverlay.enabled) {
               window.destroy()
               return
             }
