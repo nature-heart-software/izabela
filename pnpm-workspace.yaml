@@ -18,6 +18,8 @@ overrides:
   'c12@3.3.4>magicast': '-'
 
 minimumReleaseAgeExclude:
+  # The vendored RC is hash-pinned and intentionally not published to npm.
+  - electron-game-overlay@0.1.0-rc.1
   - gelectron
   - electron@46.0.0-alpha.2
   - '@aws-sdk/client-cognito-identity@3.1157.0'

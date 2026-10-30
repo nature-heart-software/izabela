@@ -33,6 +33,16 @@ test('experimental SDK is the pinned complete RC tarball, distinct from legacy',
   )
 })
 
+test('unpublished vendored RC has only an exact-version release-age exception', () => {
+  const config = readFileSync(new URL('pnpm-workspace.yaml', root), 'utf8')
+  const exemptions = config
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => /^- ['"]?electron-game-overlay(?:@|['"]?$)/.test(line))
+  assert.deepEqual(exemptions, ['- electron-game-overlay@0.1.0-rc.1'])
+  assert.doesNotMatch(config, /^minimumReleaseAge:\s*0\s*$/m)
+})
+
 test('Windows artifact builds exercise the experimental consumer inside packaged Electron', () => {
   const pkg = JSON.parse(readFileSync(new URL('package.json', root), 'utf8'))
   assert.equal(
