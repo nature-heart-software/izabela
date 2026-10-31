@@ -1,5 +1,4 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
-import { fork, type ChildProcess } from 'child_process'
 import path from 'path'
 import micromatch from 'micromatch'
 import { watch, type WatchStopHandle } from 'vue'
@@ -16,6 +15,8 @@ import type {
   OverlaySession,
   ReShadeLaunchConfig,
   ReShadeOverlayLauncher,
+  observeOverlayProcesses,
+  OverlayProcessIdentity,
 } from 'electron-game-overlay'
 
 type WindowEntry = {
@@ -23,6 +24,13 @@ type WindowEntry = {
   owned: boolean
   wrapper?: ElectronOverlayWindow
   cleanup: () => void
+}
+type EarlyProcess = {
+  name: string
+  executablePath?: string
+  launcher?: ReShadeOverlayLauncher
+  pid?: number
+  disabled: boolean
 }
 const unpacked = (filename: string) =>
   filename.replace(/app\.asar([\\/])/, 'app.asar.unpacked$1')
@@ -37,8 +45,9 @@ class ExperimentalGameOverlay {
   private owner?: ElectronGameOverlay
   private session?: OverlaySession
   private prepared?: ReShadeOverlayLauncher
-  private child?: ChildProcess
+  private observer?: ReturnType<typeof observeOverlayProcesses>
   private launchers = new Map<number, ReShadeOverlayLauncher | undefined>()
+  private earlyProcesses = new Map<string, EarlyProcess>()
   private sdk?: typeof import('electron-game-overlay')
   private warnings = 0
   private config?: ReShadeLaunchConfig
@@ -116,40 +125,172 @@ class ExperimentalGameOverlay {
       this.active = true
       this.bindSession(session, generation)
       this.registerIPC(generation)
-      const child = (this.child = fork(
-        unpacked(require.resolve('@packages/process-watcher')),
-        [],
-        {
-          stdio: ['ignore', 'ignore', 'ignore', 'ipc'],
+      const processEvent = (type: string, identity: OverlayProcessIdentity) => {
+        if (!this.active || this.quitting || generation !== this.generation)
+          return
+        this.processEvent({
+          type,
+          payload: {
+            pid: identity.pid,
+            process: path.win32.basename(identity.executablePath),
+            filepath: identity.executablePath,
+          },
+        })
+      }
+      const observer = (this.observer = sdk.observeOverlayProcesses({
+        runtimeDirectory: config.runtimeDirectory,
+        onCreated: (identity) => processEvent('process-creation', identity),
+        onExited: (identity) => processEvent('process-deletion', identity),
+        onError: () => {
+          if (!this.active || generation !== this.generation) return
+          this.warn()
+          this.stopResources()
         },
-      ))
-      const onMessage = (event: unknown) => {
-        if (this.active && !this.quitting && generation === this.generation)
-          this.processEvent(event)
+      }))
+      // Only selectors fully authorized before creation can prearm injection.
+      // The SDK baselines existing processes for both observation and prearming.
+      const store = useGameOverlayStore()
+      const policy = () => {
+        const databases = useDatabasesStore().data
+        return JSON.stringify([
+          store.allowlist.filter(Boolean),
+          store.denylist.filter(Boolean),
+          (databases['game-overlay-denylist'] || []).filter(Boolean),
+        ])
       }
-      child.on('message', onMessage)
-      const onError = () => {
-        if (generation !== this.generation) return
-        this.warn()
-        this.stopResources()
+      const denies = [
+        ...store.denylist,
+        ...(useDatabasesStore().data['game-overlay-denylist'] || []),
+      ].filter(Boolean)
+      const early = new Map<string, EarlyProcess>()
+      for (const rule of store.allowlist) {
+        const normalized = rule.replace(/\\/g, '/')
+        if (
+          path.win32.isAbsolute(normalized) &&
+          !micromatch.scan(normalized).isGlob &&
+          /\.exe$/i.test(normalized) &&
+          this.isAllowed(normalized)
+        ) {
+          early.set(normalized.toLowerCase(), {
+            name: path.win32.basename(normalized).toLowerCase(),
+            executablePath: normalized,
+            disabled: false,
+          })
+        } else if (!denies.length) {
+          const name = /^\*\*\/([a-z0-9][a-z0-9 ._-]*\.exe)$/i.exec(rule)?.[1]
+          if (name && name.length <= 260)
+            early.set(name.toLowerCase(), {
+              name: name.toLowerCase(),
+              disabled: false,
+            })
+        }
       }
-      const onExit = () => {
-        if (this.child === child) this.child = undefined
-        onError()
-      }
-      child.on('error', onError)
-      child.on('exit', onExit)
-      this.subscriptions.push(() => {
-        child.removeListener('message', onMessage)
-        child.removeListener('error', onError)
-        child.removeListener('exit', onExit)
+      // A globally permitted basename already covers any exact path for it.
+      for (const [key, entry] of early)
+        if (entry.executablePath && early.has(entry.name)) early.delete(key)
+      const arming = Promise.all(
+        [...early].map(([key, entry]) => {
+          if (import.meta.env.DEV)
+            console.info('[experimental-game-overlay] Early target', {
+              name: entry.name,
+              exactPath: !!entry.executablePath,
+            })
+          this.earlyProcesses.set(key, entry)
+          return this.armEarlyProcess(entry, generation)
+        }),
+      ).then((results) => {
+        if (results.some((ready) => !ready))
+          throw new Error('Early overlay watcher failed')
       })
-      return true
+      const stopPolicy = watch(
+        policy,
+        () => {
+          if (import.meta.env.DEV && this.earlyProcesses.size)
+            console.info(
+              '[experimental-game-overlay] Early watchers cancelled after policy change',
+            )
+          // Cancel native name watchers before a changed policy can reject their target.
+          // Keep their names reserved for this run; an uncertain injection never retries.
+          this.earlyProcesses.forEach((entry) => {
+            entry.disabled = true
+            this.attempt(() => entry.launcher?.dispose())
+            if (entry.pid !== undefined) this.connected.delete(entry.pid)
+          })
+          if (this.earlyProcesses.size) this.stopIntercept()
+        },
+        { flush: 'sync' },
+      )
+      this.subscriptions.push(stopPolicy)
+      return (
+        (await this.waitFor(Promise.all([observer.ready, arming]))) &&
+        this.active &&
+        generation === this.generation
+      )
     } catch {
       if (generation !== this.generation) return false
       this.stopResources()
       this.warn()
       throw new Error('Experimental overlay startup failed')
+    }
+  }
+
+  private async armEarlyProcess(entry: EarlyProcess, generation: number) {
+    try {
+      const launcher =
+        this.prepared || new this.sdk!.ReShadeOverlayLauncher(this.config!)
+      this.prepared = undefined
+      entry.launcher = launcher
+      await launcher.prepare()
+      if (entry.disabled || !this.active || generation !== this.generation)
+        return false
+      return await new Promise<boolean>((resolve) => {
+        const stop = launcher.onEvent((event) => {
+          if (
+            !this.active ||
+            generation !== this.generation ||
+            entry.disabled ||
+            entry.launcher !== launcher
+          )
+            return
+          if (event.type === 'injector-watcher-ready') {
+            if (import.meta.env.DEV)
+              console.info(
+                '[experimental-game-overlay] Early watcher armed',
+                entry.name,
+              )
+            resolve(true)
+          }
+          if (event.type === 'injector-returned') {
+            entry.pid = event.result.injectorTargetPid
+            this.launchers.set(entry.pid, launcher)
+            if (import.meta.env.DEV)
+              console.info(
+                '[experimental-game-overlay] Early injector returned',
+                { name: entry.name, pid: entry.pid },
+              )
+          }
+        })
+        void launcher
+          .attach(this.session!, {
+            processName: entry.name,
+            ...(entry.executablePath
+              ? { executablePath: entry.executablePath }
+              : {}),
+          })
+          .catch((error: unknown) => {
+            resolve(false)
+            if (
+              this.active &&
+              generation === this.generation &&
+              !entry.disabled
+            )
+              this.warn(error)
+          })
+          .finally(stop)
+      })
+    } catch (error) {
+      if (this.active && generation === this.generation) this.warn(error)
+      return false
     }
   }
 
@@ -177,6 +318,16 @@ class ExperimentalGameOverlay {
         this.hasSurface = false
         this.stopIntercept()
       }
+      const early = [...this.earlyProcesses.values()].find(
+        (entry) => entry.pid === pid,
+      )
+      if (early && !early.disabled && this.active && !this.quitting) {
+        early.pid = undefined
+        early.launcher = undefined
+        void this.armEarlyProcess(early, this.generation).then((ready) => {
+          if (!ready) early.disabled = true
+        })
+      }
       return
     }
     if (event.type !== 'process-creation' || this.launchers.has(pid)) return
@@ -188,25 +339,19 @@ class ExperimentalGameOverlay {
       path.win32.basename(filepath).toLowerCase() !== processName.toLowerCase()
     )
       return
-    const store = useGameOverlayStore(),
-      databases = useDatabasesStore().data
-    if (
-      !micromatch.isMatch(
-        filepath,
-        [
-          ...store.allowlist,
-          ...(databases['game-overlay-allowlist'] || []),
-        ].filter(Boolean),
-      ) ||
-      micromatch.isMatch(
-        filepath,
-        [
-          ...store.denylist,
-          ...(databases['game-overlay-denylist'] || []),
-        ].filter(Boolean),
-      )
-    )
+    if (!this.isAllowed(filepath)) return
+    const early = this.earlyProcess(filepath)
+    if (early) {
+      if (
+        !early.disabled &&
+        early.launcher &&
+        (early.pid === undefined || early.pid === pid)
+      ) {
+        early.pid = pid
+        this.launchers.set(pid, early.launcher)
+      }
       return
+    }
     this.launchers.set(pid, undefined)
     // Retain even failed launchers until authoritative deletion; never retry uncertainty.
     const generation = this.generation
@@ -217,23 +362,64 @@ class ExperimentalGameOverlay {
       this.launchers.set(pid, launcher)
       void launcher
         .attach(this.session!, { pid, processName, executablePath: filepath })
-        .catch(() => {
+        .catch((error: unknown) => {
           if (
             this.active &&
             generation === this.generation &&
             this.launchers.get(pid) === launcher
           )
-            this.warn()
+            this.warn(error)
         })
     } catch {
       this.warn()
     }
   }
 
-  private warn() {
+  private earlyProcess(filepath: string) {
+    return (
+      this.earlyProcesses.get(filepath.replace(/\\/g, '/').toLowerCase()) ||
+      this.earlyProcesses.get(path.win32.basename(filepath).toLowerCase())
+    )
+  }
+
+  private isAllowed(filepath: string) {
+    const store = useGameOverlayStore(),
+      databases = useDatabasesStore().data
+    const options = { windows: true, nocase: true, dot: true }
+    return (
+      micromatch.isMatch(
+        filepath.replace(/\\/g, '/'),
+        [...store.allowlist, ...(databases['game-overlay-allowlist'] || [])]
+          .filter(Boolean)
+          .map((rule) => rule.replace(/\\/g, '/')),
+        options,
+      ) &&
+      !micromatch.isMatch(
+        filepath.replace(/\\/g, '/'),
+        [...store.denylist, ...(databases['game-overlay-denylist'] || [])]
+          .filter(Boolean)
+          .map((rule) => rule.replace(/\\/g, '/')),
+        options,
+      )
+    )
+  }
+
+  private warn(error?: unknown) {
+    // Log only SDK-owned classifications, never paths, discovery tokens or raw errors.
+    const diagnostic = this.sdk?.isReShadeOperationError(error)
+      ? error.diagnostic
+      : undefined
     if (this.warnings++ < 5)
       console.warn(
         '[experimental-game-overlay] Runtime operation failed; no automatic retry.',
+        diagnostic
+          ? {
+              code: diagnostic.code,
+              stage: diagnostic.stage,
+              pid: diagnostic.pid,
+              runtimeStartupCode: diagnostic.runtimeStartupCode,
+            }
+          : {},
       )
   }
 
@@ -264,8 +450,33 @@ class ExperimentalGameOverlay {
       session.on('diagnostic', ({ severity }) => {
         if (current() && severity === 'error') this.warn()
       }),
-      session.on('targetConnected', ({ pid }) => {
-        if (current() && this.launchers.has(pid)) this.connected.add(pid)
+      session.on('targetConnected', ({ pid, executablePath }) => {
+        if (!current()) return
+        if (import.meta.env.DEV)
+          console.info('[experimental-game-overlay] Target connected', { pid })
+        const early =
+          typeof executablePath === 'string'
+            ? this.earlyProcess(executablePath)
+            : undefined
+        if (early?.disabled) return
+        // Authentication can arrive before the native watcher publishes its result.
+        if (
+          !this.launchers.has(pid) &&
+          typeof executablePath === 'string' &&
+          path.win32.isAbsolute(executablePath)
+        ) {
+          const entry = this.earlyProcess(executablePath)
+          if (
+            entry?.launcher &&
+            !entry.disabled &&
+            (entry.pid === undefined || entry.pid === pid) &&
+            this.isAllowed(executablePath)
+          ) {
+            entry.pid = pid
+            this.launchers.set(pid, entry.launcher)
+          }
+        }
+        if (this.launchers.has(pid)) this.connected.add(pid)
       }),
       ...(['targetDisconnected', 'targetTransportLost'] as const).map((event) =>
         session.on(event, ({ pid }) => {
@@ -281,6 +492,11 @@ class ExperimentalGameOverlay {
       }),
       session.on('targetSurfaceChanged', ({ pid }) => {
         if (!current() || !this.connected.has(pid)) return
+        if (import.meta.env.DEV)
+          console.info('[experimental-game-overlay] Target surface ready', {
+            pid,
+            rendererReady: !!this.renderer(),
+          })
         this.hasSurface = true
         this.emitResize()
       }),
@@ -429,8 +645,18 @@ class ExperimentalGameOverlay {
       !useGameOverlayStore().enableExperimentalGameOverlay ||
       !this.connected.size ||
       !entry?.wrapper
-    )
+    ) {
+      if (import.meta.env.DEV)
+        console.info('[experimental-game-overlay] Interception unavailable', {
+          active: this.active,
+          targets: this.connected.size,
+          rendererReady: !!entry,
+          wrapperReady: !!entry?.wrapper,
+        })
       return
+    }
+    if (import.meta.env.DEV)
+      console.info('[experimental-game-overlay] Starting interception')
     this.requested = true
     try {
       entry.wrapper.show()
@@ -477,15 +703,19 @@ class ExperimentalGameOverlay {
     this.windows.clear()
     this.connected.clear()
     this.attempt(() => {
-      this.child?.kill()
+      this.observer?.dispose()
     })
-    this.child = undefined
+    this.observer = undefined
     this.attempt(() => this.prepared?.dispose())
     this.prepared = undefined
     this.launchers.forEach((launcher) =>
       this.attempt(() => launcher?.dispose()),
     )
     this.launchers.clear()
+    this.earlyProcesses.forEach((entry) =>
+      this.attempt(() => entry.launcher?.dispose()),
+    )
+    this.earlyProcesses.clear()
     this.attempt(() => this.session?.close())
     this.session = undefined
     this.attempt(() => this.owner?.dispose())

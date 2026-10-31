@@ -33,9 +33,11 @@ function fixture({
   storeReady,
   failAt,
   pathApi = path,
+  observerReady = true,
+  earlyWatcherReady = true,
 } = {}) {
   const calls = [],
-    children = [],
+    observers = [],
     launchers = [],
     sessions = [],
     wrappers = [],
@@ -153,6 +155,11 @@ function fixture({
       this.config = config
       this.attachments = []
       launchers.push(this)
+      this.events = new Set()
+    }
+    onEvent(callback) {
+      this.events.add(callback)
+      return () => this.events.delete(callback)
     }
     prepare() {
       calls.push('prepare')
@@ -160,6 +167,15 @@ function fixture({
     }
     attach(session, target) {
       this.attachments.push({ session, target: { ...target } })
+      if (target.pid === undefined) {
+        this.pendingAttach = deferred()
+        if (earlyWatcherReady)
+          queueMicrotask(() => {
+            for (const event of this.events)
+              event({ type: 'injector-watcher-ready' })
+          })
+        return this.pendingAttach.promise
+      }
       return this.result?.promise ?? Promise.resolve({ pid: target.pid })
     }
     confirmTargetExited(pid) {
@@ -167,9 +183,31 @@ function fixture({
     }
     dispose() {
       this.disposed = true
+      this.pendingAttach?.reject(new Error('Disposed'))
     }
   }
   const sdk = {
+    observeOverlayProcesses(options) {
+      if (failAt === 'observe') throw new Error('SECRET')
+      calls.push('observe')
+      const readiness = deferred()
+      void readiness.promise.catch(() => {})
+      const observer = {
+        options,
+        ready: readiness.promise,
+        resolveReady: readiness.resolve,
+        disposals: 0,
+        dispose() {
+          if (this.disposals) return
+          this.disposals++
+          readiness.reject(new Error('Disposed'))
+        },
+      }
+      observers.push(observer)
+      if (observerReady) queueMicrotask(readiness.resolve)
+      return observer
+    },
+    isReShadeOperationError: (error) => error?.sdkError === true,
     ElectronGameOverlay: class {
       constructor(options) {
         calls.push(['owner', { ...options }])
@@ -185,7 +223,10 @@ function fixture({
     parseReShadeLaunchConfig(argv, options) {
       calls.push(['parse', [...argv], { ...options }])
       if (failAt === 'parse') throw new Error('SECRET')
-      return { runtimeDirectory: options.bundledRuntimeDirectory }
+      return {
+        runtimeDirectory: options.bundledRuntimeDirectory,
+        injectorPath: 'C:/sdk/inject.exe',
+      }
     },
   }
   const boundary = (id) => {
@@ -199,23 +240,6 @@ function fixture({
         BrowserWindow,
         ipcMain,
         app: { getPath: () => '/private/userData' },
-      },
-      child_process: {
-        fork: (file, args, options) => {
-          if (failAt === 'fork') throw new Error('SECRET')
-          calls.push('fork')
-          const child = Object.assign(new EventEmitter(), {
-            file,
-            args,
-            options,
-            kills: 0,
-            kill() {
-              this.kills++
-            },
-          })
-          children.push(child)
-          return child
-        },
       },
       vue: { watch },
       '@/features/game-overlay/store': { useGameOverlayStore: () => store },
@@ -237,8 +261,6 @@ function fixture({
     calls.push(['resolve', id])
     if (id === 'electron-game-overlay/package.json')
       return '/app/resources/app.asar/node_modules/electron-game-overlay/package.json'
-    if (id === '@packages/process-watcher')
-      return '/app/resources/app.asar/node_modules/@packages/process-watcher/index.js'
     throw new Error(`Forbidden resolution: ${id}`)
   }
   assert.ok(existsSync(filename), 'experimental adapter must exist')
@@ -261,22 +283,20 @@ function fixture({
     filepath = 'C:/Games/game.exe',
     type = 'process-creation',
   ) =>
-    children.at(-1).emit('message', {
-      type,
-      payload: {
+    observers
+      .at(-1)
+      .options[type === 'process-creation' ? 'onCreated' : 'onExited']({
         pid,
-        process: path.win32.basename(filepath),
-        filepath,
-        user: 'DO NOT LOG',
-      },
-    })
+        executablePath: filepath,
+        creationTime100ns: '133000000000000000',
+      })
   return {
     sdk,
     overlay,
     store,
     database,
     calls,
-    children,
+    observers,
     launchers,
     sessions,
     wrappers,
@@ -304,18 +324,18 @@ for (const [pathName, pathApi] of [
     await drain()
     assert.equal(f.sessions.length, 1)
     assert.ok(f.calls.includes('session.start'))
-    assert.equal(f.children.length, 0)
+    assert.equal(f.observers.length, 0)
     prepared.resolve()
     await drain()
     assert.equal(
-      f.children.length,
+      f.observers.length,
       0,
       'session readiness is independently required',
     )
     ready.resolve()
     assert.equal(await starting, true)
     assert.equal(await f.overlay.isReady(), true)
-    assert.equal(f.children.length, 1)
+    assert.equal(f.observers.length, 1)
     const parse = f.calls.find((call) => call[0] === 'parse')
     assert.deepEqual(parse.slice(1), [
       ['--reshade-overlay'],
@@ -338,10 +358,10 @@ for (const [pathName, pathApi] of [
       allowPrereleaseBroker: true,
     })
     assert.equal(
-      f.children[0].file,
-      '/app/resources/app.asar.unpacked/node_modules/@packages/process-watcher/index.js',
+      f.observers[0].options.runtimeDirectory,
+      f.launchers[0].config.runtimeDirectory,
     )
-    assert.equal(f.children[0].options.stdio[3], 'ipc')
+    assert.equal(f.calls.filter((call) => call === 'observe').length, 1)
     await f.overlay.start()
     assert.equal(f.sessions.length, 1)
     f.overlay.quit()
@@ -362,12 +382,6 @@ test('new-PID policy combines database rules, deduplicates failures, and cleans 
   f.event(-1)
   f.event(1.5)
   f.event(47, 'relative.exe')
-  f.children[0].emit('message', {
-    type: 'process-creation',
-    payload: { pid: 48, process: 'other.exe', filepath: 'C:/Games/game.exe' },
-  })
-  f.children[0].emit('message', { type: 'process-creation' })
-  f.children[0].emit('message', null)
   assert.equal(first.attachments.length, 1)
   assert.deepEqual(first.attachments[0].target, {
     pid: 42,
@@ -387,7 +401,7 @@ test('new-PID policy combines database rules, deduplicates failures, and cleans 
   f.store.allowlist.push('E:/Games/**')
   f.event(49, 'E:/Games/new.exe')
   assert.equal(
-    f.children.length,
+    f.observers.length,
     1,
     'policy changes do not restart watcher or scan',
   )
@@ -518,27 +532,27 @@ test('disabling cancels pending readiness and quit gates every retained late cal
   ready.resolve()
   prepared.resolve()
   await drain()
-  assert.equal(f.children.length, 0)
+  assert.equal(f.observers.length, 0)
   f.store.enableExperimentalGameOverlay = true
   await drain()
   assert.equal(await f.overlay.isReady(), true)
-  assert.equal(f.children.length, 1)
-  const child = f.children[0],
+  assert.equal(f.observers.length, 1)
+  const observer = f.observers[0],
     session = f.sessions[1]
-  const message = child.listeners('message')[0],
+  const created = observer.options.onCreated,
     connected = session.listeners('targetConnected')[0],
     input = f.ipcMain.listeners('start').at(-1)
   f.event(42)
   f.overlay.quit()
   f.overlay.quit()
-  assert.equal(child.kills, 1)
-  assert.equal(child.listenerCount('message'), 0)
+  assert.equal(observer.disposals, 1)
   assert.equal(session.eventNames().length, 0)
   assert.equal(await f.overlay.isReady(), false)
   const before = f.calls.length
-  message({
-    type: 'process-creation',
-    payload: { pid: 55, process: 'game.exe', filepath: 'C:/Games/game.exe' },
+  created({
+    pid: 55,
+    executablePath: 'C:/Games/game.exe',
+    creationTime100ns: '133000000000000001',
   })
   connected({ pid: 42 })
   input()
@@ -551,7 +565,7 @@ test('disabling cancels pending readiness and quit gates every retained late cal
 })
 
 test('startup failures reject sanitized readiness and close every allocated resource', async () => {
-  for (const failAt of ['require', 'parse', 'ready', 'prepare', 'fork']) {
+  for (const failAt of ['require', 'parse', 'ready', 'prepare', 'observe']) {
     const ready = deferred(),
       prepared = deferred()
     const f = fixture({ enabled: true, ready, prepared, failAt })
@@ -602,24 +616,24 @@ test('authoritative deletion clears hooked/input state and late launcher rejecti
   assert.equal(f.logs.length, before)
 })
 
-test('watcher errors and exit fail closed without restarting or logging process state', async () => {
-  for (const event of ['error', 'exit']) {
-    const f = fixture({ enabled: true })
-    await f.overlay.start()
-    const child = f.children[0]
-    assert.doesNotThrow(() =>
-      child.emit(event, new Error('SECRET account/path'), 1),
-    )
-    assert.equal(await f.overlay.isReady(), false)
-    assert.equal(f.sessions[0].closed, true)
-    assert.equal(child.kills, event === 'error' ? 1 : 0)
-    f.store.allowlist.push('**')
-    await drain()
-    assert.equal(f.children.length, 1)
-    assert.ok(f.logs.length > 0)
-    assert.ok(!JSON.stringify(f.logs).includes('SECRET'))
-    f.overlay.quit()
-  }
+test('public observer failure stops the session without fabricating target exit or retrying', async () => {
+  const f = fixture({ enabled: true })
+  await f.overlay.start()
+  f.event(42)
+  const observer = f.observers[0]
+  assert.doesNotThrow(() =>
+    observer.options.onError(new Error('SECRET account/path')),
+  )
+  assert.equal(await f.overlay.isReady(), false)
+  assert.equal(f.sessions[0].closed, true)
+  assert.equal(observer.disposals, 1)
+  assert.equal(f.launchers[0].exited, undefined)
+  f.store.allowlist.push('**')
+  await drain()
+  assert.equal(f.observers.length, 1)
+  assert.ok(f.logs.length > 0)
+  assert.ok(!JSON.stringify(f.logs).includes('SECRET'))
+  f.overlay.quit()
 })
 
 test('diagnostic bursts are bounded and input failure releases/hides before returning', async () => {
@@ -673,7 +687,7 @@ test('teardown attempts all owned resources despite boundary errors and leaves c
   assert.equal(caller.webContents.listenerCount('did-finish-load'), 0)
   assert.equal(f.wrappers[1].destroyed, true)
   assert.equal(f.sessions[0].closed, true)
-  assert.equal(f.children[0].kills, 1)
+  assert.equal(f.observers[0].disposals, 1)
   assert.ok(f.calls.includes('owner.dispose'))
   assert.ok(!JSON.stringify(f.logs).includes('SECRET'))
 })
@@ -797,7 +811,7 @@ test('unexpected public session closure tears down its retained watcher without 
   await f.overlay.start()
   f.sessions[0].close()
   assert.equal(await f.overlay.isReady(), false)
-  assert.equal(f.children[0].kills, 1)
+  assert.equal(f.observers[0].disposals, 1)
   assert.deepEqual(f.ipcMain.listeners('start'), [f.unrelated])
   await f.overlay.start()
   assert.equal(f.sessions.length, 1)
@@ -854,4 +868,241 @@ test('disabled and non-Windows startup never loads SDK or starts native work', a
     assert.equal(await f.overlay.isReady(), false)
     f.overlay.quit()
   }
+})
+
+test('attachment failures preserve SDK classifications without logging private error fields', async () => {
+  const f = fixture({ enabled: true })
+  await f.overlay.start()
+  f.launchers[0].result = deferred()
+  f.event(42)
+  f.launchers[0].result.reject({
+    sdkError: true,
+    message: 'SECRET',
+    diagnostic: {
+      code: 'runtime-initialization-timeout',
+      stage: 'runtime-initialization',
+      pid: 42,
+      runtimeStartupCode: 'not-observed',
+      evidence: { runDirectory: 'SECRET' },
+    },
+  })
+  await drain()
+  assert.deepEqual(
+    { ...f.logs[0][1] },
+    {
+      code: 'runtime-initialization-timeout',
+      stage: 'runtime-initialization',
+      pid: 42,
+      runtimeStartupCode: 'not-observed',
+    },
+  )
+  assert.ok(!JSON.stringify(f.logs).includes('SECRET'))
+  f.overlay.quit()
+})
+
+test('readiness waits for the native observer handshake and quit cancels that wait', async () => {
+  for (const cancel of [false, true]) {
+    const f = fixture({ enabled: true, observerReady: false })
+    let settled = false
+    const starting = f.overlay.start().then((result) => {
+      settled = true
+      return result
+    })
+    await drain()
+    assert.equal(f.observers.length, 1)
+    assert.equal(settled, false)
+    if (cancel) f.overlay.quit()
+    else f.observers[0].resolveReady()
+    assert.equal(await starting, !cancel)
+    f.overlay.quit()
+  }
+})
+
+function earlyFixture(options) {
+  const f = fixture({ enabled: true, ...options })
+  f.store.allowlist = ['**/fast.exe']
+  f.store.denylist = []
+  f.database.data['game-overlay-denylist'] = []
+  return f
+}
+
+test('explicit basename rules arm before readiness and never start a competing exact-PID injection', async () => {
+  const f = earlyFixture()
+  assert.equal(await f.overlay.start(), true)
+  const launcher = f.launchers[0]
+  assert.deepEqual(
+    { ...launcher.attachments[0].target },
+    { processName: 'fast.exe' },
+  )
+  const window = f.overlay.createWindow('messenger-game-overlay', {})
+  f.overlay.addOverlayWindow('messenger-game-overlay', window)
+  window.finishLoad()
+  f.event(42, 'C:\\Users\\User\\.games\\FAST.EXE')
+  assert.equal(launcher.attachments.length, 1)
+  assert.equal(f.launchers.length, 1)
+  f.sessions[0].emit('targetConnected', {
+    pid: 42,
+    executablePath: 'C:\\Users\\User\\.games\\FAST.EXE',
+  })
+  assert.equal(f.overlay.isProcessHooked(42), true)
+  f.overlay.startIntercept()
+  assert.deepEqual(f.calls.slice(-3), ['show', 'focus', 'intercept'])
+  f.overlay.quit()
+  await drain()
+  assert.equal(launcher.events.size, 0)
+})
+
+test('early authentication can precede watcher output and confirmed exit rearms a fresh launcher', async () => {
+  const f = earlyFixture()
+  await f.overlay.start()
+  const window = f.overlay.createWindow('messenger-game-overlay', {})
+  f.overlay.addOverlayWindow('messenger-game-overlay', window)
+  window.finishLoad()
+  f.sessions[0].emit('targetConnected', {
+    pid: 42,
+    executablePath: 'C:/Games/fast.exe',
+  })
+  assert.equal(f.overlay.isProcessHooked(42), true)
+  f.event(42, 'C:/Games/fast.exe')
+  assert.equal(f.launchers.length, 1)
+  f.event(42, 'C:/Games/fast.exe', 'process-deletion')
+  await drain()
+  assert.equal(f.launchers[0].exited, 42)
+  assert.equal(f.launchers[0].disposed, true)
+  assert.equal(f.launchers.length, 2)
+  assert.deepEqual(
+    { ...f.launchers[1].attachments[0].target },
+    { processName: 'fast.exe' },
+  )
+  f.event(43, 'C:/Games/fast.exe')
+  assert.equal(f.launchers.length, 2)
+  f.overlay.quit()
+})
+
+test('restricted paths, wildcard basenames and either denylist never authorize a native name watcher', async () => {
+  for (const policy of [
+    'folder',
+    'glob',
+    'deny',
+    'database-deny',
+    'database-name',
+  ]) {
+    const f = earlyFixture()
+    if (policy === 'folder') f.store.allowlist = ['C:/Games/*.exe']
+    if (policy === 'glob') f.store.allowlist = ['**/fast*.exe']
+    if (policy === 'deny') f.store.denylist = ['**/protected/**']
+    if (policy === 'database-deny')
+      f.database.data['game-overlay-denylist'] = ['**/protected/**']
+    if (policy === 'database-name') {
+      f.store.allowlist = []
+      f.database.data['game-overlay-allowlist'] = ['**/fast.exe']
+    }
+    await f.overlay.start()
+    assert.equal(f.launchers[0].attachments.length, 0, policy)
+    f.event(42, 'C:/Games/fast.exe')
+    assert.equal(f.launchers[0].attachments[0].target.pid, 42, policy)
+    f.overlay.quit()
+  }
+})
+
+test('an exact executable prearms only its permitted path while retaining unrelated deny rules', async () => {
+  const f = fixture({ enabled: true })
+  f.store.allowlist = ['C:\\Games\\fast.exe']
+  assert.equal(await f.overlay.start(), true)
+  const window = f.overlay.createWindow('messenger-game-overlay', {})
+  f.overlay.addOverlayWindow('messenger-game-overlay', window)
+  window.finishLoad()
+  const launcher = f.launchers[0]
+  assert.deepEqual(launcher.attachments[0].target, {
+    processName: 'fast.exe',
+    executablePath: 'C:/Games/fast.exe',
+  })
+  f.event(42, 'C:\\Games\\fast.exe')
+  assert.equal(
+    launcher.attachments.length,
+    1,
+    'no competing exact-PID attachment',
+  )
+  f.sessions[0].emit('targetConnected', {
+    pid: 42,
+    executablePath: 'C:\\Games\\fast.exe',
+  })
+  assert.equal(f.overlay.isProcessHooked(42), true)
+  f.event(42, 'C:\\Games\\fast.exe', 'process-deletion')
+  await drain()
+  assert.equal(
+    f.launchers[1].attachments[0].target.executablePath,
+    'C:/Games/fast.exe',
+  )
+  f.overlay.quit()
+})
+
+test('a denied exact executable never prearms and a global basename does not duplicate exact watchers', async () => {
+  const denied = fixture({ enabled: true })
+  denied.store.allowlist = ['C:/Games/blocked.exe']
+  await denied.overlay.start()
+  assert.equal(denied.launchers[0].attachments.length, 0)
+  denied.event(42, 'C:/Games/blocked.exe')
+  assert.equal(denied.launchers[0].attachments.length, 0)
+  denied.overlay.quit()
+  const f = earlyFixture()
+  f.store.allowlist.push('C:/Games/fast.exe', 'c:/games/fast.exe')
+  await f.overlay.start()
+  assert.equal(f.launchers.length, 1)
+  assert.deepEqual(f.launchers[0].attachments[0].target, {
+    processName: 'fast.exe',
+  })
+  f.overlay.quit()
+})
+
+test('policy edits cancel early injection until restart', async () => {
+  const f = earlyFixture()
+  await f.overlay.start()
+  const launcher = f.launchers[0]
+  f.store.denylist.push('**/elsewhere/**')
+  assert.equal(launcher.disposed, true, 'policy change cancels synchronously')
+  f.event(42, 'C:/Games/fast.exe')
+  await drain()
+  assert.equal(
+    f.launchers.length,
+    1,
+    'uncertain watcher is never replaced automatically',
+  )
+  assert.equal(launcher.attachments.length, 1)
+  f.sessions[0].emit('targetConnected', {
+    pid: 42,
+    executablePath: 'C:/Games/fast.exe',
+  })
+  assert.equal(f.overlay.isProcessHooked(42), false)
+  f.overlay.quit()
+})
+
+test('quit cancels held native-name readiness without starting an exact fallback', async () => {
+  const f = earlyFixture({ earlyWatcherReady: false })
+  let settled = false
+  const starting = f.overlay.start().then((value) => {
+    settled = true
+    return value
+  })
+  await drain()
+  assert.equal(settled, false)
+  assert.equal(f.launchers[0].attachments.length, 1)
+  f.overlay.quit()
+  assert.equal(await starting, false)
+  await drain()
+  assert.equal(f.launchers[0].events.size, 0)
+})
+
+test('database hydration does not cancel an explicitly allowed name unless it adds a deny rule', async () => {
+  const f = earlyFixture()
+  f.database.data = {}
+  await f.overlay.start()
+  const launcher = f.launchers[0]
+  f.database.data['game-overlay-allowlist'] = ['**/steamapps/**']
+  f.database.data['game-overlay-denylist'] = []
+  await drain()
+  assert.notEqual(launcher.disposed, true)
+  f.database.data['game-overlay-denylist'] = ['**/protected/**']
+  assert.equal(launcher.disposed, true)
+  f.overlay.quit()
 })

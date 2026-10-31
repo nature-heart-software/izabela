@@ -160,7 +160,6 @@ test('experimental opt-in disables the legacy administrator startup setting', as
   assert.equal(f.runAsAdmin(), true)
   await f.toggle(1)
   assert.equal(f.runAsAdmin(), false)
-  assert.match(f.wrapper.text(), /quit.*reopen.*normally/i)
 })
 
 test('confirmed legacy opt-in deselects experimental and retains the admin requirement', async (t) => {
@@ -206,17 +205,11 @@ test('the shared allowlist and denylist are visible for either opt-in only', asy
   assert.doesNotMatch(wrapper.text(), /Allowlist|Denylist/)
 })
 
-test('both choices have distinct labels and experimental setup and safety guidance', (t) => {
+test('both choices have distinct labels', (t) => {
   const { wrapper } = fixture(t)
   const text = wrapper.text().replace(/\s+/g, ' ')
   assert.match(text, /Enable Game Overlay/)
   assert.match(text, /Enable Experimental Game Overlay/)
-  assert.match(text, /release candidate \(RC\)/i)
-  assert.match(text, /supported Direct3D Windows games/)
-  assert.match(text, /before launching the game/)
-  assert.match(text, /Restart Izabela after switching/)
-  assert.match(text, /not.*anti-cheat.*elevated/i)
-  assert.match(text, /existing ReShade/i)
 })
 
 test('both switches expose their names and state and support keyboard opt-in', async (t) => {

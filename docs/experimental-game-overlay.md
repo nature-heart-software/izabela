@@ -1,6 +1,6 @@
 # Experimental Game Overlay
 
-The Experimental backend uses the pinned `electron-game-overlay` **0.1.0-rc.1**
+The Experimental backend uses the pinned `electron-game-overlay` **0.1.0-rc.2**
 SDK. It is separate from the existing Game Overlay, which continues to use
 `@packages/electron-game-overlay`. Both are off by default; enabling one deselects
 the other. Existing saved legacy settings do not opt you into the experiment.
@@ -23,10 +23,42 @@ legacy, stop the game, select the existing **Game Overlay** option, and restart
 Izabela before launching it again. The legacy administrator confirmation is
 unchanged.
 
+The experiment uses the SDK's public `observeOverlayProcesses` API instead of the
+legacy WMI watcher's one-second polling interval. Unity games such as Gun Frog
+can create their main graphics surface before that first WMI event arrives;
+injecting afterward can succeed without producing an overlay connection. The
+native observer excludes existing processes and retains exact creation identity
+and authoritative exit evidence. Izabela applies its allowlist and denylist
+before exact-PID attachment. Attachment warnings include SDK failure
+codes and runtime startup status without exposing discovery data.
+
+### Gun Frog and early attachment
+
+Gun Frog can initialize graphics before an exact-PID attachment completes, even
+with the native observer. Add the full executable path to the **user allowlist**,
+close the game, and restart Izabela before launching it. A literal executable
+path that passes both denylists arms the SDK's exact-path future watcher.
+Alternatively, `**/Gun Frog.exe` permits that basename in any folder and arms a
+name watcher, but requires both user and database denylists to be empty. Folder
+globs and database rules alone use observation followed by exact-PID attachment.
+Both observer and future watchers baseline existing processes without injecting
+them.
+
+Policy edits cancel early watchers for the rest of the application run; restart
+after changing rules. A confirmed target exit permits rearming for the next
+launch, while an uncertain failure never falls back to another injection attempt.
+Windows path matching handles backslashes, case differences, and dot directories.
+
+The unchanged upstream SDK keeps future watchers armed indefinitely while idle.
+Readiness, post-selection injection and authentication still have bounded
+deadlines. Izabela applies no SDK JavaScript or native patches. Prearming is
+exclusive; it does not provide the SDK's exact-PID multi-application sharing.
+
 ## Keyboard focus
 
-The Experimental backend focuses the offscreen web view through the SDK and
-selects the messenger input directly when it becomes available, including the
+The Experimental backend calls the SDK's `show(); focus(); input.intercept()`
+sequence, which selects the native keyboard destination and offscreen web view,
+and selects the messenger input directly when it becomes available, including the
 first opening. It does not use the invisible fullscreen focus button or move and
 click the system cursor. The legacy backend retains its existing workaround.
 The renderer uses the backend chosen when its window was created; changing a
@@ -38,9 +70,13 @@ setting does not switch focus behavior before a restart.
   are supplied by the SDK.
 - No anti-cheat or elevated game targets. Do not disable security software or
   add antivirus exceptions. Existing ReShade installations are not overwritten.
-- Izabela keeps Electron **46.0.0-alpha.2**, outside the RC SDK's declared
-  `>=39.1.0 <40` peer range. The metadata is deliberately unchanged. This branch
-  is a compatibility experiment, not a claim of general Electron 46 support.
+- Izabela keeps Electron **46.0.0-alpha.2**, an exact prerelease explicitly
+  admitted and tested by this SDK candidate. This does not establish support for
+  other Electron 40–46 versions or arbitrary games.
+- Explicit native focus requires the negotiated `window-focus-v1` capability.
+  An older already-running coordinator/runtime retains click-to-focus behavior.
+  Exit its clients/targets normally before starting a new game with rc.2; never
+  kill an unrelated broker or reinject a live game to enable the capability.
 - Automated SDK-load/DOM checks do not establish real game rendering, native
   input, or attachment compatibility. The noninjecting runtime check explicitly
   forbids broker/process/network startup and records that transport is untested.
@@ -55,6 +91,8 @@ pnpm test:experimental-overlay
 pnpm test:app:unit
 pnpm test:experimental-overlay:runtime
 pnpm test:experimental-overlay:runtime apps/app/dist_electron/win-unpacked/resources/app.asar
+pnpm test:experimental-overlay:fixtures
+pnpm test:experimental-overlay:e2e --build
 ```
 
 The first command covers opt-in, exact-PID matching, input/lifecycle and packaging
@@ -64,5 +102,14 @@ lazy SDK owner/session and type into a genuine offscreen DOM window. They do not
 start the SDK transport or inject a game. Windows artifact builds also run the
 packaged check and retain its JSON report.
 
-The unchanged candidate tarball is stored under `vendor/`; see its README for
-integrity and licensing. Consumers do not rebuild the EGO native runtime.
+The native E2E suite uses controlled Direct3D 9/10/11/12 hosts built from pinned
+SDK source instead of requiring a game installation. It checks the real app's
+shortcut-to-native-keyboard path, first typing after opening/reopening, actual
+target pixels and input release. A negative control must reproduce the original
+webview-only focus failure. It requires an interactive Windows graphics desktop;
+see [the native E2E guide](../tests/experimental-overlay-e2e/README.md).
+
+The unchanged upstream candidate is stored under `vendor/`; see its README for
+source provenance, integrity and licensing. Consumers install the complete SDK
+without rebuilding or patching it. Native keyboard focus follows explicit SDK
+window focus, including first opening and reopening without a click.

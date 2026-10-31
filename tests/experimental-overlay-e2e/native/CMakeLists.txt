@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.24)
+project(izabela_overlay_input LANGUAGES CXX)
+add_executable(overlay-test-input input.cpp)
+target_compile_features(overlay-test-input PRIVATE cxx_std_20)
+target_compile_definitions(overlay-test-input PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN NOMINMAX)
+target_link_libraries(overlay-test-input PRIVATE user32 gdi32)

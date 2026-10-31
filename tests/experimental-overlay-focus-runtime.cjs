@@ -213,7 +213,13 @@ module.exports = async function focusRuntime({ sdkRoot, profile }) {
       sdkRoot,
       'dist/lib/electron-overlay-window.js',
     ))
-    const bridgeCalls = { register: 0, unregister: 0, frames: 0, remove: 0 }
+    const bridgeCalls = {
+      register: 0,
+      unregister: 0,
+      frames: 0,
+      remove: 0,
+      focus: [],
+    }
     const bridge = {
       registerWindow() {
         bridgeCalls.register++
@@ -226,6 +232,9 @@ module.exports = async function focusRuntime({ sdkRoot, profile }) {
       },
       removeWindow() {
         bridgeCalls.remove++
+      },
+      setWindowFocus(overlayWindow, focused) {
+        bridgeCalls.focus.push({ nativeId: overlayWindow.nativeId, focused })
       },
       syncWindowGeometry() {},
       followTarget() {
@@ -333,6 +342,9 @@ module.exports = async function focusRuntime({ sdkRoot, profile }) {
     assert.equal(window.getBounds().height, 240)
     assert.equal(bridgeCalls.register, 2)
     assert.equal(bridgeCalls.unregister, 1)
+    assert.equal(bridgeCalls.focus.filter((call) => call.focused).length, 2)
+    assert.ok(bridgeCalls.focus.some((call) => !call.focused))
+    assert.ok(bridgeCalls.focus.every((call) => call.nativeId === window.id))
     report.bridgeCalls = bridgeCalls
     report.status = 'passed'
     report.stage = 'complete'

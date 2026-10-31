@@ -1,0 +1,73 @@
+name: Native overlay open and type
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fixtures:
+    runs-on: windows-2022
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Build pinned SDK graphics hosts and keyboard driver
+        run: node tests/experimental-overlay-e2e/build-fixtures.cjs
+      - uses: actions/upload-artifact@v7.0.2
+        with:
+          name: controlled-graphics-hosts
+          path: |
+            coverage/experimental-overlay/fixtures/bin
+            coverage/experimental-overlay/fixtures/overlay-test-input.exe
+            coverage/experimental-overlay/fixtures/manifest.json
+            coverage/experimental-overlay/fixtures/SDK-fixtures-LICENSE
+          if-no-files-found: error
+  desktop:
+    needs: fixtures
+    # SendInput and graphics presentation need an unlocked interactive desktop.
+    # Do not substitute a headless/DOM smoke and call the native feature tested.
+    runs-on: [self-hosted, Windows, X64, graphics-overlay]
+    timeout-minutes: 30
+    env:
+      NX_DAEMON: 'false'
+      VITE_DISABLE_AUTO_UPDATE: 'true'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - uses: actions/download-artifact@v8.0.2
+        with:
+          name: controlled-graphics-hosts
+          path: coverage/experimental-overlay/fixtures
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Real app and native graphics regression matrix
+        run: pnpm test:experimental-overlay:e2e --build
+      - name: Upload native input reports and actual target screenshots
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: native-overlay-e2e
+          path: |
+            coverage/experimental-overlay/e2e/**/report.json
+            coverage/experimental-overlay/e2e/**/summary.json
+            coverage/experimental-overlay/e2e/**/*.png
+            coverage/experimental-overlay/e2e/**/app.stdout.log
+            coverage/experimental-overlay/e2e/**/app.stderr.log
+            coverage/experimental-overlay/e2e/**/target.stdout.log
+            coverage/experimental-overlay/e2e/**/target.stderr.log
+          if-no-files-found: error

@@ -50,18 +50,6 @@
                 "
               />
             </NvGroup>
-            <NvText>
-              Experimental release candidate (RC) for supported Direct3D Windows
-              games. Enable before launching the game. Restart Izabela after
-              switching overlay backends or turning an overlay off.
-            </NvText>
-            <NvText>
-              Do not use with anti-cheat games or elevated game processes. This
-              option disables Run as Administrator. If Izabela is currently
-              elevated, quit and reopen it normally before using this backend.
-              Keep any existing ReShade installation; do not overwrite or
-              replace its files.
-            </NvText>
           </NvStack>
         </NvCard>
         <div class="pl-8">
