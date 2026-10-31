@@ -61,6 +61,11 @@ beforeEach(async () => {
     path.join(gelectron, 'electron-overlay/index.d.ts'),
     path.join(source, 'electron-overlay/index.d.ts'),
   )
+  await mkdir(path.join(source, 'electron-overlay/src'), { recursive: true })
+  await copyFile(
+    path.join(gelectron, 'electron-overlay/src/overlay.h'),
+    path.join(source, 'electron-overlay/src/overlay.h'),
+  )
   for (const binary of binaries)
     await put(
       path.join(source, 'game-overlay/prebuilt', binary),
@@ -145,6 +150,36 @@ function executeBuild(arch = 'x64', outcome: number | Error = 0) {
 }
 
 describe('native overlay packaging', () => {
+  it('patches the staged framebuffer cleanup without changing upstream source', async () => {
+    const headerPath = 'electron-overlay/src/overlay.h'
+    const header = await readFile(path.join(source, headerPath), 'utf8')
+    await executeBuild().finished
+    const stagedHeader = await readFile(path.join(staging, headerPath), 'utf8')
+    const newline = header.includes('\r\n') ? '\r\n' : '\n'
+    const cleanup = `        shareMemMap_.erase(message.windowId);${newline}`
+    expect(stagedHeader).toContain(cleanup)
+    expect(stagedHeader.replace(cleanup, '')).toBe(header)
+    expect(await readFile(path.join(source, headerPath), 'utf8')).toBe(header)
+  })
+
+  it('rejects changed upstream cleanup source before compiling or publishing', async () => {
+    const headerPath = path.join(source, 'electron-overlay/src/overlay.h')
+    const header = await readFile(headerPath, 'utf8')
+    expect(header).toContain('windows_.erase(it);')
+    await writeFile(
+      headerPath,
+      header.replace('windows_.erase(it);', 'windows_.clear();'),
+    )
+    const build = executeBuild()
+    await expect(build.finished).rejects.toThrow(
+      'Unexpected gelectron closeWindow source; refusing native build',
+    )
+    expect(build.spawn).not.toHaveBeenCalled()
+    await expect(access(path.join(output, 'index.cjs'))).rejects.toMatchObject({
+      code: 'ENOENT',
+    })
+  })
+
   it('cleans staging and copies real wrapper files while excluding nested dependencies and old builds', async () => {
     const build = executeBuild()
     await build.finished
