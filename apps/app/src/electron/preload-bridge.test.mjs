@@ -105,6 +105,10 @@ function mainFixture() {
     '@/utils/electron-window': {},
     '@/electron/game-overlay-backend': {},
     '@/modules/electron-overlay-defender': {
+      prepareOverlayInjectorDefenderExclusions: async () => ({
+        status: 'ready',
+        token: 'prepared-test-plan',
+      }),
       addOverlayInjectorDefenderExclusions: async () => ({
         status: 'cancelled',
       }),

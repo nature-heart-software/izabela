@@ -60,6 +60,33 @@
                 >Add Windows Defender exclusions</NvButton
               >
             </NvGroup>
+            <NvDialog v-model:open="defenderOpen" portal-target="#settings">
+              <template #title>Windows Defender exclusions</template>
+              <template #description>
+                <NvText data-overlay-defender-dialog
+                  >The game overlay injector may be flagged as malware by
+                  Microsoft Defender. Would you like to add its files to
+                  Microsoft Defender’s exclusion list?</NvText
+                >
+              </template>
+              <template #footer>
+                <NvGroup justify="right">
+                  <NvButton
+                    type="plain"
+                    autofocus
+                    data-overlay-defender-cancel
+                    @click="defenderOpen = false"
+                    >Cancel</NvButton
+                  >
+                  <NvButton
+                    data-overlay-defender-confirm
+                    :disabled="defenderBusy || !defenderPlan"
+                    @click="confirmDefender"
+                    >Add exclusions</NvButton
+                  >
+                </NvGroup>
+              </template>
+            </NvDialog>
             <NvText v-if="defenderMessage" role="status">{{
               defenderMessage
             }}</NvText>
@@ -151,6 +178,7 @@ import {
   NvButton,
   NvCard,
   NvDivider,
+  NvDialog,
   NvGroup,
   NvInput,
   NvStack,
@@ -160,7 +188,7 @@ import {
 import { storeToRefs } from 'pinia'
 import { useGameOverlayStore } from '@/features/game-overlay/store'
 import { useDatabasesStore } from '@/features/databases/store'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useSettingsStore } from '@/features/settings/store'
 import { useConfirmAdmin } from '@/hooks/use-confirm-admin.ts'
 import { useMessengerStateStore } from '@/teams/messenger/store'
@@ -186,13 +214,37 @@ const settingsStore = useSettingsStore()
 const messengerStateStore = useMessengerStateStore()
 const defenderBusy = ref(false)
 const defenderMessage = ref('')
+const defenderOpen = ref(false)
+const defenderPlan = ref<{ token: string }>()
+watch(defenderOpen, (open) => {
+  if (!open) defenderPlan.value = undefined
+})
 const configureDefender = async () => {
-  if (defenderBusy.value) return
+  if (defenderBusy.value || defenderOpen.value) return
   defenderBusy.value = true
   defenderMessage.value = ''
   try {
     const result =
-      await window.ElectronResources.addOverlayInjectorDefenderExclusions()
+      await window.ElectronResources.prepareOverlayInjectorDefenderExclusions()
+    if (result.status === 'ready') {
+      defenderPlan.value = result
+      defenderOpen.value = true
+    } else defenderMessage.value = result.message
+  } catch {
+    defenderMessage.value =
+      'Windows Defender exclusions could not be configured.'
+  } finally {
+    defenderBusy.value = false
+  }
+}
+const confirmDefender = async () => {
+  if (defenderBusy.value || !defenderPlan.value) return
+  const { token } = defenderPlan.value
+  defenderBusy.value = true
+  defenderOpen.value = false
+  try {
+    const result =
+      await window.ElectronResources.addOverlayInjectorDefenderExclusions(token)
     defenderMessage.value = result.message || ''
   } catch {
     defenderMessage.value =

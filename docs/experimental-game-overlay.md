@@ -104,8 +104,9 @@ upstream; no retry or SDK workaround was added to Izabela.
 ## Windows Defender exclusions
 
 The Experimental overlay settings include **Add Windows Defender exclusions**.
-The main process displays a warning listing the exact rules and defaults to
-Cancel. Approval requests an elevated helper; it does not change Izabela's
+The app displays an in-app explanation with Cancel focused by default. Main
+prepares the fixed injector paths and returns a one-use confirmation token;
+the renderer supplies no paths. Approval requests an elevated helper; it does not change Izabela's
 administrator-startup setting. No rules are added at startup or after cancellation.
 
 Rules cover `inject.exe` and `inject32.exe` in the bundled SDK runtime and direct

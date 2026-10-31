@@ -72,9 +72,9 @@ Assertions cover:
   programmatic scrolling or test-only UI is substituted.
 - Hiding after pointer use restores the controlled game's original cursor.
 - The D3D11 x64 case at 100% scale clicks the Defender exclusions button through
-  the real settings UI and IPC. It verifies the main-process warning, default
-  cancellation and release of overlay input. The native dialog returns a
-  controlled Cancel response; elevation is forbidden and Defender is never changed.
+  the real settings UI and IPC. It verifies the in-app explanation remains visible
+  in the interactive overlay and clicks Cancel using native pointer input.
+  Elevation is forbidden and Defender is never changed.
 - Intercepted typing does not reach the game's input oracle; hidden-overlay input
   returns to the game without altering the messenger draft.
 - A negative control replaces only native focus with the old webview-only focus
@@ -93,8 +93,8 @@ wheel input, visible system-cursor inspection, owned-window foreground activatio
 module inspection and capture. It checks PID/image identity and foreground before
 input, and confines pointer operations to the owned host. SDK public-call wrappers in the Electron
 test runtime collect observations; only the explicit negative control changes a
-focus call. Security confirmation and elevation use the controlled boundaries
-described above. The normal case does not replace backend, renderer or SDK behavior.
+focus call. The real in-app explanation is cancelled with native input; elevation
+is blocked. The normal case does not replace backend, renderer or SDK behavior.
 
 Reports and screenshots are under `coverage/experimental-overlay/e2e/<run>/`.
 `Native overlay input` builds fixtures on hosted Windows and runs the

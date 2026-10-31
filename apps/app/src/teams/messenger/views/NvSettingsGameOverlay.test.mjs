@@ -79,11 +79,19 @@ function fixture(t, saved = {}, decision = 'confirm') {
   const calls = { admin: 0, confirmation: 0, closed: 0 }
   let runAsAdmin = true
   const defenderCalls = []
+  const defenderPreviews = []
   let defenderAction = async () => ({ status: 'cancelled' })
   const originalResources = window.ElectronResources
   window.ElectronResources = {
-    addOverlayInjectorDefenderExclusions: () => {
-      defenderCalls.push(true)
+    prepareOverlayInjectorDefenderExclusions: async () => {
+      defenderPreviews.push(true)
+      return {
+        status: 'ready',
+        token: 'main-plan',
+      }
+    },
+    addOverlayInjectorDefenderExclusions: (token) => {
+      defenderCalls.push(token)
       return defenderAction()
     },
   }
@@ -104,6 +112,19 @@ function fixture(t, saved = {}, decision = 'confirm') {
           ].map((name) => [name, layout]),
         ),
         NvSwitch,
+        NvDialog: {
+          props: ['open'],
+          setup:
+            (props, { slots }) =>
+            () =>
+              props.open
+                ? vue.h('section', { role: 'dialog' }, [
+                    slots.title?.(),
+                    slots.description?.(),
+                    slots.footer?.(),
+                  ])
+                : null,
+        },
       },
       '@/features/game-overlay/store': { useGameOverlayStore: () => store },
       '@/features/databases/store': {
@@ -154,6 +175,7 @@ function fixture(t, saved = {}, decision = 'confirm') {
     toggle,
     runAsAdmin: () => runAsAdmin,
     defenderCalls,
+    defenderPreviews,
     setDefenderAction: (action) => {
       defenderAction = action
     },
@@ -278,7 +300,31 @@ test('Defender action appears only for experimental opt-in and never runs on mou
   assert.equal(f.defenderCalls.length, 0)
 })
 
-test('Defender action is single-flight, reports success, and does not enable administrator startup', async (t) => {
+test('Defender explanation uses the in-app dialog; cancellation never requests exclusions', async (t) => {
+  const f = fixture(t, { enableExperimentalGameOverlay: true })
+  await f.wrapper.get('[data-overlay-defender-exclusions]').trigger('click')
+  await flushPromises()
+  assert.equal(f.defenderPreviews.length, 1)
+  assert.equal(f.defenderCalls.length, 0)
+  const dialog = f.wrapper.get('[role="dialog"]')
+  assert.match(
+    dialog.get('[data-overlay-defender-dialog]').text(),
+    /may be flagged as malware by Microsoft Defender/,
+  )
+  assert.match(
+    dialog.get('[data-overlay-defender-dialog]').text(),
+    /exclusion list/,
+  )
+  assert.doesNotMatch(dialog.text(), /C:\\SDK|runtime\/inject/)
+  assert.equal(dialog.findAll('[data-overlay-defender-path]').length, 0)
+  await dialog.get('[data-overlay-defender-cancel]').trigger('click')
+  await flushPromises()
+  assert.equal(f.wrapper.find('[role="dialog"]').exists(), false)
+  assert.equal(f.defenderCalls.length, 0)
+  assert.equal(f.calls.admin, 0)
+})
+
+test('only the in-app confirmation runs the single-flight action and reports success', async (t) => {
   const f = fixture(t, { enableExperimentalGameOverlay: true })
   let finish
   f.setDefenderAction(
@@ -289,27 +335,24 @@ test('Defender action is single-flight, reports success, and does not enable adm
   )
   const button = f.wrapper.get('[data-overlay-defender-exclusions]')
   await button.trigger('click')
+  await flushPromises()
+  await f.wrapper.get('[data-overlay-defender-confirm]').trigger('click')
   await button.trigger('click')
-  assert.equal(f.defenderCalls.length, 1)
+  assert.deepEqual(f.defenderCalls, ['main-plan'])
   assert.equal(button.attributes('disabled'), 'true')
   finish({ status: 'added', message: 'Injector exclusions configured.' })
   await flushPromises()
-  await vue.nextTick()
   assert.match(f.wrapper.get('[role="status"]').text(), /configured/)
   assert.equal(f.calls.admin, 0)
 })
 
-test('cancelled Defender confirmation stays quiet and invocation errors are visible', async (t) => {
+test('Defender invocation errors remain visible without leaking native details', async (t) => {
   const f = fixture(t, { enableExperimentalGameOverlay: true })
-  const button = f.wrapper.get('[data-overlay-defender-exclusions]')
-  await button.trigger('click')
-  await Promise.resolve()
-  await vue.nextTick()
-  assert.equal(f.wrapper.find('[role="status"]').exists(), false)
   f.setDefenderAction(() => Promise.reject(new Error('secret native error')))
-  await button.trigger('click')
-  await Promise.resolve()
-  await vue.nextTick()
+  await f.wrapper.get('[data-overlay-defender-exclusions]').trigger('click')
+  await flushPromises()
+  await f.wrapper.get('[data-overlay-defender-confirm]').trigger('click')
+  await flushPromises()
   assert.match(
     f.wrapper.get('[role="status"]').text(),
     /could not be configured/,

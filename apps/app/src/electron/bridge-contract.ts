@@ -97,6 +97,7 @@ export const bridgeContract: BridgeMethods<AppBridgeModules> = {
     getPrimaryDisplay: true,
   },
   ElectronResources: {
+    prepareOverlayInjectorDefenderExclusions: true,
     addOverlayInjectorDefenderExclusions: true,
     isVirtualAudioCableInstalled: true,
     installVirtualAudioCable: true,

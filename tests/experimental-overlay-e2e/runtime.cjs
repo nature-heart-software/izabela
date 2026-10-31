@@ -17,16 +17,12 @@ requireApp('@vscode/sudo-prompt').exec = () => {
   evidence.elevationRequests++
   throw new Error('Elevation and Defender changes are forbidden in E2E')
 }
-dialog.showMessageBox = async (...args) => {
-  const options = args.at(-1)
-  assert.equal(
-    options.title,
-    'Windows Defender exclusions',
-    'Unexpected native dialog in E2E',
+dialog.showMessageBox = async () => {
+  throw new Error(
+    'The exclusion explanation must use the in-app dialog, not a native message box',
   )
-  evidence.defenderWarning = options
-  return { response: 0, checkboxChecked: false }
 }
+
 const evidence = {
   status: 'failed',
   case: config.case,
@@ -608,21 +604,36 @@ async function verifyDefenderWarning() {
   drive('click')
   evidence.pointerClicks++
   await until(
-    () => evidence.defenderWarning && !wrapper.visible && !intercepting,
-    'real IPC requests native warning and releases game input',
+    () =>
+      overlay.webContents.executeJavaScript(
+        "!!document.querySelector('[data-overlay-defender-dialog]')",
+      ),
+    'in-app Defender explanation is visible',
   )
-  assert.equal(evidence.defenderWarning.defaultId, 0)
-  assert.equal(evidence.defenderWarning.cancelId, 0)
-  assert.equal(evidence.defenderWarning.type, 'warning')
+  const explanation = await overlay.webContents.executeJavaScript(
+    "document.querySelector('[data-overlay-defender-dialog]').textContent",
+  )
   assert.ok(
-    evidence.defenderWarning.detail.includes('reduces antivirus protection'),
+    explanation.includes('may be flagged as malware') &&
+      explanation.includes('exclusion list'),
   )
-  assert.deepEqual(evidence.defenderWarning.buttons, [
-    'Cancel',
-    'Add exclusions',
-  ])
+  assert.ok(
+    wrapper.visible && intercepting,
+    'dialog remains within the visible interactive app',
+  )
+  await pointerAt('[data-overlay-defender-cancel]')
+  drive('click')
+  evidence.pointerClicks++
+  await until(
+    async () =>
+      !(await overlay.webContents.executeJavaScript(
+        "!!document.querySelector('[data-overlay-defender-dialog]')",
+      )),
+    'in-app cancellation closes the explanation',
+  )
+  assert.equal(evidence.elevationRequests, 0)
   evidence.checks.push(
-    'native click reaches main-process Defender warning; controlled cancellation leaves security settings untouched',
+    'in-app Defender dialog stays visible; Cancel leaves security settings untouched',
   )
 }
 async function changePolicy(patch) {
@@ -707,7 +718,7 @@ async function revokePolicy(before) {
       'folder-only policy after basename removal: fresh no-barrier relaunch renders and accepts first key without clicking',
     )
   }
-  drive('shortcut', 13)
+  if (!wrapper.visible) drive('shortcut', 13)
   await until(
     () => wrapper.visible && intercepting,
     'overlay opened before genuine revocation',

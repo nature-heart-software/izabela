@@ -1,10 +1,10 @@
-import { app, dialog } from 'electron'
+import { app } from 'electron'
+import { randomUUID } from 'node:crypto'
 import path from 'node:path'
 import { Buffer } from 'node:buffer'
 import sudo from '@vscode/sudo-prompt'
 import koffi from 'koffi'
 import gameOverlay from '@/electron/game-overlay-backend'
-import { dialogsMap } from '@/modules/electron-dialog'
 import { defenderExclusionCommand, injectorExclusionPaths } from './plan'
 
 export type OverlayDefenderResult = {
@@ -12,19 +12,18 @@ export type OverlayDefenderResult = {
   message?: string
 }
 
+export type OverlayDefenderPlan =
+  | { status: 'ready'; token: string }
+  | { status: 'failed'; message: string }
+
+let prepared: { token: string; paths: string[] } | undefined
 let pending: Promise<OverlayDefenderResult> | undefined
+let pendingToken: string | undefined
 
-// This privileged action accepts no paths or commands from the renderer.
-// The main-process native warning is mandatory even for direct IPC invocation.
-export function addOverlayInjectorDefenderExclusions(): Promise<OverlayDefenderResult> {
-  if (pending) return pending
-  pending = configure().finally(() => {
-    pending = undefined
-  })
-  return pending
-}
-
-async function configure(): Promise<OverlayDefenderResult> {
+// Paths and commands are owned by main; the renderer confirms that prepared
+// plan with its opaque token from the in-app dialog.
+export async function prepareOverlayInjectorDefenderExclusions(): Promise<OverlayDefenderPlan> {
+  prepared = undefined
   if (process.platform !== 'win32' || process.arch !== 'x64')
     return {
       status: 'failed',
@@ -33,37 +32,48 @@ async function configure(): Promise<OverlayDefenderResult> {
     }
   try {
     const sdk: typeof import('electron-game-overlay') = require('electron-game-overlay')
-    // Discovery works even if Defender has already quarantined an injector.
-    // The SDK stages each launch in a direct child of these public run roots.
     const paths = injectorExclusionPaths(
       sdk.defaultReShadeRuntimeDirectory(),
       path.join(app.getPath('userData'), 'experimental-game-overlay', 'runs'),
       sdk.defaultReShadeRunsRootDirectory(),
     )
-    gameOverlay.stopIntercept()
-    const warning = dialog.showMessageBox({
-      type: 'warning',
-      title: 'Windows Defender exclusions',
-      message: 'Exclude the overlay injector files from Windows Defender?',
-      detail: [
-        'This reduces antivirus protection. Defender will skip scanning files at the paths below, including future injector copies matching these rules. Shared SDK run folders may also contain injector copies from other applications. A replacement file at the same path is also excluded. Continue only if you trust the overlay SDK.',
-        'These exclusions do not confirm that a detection is a false positive and may not prevent behavioral detections. Files already quarantined are not restored.',
-        'Injector paths (* matches one launch folder):\n' + paths.join('\n'),
-        "Administrator approval is required for this change. Izabela's administrator-startup setting will stay unchanged. You can remove these rules in Windows Security under Virus & threat protection → Manage settings → Exclusions.",
-      ].join('\n\n'),
-      buttons: ['Cancel', 'Add exclusions'],
-      defaultId: 0,
-      cancelId: 0,
-      noLink: true,
-    })
-    dialogsMap.set('overlay-defender-exclusions', warning)
-    let response: number
-    try {
-      response = (await warning).response
-    } finally {
-      dialogsMap.delete('overlay-defender-exclusions')
+    prepared = { token: randomUUID(), paths }
+    return {
+      status: 'ready',
+      token: prepared.token,
     }
-    if (response !== 1) return { status: 'cancelled' }
+  } catch {
+    return {
+      status: 'failed',
+      message: 'The overlay injector paths could not be determined.',
+    }
+  }
+}
+
+export function addOverlayInjectorDefenderExclusions(
+  token: string,
+): Promise<OverlayDefenderResult> {
+  if (pending && token === pendingToken) return pending
+  if (pending || !prepared || token !== prepared.token)
+    return Promise.resolve({
+      status: 'failed',
+      message: 'Open the exclusions dialog and confirm before continuing.',
+    })
+  const { paths } = prepared
+  prepared = undefined
+  pendingToken = token
+  pending = configure(paths).finally(() => {
+    pending = undefined
+    pendingToken = undefined
+  })
+  return pending
+}
+
+async function configure(
+  paths: readonly string[],
+): Promise<OverlayDefenderResult> {
+  try {
+    gameOverlay.stopIntercept()
     // Resolve the OS executable directory through the Windows API, rather than
     // trusting a user-controlled environment variable for an elevated program.
     const getSystemDirectory = koffi

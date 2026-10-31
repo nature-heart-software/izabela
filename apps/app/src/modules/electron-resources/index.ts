@@ -5,7 +5,10 @@ import path from 'path'
 import { EXTERNALS_DIR } from '@/electron/utils'
 import { app } from 'electron'
 import { Deferred } from '@packages/toolbox'
-import { addOverlayInjectorDefenderExclusions } from '@/modules/electron-overlay-defender'
+import {
+  addOverlayInjectorDefenderExclusions,
+  prepareOverlayInjectorDefenderExclusions,
+} from '@/modules/electron-overlay-defender'
 
 const VBCResourceExePath = path.join(
   EXTERNALS_DIR,
@@ -20,6 +23,7 @@ export const ElectronResources = () => {
     // icns: '/Applications/Electron.app/Contents/Resources/Electron.icns', // (optional)
   })
   return {
+    prepareOverlayInjectorDefenderExclusions,
     addOverlayInjectorDefenderExclusions,
     isVirtualAudioCableInstalled(): Promise<boolean> {
       return si.audio().then((audioData) => {

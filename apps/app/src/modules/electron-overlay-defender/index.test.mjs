@@ -33,18 +33,20 @@ function fixture({
     events = [],
     dialogsMap = new Map()
   let answer
-  const confirmation = deferred
-    ? new Promise((resolve) => (answer = resolve))
-    : Promise.resolve({ response })
   const api = loadTypescript(
     file,
     {
       electron: {
-        app: { getPath: () => 'C:/User/Izabela' },
+        app: {
+          isPackaged: true,
+          getAppPath: () => 'C:/SDK',
+          getPath: (name) =>
+            name === 'exe' ? 'C:/SDK/Izabela.exe' : 'C:/User/Izabela',
+        },
         dialog: {
           showMessageBox: (options) => {
             warnings.push(options)
-            return confirmation
+            throw new Error('Native explanation dialogs must not be opened')
           },
         },
       },
@@ -63,7 +65,8 @@ function fixture({
       '@vscode/sudo-prompt': elevation || {
         exec: (command, options, callback) => {
           commands.push({ command, options })
-          callback(failure, stdout)
+          if (deferred) answer = () => callback(failure, stdout)
+          else callback(failure, stdout)
         },
       },
       '@/electron/game-overlay-backend': {
@@ -78,7 +81,14 @@ function fixture({
     },
     { process: { platform, arch, env: { SystemRoot: 'C:\\Windows' } } },
   )
-  return { ...api, warnings, commands, events, dialogsMap, answer }
+  return {
+    ...api,
+    warnings,
+    commands,
+    events,
+    dialogsMap,
+    answer: () => answer(),
+  }
 }
 
 test('plan targets both injector filenames in SDK roots without folder/process exclusions', () => {
@@ -147,75 +157,84 @@ test('command encodes all path data separately, preserves other settings and ver
   )
 })
 
-test('native warning defaults to Cancel, lists exact scope and cancel never elevates', async () => {
-  const f = fixture()
-  const result = await f.addOverlayInjectorDefenderExclusions()
-  assert.equal(result.status, 'cancelled')
-  assert.equal(f.commands.length, 0)
-  const warning = f.warnings[0]
-  assert.equal(warning.type, 'warning')
-  assert.equal(warning.defaultId, 0)
-  assert.equal(warning.cancelId, 0)
-  assert.deepEqual([...warning.buttons], ['Cancel', 'Add exclusions'])
-  assert.match(warning.detail, /reduces antivirus protection/)
-  assert.match(warning.detail, /replacement file/)
-  assert.match(warning.detail, /future injector copies/)
-  assert.match(warning.detail, /not restored/)
-  assert.match(warning.detail, /C:\\SDK\\runtime\\inject32.exe/)
-  assert.deepEqual(f.events, ['release'])
-  assert.equal(f.dialogsMap.size, 0)
-})
+async function approve(f) {
+  const preview = await f.prepareOverlayInjectorDefenderExclusions()
+  assert.equal(preview.status, 'ready')
+  return f.addOverlayInjectorDefenderExclusions(preview.token)
+}
 
-test('only explicit native approval runs the fixed command and success must be verified', async () => {
-  const f = fixture({ response: 1 })
+test('preparing confirmation opens no native dialog and never elevates or releases input', async () => {
+  const f = fixture()
+  const preview = await f.prepareOverlayInjectorDefenderExclusions()
+  assert.equal(preview.status, 'ready')
+  assert.equal(typeof preview.token, 'string')
+  assert.equal('paths' in preview, false)
+  assert.equal(f.warnings.length, 0)
+  assert.equal(f.commands.length, 0)
+  assert.deepEqual(f.events, [])
   assert.equal(
     (await f.addOverlayInjectorDefenderExclusions('C:/arbitrary.exe')).status,
+    'failed',
+  )
+  assert.equal(f.commands.length, 0)
+})
+
+test('confirmation uses the prepared main-owned paths, never a renderer-modified preview', async () => {
+  const f = fixture()
+  const preview = await f.prepareOverlayInjectorDefenderExclusions()
+  preview.paths = ['C:/arbitrary.exe']
+  assert.equal(
+    (await f.addOverlayInjectorDefenderExclusions(preview.token)).status,
     'added',
   )
-  assert.equal(f.commands.length, 1)
   const script = Buffer.from(
     /-EncodedCommand (\S+)$/.exec(f.commands[0].command)[1],
     'base64',
   ).toString('utf16le')
   assert.doesNotMatch(script, /arbitrary/)
   assert.equal(f.commands[0].options.name, 'Izabela Next')
+  assert.deepEqual(f.events, ['release'])
+  assert.equal(
+    (await f.addOverlayInjectorDefenderExclusions(preview.token)).status,
+    'failed',
+  )
+  assert.equal(f.commands.length, 1)
 })
 
-test('concurrent renderer calls share one native warning and one elevation request', async () => {
+test('concurrent confirmations share one elevation request for the same plan', async () => {
   const f = fixture({ deferred: true })
-  const first = f.addOverlayInjectorDefenderExclusions(),
-    second = f.addOverlayInjectorDefenderExclusions()
+  const preview = await f.prepareOverlayInjectorDefenderExclusions()
+  const first = f.addOverlayInjectorDefenderExclusions(preview.token),
+    second = f.addOverlayInjectorDefenderExclusions(preview.token)
   assert.equal(first, second)
-  assert.equal(f.warnings.length, 1)
-  assert.equal(f.commands.length, 0)
-  f.answer({ response: 1 })
-  await first
   assert.equal(f.commands.length, 1)
+  assert.equal(f.warnings.length, 0)
+  f.answer()
+  await first
 })
 
 for (const options of [
   { failure: new Error('SECRET') },
   { stdout: 'not JSON' },
   { stdout: '{"status":"added","count":1}' },
-]) {
-  test('cancelled elevation or unverifiable command output reports failure without exposing raw errors', async () => {
-    const f = fixture({ response: 1, ...options })
-    const result = await f.addOverlayInjectorDefenderExclusions()
+])
+  test('cancelled elevation or unverifiable output reports failure without exposing raw errors', async () => {
+    const f = fixture(options),
+      result = await approve(f)
     assert.equal(result.status, 'failed')
     assert.doesNotMatch(result.message, /SECRET|not JSON/)
     assert.equal(f.commands.length, 1)
   })
-}
 
-test('unsupported hosts fail before native confirmation or elevation', async () => {
+test('unsupported hosts fail before preview or elevation', async () => {
   for (const options of [{ platform: 'linux' }, { arch: 'ia32' }]) {
     const f = fixture(options)
     assert.equal(
-      (await f.addOverlayInjectorDefenderExclusions()).status,
+      (await f.prepareOverlayInjectorDefenderExclusions()).status,
       'failed',
     )
-    assert.equal(f.warnings.length, 0)
     assert.equal(f.commands.length, 0)
+    assert.deepEqual(f.events, [])
   }
 })
 
@@ -255,10 +274,7 @@ test('real elevation dependency reaches Windows UAC launch on the current Node r
     setTimeout,
   })
   const f = fixture({ response: 1, elevation: module.exports })
-  assert.equal(
-    (await f.addOverlayInjectorDefenderExclusions()).status,
-    'failed',
-  )
+  assert.equal((await approve(f)).status, 'failed')
   const elevationLaunches = launches.filter((command) =>
     command.startsWith('powershell.exe '),
   )
