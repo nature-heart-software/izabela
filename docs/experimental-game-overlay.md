@@ -1,6 +1,6 @@
 # Experimental Game Overlay
 
-The Experimental backend uses the pinned `electron-game-overlay` **0.1.0-rc.4**
+The Experimental backend uses the pinned `electron-game-overlay` **0.1.0-rc.5**
 SDK. It is separate from the existing Game Overlay, which continues to use
 `@packages/electron-game-overlay`. Both are off by default; enabling one deselects
 the other. Existing saved legacy settings do not opt you into the experiment.
@@ -23,13 +23,13 @@ legacy, stop the game, select the existing **Game Overlay** option, and restart
 Izabela before launching it again. The legacy administrator confirmation is
 unchanged.
 
-The experiment uses the SDK's public `observeOverlayProcesses` API instead of the
+The experiment uses the SDK's public `OverlayTargetWatcher` instead of the
 legacy WMI watcher's one-second polling interval. Unity games such as Gun Frog
 can create their main graphics surface before that first WMI event arrives;
 injecting afterward can succeed without producing an overlay connection. The
-native observer excludes existing processes and retains exact creation identity
-and authoritative exit evidence. Izabela applies its allowlist and denylist
-before exact-PID attachment. Attachment warnings include SDK failure
+managed controller owns process observation, exact creation identity, attachment,
+and authoritative exits. Izabela supplies fully authorized early selectors and
+an allowlist/denylist predicate for best-effort exact-PID attachment. Attachment warnings include SDK failure
 codes and runtime startup status without exposing discovery data.
 
 ### Gun Frog and early attachment
@@ -44,9 +44,11 @@ globs and database rules alone use observation followed by exact-PID attachment.
 Both observer and future watchers baseline existing processes without injecting
 them.
 
-Policy edits cancel early watchers for the rest of the application run; restart
-after changing rules. A confirmed target exit permits rearming for the next
-launch, while an uncertain failure never falls back to another injection attempt.
+Policy edits immediately call the controller's `update()` with a fresh policy
+snapshot. Removed selectors/targets are cancelled synchronously. Uncertain or
+cancelled selector reservations remain blocked until authoritative exit; an
+overlapping re-add can require restarting Izabela before a fresh game launch.
+The SDK rearms after confirmed exit and never retries an uncertain injection.
 Windows path matching handles backslashes, case differences, and dot directories.
 
 The unchanged upstream SDK keeps future watchers armed indefinitely while idle.
@@ -113,9 +115,16 @@ target pixels and input release. It also uses native pointer input to verify
 visible text/hand cursor shapes and scrolling in the real settings popup.
 The matrix includes 100%, 125% and 150% scale. A negative control must reproduce the original
 webview-only focus failure. It requires an interactive Windows graphics desktop;
-see [the native E2E guide](../tests/experimental-overlay-e2e/README.md).
+see [the native E2E guide](experimental-overlay-e2e.md).
 
-The unchanged upstream candidate is stored under `vendor/`; see its README for
-source provenance, integrity and licensing. Consumers install the complete SDK
+Setup uses `createReShadeLaunchConfig()` with only the application's writable
+run-directory override; the SDK discovers its runtime in workspace and ASAR
+layouts. Packaging uses the Node-only `createOverlayAfterPack()` helper, retaining
+the SDK's ASAR unpack pattern. Izabela no longer reconstructs runtime paths or
+copies sealed SDK files itself.
+
+The unchanged upstream candidate is stored under `vendor/`; see the
+[SDK distribution notes](experimental-overlay-sdk.md) for source provenance,
+integrity and licensing. Consumers install the complete SDK
 without rebuilding or patching it. Native keyboard focus follows explicit SDK
 window focus, including first opening and reopening without a click.

@@ -4,6 +4,7 @@
 const path = require('path')
 const fs = require('fs')
 const pkg = require('./package.json')
+const { createOverlayAfterPack } = require('electron-game-overlay/packaging')
 
 function getElectronVersion() {
   const electronPath = require.resolve('electron')
@@ -44,31 +45,7 @@ module.exports = {
   publish: ['github'],
   electronVersion: getElectronVersion(),
   extraFiles: ['./resources/**'],
-  afterPack: async (context) => {
-    if (context.electronPlatformName !== 'win32') return
-    // Default dependency pruning strips sealed notices such as CopyrightNotice.txt.
-    // Restore the immutable SDK verbatim after ASAR creation and before installer/signing.
-    const sdkRoot = path.dirname(
-      require.resolve('electron-game-overlay/package.json'),
-    )
-    fs.cpSync(
-      sdkRoot,
-      path.join(
-        context.appOutDir,
-        'resources',
-        'app.asar.unpacked',
-        'node_modules',
-        'electron-game-overlay',
-      ),
-      {
-        recursive: true,
-        dereference: true,
-        // Ignore only pnpm's peer CLI wrappers; retain nested sealed node_modules.
-        filter: (source) =>
-          source !== path.join(sdkRoot, 'node_modules', '.bin'),
-      },
-    )
-  },
+  afterPack: createOverlayAfterPack(),
   asarUnpack: [
     'node_modules/@nut-tree-fork/**/*',
     'node_modules/@packages/electron-game-overlay/**/*',

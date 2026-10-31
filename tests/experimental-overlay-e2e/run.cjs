@@ -17,6 +17,7 @@ const argument = (name) =>
     ?.slice(name.length + 3)
 const appRoot = path.resolve(argument('app-root') || 'apps/app')
 const selected = argument('case') ? [argument('case')] : cases
+const targetMode = argument('target-mode') || 'best-effort'
 const requestedScale =
   argument('scale') === undefined ? undefined : Number(argument('scale'))
 const reportRoot = path.join(
@@ -64,7 +65,13 @@ function writeStore(profile, name, value) {
     JSON.stringify({ [id]: value }),
   )
 }
-async function runCase(name, negativeControl, manifest, scaleFactor = 1) {
+async function runCase(
+  name,
+  negativeControl,
+  manifest,
+  scaleFactor = 1,
+  mode = targetMode,
+) {
   const fixture = manifest.files.find((file) => file.case === name)
   assert.ok(fixture, `Missing compiled fixture: ${name}`)
   const source = path.join(fixtures, fixture.path)
@@ -76,6 +83,7 @@ async function runCase(name, negativeControl, manifest, scaleFactor = 1) {
   const directory = path.join(
     reportRoot,
     name +
+      (mode === 'early' ? '-early' : '') +
       (scaleFactor === 1 ? '' : `-scale-${scaleFactor}`) +
       (negativeControl ? '-negative-control' : ''),
   )
@@ -95,7 +103,11 @@ async function runCase(name, negativeControl, manifest, scaleFactor = 1) {
     enableExperimentalGameOverlay: true,
     // Folder rule deliberately exercises public process observation + exact PID,
     // without acquiring the SDK's exclusive future-target watcher.
-    allowlist: [targetDirectory.replaceAll('\\', '/') + '/**'],
+    allowlist: [
+      mode === 'early'
+        ? target.replaceAll('\\', '/')
+        : targetDirectory.replaceAll('\\', '/') + '/**',
+    ],
     denylist: [],
     ignorelist: [],
   })
@@ -115,6 +127,7 @@ async function runCase(name, negativeControl, manifest, scaleFactor = 1) {
     case: name,
     negativeControl,
     scaleFactor,
+    targetMode: mode,
     appRoot,
     directory,
     profile,
@@ -173,7 +186,7 @@ async function runCase(name, negativeControl, manifest, scaleFactor = 1) {
   console.log(
     `${report.status === 'passed' && code === 0 ? 'PASS' : 'FAIL'} ${name}${
       negativeControl ? ' negative-control' : ''
-    } scale=${scaleFactor}${report.error ? ': ' + report.error : ''}`,
+    } scale=${scaleFactor} ${mode}${report.error ? ': ' + report.error : ''}`,
   )
   return report
 }
@@ -185,6 +198,10 @@ async function main() {
   )
   for (const name of selected)
     assert.ok(cases.includes(name), `Unknown fixture: ${name}`)
+  assert.ok(
+    ['early', 'best-effort'].includes(targetMode),
+    'Supported target modes: early, best-effort',
+  )
   assert.ok(
     requestedScale === undefined || [1, 1.25, 1.5].includes(requestedScale),
     'Supported E2E scales: 1, 1.25, 1.5',
@@ -229,6 +246,17 @@ async function main() {
     const scaleCase = selected.includes('d3d11-x64') ? 'd3d11-x64' : selected[0]
     for (const scale of [1.25, 1.5])
       reports.push(await runCase(scaleCase, false, manifest, scale))
+  }
+  if (!argument('target-mode')) {
+    reports.push(
+      await runCase(
+        selected.includes('d3d11-x64') ? 'd3d11-x64' : selected[0],
+        false,
+        manifest,
+        requestedScale ?? 1,
+        'early',
+      ),
+    )
   }
   // A regression test must detect the original bug, not merely prove that its
   // own input helper can type into an Electron webview.

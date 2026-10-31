@@ -115,7 +115,7 @@ app
         'SDK escaped packaged application',
       )
     const metadata = requireApp('electron-game-overlay/package.json')
-    assert.equal(metadata.version, '0.1.0-rc.4')
+    assert.equal(metadata.version, '0.1.0-rc.5')
     const expectedElectron = JSON.parse(
       fs.readFileSync(path.resolve('apps/app/package.json'), 'utf8'),
     ).devDependencies.electron
@@ -137,7 +137,7 @@ app
         file.sha256,
       )
     }
-    assert.equal(manifest.files.length, 51)
+    assert.equal(manifest.files.length, 53)
     report.sealedPayloadsVerified = manifest.files.length
     // Hidden-window smoke must not start/join a broker or execute native helpers.
     const refuse = () => {
@@ -157,19 +157,19 @@ app
       createServer: refuse,
     })
     report.stage = 'sdk-window'
-    const { ElectronGameOverlay, parseReShadeLaunchConfig } = requireApp(
-      'electron-game-overlay',
-    )
+    const {
+      ElectronGameOverlay,
+      createReShadeLaunchConfig,
+      OverlayTargetWatcher,
+    } = requireApp('electron-game-overlay')
     if (process.platform === 'win32')
       assert.ok(
-        parseReShadeLaunchConfig(['--reshade-overlay'], {
-          bundledRuntimeDirectory: path.join(
-            sdkRoot,
-            'dist/runtime/win32-x64/reshade',
-          ),
+        createReShadeLaunchConfig({
           runsRootDirectory: path.join(profile, 'runs'),
         }),
       )
+    assert.equal(typeof OverlayTargetWatcher, 'function')
+    report.automaticRuntimeDiscovery = true
     owner = new ElectronGameOverlay()
     session = owner.createSession()
     assert.equal(session.windows.get('absent'), null)

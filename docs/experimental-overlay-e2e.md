@@ -1,4 +1,4 @@
-# Native overlay open-and-type regression
+# Native overlay E2E tests
 
 This suite runs Izabela's built main bundle, real messenger page, normal
 Ctrl+Enter/Escape shortcuts, unmodified SDK, injected graphics runtime and Windows
@@ -14,6 +14,8 @@ pnpm test:experimental-overlay:e2e --build
 pnpm test:experimental-overlay:e2e --case=d3d11-x64
 # One scale, for focused iteration (the default matrix includes all three):
 pnpm test:experimental-overlay:e2e --case=d3d11-x64 --scale=1.25
+# Exact-path early attachment, including exit and automatic rearming:
+pnpm test:experimental-overlay:e2e --case=d3d11-x64 --scale=1 --target-mode=early
 # Also accepts an already-built packaged app:
 pnpm test:experimental-overlay:e2e --app-root=apps/app/dist_electron/win-unpacked/resources/app.asar
 ```
@@ -36,8 +38,10 @@ build, and the binary artifact includes the license and source revision.
 
 Each case gets a fresh application profile, exact test executable copy, private
 broker pipe, runtime staging and logs. Its folder allow rule exercises real
-process observation and exact-PID attachment without the exclusive future-name
-watcher. The SDK host's startup barrier holds graphics initialization until the
+managed process observation and best-effort exact-PID attachment without the exclusive
+early watcher. An additional exact-path early case runs two fresh target lifecycles,
+verifies authoritative process-incarnation exit and waits for SDK rearming before
+the second launch. The SDK host's startup barrier holds graphics initialization until the
 injector has completed; this intentionally removes a graphics-startup timing
 race and does not claim universal late attachment to arbitrary games.
 
@@ -63,7 +67,8 @@ Assertions cover:
   routing boundary that the DOM smoke deliberately does not exercise.
 
 The default matrix runs all six graphics/architecture pairs at 100% scale, plus
-D3D11 x64 at 125% and 150%. Every positive case includes rendering, typing,
+D3D11 x64 at 125% and 150%, plus D3D11 x64 using the managed early controller.
+Every positive case includes rendering, typing,
 pointer/cursor and scrolling assertions; the negative focus control runs once.
 Raster comparison uses actual PNG dimensions rather than assuming NativeImage
 DIP dimensions are bitmap pixels.

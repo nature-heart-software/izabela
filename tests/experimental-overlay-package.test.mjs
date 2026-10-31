@@ -19,19 +19,19 @@ test('experimental SDK is the pinned complete upstream RC, distinct from legacy'
   )
   assert.equal(
     app.dependencies['electron-game-overlay'],
-    'file:../../vendor/electron-game-overlay-0.1.0-rc.4.tgz',
+    'file:../../vendor/electron-game-overlay-0.1.0-rc.5.tgz',
   )
   const bytes = readFileSync(
-    new URL('vendor/electron-game-overlay-0.1.0-rc.4.tgz', root),
+    new URL('vendor/electron-game-overlay-0.1.0-rc.5.tgz', root),
   )
   assert.equal(
     createHash('sha256').update(bytes).digest('hex'),
-    'd16d03da6b40cc9ffc7c6f3f732770f97eda16689b703ad54860fbe3fc9f28e5',
+    '3dc4d1af8372061692843d69e05e2fa32f4a76167b70c1219aa71d24feaa3eae',
   )
   const consumer = createRequire(new URL('apps/app/package.json', root))
   assert.equal(
     consumer('electron-game-overlay/package.json').version,
-    '0.1.0-rc.4',
+    '0.1.0-rc.5',
   )
   const sdkRoot = path.dirname(
     consumer.resolve('electron-game-overlay/package.json'),
@@ -39,7 +39,7 @@ test('experimental SDK is the pinned complete upstream RC, distinct from legacy'
   const provenance = JSON.parse(
     readFileSync(path.join(sdkRoot, 'SDK_PROVENANCE.json'), 'utf8'),
   )
-  assert.equal(provenance.version, '0.1.0-rc.4')
+  assert.equal(provenance.version, '0.1.0-rc.5')
   assert.equal(
     provenance.baseCommit,
     '1ff4baeb5930bb20d6dff0d8e69ca05c8eb8be98',
@@ -48,11 +48,11 @@ test('experimental SDK is the pinned complete upstream RC, distinct from legacy'
   for (const [entry, expected] of [
     [
       provenance.sourceSnapshot,
-      '3f0c4fa0c0d0dbaa2d4273802ab25769dcd689e239fada02a938603406231dfc',
+      '4741e9d3472626797024556b4a6eed877ee7c98e2f0aef88b2d1f96056940c82',
     ],
     [
       provenance.sourceManifest,
-      'd1981bae28ca52941a59c282c5578ab4f3c8ca9ff745a07125948eb0836be43b',
+      '9f155c9058fadf15707c35270db43441683a67fe0e25b2bea18e181ba14a65e8',
     ],
   ]) {
     assert.equal(entry.sha256, expected)
@@ -71,7 +71,7 @@ test('unpublished vendored RC has only an exact-version release-age exception', 
     .split('\n')
     .map((line) => line.trim())
     .filter((line) => /^- ['"]?electron-game-overlay(?:@|['"]?$)/.test(line))
-  assert.deepEqual(exemptions, ['- electron-game-overlay@0.1.0-rc.4'])
+  assert.deepEqual(exemptions, ['- electron-game-overlay@0.1.0-rc.5'])
   assert.doesNotMatch(config, /^  electron-game-overlay@.*: patches\//m)
   assert.doesNotMatch(config, /^minimumReleaseAge:\s*0\s*$/m)
 })
@@ -160,7 +160,7 @@ test('afterPack preserves every actual SDK file including sealed dependency noti
         (file) =>
           !file.startsWith(path.join('node_modules', '.bin') + path.sep),
       )
-    assert.equal(files.length, 165)
+    assert.equal(files.length, 176)
     assert.deepEqual(
       readdirSync(destination, { recursive: true, withFileTypes: true })
         .filter((entry) => entry.isFile())
@@ -199,7 +199,7 @@ test('afterPack preserves every actual SDK file including sealed dependency noti
         file.path,
       )
     }
-    assert.equal(manifest.files.length, 51)
+    assert.equal(manifest.files.length, 53)
   } finally {
     rmSync(temporary, { recursive: true, force: true })
   }

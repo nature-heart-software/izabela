@@ -18,6 +18,7 @@ const evidence = {
   electron: process.versions.electron,
   sdk: requireApp('electron-game-overlay/package.json').version,
   scaleFactor: config.scaleFactor,
+  targetMode: config.targetMode,
   inputSource: 'Windows SendInput virtual-key down/up pairs',
   pointerClicks: 0,
   realAppBundle: true,
@@ -26,6 +27,7 @@ const evidence = {
   checks: [],
   diagnostics: [],
   keyTimings: [],
+  managedEvents: [],
 }
 const failures = []
 let target,
@@ -290,6 +292,18 @@ app.on('browser-window-created', (_event, window) => {
   })
 })
 const createSession = sdk.ElectronGameOverlay.prototype.createSession
+const onTargetEvent = sdk.OverlayTargetWatcher.prototype.onEvent
+sdk.OverlayTargetWatcher.prototype.onEvent = function (handler) {
+  return onTargetEvent.call(this, (event) => {
+    evidence.managedEvents.push({
+      type: event.type,
+      pid: event.target?.pid,
+      mode: event.target?.mode,
+      creationTime100ns: event.identity?.creationTime100ns,
+    })
+    return handler(event)
+  })
+}
 const prepare = sdk.ReShadeOverlayLauncher.prototype.prepare
 sdk.ReShadeOverlayLauncher.prototype.prepare = function (...args) {
   const ready = prepare.apply(this, args)
@@ -514,17 +528,18 @@ async function verifyPointerAndScroll() {
     'real input refocused after pointer tests',
   )
 }
-async function run() {
-  require(path.join(config.appRoot, 'dist-electron/background.js'))
-  await app.whenReady()
-  await until(
-    async () =>
-      overlay && wrapper && (await read()).probe && (await read()).value === '',
-    'real messenger and public backend readiness',
-    90000,
+async function startTarget() {
+  targetConnected = false
+  surface = undefined
+  rendering = false
+  intercepting = false
+  fs.writeFileSync(
+    path.join(
+      path.dirname(config.target),
+      'electron-game-overlay-startup-barrier.enabled',
+    ),
+    '',
   )
-  evidence.displayScaleFactor = screen.getPrimaryDisplay().scaleFactor
-  assert.equal(evidence.displayScaleFactor, config.scaleFactor)
   target = spawn(config.target, [], {
     cwd: path.dirname(config.target),
     windowsHide: false,
@@ -560,11 +575,40 @@ async function run() {
   )
   evidence.nativeInjectionExecuted = true
   await until(
-    () => targetConnected && surface,
+    () =>
+      targetConnected &&
+      surface &&
+      evidence.managedEvents.some(
+        (event) => event.type === 'connected' && event.pid === target.pid,
+      ),
     'authenticated graphics surface',
     30000,
   )
   drive('activate')
+}
+async function closeTarget() {
+  const owned = target
+  if (!owned || owned.exitCode !== null) return
+  drive('close')
+  await until(() => owned.exitCode !== null, 'owned graphics host exited', 5000)
+}
+async function run() {
+  require(path.join(config.appRoot, 'dist-electron/background.js'))
+  await app.whenReady()
+  await until(
+    async () =>
+      overlay && wrapper && (await read()).probe && (await read()).value === '',
+    'real messenger and public backend readiness',
+    90000,
+  )
+  evidence.displayScaleFactor = screen.getPrimaryDisplay().scaleFactor
+  assert.equal(evidence.displayScaleFactor, config.scaleFactor)
+  if (config.targetMode === 'early')
+    await until(
+      () => evidence.managedEvents.some((event) => event.type === 'armed'),
+      'managed early watcher armed before launch',
+    )
+  await startTarget()
   drive('move', '20,20')
   await wait(100)
   const gameCursor = drive('state').cursor
@@ -579,6 +623,40 @@ async function run() {
       'Escape hides overlay and releases interception',
     )
     assert.equal((await read()).value, 'a')
+    if (config.targetMode === 'early') {
+      const previousPid = target.pid
+      const armed = evidence.managedEvents.filter(
+        (event) => event.type === 'armed',
+      ).length
+      await closeTarget()
+      await until(
+        () =>
+          evidence.managedEvents.some(
+            (event) =>
+              event.type === 'exited' &&
+              event.pid === previousPid &&
+              event.creationTime100ns,
+          ),
+        'SDK authoritative process-incarnation exit',
+      )
+      await until(
+        () =>
+          evidence.managedEvents.filter((event) => event.type === 'armed')
+            .length > armed,
+        'managed early watcher rearms after proven exit',
+      )
+      await startTarget()
+      assert.notEqual(target.pid, previousPid)
+      assert.equal(
+        evidence.managedEvents.filter(
+          (event) => event.type === 'connected' && event.mode === 'early',
+        ).length,
+        2,
+      )
+      evidence.checks.push(
+        'managed early attachment: two fresh game launches, authoritative exit, rearm and no best-effort fallback',
+      )
+    }
     await openAndType('b', 'ab', 'reopen')
     await verifyVisible('reopen', before)
     await wait(150) // Stabilize the game-side oracle only AFTER first-key checks.
