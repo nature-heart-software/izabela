@@ -17,7 +17,7 @@ const argument = (name) =>
     ?.slice(name.length + 3)
 const appRoot = path.resolve(argument('app-root') || 'apps/app')
 const selected = argument('case') ? [argument('case')] : cases
-const targetMode = argument('target-mode') || 'best-effort'
+const targetMode = argument('target-mode') || 'folder'
 const requestedScale =
   argument('scale') === undefined ? undefined : Number(argument('scale'))
 const reportRoot = path.join(
@@ -84,6 +84,7 @@ async function runCase(
     reportRoot,
     name +
       (mode === 'early' ? '-early' : '') +
+      (mode === 'fast-folder' ? '-fast-folder' : '') +
       (scaleFactor === 1 ? '' : `-scale-${scaleFactor}`) +
       (negativeControl ? '-negative-control' : ''),
   )
@@ -93,16 +94,19 @@ async function runCase(
   fs.mkdirSync(targetDirectory, { recursive: true })
   fs.mkdirSync(path.join(profile, 'session'), { recursive: true })
   fs.copyFileSync(source, target)
-  for (const marker of [
-    'electron-game-overlay-startup-barrier.enabled',
-    'reshade-input-gate.enabled',
-  ])
-    fs.writeFileSync(path.join(targetDirectory, marker), '')
+  if (mode !== 'fast-folder')
+    fs.writeFileSync(
+      path.join(
+        targetDirectory,
+        'electron-game-overlay-startup-barrier.enabled',
+      ),
+      '',
+    )
+  fs.writeFileSync(path.join(targetDirectory, 'reshade-input-gate.enabled'), '')
   writeStore(profile, 'game-overlay', {
     enableGameOverlay: false,
     enableExperimentalGameOverlay: true,
-    // Folder rule deliberately exercises public process observation + exact PID,
-    // without acquiring the SDK's exclusive future-target watcher.
+    // Folder rules now use the SDK's native policy watcher, without a name rule.
     allowlist: [
       mode === 'early'
         ? target.replaceAll('\\', '/')
@@ -199,8 +203,8 @@ async function main() {
   for (const name of selected)
     assert.ok(cases.includes(name), `Unknown fixture: ${name}`)
   assert.ok(
-    ['early', 'best-effort'].includes(targetMode),
-    'Supported target modes: early, best-effort',
+    ['early', 'folder', 'fast-folder'].includes(targetMode),
+    'Supported target modes: early, folder, fast-folder',
   )
   assert.ok(
     requestedScale === undefined || [1, 1.25, 1.5].includes(requestedScale),

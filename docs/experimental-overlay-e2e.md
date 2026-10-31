@@ -16,6 +16,8 @@ pnpm test:experimental-overlay:e2e --case=d3d11-x64
 pnpm test:experimental-overlay:e2e --case=d3d11-x64 --scale=1.25
 # Exact-path early attachment, including exit and automatic rearming:
 pnpm test:experimental-overlay:e2e --case=d3d11-x64 --scale=1 --target-mode=early
+# Fast-start diagnostic: no graphics startup barrier (timing can still fail):
+pnpm test:experimental-overlay:e2e --case=d3d11-x64 --scale=1 --target-mode=fast-folder
 # Also accepts an already-built packaged app:
 pnpm test:experimental-overlay:e2e --app-root=apps/app/dist_electron/win-unpacked/resources/app.asar
 ```
@@ -37,13 +39,22 @@ The SDK hosts are GPL-3.0-only; their source and license remain with the fixture
 build, and the binary artifact includes the license and source revision.
 
 Each case gets a fresh application profile, exact test executable copy, private
-broker pipe, runtime staging and logs. Its folder allow rule exercises real
-managed process observation and best-effort exact-PID attachment without the exclusive
-early watcher. An additional exact-path early case runs two fresh target lifecycles,
-verifies authoritative process-incarnation exit and waits for SDK rearming before
-the second launch. The SDK host's startup barrier holds graphics initialization until the
-injector has completed; this intentionally removes a graphics-startup timing
-race and does not claim universal late attachment to arbitrary games.
+broker pipe, runtime staging and logs. Its folder-only allow rule exercises the
+SDK native allow/deny policy without an executable-name rule. An additional
+exact-path case runs two fresh target lifecycles and verifies authoritative
+process-incarnation exit and rearming. The normal graphics matrix holds graphics
+initialization until the injector completes, isolating rendering/input from
+startup timing. The explicit `fast-folder` mode never creates or waits for that
+barrier. Its failures remain failures; one successful sample does not establish
+reliable fast-start attachment.
+
+The D3D11 x64 folder case at 100% scale adds then removes a redundant basename
+allow rule through the real renderer's shared Pinia store and normal IPC. It
+requires the same live target, native keyboard input and actual rendered pixels
+to survive removal. It later adds a genuine deny and checks that input returns
+to the game and overlay pixels disappear. These controlled policy changes do not
+replace the SDK controller or native attachment; keyboard, cursor and wheel
+checks still use actual Windows input.
 
 Assertions cover:
 
@@ -60,6 +71,10 @@ Assertions cover:
   input scrolls its actual overflow panel down and back up. No DOM click,
   programmatic scrolling or test-only UI is substituted.
 - Hiding after pointer use restores the controlled game's original cursor.
+- The D3D11 x64 case at 100% scale clicks the Defender exclusions button through
+  the real settings UI and IPC. It verifies the main-process warning, default
+  cancellation and release of overlay input. The native dialog returns a
+  controlled Cancel response; elevation is forbidden and Defender is never changed.
 - Intercepted typing does not reach the game's input oracle; hidden-overlay input
   returns to the game without altering the messenger draft.
 - A negative control replaces only native focus with the old webview-only focus
@@ -78,7 +93,8 @@ wheel input, visible system-cursor inspection, owned-window foreground activatio
 module inspection and capture. It checks PID/image identity and foreground before
 input, and confines pointer operations to the owned host. SDK public-call wrappers in the Electron
 test runtime collect observations; only the explicit negative control changes a
-focus call. The normal case does not replace backend, renderer or SDK behavior.
+focus call. Security confirmation and elevation use the controlled boundaries
+described above. The normal case does not replace backend, renderer or SDK behavior.
 
 Reports and screenshots are under `coverage/experimental-overlay/e2e/<run>/`.
 `Native overlay input` builds fixtures on hosted Windows and runs the

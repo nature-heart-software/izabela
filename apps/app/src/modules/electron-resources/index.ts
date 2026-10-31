@@ -1,10 +1,11 @@
 import si from 'systeminformation'
-import sudo from 'sudo-prompt'
+import sudo from '@vscode/sudo-prompt'
 import filter from 'lodash/filter'
 import path from 'path'
 import { EXTERNALS_DIR } from '@/electron/utils'
 import { app } from 'electron'
 import { Deferred } from '@packages/toolbox'
+import { addOverlayInjectorDefenderExclusions } from '@/modules/electron-overlay-defender'
 
 const VBCResourceExePath = path.join(
   EXTERNALS_DIR,
@@ -19,6 +20,7 @@ export const ElectronResources = () => {
     // icns: '/Applications/Electron.app/Contents/Resources/Electron.icns', // (optional)
   })
   return {
+    addOverlayInjectorDefenderExclusions,
     isVirtualAudioCableInstalled(): Promise<boolean> {
       return si.audio().then((audioData) => {
         const vbcDevices = filter(

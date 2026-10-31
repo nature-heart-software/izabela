@@ -115,7 +115,7 @@ app
         'SDK escaped packaged application',
       )
     const metadata = requireApp('electron-game-overlay/package.json')
-    assert.equal(metadata.version, '0.1.0-rc.5')
+    assert.equal(metadata.version, '0.1.0-rc.7')
     const expectedElectron = JSON.parse(
       fs.readFileSync(path.resolve('apps/app/package.json'), 'utf8'),
     ).devDependencies.electron
@@ -137,7 +137,7 @@ app
         file.sha256,
       )
     }
-    assert.equal(manifest.files.length, 53)
+    assert.equal(manifest.files.length, 54)
     report.sealedPayloadsVerified = manifest.files.length
     // Hidden-window smoke must not start/join a broker or execute native helpers.
     const refuse = () => {

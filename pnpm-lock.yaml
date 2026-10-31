@@ -464,8 +464,8 @@ importers:
         specifier: 1.5.0
         version: 1.5.0
       electron-game-overlay:
-        specifier: file:../../vendor/electron-game-overlay-0.1.0-rc.5.tgz
-        version: file:vendor/electron-game-overlay-0.1.0-rc.5.tgz(electron@46.0.0-alpha.2)
+        specifier: file:../../vendor/electron-game-overlay-0.1.0-rc.7.tgz
+        version: file:vendor/electron-game-overlay-0.1.0-rc.7.tgz(electron@46.0.0-alpha.2)
       electron-postman:
         specifier: workspace:*
         version: link:../../packages/electron-postman
@@ -557,6 +557,9 @@ importers:
       '@vitalets/google-translate-api':
         specifier: ^9.2.1
         version: 9.2.1(encoding@0.1.13)
+      '@vscode/sudo-prompt':
+        specifier: 9.3.2
+        version: 9.3.2
       electron:
         specifier: 46.0.0-alpha.2
         version: 46.0.0-alpha.2
@@ -575,9 +578,6 @@ importers:
       openai:
         specifier: ^7.45.0
         version: 7.45.0(@aws-sdk/credential-provider-node@3.972.89)(@smithy/signature-v4@5.7.4)(undici@7.30.1)(ws@8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))
-      sudo-prompt:
-        specifier: ^9.2.1
-        version: 9.2.1
       systeminformation:
         specifier: ^5.17.3
         version: 5.31.7
@@ -4027,6 +4027,9 @@ packages:
   '@volar/typescript@2.4.28':
     resolution: {integrity: sha512-Ja6yvWrbis2QtN4ClAKreeUZPVYMARDYZl9LMEv1iQ1QdepB6wn0jTRxA9MftYmYa4DQ4k/DaSZpFPUfxl8giw==}
 
+  '@vscode/sudo-prompt@9.3.2':
+    resolution: {integrity: sha512-gcXoCN00METUNFeQOFJ+C9xUI0DKB+0EGMVg7wbVYRHBw2Eq3fKisDZOkRdOz3kqXRKOENMfShPOmypw1/8nOw==}
+
   '@vue/compiler-core@3.5.11':
     resolution: {integrity: sha512-PwAdxs7/9Hc3ieBO12tXzmTD+Ln4qhT/56S+8DvrrZ4kLDn4Z/AMUr8tXJD0axiJBS0RKIoNaR0yMuQB9v9Udg==}
 
@@ -5941,9 +5944,9 @@ packages:
   electron-devtools-installer@3.2.1:
     resolution: {integrity: sha512-FaCi+oDCOBTw0gJUsuw5dXW32b2Ekh5jO8lI1NRCQigo3azh2VogsIi0eelMVrP1+LkN/bewyH3Xoo1USjO0eQ==}
 
-  electron-game-overlay@file:vendor/electron-game-overlay-0.1.0-rc.5.tgz:
-    resolution: {integrity: sha512-8qZaPOEkoBH0XiccgehYR5bUItS47BMl6104XrzrnpFal0ZZonn+JfOphjgjGSdajqmKrwCXFPOfo121uH7U2g==, tarball: file:vendor/electron-game-overlay-0.1.0-rc.5.tgz}
-    version: 0.1.0-rc.5
+  electron-game-overlay@file:vendor/electron-game-overlay-0.1.0-rc.7.tgz:
+    resolution: {integrity: sha512-X5dHejml3ak/bp4xiv/pnmUB1SH+ct+KnYAwmQkPd3KI410zs6UYLmwht7/tF3hCHqXAfw/C4i5eaKGVXfYmBQ==, tarball: file:vendor/electron-game-overlay-0.1.0-rc.7.tgz}
+    version: 0.1.0-rc.7
     peerDependencies:
       electron: '>=39.1.0 <40 || 46.0.0-alpha.2'
 
@@ -15433,6 +15436,8 @@ snapshots:
       path-browserify: 1.0.1
       vscode-uri: 3.1.0
 
+  '@vscode/sudo-prompt@9.3.2': {}
+
   '@vue/compiler-core@3.5.11':
     dependencies:
       '@babel/parser': 7.29.7
@@ -17895,7 +17900,7 @@ snapshots:
       tslib: 2.8.1
       unzip-crx-3: 0.2.0
 
-  electron-game-overlay@file:vendor/electron-game-overlay-0.1.0-rc.5.tgz(electron@46.0.0-alpha.2):
+  electron-game-overlay@file:vendor/electron-game-overlay-0.1.0-rc.7.tgz(electron@46.0.0-alpha.2):
     dependencies:
       electron: 46.0.0-alpha.2
       tslib: 2.8.1

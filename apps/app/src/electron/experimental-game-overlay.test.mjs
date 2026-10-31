@@ -8,6 +8,10 @@ import loadTypescript from '../../../../tests/load-typescript.cjs'
 
 const require = createRequire(import.meta.url)
 const { reactive, watch, nextTick } = require('vue')
+const {
+  createOverlayProcessPolicy,
+  overlayProcessPolicyAllows,
+} = require('electron-game-overlay')
 const filename = fileURLToPath(
   new URL('./experimental-game-overlay.ts', import.meta.url),
 )
@@ -151,9 +155,7 @@ function fixture({
       this.session = session
       this.options = {
         ...options,
-        earlyTargets: Array.from(options.earlyTargets, (target) => ({
-          ...target,
-        })),
+        earlyPolicy: options.earlyPolicy,
       }
       this.handlers = new Set()
       this.updates = []
@@ -179,9 +181,7 @@ function fixture({
     update(policy) {
       this.updates.push({
         ...policy,
-        earlyTargets: Array.from(policy.earlyTargets, (target) => ({
-          ...target,
-        })),
+        earlyPolicy: policy.earlyPolicy,
       })
       calls.push('targets.update')
       if (this.updateError) throw this.updateError
@@ -195,6 +195,7 @@ function fixture({
     }
   }
   const sdk = {
+    createOverlayProcessPolicy,
     createReShadeLaunchConfig(options) {
       calls.push(['config', { ...options }])
       if (failAt === 'config') throw new Error('SECRET')
@@ -346,91 +347,68 @@ for (const [name, pathApi] of [
   })
 }
 
-test('application policy snapshots normalize Windows paths and combine both allow/deny sources', async () => {
+test('native policy combines configured rules and freezes snapshots without implicit exclusions', async () => {
   const f = fixture({ enabled: true })
   await f.overlay.start()
-  const policy = f.controllers[0].options,
-    allow = (file) => policy.acceptBestEffort({ pid: 42, executablePath: file })
-  assert.equal(allow('c:\\games\\.hidden\\GAME.exe'), true)
-  assert.equal(allow('D:/Games/database.exe'), true)
+  const policy = f.controllers[0].options.earlyPolicy
+  const allows = (file) => overlayProcessPolicyAllows(policy, file)
+  assert.equal(allows('c:\\games\\.hidden\\GAME.exe'), true)
+  assert.equal(allows('D:/Games/database.exe'), true)
   for (const file of [
     'C:/Other/no.exe',
     'C:/Games/blocked.exe',
     'D:/Games/db-blocked.exe',
     'relative.exe',
   ])
-    assert.equal(allow(file), false, file)
-  assert.deepEqual(policy.earlyTargets, [])
+    assert.equal(allows(file), false, file)
+  assert.deepEqual([...policy.deny], ['**/blocked.exe', '**/db-blocked.exe'])
+  assert.equal(f.controllers[0].options.acceptBestEffort, undefined)
   f.store.allowlist = ['E:/New/**']
   await drain()
   assert.equal(
-    allow('C:/Games/game.exe'),
+    allows('C:/Games/game.exe'),
     true,
-    'An old policy is immutable while SDK update applies',
+    'Old policy remains immutable',
   )
-  const next = f.controllers[0].updates.at(-1)
-  assert.equal(
-    next.acceptBestEffort({ executablePath: 'C:/Games/game.exe' }),
-    false,
-  )
-  assert.equal(
-    next.acceptBestEffort({ executablePath: 'E:/New/game.exe' }),
-    true,
-  )
+  const next = f.controllers[0].updates.at(-1).earlyPolicy
+  assert.equal(overlayProcessPolicyAllows(next, 'C:/Games/game.exe'), false)
+  assert.equal(overlayProcessPolicyAllows(next, 'E:/New/game.exe'), true)
   f.overlay.quit()
 })
 
-test('only fully authorized user exact paths or global basenames become early selectors', async () => {
+test('database folder policy still authorizes Gun Frog after its redundant user rule is removed', async () => {
   const f = fixture({ enabled: true })
-  f.store.allowlist = [
-    'C:\\Games\\Game.exe',
-    'C:/Games/blocked.exe',
-    'C:/Games/*.exe',
-    '**/other.exe',
-  ]
+  const game =
+    'C:/Program Files (x86)/Steam/steamapps/common/Gun Frog/Gun Frog.exe'
+  f.store.allowlist = ['**/Gun Frog.exe']
+  f.database.data['game-overlay-allowlist'] = ['**/steamapps/**']
   await f.overlay.start()
-  assert.deepEqual(f.controllers[0].options.earlyTargets, [
-    { processName: 'game.exe', executablePath: 'C:/Games/Game.exe' },
-  ])
-  f.store.denylist = []
-  f.database.data['game-overlay-denylist'] = []
-  await drain()
-  const current = f.controllers[0].updates.at(-1)
-  assert.ok(
-    current.earlyTargets.some(
-      (t) => t.processName === 'other.exe' && !t.executablePath,
-    ),
+  assert.equal(
+    overlayProcessPolicyAllows(f.controllers[0].options.earlyPolicy, game),
+    true,
   )
-  f.store.allowlist = ['C:/Games/GAME.exe', '**/game.exe', '**/g?me.exe']
-  await drain()
-  assert.deepEqual(f.controllers[0].updates.at(-1).earlyTargets, [
-    { processName: 'game.exe' },
-  ])
-  f.overlay.quit()
-})
-
-test('database-only allow rules remain best-effort and database policy edits reach the controller', async () => {
-  const f = fixture({ enabled: true })
   f.store.allowlist = []
-  f.database.data['game-overlay-allowlist'] = ['**/game.exe']
-  await f.overlay.start()
-  assert.deepEqual(f.controllers[0].options.earlyTargets, [])
-  f.database.data['game-overlay-allowlist'] = ['F:/Games/**']
+  await drain()
+  const next = f.controllers[0].updates.at(-1)
+  assert.equal(overlayProcessPolicyAllows(next.earlyPolicy, game), true)
+  assert.equal(next.acceptBestEffort, undefined)
+  f.database.data['game-overlay-denylist'] = ['**/Gun Frog.exe']
   await drain()
   assert.equal(
-    f.controllers[0].updates
-      .at(-1)
-      .acceptBestEffort({ executablePath: 'F:/Games/game.exe' }),
-    true,
-  )
-  f.database.data['game-overlay-denylist'] = ['F:/Games/**']
-  await drain()
-  assert.equal(
-    f.controllers[0].updates
-      .at(-1)
-      .acceptBestEffort({ executablePath: 'F:/Games/game.exe' }),
+    overlayProcessPolicyAllows(
+      f.controllers[0].updates.at(-1).earlyPolicy,
+      game,
+    ),
     false,
   )
+  f.overlay.quit()
+})
+
+test('SDK policy validation rejects unsupported globs without silently broadening authorization', async () => {
+  const f = fixture({ enabled: true })
+  f.store.allowlist = ['C:/Games/!(blocked).exe']
+  await assert.rejects(f.overlay.start(), /Experimental overlay startup failed/)
+  assert.equal(f.controllers.length, 0)
   f.overlay.quit()
 })
 
@@ -571,9 +549,42 @@ test('scoped attachment errors retain the controller; fatal controller errors te
   f.overlay.quit()
 })
 
+test('blocked future discovery preserves authorized overlay input and reports no raw errors', async () => {
+  const f = fixture({ enabled: true })
+  await f.overlay.start()
+  f.window()
+  f.event()
+  f.overlay.startIntercept()
+  f.sessions[0].emit('inputInterceptionChanged', {
+    pid: 42,
+    intercepting: true,
+  })
+  const releases = f.calls.filter((call) => call === 'release').length
+  f.controllers[0].emit({
+    type: 'discovery-blocked',
+    error: new Error('SECRET'),
+  })
+  assert.equal(f.overlay.isProcessHooked(42), true)
+  assert.equal(f.overlay.intercepting, true)
+  assert.equal(f.wrappers[0].visible, true)
+  assert.equal(f.controllers[0].disposals, 0)
+  assert.equal(f.calls.filter((call) => call === 'release').length, releases)
+  assert.match(JSON.stringify(f.logs), /Future target discovery blocked/)
+  assert.doesNotMatch(JSON.stringify(f.logs), /SECRET/)
+  f.overlay.quit()
+})
+
 test('SDK diagnostics are bounded and expose classifications without raw errors', async () => {
   const f = fixture({ enabled: true })
   await f.overlay.start()
+  f.sessions[0].emit('diagnostic', {
+    severity: 'error',
+    code: 'runtime-input-routing-failed',
+    source: 'electron-game-overlay-runtime',
+    pid: 42,
+    message: 'SECRET',
+    context: { privateToken: 'SECRET' },
+  })
   const error = Object.assign(new Error('SECRET'), {
     sdkError: true,
     diagnostic: {
@@ -592,6 +603,7 @@ test('SDK diagnostics are bounded and expose classifications without raw errors'
   assert.equal(f.logs.length, 5)
   assert.doesNotMatch(JSON.stringify(f.logs), /SECRET/)
   assert.match(JSON.stringify(f.logs), /target-disconnected/)
+  assert.match(JSON.stringify(f.logs), /runtime-input-routing-failed/)
   f.overlay.quit()
 })
 

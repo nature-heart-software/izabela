@@ -1,6 +1,6 @@
 # Experimental Game Overlay
 
-The Experimental backend uses the pinned `electron-game-overlay` **0.1.0-rc.5**
+The Experimental backend uses the pinned `electron-game-overlay` **0.1.0-rc.7**
 SDK. It is separate from the existing Game Overlay, which continues to use
 `@packages/electron-game-overlay`. Both are off by default; enabling one deselects
 the other. Existing saved legacy settings do not opt you into the experiment.
@@ -23,38 +23,109 @@ legacy, stop the game, select the existing **Game Overlay** option, and restart
 Izabela before launching it again. The legacy administrator confirmation is
 unchanged.
 
-The experiment uses the SDK's public `OverlayTargetWatcher` instead of the
-legacy WMI watcher's one-second polling interval. Unity games such as Gun Frog
-can create their main graphics surface before that first WMI event arrives;
-injecting afterward can succeed without producing an overlay connection. The
-managed controller owns process observation, exact creation identity, attachment,
-and authoritative exits. Izabela supplies fully authorized early selectors and
-an allowlist/denylist predicate for best-effort exact-PID attachment. Attachment warnings include SDK failure
-codes and runtime startup status without exposing discovery data.
+The experiment uses the SDK's public `OverlayTargetWatcher` with
+`createOverlayProcessPolicy`. User and database allow/deny rules are combined
+into one serializable `earlyPolicy`, checked natively before injection. Folder
+rules use this same path; Izabela does not expand executable names, enumerate game
+installations, add implicit executable exclusions, or use an exact-PID fallback.
+Deny wins over allow. Removing a redundant executable rule leaves an active game
+authorized when a remaining folder rule still allows it. Genuine revocation
+releases overlay input and suppresses its scene without claiming to unload DLLs.
 
-### Gun Frog and early attachment
+### Candidate limits and policy grammar
 
-Gun Frog can initialize graphics before an exact-PID attachment completes, even
-with the native observer. Add the full executable path to the **user allowlist**,
-close the game, and restart Izabela before launching it. A literal executable
-path that passes both denylists arms the SDK's exact-path future watcher.
-Alternatively, `**/Gun Frog.exe` permits that basename in any folder and arms a
-name watcher, but requires both user and database denylists to be empty. Folder
-globs and database rules alone use observation followed by exact-PID attachment.
-Both observer and future watchers baseline existing processes without injecting
-them.
+rc.7 retains the unresolved fast-start timing limitation. It is not accepted as
+reliable fast-start support.
+Its native future-process polling can still lose the graphics-startup race,
+including with folder rules. Watcher readiness means armed, not attached; an
+injector success message does not establish a live rendered overlay. Close games
+before starting Izabela. Failed or uncertain live targets are never retried.
 
-Policy edits immediately call the controller's `update()` with a fresh policy
-snapshot. Removed selectors/targets are cancelled synchronously. Uncertain or
-cancelled selector reservations remain blocked until authoritative exit; an
-overlapping re-add can require restarting Izabela before a fresh game launch.
-The SDK rearms after confirmed exit and never retries an uncertain injection.
-Windows path matching handles backslashes, case differences, and dot directories.
+The SDK owns identity checks, successor watchers, exit retirement, cancellation
+and authorization retention. Izabela passes only configured rules, with no
+hardcoded game or helper names. Both user and database policy edits call its
+`update()`; an empty allow policy authorizes no new targets. The SDK's bounded
+grammar supports full Windows paths or a `**/` prefix, component `*` and `?`,
+and whole-component `**`. Deny rules share that grammar. Extglobs, braces,
+classes and malformed/relative patterns are rejected, not silently broadened.
+See the upstream source snapshot's `doc/sdk-rc7-discovery-policy.md` for policy
+retention semantics and `doc/sdk-rc6-process-policy.md` for the native grammar and
+remaining timing restrictions. If the SDK cannot safely replace discovery, its
+`discovery-blocked` event is logged without cancelling an authorized live overlay.
+A resolved policy update does not by itself prove that new discovery is armed.
 
-The unchanged upstream SDK keeps future watchers armed indefinitely while idle.
-Readiness, post-selection injection and authentication still have bounded
-deadlines. Izabela applies no SDK JavaScript or native patches. Prearming is
-exclusive; it does not provide the SDK's exact-PID multi-application sharing.
+Izabela applies no SDK JavaScript or native patches. Native policy attachment
+remains exclusive across applications. Runtime generation 7 changes require
+fresh game processes; running older injected runtimes are never replaced.
+Warnings retain SDK classifications and startup status without discovery data.
+
+### rc.7 consumer validation
+
+The complete archive SHA-256 is
+`dcf989d08a1c2913023c5d5983f080c12307e9fbd01952e630eed532cc040f9d`.
+The 81 overlay/package tests, 125 app tests and Electron 46 noninjecting smoke
+passed, including all 54 sealed payload hashes. Native coverage passed across all
+six graphics/architecture pairs, 125%/150% D3D11, two-launch lifecycle and focus
+negative controls. The exact folder → folder plus `**/name.exe` → folder sequence
+passed through Izabela's real renderer/store/IPC path, preserving typed glyphs.
+
+The focused no-barrier folder case also passed a fresh relaunch after rule removal,
+typing without another click, scrolling/cursors, and genuine denial with actual
+pixels removed and OS input returned to the game. This successful sample does not
+establish reliable fast startup. Reports and the coverage index are under
+`coverage/experimental-overlay/rc7-validation.json`.
+
+The initial matrix retained one harness failure: it expected a final interception
+ack after target admission was revoked. The focused rerun instead verifies actual
+native key delivery and removed overlay pixels; both passed even though the last
+observed ack remained true. The initial report remains preserved. No SDK workaround
+or hardcoded executable policy was added.
+
+### Historical rc.6 consumer trial
+
+The pinned archive SHA-256 is
+`baed10ac3c41709a155a35aacb62ee50b338a831618527cc3aaf353f83604ba2`.
+The 80 overlay/package tests, 125 app tests and noninjecting Electron 46 smoke
+passed, including all 54 sealed payload hashes. Native rendering, first-key input,
+cursor and scrolling checks passed on D3D9/10 x86+x64, D3D12 x64 and D3D11 x64 at
+125%/150%. A focused D3D11 relaunch case and its focus negative control passed.
+
+The exact basename-glob removal remains a failing native regression. Starting
+from an allowed folder, adding then removing `**/name.exe` throws
+`A cancelled or uncertain selector remains reserved until authoritative exit; active policy was cancelled`
+and cancels the allowed running target. Both the controlled-start and no-barrier
+cases reproduced it after successful first-show/reopen typing and pixel checks.
+Evidence is under `coverage/experimental-overlay/e2e/2026-10-31T18-51-14.214Z`
+and `2026-10-31T18-51-36.737Z`. An independent matrix run also timed out closing
+the D3D11 settings popup; its cause is unproven. rc.6 is not a fully passing
+consumer candidate. These failures were preserved and the policy issue reported
+upstream; no retry or SDK workaround was added to Izabela.
+
+## Windows Defender exclusions
+
+The Experimental overlay settings include **Add Windows Defender exclusions**.
+The main process displays a warning listing the exact rules and defaults to
+Cancel. Approval requests an elevated helper; it does not change Izabela's
+administrator-startup setting. No rules are added at startup or after cancellation.
+
+Rules cover `inject.exe` and `inject32.exe` in the bundled SDK runtime and direct
+launch subfolders of Izabela's and the SDK's shared run roots. Shared rules can
+also match injector copies used by other applications. Paths come from the main
+process and public SDK discovery APIs; the renderer supplies no paths or commands.
+The helper adds missing `ExclusionPath` entries and reads them back before
+reporting success, preserving existing exclusions.
+
+Elevation uses the maintained `@vscode/sudo-prompt` package with Node 24 support.
+The regression test runs its actual Windows argument validation and command-file
+creation, blocking only process launch so it cannot request UAC or change Defender.
+
+Exclusions reduce scanning protection and apply to replacement/future files at
+the same paths. They do not establish a Microsoft false-positive determination,
+restore quarantined files, or guarantee that behavioral detections stop. Managed
+device policy or cancelled administrator approval can prevent configuration.
+Review/remove these rules in Windows Security's exclusion settings.
+See [Microsoft's exclusion guidance](https://learn.microsoft.com/en-us/defender-endpoint/microsoft-defender-antivirus-exclusions-overview)
+and [Add-MpPreference](https://learn.microsoft.com/en-us/powershell/module/defender/add-mppreference).
 
 ## Keyboard focus
 
@@ -70,8 +141,9 @@ setting does not switch focus behavior before a restart.
 
 - Windows x64 host, supported Direct3D 9/10/11/12 games; x86/x64 runtime payloads
   are supplied by the SDK.
-- No anti-cheat or elevated game targets. Do not disable security software or
-  add antivirus exceptions. Existing ReShade installations are not overwritten.
+- No anti-cheat or elevated game targets. Existing ReShade installations are not
+  overwritten. The optional Defender action changes only the disclosed injector
+  path exclusions after user approval; it does not disable antivirus protection.
 - Izabela keeps Electron **46.0.0-alpha.2**, an exact prerelease explicitly
   admitted and tested by this SDK candidate. This does not establish support for
   other Electron 40–46 versions or arbitrary games.

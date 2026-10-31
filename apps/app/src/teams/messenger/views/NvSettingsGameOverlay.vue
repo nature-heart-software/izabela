@@ -50,6 +50,19 @@
                 "
               />
             </NvGroup>
+            <NvGroup v-if="gameOverlayStore.enableExperimentalGameOverlay">
+              <NvButton
+                size="sm"
+                :loading="defenderBusy"
+                :disabled="defenderBusy"
+                data-overlay-defender-exclusions
+                @click="configureDefender"
+                >Add Windows Defender exclusions</NvButton
+              >
+            </NvGroup>
+            <NvText v-if="defenderMessage" role="status">{{
+              defenderMessage
+            }}</NvText>
           </NvStack>
         </NvCard>
         <div class="pl-8">
@@ -147,8 +160,7 @@ import {
 import { storeToRefs } from 'pinia'
 import { useGameOverlayStore } from '@/features/game-overlay/store'
 import { useDatabasesStore } from '@/features/databases/store'
-import { computed } from 'vue'
-import { useConfirmStore } from '@/store/use-confirm-store.ts'
+import { computed, ref } from 'vue'
 import { useSettingsStore } from '@/features/settings/store'
 import { useConfirmAdmin } from '@/hooks/use-confirm-admin.ts'
 import { useMessengerStateStore } from '@/teams/messenger/store'
@@ -172,6 +184,23 @@ const gameOverlayAllowlistData = computed(
 const confirmAdmin = useConfirmAdmin()
 const settingsStore = useSettingsStore()
 const messengerStateStore = useMessengerStateStore()
+const defenderBusy = ref(false)
+const defenderMessage = ref('')
+const configureDefender = async () => {
+  if (defenderBusy.value) return
+  defenderBusy.value = true
+  defenderMessage.value = ''
+  try {
+    const result =
+      await window.ElectronResources.addOverlayInjectorDefenderExclusions()
+    defenderMessage.value = result.message || ''
+  } catch {
+    defenderMessage.value =
+      'Windows Defender exclusions could not be configured.'
+  } finally {
+    defenderBusy.value = false
+  }
+}
 
 const setGameOverlay = (value: boolean) => {
   if (value) {

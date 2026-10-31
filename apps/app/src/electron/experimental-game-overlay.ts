@@ -1,6 +1,5 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 import path from 'path'
-import micromatch from 'micromatch'
 import { watch, type WatchStopHandle } from 'vue'
 import { useGameOverlayStore } from '@/features/game-overlay/store'
 import { useDatabasesStore } from '@/features/databases/store'
@@ -16,6 +15,7 @@ import type {
   OverlayTargetWatcher,
   OverlayTargetPolicy,
   OverlayTargetWatcherEvent,
+  OverlayDiagnostic,
 } from 'electron-game-overlay'
 
 type WindowEntry = {
@@ -164,41 +164,13 @@ class ExperimentalGameOverlay {
       this.policyRules()
     const allows = [...allowlist, ...databaseAllowlist],
       denies = [...denylist, ...databaseDenylist]
-    const options = { windows: true, nocase: true, dot: true }
-    const allowed = (filename: string) => {
-      const normalized = filename.replace(/\\/g, '/')
-      return (
-        path.win32.isAbsolute(normalized) &&
-        micromatch.isMatch(normalized, allows, options) &&
-        !micromatch.isMatch(normalized, denies, options)
-      )
-    }
-    const early = new Map<
-      string,
-      { processName: string; executablePath?: string }
-    >()
-    for (const rule of allowlist) {
-      if (
-        path.win32.isAbsolute(rule) &&
-        !micromatch.scan(rule).isGlob &&
-        /\.exe$/i.test(rule) &&
-        allowed(rule)
-      ) {
-        early.set(rule.toLowerCase(), {
-          processName: path.win32.basename(rule).toLowerCase(),
-          executablePath: rule,
-        })
-      } else if (!denies.length) {
-        const name = /^\*\*\/([a-z0-9][a-z0-9 ._-]*\.exe)$/i.exec(rule)?.[1]
-        if (name && name.length <= 260)
-          early.set(name.toLowerCase(), { processName: name.toLowerCase() })
-      }
-    }
+    if (!allows.length) return {}
+    if (!this.sdk) throw new Error('Experimental overlay SDK is unavailable')
     return {
-      earlyTargets: [...early.values()].filter(
-        (entry) => !entry.executablePath || !early.has(entry.processName),
-      ),
-      acceptBestEffort: (identity) => allowed(identity.executablePath),
+      earlyPolicy: this.sdk.createOverlayProcessPolicy({
+        allow: allows,
+        deny: denies,
+      }),
     }
   }
 
@@ -207,7 +179,7 @@ class ExperimentalGameOverlay {
     if (event.type === 'armed' && import.meta.env.DEV)
       console.info(
         '[experimental-game-overlay] Early watcher armed',
-        event.selector.processName,
+        event.selector.processName || 'native allow/deny policy',
       )
     if (event.type === 'connected' && !event.target.cancelled) {
       this.connected.add(event.target.pid)
@@ -220,6 +192,11 @@ class ExperimentalGameOverlay {
       if (event.type !== 'transport-lost')
         this.surfaces.delete(event.target.pid)
       if (this.connected.delete(event.target.pid)) this.stopIntercept()
+    } else if (event.type === 'discovery-blocked') {
+      if (this.warnings++ < 5)
+        console.warn(
+          '[experimental-game-overlay] Future target discovery blocked; authorized overlays remain active.',
+        )
     } else if (event.type === 'error') {
       this.warn(event.error)
       if (event.target && this.connected.delete(event.target.pid))
@@ -230,7 +207,10 @@ class ExperimentalGameOverlay {
     }
   }
 
-  private warn(error?: unknown) {
+  private warn(
+    error?: unknown,
+    sessionDiagnostic?: Pick<OverlayDiagnostic, 'code' | 'source' | 'pid'>,
+  ) {
     // Log only SDK-owned classifications, never paths, discovery tokens or raw errors.
     const diagnostic = this.sdk?.isReShadeOperationError(error)
       ? error.diagnostic
@@ -244,6 +224,12 @@ class ExperimentalGameOverlay {
               stage: diagnostic.stage,
               pid: diagnostic.pid,
               runtimeStartupCode: diagnostic.runtimeStartupCode,
+            }
+          : sessionDiagnostic
+          ? {
+              code: sessionDiagnostic.code,
+              source: sessionDiagnostic.source,
+              pid: sessionDiagnostic.pid,
             }
           : {},
       )
@@ -273,8 +259,9 @@ class ExperimentalGameOverlay {
         this.warn()
         this.stopResources()
       }),
-      session.on('diagnostic', ({ severity }) => {
-        if (current() && severity === 'error') this.warn()
+      session.on('diagnostic', (diagnostic) => {
+        if (current() && diagnostic.severity === 'error')
+          this.warn(undefined, diagnostic)
       }),
       ...(['targetDisconnected', 'targetTransportLost'] as const).map((event) =>
         session.on(event, ({ pid }) => {

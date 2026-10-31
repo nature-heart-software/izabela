@@ -20,7 +20,7 @@ for (const name of [
 const vue = await import('vue')
 const piniaModule = await import('pinia')
 const { createPinia, defineStore } = piniaModule
-const { mount } = await import('@vue/test-utils')
+const { mount, flushPromises } = await import('@vue/test-utils')
 
 function compile(url, imports) {
   const filename = fileURLToPath(url)
@@ -32,8 +32,12 @@ function compile(url, imports) {
     id: filename,
     inlineTemplate: true,
   })
-  return loadTypescript(filename, { vue, ...imports }, {}, script.content)
-    .default
+  return loadTypescript(
+    filename,
+    { vue, ...imports },
+    { window },
+    script.content,
+  ).default
 }
 
 const layout = {
@@ -74,6 +78,15 @@ function fixture(t, saved = {}, decision = 'confirm') {
   const messenger = useMessengerStateStore(pinia)
   const calls = { admin: 0, confirmation: 0, closed: 0 }
   let runAsAdmin = true
+  const defenderCalls = []
+  let defenderAction = async () => ({ status: 'cancelled' })
+  const originalResources = window.ElectronResources
+  window.ElectronResources = {
+    addOverlayInjectorDefenderExclusions: () => {
+      defenderCalls.push(true)
+      return defenderAction()
+    },
+  }
   const component = compile(
     new URL('./NvSettingsGameOverlay.vue', import.meta.url),
     {
@@ -120,6 +133,7 @@ function fixture(t, saved = {}, decision = 'confirm') {
   )
   const wrapper = mount(component)
   t.after(() => {
+    window.ElectronResources = originalResources
     wrapper.unmount()
     store.$dispose()
     messenger.$dispose()
@@ -139,6 +153,10 @@ function fixture(t, saved = {}, decision = 'confirm') {
     calls,
     toggle,
     runAsAdmin: () => runAsAdmin,
+    defenderCalls,
+    setDefenderAction: (action) => {
+      defenderAction = action
+    },
   }
 }
 
@@ -244,4 +262,57 @@ test('cancelled legacy confirmation preserves experimental opt-in without a rest
   assert.equal(store.enableExperimentalGameOverlay, true)
   assert.equal(messenger.markForRestart, false)
   assert.deepEqual(calls, { admin: 0, confirmation: 1, closed: 1 })
+})
+
+test('Defender action appears only for experimental opt-in and never runs on mount', async (t) => {
+  const f = fixture(t)
+  assert.equal(
+    f.wrapper.find('[data-overlay-defender-exclusions]').exists(),
+    false,
+  )
+  await f.toggle(1)
+  assert.equal(
+    f.wrapper.find('[data-overlay-defender-exclusions]').exists(),
+    true,
+  )
+  assert.equal(f.defenderCalls.length, 0)
+})
+
+test('Defender action is single-flight, reports success, and does not enable administrator startup', async (t) => {
+  const f = fixture(t, { enableExperimentalGameOverlay: true })
+  let finish
+  f.setDefenderAction(
+    () =>
+      new Promise((resolve) => {
+        finish = resolve
+      }),
+  )
+  const button = f.wrapper.get('[data-overlay-defender-exclusions]')
+  await button.trigger('click')
+  await button.trigger('click')
+  assert.equal(f.defenderCalls.length, 1)
+  assert.equal(button.attributes('disabled'), 'true')
+  finish({ status: 'added', message: 'Injector exclusions configured.' })
+  await flushPromises()
+  await vue.nextTick()
+  assert.match(f.wrapper.get('[role="status"]').text(), /configured/)
+  assert.equal(f.calls.admin, 0)
+})
+
+test('cancelled Defender confirmation stays quiet and invocation errors are visible', async (t) => {
+  const f = fixture(t, { enableExperimentalGameOverlay: true })
+  const button = f.wrapper.get('[data-overlay-defender-exclusions]')
+  await button.trigger('click')
+  await Promise.resolve()
+  await vue.nextTick()
+  assert.equal(f.wrapper.find('[role="status"]').exists(), false)
+  f.setDefenderAction(() => Promise.reject(new Error('secret native error')))
+  await button.trigger('click')
+  await Promise.resolve()
+  await vue.nextTick()
+  assert.match(
+    f.wrapper.get('[role="status"]').text(),
+    /could not be configured/,
+  )
+  assert.doesNotMatch(f.wrapper.text(), /secret native error/)
 })

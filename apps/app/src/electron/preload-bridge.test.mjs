@@ -104,6 +104,11 @@ function mainFixture() {
     '@/modules/vue-hitboxes/hitboxes.store': {},
     '@/utils/electron-window': {},
     '@/electron/game-overlay-backend': {},
+    '@/modules/electron-overlay-defender': {
+      addOverlayInjectorDefenderExclusions: async () => ({
+        status: 'cancelled',
+      }),
+    },
     '@/features/display/utils': {},
     '@/modules/electron-keybinding/utils': {},
     '@/electron/events/main': {},
@@ -123,7 +128,7 @@ function mainFixture() {
     '@google-cloud/translate': {},
     'electron-postman': {},
     systeminformation: {},
-    'sudo-prompt': {},
+    '@vscode/sudo-prompt': {},
     clipboardy: {},
     'node-abi': {},
   }

@@ -19,7 +19,7 @@ overrides:
 
 minimumReleaseAgeExclude:
   # The vendored RC is hash-pinned and intentionally not published to npm.
-  - electron-game-overlay@0.1.0-rc.5
+  - electron-game-overlay@0.1.0-rc.7
   - gelectron
   - electron@46.0.0-alpha.2
   - '@aws-sdk/client-cognito-identity@3.1157.0'

@@ -6,11 +6,27 @@ const fs = require('node:fs')
 const path = require('node:path')
 const { createRequire } = require('node:module')
 const { spawn, execFileSync } = require('node:child_process')
-const { app, BrowserWindow, nativeImage, screen } = require('electron')
+const { app, BrowserWindow, nativeImage, screen, dialog } = require('electron')
 const config = JSON.parse(fs.readFileSync(process.argv.at(-1), 'utf8'))
 process.argv = [process.argv[0], __filename]
 const requireApp = createRequire(path.join(config.appRoot, 'package.json'))
 const sdk = requireApp('electron-game-overlay')
+// Security configuration is always a controlled boundary in native E2E.
+// The real button/IPC/main warning path runs, but no exclusion can be applied.
+requireApp('@vscode/sudo-prompt').exec = () => {
+  evidence.elevationRequests++
+  throw new Error('Elevation and Defender changes are forbidden in E2E')
+}
+dialog.showMessageBox = async (...args) => {
+  const options = args.at(-1)
+  assert.equal(
+    options.title,
+    'Windows Defender exclusions',
+    'Unexpected native dialog in E2E',
+  )
+  evidence.defenderWarning = options
+  return { response: 0, checkboxChecked: false }
+}
 const evidence = {
   status: 'failed',
   case: config.case,
@@ -19,6 +35,7 @@ const evidence = {
   sdk: requireApp('electron-game-overlay/package.json').version,
   scaleFactor: config.scaleFactor,
   targetMode: config.targetMode,
+  startupBarrier: config.targetMode !== 'fast-folder',
   inputSource: 'Windows SendInput virtual-key down/up pairs',
   pointerClicks: 0,
   realAppBundle: true,
@@ -28,9 +45,12 @@ const evidence = {
   diagnostics: [],
   keyTimings: [],
   managedEvents: [],
+  policyUpdates: [],
+  elevationRequests: 0,
 }
 const failures = []
 let target,
+  managedController,
   overlay,
   wrapper,
   session,
@@ -294,6 +314,7 @@ app.on('browser-window-created', (_event, window) => {
 const createSession = sdk.ElectronGameOverlay.prototype.createSession
 const onTargetEvent = sdk.OverlayTargetWatcher.prototype.onEvent
 sdk.OverlayTargetWatcher.prototype.onEvent = function (handler) {
+  managedController = this
   return onTargetEvent.call(this, (event) => {
     evidence.managedEvents.push({
       type: event.type,
@@ -303,6 +324,34 @@ sdk.OverlayTargetWatcher.prototype.onEvent = function (handler) {
     })
     return handler(event)
   })
+}
+const updatePolicy = sdk.OverlayTargetWatcher.prototype.update
+sdk.OverlayTargetWatcher.prototype.update = function (policy) {
+  const entry = {
+    allow: policy.earlyPolicy?.allow,
+    deny: policy.earlyPolicy?.deny,
+    status: 'pending',
+    eventsAtStart: evidence.managedEvents.length,
+  }
+  evidence.policyUpdates.push(entry)
+  let result
+  try {
+    result = updatePolicy.call(this, policy)
+  } catch (error) {
+    entry.status = 'failed'
+    entry.error = String(error)
+    throw error
+  }
+  void result.then(
+    () => {
+      entry.status = 'applied'
+    },
+    (error) => {
+      entry.status = 'failed'
+      entry.error = String(error)
+    },
+  )
+  return result
 }
 const prepare = sdk.ReShadeOverlayLauncher.prototype.prepare
 sdk.ReShadeOverlayLauncher.prototype.prepare = function (...args) {
@@ -528,18 +577,198 @@ async function verifyPointerAndScroll() {
     'real input refocused after pointer tests',
   )
 }
+async function verifyDefenderWarning() {
+  drive('shortcut', 13)
+  await until(
+    () => wrapper.visible && intercepting,
+    'overlay reopened for security-button cancellation test',
+  )
+  await pointerAt('[data-v-step="settings-button"]')
+  drive('click')
+  evidence.pointerClicks++
+  await until(
+    () =>
+      overlay.webContents.executeJavaScript(
+        "!!document.querySelector('#settings')",
+      ),
+    'settings popup opened',
+  )
+  await pointerAt('a[href="#/settings/game-overlay"]')
+  drive('click')
+  evidence.pointerClicks++
+  await until(
+    () =>
+      overlay.webContents.executeJavaScript(
+        "!!document.querySelector('[data-overlay-defender-exclusions]')",
+      ),
+    'experimental Defender action visible',
+  )
+  await pointerAt('[data-overlay-defender-exclusions]')
+  capture('defender-action')
+  drive('click')
+  evidence.pointerClicks++
+  await until(
+    () => evidence.defenderWarning && !wrapper.visible && !intercepting,
+    'real IPC requests native warning and releases game input',
+  )
+  assert.equal(evidence.defenderWarning.defaultId, 0)
+  assert.equal(evidence.defenderWarning.cancelId, 0)
+  assert.equal(evidence.defenderWarning.type, 'warning')
+  assert.ok(
+    evidence.defenderWarning.detail.includes('reduces antivirus protection'),
+  )
+  assert.deepEqual(evidence.defenderWarning.buttons, [
+    'Cancel',
+    'Add exclusions',
+  ])
+  evidence.checks.push(
+    'native click reaches main-process Defender warning; controlled cancellation leaves security settings untouched',
+  )
+}
+async function changePolicy(patch) {
+  const previous = evidence.policyUpdates.length
+  await overlay.webContents.executeJavaScript(`(() => {
+    const store = document.querySelector('#app').__vue_app__.config.globalProperties.$pinia._s.get('game-overlay');
+    if (!store) throw new Error('Real game-overlay Pinia store unavailable');
+    store.$patch(${JSON.stringify(patch)});
+  })()`)
+  await until(
+    () =>
+      evidence.policyUpdates.length > previous &&
+      evidence.policyUpdates.at(-1).status !== 'pending',
+    'real renderer policy change reached managed SDK',
+  )
+  assert.equal(
+    evidence.policyUpdates.at(-1).status,
+    'applied',
+    JSON.stringify(evidence.policyUpdates.at(-1)),
+  )
+}
+async function removeRedundantRule() {
+  const folder = path.dirname(config.target).replaceAll('\\', '/') + '/**'
+  const name = '**/' + path.basename(config.target)
+  await changePolicy({ allowlist: [folder, name] })
+  await changePolicy({ allowlist: [folder] })
+  assert.ok(
+    managedController.targets.some((t) => t.pid === target.pid && !t.cancelled),
+    'Authorized running target survives removal',
+  )
+  assert.equal(wrapper.visible, true)
+  assert.equal(intercepting, true)
+}
+async function revokePolicy(before) {
+  if (config.targetMode === 'fast-folder') {
+    const previousPid = target.pid
+    const pointerDowns = (await read()).probe.pointerDowns
+    await closeTarget()
+    await until(
+      () =>
+        evidence.managedEvents.some(
+          (event) =>
+            event.type === 'exited' &&
+            event.pid === previousPid &&
+            event.creationTime100ns,
+        ),
+      'folder-policy target authoritative exit after rule removal',
+    )
+    await until(
+      () =>
+        evidence.managedEvents
+          .slice(evidence.policyUpdates.at(-1).eventsAtStart)
+          .some((event) => event.type === 'armed'),
+      'updated folder policy has an armed successor for relaunch',
+    )
+    await startTarget()
+    assert.notEqual(target.pid, previousPid)
+    const baseline = capture('folder-relaunch-before')
+    drive('shortcut', 13)
+    await until(
+      () => wrapper.visible && intercepting,
+      'folder relaunch overlay interception',
+    )
+    drive('key', 68)
+    await until(
+      async () => (await read()).value === 'abcd',
+      'folder relaunch first native key without clicking',
+    )
+    assert.equal((await read()).probe.pointerDowns, pointerDowns)
+    await verifyVisible('folder-relaunch', baseline)
+    drive('key', 8)
+    await until(
+      async () => (await read()).value === 'abc',
+      'folder relaunch test key cleared',
+    )
+    drive('key', 27)
+    await until(
+      () => !wrapper.visible && !intercepting,
+      'folder relaunch Escape releases input',
+    )
+    evidence.checks.push(
+      'folder-only policy after basename removal: fresh no-barrier relaunch renders and accepts first key without clicking',
+    )
+  }
+  drive('shortcut', 13)
+  await until(
+    () => wrapper.visible && intercepting,
+    'overlay opened before genuine revocation',
+  )
+  const state = await read()
+  await changePolicy({ denylist: [config.target.replaceAll('\\', '/')] })
+  evidence.revocation = {
+    lastInterceptionAck: intercepting,
+    cancelled: managedController.targets.some(
+      (t) => t.pid === target.pid && t.cancelled,
+    ),
+  }
+  await until(() => !wrapper.visible, 'genuine deny hides application overlay')
+  const x = Math.floor(
+    (state.rect.x + state.rect.width / 2) * config.scaleFactor,
+  )
+  const y = Math.floor(
+    (state.rect.y + state.rect.height / 2) * config.scaleFactor,
+  )
+  await until(
+    () =>
+      capture('revoked')
+        .at(x, y)
+        .every((v, i) => Math.abs(v - before.at(x, y)[i]) < 15),
+    'revocation removes actual overlay pixels',
+  )
+  const keys = Number(/ key=(\d+)/.exec(drive('state').title)?.[1])
+  drive('key', 86)
+  await until(
+    () => Number(/ key=(\d+)/.exec(drive('state').title)?.[1]) > keys,
+    'revoked target receives OS key',
+  )
+  evidence.revocation.nativeKeyReturnedToGame = true
+  assert.equal((await read()).value, 'abc')
+  evidence.checks.push(
+    'genuine deny revokes actual overlay pixels and input; game receives native key',
+  )
+}
 async function startTarget() {
   targetConnected = false
   surface = undefined
   rendering = false
   intercepting = false
-  fs.writeFileSync(
-    path.join(
-      path.dirname(config.target),
-      'electron-game-overlay-startup-barrier.enabled',
-    ),
-    '',
-  )
+  if (config.targetMode !== 'fast-folder')
+    fs.writeFileSync(
+      path.join(
+        path.dirname(config.target),
+        'electron-game-overlay-startup-barrier.enabled',
+      ),
+      '',
+    )
+  else
+    assert.equal(
+      fs.existsSync(
+        path.join(
+          path.dirname(config.target),
+          'electron-game-overlay-startup-barrier.enabled',
+        ),
+      ),
+      false,
+    )
   target = spawn(config.target, [], {
     cwd: path.dirname(config.target),
     windowsHide: false,
@@ -552,27 +781,29 @@ async function startTarget() {
   target.stderr.pipe(
     fs.createWriteStream(path.join(config.directory, 'target.stderr.log')),
   )
-  await until(
-    () => {
-      const module = drive('module').module
-      if (!module) return false
-      const log = path.join(path.dirname(module), 'inject.stdout.log')
-      return (
-        fs.existsSync(log) &&
-        fs
-          .readFileSync(log, 'utf8')
-          .includes('ELECTRON_GAME_OVERLAY_INJECTOR_RESULT')
-      )
-    },
-    'completed injection before releasing controlled graphics barrier',
-    45000,
-  )
-  fs.unlinkSync(
-    path.join(
-      path.dirname(config.target),
-      'electron-game-overlay-startup-barrier.enabled',
-    ),
-  )
+  if (config.targetMode !== 'fast-folder') {
+    await until(
+      () => {
+        const module = drive('module').module
+        if (!module) return false
+        const log = path.join(path.dirname(module), 'inject.stdout.log')
+        return (
+          fs.existsSync(log) &&
+          fs
+            .readFileSync(log, 'utf8')
+            .includes('ELECTRON_GAME_OVERLAY_INJECTOR_RESULT')
+        )
+      },
+      'completed injection before releasing controlled graphics barrier',
+      45000,
+    )
+    fs.unlinkSync(
+      path.join(
+        path.dirname(config.target),
+        'electron-game-overlay-startup-barrier.enabled',
+      ),
+    )
+  }
   evidence.nativeInjectionExecuted = true
   await until(
     () =>
@@ -603,11 +834,10 @@ async function run() {
   )
   evidence.displayScaleFactor = screen.getPrimaryDisplay().scaleFactor
   assert.equal(evidence.displayScaleFactor, config.scaleFactor)
-  if (config.targetMode === 'early')
-    await until(
-      () => evidence.managedEvents.some((event) => event.type === 'armed'),
-      'managed early watcher armed before launch',
-    )
+  await until(
+    () => evidence.managedEvents.some((event) => event.type === 'armed'),
+    'managed early watcher armed before launch',
+  )
   await startTarget()
   drive('move', '20,20')
   await wait(100)
@@ -625,9 +855,9 @@ async function run() {
     assert.equal((await read()).value, 'a')
     if (config.targetMode === 'early') {
       const previousPid = target.pid
-      const armed = evidence.managedEvents.filter(
-        (event) => event.type === 'armed',
-      ).length
+      const selection = evidence.managedEvents.findIndex(
+        (event) => event.type === 'attaching' && event.pid === previousPid,
+      )
       await closeTarget()
       await until(
         () =>
@@ -641,9 +871,10 @@ async function run() {
       )
       await until(
         () =>
-          evidence.managedEvents.filter((event) => event.type === 'armed')
-            .length > armed,
-        'managed early watcher rearms after proven exit',
+          evidence.managedEvents
+            .slice(selection + 1)
+            .some((event) => event.type === 'armed'),
+        'SDK successor watcher armed before the next launch',
       )
       await startTarget()
       assert.notEqual(target.pid, previousPid)
@@ -665,6 +896,12 @@ async function run() {
       Number.isFinite(gameKeys),
       'SDK host input oracle must be enabled',
     )
+    if (
+      config.case === 'd3d11-x64' &&
+      config.scaleFactor === 1 &&
+      config.targetMode !== 'early'
+    )
+      await removeRedundantRule()
     drive('key', 67)
     await until(
       async () => (await read()).value === 'abc',
@@ -676,6 +913,16 @@ async function run() {
       gameKeys,
       'Intercepted typing must not leak into the game',
     )
+    if (
+      config.case === 'd3d11-x64' &&
+      config.scaleFactor === 1 &&
+      config.targetMode !== 'early'
+    ) {
+      await verifyVisible('policy-removal', before)
+      evidence.checks.push(
+        'redundant basename allow removal retains real native typing and rendered overlay',
+      )
+    }
     await verifyPointerAndScroll()
     drive('key', 27)
     await until(
@@ -710,8 +957,25 @@ async function run() {
     evidence.checks.push(
       'hidden overlay releases input to the game; intercepted typing does not leak',
     )
+    if (
+      config.case === 'd3d11-x64' &&
+      config.scaleFactor === 1 &&
+      config.targetMode === 'folder'
+    )
+      await verifyDefenderWarning()
+    if (
+      config.case === 'd3d11-x64' &&
+      config.scaleFactor === 1 &&
+      config.targetMode !== 'early'
+    )
+      await revokePolicy(before)
   }
   const state = await read()
+  assert.equal(
+    evidence.elevationRequests,
+    0,
+    'Native E2E must never request administrator changes',
+  )
   assert.equal(state.probe.pointerDowns, evidence.pointerClicks)
   evidence.dom = state
   assert.deepEqual(failures, [], 'No uncaught application errors')
