@@ -4,7 +4,8 @@
     :style="{
       willChange: 'opacity',
     }"
-    class="absolute inset-0 opacity-0 pointer-events-none"
+    :class="{ 'opacity-0': !isGameOverlay }"
+    class="absolute inset-0 pointer-events-none"
   >
     <div
       :style="{
@@ -65,6 +66,7 @@ watch(isBackgroundShown, (newValue) => {
 })
 
 onMounted(() => {
+  if (isGameOverlay) return
   window.addEventListener('blur', () => {
     gsap.set(background.value, {
       opacity: 0,
