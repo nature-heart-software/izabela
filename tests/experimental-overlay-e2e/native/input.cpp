@@ -1,4 +1,4 @@
-// Test-only Windows keyboard/capture driver. No pointer input is implemented.
+// Test-only Windows input/capture driver. Every command validates its owned PID.
 #include <Windows.h>
 #include <TlHelp32.h>
 #include <cstdio>
@@ -82,6 +82,39 @@ int wmain(int argc, wchar_t **argv) {
         PostMessageW(target_window, WM_CLOSE, 0, 0);
     } else if (command == L"activate") {
         if (!activate()) return 5;
+    } else if (command == L"move" || command == L"click" || command == L"wheel") {
+        if (GetForegroundWindow() != target_window) return 6;
+        std::vector<INPUT> inputs;
+        INPUT input{}; input.type = INPUT_MOUSE;
+        if (command == L"move") {
+            int x = 0, y = 0;
+            RECT client{}; GetClientRect(target_window, &client);
+            if (argc < 5 || swscanf_s(argv[4], L"%d,%d", &x, &y) != 2 || x < 0 || y < 0 || x >= client.right || y >= client.bottom) return 2;
+            POINT point{x, y}; if (!ClientToScreen(target_window, &point)) return 8;
+            input.mi.dx = MulDiv(point.x - GetSystemMetrics(SM_XVIRTUALSCREEN), 65535, GetSystemMetrics(SM_CXVIRTUALSCREEN) - 1);
+            input.mi.dy = MulDiv(point.y - GetSystemMetrics(SM_YVIRTUALSCREEN), 65535, GetSystemMetrics(SM_CYVIRTUALSCREEN) - 1);
+            input.mi.dwFlags = MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_VIRTUALDESK;
+            inputs.push_back(input);
+        } else {
+            CURSORINFO cursor{}; cursor.cbSize = sizeof(cursor);
+            RECT bounds{}; GetClientRect(target_window, &bounds);
+            if (!GetCursorInfo(&cursor)) return 8;
+            POINT point = cursor.ptScreenPos; ScreenToClient(target_window, &point);
+            if (!PtInRect(&bounds, point)) return 6;
+            if (command == L"click") {
+                input.mi.dwFlags = MOUSEEVENTF_LEFTDOWN; inputs.push_back(input);
+                input.mi.dwFlags = MOUSEEVENTF_LEFTUP; inputs.push_back(input);
+            } else {
+                if (argc < 5) return 2;
+                input.mi.dwFlags = MOUSEEVENTF_WHEEL;
+                input.mi.mouseData = (DWORD)wcstol(argv[4], nullptr, 10);
+                inputs.push_back(input);
+            }
+        }
+        if (SendInput((UINT)inputs.size(), inputs.data(), sizeof(INPUT)) != inputs.size()) {
+            if (command == L"click") { input.mi.dwFlags = MOUSEEVENTF_LEFTUP; SendInput(1, &input, sizeof(INPUT)); }
+            return 7;
+        }
     } else if (command == L"key" || command == L"shortcut") {
         if (GetForegroundWindow() != target_window) { std::fprintf(stderr, "Fixture is not foreground\n"); return 6; }
         if (argc < 5) return 2;
@@ -120,7 +153,15 @@ int wmain(int argc, wchar_t **argv) {
         SelectObject(memory, prior); DeleteObject(bitmap); DeleteDC(memory); ReleaseDC(nullptr, screen);
         if (!captured || !written) return 9;
     } else if (command != L"state") return 2;
+    CURSORINFO cursor{}; cursor.cbSize = sizeof(cursor); GetCursorInfo(&cursor);
+    const char *shape = "other";
+    if (!(cursor.flags & CURSOR_SHOWING)) shape = "hidden";
+    else if (cursor.hCursor == LoadCursorW(nullptr, IDC_ARROW)) shape = "arrow";
+    else if (cursor.hCursor == LoadCursorW(nullptr, IDC_IBEAM)) shape = "text";
+    else if (cursor.hCursor == LoadCursorW(nullptr, IDC_HAND)) shape = "pointer";
+    else if (cursor.hCursor == LoadCursorW(nullptr, IDC_SIZEALL)) shape = "move";
+    RECT client{}; GetClientRect(target_window, &client);
     wchar_t title[2048]{}; GetWindowTextW(target_window, title, 2048);
-    std::printf("{\"foreground\":%s,\"title\":%s}\n", GetForegroundWindow() == target_window ? "true" : "false", json_string(title).c_str());
+    std::printf("{\"foreground\":%s,\"title\":%s,\"width\":%ld,\"height\":%ld,\"cursor\":\"%s\"}\n", GetForegroundWindow() == target_window ? "true" : "false", json_string(title).c_str(), client.right, client.bottom, shape);
     return 0;
 }

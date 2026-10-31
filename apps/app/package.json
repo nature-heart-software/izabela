@@ -10,7 +10,7 @@
     "@packages/process-watcher": "workspace:*",
     "@packages/win-mouse": "workspace:*",
     "bindings": "1.5.0",
-    "electron-game-overlay": "file:../../vendor/electron-game-overlay-0.1.0-rc.2.tgz",
+    "electron-game-overlay": "file:../../vendor/electron-game-overlay-0.1.0-rc.4.tgz",
     "electron-postman": "workspace:*",
     "electron-store": "^8.1.0",
     "electron-updater": "^5.0.1",

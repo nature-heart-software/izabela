@@ -1,18 +1,22 @@
 # Experimental overlay SDK
 
-`electron-game-overlay-0.1.0-rc.2.tgz` is the complete, unmodified upstream SDK
+`electron-game-overlay-0.1.0-rc.4.tgz` is the complete, unmodified upstream SDK
 candidate used by Izabela's **Experimental Game Overlay**. The scoped workspace
 package `@packages/electron-game-overlay` remains the legacy backend.
 
-- Source: `Wurielle/electron-game-overlay`, commit
-  `1ff4baeb5930bb20d6dff0d8e69ca05c8eb8be98`.
+- Source: `Wurielle/electron-game-overlay`, `feat/sdk-release-candidate`,
+  with uncommitted wheel/cursor and scaling changes based on
+  `1ff4baeb5930bb20d6dff0d8e69ca05c8eb8be98`. This base commit does not identify
+  the modified candidate; the exact archive is pinned by its checksum below.
 - Upstream PR: <https://github.com/Wurielle/electron-game-overlay/pull/2>.
-- SHA-256: `810674987dd9911dfd9b58dc307c7399e48306ad7c189acc569524895991032a`.
+- SHA-256: `d16d03da6b40cc9ffc7c6f3f732770f97eda16689b703ad54860fbe3fc9f28e5`.
 - License: GPL-3.0-only; the archive includes runtime third-party notices.
 
-The archive includes both Windows target architectures, 49 sealed broker
-payloads, native build stamps and `SDK_PROVENANCE.json`. The native add-on build
-ID is `B6A6721DEF914B38A040AC08A87F31A2`, runtime generation 4. Installation needs
+The archive includes both Windows target architectures, 51 sealed broker
+payloads, native build stamps and `SDK_PROVENANCE.json`. Its source snapshot ZIP
+and per-file source manifest are retained beside the SDK archive and verified
+against their provenance hashes. The native add-on build ID is
+`1CAEA7482B41451AB31FC2F91B46F2DD`, runtime generation 6. Installation needs
 neither a native SDK rebuild nor an expiring Actions artifact download.
 
 Izabela applies no SDK patches and carries no locally rebuilt SDK variant.
@@ -27,7 +31,14 @@ remains an RC with game-specific compatibility limits. Older running SDK
 coordinators/runtimes retain their negotiated behavior and are not replaced live.
 
 Consumer checks verify the tarball checksum, native payload hashes and build
-identities, SDK provenance, complete packaging, and actual Electron loading/DOM
+identities, complete packaging, and actual Electron loading/DOM
 focus. Native routing, long-idle attachment and physical-key Gun Frog evidence
 were supplied with the upstream release. A consumer DOM smoke alone does not
 establish native game input or graphics-hook compatibility.
+
+rc.3 adds vertical/horizontal pointer-wheel routing and negotiated standard
+cursor shapes (`window-cursor-v1`). Custom bitmap and unmapped exotic cursors
+fall back to arrow. rc.4 separates offscreen raster dimensions from physical
+display placement to fix fractional scaling on Electron 46, without resampling
+or relabelling frames. Consumer E2E includes actual app rendering, pointer input,
+scrolling and native cursor shapes at 100%, 125% and 150% display scale.

@@ -1,4 +1,4 @@
-name: Native overlay open and type
+name: Native overlay input
 
 on:
   workflow_dispatch:
@@ -17,7 +17,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-      - name: Build pinned SDK graphics hosts and keyboard driver
+      - name: Build pinned SDK graphics hosts and native input driver
         run: node tests/experimental-overlay-e2e/build-fixtures.cjs
       - uses: actions/upload-artifact@v7.0.2
         with:

@@ -19,19 +19,19 @@ test('experimental SDK is the pinned complete upstream RC, distinct from legacy'
   )
   assert.equal(
     app.dependencies['electron-game-overlay'],
-    'file:../../vendor/electron-game-overlay-0.1.0-rc.2.tgz',
+    'file:../../vendor/electron-game-overlay-0.1.0-rc.4.tgz',
   )
   const bytes = readFileSync(
-    new URL('vendor/electron-game-overlay-0.1.0-rc.2.tgz', root),
+    new URL('vendor/electron-game-overlay-0.1.0-rc.4.tgz', root),
   )
   assert.equal(
     createHash('sha256').update(bytes).digest('hex'),
-    '810674987dd9911dfd9b58dc307c7399e48306ad7c189acc569524895991032a',
+    'd16d03da6b40cc9ffc7c6f3f732770f97eda16689b703ad54860fbe3fc9f28e5',
   )
   const consumer = createRequire(new URL('apps/app/package.json', root))
   assert.equal(
     consumer('electron-game-overlay/package.json').version,
-    '0.1.0-rc.2',
+    '0.1.0-rc.4',
   )
   const sdkRoot = path.dirname(
     consumer.resolve('electron-game-overlay/package.json'),
@@ -39,11 +39,30 @@ test('experimental SDK is the pinned complete upstream RC, distinct from legacy'
   const provenance = JSON.parse(
     readFileSync(path.join(sdkRoot, 'SDK_PROVENANCE.json'), 'utf8'),
   )
+  assert.equal(provenance.version, '0.1.0-rc.4')
   assert.equal(
-    provenance.sourceCommit,
+    provenance.baseCommit,
     '1ff4baeb5930bb20d6dff0d8e69ca05c8eb8be98',
   )
-  assert.equal(provenance.version, '0.1.0-rc.2')
+  assert.equal(provenance.workingTreeDirty, true)
+  for (const [entry, expected] of [
+    [
+      provenance.sourceSnapshot,
+      '3f0c4fa0c0d0dbaa2d4273802ab25769dcd689e239fada02a938603406231dfc',
+    ],
+    [
+      provenance.sourceManifest,
+      'd1981bae28ca52941a59c282c5578ab4f3c8ca9ff745a07125948eb0836be43b',
+    ],
+  ]) {
+    assert.equal(entry.sha256, expected)
+    assert.equal(
+      createHash('sha256')
+        .update(readFileSync(new URL(`vendor/${entry.file}`, root)))
+        .digest('hex'),
+      expected,
+    )
+  }
 })
 
 test('unpublished vendored RC has only an exact-version release-age exception', () => {
@@ -52,7 +71,7 @@ test('unpublished vendored RC has only an exact-version release-age exception', 
     .split('\n')
     .map((line) => line.trim())
     .filter((line) => /^- ['"]?electron-game-overlay(?:@|['"]?$)/.test(line))
-  assert.deepEqual(exemptions, ['- electron-game-overlay@0.1.0-rc.2'])
+  assert.deepEqual(exemptions, ['- electron-game-overlay@0.1.0-rc.4'])
   assert.doesNotMatch(config, /^  electron-game-overlay@.*: patches\//m)
   assert.doesNotMatch(config, /^minimumReleaseAge:\s*0\s*$/m)
 })
@@ -71,8 +90,8 @@ test('both native architectures carry the fixed identity and verified artifacts'
         'utf8',
       ).replace(/^\uFEFF/, ''),
     )
-    assert.equal(stamp.addonBuildId, 'B6A6721DEF914B38A040AC08A87F31A2')
-    assert.equal(stamp.runtimeGeneration, 4)
+    assert.equal(stamp.addonBuildId, '1CAEA7482B41451AB31FC2F91B46F2DD')
+    assert.equal(stamp.runtimeGeneration, 6)
     assert.equal(stamp.injectorFutureTargets, 1)
     const assets = {
       addonSha256: `electron_game_overlay.addon${bits}`,
@@ -141,7 +160,7 @@ test('afterPack preserves every actual SDK file including sealed dependency noti
         (file) =>
           !file.startsWith(path.join('node_modules', '.bin') + path.sep),
       )
-    assert.equal(files.length, 157)
+    assert.equal(files.length, 165)
     assert.deepEqual(
       readdirSync(destination, { recursive: true, withFileTypes: true })
         .filter((entry) => entry.isFile())
@@ -180,7 +199,7 @@ test('afterPack preserves every actual SDK file including sealed dependency noti
         file.path,
       )
     }
-    assert.equal(manifest.files.length, 49)
+    assert.equal(manifest.files.length, 51)
   } finally {
     rmSync(temporary, { recursive: true, force: true })
   }

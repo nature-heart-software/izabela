@@ -236,6 +236,7 @@ module.exports = async function focusRuntime({ sdkRoot, profile }) {
       setWindowFocus(overlayWindow, focused) {
         bridgeCalls.focus.push({ nativeId: overlayWindow.nativeId, focused })
       },
+      setWindowCursor() {},
       syncWindowGeometry() {},
       followTarget() {
         throw new Error('Unexpected target following')

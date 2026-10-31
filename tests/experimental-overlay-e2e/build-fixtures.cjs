@@ -97,6 +97,21 @@ function build() {
       })
     }
   }
+  fs.copyFileSync(
+    path.join(source, 'LICENSE'),
+    path.join(directory, 'SDK-fixtures-LICENSE'),
+  )
+  buildInput(manifest)
+  console.log(`Built controlled graphics fixtures: ${directory}`)
+  return directory
+}
+function inputSourceHash() {
+  return createHash('sha256')
+    .update(fs.readFileSync(path.join(__dirname, 'native/input.cpp')))
+    .update(fs.readFileSync(path.join(__dirname, 'native/CMakeLists.txt')))
+    .digest('hex')
+}
+function buildInput(manifest) {
   const helperBuild = path.join(directory, 'input-build')
   execute('cmake', [
     '-S',
@@ -120,19 +135,21 @@ function build() {
     path.join(helperBuild, 'Release/overlay-test-input.exe'),
     path.join(directory, 'overlay-test-input.exe'),
   )
-  fs.copyFileSync(
-    path.join(source, 'LICENSE'),
-    path.join(directory, 'SDK-fixtures-LICENSE'),
-  )
   manifest.inputHelperSha256 = createHash('sha256')
     .update(fs.readFileSync(path.join(directory, 'overlay-test-input.exe')))
     .digest('hex')
+  manifest.inputSourceSha256 = inputSourceHash()
   fs.writeFileSync(
     path.join(directory, 'manifest.json'),
     JSON.stringify(manifest, null, 2) + '\n',
   )
-  console.log(`Built controlled graphics fixtures: ${directory}`)
-  return directory
 }
 if (require.main === module) build()
-module.exports = { build, cases, directory, revision }
+module.exports = {
+  build,
+  buildInput,
+  inputSourceHash,
+  cases,
+  directory,
+  revision,
+}

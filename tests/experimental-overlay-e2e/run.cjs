@@ -3,7 +3,13 @@ const fs = require('node:fs')
 const path = require('node:path')
 const { createHash, randomUUID } = require('node:crypto')
 const { spawn, execFileSync } = require('node:child_process')
-const { cases, directory: fixtures, revision } = require('./build-fixtures.cjs')
+const {
+  cases,
+  directory: fixtures,
+  revision,
+  buildInput,
+  inputSourceHash,
+} = require('./build-fixtures.cjs')
 const root = path.resolve(__dirname, '../..')
 const argument = (name) =>
   process.argv
@@ -11,6 +17,8 @@ const argument = (name) =>
     ?.slice(name.length + 3)
 const appRoot = path.resolve(argument('app-root') || 'apps/app')
 const selected = argument('case') ? [argument('case')] : cases
+const requestedScale =
+  argument('scale') === undefined ? undefined : Number(argument('scale'))
 const reportRoot = path.join(
   root,
   'coverage/experimental-overlay/e2e',
@@ -56,7 +64,7 @@ function writeStore(profile, name, value) {
     JSON.stringify({ [id]: value }),
   )
 }
-async function runCase(name, negativeControl, manifest) {
+async function runCase(name, negativeControl, manifest, scaleFactor = 1) {
   const fixture = manifest.files.find((file) => file.case === name)
   assert.ok(fixture, `Missing compiled fixture: ${name}`)
   const source = path.join(fixtures, fixture.path)
@@ -67,7 +75,9 @@ async function runCase(name, negativeControl, manifest) {
   )
   const directory = path.join(
     reportRoot,
-    name + (negativeControl ? '-negative-control' : ''),
+    name +
+      (scaleFactor === 1 ? '' : `-scale-${scaleFactor}`) +
+      (negativeControl ? '-negative-control' : ''),
   )
   const targetDirectory = path.join(directory, 'target')
   const target = path.join(targetDirectory, path.basename(source))
@@ -104,6 +114,7 @@ async function runCase(name, negativeControl, manifest) {
   const config = {
     case: name,
     negativeControl,
+    scaleFactor,
     appRoot,
     directory,
     profile,
@@ -120,7 +131,11 @@ async function runCase(name, negativeControl, manifest) {
   delete env.ELECTRON_RUN_AS_NODE
   child = spawn(
     require('electron'),
-    [path.join(__dirname, 'runtime.cjs'), configFile],
+    [
+      `--force-device-scale-factor=${scaleFactor}`,
+      path.join(__dirname, 'runtime.cjs'),
+      configFile,
+    ],
     {
       cwd: path.join(root, 'apps/app'),
       env,
@@ -158,7 +173,7 @@ async function runCase(name, negativeControl, manifest) {
   console.log(
     `${report.status === 'passed' && code === 0 ? 'PASS' : 'FAIL'} ${name}${
       negativeControl ? ' negative-control' : ''
-    }${report.error ? ': ' + report.error : ''}`,
+    } scale=${scaleFactor}${report.error ? ': ' + report.error : ''}`,
   )
   return report
 }
@@ -170,6 +185,10 @@ async function main() {
   )
   for (const name of selected)
     assert.ok(cases.includes(name), `Unknown fixture: ${name}`)
+  assert.ok(
+    requestedScale === undefined || [1, 1.25, 1.5].includes(requestedScale),
+    'Supported E2E scales: 1, 1.25, 1.5',
+  )
   await assertFreePort(7070)
   if (!fs.existsSync(path.join(fixtures, 'manifest.json')))
     require('./build-fixtures.cjs').build()
@@ -194,17 +213,23 @@ async function main() {
     fs.readFileSync(path.join(fixtures, 'manifest.json'), 'utf8'),
   )
   assert.equal(manifest.sourceRevision, revision)
+  if (manifest.inputSourceSha256 !== inputSourceHash()) buildInput(manifest)
   assert.equal(
     createHash('sha256')
       .update(fs.readFileSync(path.join(fixtures, 'overlay-test-input.exe')))
       .digest('hex'),
     manifest.inputHelperSha256,
-    'Keyboard driver checksum',
+    'Native input driver checksum',
   )
   fs.mkdirSync(reportRoot, { recursive: true })
   const reports = []
   for (const name of selected)
-    reports.push(await runCase(name, false, manifest))
+    reports.push(await runCase(name, false, manifest, requestedScale ?? 1))
+  if (requestedScale === undefined) {
+    const scaleCase = selected.includes('d3d11-x64') ? 'd3d11-x64' : selected[0]
+    for (const scale of [1.25, 1.5])
+      reports.push(await runCase(scaleCase, false, manifest, scale))
+  }
   // A regression test must detect the original bug, not merely prove that its
   // own input helper can type into an Electron webview.
   if (reports.every((report) => report.status === 'passed'))
@@ -213,6 +238,7 @@ async function main() {
         selected.includes('d3d11-x64') ? 'd3d11-x64' : selected[0],
         true,
         manifest,
+        requestedScale ?? 1,
       ),
     )
   const passed = reports.every(

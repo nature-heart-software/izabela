@@ -6,9 +6,9 @@ const fs = require('node:fs')
 const path = require('node:path')
 const { createRequire } = require('node:module')
 const { spawn, execFileSync } = require('node:child_process')
-const { app, BrowserWindow, nativeImage } = require('electron')
-const config = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'))
-process.argv = process.argv.slice(0, 2)
+const { app, BrowserWindow, nativeImage, screen } = require('electron')
+const config = JSON.parse(fs.readFileSync(process.argv.at(-1), 'utf8'))
+process.argv = [process.argv[0], __filename]
 const requireApp = createRequire(path.join(config.appRoot, 'package.json'))
 const sdk = requireApp('electron-game-overlay')
 const evidence = {
@@ -17,8 +17,9 @@ const evidence = {
   negativeControl: config.negativeControl,
   electron: process.versions.electron,
   sdk: requireApp('electron-game-overlay/package.json').version,
+  scaleFactor: config.scaleFactor,
   inputSource: 'Windows SendInput virtual-key down/up pairs',
-  pointerActions: 0,
+  pointerClicks: 0,
   realAppBundle: true,
   realRenderer: true,
   nativeInjectionExecuted: false,
@@ -152,10 +153,23 @@ async function verifyVisible(name, before) {
     async () => {
       const state = await read()
       if (!state.rect?.width) return false
-      const page = await overlay.webContents.capturePage()
-      const size = page.getSize(),
-        pixels = page.toBitmap()
+      // NativeImage.getSize() is DIP on modern Electron. Read the real raster
+      // dimensions from the existing PNG representation, without resampling.
+      const png = (await overlay.webContents.capturePage()).toPNG()
+      const size = { width: png.readUInt32BE(16), height: png.readUInt32BE(20) }
+      const pixels = nativeImage.createFromBuffer(png).toBitmap()
+      assert.equal(pixels.length, size.width * size.height * 4)
       const frame = capture(name)
+      const bounds = wrapper.getBounds()
+      evidence.rasterGeometry = {
+        bounds,
+        contentBounds: overlay.getContentBounds(),
+        surface,
+        viewport: { width: state.width, height: state.height },
+        raster: size,
+        target: { width: frame.width, height: frame.height },
+        scale: config.scaleFactor,
+      }
       let matched = 0
       for (const fx of [0.2, 0.5, 0.8])
         for (const fy of [0.25, 0.5, 0.75]) {
@@ -166,8 +180,8 @@ async function verifyVisible(name, before) {
               Math.floor((x * size.width) / state.width)) *
             4
           const expected = [...pixels.subarray(source, source + 3)]
-          const tx = Math.floor((x * frame.width) / state.width),
-            ty = Math.floor((y * frame.height) / state.height)
+          const tx = Math.floor(x * config.scaleFactor),
+            ty = Math.floor(y * config.scaleFactor)
           if (pixels[source + 3] < 250 || expected.some((v) => v < 180))
             continue
           const actual = frame.at(tx, ty),
@@ -201,8 +215,8 @@ async function verifyVisible(name, before) {
             ink++
             minX = Math.min(minX, x)
             maxX = Math.max(maxX, x)
-            const tx = Math.floor((px * frame.width) / state.width),
-              ty = Math.floor((py * frame.height) / state.height)
+            const tx = Math.floor(px * config.scaleFactor),
+              ty = Math.floor(py * config.scaleFactor)
             let found = false
             for (let dx = -1; dx <= 1; dx++)
               for (let dy = -1; dy <= 1; dy++)
@@ -252,6 +266,7 @@ app.on('browser-window-created', (_event, window) => {
         pointerDowns: 0,
         held: [],
         keys: [],
+        wheels: [],
       })
       const held = new Set()
       document.addEventListener('pointerdown', () => probe.pointerDowns++)
@@ -263,6 +278,9 @@ app.on('browser-window-created', (_event, window) => {
       document.addEventListener('keyup', (event) => {
         held.delete(event.key)
         probe.held = [...held]
+      })
+      document.addEventListener('wheel', (event) => {
+        probe.wheels.push({ trusted: event.isTrusted, deltaY: event.deltaY })
       })
       window.addEventListener('blur', () => {
         held.clear()
@@ -385,6 +403,117 @@ async function openAndType(key, expected, label) {
     )
   }
 }
+async function pointerAt(selector) {
+  const point = await overlay.webContents.executeJavaScript(`(() => {
+    const element = document.querySelector(${JSON.stringify(selector)})
+    if (!element) return null
+    const r = element.getBoundingClientRect()
+    const x = r.x + r.width / 2, y = r.y + r.height / 2
+    const hit = document.elementFromPoint(x, y)
+    return r.width && r.height && hit && (element === hit || element.contains(hit))
+      ? { x, y, width: innerWidth, height: innerHeight, cssCursor: getComputedStyle(hit).cursor } : null
+  })()`)
+  assert.ok(point, `Visible pointer target: ${selector}`)
+  drive(
+    'move',
+    `${Math.round(point.x * config.scaleFactor)},${Math.round(
+      point.y * config.scaleFactor,
+    )}`,
+  )
+  return point
+}
+async function verifyPointerAndScroll() {
+  const input =
+    '[data-v-step="messenger-text-input"] input, input[data-v-step="messenger-text-input"], [data-v-step="messenger-text-input"] textarea'
+  // Complete both no-click first-key assertions before any pointer interaction.
+  assert.equal((await read()).probe.pointerDowns, 0)
+  const gameWheel = Number(/ wheel=(\d+)/.exec(drive('state').title)?.[1])
+  assert.ok(Number.isFinite(gameWheel), 'Native wheel oracle is enabled')
+  for (const [selector, expected] of [
+    [input, 'text'],
+    ['[data-v-step="settings-button"]', 'pointer'],
+  ]) {
+    const point = await pointerAt(selector)
+    assert.equal(point.cssCursor, expected)
+    await until(
+      () => drive('state').cursor === expected,
+      `actual Windows ${expected} cursor`,
+      5000,
+    )
+    evidence.checks.push(
+      `hover: real ${expected} cursor over actual messenger control`,
+    )
+  }
+  drive('click')
+  evidence.pointerClicks++
+  const scroller = '#settings .settings__content .overflow-y-auto'
+  const scrollState = () =>
+    overlay.webContents.executeJavaScript(`(() => {
+    const e = document.querySelector(${JSON.stringify(scroller)})
+    if (!e || e.clientHeight < 40 || e.scrollHeight <= e.clientHeight + 100) return null
+    const r = e.getBoundingClientRect()
+    return { top: e.scrollTop, height: e.clientHeight, content: e.scrollHeight,
+      x: r.x, y: r.y, width: r.width }
+  })()`)
+  const initial = await until(
+    scrollState,
+    'real settings overflow panel',
+    10000,
+  )
+  await pointerAt(scroller)
+  await until(
+    async () => (await read()).probe.pointerDowns === evidence.pointerClicks,
+    'native settings click reached renderer',
+  )
+  drive('wheel', -120)
+  const down = await until(
+    async () => {
+      const value = await scrollState()
+      return value?.top > initial.top + 5 && value
+    },
+    'native wheel scrolls real settings content',
+    5000,
+  )
+  drive('wheel', 120)
+  await until(
+    async () => (await scrollState())?.top < down.top - 5,
+    'reverse native settings scroll',
+    5000,
+  )
+  assert.ok(
+    (await read()).probe.wheels.some(
+      (event) => event.trusted && event.deltaY !== 0,
+    ),
+  )
+  await wait(150)
+  assert.equal(
+    Number(/ wheel=(\d+)/.exec(drive('state').title)?.[1]),
+    gameWheel,
+    'Intercepted wheel must not leak into the game',
+  )
+  evidence.settingsScroll = { initial, down }
+  evidence.checks.push(
+    'native pointer click opens settings; trusted wheel scrolls actual panel in both directions',
+  )
+  capture('settings-scrolled')
+  await pointerAt('[data-v-step="settings-button"]')
+  drive('click')
+  evidence.pointerClicks++
+  await until(
+    () =>
+      overlay.webContents.executeJavaScript(
+        "!document.querySelector('#settings')",
+      ),
+    'settings popup closes',
+  )
+  await pointerAt(input)
+  drive('click')
+  evidence.pointerClicks++
+  await until(
+    async () => (await read()).focused,
+    'real input refocused after pointer tests',
+  )
+}
 async function run() {
   require(path.join(config.appRoot, 'dist-electron/background.js'))
   await app.whenReady()
@@ -394,6 +523,8 @@ async function run() {
     'real messenger and public backend readiness',
     90000,
   )
+  evidence.displayScaleFactor = screen.getPrimaryDisplay().scaleFactor
+  assert.equal(evidence.displayScaleFactor, config.scaleFactor)
   target = spawn(config.target, [], {
     cwd: path.dirname(config.target),
     windowsHide: false,
@@ -434,6 +565,9 @@ async function run() {
     30000,
   )
   drive('activate')
+  drive('move', '20,20')
+  await wait(100)
+  const gameCursor = drive('state').cursor
   const before = capture('before-open')
   await openAndType('a', 'a', 'first-show')
   if (!config.negativeControl) {
@@ -464,10 +598,30 @@ async function run() {
       gameKeys,
       'Intercepted typing must not leak into the game',
     )
+    await verifyPointerAndScroll()
     drive('key', 27)
     await until(
       () => !wrapper.visible && !intercepting,
       'second hide releases input',
+    )
+    drive('move', '20,20')
+    await until(
+      () => drive('state').cursor === gameCursor,
+      'hidden overlay restores native game cursor',
+      5000,
+    )
+    evidence.checks.push(
+      'hiding restores the game cursor after overlay pointer use',
+    )
+    const gameWheel = Number(/ wheel=(\d+)/.exec(drive('state').title)?.[1])
+    drive('wheel', -120)
+    await until(
+      () => Number(/ wheel=(\d+)/.exec(drive('state').title)?.[1]) > gameWheel,
+      'hidden overlay releases wheel input to graphics host',
+      5000,
+    )
+    evidence.checks.push(
+      'intercepted wheel is isolated; hiding returns wheel input to the game',
     )
     drive('key', 90)
     await until(
@@ -480,7 +634,7 @@ async function run() {
     )
   }
   const state = await read()
-  assert.equal(state.probe.pointerDowns, 0)
+  assert.equal(state.probe.pointerDowns, evidence.pointerClicks)
   evidence.dom = state
   assert.deepEqual(failures, [], 'No uncaught application errors')
   evidence.status = 'passed'

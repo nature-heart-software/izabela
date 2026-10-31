@@ -1,6 +1,6 @@
 # Experimental Game Overlay
 
-The Experimental backend uses the pinned `electron-game-overlay` **0.1.0-rc.2**
+The Experimental backend uses the pinned `electron-game-overlay` **0.1.0-rc.4**
 SDK. It is separate from the existing Game Overlay, which continues to use
 `@packages/electron-game-overlay`. Both are off by default; enabling one deselects
 the other. Existing saved legacy settings do not opt you into the experiment.
@@ -75,8 +75,12 @@ setting does not switch focus behavior before a restart.
   other Electron 40–46 versions or arbitrary games.
 - Explicit native focus requires the negotiated `window-focus-v1` capability.
   An older already-running coordinator/runtime retains click-to-focus behavior.
-  Exit its clients/targets normally before starting a new game with rc.2; never
+  Exit its clients/targets normally before starting a new game with rc.4; never
   kill an unrelated broker or reinject a live game to enable the capability.
+- rc.3 routes both wheel axes and negotiates standard hover cursor shapes through
+  `window-cursor-v1`. Custom bitmap cursors fall back to arrow. rc.4 fixes
+  fractional-scale offscreen raster handling on Electron 46; native consumer
+  E2E covers 100%, 125% and 150% scale.
 - Automated SDK-load/DOM checks do not establish real game rendering, native
   input, or attachment compatibility. The noninjecting runtime check explicitly
   forbids broker/process/network startup and records that transport is untested.
@@ -105,7 +109,9 @@ packaged check and retain its JSON report.
 The native E2E suite uses controlled Direct3D 9/10/11/12 hosts built from pinned
 SDK source instead of requiring a game installation. It checks the real app's
 shortcut-to-native-keyboard path, first typing after opening/reopening, actual
-target pixels and input release. A negative control must reproduce the original
+target pixels and input release. It also uses native pointer input to verify
+visible text/hand cursor shapes and scrolling in the real settings popup.
+The matrix includes 100%, 125% and 150% scale. A negative control must reproduce the original
 webview-only focus failure. It requires an interactive Windows graphics desktop;
 see [the native E2E guide](../tests/experimental-overlay-e2e/README.md).
 
