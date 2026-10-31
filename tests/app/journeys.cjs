@@ -5,6 +5,7 @@ const http = require('node:http')
 const { recoveryCases, runRecovery } = require('./recovery-journeys.cjs')
 const { resilienceCases, runResilience } = require('./resilience-journeys.cjs')
 const { edgeCases, runEdges } = require('./edge-journeys.cjs')
+const { memoryCases, runMemory } = require('./memory-journey.cjs')
 
 // These names are also the runner's required-result contract.
 const journeyCases = [
@@ -32,6 +33,7 @@ const journeyCases = [
   ...recoveryCases,
   ...resilienceCases,
   ...edgeCases,
+  ...memoryCases,
 ]
 
 async function runJourneys(context) {
@@ -1186,6 +1188,7 @@ async function runJourneys(context) {
       )
       await patch('settings', { enableAutoUpdate: false })
     })
+    await runMemory({ ...context, route })
     await runRecovery({
       ...context,
       holds,

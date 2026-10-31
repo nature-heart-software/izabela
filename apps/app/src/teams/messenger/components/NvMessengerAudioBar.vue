@@ -138,17 +138,19 @@ import { useSpeechStore } from '@/features/speech/store'
 import { useSettingsStore } from '@/features/settings/store'
 import SpeechEngineSelect from '@/features/speech/components/inputs/NvSpeechEngineSelect.vue'
 import NvAudioOutputsSelect from '@/features/audio/components/inputs/NvAudioOutputsSelect.vue'
-import { inject } from 'vue'
+import { computed, inject } from 'vue'
 import { useRoute } from 'vue-router'
 import NvAudioInputForm from '@/features/speech/components/forms/NvAudioInputForm.vue'
-import { useDevicesList } from '@vueuse/core'
+import { useAudioDevices } from '@/features/audio/hooks'
 
 const speechStore = useSpeechStore()
 const settingsStore = useSettingsStore()
 const messengerContext = inject('messenger')
 const route = useRoute()
 
-const { audioOutputs } = useDevicesList()
+const { audioOutputs } = useAudioDevices(
+  computed(() => settingsStore.audioOutputs.length > 0),
+)
 
 function toggleSTTTS() {
   settingsStore.$patch({

@@ -573,6 +573,17 @@ async function main() {
       'F18',
     )
     assert.equal(settings.enableSTTTS, false)
+    await sleep(300)
+    assert.equal(
+      app
+        .getAppMetrics()
+        .some(
+          (metric) =>
+            metric.serviceName === 'video_capture.mojom.VideoCaptureService',
+        ),
+      false,
+      'Idle default configuration must not enumerate media devices',
+    )
   })
   for (const [id, name] of [
     ['samtts', 'Sam'],
@@ -617,8 +628,14 @@ async function main() {
       'native alternate shortcut',
     )
     await patch('settings', { enableOverlayWindow: true })
-    const overlay = BrowserWindow.getAllWindows().find((w) =>
-      w.webContents.getURL().includes('/overlay/'),
+    const overlay = await until(
+      () =>
+        BrowserWindow.getAllWindows().find(
+          (w) =>
+            w.webContents.getURL().includes('/overlay/') &&
+            !w.webContents.isLoadingMainFrame(),
+        ),
+      'optional overlay created',
     )
     const visible = overlay.isVisible()
     await press(15)

@@ -8,7 +8,7 @@ import { mouse, Point } from '@nut-tree-fork/nut-js'
 import { fork } from 'child_process'
 import { Deferred } from '@packages/toolbox'
 import { useGameOverlayStore } from '@/features/game-overlay/store'
-import { onWatcherCleanup, watch } from 'vue'
+import { onWatcherCleanup, watch, type WatchStopHandle } from 'vue'
 import micromatch from 'micromatch'
 import { useDatabasesStore } from '@/features/databases/store'
 import path from 'path'
@@ -37,10 +37,14 @@ class GameOverlay {
   public Overlay: any = null
   public detectedProcesses: ProcessInfo[] = []
   public intercepting = false
+  private interceptRequested = false
+  private gameViewport?: { width: number; height: number }
   private windows: Map<string, Electron.BrowserWindow> = new Map()
   private markQuit = false
   private scaleFactor = 1.0
   private hookedProcesses: Record<number, boolean> = {}
+  private stopProcessWatch?: WatchStopHandle
+  private pendingInjections = new Map<number, () => void>()
 
   constructor() {}
 
@@ -66,6 +70,14 @@ class GameOverlay {
       if (event === 'graphics.fps') this.hookedProcesses[payload.pid] = true
       if (['graphics.window.event.resize', 'graphics.window'].includes(event)) {
         const { width, height } = payload
+        this.gameViewport = { width, height }
+        const window = this.windows.get('messenger-game-overlay')
+        if (
+          !window ||
+          window.isDestroyed() ||
+          window.webContents.isLoadingMainFrame()
+        )
+          return
         emitIPCGameOverlayResize({
           width,
           height,
@@ -86,6 +98,13 @@ class GameOverlay {
       }
 
       if (event === 'game.input.intercept') {
+        if (
+          payload.intercepting &&
+          (!this.interceptRequested || !this.canIntercept())
+        ) {
+          this.stopIntercept()
+          return
+        }
         this.intercepting = payload.intercepting
       }
 
@@ -105,11 +124,17 @@ class GameOverlay {
           const width = right - left
           const height = bottom - top
 
+          const canFocus = () =>
+            this.interceptRequested &&
+            this.intercepting &&
+            this.canIntercept() &&
+            this.windows.get('messenger-game-overlay') === focusWin
           mouse.getPosition().then(async (initialPosition) => {
+            if (!canFocus()) return
             await mouse.setPosition(
               new Point(left + width / 2, top + height / 2),
             )
-            await mouse.leftClick()
+            if (canFocus()) await mouse.leftClick()
             await mouse.setPosition(initialPosition)
           })
         }
@@ -251,44 +276,44 @@ class GameOverlay {
   }
 
   public injectByProcessOnceFocused(processInfo: ProcessInfo) {
-    const { pid } = processInfo
-    let timeout: ReturnType<typeof setTimeout>
-    let interval: ReturnType<typeof setInterval>
-    interval = setInterval(() => {
+    this.waitToInject(processInfo, () => {
       const foregroundWindow = this.WinControl.getForeground()
-      if (pid === foregroundWindow?.getPid()) {
-        clearInterval(interval)
-        clearTimeout(timeout)
-        this.injectByProcess(processInfo)
-      }
-    }, 1000)
-    setTimeout(
-      () => {
-        clearInterval(interval)
-      },
-      5 * 60 * 1000,
-    )
+      return processInfo.pid === foregroundWindow?.getPid()
+    })
   }
 
   /* Some games needs to be hooked quickly for the overlay to work so favor this method. E.g. FragPunk */
   public injectByProcessOnceCreated(processInfo: ProcessInfo) {
+    this.waitToInject(processInfo, () =>
+      this.Overlay.getTopWindows().some(
+        (window: any) => window.processId === processInfo.pid,
+      ),
+    )
+  }
+
+  private waitToInject(processInfo: ProcessInfo, ready: () => boolean) {
     const { pid } = processInfo
-    let timeout: ReturnType<typeof setTimeout>
-    let interval: ReturnType<typeof setInterval>
-    interval = setInterval(() => {
-      const foregroundWindows = this.Overlay.getTopWindows()
-      if (foregroundWindows.find((window: any) => window.processId === pid)) {
-        clearInterval(interval)
-        clearTimeout(timeout)
+    this.pendingInjections.get(pid)?.()
+    const cancel = () => {
+      clearInterval(interval)
+      clearTimeout(timeout)
+      if (this.pendingInjections.get(pid) === cancel)
+        this.pendingInjections.delete(pid)
+    }
+    const interval = setInterval(() => {
+      if (this.markQuit || !useGameOverlayStore().enableGameOverlay) {
+        cancel()
+      } else if (ready()) {
+        cancel()
         this.injectByProcess(processInfo)
       }
     }, 1000)
-    setTimeout(
-      () => {
-        clearInterval(interval)
-      },
-      5 * 60 * 1000,
-    )
+    const timeout = setTimeout(cancel, 5 * 60 * 1000)
+    this.pendingInjections.set(pid, cancel)
+  }
+
+  private cancelPendingInjections() {
+    this.pendingInjections.forEach((cancel) => cancel())
   }
 
   public injectByProcess(processInfo: ProcessInfo) {
@@ -310,6 +335,7 @@ class GameOverlay {
       require('win-control'),
       gameOverlayStore.$whenReady(),
     ]).then(([Overlay, WinControl]) => {
+      if (this.markQuit) return
       this.WinControl = WinControl.Window
       this.Overlay = Overlay
       this.scaleFactor = screen.getDisplayNearestPoint({
@@ -319,7 +345,7 @@ class GameOverlay {
 
       this.startOverlay()
 
-      watch(
+      this.stopProcessWatch = watch(
         () => [
           gameOverlayStore.enableGameOverlay,
           gameOverlayStore.allowlist,
@@ -392,6 +418,7 @@ class GameOverlay {
             onWatcherCleanup(() => {
               console.log('[game-overlay] Destroying process-watcher process')
               child.kill()
+              this.cancelPendingInjections()
             })
           } catch (e) {
             console.log(
@@ -420,6 +447,9 @@ class GameOverlay {
 
   public quit() {
     this.markQuit = true
+    this.stopProcessWatch?.()
+    this.stopProcessWatch = undefined
+    this.cancelPendingInjections()
     this.closeAllWindows()
 
     if (this.Overlay) {
@@ -427,8 +457,22 @@ class GameOverlay {
     }
   }
 
+  private canIntercept() {
+    const window = this.windows.get('messenger-game-overlay')
+    return (
+      !!this.Overlay &&
+      !this.markQuit &&
+      useGameOverlayStore().enableGameOverlay &&
+      !!window &&
+      !window.isDestroyed() &&
+      !window.webContents.isLoadingMainFrame()
+    )
+  }
+
   public startIntercept() {
+    if (!this.canIntercept()) return
     console.log('[game-overlay] startIntercept')
+    this.interceptRequested = true
     this.Overlay!.sendCommand({
       command: 'input.intercept',
       intercept: true,
@@ -437,7 +481,9 @@ class GameOverlay {
 
   public stopIntercept() {
     console.log('[game-overlay] stopIntercept')
-    this.Overlay!.sendCommand({
+    this.interceptRequested = false
+    this.intercepting = false
+    this.Overlay?.sendCommand({
       command: 'input.intercept',
       intercept: false,
     })
@@ -449,6 +495,22 @@ class GameOverlay {
   ) {
     const window = new BrowserWindow(option)
     this.windows.set(name, window)
+
+    if (name === 'messenger-game-overlay') {
+      window.webContents.on('did-finish-load', () => {
+        // electron-postman registers this window later in the same load event.
+        queueMicrotask(() => {
+          if (
+            this.windows.get(name) !== window ||
+            window.isDestroyed() ||
+            !this.gameViewport
+          )
+            return
+          const { width, height } = this.gameViewport
+          emitIPCGameOverlayResize({ width, height })
+        })
+      })
+    }
 
     window.on('closed', () => {
       this.windows.delete(name)
@@ -474,10 +536,17 @@ class GameOverlay {
   }
 
   public isProcessHooked(pid: number) {
-    return !!this.hookedProcesses[pid]
+    const window = this.windows.get('messenger-game-overlay')
+    return (
+      !!this.hookedProcesses[pid] &&
+      !!window &&
+      !window.isDestroyed() &&
+      !window.webContents.isLoadingMainFrame()
+    )
   }
 
   private removeProcess(pid: number) {
+    this.pendingInjections.get(pid)?.()
     this.detectedProcesses = this.detectedProcesses.filter(
       (process) => process.pid !== pid,
     )

@@ -21,6 +21,9 @@ const ElectronWindowManager = () => {
       name,
       window,
     }
+    window.once('closed', () => {
+      if (instances[name]?.window === window) delete instances[name]
+    })
     return instances[name]
   }
 
