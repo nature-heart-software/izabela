@@ -1,4 +1,4 @@
-const wqlImport = import('wql-process-monitor')
+const wqlImport = Promise.resolve().then(() => require('./native'))
 
 function send(...args) {
   process.send(...args)

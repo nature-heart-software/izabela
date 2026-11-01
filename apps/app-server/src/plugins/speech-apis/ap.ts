@@ -5,7 +5,6 @@ import {
   SynthesizeSpeechCommand,
 } from '@aws-sdk/client-polly'
 import { fromCognitoIdentityPool } from '@aws-sdk/credential-provider-cognito-identity'
-import { CognitoIdentityClient } from '@aws-sdk/client-cognito-identity'
 import { handleError } from '../../utils/requests'
 import { Readable } from 'stream'
 
@@ -41,7 +40,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
       const client = new Polly({
         region,
         credentials: fromCognitoIdentityPool({
-          client: new CognitoIdentityClient({ region }),
+          clientConfig: { region },
           identityPoolId: identityPoolId,
         }),
       })
@@ -68,7 +67,7 @@ const plugin: Izabela.Server.Plugin = ({ app }) => {
       const client = new Polly({
         region,
         credentials: fromCognitoIdentityPool({
-          client: new CognitoIdentityClient({ region }),
+          clientConfig: { region },
           identityPoolId: identityPoolId,
         }),
       })

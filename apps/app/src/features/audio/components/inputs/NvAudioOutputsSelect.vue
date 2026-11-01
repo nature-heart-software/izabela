@@ -5,18 +5,21 @@
     :modelValue="settingsStore.audioOutputs"
     :options="options"
     multiple
-    @update:modelValue="(value) => settingsStore.$patch({ audioOutputs: value })"
+    @update:modelValue="
+      (value) => settingsStore.$patch({ audioOutputs: value })
+    "
   />
 </template>
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { NvSelect } from '@packages/ui'
-import { useDevicesList, useElementSize } from '@vueuse/core'
+import { useElementSize } from '@vueuse/core'
+import { useAudioDevices } from '@/features/audio/hooks'
 import { useSettingsStore } from '@/features/settings/store'
 
 const settingsStore = useSettingsStore()
 
-const { audioOutputs } = useDevicesList()
+const { audioOutputs } = useAudioDevices()
 
 const options = computed(() =>
   audioOutputs.value.map((output) => ({

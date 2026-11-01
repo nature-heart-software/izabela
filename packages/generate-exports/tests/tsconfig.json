@@ -1,0 +1,5 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": { "noEmit": true, "strict": true, "types": ["node"] },
+  "include": ["./consumer.types.ts", "./generate-exports.spec.ts"]
+}

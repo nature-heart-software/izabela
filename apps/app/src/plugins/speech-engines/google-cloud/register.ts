@@ -1,9 +1,8 @@
-import { fetchApi } from '@/services'
+import { api, fetchApi } from '@/services'
 import pick from 'lodash/pick'
 import { registerEngine } from '@/modules/speech-engine-manager'
 import { useSpeechStore } from '@/features/speech/store'
-import NvVoiceSelect from './NvVoiceSelect.vue'
-import NvSettings from './NvSettings.vue'
+import { defineAsyncComponent } from 'vue'
 import { Credentials, ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, store } from './store'
 import { SpeechEngine } from '@/modules/speech-engine-manager/types.ts'
@@ -25,6 +24,10 @@ export const engine = registerEngine({
   id: ENGINE_ID,
   name: ENGINE_NAME,
   category: 'cloud',
+  getRegions: () =>
+    api('remote')
+      .get('/tts/google-cloud/list-regions')
+      .then(({ data }) => data),
   getSelectedVoice,
   getVoiceName,
   getCredentials,
@@ -60,7 +63,7 @@ export const engine = registerEngine({
   getLanguageCode(voice) {
     return (voice || getSelectedVoice()).languageCodes[0]
   },
-  synthesizeSpeech({ credentials, payload }) {
+  synthesizeSpeech({ credentials, payload: { region, ...payload } }) {
     return fetchApi(
       getProperty('useLocalCredentials') ? 'local' : 'remote',
       `/tts/google-cloud/synthesize-speech${
@@ -73,12 +76,15 @@ export const engine = registerEngine({
           payload,
         }),
       },
+      region,
     )
   },
   getUseCacheOnEveryRequest() {
     return getProperty('useCacheOnEveryRequest')
   },
-  voiceSelectComponent: NvVoiceSelect,
-  settingsComponent: NvSettings,
+  voiceSelectComponent: defineAsyncComponent(
+    () => import('./NvVoiceSelect.vue'),
+  ),
+  settingsComponent: defineAsyncComponent(() => import('./NvSettings.vue')),
   store,
 })

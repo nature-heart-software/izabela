@@ -8,7 +8,7 @@ export const isRenderer = typeof window !== 'undefined'
 export const Bridge = () => {
   const registeredInstances: Record<string, ReturnType<Callback<any>>> = {}
 
-  const newInstancInRenderer = <C extends Callback<C>>(
+  const newInstancInRenderer = <C extends Callback<object>>(
     name: string,
     pluginCallback: C,
   ) => {
@@ -32,7 +32,7 @@ export const Bridge = () => {
     return registeredInstances[name]
   }
 
-  const newInstancInMain = <C extends Callback<C>>(
+  const newInstancInMain = <C extends Callback<object>>(
     name: string,
     pluginCallback: C,
   ) => {
@@ -48,7 +48,7 @@ export const Bridge = () => {
     return instance
   }
 
-  const registerPlugin = <C extends Callback<C>>(
+  const registerPlugin = <C extends Callback<object>>(
     name: string,
     pluginCallback: C,
   ) => {
@@ -57,9 +57,7 @@ export const Bridge = () => {
     }
     return newInstancInMain(name, pluginCallback)
   }
-  const register = <P extends Plugin<any>[]>(
-    plugins: Plugin<ReturnType<P[number][1]>>[],
-  ) => {
+  const register = <P extends Plugin<object>[]>(plugins: P) => {
     plugins.forEach(([name, pluginCallback]) => {
       registerPlugin(name, pluginCallback)
     })

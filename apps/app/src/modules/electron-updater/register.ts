@@ -5,12 +5,18 @@ import { useSettingsStore } from '@/features/settings/store'
 
 export default () =>
   app.whenReady().then(() => {
+    if (import.meta.env.VITE_DISABLE_AUTO_UPDATE === 'true') return
     const settingsStore = useSettingsStore()
     return settingsStore.$whenReady().then(() => {
       if (!settingsStore.enableAutoUpdate) return
       const channel = settingsStore.updateChannel
       console.log('[electron-updater] Auto-update channel:', channel)
       autoUpdater.channel = channel
+      // Setting channel enables downgrades in electron-updater. Only allow
+      // those when the user has explicitly selected a different release track.
+      const currentChannel =
+        app.getVersion().match(/-(alpha|beta|rc)(?:[.-]|$)/)?.[1] || 'latest'
+      autoUpdater.allowDowngrade = channel !== currentChannel
       const notification = createNotification({
         title: `${app.name} update available`,
         body: `A new update has been downloaded and will install on exit.`,

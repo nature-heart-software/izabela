@@ -2,7 +2,7 @@
   "name": "@packages/icons",
   "version": "0.0.0",
   "dependencies": {
-    "@packages/vite-plugin-generate-exports": "*"
+    "@packages/vite-plugin-generate-exports": "workspace:*"
   },
   "files": [
     "./dist"
@@ -12,8 +12,9 @@
   "private": true,
   "scripts": {
     "build": "vite build",
-    "build:prod": "tsc && yarn build",
-    "dev": "vite build --watch --mode development"
+    "build:prod": "tsc && pnpm run build",
+    "dev": "vite build --watch --mode development",
+    "test:types": "vue-tsc -p tsconfig.json --declaration --emitDeclarationOnly --outDir dist --rootDir src && tsc --noEmit -p tests/tsconfig.json"
   },
   "sideEffects": false,
   "type": "module",

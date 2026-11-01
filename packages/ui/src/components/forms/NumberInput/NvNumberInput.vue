@@ -15,7 +15,7 @@
   </StNumberInput>
 </template>
 <script lang="ts" setup>
-import { computed, defineProps, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { ElInput as WrappedComponent } from 'element-plus'
 import 'element-plus/lib/components/input/style/css'
 import { StNumberInput } from './number-input.styled'

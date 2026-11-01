@@ -7,9 +7,7 @@ export const emitIPCProcessError = (payload: {
   name: string
   message: string
 }) => {
-  processes.forEach((process) => {
-    ipc.sendTo(process, 'error', payload)
-  })
+  ipc.sendTo(mainProcess, 'error', payload)
 }
 
 export const emitIPCGameOverlayStartIntercept = () => {

@@ -2,6 +2,7 @@ import { PiniaPlugin, PiniaPluginContext } from 'pinia'
 import defaults from 'lodash/defaults'
 import cloneDeep from 'lodash/cloneDeep'
 import type ElectronStore from 'electron-store'
+import { createStore } from './create-store'
 
 import {
   ELECTRON_STORAGE_NAME,
@@ -22,8 +23,8 @@ function getElectronStore(name: string) {
         require('electron').app.getPath('userData'),
         `${ELECTRON_STORAGE_NAME}.json`,
       )
-      const globalDefaults: Record<string, any> = require(
-        electronPiniaDefaultFile,
+      const globalDefaults: Record<string, any> = JSON.parse(
+        require('fs').readFileSync(electronPiniaDefaultFile, 'utf8'),
       )
       if (globalDefaults) {
         defaults = {
@@ -31,32 +32,45 @@ function getElectronStore(name: string) {
         }
       }
     } catch (e) {}
-    electronStores[name] = new (require('electron-store'))({
+    const options = {
       name,
       defaults,
       cwd: ELECTRON_STORAGE_NAME,
-    })
+    }
+    electronStores[name] = createStore(require('electron-store'), options, () =>
+      require('electron').app.getPath('userData'),
+    )
   }
   return electronStores[name]
 }
 
-function getStorage(name: string): ElectronStore {
+function getStorage(
+  name: string,
+): ElectronStore | Window['ElectronPiniaStorage'] {
   return isMain ? getElectronStore(name) : window.ElectronPiniaStorage
 }
 
 const storageGetState = (name: string) => getStorage(name).get(name)
-const storageSetState = (name: string, state: any) =>
-  getStorage(name).set(name, state)
+const storageSetState = (name: string, state: any) => {
+  try {
+    getStorage(name).set(name, state)
+    return true
+  } catch (error) {
+    // Keep the live store usable and the previous atomic save intact. A later
+    // state change retries persistence after a locked/full disk recovers.
+    console.error(`[electron-pinia] Unable to save ${name}:`, error)
+    return false
+  }
+}
 const storageDelete = (name: string) => getStorage(name).delete(name)
 
 if (isMain) {
-  const { ipcMain } = require('electron')
+  const { ipcMain } = require('electron') as typeof import('electron')
   ipcMain.handle(IPC_EVENT_STORE_GET, (_, { name }) => {
     return storageGetState(name)
   })
   ipcMain.on(IPC_EVENT_STORE_SET, (_, { name, state }) => {
-    storageSetState(name, state)
-    return true
+    return storageSetState(name, state)
   })
   ipcMain.on(IPC_EVENT_STORE_DELETE, (_, { name }) => {
     storageDelete(name)

@@ -1,97 +1,93 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
-import NvSettings from '@/teams/messenger/views/NvSettings.vue'
-import NvSettingsGeneral from '@/teams/messenger/views/NvSettingsGeneral.vue'
-import NvSettingsGameOverlay from '@/teams/messenger/views/NvSettingsGameOverlay.vue'
-import NvSettingsEngine from '@/teams/messenger/views/NvSettingsEngine.vue'
-import NvSettingsProfiles from '@/teams/messenger/views/NvSettingsProfiles.vue'
-import NvSettingsAudioInput from '@/teams/messenger/views/NvSettingsAudioInput.vue'
-import NvSettingsAudioOutputs from '@/teams/messenger/views/NvSettingsAudioOutputs.vue'
-import NvSettingsDictionary from '@/teams/messenger/views/NvSettingsDictionary.vue'
-import NvMessages from '@/teams/messenger/views/NvMessages.vue'
-import NvMessagesHistory from '@/teams/messenger/views/NvMessagesHistory.vue'
-import NvMessagesShortcuts from '@/teams/messenger/views/NvMessagesShortcuts.vue'
-import NvSettingsCommands from '@/teams/messenger/views/NvSettingsCommands.vue'
-import NvSettingsAbout from '@/teams/messenger/views/NvSettingsAbout.vue'
-import NvSettingsSupport from '@/teams/messenger/views/NvSettingsSupport.vue'
-import NvSettingsTranslation from '@/teams/messenger/views/NvSettingsTranslation.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
     name: 'settings',
     path: '/settings',
-    component: NvSettings,
+    component: () => import('@/teams/messenger/views/NvSettings.vue'),
     children: [
       {
         name: 'settings-general',
         path: 'general',
-        component: NvSettingsGeneral,
+        component: () =>
+          import('@/teams/messenger/views/NvSettingsGeneral.vue'),
       },
       {
         name: 'settings-game-overlay',
         path: 'game-overlay',
-        component: NvSettingsGameOverlay,
+        component: () =>
+          import('@/teams/messenger/views/NvSettingsGameOverlay.vue'),
       },
       {
         name: 'settings-profiles',
         path: 'profiles',
-        component: NvSettingsProfiles,
+        component: () =>
+          import('@/teams/messenger/views/NvSettingsProfiles.vue'),
       },
       {
         name: 'settings-engine',
         path: 'engine',
-        component: NvSettingsEngine,
+        component: () => import('@/teams/messenger/views/NvSettingsEngine.vue'),
       },
       {
         name: 'settings-audio-outputs',
         path: 'audio-outputs',
-        component: NvSettingsAudioOutputs,
+        component: () =>
+          import('@/teams/messenger/views/NvSettingsAudioOutputs.vue'),
       },
       {
         name: 'settings-audio-input',
         path: 'audio-input',
-        component: NvSettingsAudioInput,
+        component: () =>
+          import('@/teams/messenger/views/NvSettingsAudioInput.vue'),
       },
       {
         name: 'settings-translation',
         path: 'translation',
-        component: NvSettingsTranslation,
+        component: () =>
+          import('@/teams/messenger/views/NvSettingsTranslation.vue'),
       },
       {
         name: 'settings-dictionary',
         path: 'dictionary',
-        component: NvSettingsDictionary,
+        component: () =>
+          import('@/teams/messenger/views/NvSettingsDictionary.vue'),
       },
       {
         name: 'settings-commands',
         path: 'commands',
-        component: NvSettingsCommands,
+        component: () =>
+          import('@/teams/messenger/views/NvSettingsCommands.vue'),
       },
       {
         name: 'settings-about',
         path: 'about',
-        component: NvSettingsAbout,
+        component: () => import('@/teams/messenger/views/NvSettingsAbout.vue'),
       },
       {
         name: 'settings-support',
         path: 'support',
-        component: NvSettingsSupport,
+        component: () =>
+          import('@/teams/messenger/views/NvSettingsSupport.vue'),
       },
     ],
   },
   {
     name: 'messages',
     path: '/messages',
-    component: NvMessages,
+    component: () => import('@/teams/messenger/views/NvMessages.vue'),
     children: [
       {
         name: 'messages-history',
         path: 'history',
-        component: NvMessagesHistory,
+        component: () =>
+          import('@/teams/messenger/views/NvMessagesHistory.vue'),
       },
       {
         name: 'messages-shortcuts',
         path: 'shortcuts',
-        component: NvMessagesShortcuts,
+        component: () =>
+          import('@/teams/messenger/views/NvMessagesShortcuts.vue'),
       },
     ],
   },

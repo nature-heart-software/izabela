@@ -65,6 +65,7 @@ useResizeObserver(componentRef, updateHitbox)
 useEventListener('resize', updateHitbox)
 useEventListener('focus', updateHitbox)
 onBeforeUnmount(() => {
+  updateHitbox.cancel()
   if (isGameOverlay) return
   hitboxesStore.removeHitbox(hitboxes.value.id)
 })

@@ -10,6 +10,7 @@ export const store = definePluginStore(
   {
     identityPoolId: '',
     region: '',
+    remoteRegion: '',
     favoriteVoiceIds: [],
     useLocalCredentials: false,
     useCacheOnEveryRequest: true,

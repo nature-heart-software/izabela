@@ -1,7 +1,7 @@
 import translationEngineManager from '@/modules/translation-engine-manager'
 import { ENGINE_ID, ENGINE_NAME } from './shared.ts'
 import { store } from './store.ts'
-import NvSettings from './NvSettings.vue'
+import { defineAsyncComponent } from 'vue'
 import axios from 'axios'
 import { TranslationEngine } from '@/modules/translation-engine-manager/types.ts'
 
@@ -28,7 +28,7 @@ translationEngineManager.registerEngine(ENGINE_ID, {
   hasCredentials() {
     return Object.values(getCredentials()).every(Boolean)
   },
-  settingsComponent: NvSettings,
+  settingsComponent: defineAsyncComponent(() => import('./NvSettings.vue')),
   getTranslationOptions,
   async translate(text, voiceLanguage) {
     const { translateFrom, translateTo } = getTranslationOptions(voiceLanguage)

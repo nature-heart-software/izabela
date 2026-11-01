@@ -113,7 +113,9 @@ Napi::Object Window::Init(Napi::Env env, Napi::Object exports) {
 
   exports.Set("Window", func);
 
-  env.SetInstanceData<Napi::FunctionReference>(&constructor);
+  // The constructor has static storage. SetInstanceData's default finalizer
+  // would delete it as a heap allocation when the environment shuts down.
+  napi_add_env_cleanup_hook(env, [](void*) { constructor.Reset(); }, nullptr);
 
   return exports;
 }

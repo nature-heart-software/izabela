@@ -1,8 +1,8 @@
 import {
-  copyFile,
   mkdir,
   readdir,
   readFile,
+  rename,
   rm,
   stat,
   writeFile,
@@ -15,6 +15,7 @@ import { useSettingsStore } from '@/features/settings/store'
 import pkg from '@root/package.json'
 import mime from 'mime'
 import { ElectronDialog } from '@/modules/electron-dialog'
+import { createPrivateKey, randomUUID } from 'crypto'
 
 // reusable arrow function to encode file data to base64 encoded string
 const convertFileToBase64 = async (filePath: string) => {
@@ -25,18 +26,35 @@ const convertFileToBase64 = async (filePath: string) => {
 }
 
 export const ElectronFilesystem = () => ({
-  importGoogleCloudSpeechCredentials(credentialsPath: string): Promise<string> {
+  async importGoogleCloudSpeechCredentials(
+    credentialsPath: string,
+  ): Promise<string> {
+    const content = await readFile(credentialsPath, 'utf8')
+    const credentials = JSON.parse(content)
+    if (
+      credentials?.type !== 'service_account' ||
+      typeof credentials.project_id !== 'string' ||
+      !credentials.project_id.trim() ||
+      typeof credentials.client_email !== 'string' ||
+      !credentials.client_email.includes('@') ||
+      typeof credentials.private_key !== 'string'
+    )
+      throw new Error('Invalid service account credentials')
+    createPrivateKey(credentials.private_key)
     const credentialsDirPath = path.join(app.getPath('userData'), 'credentials')
     const googleCloudSpeechCredentialsFilePath = path.join(
       credentialsDirPath,
       'google-cloud-speech-credentials.json',
     )
-    // NOTE: need to secure this one day somehow
-    return mkdir(credentialsDirPath, { recursive: true })
-      .then(() =>
-        copyFile(credentialsPath, googleCloudSpeechCredentialsFilePath),
-      )
-      .then(() => Promise.resolve(googleCloudSpeechCredentialsFilePath))
+    await mkdir(credentialsDirPath, { recursive: true })
+    const temporary = `${googleCloudSpeechCredentialsFilePath}.${randomUUID()}.tmp`
+    try {
+      await writeFile(temporary, content, { mode: 0o600, flag: 'wx' })
+      await rename(temporary, googleCloudSpeechCredentialsFilePath)
+    } finally {
+      await rm(temporary, { force: true })
+    }
+    return googleCloudSpeechCredentialsFilePath
   },
   getGoogleCloudSpeechCredentialsPath(): Promise<string> {
     const credentialsDirPath = path.join(app.getPath('userData'), 'credentials')

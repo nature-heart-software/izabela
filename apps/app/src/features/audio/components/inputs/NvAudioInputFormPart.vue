@@ -206,14 +206,14 @@ import { rem } from 'polished'
 import * as Tone from 'tone'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import NvSoxAudioInputSelect from '@/features/audio/components/inputs/NvSoxAudioInputSelect.vue'
-import { useDevicesList } from '@vueuse/core'
+import { useAudioDevices } from '@/features/audio/hooks'
 import { soxMediaInputsFilter } from '@/utils/media-devices'
 import { NvBar, NvBarWrapper } from '@/components'
 
 const minMeterValue = -80
 const micVolume = ref(minMeterValue)
 const settingsStore = useSettingsStore()
-const { audioInputs } = useDevicesList()
+const { audioInputs } = useAudioDevices()
 const soxAudioInputs = computed(() => soxMediaInputsFilter(audioInputs.value))
 const soxAudioInput = computed(
   () => soxAudioInputs.value[settingsStore.soxDevice],

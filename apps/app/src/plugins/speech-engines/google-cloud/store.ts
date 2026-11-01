@@ -13,6 +13,7 @@ export const store = definePluginStore(
   {
     apiKey: '',
     useLocalCredentials: false,
+    remoteRegion: '',
     favoriteVoiceIds: [],
     useCacheOnEveryRequest: true,
     streamAudio: true,

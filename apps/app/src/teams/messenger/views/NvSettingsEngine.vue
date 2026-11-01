@@ -34,6 +34,19 @@
                 </template>
               </NvGroup>
               <NvDivider direction="horizontal" />
+              <template
+                v-if="
+                  currentEngine?.getRegions &&
+                  speechStore.hasUniversalApiCredentials &&
+                  !currentEngine.store.getProperty('useLocalCredentials')
+                "
+              >
+                <NvSpeechRegionSelect
+                  :key="currentEngine.id"
+                  :engine="currentEngine"
+                />
+                <NvDivider direction="horizontal" />
+              </template>
               <template v-if="currentEngineSettingsComponent">
                 <component :is="currentEngineSettingsComponent" />
               </template>
@@ -85,6 +98,7 @@ import { SpeechEngine } from '@/modules/speech-engine-manager/types'
 import { useSettingsStore } from '@/features/settings/store'
 import { useSpeechStore } from '@/features/speech/store'
 import NvUniversalApiForm from '@/features/speech/components/forms/NvUniversalApiForm.vue'
+import NvSpeechRegionSelect from '@/features/speech/components/inputs/NvSpeechRegionSelect.vue'
 
 const speechStore = useSpeechStore()
 const settingsStore = useSettingsStore()
@@ -98,9 +112,10 @@ watch(
     selectedEngineTab.value = value
   },
 )
+const currentEngine = computed(() =>
+  getEngines().find((e) => e.id === selectedEngineTab.value),
+)
 const currentEngineSettingsComponent = computed(
-  () =>
-    getEngines().find((e) => e.id === selectedEngineTab.value)
-      ?.settingsComponent,
+  () => currentEngine.value?.settingsComponent,
 )
 </script>

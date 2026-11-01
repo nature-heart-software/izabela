@@ -14,7 +14,7 @@ import gameOverlay from '@/electron/game-overlay.ts'
 import { focusWindow } from 'forcefocus'
 import koffi from 'koffi'
 import { dialogsMap } from '@/modules/electron-dialog'
-import { boundsMatch } from '@/electron/utils'
+import { findDisplay } from '@/features/display/utils'
 
 export const ElectronMessengerWindow = () => {
   /* use isFocused as source of truth instead of window.isFocused() as in some instances
@@ -29,8 +29,7 @@ export const ElectronMessengerWindow = () => {
   let hitboxesStore: ReturnType<typeof useHitboxesStore> | undefined
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
   let messengerWindowStore:
-    | ReturnType<typeof useMessengerWindowStore>
-    | undefined
+    ReturnType<typeof useMessengerWindowStore> | undefined
   const ready = Deferred<BrowserWindow>()
   const isReady = () => ready.promise
   let foregroundWindow: string | number | null = null
@@ -67,7 +66,8 @@ export const ElectronMessengerWindow = () => {
 
   const ensureNativeFocus = () => {
     const window = getWindow()
-    if (window) {
+    // The delayed native-focus workaround may outlive a quick send or Escape.
+    if (window && !window.isDestroyed() && window.isVisible() && isFocused) {
       focusWindow(window)
     }
   }
@@ -259,11 +259,7 @@ export const ElectronMessengerWindow = () => {
     if (window) {
       const allDisplays = screen.getAllDisplays()
       const primaryDisplay = screen.getPrimaryDisplay()
-      const display =
-        (id != null && allDisplays.find((d) => d.id === id)) ||
-        (boundsHint &&
-          allDisplays.find((d) => boundsMatch(d.bounds, boundsHint))) ||
-        primaryDisplay
+      const display = findDisplay(allDisplays, id, boundsHint) || primaryDisplay
       window.setBounds(display.bounds)
     }
   }

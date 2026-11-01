@@ -1,15 +1,20 @@
 declare module '@ungap/structured-clone' {
-  function structuredClone<T>(o: T): T
-
-  export function serialize<T>(o: T): string
-
-  export function deserialize<T>(s: string): T
-
+  export type SerializedRecord = [number | string, unknown?]
+  export interface CloneOptions {
+    json?: boolean
+    lossy?: boolean
+    transfer?: unknown[]
+  }
+  function structuredClone<T>(value: T, options?: CloneOptions): T
+  export function serialize(
+    value: unknown,
+    options?: Pick<CloneOptions, 'json' | 'lossy'>,
+  ): SerializedRecord[]
+  export function deserialize<T = unknown>(records: SerializedRecord[]): T
   export default structuredClone
 }
 
 declare module '@ungap/structured-clone/json' {
-  export function stringify<T>(o: T): string
-
-  export function parse<T>(s: string): T
+  export function stringify(value: unknown): string
+  export function parse<T = unknown>(text: string): T
 }

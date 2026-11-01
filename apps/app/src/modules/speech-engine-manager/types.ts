@@ -9,6 +9,7 @@ export interface SpeechEngine<C = Credentials> {
   id: string
   name: string
   category: 'cloud' | 'local' | 'other'
+  getRegions?: () => Promise<{ name: string; value: string }[]>
   getVoiceName: (voice: any) => string
   getSelectedVoice: () => any
   getCredentials: (useStoreValues?: boolean) => C | {}

@@ -9,7 +9,6 @@
   </NvStack>
 </template>
 <script lang="ts" setup>
-import { defineProps } from 'vue'
 import NvStack from '@/components/miscellaneous/Stack/NvStack.vue'
 import NvText from '@/components/typography/Text/NvText.vue'
 

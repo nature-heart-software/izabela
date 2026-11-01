@@ -1,9 +1,8 @@
-import { fetchApi } from '@/services'
+import { api, fetchApi } from '@/services'
 import { registerEngine } from '@/modules/speech-engine-manager'
 import { DEFAULT_LANGUAGE_CODE } from '@/consts'
 import { useSpeechStore } from '@/features/speech/store'
-import NvVoiceSelect from './NvVoiceSelect.vue'
-import NvSettings from './NvSettings.vue'
+import { defineAsyncComponent } from 'vue'
 import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, store } from './store'
 
@@ -12,6 +11,10 @@ export const engine = registerEngine({
   id: ENGINE_ID,
   name: ENGINE_NAME,
   category: 'cloud',
+  getRegions: () =>
+    api('remote')
+      .get('/tts/izabela/list-regions')
+      .then(({ data }) => data),
   getSelectedVoice,
   getVoiceName,
   hasCredentials() {
@@ -31,7 +34,7 @@ export const engine = registerEngine({
   getLanguageCode() {
     return DEFAULT_LANGUAGE_CODE
   },
-  synthesizeSpeech({ payload }) {
+  synthesizeSpeech({ payload: { region, ...payload } }) {
     return fetchApi(
       'remote',
       `/tts/izabela/synthesize-speech${
@@ -43,12 +46,15 @@ export const engine = registerEngine({
           payload,
         }),
       },
+      region,
     )
   },
   getUseCacheOnEveryRequest() {
     return getProperty('useCacheOnEveryRequest')
   },
-  voiceSelectComponent: NvVoiceSelect,
-  settingsComponent: NvSettings,
+  voiceSelectComponent: defineAsyncComponent(
+    () => import('./NvVoiceSelect.vue'),
+  ),
+  settingsComponent: defineAsyncComponent(() => import('./NvSettings.vue')),
   store,
 })

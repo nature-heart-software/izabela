@@ -7,6 +7,7 @@ export interface SpeechRecognitionEngine {
   id: string
   name: string
   category: string
+  sampleRateHertz?: number
   getCredentials: () => Credentials
   hasCredentials: () => boolean
   settingsComponent?: Component | null

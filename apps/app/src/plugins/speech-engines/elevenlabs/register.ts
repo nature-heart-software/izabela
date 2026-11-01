@@ -1,8 +1,7 @@
 import { registerEngine } from '@/modules/speech-engine-manager'
 import { DEFAULT_LANGUAGE_CODE } from '@/consts'
 import { fetchApi } from '@/services'
-import NvVoiceSelect from './NvVoiceSelect.vue'
-import NvSettings from './NvSettings.vue'
+import { defineAsyncComponent } from 'vue'
 import { Credentials, ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, store } from './store'
 import { SpeechEngine } from '@/modules/speech-engine-manager/types.ts'
@@ -61,7 +60,9 @@ export const engine = registerEngine({
     if (getProperty('includeTimestamps')) return false
     return getProperty('useCacheOnEveryRequest')
   },
-  voiceSelectComponent: NvVoiceSelect,
-  settingsComponent: NvSettings,
+  voiceSelectComponent: defineAsyncComponent(
+    () => import('./NvVoiceSelect.vue'),
+  ),
+  settingsComponent: defineAsyncComponent(() => import('./NvSettings.vue')),
   store,
 })

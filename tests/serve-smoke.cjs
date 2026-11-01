@@ -1,0 +1,152 @@
+const assert = require('node:assert/strict')
+const { spawn, execFileSync } = require('node:child_process')
+
+const failure =
+  /error TS\d+|gyp ERR!|\[(?:error|ELIFECYCLE)\]|Couldn't (?:register|unregister)|Unable to load preload|Error sending from webFrameMain|Invalid watch source|Uncaught|UnhandledPromiseRejection|(?:^|\n)\s*(?:TypeError|ReferenceError|Error):|:ERROR:/i
+const page = 'http://localhost:3000/src/teams/messenger/index.html'
+const debugPort = 9229
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+let child
+let stopping = false
+
+function stop() {
+  if (!child || stopping) return
+  stopping = true
+  try {
+    if (process.platform === 'win32') {
+      execFileSync('taskkill', ['/PID', String(child.pid), '/T', '/F'], {
+        windowsHide: true,
+        stdio: 'ignore',
+      })
+    } else {
+      child.kill('SIGTERM')
+    }
+  } catch (error) {
+    if (child.exitCode === null) throw error
+  }
+}
+
+async function main() {
+  assert.equal(process.platform, 'win32', 'desktop validation requires Windows')
+  for (const port of [3000, 7070, debugPort]) {
+    const { createConnection } = require('node:net')
+    const occupied = await new Promise((resolve) => {
+      const socket = createConnection({ host: 'localhost', port })
+      socket.once('connect', () => {
+        socket.destroy()
+        resolve(true)
+      })
+      socket.once('error', () => resolve(false))
+    })
+    assert.equal(occupied, false, `port ${port} is already in use`)
+  }
+
+  let output = ''
+  let exited = false
+  let spawnError
+  child = process.env.npm_execpath
+    ? spawn(process.execPath, [process.env.npm_execpath, 'serve'], {
+        env: {
+          ...process.env,
+          ELECTRON_ENABLE_LOGGING: '1',
+          NX_SKIP_NX_CACHE: process.env.NX_SKIP_NX_CACHE || 'true',
+          IZABELA_SMOKE_DEBUG_PORT: String(debugPort),
+        },
+        windowsHide: true,
+        stdio: ['ignore', 'pipe', 'pipe'],
+      })
+    : spawn('pnpm', ['serve'], {
+        env: {
+          ...process.env,
+          ELECTRON_ENABLE_LOGGING: '1',
+          NX_SKIP_NX_CACHE: process.env.NX_SKIP_NX_CACHE || 'true',
+          IZABELA_SMOKE_DEBUG_PORT: String(debugPort),
+        },
+        shell: true,
+        windowsHide: true,
+        stdio: ['ignore', 'pipe', 'pipe'],
+      })
+  const consume = (chunk) => {
+    const text = chunk.toString()
+    process.stdout.write(text)
+    output += text.replace(/\u001b\[[0-9;]*m/g, '')
+  }
+  child.stdout.on('data', consume)
+  child.stderr.on('data', consume)
+  child.on('error', (error) => {
+    spawnError = error
+  })
+  child.on('exit', () => {
+    exited = true
+  })
+
+  const deadline = Date.now() + 15 * 60 * 1000
+  let readySince
+  let initialized = false
+  while (Date.now() < deadline) {
+    if (spawnError) throw spawnError
+    assert.equal(exited, false, 'pnpm serve exited before validation completed')
+    assert.doesNotMatch(
+      output,
+      failure,
+      'a build or application startup error was logged',
+    )
+    if (
+      output.includes('App server now running on port 7070') &&
+      output.includes('[game-overlay] Starting overlay...') &&
+      (output.match(/\[socket.io\] Connected:/g) || []).length >= 4
+    ) {
+      const response = await fetch(page, { signal: AbortSignal.timeout(5000) })
+      assert.equal(response.status, 200)
+      readySince ??= Date.now()
+      if (Date.now() - readySince >= 10000) {
+        initialized = true
+        break
+      }
+    }
+    await wait(1000)
+  }
+  assert.ok(
+    initialized,
+    'Timed out waiting for the development app to initialize',
+  )
+  const closed = new Promise((resolve) => child.once('close', resolve))
+  const response = await fetch(`http://127.0.0.1:${debugPort}/json/version`)
+  const { webSocketDebuggerUrl } = await response.json()
+  const socket = new WebSocket(webSocketDebuggerUrl)
+  await new Promise((resolve, reject) => {
+    socket.addEventListener('open', resolve, { once: true })
+    socket.addEventListener('error', reject, { once: true })
+  })
+  socket.send(JSON.stringify({ id: 1, method: 'Browser.close' }))
+  await Promise.race([
+    closed,
+    wait(10000).then(() => {
+      throw new Error('Development process did not stop')
+    }),
+  ])
+  stopping = true
+  socket.close()
+  assert.equal(child.exitCode, 0, 'pnpm serve did not exit cleanly')
+  assert.doesNotMatch(
+    output,
+    failure,
+    'an application error was logged during shutdown',
+  )
+  console.log(
+    'PASS serve: HTTP 200, API and overlay initialized, four renderer connections, no startup or shutdown errors',
+  )
+}
+
+for (const signal of ['SIGINT', 'SIGTERM']) {
+  process.on(signal, () => {
+    stop()
+    process.exit(1)
+  })
+}
+main()
+  .catch((error) => {
+    console.error(error)
+    process.exitCode = 1
+  })
+  .finally(stop)

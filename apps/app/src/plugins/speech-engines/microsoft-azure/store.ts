@@ -10,6 +10,7 @@ export const store = definePluginStore(
   {
     apiKey: '',
     region: '',
+    remoteRegion: '',
     useLocalCredentials: false,
     favoriteVoiceIds: [],
     useCacheOnEveryRequest: true,

@@ -4,10 +4,10 @@ import '@/modules/electron-log/preload'
 import '@/plugins/preload'
 /* Other plugins */
 import { ipcRenderer } from 'electron-postman'
-import { bridgeModules } from '@/electron/bridge'
+import { bridgePreloadModules } from './preload-bridge'
 
 ipcRenderer.exposeInMainWorld('ipc')
-bridgeModules()
+bridgePreloadModules()
 
 declare global {
   interface Window {

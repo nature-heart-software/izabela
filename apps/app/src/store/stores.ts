@@ -13,6 +13,7 @@ import {
 import { useMessengerStore } from '@/teams/messenger/store'
 import { useProfilesStore } from '@/features/profiles/store.ts'
 import { useSettingsStore } from '@/features/settings/store'
+import { migrateUniversalApiEndpoint } from '@/features/settings/store/migrations'
 import { useGameOverlayStore } from '@/features/game-overlay/store'
 import SpeechRecognitionEngineManager from '@/modules/speech-recognition-engine-manager'
 import SpeechEngineManager from '@/modules/speech-engine-manager'
@@ -53,5 +54,14 @@ export function loadStores() {
   )
   return Promise.all(
     Object.values(storesStates).map((storeStates) => storeStates.$whenReady()),
-  )
+  ).then((ready) => {
+    const settingsStore = useSettingsStore()
+    const endpoint = migrateUniversalApiEndpoint(
+      settingsStore.universalApiEndpoint,
+    )
+    if (endpoint !== settingsStore.universalApiEndpoint) {
+      settingsStore.$patch({ universalApiEndpoint: endpoint })
+    }
+    return ready
+  })
 }

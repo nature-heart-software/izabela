@@ -1,0 +1,60 @@
+diff --git a/dist/index.js b/dist/index.js
+index 146870c..34d7bc6 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -123,10 +123,21 @@ function resolvePackageJson(root = process.cwd()) {
+   }
+ }
+ function treeKillSync(pid) {
+-  if (process.platform === "win32") {
+-    cp.execSync(`taskkill /pid ${pid} /T /F`);
+-  } else {
+-    killTree(pidTree({ pid, ppid: process.pid }));
++  try {
++    process.kill(pid, 0);
++  } catch (error) {
++    if (error.code === "ESRCH") return;
++    throw error;
++  }
++  try {
++    if (process.platform === "win32") {
++      cp.execSync(`taskkill /pid ${pid} /T /F`);
++    } else {
++      killTree(pidTree({ pid, ppid: process.pid }));
++    }
++  } catch (error) {
++    console.error("An error occurred:", error.message);
++    console.log (`Couldn\`t kill task ${pid}`)
+   }
+ }
+ function pidTree(tree) {
+diff --git a/dist/index.mjs b/dist/index.mjs
+index b7ffad9..266c46a 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -99,10 +99,21 @@ function resolvePackageJson(root = process.cwd()) {
+   }
+ }
+ function treeKillSync(pid) {
+-  if (process.platform === "win32") {
+-    cp.execSync(`taskkill /pid ${pid} /T /F`);
+-  } else {
+-    killTree(pidTree({ pid, ppid: process.pid }));
++  try {
++    process.kill(pid, 0);
++  } catch (error) {
++    if (error.code === "ESRCH") return;
++    throw error;
++  }
++  try {
++    if (process.platform === "win32") {
++      cp.execSync(`taskkill /pid ${pid} /T /F`);
++    } else {
++      killTree(pidTree({ pid, ppid: process.pid }));
++    }
++  } catch (error) {
++    console.error("An error occurred:", error.message);
++    console.log (`Couldn\`t kill task ${pid}`)
+   }
+ }
+ function pidTree(tree) {

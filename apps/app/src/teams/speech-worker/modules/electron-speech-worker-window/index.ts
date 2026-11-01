@@ -1,6 +1,6 @@
 // see: https://tipsfordev.com/stream-audio-with-websocket-and-get-back-audio-transcription-obtained-with-google-speech-api
 import speech from '@google-cloud/speech'
-import { BrowserWindow, screen } from 'electron'
+import { BrowserWindow, screen, powerMonitor } from 'electron'
 import { ipcMain } from 'electron-postman'
 import { createNotification } from '@/utils/electron-notification'
 import { useSpeechRecognitionStore } from '@/features/speech/store'
@@ -17,7 +17,8 @@ import ElectronWindowManager from '@/modules/electron-window-manager'
 import mapValues from 'lodash/mapValues'
 import { getTime } from '@/utils/time'
 import { windowHeight, windowWidth } from '@/teams/speech-worker/electron/const'
-import { getTopLeftWindow, boundsMatch } from '@/electron/utils'
+import { getTopLeftWindow } from '@/electron/utils'
+import { findDisplay } from '@/features/display/utils'
 import speechRecognitionEngineManager from '@/modules/speech-recognition-engine-manager'
 
 export const ElectronSpeechWindow = () => {
@@ -26,9 +27,10 @@ export const ElectronSpeechWindow = () => {
   const isReady = () => ready.promise
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
   let speechRecognitionStore:
-    | ReturnType<typeof useSpeechRecognitionStore>
-    | undefined
+    ReturnType<typeof useSpeechRecognitionStore> | undefined
   let deferredRecording: ReturnType<typeof Deferred> | null = null
+  let suspended = false
+  let rendererAvailable = true
   // eslint-disable-next-line prefer-const
   let electronNativeSpeechRecognitionCallback: ReturnType<
     typeof electronNativeSpeechRecognition
@@ -103,12 +105,11 @@ export const ElectronSpeechWindow = () => {
       const allDisplays = screen.getAllDisplays()
       const primaryDisplay = screen.getPrimaryDisplay()
       const display =
-        allDisplays.find((d) => d.id === settingsStore?.display) ||
-        (settingsStore?.displayBounds &&
-          allDisplays.find((d) =>
-            boundsMatch(d.bounds, settingsStore.displayBounds!),
-          )) ||
-        primaryDisplay
+        findDisplay(
+          allDisplays,
+          settingsStore?.display,
+          settingsStore?.displayBounds,
+        ) || primaryDisplay
       const displayBounds = mapValues(display.bounds, (v) => v + 24)
       window.setPosition(displayBounds.x, displayBounds.y)
     }
@@ -122,6 +123,8 @@ export const ElectronSpeechWindow = () => {
     gkl?.addListener((e) => {
       if (
         settingsStore &&
+        rendererAvailable &&
+        !suspended &&
         settingsStore.enableSTTTS &&
         settingsStore.speechRecognitionStrategy === 'ptr' &&
         e.state === 'DOWN' &&
@@ -157,16 +160,29 @@ export const ElectronSpeechWindow = () => {
   const restartNativeSpeechRecognition = () => {
     if (electronNativeSpeechRecognitionCallback) {
       electronNativeSpeechRecognitionCallback()
+      electronNativeSpeechRecognitionCallback = null
     }
-    if (settingsStore?.enableSTTTS) {
+    if (settingsStore?.enableSTTTS && !suspended && rendererAvailable) {
       electronNativeSpeechRecognitionCallback =
         electronNativeSpeechRecognition()
+    } else {
+      deferredRecording?.resolve(true)
+      deferredRecording = null
+      speechRecognitionStore?.$patch({ recording: false })
     }
   }
 
   isReady().then(() => {
     settingsStore = useSettingsStore()
     speechRecognitionStore = useSpeechRecognitionStore()
+    powerMonitor.on('suspend', () => {
+      suspended = true
+      restartNativeSpeechRecognition()
+    })
+    powerMonitor.on('resume', () => {
+      suspended = false
+      restartNativeSpeechRecognition()
+    })
 
     watch(
       () => [
@@ -195,6 +211,14 @@ export const ElectronSpeechWindow = () => {
 
   const start = (window: BrowserWindow) => {
     registeredWindow = window
+    window.webContents?.on('render-process-gone', () => {
+      rendererAvailable = false
+      restartNativeSpeechRecognition()
+    })
+    window.webContents?.on('did-finish-load', () => {
+      rendererAvailable = true
+      restartNativeSpeechRecognition()
+    })
     ready.resolve(window)
     addEventListeners()
   }

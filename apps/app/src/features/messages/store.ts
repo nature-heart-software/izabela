@@ -1,8 +1,12 @@
 // eslint-disable-next-line import/no-cycle
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { IzabelaHistoryMessage, IzabelaMessagePayload } from '@/modules/izabela/types'
+import {
+  IzabelaHistoryMessage,
+  IzabelaMessagePayload,
+} from '@/modules/izabela/types'
 import { ShortcutMessage } from '@/features/messages/types'
+import cloneDeep from 'lodash/cloneDeep'
 
 export const usePlayingMessageStore = defineStore(
   'playing-message',
@@ -39,12 +43,16 @@ export const useMessagesStore = defineStore(
       shortcutMessages.value = shortcutMessages.value.filter((m) => m.id !== id)
     }
     const history = ref<IzabelaHistoryMessage[]>([])
-    const addToHistory = (id: string, { credentials, ...rest }: IzabelaMessagePayload) => {
-      const historyMessage: IzabelaHistoryMessage = {
+    const addToHistory = (
+      id: string,
+      { credentials, ...rest }: IzabelaMessagePayload,
+    ) => {
+      // Voice selections are reactive and may be patched in place later.
+      const historyMessage: IzabelaHistoryMessage = cloneDeep({
         id,
         ...rest,
         createdAt: new Date().toISOString(),
-      }
+      })
       if (history.value.length === 50) {
         history.value.splice(0, 1)
       }

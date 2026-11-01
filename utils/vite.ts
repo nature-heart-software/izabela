@@ -1,8 +1,26 @@
 import { builtinModules } from 'node:module'
 import { LibraryOptions } from 'vite'
 import { ModuleFormat } from 'rollup'
+import dts, { PluginOptions } from 'vite-plugin-dts'
+import { DiagnosticCategory } from 'typescript'
 
 const pkg = require('../package.json')
+
+export function declarations(options: PluginOptions = {}) {
+  return dts({
+    ...options,
+    afterDiagnostic(diagnostics) {
+      const errors = diagnostics.filter(
+        ({ category }) => category === DiagnosticCategory.Error,
+      )
+      if (errors.length) {
+        throw new Error(
+          `Declaration generation failed with ${errors.length} TypeScript errors`,
+        )
+      }
+    },
+  })
+}
 
 const omitPackages = (keys: string[], ignore: string[] = []) =>
   keys.filter((key) => !ignore.includes(key))

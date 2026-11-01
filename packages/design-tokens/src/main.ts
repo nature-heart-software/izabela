@@ -114,20 +114,31 @@ export const tokens = {
   },
 } as const
 
+type RemScale<T> = { [Key in keyof T]: string }
+type RemFontSizes = {
+  [Key in keyof typeof tokens.fontSize]: [
+    string,
+    {
+      lineHeight: typeof tokens.fontSize[Key][1]['lineHeight']
+      letterSpacing: string
+    },
+  ]
+}
+
 export const tailwindTheme = {
   ...tokens,
   spacing: Object.fromEntries(
     Object.entries(tokens.spacing).map(([key, value]) => [key, rem(value)]),
-  ),
+  ) as RemScale<typeof tokens.spacing>,
   borderRadius: Object.fromEntries(
     Object.entries(tokens.borderRadius).map(([key, value]) => [
       key,
       rem(value),
     ]),
-  ),
+  ) as RemScale<typeof tokens.borderRadius>,
   borderWidth: Object.fromEntries(
     Object.entries(tokens.borderWidth).map(([key, value]) => [key, rem(value)]),
-  ),
+  ) as RemScale<typeof tokens.borderWidth>,
   fontSize: Object.fromEntries(
     Object.entries(tokens.fontSize).map(
       ([key, [fontSize, { lineHeight, letterSpacing }]]) => [
@@ -135,5 +146,5 @@ export const tailwindTheme = {
         [rem(fontSize), { lineHeight, letterSpacing: rem(letterSpacing) }],
       ],
     ),
-  ),
+  ) as RemFontSizes,
 }

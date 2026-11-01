@@ -1,14 +1,23 @@
 import path from 'path'
-import type { Entry, Options } from './types'
+import type { DirectoriesOption, Entry, Options } from './types'
 import { promises as fs } from 'fs'
 import globby from 'globby'
 import chokidar from 'chokidar'
 
 export * from './types'
 
+/** Generates deterministic export barrels for configured source directories.
+ * @param config - Entries and whether filesystem events should trigger regeneration.
+ * @returns A named generator whose start method schedules work without a completion promise.
+ * @example
+ * ```ts
+ * import { generateExports } from '@packages/generate-exports'
+ * generateExports({ entries: [{ directories: ['src'], include: ['*.ts'] }] }).start()
+ * ```
+ */
 export const generateExports = (config: {
   watch?: boolean
-  entries: Partial<Entry>[]
+  entries: (Partial<Options> & DirectoriesOption)[]
 }) => {
   const eol = '\n'
   const defaultOptions: Entry = {

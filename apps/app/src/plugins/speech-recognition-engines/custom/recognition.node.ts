@@ -5,7 +5,9 @@ import engine from './register.node.ts'
 export default ({ recorder, useRecording }: any) => {
   if (!engine.hasCredentials()) return
   const settingsStore = useSettingsStore()
-  const socket = io(`ws://localhost:7071`)
+  const socket = io(
+    `ws://localhost:${import.meta.env.VITE_SERVER_WS_PORT || 7071}`,
+  )
 
   return {
     startStream() {
@@ -31,6 +33,8 @@ export default ({ recorder, useRecording }: any) => {
       recording.startPumping()
     },
     stopStream() {},
-    cleanup() {},
+    cleanup() {
+      socket.disconnect()
+    },
   }
 }

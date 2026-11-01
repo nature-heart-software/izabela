@@ -1,11 +1,23 @@
-import { fetchApi } from '@/services'
+import { api, fetchApi } from '@/services'
 import { registerEngine } from '@/modules/speech-engine-manager'
 import type { SpeechEngine } from '@/modules/speech-engine-manager/types'
 import { useSpeechStore } from '@/features/speech/store'
-import NvVoiceSelect from './NvVoiceSelect.vue'
-import NvSettings from './NvSettings.vue'
+import { defineAsyncComponent } from 'vue'
 import { Credentials, ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
 import { getProperty, store } from './store'
+
+const escapeXml = (value: string) =>
+  value.replace(
+    /[<>&"']/g,
+    (character) =>
+      ({
+        '<': '&lt;',
+        '>': '&gt;',
+        '&': '&amp;',
+        '"': '&quot;',
+        "'": '&apos;',
+      })[character] as string,
+  )
 
 const getCredentials: SpeechEngine<Credentials>['getCredentials'] = () => {
   const speechStore = useSpeechStore()
@@ -33,6 +45,10 @@ export const engine = registerEngine({
   id: ENGINE_ID,
   name: ENGINE_NAME,
   category: 'cloud',
+  getRegions: () =>
+    api('remote')
+      .get('/tts/microsoft-azure/list-regions')
+      .then(({ data }) => data),
   getSelectedVoice,
   getVoiceName,
   getCredentials,
@@ -58,11 +74,11 @@ export const engine = registerEngine({
       }
     }
     const ssml = expression
-      ? `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US"><voice name="${
-          voice.ShortName
-        }"><mstts:express-as style="${expression}">${
-          translatedText || newText
-        }</mstts:express-as></voice></speak>`
+      ? `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US"><voice name="${escapeXml(
+          voice.ShortName,
+        )}"><mstts:express-as style="${escapeXml(expression)}">${escapeXml(
+          translatedText || newText,
+        )}</mstts:express-as></voice></speak>`
       : null
     return {
       ssml,
@@ -73,7 +89,7 @@ export const engine = registerEngine({
   getLanguageCode(voice) {
     return (voice || getSelectedVoice()).Locale
   },
-  synthesizeSpeech({ credentials, payload }) {
+  synthesizeSpeech({ credentials, payload: { region, ...payload } }) {
     return fetchApi(
       getProperty('useLocalCredentials') ? 'local' : 'remote',
       `/tts/microsoft-azure/synthesize-speech${
@@ -87,14 +103,17 @@ export const engine = registerEngine({
           includeTimestamps: getProperty('includeTimestamps'),
         }),
       },
+      region,
     )
   },
   getUseCacheOnEveryRequest() {
     if (getProperty('includeTimestamps')) return false
     return getProperty('useCacheOnEveryRequest')
   },
-  voiceSelectComponent: NvVoiceSelect,
-  settingsComponent: NvSettings,
+  voiceSelectComponent: defineAsyncComponent(
+    () => import('./NvVoiceSelect.vue'),
+  ),
+  settingsComponent: defineAsyncComponent(() => import('./NvSettings.vue')),
   commands,
   store,
 })

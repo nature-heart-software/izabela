@@ -1,35 +1,36 @@
-const mediaDevices: { [key: MediaDeviceInfo['label']]: MediaDeviceInfo } = {}
-
-export const getMediaDeviceByLabel = (
+export const getMediaDeviceByLabel = async (
   label: MediaDeviceInfo['label'],
-): Promise<MediaDeviceInfo | null> =>
-  new Promise((resolve) => {
-    if (mediaDevices[label]) {
-      resolve(mediaDevices[label])
-    } else {
-      navigator.mediaDevices
-        .enumerateDevices()
-        .then((devices) => {
-          devices.forEach((device) => {
-            mediaDevices[device.label] = device
-          })
-          const device = mediaDevices[label]
-          resolve(device || null)
-        })
-        .catch(() => resolve(null))
-    }
-  })
+  kind?: MediaDeviceKind,
+): Promise<MediaDeviceInfo | null> => {
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices()
+    return (
+      devices.find(
+        (device) => device.label === label && (!kind || device.kind === kind),
+      ) || null
+    )
+  } catch {
+    return null
+  }
+}
 
 export const soxMediaInputsFilter = (inputs: MediaDeviceInfo[]) =>
   inputs.filter((d) => {
-    const defaultDevice = inputs.find((device) => device.deviceId === 'default')
+    const defaultDevice = inputs.find(
+      (device) => device.kind === 'audioinput' && device.deviceId === 'default',
+    )
     return (
+      d.kind === 'audioinput' &&
       d.deviceId !== 'communications' &&
-      (defaultDevice?.label === d.label ? true : !defaultDevice?.label.includes(d.label))
+      (defaultDevice?.label === d.label
+        ? true
+        : !defaultDevice?.label.includes(d.label))
     )
   })
 
-export const getSoxMediaDeviceByIndex = (index: number): Promise<MediaDeviceInfo | null> =>
+export const getSoxMediaDeviceByIndex = (
+  index: number,
+): Promise<MediaDeviceInfo | null> =>
   new Promise((resolve) => {
     navigator.mediaDevices
       .enumerateDevices()

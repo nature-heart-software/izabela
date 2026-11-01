@@ -12,6 +12,7 @@ export default {
   name: ENGINE_NAME,
   store,
   category: 'cloud',
+  sampleRateHertz: 24000,
   getCredentials,
   hasCredentials() {
     return Object.values(getCredentials()).every(Boolean)

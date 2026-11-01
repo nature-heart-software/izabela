@@ -8,11 +8,11 @@ import { ipcMain } from 'electron-postman'
 import { IzabelaMessage } from '@/modules/izabela/types'
 import { purify } from '@packages/toolbox'
 import debounce from 'lodash/debounce'
-import { IGlobalKeyEvent, IGlobalKeyListener } from 'node-global-key-listener'
+import { IGlobalKeyListener } from 'node-global-key-listener'
 import {
   gkl,
   handleShortcut,
-  keybindingTriggered,
+  createShortcutListener,
 } from '@/modules/electron-keybinding/utils'
 import {
   emitIPCApplyProfile,
@@ -21,6 +21,7 @@ import {
 } from '@/electron/events/main'
 import electronOverlayWindow from '@/teams/overlay/modules/electron-overlay-window'
 import { useProfilesStore } from '@/features/profiles/store.ts'
+import { canRegisterElectronShortcut } from './accelerator'
 
 export default () =>
   app.whenReady().then(async () => {
@@ -41,13 +42,14 @@ export default () =>
       cancelAllMessages: handleShortcut(() => emitIPCCancelAllMessages()),
     }
     const registeredShortcuts: Record<string, string> = {}
-    const registeredCallbacks: Record<string, IGlobalKeyListener> = {}
+    const registeredCallbacks = new Set<IGlobalKeyListener>()
     const getAccelerator = (shortcut: Key[]) =>
       shortcut.map(({ key }: Key) => key).join('+')
     const registerElectronShortcut = (
       accelerator: string,
       callback: () => void,
     ) => {
+      if (!canRegisterElectronShortcut(accelerator)) return
       try {
         globalShortcut.register(accelerator, callback)
         console.log('[electron-shortcuts] Registered shortcut', accelerator)
@@ -59,6 +61,7 @@ export default () =>
       }
     }
     const unregisterElectronShortcut = (accelerator: string) => {
+      if (!canRegisterElectronShortcut(accelerator)) return
       try {
         globalShortcut.unregister(accelerator)
       } catch (e: any) {
@@ -68,74 +71,65 @@ export default () =>
         )
       }
     }
-    const getShortcuts: () => {
+    type Shortcuts = {
       electron: [Key[], () => void][]
       gkl: [Key[], IGlobalKeyListener][]
-    } = () => ({
-      electron: [
-        [
-          settingsStore.keybindings.toggleMessengerWindow,
-          multiKeysKeybindings.toggleMessengerWindow,
+    }
+    const getShortcuts = (): Shortcuts => {
+      const shortcuts: Shortcuts = {
+        electron: [
+          [
+            settingsStore.keybindings.toggleMessengerWindow,
+            multiKeysKeybindings.toggleMessengerWindow,
+          ],
         ],
-      ],
-      gkl: [
-        [
-          settingsStore.keybindings.toggleMessengerWindowAlt,
-          (e) => {
-            if (e.state === 'DOWN') {
-              if (
-                keybindingTriggered(
-                  settingsStore.keybindings.toggleMessengerWindowAlt,
-                )
-              ) {
-                multiKeysKeybindings.toggleMessengerWindowAlt()
-              }
-            }
-          },
+        gkl: [
+          [
+            settingsStore.keybindings.toggleMessengerWindowAlt,
+            createShortcutListener(
+              settingsStore.keybindings.toggleMessengerWindowAlt,
+              multiKeysKeybindings.toggleMessengerWindowAlt,
+            ),
+          ],
+          [
+            settingsStore.keybindings.toggleOverlayWindow,
+            createShortcutListener(
+              settingsStore.keybindings.toggleOverlayWindow,
+              () => {
+                if (settingsStore.enableOverlayWindow)
+                  multiKeysKeybindings.toggleOverlayWindow()
+              },
+            ),
+          ],
+          [
+            settingsStore.keybindings.cancelCurrentMessage,
+            createShortcutListener(
+              settingsStore.keybindings.cancelCurrentMessage,
+              multiKeysKeybindings.cancelCurrentMessage,
+            ),
+          ],
+          [
+            settingsStore.keybindings.cancelAllMessages,
+            createShortcutListener(
+              settingsStore.keybindings.cancelAllMessages,
+              multiKeysKeybindings.cancelAllMessages,
+            ),
+          ],
         ],
-        [
-          settingsStore.keybindings.toggleOverlayWindow,
-          (e) => {
-            if (e.state === 'DOWN') {
-              if (
-                settingsStore?.enableOverlayWindow &&
-                keybindingTriggered(
-                  settingsStore.keybindings.toggleOverlayWindow,
-                )
-              ) {
-                multiKeysKeybindings.toggleOverlayWindow()
-              }
-            }
-          },
-        ],
-        [
-          settingsStore.keybindings.cancelCurrentMessage,
-          (e) => {
-            if (e.state === 'DOWN') {
-              if (
-                keybindingTriggered(
-                  settingsStore.keybindings.cancelCurrentMessage,
-                )
-              ) {
-                multiKeysKeybindings.cancelCurrentMessage()
-              }
-            }
-          },
-        ],
-        [
-          settingsStore.keybindings.cancelAllMessages,
-          (e) => {
-            if (e.state === 'DOWN') {
-              if (
-                keybindingTriggered(settingsStore.keybindings.cancelAllMessages)
-              ) {
-                multiKeysKeybindings.cancelAllMessages()
-              }
-            }
-          },
-        ],
-      ],
-    })
+      }
+      const electron: Shortcuts['electron'] = []
+      for (const [shortcut, callback] of shortcuts.electron) {
+        if (canRegisterElectronShortcut(getAccelerator(shortcut))) {
+          electron.push([shortcut, callback])
+        } else {
+          shortcuts.gkl.push([
+            shortcut,
+            createShortcutListener(shortcut, callback),
+          ])
+        }
+      }
+      return { electron, gkl: shortcuts.gkl }
+    }
 
     let shortcuts = getShortcuts()
 
@@ -155,11 +149,10 @@ export default () =>
         unregisterElectronShortcut(accelerator)
         delete registeredShortcuts[accelerator]
       })
-      Object.entries(registeredCallbacks).forEach(([accelerator, callback]) => {
+      registeredCallbacks.forEach((callback) => {
         gkl?.removeListener(callback)
-        unregisterElectronShortcut(accelerator)
-        delete registeredShortcuts[accelerator]
       })
+      registeredCallbacks.clear()
     }
 
     const registerAllShortcuts = debounce(() => {
@@ -179,35 +172,29 @@ export default () =>
       messagesStore.shortcutMessages.forEach((message) => {
         if (!message.shortcut.length) return
         const accelerator = getAccelerator(message.shortcut)
-        registeredCallbacks[accelerator] = handleShortcut(
-          (e: IGlobalKeyEvent) => {
-            if (e.state === 'DOWN' && keybindingTriggered(message.shortcut)) {
-              const payload: IzabelaMessage = {
-                ...message,
-                excludeFromHistory: true,
-              }
-              ipcMain.sendTo('speech-worker', 'say', purify(payload))
-            }
-          },
-        )
-        gkl?.addListener(registeredCallbacks[accelerator])
+        const callback = createShortcutListener(message.shortcut, () => {
+          const payload: IzabelaMessage = {
+            ...message,
+            excludeFromHistory: true,
+          }
+          ipcMain.sendTo('speech-worker', 'say', purify(payload))
+        })
+        registeredCallbacks.add(callback)
+        gkl?.addListener(callback)
         registerElectronShortcut(accelerator, () => null)
         registeredShortcuts[accelerator] = accelerator
       })
       profilesStore.profiles.forEach((profile) => {
         if (!profile.shortcut.length) return
         const accelerator = getAccelerator(profile.shortcut)
-        registeredCallbacks[accelerator] = handleShortcut(
-          (e: IGlobalKeyEvent) => {
-            if (e.state === 'DOWN' && keybindingTriggered(profile.shortcut)) {
-              emitIPCApplyProfile(profile.id)
-              if (profile.openMessengerOnTrigger) {
-                electronMessengerWindow.focus('keyboard', true)
-              }
-            }
-          },
-        )
-        gkl?.addListener(registeredCallbacks[accelerator])
+        const callback = createShortcutListener(profile.shortcut, () => {
+          emitIPCApplyProfile(profile.id)
+          if (profile.openMessengerOnTrigger) {
+            electronMessengerWindow.focus('keyboard', true)
+          }
+        })
+        registeredCallbacks.add(callback)
+        gkl?.addListener(callback)
         registerElectronShortcut(accelerator, () => null)
         registeredShortcuts[accelerator] = accelerator
       })
