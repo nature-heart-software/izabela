@@ -1,0 +1,68 @@
+import { registerEngine } from '@/modules/speech-engine-manager'
+import { DEFAULT_LANGUAGE_CODE } from '@/consts'
+import { fetchApi } from '@/services'
+import { defineAsyncComponent } from 'vue'
+import { Credentials, ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
+import { getProperty, store } from './store'
+import { SpeechEngine } from '@/modules/speech-engine-manager/types.ts'
+
+const getCredentials: SpeechEngine<Credentials>['getCredentials'] = () => ({
+  apiKey:
+    getProperty('apiKey', true) ||
+    import.meta.env.VITE_SPEECH_ENGINE_ELEVENLABS_API_KEY,
+})
+
+const getSelectedVoice = () => getProperty('selectedVoice')
+
+export const engine = registerEngine({
+  id: ENGINE_ID,
+  name: ENGINE_NAME,
+  category: 'cloud',
+  getSelectedVoice,
+  getVoiceName,
+  getCredentials,
+  hasCredentials() {
+    return Object.values(getCredentials()).every(Boolean)
+  },
+  getPayload({ text, translatedText, voice: v }) {
+    const voice = v || getSelectedVoice()
+    return {
+      text: translatedText || text,
+      voice,
+      stability: getProperty('stability'),
+      similarityBoost: getProperty('similarity_boost'),
+      style: getProperty('style'),
+      useSpeakerBoost: getProperty('use_speaker_boost'),
+      modelId: getProperty('model_id'),
+      speed: getProperty('speed'),
+    }
+  },
+  getLanguageCode() {
+    return DEFAULT_LANGUAGE_CODE
+  },
+  async synthesizeSpeech({ credentials, payload }) {
+    return fetchApi(
+      'local',
+      `/tts/elevenlabs/synthesize-speech${
+        getProperty('streamAudio') ? '/stream' : ''
+      }`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          credentials,
+          payload,
+          includeTimestamps: getProperty('includeTimestamps'),
+        }),
+      },
+    )
+  },
+  getUseCacheOnEveryRequest() {
+    if (getProperty('includeTimestamps')) return false
+    return getProperty('useCacheOnEveryRequest')
+  },
+  voiceSelectComponent: defineAsyncComponent(
+    () => import('./NvVoiceSelect.vue'),
+  ),
+  settingsComponent: defineAsyncComponent(() => import('./NvSettings.vue')),
+  store,
+})

@@ -1,0 +1,42 @@
+{
+  "name": "@packages/win-mouse",
+  "description": "Mouse tracking for Windows",
+  "version": "2.0.1",
+  "bugs": "https://github.com/kapetan/win-mouse/issues",
+  "dependencies": {
+    "koffi": "^2.9.0"
+  },
+  "devDependencies": {
+    "standard": "^17.1.2"
+  },
+  "homepage": "https://github.com/kapetan/win-mouse",
+  "keywords": [
+    "display",
+    "events",
+    "mouse",
+    "native",
+    "position",
+    "screen",
+    "track",
+    "windows"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "index.js",
+    "dist"
+  ],
+  "os": [
+    "win32"
+  ],
+  "repository": "kapetan/win-mouse.git",
+  "scripts": {
+    "build": "tsc -p tsconfig.types.json",
+    "test:types": "pnpm run build && tsc -p tests/tsconfig.json",
+    "install": "",
+    "lint": "standard",
+    "test": "node test/parallel-destroy && node test/parallel-unref && node test/sequence-destroy && node test/sequence-unref",
+    "win-mouse": "node -e \"const mouse = require('./')({debug: true}); mouse.on('*', console.log); console.log('Mouse tracker started. Move your mouse or click.');\""
+  }
+}

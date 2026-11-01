@@ -1,0 +1,57 @@
+import translationEngineManager from '@/modules/translation-engine-manager'
+import { ENGINE_ID, ENGINE_NAME } from './shared.ts'
+import { store } from './store.ts'
+import { defineAsyncComponent } from 'vue'
+import axios from 'axios'
+import { TranslationEngine } from '@/modules/translation-engine-manager/types.ts'
+
+const getCredentials: TranslationEngine['getCredentials'] = () => ({
+  apiKey:
+    store.getProperty('apiKey', true) ||
+    import.meta.env.VITE_TRANSLATION_ENGINE_CUSTOM_API_KEY,
+  endpoint:
+    store.getProperty('endpoint') ||
+    import.meta.env.VITE_TRANSLATION_ENGINE_CUSTOM_ENDPOINT,
+})
+const getTranslationOptions = (voiceLanguage?: string) => {
+  return {
+    translateFrom: store.getProperty('translateFrom') || undefined,
+    translateTo: store.getProperty('translateTo') || voiceLanguage,
+  }
+}
+translationEngineManager.registerEngine(ENGINE_ID, {
+  id: ENGINE_ID,
+  name: ENGINE_NAME,
+  store,
+  category: 'other',
+  getCredentials,
+  hasCredentials() {
+    return Object.values(getCredentials()).every(Boolean)
+  },
+  settingsComponent: defineAsyncComponent(() => import('./NvSettings.vue')),
+  getTranslationOptions,
+  async translate(text, voiceLanguage) {
+    const { translateFrom, translateTo } = getTranslationOptions(voiceLanguage)
+    const { endpoint, apiKey } = getCredentials()
+    try {
+      const { data } = await axios.post<string>(
+        `${
+          endpoint.endsWith('/') ? endpoint.slice(0, -1) : endpoint
+        }/translate`,
+        {
+          credentials: {
+            apiKey,
+          },
+          payload: {
+            text,
+            from: translateFrom,
+            to: translateTo,
+          },
+        },
+      )
+      return data
+    } catch (e) {
+      return text
+    }
+  },
+})

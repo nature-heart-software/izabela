@@ -1,0 +1,17 @@
+[
+  "**/steamapps/**",
+  "**/Epic Games/**",
+  "**/Ubisoft/Ubisoft Game Launcher/games/**",
+  "**/EA Games/**",
+  "**/Origin Games/**",
+  "**/Battle.net/**",
+  "**/Blizzard Entertainment/**",
+  "**/XboxGames/**",
+  "**/Program Files/WindowsApps/**",
+  "**/GOG Galaxy/Games/**",
+  "**/Riot Games/**",
+  "**/Rockstar Games/**",
+  "**/itch/apps/**",
+  "**/Amazon Games/**",
+  "**/Games/**"
+]

@@ -1,0 +1,29 @@
+{
+  "name": "node-record-lpcm16",
+  "description": "Record a microphone input stream",
+  "version": "1.0.1",
+  "author": "Gilles De Mey",
+  "bugs": "https://github.com/gillesdemey/node-record-lpcm16/issues",
+  "dependencies": {
+    "debug": "^2.6.8"
+  },
+  "devDependencies": {
+    "standard": "^14.3.4"
+  },
+  "homepage": "https://github.com/gillesdemey/node-record-lpcm16",
+  "keywords": [
+    "audio",
+    "record",
+    "sox",
+    "speech"
+  ],
+  "license": "ISC",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "repository": "gillesdemey/node-record-lpcm16",
+  "scripts": {
+    "build": "node -e \"console.log('No build step required')\"",
+    "test": "standard",
+    "test:types": "tsc --noEmit -p tests/tsconfig.json"
+  }
+}

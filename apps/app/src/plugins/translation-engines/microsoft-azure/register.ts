@@ -1,0 +1,49 @@
+import translationEngineManager from '@/modules/translation-engine-manager'
+import { electronModuleName, ENGINE_ID, ENGINE_NAME } from './shared.ts'
+import { store } from './store.ts'
+import { defineAsyncComponent } from 'vue'
+import { TranslationEngine } from '@/modules/translation-engine-manager/types.ts'
+
+const getCredentials: TranslationEngine['getCredentials'] = () => ({
+  apiKey:
+    store.getProperty('apiKey', true) ||
+    import.meta.env.VITE_TRANSLATION_ENGINE_MICROSOFT_AZURE_API_KEY,
+  region:
+    store.getProperty('region') ||
+    import.meta.env.VITE_TRANSLATION_ENGINE_MICROSOFT_AZURE_REGION,
+})
+
+const getTranslationOptions = (voiceLanguage?: string) => {
+  return {
+    translateFrom: store.getProperty('translateFrom') || undefined,
+    translateTo: store.getProperty('translateTo') || voiceLanguage,
+  }
+}
+
+export const engine = translationEngineManager.registerEngine(ENGINE_ID, {
+  id: ENGINE_ID,
+  name: ENGINE_NAME,
+  store,
+  category: 'Cloud',
+  getCredentials,
+  hasCredentials() {
+    return Object.values(getCredentials()).every(Boolean)
+  },
+  settingsComponent: defineAsyncComponent(() => import('./NvSettings.vue')),
+  getTranslationOptions,
+  async translate(text, voiceLanguage) {
+    const credentials = getCredentials()
+    try {
+      const { translateFrom, translateTo } =
+        getTranslationOptions(voiceLanguage)
+      return await window[electronModuleName as keyof typeof window].translate({
+        text,
+        from: translateFrom,
+        to: translateTo,
+        credentials,
+      })
+    } catch (e) {
+      return text
+    }
+  },
+})

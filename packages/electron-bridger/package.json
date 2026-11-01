@@ -1,0 +1,22 @@
+{
+  "name": "@packages/electron-bridger",
+  "version": "0.0.0",
+  "dependencies": {
+    "@packages/toolbox": "workspace:*"
+  },
+  "files": [
+    "./dist"
+  ],
+  "main": "./dist/main.cjs",
+  "module": "./dist/main.js",
+  "private": true,
+  "scripts": {
+    "build": "vite build",
+    "build:prod": "tsc && pnpm run build",
+    "dev": "vite build --watch --mode development",
+    "test:types": "pnpm run build && tsc -p tests/tsconfig.json"
+  },
+  "source": "src/main.ts",
+  "type": "module",
+  "types": "./dist/main.d.ts"
+}

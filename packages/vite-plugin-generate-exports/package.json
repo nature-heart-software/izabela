@@ -1,0 +1,22 @@
+{
+  "name": "@packages/vite-plugin-generate-exports",
+  "version": "0.0.0",
+  "dependencies": {
+    "@packages/generate-exports": "workspace:*"
+  },
+  "files": [
+    "./dist"
+  ],
+  "main": "./dist/main.cjs",
+  "module": "./dist/main.js",
+  "private": true,
+  "scripts": {
+    "build": "vite build",
+    "test:types": "vite build && tsc -p tests/tsconfig.json",
+    "build:prod": "tsc && pnpm run build",
+    "dev": "vite build --watch --mode development"
+  },
+  "source": "src/main.ts",
+  "type": "module",
+  "types": "./dist/main.d.ts"
+}

@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "../src",
+    "outDir": "../dist",
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "noEmit": false
+  },
+  "vueCompilerOptions": {
+    "globalTypesPath": "../../../coverage/ui-types/vue-global-types.d.ts"
+  },
+  "include": ["../src"],
+  "exclude": ["../src/**/*.stories.ts", "../src/**/*Story.vue"]
+}

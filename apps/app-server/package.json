@@ -1,0 +1,56 @@
+{
+  "name": "@apps/app-server",
+  "version": "0.0.0",
+  "dependencies": {
+    "@aws-sdk/client-cognito-identity": "^3.1157.0",
+    "@aws-sdk/client-polly": "^3.1157.0",
+    "@aws-sdk/credential-provider-cognito-identity": "^3.972.76",
+    "@elevenlabs/elevenlabs-js": "^2.74.0",
+    "@google-cloud/text-to-speech": "^7.2.0",
+    "@types/object-hash": "^3.0.2",
+    "axios": "^0.27.2",
+    "body-parser": "^1.20.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.3",
+    "ibm-watson": "^12.2.0",
+    "lodash": "^4.17.21",
+    "microsoft-cognitiveservices-speech-sdk": "^1.53.0",
+    "morgan": "^1.10.0",
+    "node-cache": "^5.1.2",
+    "object-hash": "^3.0.0",
+    "openai": "^7.45.0",
+    "say": "^0.16.0",
+    "socket.io": "^4.5.4",
+    "uuid": "^9.0.0",
+    "ws": "^8.21.0"
+  },
+  "devDependencies": {
+    "@packages/generate-exports": "workspace:*",
+    "@types/body-parser": "^1.19.2",
+    "@types/cors": "^2.8.12",
+    "@types/express": "^4.17.13",
+    "@types/lodash": "^4.14.184",
+    "@types/morgan": "^1.9.3",
+    "@types/uuid": "^8.3.4",
+    "nodemon": "^2.0.15",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.0",
+    "@packages/vite-plugin-generate-exports": "workspace:*",
+    "vite-plugin-dts": "^5.0.2"
+  },
+  "files": [
+    "./dist"
+  ],
+  "main": "./dist/main.cjs",
+  "module": "./dist/main.cjs",
+  "private": true,
+  "scripts": {
+    "build": "vite build",
+    "test:types": "node tests/build-types.mjs && tsc --noEmit -p tests/tsconfig.consumer.json && tsc --noEmit -p tests/tsconfig.suite.json",
+    "dev": "vite build --watch --mode development",
+    "start": "node bin/generate-exports && nodemon ./dist/main.cjs --start-server"
+  },
+  "source": "src/main.ts",
+  "type": "module",
+  "types": "./dist/main.d.ts"
+}

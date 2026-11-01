@@ -1,0 +1,101 @@
+import { defineConfig } from 'vite'
+import electron from 'vite-plugin-electron/simple'
+import vue from '@vitejs/plugin-vue'
+import tsconfigPaths from 'vite-tsconfig-paths'
+import path from 'path'
+import { getRootExternal } from '../../utils/vite'
+
+const pkg = require('./package.json')
+const escapeRegExp = (value: string) =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+export default defineConfig(({ mode }) => {
+  const debugPort = process.env.IZABELA_SMOKE_DEBUG_PORT
+  const smokeArgs = debugPort
+    ? [
+        '.',
+        '--no-sandbox',
+        `--remote-debugging-port=${debugPort}`,
+        '--remote-debugging-address=127.0.0.1',
+      ]
+    : undefined
+  const packagesToOmit = []
+  const omitPackages = (keys: string[]) =>
+    keys.filter((key) => !packagesToOmit.includes(key))
+  const externalPackages = [
+    ...omitPackages(Object.keys(pkg.dependencies || {})),
+    ...omitPackages(Object.keys(pkg.peerDependencies || {})),
+    ...(mode === 'development'
+      ? omitPackages(Object.keys(pkg.devDependencies || {}))
+      : []),
+  ]
+  const external = [
+    ...externalPackages.map(
+      (packageName) => new RegExp(`^${escapeRegExp(packageName)}(/.*)?`),
+    ),
+    ...(mode === 'development' ? getRootExternal() : []),
+  ]
+  const resolve = {
+    alias: {
+      '@': path.join(__dirname, './src'),
+      '@root': __dirname,
+    },
+    extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json', '.vue'],
+  }
+  const rollupOptions = {
+    external,
+    output: {
+      externalLiveBindings: false,
+    },
+  }
+  const plugins = () => [tsconfigPaths()]
+  return {
+    server: {
+      port: 3000,
+    },
+    resolve,
+    build: {
+      rollupOptions: {
+        ...rollupOptions,
+        input: {
+          messenger: './src/teams/messenger/index.html',
+          'speech-worker': './src/teams/speech-worker/index.html',
+          overlay: './src/teams/overlay/index.html',
+        },
+      },
+    },
+    plugins: [
+      ...plugins(),
+      vue(),
+      electron({
+        main: {
+          entry: 'src/electron/background.ts',
+          onstart({ startup }) {
+            return startup(smokeArgs)
+          },
+          vite: {
+            resolve,
+            build: {
+              emptyOutDir: mode === 'production',
+              rollupOptions,
+            },
+            plugins: [...plugins()],
+          },
+        },
+        preload: {
+          input: path.join(__dirname, 'src/electron/preload.ts'),
+          onstart({ startup, reload }) {
+            return smokeArgs ? startup(smokeArgs) : reload()
+          },
+          vite: {
+            resolve,
+            build: {
+              rollupOptions,
+            },
+            plugins: [...plugins()],
+          },
+        },
+      }),
+    ],
+  }
+})

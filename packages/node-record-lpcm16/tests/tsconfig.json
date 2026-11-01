@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "Preserve",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "noEmit": true,
+    "types": ["node"],
+    "skipLibCheck": false
+  },
+  "include": [
+    "./consumer.types.ts",
+    "./source-loader.ts",
+    "./node-record-lpcm16.spec.ts"
+  ]
+}

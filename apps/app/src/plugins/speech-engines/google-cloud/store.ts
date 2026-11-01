@@ -1,0 +1,25 @@
+import { definePluginStore } from '@/store'
+import { ENGINE_ID } from './shared'
+
+const exposedProperties = {
+  selectedVoice: null,
+  speakingRate: 1,
+  pitch: 0,
+  volumeGainDb: 0,
+}
+
+export const store = definePluginStore(
+  ENGINE_ID,
+  {
+    apiKey: '',
+    useLocalCredentials: false,
+    remoteRegion: '',
+    favoriteVoiceIds: [],
+    useCacheOnEveryRequest: true,
+    streamAudio: true,
+    ...exposedProperties,
+  },
+  Object.keys(exposedProperties) as (keyof typeof exposedProperties)[],
+)
+
+export const { setProperty, getProperty } = store

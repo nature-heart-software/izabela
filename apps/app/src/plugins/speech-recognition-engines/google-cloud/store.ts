@@ -1,0 +1,14 @@
+import { definePluginStore } from '@/store'
+import { ENGINE_ID } from './shared.ts'
+
+const exposedProperties = {
+  profanityFilter: false,
+}
+
+export const store = definePluginStore(
+  ENGINE_ID,
+  {
+    ...exposedProperties,
+  },
+  Object.keys(exposedProperties) as (keyof typeof exposedProperties)[],
+)

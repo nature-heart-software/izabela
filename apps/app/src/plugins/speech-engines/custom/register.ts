@@ -1,0 +1,60 @@
+import { registerEngine } from '@/modules/speech-engine-manager'
+import { DEFAULT_LANGUAGE_CODE } from '@/consts'
+import axios from 'axios'
+import { defineAsyncComponent } from 'vue'
+import { ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
+import { getProperty, store } from './store'
+
+const getSelectedVoice = () => getProperty('selectedVoice')
+
+export const engine = registerEngine({
+  id: ENGINE_ID,
+  name: ENGINE_NAME,
+  category: 'other',
+  getSelectedVoice,
+  getVoiceName,
+  hasCredentials() {
+    return getProperty('endpoint')
+  },
+  getCredentials() {
+    return {
+      apiKey: getProperty('apiKey', true),
+    }
+  },
+  getPayload({ text, translatedText, voice: v }) {
+    const voice = v || getSelectedVoice()
+    return {
+      text: translatedText || text,
+      voice,
+      additionalData: getProperty('additionalData'),
+    }
+  },
+  getLanguageCode(voice) {
+    return (voice || getSelectedVoice()).languageCode || DEFAULT_LANGUAGE_CODE
+  },
+  synthesizeSpeech({ payload, credentials }) {
+    const endpoint = getProperty('endpoint')
+    return axios
+      .post<Blob>(
+        `${
+          endpoint.endsWith('/') ? endpoint.slice(0, -1) : endpoint
+        }/synthesize-speech${getProperty('streamAudio') ? '/stream' : ''}`,
+        {
+          credentials,
+          payload,
+          includeTimestamps: getProperty('includeTimestamps'),
+        },
+        { responseType: 'blob' },
+      )
+      .then((res) => res.data)
+  },
+  getUseCacheOnEveryRequest() {
+    if (getProperty('includeTimestamps')) return false
+    return getProperty('useCacheOnEveryRequest')
+  },
+  voiceSelectComponent: defineAsyncComponent(
+    () => import('./NvVoiceSelect.vue'),
+  ),
+  settingsComponent: defineAsyncComponent(() => import('./NvSettings.vue')),
+  store,
+})

@@ -1,0 +1,80 @@
+import { api, fetchApi } from '@/services'
+import { registerEngine } from '@/modules/speech-engine-manager'
+import { useSpeechStore } from '@/features/speech/store'
+import { defineAsyncComponent } from 'vue'
+import { Credentials, ENGINE_ID, ENGINE_NAME, getVoiceName } from './shared'
+import { getProperty, store } from './store'
+import { SpeechEngine } from '@/modules/speech-engine-manager/types.ts'
+
+const getCredentials: SpeechEngine<Credentials>['getCredentials'] = () => {
+  const speechStore = useSpeechStore()
+  return speechStore.hasUniversalApiCredentials &&
+    !getProperty('useLocalCredentials')
+    ? {}
+    : {
+        apiKey:
+          getProperty('apiKey', true) ||
+          import.meta.env.VITE_SPEECH_ENGINE_IBM_WATSON_API_KEY,
+        url:
+          getProperty('url') ||
+          import.meta.env.VITE_SPEECH_ENGINE_IBM_WATSON_URL,
+      }
+}
+
+const getSelectedVoice = () => getProperty('selectedVoice')
+export const engine = registerEngine({
+  id: ENGINE_ID,
+  name: ENGINE_NAME,
+  category: 'cloud',
+  getRegions: () =>
+    api('remote')
+      .get('/tts/ibm-watson/list-regions')
+      .then(({ data }) => data),
+  getSelectedVoice,
+  getVoiceName,
+  getCredentials,
+  hasCredentials() {
+    const speechStore = useSpeechStore()
+    return (
+      speechStore.hasUniversalApiCredentials ||
+      Object.values(getCredentials()).every(Boolean)
+    )
+  },
+  getPayload({ text, translatedText, voice }) {
+    return {
+      text: translatedText || text,
+      voice: (voice || getSelectedVoice()).name,
+      ratePercentage: Number(getProperty('ratePercentage')),
+      pitchPercentage: Number(getProperty('pitchPercentage')),
+    }
+  },
+  getLanguageCode(voice) {
+    return (voice || getSelectedVoice()).language
+  },
+  synthesizeSpeech({ credentials, payload: { region, ...payload } }) {
+    return fetchApi(
+      getProperty('useLocalCredentials') ? 'local' : 'remote',
+      `/tts/ibm-watson/synthesize-speech${
+        getProperty('streamAudio') ? '/stream' : ''
+      }`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          credentials,
+          payload,
+          includeTimestamps: getProperty('includeTimestamps'),
+        }),
+      },
+      region,
+    )
+  },
+  getUseCacheOnEveryRequest() {
+    if (getProperty('includeTimestamps')) return false
+    return getProperty('useCacheOnEveryRequest')
+  },
+  voiceSelectComponent: defineAsyncComponent(
+    () => import('./NvVoiceSelect.vue'),
+  ),
+  settingsComponent: defineAsyncComponent(() => import('./NvSettings.vue')),
+  store,
+})
