@@ -1,5 +1,7 @@
 import { ExtractPropTypes, PropType } from 'vue'
-import { TippyOptions } from 'vue-tippy'
+import type { Props as TippyProps } from 'tippy.js'
+
+type TippyOptions = Partial<TippyProps>
 
 export const props = {
   tippyOptions: {

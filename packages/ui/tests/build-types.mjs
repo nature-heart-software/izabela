@@ -1,5 +1,6 @@
 import { dirname, join, relative, resolve, sep } from 'node:path'
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import './prepare-panda.mjs'
 import { fileURLToPath } from 'node:url'
 import { execFileSync } from 'node:child_process'
 import { createRequire } from 'node:module'

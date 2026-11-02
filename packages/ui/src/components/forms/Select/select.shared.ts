@@ -1,7 +1,7 @@
 import { ExtractPropTypes, PropType } from 'vue'
 
 export const sizeValues = ['sm', 'md', 'lg'] as const
-export type Size = (typeof sizeValues)[number]
+export type Size = typeof sizeValues[number]
 
 export const optionProps = {
   active: {
@@ -20,10 +20,13 @@ export type Option = {
   category?: string
   searchValue?: string
   attr?: Record<string, number | string>
+  attrs?: Record<string, unknown>
   children?: Omit<Option, 'children'>[]
 }
 
 export const selectProps = {
+  disabled: { type: Boolean, default: false },
+  readonly: { type: Boolean, default: false },
   multiple: {
     type: Boolean,
     default: false,

@@ -1,11 +1,13 @@
 <template>
   <NvAutocomplete
+    :class="$attrs.class"
+    :style="$attrs.style"
     :autoScrollIndex="autoScrollIndex"
     :options="searchResults"
     :valueKey="props.valueKey"
     :visible="isAutocompleteVisible"
     :width="props.autocompleteWidth"
-    @select="(item: Option) => !item.children && handleValue(item.value)"
+    @select="selectOption"
     @positioner-change="autocomplete = $event"
     @pointer-down-outside="blurInput"
     @focus-outside="blurInput"
@@ -14,23 +16,25 @@
     <template #reference>
       <StSelect
         ref="select"
-        class="w-full"
+        :class="box({ width: '100%' })"
         v-bind="{ ...props, isFocused: hasFocus }"
         @click="activate"
       >
-        <StSelectWrapper class="w-full" v-bind="props">
-          <NvStack :spacing="2" class="w-full">
+        <StSelectWrapper :class="box({ width: '100%' })" v-bind="props">
+          <NvStack :spacing="2" :class="box({ width: '100%' })">
             <template v-if="props.multiple && selectedOptions.length > 0">
               <StSelectTagsWrapper>
-                <NvGroup :spacing="2" class="w-full">
+                <NvGroup :spacing="2" :class="box({ width: '100%' })">
                   <template
                     v-for="option in selectedOptions"
                     :key="get(option.value, props.valueKey) || option.value"
                   >
                     <NvTag
                       :title="option.label"
-                      closable
-                      @close="handleValue(option.value)"
+                      :closable="
+                        !isLocked && !option.disabled && !option.readonly
+                      "
+                      @close="selectOption(option)"
                       @mousedown="blurInput()"
                       @click.stop
                     >
@@ -40,15 +44,17 @@
                 </NvGroup>
               </StSelectTagsWrapper>
             </template>
-            <div ref="inputWrapper" class="inline-flex">
+            <div ref="inputWrapper" :class="box({ display: 'inline-flex' })">
               <StSelectInput
                 ref="selectInput"
                 :isFocused="hasFocus"
                 :modelValue="inputValue"
-                :placeholder="$attrs.placeholder"
-                v-bind="omit(props, ['modelValue'])"
+                v-bind="{
+                  ...omit(props, ['modelValue', 'isFocused']),
+                  ...inputAttrs,
+                }"
                 @focus="activate"
-                @update:modelValue="search = $event"
+                @update:modelValue="updateSearch"
               />
             </div>
           </NvStack>
@@ -65,7 +71,7 @@
         :disabled="item.disabled"
         :readonly="item.children"
         :selected="
-          selectedValues.find(
+          selectedValues.some(
             (v: Value) =>
               (get(item.value, props.valueKey) || item.value) ===
               (get(v, props.valueKey) || v),
@@ -73,9 +79,13 @@
         "
         :title="item.label"
         v-bind="item.attrs || {}"
-        @mousedown="!item.children && handleValue(item.value)"
+        @click="selectOption(item)"
       >
-        <div class="w-full text-ellipsis overflow-hidden">
+        <div
+          :class="
+            box({ width: '100%', textOverflow: 'ellipsis', overflow: 'hidden' })
+          "
+        >
           {{ item.label }}
         </div>
         <template #after="props">
@@ -86,7 +96,7 @@
     <template #fallback>
       <StSelectOption
         v-if="searchResults.length === 0"
-        class="justify-center pointer-events-none"
+        :class="box({ justifyContent: 'center', pointerEvents: 'none' })"
       >
         No Data
       </StSelectOption>
@@ -94,7 +104,8 @@
   </NvAutocomplete>
 </template>
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, useAttrs, watch } from 'vue'
+import { box } from '@/styled-system/patterns'
 import { useFocusTrap } from '@vueuse/integrations/useFocusTrap'
 import { useFuse, UseFuseOptions } from '@vueuse/integrations/useFuse'
 import { onClickOutside, onKeyStroke } from '@vueuse/core'
@@ -106,7 +117,7 @@ import {
   StSelectOption,
   StSelectTagsWrapper,
   StSelectWrapper,
-} from './select.styled'
+} from './select.panda'
 import {
   Option,
   selectProps as propsDefinition,
@@ -125,6 +136,10 @@ import omit from 'lodash/omit'
 import { v4 as uuid } from 'uuid'
 
 const props = defineProps(propsDefinition)
+defineOptions({ inheritAttrs: false })
+const attrs = useAttrs()
+const inputAttrs = computed(() => omit(attrs, ['class', 'style']))
+const isLocked = computed(() => props.disabled || props.readonly)
 const emit = defineEmits(['update:modelValue'])
 const iconSize = computed(() => {
   const sizes: Record<Size, keyof typeof tokens.spacing> = {
@@ -139,7 +154,7 @@ const selectedValues = computed(() =>
   props.multiple ? (props.modelValue as Value[]) : [props.modelValue],
 )
 
-const options = computed(() =>
+const options = computed<Option[]>(() =>
   flatten(
     props.options.map((option) => {
       if (option.children) {
@@ -182,7 +197,11 @@ const select = ref()
 const selectInput = ref()
 const inputWrapper = ref()
 const autocomplete = ref()
-const { hasFocus, activate, deactivate } = useFocusTrap(inputWrapper, {
+const {
+  hasFocus,
+  activate: activateTrap,
+  deactivate,
+} = useFocusTrap(inputWrapper, {
   returnFocusOnDeactivate: false,
   allowOutsideClick: true,
   preventScroll: true,
@@ -192,17 +211,25 @@ const { hasFocus, activate, deactivate } = useFocusTrap(inputWrapper, {
 })
 
 const isAutocompleteVisible = ref(false)
+const activate = () => {
+  if (!isLocked.value) activateTrap()
+}
+const updateSearch = (value: string) => {
+  if (!isLocked.value) search.value = value
+  else if (selectInput.value?.$el)
+    selectInput.value.$el.value = inputValue.value
+}
 
 watch(
   () => hasFocus.value,
   (value) => {
-    if (value) {
+    if (value && !isLocked.value) {
       isAutocompleteVisible.value = true
     }
   },
 )
 
-const fuseOptions = computed<UseFuseOptions<(typeof options.value)[number]>>(
+const fuseOptions = computed<UseFuseOptions<typeof options.value[number]>>(
   () => ({
     fuseOptions: {
       keys: ['label', 'category', 'searchValue'],
@@ -233,23 +260,20 @@ const inputValue = computed(
 )
 
 const autoScrollIndex = computed(() => {
-  return (
-    selectedValues.value.length > 0 &&
-    Math.min(
-      ...selectedValues.value
-        .map((v) =>
-          options.value.findIndex(
-            (o) =>
-              get(o.value, props.valueKey, o.value) ===
-              get(v, props.valueKey, v),
-          ),
-        )
-        .filter((i) => i !== undefined),
+  const indices = selectedValues.value
+    .map((value) =>
+      searchResults.value.findIndex(
+        (option) =>
+          get(option.value, props.valueKey, option.value) ===
+          get(value, props.valueKey, value),
+      ),
     )
-  )
+    .filter((index) => index >= 0)
+  return indices.length > 0 ? Math.min(...indices) : undefined
 })
 
 const handleValue = (value: Value) => {
+  if (isLocked.value) return
   if (props.multiple) {
     const newValue = [...selectedValues.value]
     const index = newValue.findIndex(
@@ -267,11 +291,25 @@ const handleValue = (value: Value) => {
     blurInput()
   }
 }
+const selectOption = (item?: Option) => {
+  if (
+    !item ||
+    item.children ||
+    item.disabled ||
+    item.readonly ||
+    isLocked.value
+  )
+    return
+  handleValue(item.value)
+}
 const blurInput = () => {
   search.value = ''
   deactivate()
   isAutocompleteVisible.value = false
 }
+watch(isLocked, (locked) => {
+  if (locked) blurInput()
+})
 onKeyStroke('Escape', blurInput)
 onKeyStroke('Tab', blurInput)
 onBeforeUnmount(blurInput)

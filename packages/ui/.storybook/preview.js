@@ -1,26 +1,21 @@
 import '@/styles'
 import { themes } from '@/themes'
-import { ThemeProvider } from 'vue3-styled-components'
+import { GlobalStyles } from '@/main'
+import { provide } from 'vue'
 
 export const parameters = {
+  options: { storySort: { method: 'configure' } },
   controls: {
-    matchers: {
-      color: /(background|color)$/i,
-      date: /Date$/,
-    },
+    matchers: { color: /(background|color)$/i, date: /Date$/ },
   },
 }
 
 export const decorators = [
   (story) => ({
-    components: { story, ThemeProvider },
+    components: { story, GlobalStyles },
     setup() {
-      return { theme: themes.get('dark') }
+      provide('theme', themes.get('dark'))
     },
-    template: `
-      <ThemeProvider :theme="theme">
-        <story />
-      </ThemeProvider>
-    `,
+    template: '<GlobalStyles><story /></GlobalStyles>',
   }),
 ]

@@ -1,6 +1,12 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+// Keep the application's legacy utilities while Panda owns shared UI recipes.
+// Layering prevents the legacy reset from overriding Panda's control styles.
+@layer reset {
+  @tailwind base;
+}
+@layer legacy {
+  @tailwind components;
+  @tailwind utilities;
+}
 
 .v-enter-active,
 .v-leave-active {
@@ -14,10 +20,4 @@
 
 a {
   display: inline-flex;
-}
-
-.el-loading-spinner {
-  width: auto !important;
-  left: 50%;
-  transform: translateX(-50%);
 }

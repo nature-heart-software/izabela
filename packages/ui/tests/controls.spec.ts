@@ -79,7 +79,7 @@ describe('real shared controls', () => {
     expect(document.activeElement).toBe(w.element)
     await w.setProps({ loading: true })
     await nextTick()
-    expect(w.find('.el-loading-mask').exists()).toBe(true)
+    expect(w.find('[role="status"]').exists()).toBe(true)
     await w.setProps({ loading: false })
     await flushPromises()
   })
@@ -92,40 +92,39 @@ describe('real shared controls', () => {
     ;(w.element as HTMLButtonElement).click()
     expect(w.emitted('click')).toHaveLength(1)
   })
-  it('switch toggles from external model updates without inventing native semantics', async () => {
-    const w = render(ui.NvSwitch, { props: { modelValue: false } })
-    expect(w.element.tagName).toBe('SPAN')
-    expect(w.attributes('tabindex')).toBe('0')
-    await w.trigger('click')
+  it('switch toggles through its real Ark native control and external model updates', async () => {
+    const w = render(ui.NvSwitch, {
+      props: { modelValue: false },
+      attrs: { 'aria-label': 'Enable speech' },
+    })
+    const input = w.get('input[role="switch"]')
+    expect(input.attributes('aria-checked')).toBe('false')
+    ;(input.element as HTMLInputElement).click()
+    await settle()
     expect(w.emitted('update:modelValue')).toEqual([[true]])
     await w.setProps({ modelValue: true })
-    await w.trigger('click')
+    ;(input.element as HTMLInputElement).click()
+    await settle()
     expect(w.emitted('update:modelValue')).toEqual([[true], [false]])
   })
-  it('switch currently accepts clicks with a disabled attribute and ignores Space/Enter', async () => {
-    const w = render(ui.NvSwitch, { attrs: { disabled: true } })
-    ;(w.element as HTMLElement).focus()
-    expect(document.activeElement).toBe(w.element)
-    await w.trigger('keydown', { key: ' ' })
-    await w.trigger('keydown', { key: 'Enter' })
-    expect(w.emitted('update:modelValue')).toBeUndefined()
-    await w.trigger('click')
-    expect(w.emitted('update:modelValue')).toEqual([[true]])
-  })
-  it.fails('[known issue] disabled switch prevents model updates', async () => {
-    const w = render(ui.NvSwitch, { attrs: { disabled: true } })
-    await w.trigger('click')
+  it('disabled switch prevents native activation and focus', async () => {
+    const w = render(ui.NvSwitch, { props: { disabled: true } })
+    const input = w.get('input').element as HTMLInputElement
+    expect(input.disabled).toBe(true)
+    input.focus()
+    expect(document.activeElement).not.toBe(input)
+    input.click()
+    await settle()
     expect(w.emitted('update:modelValue')).toBeUndefined()
   })
-  it.fails(
-    '[known issue] focused switch supports keyboard Space activation',
-    async () => {
-      const w = render(ui.NvSwitch)
-      ;(w.element as HTMLElement).focus()
-      await w.trigger('keydown', { key: ' ' })
-      expect(w.emitted('update:modelValue')).toEqual([[true]])
-    },
-  )
+  it('switch exposes keyboard-focusable native semantics and an accessible name', () => {
+    const w = render(ui.NvSwitch, { attrs: { 'aria-label': 'Enable speech' } })
+    const input = w.get('input').element as HTMLInputElement
+    expect(input.type).toBe('checkbox')
+    expect(input.getAttribute('aria-label')).toBe('Enable speech')
+    input.focus()
+    expect(document.activeElement).toBe(input)
+  })
   it('range forwards bounds and currently emits strings from the styled input', async () => {
     const w = render(ui.NvRangeInput, {
       props: { modelValue: 2 },
@@ -155,7 +154,7 @@ describe('real shared controls', () => {
     [ui.NvInput, 'text'],
     [ui.NvNumberInput, 'number'],
   ])(
-    'input wrapper uses the real Element Plus input (%s)',
+    'input wrapper uses the real native input (%s)',
     async (component, type) => {
       const w = render(component, {
         props: { modelValue: '12' },
@@ -455,17 +454,14 @@ describe('real select composition', () => {
     await key('Enter')
     return w
   }
-  it('currently selects disabled options through keyboard even though their pointer style is disabled', async () => {
+  it('retains the model when the only keyboard option is disabled', async () => {
     const w = await blockedSelection()
-    expect(w.emitted('update:modelValue')).toEqual([['blocked']])
+    expect(w.emitted('update:modelValue')).toBeUndefined()
   })
-  it.fails(
-    '[known issue] select keyboard activation ignores disabled options',
-    async () => {
-      const w = await blockedSelection()
-      expect(w.emitted('update:modelValue')).toBeUndefined()
-    },
-  )
+  it('select keyboard activation ignores disabled options', async () => {
+    const w = await blockedSelection()
+    expect(w.emitted('update:modelValue')).toBeUndefined()
+  })
   it('group headings are not selectable but their actual child options are', async () => {
     const w = render(ui.NvSelect, {
       props: {
@@ -709,7 +705,7 @@ describe('real overlay controls', () => {
     await settle()
     expect(onClick).toHaveBeenCalledExactlyOnceWith()
   })
-  it('tooltip uses the real Tippy renderer and cleans up its generated popper', async () => {
+  it('tooltip uses Ark rendering, suppresses focused content and cleans up its portal', async () => {
     const w = render(ui.NvTooltip, {
       props: { tippyOptions: { delay: 0, duration: 0 } },
       slots: {
@@ -718,21 +714,14 @@ describe('real overlay controls', () => {
       },
     })
     await settle()
-    await w.get('[data-v-tippy]').trigger('mouseenter')
+    await w.get('button').trigger('pointermove', { pointerType: 'mouse' })
     await settle()
     expect(
       document.body.querySelector('[role="tooltip"]')?.textContent,
     ).toContain('Tooltip content')
-    const reference = w.get('[data-v-tippy]').element as HTMLElement & {
-      _tippy: { state: { isEnabled: boolean } }
-    }
-    expect(reference._tippy.state.isEnabled).toBe(true)
     ;(w.get('button').element as HTMLElement).focus()
-    await nextTick()
-    expect(reference._tippy.state.isEnabled).toBe(false)
-    ;(w.get('button').element as HTMLElement).blur()
-    await nextTick()
-    expect(reference._tippy.state.isEnabled).toBe(true)
+    await settle()
+    expect(document.body.querySelector('[role="tooltip"]')).toBeNull()
     w.unmount()
     wrappers.splice(wrappers.indexOf(w), 1)
     await settle()

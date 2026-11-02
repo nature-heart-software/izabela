@@ -1,51 +1,82 @@
 <template>
   <StTooltip ref="tooltip" v-bind="props">
-    <tippy ref="tippyInstance" v-bind="tippyProps">
-      <slot name="reference" />
-      <template #content>
-        <slot />
-      </template>
-    </tippy>
+    <Tooltip.Root
+      v-model:open="open"
+      :ids="{ trigger: triggerId }"
+      :disabled="focused"
+      :open-delay="openDelay"
+      :close-delay="closeDelay"
+      :positioning="positioning"
+      :interactive="props.tippyOptions.interactive ?? false"
+    >
+      <Tooltip.Trigger ref="trigger" :id="triggerId" as-child>
+        <slot name="reference" />
+      </Tooltip.Trigger>
+      <Teleport :to="portalTarget" defer>
+        <StTooltipPositioner v-if="open && !focused">
+          <StTooltipContent><slot /></StTooltipContent>
+        </StTooltipPositioner>
+      </Teleport>
+    </Tooltip.Root>
   </StTooltip>
 </template>
 <script lang="ts" setup>
-import { computed, inject, ref, watch } from 'vue'
-import { StTooltip } from './tooltip.styled'
+import { computed, inject, ref, useId, watch, watchPostEffect } from 'vue'
+import { Tooltip, type TooltipRootProps } from '@ark-ui/vue'
+import {
+  StTooltip,
+  StTooltipContent,
+  StTooltipPositioner,
+} from './tooltip.panda'
 import { props as propsDefinition } from './tooltip.shared'
-import { Tippy, TippyInstance, TippyOptions } from 'vue-tippy'
 import { tokens } from '@/styles/tokens'
-import { MaybeElement, useFocusWithin } from '@vueuse/core'
+import { type MaybeElement, useFocusWithin } from '@vueuse/core'
 import { getElement } from '@/utils/vue'
 import { PORTAL_TARGET } from '@/consts'
 
 const props = defineProps(propsDefinition)
+const open = ref(false)
+const trigger = ref()
+const triggerId = ref(`nv-tooltip-${useId()}-trigger`)
+watchPostEffect(() => {
+  // Zag measures the trigger by ID even when Ark composes a consumer element.
+  const element = getElement(trigger.value)
+  if (element?.id) triggerId.value = element.id
+})
+const tooltip = ref<MaybeElement>()
+const { focused } = useFocusWithin(tooltip)
+watch(focused, (value) => {
+  if (value) open.value = false
+})
 const injectedPortalTarget = inject(PORTAL_TARGET)
 const portalTarget = computed(
   () => getElement(injectedPortalTarget) || document.body,
 )
-const tippyProps = computed<TippyOptions>(
-  () =>
-    ({
-      trigger: 'mouseenter focus',
-      delay: [250, 0],
-      interactive: false,
-      placement: 'top',
-      offset: [0, tokens.spacing['4']],
-      appendTo: portalTarget.value,
-      theme: `tooltip`,
-      maxWidth: 300,
-      ...props.tippyOptions,
-    }) as TippyOptions,
+const openDelay = computed(() =>
+  Array.isArray(props.tippyOptions.delay)
+    ? props.tippyOptions.delay[0] ?? 250
+    : props.tippyOptions.delay ?? 250,
 )
-const tooltip = ref<MaybeElement>()
-const tippyInstance = ref<TippyInstance>()
-const { focused } = useFocusWithin(tooltip)
-watch(focused, (value) => {
-  const instance = tippyInstance.value
-  if (value) {
-    if (instance && 'disable' in instance) instance.disable()
-  } else {
-    if (instance && 'enable' in instance) instance.enable()
-  }
-})
+const closeDelay = computed(() =>
+  Array.isArray(props.tippyOptions.delay)
+    ? props.tippyOptions.delay[1] ?? 0
+    : props.tippyOptions.delay ?? 0,
+)
+const positioning = computed<TooltipRootProps['positioning']>(() => ({
+  placement:
+    !props.tippyOptions.placement ||
+    props.tippyOptions.placement === 'auto' ||
+    props.tippyOptions.placement === 'auto-start' ||
+    props.tippyOptions.placement === 'auto-end'
+      ? 'top'
+      : props.tippyOptions.placement,
+  offset: {
+    mainAxis: Array.isArray(props.tippyOptions.offset)
+      ? props.tippyOptions.offset[1]
+      : tokens.spacing['4'],
+    crossAxis: Array.isArray(props.tippyOptions.offset)
+      ? props.tippyOptions.offset[0]
+      : 0,
+  },
+}))
 </script>

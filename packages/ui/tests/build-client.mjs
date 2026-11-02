@@ -1,3 +1,4 @@
+import './prepare-panda.mjs'
 import { fileURLToPath } from 'node:url'
 import { build } from 'vite'
 import vue from '@vitejs/plugin-vue'

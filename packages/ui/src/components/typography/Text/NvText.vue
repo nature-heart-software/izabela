@@ -4,7 +4,7 @@
   </StText>
 </template>
 <script lang="ts" setup>
-import { StText } from './text.styled'
+import { StText } from './text.panda'
 import { props as propsDefinition } from './text.shared'
 
 const props = defineProps(propsDefinition)
