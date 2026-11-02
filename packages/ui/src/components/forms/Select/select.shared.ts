@@ -2,7 +2,7 @@ import { ExtractPropTypes, PropType } from 'vue'
 import { props as autocompleteProps } from '../Autocomplete/autocomplete.shared'
 
 export const sizeValues = ['sm', 'md', 'lg'] as const
-export type Size = typeof sizeValues[number]
+export type Size = (typeof sizeValues)[number]
 
 export const optionProps = {
   active: {

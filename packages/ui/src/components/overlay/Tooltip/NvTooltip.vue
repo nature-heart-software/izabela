@@ -49,18 +49,18 @@ const portalTarget = computed(
 )
 const openDelay = computed(() =>
   Array.isArray(props.tippyOptions.delay)
-    ? props.tippyOptions.delay[0] ?? 250
-    : props.tippyOptions.delay ?? 250,
+    ? (props.tippyOptions.delay[0] ?? 250)
+    : (props.tippyOptions.delay ?? 250),
 )
 const closeDelay = computed(() =>
   Array.isArray(props.tippyOptions.delay)
-    ? props.tippyOptions.delay[1] ?? 0
-    : props.tippyOptions.delay ?? 0,
+    ? (props.tippyOptions.delay[1] ?? 0)
+    : (props.tippyOptions.delay ?? 0),
 )
 const enterDuration = computed(() => {
   if (props.tippyOptions.animation === false) return 0
   const duration = props.tippyOptions.duration
-  return Array.isArray(duration) ? duration[0] ?? 300 : duration ?? 300
+  return Array.isArray(duration) ? (duration[0] ?? 300) : (duration ?? 300)
 })
 const positioning = computed<TooltipRootProps['positioning']>(() => ({
   placement:
