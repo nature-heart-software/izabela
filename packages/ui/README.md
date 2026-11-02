@@ -21,6 +21,8 @@ prepare them automatically. The PostCSS integration extracts recipes and
 registers source dependencies so development rebuilds include recipe changes.
 Component recipes are colocated in `*.panda.ts` files. Shared geometry and
 font metrics are mapped from `@packages/design-tokens` in `panda.config.ts`.
+Generation runs at those entry points, not during dependency installation:
+workspace dependencies must be built before the UI configuration is evaluated.
 
 Applications importing the built package also import its stylesheet:
 

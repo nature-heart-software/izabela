@@ -39,13 +39,14 @@ execFileSync(
     `
 import { build } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import { win32 } from 'node:path'
 await build({
   root: ${JSON.stringify(
     resolve(testRoot, '..'),
   )}, configFile: false, envFile: false, logLevel: 'error',
   plugins: [vue(), {
     name: 'display-client-entry',
-    resolveId(id) { if (id === 'display-client' || id.endsWith('/display-client')) return 'display-client' },
+    resolveId(id) { if (win32.basename(id) === 'display-client') return 'display-client' },
     load(id) { if (id === 'display-client') return ${JSON.stringify(entry)} },
   }],
   resolve: { alias: ${JSON.stringify({

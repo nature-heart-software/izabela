@@ -58,13 +58,14 @@ execFileSync(
     `
 import { build } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import { win32 } from 'node:path'
 await build({
   root: ${JSON.stringify(
     packageRoot,
   )}, configFile: false, envFile: false, logLevel: 'error',
   plugins: [vue(), {
     name: 'style-boundaries-entry',
-    resolveId(id) { if (id === 'style-boundaries-client' || id.endsWith('/style-boundaries-client')) return 'style-boundaries-client' },
+    resolveId(id) { if (win32.basename(id) === 'style-boundaries-client') return 'style-boundaries-client' },
     load(id) { if (id === 'style-boundaries-client') return ${JSON.stringify(
       entry,
     )} },

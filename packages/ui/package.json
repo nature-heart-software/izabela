@@ -24,8 +24,7 @@
     "build:prod": "pnpm run panda:prepare && vue-tsc && vite build",
     "dev": "pnpm run panda:prepare && vite build --watch --mode development",
     "storybook": "pnpm run panda:prepare && storybook dev -p 6006",
-    "panda:prepare": "panda codegen && panda cssgen",
-    "prepare": "pnpm run panda:prepare"
+    "panda:prepare": "panda codegen && panda cssgen"
   },
   "type": "module",
   "types": "./dist/main.d.ts",
