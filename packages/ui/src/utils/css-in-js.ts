@@ -4,7 +4,7 @@ import { CSSObject } from '@/types/css-in-js'
 
 const { borderRadius, spacing } = tokens
 export const sizeValues = ['xs', 'sm', 'md', 'lg'] as const
-export type Size = typeof sizeValues[number]
+export type Size = (typeof sizeValues)[number]
 
 type Value = number | string
 type FontSizeProperty = 'lineHeight' | 'letterSpacing'
@@ -23,8 +23,8 @@ export const lineHeight = (fontSizeToken: FontSizeToken) =>
   typeof fontSizeToken === 'number' || typeof fontSizeToken === 'string'
     ? 1
     : typeof fontSizeToken[1]?.lineHeight === 'string'
-    ? rem(fontSizeToken[1]?.lineHeight)
-    : fontSizeToken[1]?.lineHeight || 1
+      ? rem(fontSizeToken[1]?.lineHeight)
+      : fontSizeToken[1]?.lineHeight || 1
 
 export const letterSpacing = (fontSizeToken: FontSizeToken) =>
   typeof fontSizeToken === 'number' || typeof fontSizeToken === 'string'
