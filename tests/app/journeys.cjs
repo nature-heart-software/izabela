@@ -1021,7 +1021,8 @@ async function runJourneys(context) {
       await selectTts('samtts')
     })
     await run(18, async () => {
-      const selector = '[data-v-step="engine-voice-select"] input'
+      const selector =
+        '[data-v-step="engine-voice-select"] input, input[data-v-step="engine-voice-select"]'
       await evaluate(messenger, () =>
         document
           .querySelector(
@@ -1066,9 +1067,7 @@ async function runJourneys(context) {
         'voice favorite saved',
       )
       await evaluate(messenger, () =>
-        document
-          .querySelector('[title="Elf"]')
-          .dispatchEvent(new MouseEvent('mousedown', { bubbles: true })),
+        document.querySelector('[title="Elf"]').click(),
       )
       await audioMessage('Hello from the elf.', 'samtts', (m) =>
         assert.equal(m.voice.name, 'Elf'),
@@ -1082,9 +1081,7 @@ async function runJourneys(context) {
         'custom voice option',
       )
       await evaluate(messenger, () =>
-        document
-          .querySelector('[title="Custom"]')
-          .dispatchEvent(new MouseEvent('mousedown', { bubbles: true })),
+        document.querySelector('[title="Custom"]').click(),
       )
       await route('/settings/engine', 'Universal credentials')
       await clickText('Sam')
