@@ -2,7 +2,7 @@
   <template v-if="isListeningToKeys">
     <NvButton
       ref="target"
-      class="pointer-events-none"
+      :class="css({ pointerEvents: 'none' })"
       title="Press Esc to cancel. Hold to remove"
       v-bind="$attrs"
       >Listening...
@@ -15,6 +15,7 @@
   </template>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import { NvButton } from '@packages/ui'
 import { computed, PropType, Ref, ref, shallowRef, watch } from 'vue'
 import { useEventListener, onClickOutside } from '@vueuse/core'

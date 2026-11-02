@@ -4,37 +4,37 @@ import { CSSObject } from '@/types/css-in-js'
 
 const { borderRadius, spacing } = tokens
 export const sizeValues = ['xs', 'sm', 'md', 'lg'] as const
-export type Size = (typeof sizeValues)[number]
+export type Size = typeof sizeValues[number]
 
 type Value = number | string
 type FontSizeProperty = 'lineHeight' | 'letterSpacing'
-type TailwindFontSize =
+type FontSizeToken =
   | Value
   | [Value, Record<FontSizeProperty, Value>]
   | readonly [Value, Record<FontSizeProperty, Value>]
 
-export const fontSize = (tailwindFontSize: TailwindFontSize) =>
-  typeof tailwindFontSize === 'number' || typeof tailwindFontSize === 'string'
-    ? rem(tailwindFontSize)
-    : rem(tailwindFontSize[0])
+export const fontSize = (fontSizeToken: FontSizeToken) =>
+  typeof fontSizeToken === 'number' || typeof fontSizeToken === 'string'
+    ? rem(fontSizeToken)
+    : rem(fontSizeToken[0])
 
-export const lineHeight = (tailwindFontSize: TailwindFontSize) =>
+export const lineHeight = (fontSizeToken: FontSizeToken) =>
   // eslint-disable-next-line no-nested-ternary
-  typeof tailwindFontSize === 'number' || typeof tailwindFontSize === 'string'
+  typeof fontSizeToken === 'number' || typeof fontSizeToken === 'string'
     ? 1
-    : typeof tailwindFontSize[1]?.lineHeight === 'string'
-      ? rem(tailwindFontSize[1]?.lineHeight)
-      : tailwindFontSize[1]?.lineHeight || 1
+    : typeof fontSizeToken[1]?.lineHeight === 'string'
+    ? rem(fontSizeToken[1]?.lineHeight)
+    : fontSizeToken[1]?.lineHeight || 1
 
-export const letterSpacing = (tailwindFontSize: TailwindFontSize) =>
-  typeof tailwindFontSize === 'number' || typeof tailwindFontSize === 'string'
+export const letterSpacing = (fontSizeToken: FontSizeToken) =>
+  typeof fontSizeToken === 'number' || typeof fontSizeToken === 'string'
     ? 'normal'
-    : rem(tailwindFontSize[1]?.letterSpacing) || 'normal'
+    : rem(fontSizeToken[1]?.letterSpacing) || 'normal'
 
-export const fontSizeStyle = (tailwindFontSize: TailwindFontSize) => ({
-  fontSize: fontSize(tailwindFontSize),
-  lineHeight: lineHeight(tailwindFontSize),
-  letterSpacing: letterSpacing(tailwindFontSize),
+export const fontSizeStyle = (fontSizeToken: FontSizeToken) => ({
+  fontSize: fontSize(fontSizeToken),
+  lineHeight: lineHeight(fontSizeToken),
+  letterSpacing: letterSpacing(fontSizeToken),
 })
 
 export function borderRadiusStyleBySize(size: Size) {
@@ -149,6 +149,9 @@ export function iconStyleBySize(size: Size) {
 
 export function disabledItemBackgroundStyle({ theme }: any) {
   return `
-    background-color: ${rgba(theme.disabledItemBackground.backdropColor, theme.disabledItemBackground.backdropOpacity)};
+    background-color: ${rgba(
+      theme.disabledItemBackground.backdropColor,
+      theme.disabledItemBackground.backdropOpacity,
+    )};
   `
 }

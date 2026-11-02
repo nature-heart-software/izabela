@@ -5,7 +5,7 @@
       <NvStack spacing="4">
         <NvCard>
           <NvGroup no-wrap spacing="5">
-            <NvStack class="w-full">
+            <NvStack :class="css({ width: '100%' })">
               <NvGroup justify="apart">
                 <NvText type="label">Enable Game Overlay</NvText>
                 <NvSwitch
@@ -37,7 +37,7 @@
             </NvStack>
           </NvGroup>
         </NvCard>
-        <div class="pl-8">
+        <div :class="css({ paddingLeft: '8' })">
           <NvStack spacing="4">
             <template v-if="gameOverlayStore.enableGameOverlay">
               <NvCard>
@@ -51,7 +51,7 @@
                   </div>
                   <NvDivider v-if="allowlist.length" direction="horizontal" />
                   <template v-for="(path, i) in allowlist" :key="i">
-                    <NvGroup class="w-full" grow>
+                    <NvGroup :class="css({ width: '100%' })" grow>
                       <NvInput
                         :modelValue="path"
                         @update:modelValue="
@@ -59,7 +59,7 @@
                         "
                       />
                       <NvButton
-                        class="!grow-0"
+                        :class="css({ flexGrow: '0 !important' })"
                         icon-name="times"
                         size="xs"
                         type="plain"
@@ -71,7 +71,7 @@
                     v-for="(path, i) in gameOverlayAllowlistData"
                     :key="i"
                   >
-                    <NvGroup class="w-full" grow>
+                    <NvGroup :class="css({ width: '100%' })" grow>
                       <NvInput :modelValue="path" />
                     </NvGroup>
                   </template>
@@ -88,7 +88,7 @@
                   </div>
                   <NvDivider v-if="denylist.length" direction="horizontal" />
                   <template v-for="(path, i) in denylist" :key="i">
-                    <NvGroup class="w-full" grow>
+                    <NvGroup :class="css({ width: '100%' })" grow>
                       <NvInput
                         :modelValue="path"
                         @update:modelValue="
@@ -96,7 +96,7 @@
                         "
                       />
                       <NvButton
-                        class="!grow-0"
+                        :class="css({ flexGrow: '0 !important' })"
                         icon-name="times"
                         size="xs"
                         type="plain"
@@ -114,6 +114,7 @@
   </NvStack>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import {
   NvButton,
   NvCard,

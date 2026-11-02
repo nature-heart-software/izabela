@@ -6,10 +6,25 @@
           opacity: settingsStore.backgroundDimOpacity / 100,
           zIndex: -1,
         }"
-        class="fixed w-full h-full bg-black"
+        :class="
+          css({
+            position: 'fixed',
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'black',
+          })
+        "
       ></div>
       <NvOverlayInput
-        class="w-[720px] fixed bottom-[60px] left-1/2 transform -translate-x-1/2"
+        :class="
+          css({
+            width: '720px',
+            position: 'fixed',
+            bottom: '60px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+          })
+        "
       />
     </GlobalStyles>
   </ThemeProvider>
@@ -23,6 +38,7 @@ body {
 }
 </style>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import { useSettingsStore } from '@/features/settings/store'
 import NvOverlayInput from '@/teams/overlay/components/NvOverlayInput.vue'
 import { GlobalStyles, themes, tokens } from '@packages/ui'

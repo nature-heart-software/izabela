@@ -132,7 +132,7 @@
             </NvStack>
             <NvSwitch
               :modelValue="settingsStore.enableOverlayWindow"
-              class="shrink-0"
+              :class="css({ flexShrink: 0 })"
               @update:modelValue="
                 (value) => {
                   if (value) {
@@ -152,7 +152,12 @@
           </NvGroup>
           <template v-if="settingsStore.enableOverlayWindow">
             <NvDivider direction="horizontal" />
-            <NvGroup :spacing="5" class="pl-6" justify="apart" no-wrap>
+            <NvGroup
+              :spacing="5"
+              :class="css({ paddingLeft: '6' })"
+              justify="apart"
+              no-wrap
+            >
               <NvStack>
                 <NvText type="label">Show Overlay window</NvText>
               </NvStack>
@@ -287,7 +292,12 @@
             v-if="!autoUpdateDisabled && settingsStore.enableAutoUpdate"
           >
             <NvDivider direction="horizontal" />
-            <NvGroup :spacing="5" class="pl-6" justify="apart" no-wrap>
+            <NvGroup
+              :spacing="5"
+              :class="css({ paddingLeft: '6' })"
+              justify="apart"
+              no-wrap
+            >
               <NvStack>
                 <NvText type="label">Update channel</NvText>
               </NvStack>
@@ -333,6 +343,7 @@
   </NvStack>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import {
   NvButton,
   NvCard,

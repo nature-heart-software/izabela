@@ -1,6 +1,10 @@
 <template>
   <div class="messengerWrapper">
-    <NvHitbox id="moveable" ref="moveableTarget" class="inline-flex">
+    <NvHitbox
+      id="moveable"
+      ref="moveableTarget"
+      :class="css({ display: 'inline-flex' })"
+    >
       <Tippy
         ref="popover"
         trigger="manual"
@@ -66,14 +70,29 @@
         <NvCard
           variant="transparent"
           ref="messenger"
-          class="messenger rounded grid p-4 gap-4 grid-rows-3 grid-rows-none w-[768px]"
+          class="messenger"
+          :class="
+            css({
+              borderRadius: 'md',
+              display: 'grid',
+              padding: '4',
+              gap: '4',
+              gridTemplateRows: 'none',
+              width: '768px',
+            })
+          "
           data-v-step="messenger-window"
         >
           <!-- Top -->
           <NvGroup :spacing="4">
             <NvMessengerLinksBar />
-            <NvGroup :spacing="4" class="!flex-1">
-              <div class="moveable-handle cursor-all-scroll !flex-1">
+            <NvGroup :spacing="4" :class="css({ flex: '1 1 0% !important' })">
+              <div
+                class="moveable-handle"
+                :class="
+                  css({ cursor: 'all-scroll', flex: '1 1 0% !important' })
+                "
+              >
                 <NvMessengerHandleBar />
               </div>
               <NvMessengerNavigationBar />
@@ -124,13 +143,14 @@
       :snapThreshold="16"
       :snappable="true"
       :verticalGuidelines="[viewport.width / 2]"
-      className="opacity-0"
+      :className="css({ opacity: 0 })"
       target="#moveable"
       @drag="onDrag"
     />
   </div>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import {
   ComponentPublicInstance,
   computed,

@@ -5,7 +5,7 @@
         <NvText type="label">Enable translation</NvText>
       </NvStack>
       <NvSwitch
-        class="shrink-0"
+        :class="css({ flexShrink: 0 })"
         v-bind="{
           ...(form
             ? {
@@ -63,6 +63,7 @@
   </NvStack>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import {
   NvAccessBlocker,
   NvDivider,

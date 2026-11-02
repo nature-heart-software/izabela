@@ -6,9 +6,6 @@ module.exports = {
       cwd: __dirname,
       configPath: path.join(__dirname, 'panda.config.ts'),
     }),
-    require('tailwindcss')({
-      config: path.join(__dirname, 'tailwind.config.cjs'),
-    }),
     require('autoprefixer')(),
   ],
 }

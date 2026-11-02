@@ -4,7 +4,7 @@ import './styles'
 
 export * from './components'
 export * from './themes'
-export { tokens, tailwindTheme } from './styles/tokens'
+export { tokens } from './styles/tokens'
 export { NvLoading, loadingDirective } from './loading'
 export { PORTAL_TARGET } from './consts'
 

@@ -15,7 +15,7 @@
             </NvText>
           </NvStack>
         </NvCard>
-        <div class="pl-8">
+        <div :class="css({ paddingLeft: '8' })">
           <NvStack spacing="4">
             <NvCard>
               <NvStack spacing="5">
@@ -24,7 +24,7 @@
                     <NvText type="label">Enable audio input</NvText>
                   </NvStack>
                   <NvSwitch
-                    class="shrink-0"
+                    :class="css({ flexShrink: 0 })"
                     :modelValue="settingsStore.enableSTTTS"
                     @update:modelValue="
                       (value) => settingsStore.$patch({ enableSTTTS: value })
@@ -84,6 +84,7 @@
   </NvStack>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import {
   NvAccessBlocker,
   NvCard,

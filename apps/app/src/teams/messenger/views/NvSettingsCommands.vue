@@ -11,21 +11,37 @@
             </NvStack>
           </NvGroup>
         </NvCard>
-        <div class="pl-8">
+        <div :class="css({ paddingLeft: '8' })">
           <NvCard>
             <NvStack spacing="5">
               <div>
-                <NvButton size="sm" @click="addCustomCommand()">Add command</NvButton>
+                <NvButton size="sm" @click="addCustomCommand()"
+                  >Add command</NvButton
+                >
               </div>
               <NvDivider direction="horizontal" />
-              <NvGroup class="w-full" grow no-wrap>
-                <NvText class="w-1/2" type="label">Name</NvText>
-                <NvDivider class="!grow-0 h-5" direction="vertical" />
-                <NvText class="w-1/2" type="label">Description</NvText>
-                <NvButton class="!grow-0 invisible" icon-name="times" size="xs" type="plain" />
+              <NvGroup :class="css({ width: '100%' })" grow no-wrap>
+                <NvText :class="css({ width: '50%' })" type="label"
+                  >Name</NvText
+                >
+                <NvDivider
+                  :class="css({ flexGrow: '0 !important', height: '5' })"
+                  direction="vertical"
+                />
+                <NvText :class="css({ width: '50%' })" type="label"
+                  >Description</NvText
+                >
+                <NvButton
+                  :class="
+                    css({ flexGrow: '0 !important', visibility: 'hidden' })
+                  "
+                  icon-name="times"
+                  size="xs"
+                  type="plain"
+                />
               </NvGroup>
               <template v-for="(customCommand, i) in customCommands" :key="i">
-                <NvGroup class="w-full" grow>
+                <NvGroup :class="css({ width: '100%' })" grow>
                   <NvInput
                     :modelValue="customCommand.name"
                     @update:modelValue="
@@ -37,7 +53,10 @@
                         })
                     "
                   />
-                  <NvDivider class="!grow-0 h-5" direction="vertical" />
+                  <NvDivider
+                    :class="css({ flexGrow: '0 !important', height: '5' })"
+                    direction="vertical"
+                  />
                   <NvInput
                     :modelValue="customCommand.description"
                     @update:modelValue="
@@ -49,7 +68,7 @@
                     "
                   />
                   <NvButton
-                    class="!grow-0"
+                    :class="css({ flexGrow: '0 !important' })"
                     icon-name="times"
                     size="xs"
                     type="plain"
@@ -65,11 +84,21 @@
   </NvStack>
 </template>
 <script lang="ts" setup>
-import { NvButton, NvCard, NvDivider, NvGroup, NvInput, NvStack, NvText } from '@packages/ui'
+import { css } from '@/styled-system/css'
+import {
+  NvButton,
+  NvCard,
+  NvDivider,
+  NvGroup,
+  NvInput,
+  NvStack,
+  NvText,
+} from '@packages/ui'
 import { storeToRefs } from 'pinia'
 import { useSpeechStore } from '@/features/speech/store'
 
 const speechStore = useSpeechStore()
-const { addCustomCommand, updateCustomCommands, removeCustomCommand } = speechStore
+const { addCustomCommand, updateCustomCommands, removeCustomCommand } =
+  speechStore
 const { customCommands } = storeToRefs(speechStore)
 </script>

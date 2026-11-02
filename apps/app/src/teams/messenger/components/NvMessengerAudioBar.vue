@@ -18,13 +18,13 @@
           />
         </template>
       </NvTooltip>
-      <NvDivider class="h-3" direction="vertical" />
+      <NvDivider :class="css({ height: '3' })" direction="vertical" />
       <NvTooltip>
         <NvText>Speech engine</NvText>
         <template #reference>
           <SpeechEngineSelect
             :modelValue="speechStore.selectedSpeechEngine"
-            class="w-13"
+            :class="css({ width: '13' })"
             data-v-step="engine-select"
             icon-name="direction"
             placeholder="Speech Engine"
@@ -43,7 +43,7 @@
             <component
               :is="speechStore.currentSpeechEngine.voiceSelectComponent"
               v-if="speechStore.currentSpeechEngine.voiceSelectComponent"
-              class="w-13"
+              :class="css({ width: '13' })"
               data-v-step="engine-voice-select"
               placeholder="Speech Voice"
               placement="top-start"
@@ -52,9 +52,9 @@
           </template>
         </NvTooltip>
       </template>
-      <NvDivider class="h-3" direction="vertical" />
+      <NvDivider :class="css({ height: '3' })" direction="vertical" />
       <NvPopover placement="top-start" size="sm">
-        <div class="w-screen max-w-full">
+        <div :class="css({ width: '100vw', maxWidth: '100%' })">
           <NvStack spacing="4">
             <NvGroup justify="apart" no-wrap>
               <NvText type="label">Play on default playback device</NvText>
@@ -70,7 +70,7 @@
             </NvGroup>
             <NvDivider direction="horizontal" />
             <NvFormItem label="Audio outputs">
-              <NvAudioOutputsSelect class="w-full" />
+              <NvAudioOutputsSelect :class="css({ width: '100%' })" />
             </NvFormItem>
           </NvStack>
         </div>
@@ -94,7 +94,7 @@
         </template>
       </NvPopover>
       <NvPopover placement="top-start" size="sm">
-        <div class="w-screen max-w-full">
+        <div :class="css({ width: '100vw', maxWidth: '100%' })">
           <NvAudioInputForm size="sm" />
         </div>
         <template #reference>
@@ -122,6 +122,7 @@
   </NvCard>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import {
   NvButton,
   NvCard,

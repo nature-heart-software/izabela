@@ -1,9 +1,12 @@
 <template>
-  <NvTooltip class="inline-flex">
+  <NvTooltip :class="css({ display: 'inline-flex' })">
     <NvText>Homepage</NvText>
     <template #reference>
-      <a href="https://github.com/nature-heart-software/izabela" target="_blank">
-        <span class="hidden">GitHub</span>
+      <a
+        href="https://github.com/nature-heart-software/izabela"
+        target="_blank"
+      >
+        <span :class="css({ display: 'none' })">GitHub</span>
         <NvButton icon-name="info" type="plain" />
       </a>
     </template>
@@ -13,8 +16,11 @@
       <NvTooltip>
         <NvText>Visit GitHub page</NvText>
         <template #reference>
-          <a href="https://github.com/nature-heart-software/izabela" target="_blank">
-            <span class="hidden">GitHub</span>
+          <a
+            href="https://github.com/nature-heart-software/izabela"
+            target="_blank"
+          >
+            <span :class="css({ display: 'none' })">GitHub</span>
             <NvButton icon-name="github-alt" size="sm" />
           </a>
         </template>
@@ -23,7 +29,7 @@
         <NvText>Follow on Twitter</NvText>
         <template #reference>
           <a href="https://twitter.com/joyfuldeceased" target="_blank">
-            <span class="hidden">Twitter</span>
+            <span :class="css({ display: 'none' })">Twitter</span>
             <NvButton icon-name="twitter-alt" size="sm" />
           </a>
         </template>
@@ -32,7 +38,7 @@
         <NvText>Join the Discord</NvText>
         <template #reference>
           <a href="https://discord.gg/BmWtmYmaeQ" target="_blank">
-            <span class="hidden">Discord</span>
+            <span :class="css({ display: 'none' })">Discord</span>
             <NvButton icon-name="discord" size="sm" />
           </a>
         </template>
@@ -41,5 +47,6 @@
   </NvCard>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import { NvButton, NvCard, NvGroup, NvText, NvTooltip } from '@packages/ui'
 </script>

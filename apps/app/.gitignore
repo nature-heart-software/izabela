@@ -27,3 +27,6 @@ pnpm-debug.log*
 *.sw?
 dist_electron
 dist-electron
+
+# Generated Panda runtime and styles
+src/styled-system

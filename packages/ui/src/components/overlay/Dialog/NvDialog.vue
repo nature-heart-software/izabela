@@ -9,10 +9,28 @@
     </ReferenceTrigger>
     <Teleport :to="props.portalTarget" defer>
       <PortalTargetProvider :target="portalTarget">
-        <Transition class="transition">
+        <Transition
+          :class="
+            css({
+              transitionProperty:
+                'color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter',
+              transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+              transitionDuration: '150ms',
+            })
+          "
+        >
           <StDialogBackdrop v-if="dialogOpen" />
         </Transition>
-        <Transition class="transition">
+        <Transition
+          :class="
+            css({
+              transitionProperty:
+                'color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter',
+              transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+              transitionDuration: '150ms',
+            })
+          "
+        >
           <StDialogPositioner v-if="dialogOpen">
             <StDialogContentWrapper
               ref="portalTarget"
@@ -53,6 +71,7 @@
   </Dialog.Root>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import {
   Comment,
   Fragment,

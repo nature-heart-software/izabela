@@ -1,5 +1,5 @@
 <template>
-  <NvGroup class="h-[24px]" justify="between">
+  <NvGroup :class="css({ height: '24px' })" justify="between">
     <NvGroup>
       <NvIcon name="exclamation-triangle" size="3"></NvIcon>
       <NvText type="body-small">A restart is required</NvText>
@@ -10,6 +10,7 @@
   </NvGroup>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import { NvButton, NvGroup, NvIcon, NvText } from '@packages/ui'
 
 const { ElectronMessengerWindow } = window

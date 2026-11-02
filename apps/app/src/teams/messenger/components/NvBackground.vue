@@ -4,23 +4,31 @@
     :style="{
       willChange: 'opacity',
     }"
-    class="absolute inset-0 opacity-0 pointer-events-none"
+    :class="
+      css({
+        position: 'absolute',
+        inset: '0',
+        opacity: 0,
+        pointerEvents: 'none',
+      })
+    "
   >
     <div
       :style="{
         opacity: settingsStore.backgroundDimOpacity / 100,
       }"
-      class="w-full h-full bg-black"
+      :class="css({ width: '100%', height: '100%', backgroundColor: 'black' })"
     >
       <NvHitbox
         v-if="isBackgroundShown"
-        class="w-full h-full pointer-events-auto"
+        :class="css({ width: '100%', height: '100%', pointerEvents: 'auto' })"
         @click="onBackgroundClick"
       />
     </div>
   </div>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import NvHitbox from '@/modules/vue-hitboxes/NvHitbox.vue'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useMessengerWindowStore } from '@/teams/messenger/store'

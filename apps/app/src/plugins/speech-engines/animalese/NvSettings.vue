@@ -17,7 +17,7 @@
             :max="2"
             :min="0.1"
             :step="0.1"
-            class="!grow"
+            :class="css({ flexGrow: '1 !important' })"
             v-bind="{
               modelValue: getProperty('pitch'),
               'onUpdate:modelValue': (value) => setProperty('pitch', value),
@@ -61,6 +61,7 @@
   </template>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import {
   NvAccessBlocker,
   NvDivider,

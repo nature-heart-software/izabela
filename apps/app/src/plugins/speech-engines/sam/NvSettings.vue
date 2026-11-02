@@ -16,7 +16,7 @@
           <NvRangeInput
             :max="255"
             :min="0"
-            class="!grow"
+            :class="css({ flexGrow: '1 !important' })"
             v-bind="{
               modelValue: getProperty('pitch'),
               'onUpdate:modelValue': (value) => setProperty('pitch', value),
@@ -38,7 +38,7 @@
           <NvRangeInput
             :max="255"
             :min="0"
-            class="!grow"
+            :class="css({ flexGrow: '1 !important' })"
             v-bind="{
               modelValue: getProperty('speed'),
               'onUpdate:modelValue': (value) => setProperty('speed', value),
@@ -60,7 +60,7 @@
           <NvRangeInput
             :max="255"
             :min="0"
-            class="!grow"
+            :class="css({ flexGrow: '1 !important' })"
             v-bind="{
               modelValue: getProperty('mouth'),
               'onUpdate:modelValue': (value) => setProperty('mouth', value),
@@ -80,7 +80,7 @@
           <NvRangeInput
             :max="255"
             :min="0"
-            class="!grow"
+            :class="css({ flexGrow: '1 !important' })"
             v-bind="{
               modelValue: getProperty('throat'),
               'onUpdate:modelValue': (value) => setProperty('throat', value),
@@ -112,6 +112,7 @@
   </template>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import {
   NvAccessBlocker,
   NvDivider,

@@ -2,10 +2,10 @@
   <NvCard size="sm">
     <NvGroup noWrap>
       <NvPopover placement="top-end" size="sm">
-        <div class="w-screen max-w-full">
+        <div :class="css({ width: '100vw', maxWidth: '100%' })">
           <NvStack spacing="4">
             <NvFormItem label="Message mode">
-              <NvMessageModeSelect class="w-full" />
+              <NvMessageModeSelect :class="css({ width: '100%' })" />
             </NvFormItem>
           </NvStack>
         </div>
@@ -42,9 +42,9 @@
       <!--          </NvGroup>-->
       <!--        </template>-->
       <!--      </NvTooltip>-->
-      <NvDivider class="h-3" direction="vertical" />
+      <NvDivider :class="css({ height: '3' })" direction="vertical" />
       <NvPopover placement="top-end" size="sm">
-        <div class="w-screen max-w-full">
+        <div :class="css({ width: '100vw', maxWidth: '100%' })">
           <NvTranslationForm size="sm" />
         </div>
         <template #reference>
@@ -126,6 +126,7 @@
   </NvCard>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import {
   NvButton,
   NvCard,
