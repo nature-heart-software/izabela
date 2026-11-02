@@ -3,7 +3,9 @@
     :value="props.modelValue"
     type="range"
     v-bind="props"
-    @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
+    @input="
+      emit('update:modelValue', ($event.target as HTMLInputElement).value)
+    "
   />
 </template>
 <script lang="ts" setup>

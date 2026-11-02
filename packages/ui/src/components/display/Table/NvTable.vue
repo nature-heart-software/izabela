@@ -28,8 +28,8 @@ const dimension = (value: string | number | undefined) =>
   value === undefined
     ? undefined
     : /^\d+(\.\d+)?$/.test(String(value))
-    ? `${value}px`
-    : String(value)
+      ? `${value}px`
+      : String(value)
 
 /** Native table with declarative columns and header/default scoped slots. */
 export default defineComponent({
@@ -111,8 +111,8 @@ export default defineComponent({
                         typeof props.rowKey === 'function'
                           ? props.rowKey(row)
                           : props.rowKey
-                          ? row[props.rowKey]
-                          : $index,
+                            ? row[props.rowKey]
+                            : $index,
                     },
                     columns.map(
                       ({ column, slots: columnSlots, class: cellClass }) => {
