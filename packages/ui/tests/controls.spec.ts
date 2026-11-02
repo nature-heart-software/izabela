@@ -125,7 +125,7 @@ describe('real shared controls', () => {
     input.focus()
     expect(document.activeElement).toBe(input)
   })
-  it('range forwards bounds and currently emits strings from the styled input', async () => {
+  it('range forwards bounds and emits numeric model updates', async () => {
     const w = render(ui.NvRangeInput, {
       props: { modelValue: 2 },
       attrs: { min: 0, max: 10, step: 0.5 },
@@ -133,8 +133,8 @@ describe('real shared controls', () => {
     const input = w.element as HTMLInputElement
     expect(input.type).toBe('range')
     expect(input.value).toBe('2')
-    await w.setValue('4.5')
-    expect(w.emitted('update:modelValue')).toEqual([['4.5']])
+    await w.get('input').setValue('4.5')
+    expect(w.emitted('update:modelValue')).toEqual([[4.5]])
     await w.setProps({ modelValue: 8 })
     expect(input.value).toBe('8')
     expect(input.step).toBe('0.5')
@@ -207,17 +207,14 @@ describe('real shared controls', () => {
     await w.get('button').trigger('click')
     expect(w.emitted('close')).toEqual([[]])
   })
-  it.fails(
-    '[known issue] range model updates are numbers rather than strings',
-    async () => {
-      const w = render(ui.NvRangeInput, {
-        props: { modelValue: 2 },
-        attrs: { min: 0, max: 10, step: 0.5 },
-      })
-      await w.setValue('4.5')
-      expect(w.emitted('update:modelValue')).toEqual([[4.5]])
-    },
-  )
+  it('range model updates match the numeric public model contract', async () => {
+    const w = render(ui.NvRangeInput, {
+      props: { modelValue: 2 },
+      attrs: { min: 0, max: 10, step: 0.5 },
+    })
+    await w.get('input').setValue('4.5')
+    expect(w.emitted('update:modelValue')).toEqual([[4.5]])
+  })
 })
 
 const rect = {

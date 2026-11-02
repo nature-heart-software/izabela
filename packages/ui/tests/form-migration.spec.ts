@@ -52,15 +52,15 @@ describe('basic form migration', () => {
       ).not.toMatch(/element-plus|\.styled/)
     },
   )
-  it('preserves the range string-update contract and native bounds', async () => {
+  it('preserves the numeric range-update contract and native bounds', async () => {
     const w = render(ui.NvRangeInput, {
       props: { modelValue: 2 },
       attrs: { min: 0, max: 10, step: 0.5, 'aria-label': 'Volume' },
     })
     expect((w.element as HTMLInputElement).type).toBe('range')
     expect((w.element as HTMLInputElement).value).toBe('2')
-    await w.setValue('4.5')
-    expect(w.emitted('update:modelValue')).toEqual([['4.5']])
+    await w.get('input').setValue('4.5')
+    expect(w.emitted('update:modelValue')).toEqual([[4.5]])
     await w.setProps({ modelValue: 8, disabled: true })
     expect((w.element as HTMLInputElement).value).toBe('8')
     expect((w.element as HTMLInputElement).step).toBe('0.5')

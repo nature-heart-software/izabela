@@ -4,7 +4,7 @@
     type="range"
     v-bind="props"
     @input="
-      emit('update:modelValue', ($event.target as HTMLInputElement).value)
+      emit('update:modelValue', Number(($event.target as HTMLInputElement).value))
     "
   />
 </template>

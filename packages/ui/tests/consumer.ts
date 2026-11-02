@@ -63,7 +63,7 @@ const badButton: Props<typeof NvButton> = { type: 'danger' }
 const badSize: Props<typeof NvInput> = { size: 'huge' }
 // @ts-expect-error Switch models are boolean.
 const badToggle: Props<typeof NvSwitch> = { modelValue: 'yes' }
-// @ts-expect-error Range model props are numeric (string update is a runtime known issue).
+// @ts-expect-error Range model props are numeric.
 const badRange: Props<typeof NvRangeInput> = { modelValue: '2' }
 // @ts-expect-error Select options require labels.
 const badSelect: Props<typeof NvSelect> = { options: [{ value: 1 }] }

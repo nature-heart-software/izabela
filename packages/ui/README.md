@@ -63,9 +63,8 @@ and select journeys with an observable underlying-action counter.
 ## Native control contracts
 
 Text and number inputs expose their native `input` element and preserve existing
-model-update payloads. The range input continues emitting its established string
-payload even though its model prop is numeric; the regression suite records this
-legacy mismatch separately. Switches use Ark's native hidden checkbox for focus,
+model-update payloads. The range input emits numeric updates matching its numeric
+model prop and application settings. Switches use Ark's native hidden checkbox for focus,
 form participation, disabled/readonly behavior and keyboard Space activation.
 
 `NvLoading` installs `v-loading` and displays a named busy status without turning

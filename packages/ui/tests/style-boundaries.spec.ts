@@ -187,7 +187,7 @@ describe('Ark as-child button appearance', () => {
 describe('wrapper-owned polymorphism', () => {
   it.each([
     ['Textarea', 'textarea', 'before', 'after'],
-    ['RangeInput', 'input', 2, '4'],
+    ['RangeInput', 'input', 2, 4],
     ['Input', 'input', 'before', 'after'],
     ['NumberInput', 'input', '2', '4'],
   ])(
