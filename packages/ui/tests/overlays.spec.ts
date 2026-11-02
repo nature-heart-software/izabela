@@ -197,6 +197,140 @@ describe('overlay interaction boundaries', () => {
     expect(document.body.textContent).not.toContain('Popover details')
   })
 
+  it.each([
+    [{}, '300ms'],
+    [{ duration: 120 }, '120ms'],
+    [{ duration: [150, 90] }, '150ms'],
+    [{ duration: 0 }, '0ms'],
+    [{ animation: false }, '0ms'],
+  ])(
+    'uses the requested tooltip fade duration %j',
+    async (options, duration) => {
+      const wrapper = render(ui.NvTooltip, {
+        props: { tippyOptions: { delay: 0, ...options } },
+        slots: {
+          reference: () => h('button', 'Help'),
+          default: 'Helpful details',
+        },
+      })
+      await settle()
+      await wrapper
+        .get('button')
+        .trigger('pointermove', { pointerType: 'mouse' })
+      await settle()
+      const positioner = document.querySelector(
+        '[data-scope="tooltip"][data-part="positioner"]',
+      ) as HTMLElement
+      expect(
+        positioner.style.getPropertyValue('--nv-tooltip-enter-duration'),
+      ).toBe(duration)
+    },
+  )
+
+  it('dismisses a shared-button tooltip after the pointer leaves its trigger', async () => {
+    const wrapper = render(ui.NvTooltip, {
+      props: { tippyOptions: { delay: [0, 0] } },
+      slots: {
+        reference: () => h(ui.NvButton, null, () => 'Help'),
+        default: 'Helpful details',
+      },
+    })
+    await settle()
+    const trigger = wrapper.get('button')
+    await trigger.trigger('pointermove', { pointerType: 'mouse' })
+    await settle()
+    expect(
+      document.querySelector('[data-scope="tooltip"][role="tooltip"]'),
+    ).not.toBeNull()
+    await trigger.trigger('pointerleave', { pointerType: 'mouse' })
+    await settle()
+    expect(
+      document.querySelector('[data-scope="tooltip"][role="tooltip"]'),
+    ).toBeNull()
+  })
+
+  it('cancels a pending tooltip when the pointer leaves before its open delay', async () => {
+    const wrapper = render(ui.NvTooltip, {
+      props: { tippyOptions: { delay: [100, 0] } },
+      slots: {
+        reference: () => h(ui.NvButton, null, () => 'Help'),
+        default: 'Helpful details',
+      },
+    })
+    await settle()
+    const trigger = wrapper.get('button')
+    await trigger.trigger('pointermove', { pointerType: 'mouse' })
+    await settle()
+    await trigger.trigger('pointerleave', { pointerType: 'mouse' })
+    await new Promise((resolve) => setTimeout(resolve, 150))
+    await settle()
+    expect(
+      document.querySelector('[data-scope="tooltip"][role="tooltip"]'),
+    ).toBeNull()
+  })
+
+  it('dismisses tooltips and cancels pending hover opens when the window loses focus', async () => {
+    const wrapper = render(ui.NvTooltip, {
+      props: { tippyOptions: { delay: [80, 0] } },
+      slots: {
+        reference: () => h(ui.NvButton, null, () => 'Help'),
+        default: 'Helpful details',
+      },
+    })
+    await settle()
+    const trigger = wrapper.get('button')
+    await trigger.trigger('pointermove', { pointerType: 'mouse' })
+    await new Promise((resolve) => setTimeout(resolve, 120))
+    await settle()
+    expect(
+      document.querySelector('[data-scope="tooltip"][role="tooltip"]'),
+    ).not.toBeNull()
+    window.dispatchEvent(new Event('blur'))
+    await settle()
+    expect(
+      document.querySelector('[data-scope="tooltip"][role="tooltip"]'),
+    ).toBeNull()
+    window.dispatchEvent(new Event('focus'))
+    await trigger.trigger('pointerleave', { pointerType: 'mouse' })
+    await trigger.trigger('pointermove', { pointerType: 'mouse' })
+    window.dispatchEvent(new Event('blur'))
+    await new Promise((resolve) => setTimeout(resolve, 120))
+    await settle()
+    expect(
+      document.querySelector('[data-scope="tooltip"][role="tooltip"]'),
+    ).toBeNull()
+    window.dispatchEvent(new Event('focus'))
+    await trigger.trigger('pointermove', { pointerType: 'mouse' })
+    await new Promise((resolve) => setTimeout(resolve, 120))
+    await settle()
+    expect(
+      document.querySelector('[data-scope="tooltip"][role="tooltip"]'),
+    ).not.toBeNull()
+  })
+
+  it('dismisses a tooltip when its document becomes hidden', async () => {
+    const hidden = vi.spyOn(document, 'hidden', 'get').mockReturnValue(false)
+    const wrapper = render(ui.NvTooltip, {
+      props: { tippyOptions: { delay: [0, 0] } },
+      slots: {
+        reference: () => h(ui.NvButton, null, () => 'Help'),
+        default: 'Helpful details',
+      },
+    })
+    await settle()
+    await wrapper.get('button').trigger('pointermove', { pointerType: 'mouse' })
+    await settle()
+    expect(
+      document.querySelector('[data-scope="tooltip"][role="tooltip"]'),
+    ).not.toBeNull()
+    hidden.mockReturnValue(true)
+    document.dispatchEvent(new Event('visibilitychange'))
+    await settle()
+    expect(
+      document.querySelector('[data-scope="tooltip"][role="tooltip"]'),
+    ).toBeNull()
+  })
+
   it('passive tooltip uses Ark hover/Escape behavior without creating a click shield and suppresses focused references', async () => {
     const wrapper = render(ui.NvTooltip, {
       props: { tippyOptions: { delay: 0, duration: 0 } },

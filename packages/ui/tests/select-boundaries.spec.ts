@@ -108,6 +108,18 @@ afterEach(() => {
 })
 
 describe('compiled Select and Autocomplete interaction boundaries', () => {
+  it('forwards placement to its floating dropdown instead of the native input', async () => {
+    const wrapper = render(ui.NvSelect, {
+      props: { options, placement: 'top-start' },
+    })
+    const autocomplete = wrapper.findComponent(ui.NvAutocomplete)
+    expect(autocomplete.props('placement')).toBe('top-start')
+    expect(wrapper.get('input').attributes('placement')).toBeUndefined()
+    await wrapper.setProps({ placement: 'top-end' })
+    expect(autocomplete.props('placement')).toBe('top-end')
+    expect(wrapper.get('input').attributes('placement')).toBeUndefined()
+  })
+
   it.each([false, true])(
     'keeps the Select shield through the full gesture (nested=%s)',
     async (nested) => {

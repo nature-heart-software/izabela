@@ -2,6 +2,7 @@
   <NvAutocomplete
     :class="$attrs.class"
     :style="$attrs.style"
+    :placement="props.placement"
     :autoScrollIndex="autoScrollIndex"
     :options="searchResults"
     :valueKey="props.valueKey"
@@ -229,7 +230,7 @@ watch(
   },
 )
 
-const fuseOptions = computed<UseFuseOptions<(typeof options.value)[number]>>(
+const fuseOptions = computed<UseFuseOptions<typeof options.value[number]>>(
   () => ({
     fuseOptions: {
       keys: ['label', 'category', 'searchValue'],

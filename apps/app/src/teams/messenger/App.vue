@@ -38,7 +38,7 @@ body {
 }
 </style>
 <script lang="ts" setup>
-import { ThemeProvider } from 'vue3-styled-components'
+import { ThemeProvider } from '@packages/ui'
 import NvMessenger from '@/teams/messenger/components/NvMessenger.vue'
 import { tokens } from '@packages/ui'
 import NvBackground from '@/teams/messenger/components/NvBackground.vue'

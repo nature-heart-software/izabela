@@ -40,6 +40,7 @@ export { pandaComponent } from '@/utils/panda'
 export { card } from '@/components/display/Card/card.panda'
 export { divider } from '@/components/miscellaneous/Divider/divider.panda'
 export { table } from '@/components/display/Table/table.panda'
+export { tooltipPositioner } from '@/components/overlay/Tooltip/tooltip.panda'
 export { default as NvButton } from '@/components/forms/Button/NvButton.vue'
 export { default as NvTextarea } from '@/components/forms/Textarea/NvTextarea.vue'
 export { default as NvRangeInput } from '@/components/forms/RangeInput/NvRangeInput.vue'
@@ -140,6 +141,46 @@ afterEach(() => {
 })
 
 describe('Ark as-child button appearance', () => {
+  it('extracts the tooltip opacity fade without adding movement', () => {
+    const extracted = emittedRules(ui.tooltipPositioner().split(' '))
+    expect(extracted.map((rule) => rule.declarations)).toContainEqual({
+      'animation-name': 'nv-tooltip-in',
+    })
+    expect(extracted.map((rule) => rule.declarations)).toContainEqual({
+      'animation-duration': 'var(--nv-tooltip-enter-duration, 300ms)',
+    })
+    expect(css).toContain('@keyframes nv-tooltip-in')
+    const animatedProperties: string[] = []
+    postcss.parse(css).walkAtRules('keyframes', (rule: any) => {
+      if (rule.params === 'nv-tooltip-in')
+        rule.walkDecls((decl: any) => animatedProperties.push(decl.prop))
+    })
+    expect(animatedProperties).toEqual(['opacity', 'opacity'])
+  })
+
+  it.each(['xs', 'sm', 'md', 'lg'])(
+    'keeps %s icon-only buttons free of size padding',
+    (size) => {
+      const wrapper = render(ui.NvButton, {
+        props: { size, iconName: 'github' },
+      })
+      const declarations = emittedRules(wrapper.classes()).map(
+        (rule) => rule.declarations,
+      )
+      expect(declarations).toContainEqual({
+        'padding-inline': 'var(--spacing-0)',
+      })
+      expect(
+        declarations.some(
+          (rule) =>
+            rule['padding-inline'] &&
+            rule['padding-inline'] !== 'var(--spacing-0)',
+        ),
+      ).toBe(false)
+      expect(wrapper.find('svg').exists()).toBe(true)
+    },
+  )
+
   it.each(
     ['Popover', 'Menu', 'Dialog', 'Tooltip'].flatMap((kind) =>
       [undefined, 'plain', 'ghost'].map((appearance) => [kind, appearance]),

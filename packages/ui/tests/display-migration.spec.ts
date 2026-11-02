@@ -120,6 +120,16 @@ describe('display migration', () => {
     expect(forbidden).toEqual([])
   })
 
+  it('preserves between as an alias for apart when a row changes justification', async () => {
+    const wrapper = render(ui.NvGroup, { props: { justify: 'left' } })
+    await wrapper.setProps({ justify: 'between' })
+    expect(wrapper.classes()).toContain('jc_space-between')
+    await wrapper.setProps({ justify: 'apart' })
+    expect(wrapper.classes()).toContain('jc_space-between')
+    await wrapper.setProps({ justify: 'left' })
+    expect(wrapper.classes()).not.toContain('jc_space-between')
+  })
+
   it('keeps themed layout, polymorphic tags, attributes, slots and events on real display components', async () => {
     const clicked = vi.fn()
     const wrapper = render(ui.NvGroup, {

@@ -1,6 +1,11 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+// Keep the reset below Panda recipes, with app utility classes able to override.
+@layer reset {
+  @tailwind base;
+}
+@layer legacy {
+  @tailwind components;
+  @tailwind utilities;
+}
 
 *,
 *::before,

@@ -91,4 +91,6 @@ export const group = cva({
     { direction: 'column', grow: true, css: { alignItems: 'stretch' } },
   ],
 })
-export const StGroup = pandaComponent('div', props, group)
+export const StGroup = pandaComponent('div', props, ({ justify, ...values }) =>
+  group({ ...values, justify: justify === 'between' ? 'apart' : justify }),
+)

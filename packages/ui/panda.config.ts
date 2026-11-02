@@ -103,6 +103,7 @@ export default {
       },
       keyframes: {
         spin: { to: { transform: 'rotate(360deg)' } },
+        'nv-tooltip-in': { from: { opacity: 0 }, to: { opacity: 1 } },
       },
     },
   },

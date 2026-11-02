@@ -18,11 +18,7 @@
       @interact-outside="onOutside('interactOutside', $event)"
       @pointer-down-outside="onOutside('pointerDownOutside', $event)"
     >
-      <Popover.Anchor
-        ref="reference"
-        :class="box({ display: 'inline-flex', width: '100%' })"
-        @blur.prevent
-      >
+      <Popover.Anchor ref="reference" :class="referenceStyle()" @blur.prevent>
         <slot name="reference" />
       </Popover.Anchor>
       <Teleport :to="portalTarget" defer>
@@ -101,8 +97,12 @@
 <script lang="ts" setup>
 import { Popover } from '@ark-ui/vue'
 import { computed, inject, provide, ref, watch } from 'vue'
-import { StAutocomplete, shield, positionerStyle } from './autocomplete.panda'
-import { box } from '@/styled-system/patterns'
+import {
+  StAutocomplete,
+  shield,
+  positionerStyle,
+  reference as referenceStyle,
+} from './autocomplete.panda'
 import { defaultWidth, props as propsDefinition } from './autocomplete.shared'
 import { tokens } from '@/styles/tokens'
 import { onKeyStroke, useElementSize } from '@vueuse/core'

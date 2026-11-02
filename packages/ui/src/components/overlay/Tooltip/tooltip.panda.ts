@@ -4,11 +4,20 @@ import { pandaComponent } from '@/utils/panda'
 import { props } from './tooltip.shared'
 
 export const StTooltip = pandaComponent('div', props, cva({ base: {} }))
+export const tooltipPositioner = cva({
+  base: {
+    zIndex: '9999 !important',
+    animationName: 'nv-tooltip-in',
+    animationDuration: 'var(--nv-tooltip-enter-duration, 300ms)',
+    animationTimingFunction: 'ease',
+    animationFillMode: 'both',
+  },
+})
 export const StTooltipPositioner = pandaComponent(
   Tooltip.Positioner,
   {},
   // Override Ark's inline positioning z-index without adding a tooltip click shield.
-  cva({ base: { zIndex: '9999 !important' } }),
+  tooltipPositioner,
 )
 export const StTooltipContent = pandaComponent(
   Tooltip.Content,

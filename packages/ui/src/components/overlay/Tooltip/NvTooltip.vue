@@ -1,28 +1,23 @@
 <template>
   <StTooltip ref="tooltip" v-bind="props">
-    <Tooltip.Root
-      v-model:open="open"
-      :ids="{ trigger: triggerId }"
-      :disabled="focused"
-      :open-delay="openDelay"
-      :close-delay="closeDelay"
-      :positioning="positioning"
-      :interactive="props.tippyOptions.interactive ?? false"
-    >
+    <Tooltip.RootProvider :value="tooltipApi">
       <Tooltip.Trigger ref="trigger" :id="triggerId" as-child>
         <slot name="reference" />
       </Tooltip.Trigger>
       <Teleport :to="portalTarget" defer>
-        <StTooltipPositioner v-if="open && !focused">
+        <StTooltipPositioner
+          v-if="open && !focused"
+          :style="{ '--nv-tooltip-enter-duration': `${enterDuration}ms` }"
+        >
           <StTooltipContent><slot /></StTooltipContent>
         </StTooltipPositioner>
       </Teleport>
-    </Tooltip.Root>
+    </Tooltip.RootProvider>
   </StTooltip>
 </template>
 <script lang="ts" setup>
-import { computed, inject, ref, useId, watch, watchPostEffect } from 'vue'
-import { Tooltip, type TooltipRootProps } from '@ark-ui/vue'
+import { computed, inject, reactive, ref, useId, watchPostEffect } from 'vue'
+import { Tooltip, useTooltip, type TooltipRootProps } from '@ark-ui/vue'
 import {
   StTooltip,
   StTooltipContent,
@@ -30,12 +25,15 @@ import {
 } from './tooltip.panda'
 import { props as propsDefinition } from './tooltip.shared'
 import { tokens } from '@/styles/tokens'
-import { type MaybeElement, useFocusWithin } from '@vueuse/core'
+import {
+  type MaybeElement,
+  useEventListener,
+  useFocusWithin,
+} from '@vueuse/core'
 import { getElement } from '@/utils/vue'
 import { PORTAL_TARGET } from '@/consts'
 
 const props = defineProps(propsDefinition)
-const open = ref(false)
 const trigger = ref()
 const triggerId = ref(`nv-tooltip-${useId()}-trigger`)
 watchPostEffect(() => {
@@ -45,23 +43,25 @@ watchPostEffect(() => {
 })
 const tooltip = ref<MaybeElement>()
 const { focused } = useFocusWithin(tooltip)
-watch(focused, (value) => {
-  if (value) open.value = false
-})
 const injectedPortalTarget = inject(PORTAL_TARGET)
 const portalTarget = computed(
   () => getElement(injectedPortalTarget) || document.body,
 )
 const openDelay = computed(() =>
   Array.isArray(props.tippyOptions.delay)
-    ? (props.tippyOptions.delay[0] ?? 250)
-    : (props.tippyOptions.delay ?? 250),
+    ? props.tippyOptions.delay[0] ?? 250
+    : props.tippyOptions.delay ?? 250,
 )
 const closeDelay = computed(() =>
   Array.isArray(props.tippyOptions.delay)
-    ? (props.tippyOptions.delay[1] ?? 0)
-    : (props.tippyOptions.delay ?? 0),
+    ? props.tippyOptions.delay[1] ?? 0
+    : props.tippyOptions.delay ?? 0,
 )
+const enterDuration = computed(() => {
+  if (props.tippyOptions.animation === false) return 0
+  const duration = props.tippyOptions.duration
+  return Array.isArray(duration) ? duration[0] ?? 300 : duration ?? 300
+})
 const positioning = computed<TooltipRootProps['positioning']>(() => ({
   placement:
     !props.tippyOptions.placement ||
@@ -79,4 +79,27 @@ const positioning = computed<TooltipRootProps['positioning']>(() => ({
       : 0,
   },
 }))
+// Let Ark cancel its opening delay when the pointer leaves before becoming visible.
+// Mirroring a still-false controlled `open` value loses that cancellation transition.
+const tooltipApi = useTooltip(
+  reactive({
+    ids: computed(() => ({ trigger: triggerId.value })),
+    disabled: focused,
+    openDelay,
+    closeDelay,
+    positioning,
+    interactive: computed(() => props.tippyOptions.interactive ?? false),
+  }),
+)
+const open = computed(() => tooltipApi.value.open)
+function deactivate(event: Event) {
+  // The click-through Electron window can miss pointerleave when it loses focus.
+  // Reset hover as well as visibility so the next pointer entry can reopen normally.
+  tooltipApi.value.getTriggerProps().onPointerleave?.(event as PointerEvent)
+  tooltipApi.value.setOpen(false)
+}
+useEventListener(window, 'blur', deactivate)
+useEventListener(document, 'visibilitychange', (event) => {
+  if (document.hidden) deactivate(event)
+})
 </script>

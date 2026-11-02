@@ -75,7 +75,7 @@ export const buttonRecipe = cva({
       },
     },
     squared: {
-      true: { padding: '0', justifyContent: 'center' },
+      true: { paddingX: '0', paddingY: '0', justifyContent: 'center' },
       false: { '& .nv-button__icon': { position: 'absolute' } },
     },
     align: {

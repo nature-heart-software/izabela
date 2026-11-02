@@ -24,7 +24,7 @@ const autocomplete = cva({
   },
   defaultVariants: { size: 'md' },
 })
-const reference = cva({
+export const reference = cva({
   base: {
     display: 'inline-flex',
     width: '100%',
