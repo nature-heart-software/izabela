@@ -9,9 +9,6 @@ on:
         required: false
         default: ''
         type: string
-  push:
-    branches:
-      - dev
 
 permissions:
   contents: read
