@@ -4,6 +4,7 @@
 const path = require('path')
 const fs = require('fs')
 const pkg = require('./package.json')
+const { applicationId } = require('./application-identity.json')
 const { createOverlayAfterPack } = require('electron-game-overlay/packaging')
 
 function getElectronVersion() {
@@ -38,7 +39,7 @@ module.exports = {
     allowToChangeInstallationDirectory: false,
     deleteAppDataOnUninstall: false,
   },
-  appId: 'com.nhs.izabela',
+  appId: applicationId,
   generateUpdatesFilesForAllChannels: true,
   // eslint-disable-next-line no-template-curly-in-string
   artifactName: '${name}-setup-${version}-${os}.${ext}',

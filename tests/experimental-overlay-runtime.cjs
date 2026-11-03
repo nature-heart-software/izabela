@@ -115,7 +115,7 @@ app
         'SDK escaped packaged application',
       )
     const metadata = requireApp('electron-game-overlay/package.json')
-    assert.equal(metadata.version, '0.1.0-rc.7')
+    assert.equal(metadata.version, '0.1.0-rc.11')
     const expectedElectron = JSON.parse(
       fs.readFileSync(path.resolve('apps/app/package.json'), 'utf8'),
     ).devDependencies.electron
@@ -125,9 +125,9 @@ app
     const sdkRoot = path
       .dirname(metadataPath)
       .replace(/app\.asar([\\/])/, 'app.asar.unpacked$1')
-    const distribution = path.join(sdkRoot, 'dist/broker/win32-x64')
+    const distribution = path.join(sdkRoot, 'dist')
     const manifest = JSON.parse(
-      fs.readFileSync(path.join(distribution, 'broker-manifest.json'), 'utf8'),
+      fs.readFileSync(path.join(distribution, 'overlay-manifest.json'), 'utf8'),
     )
     for (const file of manifest.files) {
       const bytes = fs.readFileSync(path.join(distribution, file.path))
@@ -137,9 +137,9 @@ app
         file.sha256,
       )
     }
-    assert.equal(manifest.files.length, 54)
+    assert.equal(manifest.files.length, 154)
     report.sealedPayloadsVerified = manifest.files.length
-    // Hidden-window smoke must not start/join a broker or execute native helpers.
+    // Hidden-window smoke must not start a transport or execute native helpers.
     const refuse = () => {
       throw new Error(
         'Native process/network activity forbidden in noninjecting smoke',

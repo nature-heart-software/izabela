@@ -1,7 +1,7 @@
 const assert = require('node:assert/strict')
 const fs = require('node:fs')
 const path = require('node:path')
-const { createHash, randomUUID } = require('node:crypto')
+const { createHash } = require('node:crypto')
 const { spawn, execFileSync } = require('node:child_process')
 const {
   cases,
@@ -141,10 +141,7 @@ async function runCase(
   const configFile = path.join(directory, 'config.json')
   fs.writeFileSync(configFile, JSON.stringify(config, null, 2))
   await assertFreePort(7070)
-  const env = {
-    ...process.env,
-    ELECTRON_GAME_OVERLAY_BROKER_PIPE: String.raw`\\.\pipe\izabela-overlay-e2e-${randomUUID()}`,
-  }
+  const env = { ...process.env }
   delete env.ELECTRON_RUN_AS_NODE
   child = spawn(
     require('electron'),

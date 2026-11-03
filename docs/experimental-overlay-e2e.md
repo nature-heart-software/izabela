@@ -39,7 +39,7 @@ The SDK hosts are GPL-3.0-only; their source and license remain with the fixture
 build, and the binary artifact includes the license and source revision.
 
 Each case gets a fresh application profile, exact test executable copy, private
-broker pipe, runtime staging and logs. Its folder-only allow rule exercises the
+SDK transport, runtime staging and logs. Its folder-only allow rule exercises the
 SDK native allow/deny policy without an executable-name rule. An additional
 exact-path case runs two fresh target lifecycles and verifies authoritative
 process-incarnation exit and rearming. The normal graphics matrix holds graphics
@@ -47,6 +47,13 @@ initialization until the injector completes, isolating rendering/input from
 startup timing. The explicit `fast-folder` mode never creates or waits for that
 barrier. Its failures remain failures; one successful sample does not establish
 reliable fast-start attachment.
+
+Initial database loading still updates the managed SDK watcher during application
+startup. Before launching the controlled target, the test waits for both real
+database snapshots, initial watcher readiness and the latest policy update's
+current readiness. It rejects discovery blockage; a historical `armed` event
+from a replaced watcher cannot authorize a test launch. No sleep or retry is
+added to the production application.
 
 The D3D11 x64 folder case at 100% scale adds then removes a redundant basename
 allow rule through the real renderer's shared Pinia store and normal IPC. It
@@ -85,6 +92,15 @@ The default matrix runs all six graphics/architecture pairs at 100% scale, plus
 D3D11 x64 at 125% and 150%, plus D3D11 x64 using the managed early controller.
 Every positive case includes rendering, typing,
 pointer/cursor and scrolling assertions; the negative focus control runs once.
+Installed add-on registration and launch configuration use the real SDK with the
+same owned test registry. The test's public-import boundary overrides only
+`storageRoot`; it never registers test builds in the real account registry.
+Reports verify setup and runtime use the same stable application identity.
+Default profiles deliberately create preload DLL paths beyond 260 characters.
+The driver enumerates module handles with bounded K32 queries and growing path
+buffers; Toolhelp's fixed-size records fail once such a DLL is loaded. Reports
+record successful module inspection and actual path lengths for each target
+lifecycle, including no-barrier launches.
 Raster comparison uses actual PNG dimensions rather than assuming NativeImage
 DIP dimensions are bitmap pixels.
 

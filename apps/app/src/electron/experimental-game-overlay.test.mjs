@@ -28,12 +28,18 @@ function deferred() {
   void promise.catch(() => {})
   return { promise, resolve, reject }
 }
+class OverlayAddonSetupError extends Error {
+  code = 'overlay-addon-setup-failed'
+  stage = 'register'
+  filesystemCode = 'EACCES'
+}
 function fixture({
   enabled = false,
   platform = 'win32',
   ready,
   managedReady,
   storeReady,
+  preloadReady,
   failAt,
   pathApi = path,
 } = {}) {
@@ -197,7 +203,7 @@ function fixture({
   const sdk = {
     createOverlayProcessPolicy,
     createReShadeLaunchConfig(options) {
-      calls.push(['config', { ...options }])
+      calls.push(['config', JSON.parse(JSON.stringify(options))])
       if (failAt === 'config') throw new Error('SECRET')
       return { runtimeDirectory: 'SDK-owned runtime discovery' }
     },
@@ -230,6 +236,16 @@ function fixture({
       vue: { watch },
       '@/features/game-overlay/store': { useGameOverlayStore: () => store },
       '@/features/databases/store': { useDatabasesStore: () => database },
+      '@/electron/overlay-addon-installation': {
+        OVERLAY_APPLICATION_ID: 'com.nhs.izabela',
+        OverlayAddonSetupError,
+        ensureOverlayAddonInstallation() {
+          calls.push('addon.setup')
+          if (failAt === 'addon-setup')
+            return Promise.reject(new OverlayAddonSetupError('SECRET'))
+          return preloadReady?.promise ?? Promise.resolve()
+        },
+      },
       '@/electron/events/main.ts': {
         onIPCGameOverlayStartIntercept: (cb) => ipcMain.on('start', cb),
         onIPCGameOverlayStopIntercept: (cb) => ipcMain.on('stop', cb),
@@ -332,10 +348,9 @@ for (const [name, pathApi] of [
         'experimental-game-overlay',
         'runs',
       ),
+      addonPreload: { applicationId: 'com.nhs.izabela' },
     })
-    assert.deepEqual(f.calls.find((c) => c[0] === 'owner')[1], {
-      allowPrereleaseBroker: true,
-    })
+    assert.deepEqual(f.calls.find((c) => c[0] === 'owner')[1], {})
     assert.equal(f.controllers[0].session, f.sessions[0])
     assert.equal(
       f.controllers[0].options.config.runtimeDirectory,
@@ -628,6 +643,7 @@ test('disabling settles controller readiness and late callbacks cannot revive a 
 
 for (const failAt of [
   'require',
+  'addon-setup',
   'config',
   'ready',
   'controller',
@@ -646,8 +662,8 @@ for (const failAt of [
   })
 }
 
-test('quit during settings/session hydration never starts the managed controller later', async () => {
-  for (const phase of ['storeReady', 'ready']) {
+test('quit during settings, add-on setup or session hydration never starts the managed controller later', async () => {
+  for (const phase of ['storeReady', 'preloadReady', 'ready']) {
     const pending = deferred(),
       f = fixture({ enabled: true, [phase]: pending })
     const starting = f.overlay.start()
@@ -660,6 +676,25 @@ test('quit during settings/session hydration never starts the managed controller
     assert.equal(f.calls.length, before)
     assert.equal(f.controllers.length, 0)
   }
+})
+
+test('preload setup must finish before configuration; disabling cannot resume a stale activation', async () => {
+  const preloadReady = deferred()
+  const f = fixture({ enabled: true, preloadReady })
+  const starting = f.overlay.start()
+  await drain()
+  assert.ok(f.calls.includes('addon.setup'))
+  assert.ok(
+    !f.calls.some((call) => Array.isArray(call) && call[0] === 'config'),
+  )
+  assert.equal(f.sessions.length, 0)
+  f.store.enableExperimentalGameOverlay = false
+  assert.equal(await starting, false)
+  preloadReady.resolve()
+  await drain()
+  assert.equal(f.controllers.length, 0)
+  assert.equal(f.sessions.length, 0)
+  f.overlay.quit()
 })
 
 test('window lifecycle gates duplicate names and removes only its owned listeners', async () => {

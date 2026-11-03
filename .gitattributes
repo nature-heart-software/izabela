@@ -1,0 +1,2 @@
+# Release provenance manifests are hash-pinned; preserve their exact bytes.
+/vendor/electron-game-overlay-*-source-manifest.json -text whitespace=cr-at-eol

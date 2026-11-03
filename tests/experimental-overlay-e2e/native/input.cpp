@@ -1,6 +1,6 @@
 // Test-only Windows input/capture driver. Every command validates its owned PID.
 #include <Windows.h>
-#include <TlHelp32.h>
+#include <Psapi.h>
 #include <cstdio>
 #include <string>
 #include <vector>
@@ -57,25 +57,54 @@ int wmain(int argc, wchar_t **argv) {
     if (argc < 4) return 2;
     target_pid = wcstoul(argv[1], nullptr, 10);
     const std::wstring expected_image = argv[2], command = argv[3];
-    HANDLE process = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, target_pid);
+    HANDLE process = OpenProcess(command == L"module" ? PROCESS_QUERY_INFORMATION | PROCESS_VM_READ : PROCESS_QUERY_LIMITED_INFORMATION, FALSE, target_pid);
     wchar_t image[32768]{};
     DWORD size = 32768;
     const bool valid = process && QueryFullProcessImageNameW(process, 0, image, &size) && _wcsicmp(image, expected_image.c_str()) == 0;
-    if (process) CloseHandle(process);
-    if (!valid) { std::fprintf(stderr, "Owned fixture identity mismatch\n"); return 3; }
+    if (!valid) { if (process) CloseHandle(process); std::fprintf(stderr, "Owned fixture identity mismatch\n"); return 3; }
     if (command == L"module") {
-        HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, target_pid);
-        MODULEENTRY32W entry{}; entry.dwSize = sizeof(entry);
         std::wstring found;
-        if (snapshot != INVALID_HANDLE_VALUE) {
-            if (Module32FirstW(snapshot, &entry)) do {
-                if (!_wcsicmp(entry.szModule, L"ReShade64.dll") || !_wcsicmp(entry.szModule, L"ReShade32.dll")) { found = entry.szExePath; break; }
-            } while (Module32NextW(snapshot, &entry));
-            CloseHandle(snapshot);
+        DWORD query_error = ERROR_INSUFFICIENT_BUFFER, max_path_length = 0;
+        std::vector<HMODULE> modules(128);
+        // Toolhelp fails the entire snapshot when any loaded module's path is
+        // longer than MAX_PATH. Inspect handles and grow path buffers instead.
+        for (int attempt = 0; attempt < 8; ++attempt) {
+            DWORD needed = 0;
+            if (!K32EnumProcessModulesEx(process, modules.data(), (DWORD)(modules.size() * sizeof(HMODULE)), &needed, LIST_MODULES_ALL)) {
+                query_error = GetLastError(); break;
+            }
+            if (needed % sizeof(HMODULE) != 0 || needed / sizeof(HMODULE) > 65536) {
+                query_error = ERROR_BAD_LENGTH; break;
+            }
+            if (needed > modules.size() * sizeof(HMODULE)) {
+                modules.resize(needed / sizeof(HMODULE)); continue;
+            }
+            modules.resize(needed / sizeof(HMODULE));
+            query_error = ERROR_SUCCESS;
+            for (const HMODULE module : modules) {
+                std::vector<wchar_t> buffer(1024);
+                for (;;) {
+                    const DWORD length = K32GetModuleFileNameExW(process, module, buffer.data(), (DWORD)buffer.size());
+                    if (!length) break; // A module can unload during inspection.
+                    if (length >= buffer.size()) {
+                        if (buffer.size() >= 32768) break;
+                        buffer.resize(buffer.size() * 2); continue;
+                    }
+                    if (length > max_path_length) max_path_length = length;
+                    const std::wstring full_path(buffer.data(), length);
+                    const auto slash = full_path.find_last_of(L"\\/");
+                    const wchar_t *name = full_path.c_str() + (slash == std::wstring::npos ? 0 : slash + 1);
+                    if (!_wcsicmp(name, L"ReShade64.dll") || !_wcsicmp(name, L"ReShade32.dll")) found = full_path;
+                    break;
+                }
+            }
+            break;
         }
-        std::printf("{\"module\":%s}\n", json_string(found).c_str());
+        CloseHandle(process);
+        std::printf("{\"module\":%s,\"queryError\":%lu,\"maxModulePathLength\":%lu,\"inspector\":\"K32EnumProcessModulesEx\"}\n", json_string(found).c_str(), query_error, max_path_length);
         return 0;
     }
+    CloseHandle(process);
     EnumWindows(find_window, 0);
     if (!target_window) { std::fprintf(stderr, "Fixture window unavailable\n"); return 4; }
     if (command == L"close") {

@@ -4,6 +4,11 @@ import { watch, type WatchStopHandle } from 'vue'
 import { useGameOverlayStore } from '@/features/game-overlay/store'
 import { useDatabasesStore } from '@/features/databases/store'
 import {
+  ensureOverlayAddonInstallation,
+  OVERLAY_APPLICATION_ID,
+  OverlayAddonSetupError,
+} from '@/electron/overlay-addon-installation'
+import {
   emitIPCGameOverlayResize,
   onIPCGameOverlayStartIntercept,
   onIPCGameOverlayStopIntercept,
@@ -81,14 +86,21 @@ class ExperimentalGameOverlay {
     try {
       const sdk: typeof import('electron-game-overlay') = require('electron-game-overlay')
       this.sdk = sdk
+      if (
+        !(await this.waitFor(ensureOverlayAddonInstallation())) ||
+        this.quitting ||
+        generation !== this.generation
+      )
+        return false
       const config = sdk.createReShadeLaunchConfig({
         runsRootDirectory: path.join(
           app.getPath('userData'),
           'experimental-game-overlay',
           'runs',
         ),
+        addonPreload: { applicationId: OVERLAY_APPLICATION_ID },
       })
-      this.owner = new sdk.ElectronGameOverlay({ allowPrereleaseBroker: true })
+      this.owner = new sdk.ElectronGameOverlay()
       const session = (this.session = this.owner.createSession())
       session.start()
       if (
@@ -224,6 +236,12 @@ class ExperimentalGameOverlay {
               stage: diagnostic.stage,
               pid: diagnostic.pid,
               runtimeStartupCode: diagnostic.runtimeStartupCode,
+            }
+          : error instanceof OverlayAddonSetupError
+          ? {
+              code: error.code,
+              stage: error.stage,
+              filesystemCode: error.filesystemCode,
             }
           : sessionDiagnostic
           ? {

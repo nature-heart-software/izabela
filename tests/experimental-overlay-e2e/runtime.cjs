@@ -1,10 +1,11 @@
 // Loads Izabela's shipped main bundle, renderer and real SDK/native transport.
-// The SDK wrappers below observe public calls; only the explicit negative
-// control suppresses native focus. They never inject text or synthesize clicks.
+// SDK calls stay real; security changes are blocked and preload storage is
+// isolated. Only the explicit negative control suppresses native focus.
 const assert = require('node:assert/strict')
 const fs = require('node:fs')
 const path = require('node:path')
-const { createRequire } = require('node:module')
+const Module = require('node:module')
+const { createRequire } = Module
 const { spawn, execFileSync } = require('node:child_process')
 const { app, BrowserWindow, nativeImage, screen, dialog } = require('electron')
 const config = JSON.parse(fs.readFileSync(process.argv.at(-1), 'utf8'))
@@ -44,6 +45,61 @@ const evidence = {
   policyUpdates: [],
   elevationRequests: 0,
 }
+// Override only the app bundle's public SDK imports. Production omits storageRoot;
+// the E2E setup and launcher both use this owned registry instead of the account's.
+const preloadStorageRoot = path.join(
+  config.directory,
+  'isolated-addon-registry',
+)
+const preload = requireApp('electron-game-overlay/preload')
+const loadModule = Module._load
+const applicationBundle = path.join(config.appRoot, 'dist-electron') + path.sep
+Module._load = function (request, parent, isMain) {
+  if (parent?.filename?.startsWith(applicationBundle)) {
+    if (request === 'electron-game-overlay')
+      return {
+        ...sdk,
+        createReShadeLaunchConfig(options) {
+          assert.ok(options.addonPreload?.applicationId)
+          assert.equal(options.addonPreload.storageRoot, undefined)
+          evidence.preloadRuntimeApplicationId =
+            options.addonPreload.applicationId
+          return sdk.createReShadeLaunchConfig({
+            ...options,
+            addonPreload: {
+              ...options.addonPreload,
+              storageRoot: preloadStorageRoot,
+            },
+          })
+        },
+      }
+    if (request === 'electron-game-overlay/preload')
+      return {
+        ...preload,
+        async registerOverlayAddonInstallation(options) {
+          assert.equal(options.storageRoot, undefined)
+          assert.equal(options.packageRoot, undefined)
+          const result = await preload.registerOverlayAddonInstallation({
+            ...options,
+            storageRoot: preloadStorageRoot,
+          })
+          evidence.preloadRegistration = {
+            applicationId: result.applicationId,
+            registrationId: result.registrationId,
+            isolated: true,
+          }
+          return result
+        },
+        unregisterOverlayAddonInstallation(options) {
+          return preload.unregisterOverlayAddonInstallation({
+            ...options,
+            storageRoot: preloadStorageRoot,
+          })
+        },
+      }
+  }
+  return loadModule.call(this, request, parent, isMain)
+}
 const failures = []
 let target,
   managedController,
@@ -54,6 +110,8 @@ let target,
   intercepting = false,
   rendering = false
 let targetConnected = false
+let fatalWatcherError
+let targetOperationError
 const progress = setInterval(() => {
   fs.writeFileSync(
     path.join(config.directory, 'progress.json'),
@@ -76,6 +134,8 @@ const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 async function until(check, label, timeout = 20000) {
   const deadline = Date.now() + timeout
   while (Date.now() < deadline) {
+    if (fatalWatcherError) throw fatalWatcherError
+    if (targetOperationError) throw targetOperationError
     const result = await check()
     if (result) return result
     await wait(10)
@@ -311,13 +371,35 @@ const createSession = sdk.ElectronGameOverlay.prototype.createSession
 const onTargetEvent = sdk.OverlayTargetWatcher.prototype.onEvent
 sdk.OverlayTargetWatcher.prototype.onEvent = function (handler) {
   managedController = this
+  void this.ready.then(
+    () => {
+      evidence.initialDiscoveryReady = true
+    },
+    (error) => {
+      evidence.initialDiscoveryError = String(error)
+    },
+  )
   return onTargetEvent.call(this, (event) => {
     evidence.managedEvents.push({
       type: event.type,
+      at: Date.now(),
       pid: event.target?.pid,
       mode: event.target?.mode,
       creationTime100ns: event.identity?.creationTime100ns,
+      error:
+        event.type === 'error'
+          ? String(event.error?.stack || event.error)
+          : undefined,
     })
+    if (event.type === 'error' && !event.target && !event.selector)
+      fatalWatcherError = event.error
+    if (
+      event.type === 'error' &&
+      event.target &&
+      target &&
+      event.target.pid === target.pid
+    )
+      targetOperationError = event.error
     return handler(event)
   })
 }
@@ -758,7 +840,26 @@ async function revokePolicy(before) {
   )
 }
 async function startTarget() {
+  await until(() => {
+    const latest = evidence.policyUpdates.at(-1)
+    if (latest?.status === 'failed') throw new Error(latest.error)
+    if (!evidence.initialDiscoveryReady || latest?.status === 'pending')
+      return false
+    const current = evidence.managedEvents.slice(latest?.eventsAtStart ?? 0)
+    const ready = current.findLastIndex((event) => event.type === 'ready')
+    const blocked = current.findLastIndex(
+      (event) => event.type === 'discovery-blocked',
+    )
+    return ready >= 0 && ready > blocked
+  }, 'current managed discovery ready after latest policy update')
+  evidence.targetLaunchReadiness ??= []
+  evidence.targetLaunchReadiness.push({
+    at: Date.now(),
+    updatesSettled: evidence.policyUpdates.length,
+    eventsObserved: evidence.managedEvents.length,
+  })
   targetConnected = false
+  targetOperationError = undefined
   surface = undefined
   rendering = false
   intercepting = false
@@ -795,7 +896,9 @@ async function startTarget() {
   if (config.targetMode !== 'fast-folder') {
     await until(
       () => {
-        const module = drive('module').module
+        const inspection = drive('module')
+        evidence.moduleInspection = inspection
+        const module = inspection.module
         if (!module) return false
         const log = path.join(path.dirname(module), 'inject.stdout.log')
         return (
@@ -826,6 +929,16 @@ async function startTarget() {
     'authenticated graphics surface',
     30000,
   )
+  const inspection = drive('module')
+  assert.equal(inspection.queryError, 0, 'Owned module inspection succeeds')
+  assert.ok(inspection.module, 'Owned ReShade module is present')
+  if (config.profile.startsWith(config.directory + path.sep))
+    assert.ok(
+      inspection.maxModulePathLength > 260,
+      'Default test profile exercises a loaded module beyond MAX_PATH',
+    )
+  evidence.targetModuleInspections ??= []
+  evidence.targetModuleInspections.push({ pid: target.pid, ...inspection })
   drive('activate')
 }
 async function closeTarget() {
@@ -845,9 +958,15 @@ async function run() {
   )
   evidence.displayScaleFactor = screen.getPrimaryDisplay().scaleFactor
   assert.equal(evidence.displayScaleFactor, config.scaleFactor)
+  // Startup updates still run while the SDK prepares. Only the controlled game
+  // launch waits for the real database snapshots and their current discovery.
   await until(
-    () => evidence.managedEvents.some((event) => event.type === 'armed'),
-    'managed early watcher armed before launch',
+    () =>
+      overlay.webContents.executeJavaScript(`(() => {
+      const store = document.querySelector('#app').__vue_app__.config.globalProperties.$pinia._s.get('databases');
+      return ['game-overlay-allowlist', 'game-overlay-denylist'].every(name => Array.isArray(store?.data[name]));
+    })()`),
+    'real initial database policy snapshots received',
   )
   await startTarget()
   drive('move', '20,20')
@@ -982,6 +1101,17 @@ async function run() {
       await revokePolicy(before)
   }
   const state = await read()
+  assert.ok(
+    evidence.preloadRegistration?.isolated,
+    'Preload setup uses the test registry',
+  )
+  assert.equal(
+    evidence.preloadRegistration.applicationId,
+    evidence.preloadRuntimeApplicationId,
+  )
+  evidence.checks.push(
+    'installed add-on setup and existing launcher share the stable identity and isolated registry',
+  )
   assert.equal(
     evidence.elevationRequests,
     0,

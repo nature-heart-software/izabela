@@ -19,19 +19,19 @@ test('experimental SDK is the pinned complete upstream RC, distinct from legacy'
   )
   assert.equal(
     app.dependencies['electron-game-overlay'],
-    'file:../../vendor/electron-game-overlay-0.1.0-rc.7.tgz',
+    'file:../../vendor/electron-game-overlay-0.1.0-rc.11.tgz',
   )
   const bytes = readFileSync(
-    new URL('vendor/electron-game-overlay-0.1.0-rc.7.tgz', root),
+    new URL('vendor/electron-game-overlay-0.1.0-rc.11.tgz', root),
   )
   assert.equal(
     createHash('sha256').update(bytes).digest('hex'),
-    'dcf989d08a1c2913023c5d5983f080c12307e9fbd01952e630eed532cc040f9d',
+    'ddc09fe1b2851469ad057601374320d299fe6cac915731e1859f7db27c5efca6',
   )
   const consumer = createRequire(new URL('apps/app/package.json', root))
   assert.equal(
     consumer('electron-game-overlay/package.json').version,
-    '0.1.0-rc.7',
+    '0.1.0-rc.11',
   )
   const sdkRoot = path.dirname(
     consumer.resolve('electron-game-overlay/package.json'),
@@ -39,20 +39,20 @@ test('experimental SDK is the pinned complete upstream RC, distinct from legacy'
   const provenance = JSON.parse(
     readFileSync(path.join(sdkRoot, 'SDK_PROVENANCE.json'), 'utf8'),
   )
-  assert.equal(provenance.version, '0.1.0-rc.7')
+  assert.equal(provenance.version, '0.1.0-rc.11')
   assert.equal(
     provenance.baseCommit,
-    '1ff4baeb5930bb20d6dff0d8e69ca05c8eb8be98',
+    'f51777621927ff090d0281ad069b720ed553d589',
   )
   assert.equal(provenance.workingTreeDirty, true)
   for (const [entry, expected] of [
     [
       provenance.sourceSnapshot,
-      '80fc4d13aebb61c1b2d9a55e6bc9f296755b9f8b86d1e8f44eefb7a236b099c4',
+      '66044d29b286390d05bf061e137c360e0a6aa0263960eb7adf2847e05147ab8d',
     ],
     [
       provenance.sourceManifest,
-      '8e83d8d24608fa8f65beea7284b04bd0684db0b6a4c6473716142e65ddea3ecc',
+      'd62a162cacac2c77e247f9013a7e1de6292fdd0f88876cf070285f9e49c2294e',
     ],
   ]) {
     assert.equal(entry.sha256, expected)
@@ -71,7 +71,7 @@ test('unpublished vendored RC has only an exact-version release-age exception', 
     .split('\n')
     .map((line) => line.trim())
     .filter((line) => /^- ['"]?electron-game-overlay(?:@|['"]?$)/.test(line))
-  assert.deepEqual(exemptions, ['- electron-game-overlay@0.1.0-rc.7'])
+  assert.deepEqual(exemptions, ['- electron-game-overlay@0.1.0-rc.11'])
   assert.doesNotMatch(config, /^  electron-game-overlay@.*: patches\//m)
   assert.doesNotMatch(config, /^minimumReleaseAge:\s*0\s*$/m)
 })
@@ -90,9 +90,11 @@ test('both native architectures carry the fixed identity and verified artifacts'
         'utf8',
       ).replace(/^\uFEFF/, ''),
     )
-    assert.equal(stamp.addonBuildId, '12EE788081A34E00B10862242DF38893')
-    assert.equal(stamp.runtimeGeneration, 7)
+    assert.equal(stamp.addonBuildId, 'CCE20935ADD44EF6A5A7973014B2E07F')
+    assert.equal(stamp.runtimeGeneration, 21)
     assert.equal(stamp.injectorFutureTargets, 2)
+    assert.equal(stamp.cooperativeAddonProtocol, 1)
+    assert.equal(stamp.addonPreloadProtocol, 1)
     const assets = {
       addonSha256: `electron_game_overlay.addon${bits}`,
       injectorSha256: `inject${suffix}.exe`,
@@ -160,7 +162,7 @@ test('afterPack preserves every actual SDK file including sealed dependency noti
         (file) =>
           !file.startsWith(path.join('node_modules', '.bin') + path.sep),
       )
-    assert.equal(files.length, 180)
+    assert.equal(files.length, 159)
     assert.deepEqual(
       readdirSync(destination, { recursive: true, withFileTypes: true })
         .filter((entry) => entry.isFile())
@@ -172,9 +174,7 @@ test('afterPack preserves every actual SDK file including sealed dependency noti
     )
     assert.ok(
       files.includes(
-        path.join(
-          'dist/broker/win32-x64/node_modules/tslib/CopyrightNotice.txt',
-        ),
+        path.join('dist', 'node_modules', 'tslib', 'CopyrightNotice.txt'),
       ),
     )
     for (const file of files)
@@ -185,27 +185,62 @@ test('afterPack preserves every actual SDK file including sealed dependency noti
       )
     const manifest = JSON.parse(
       readFileSync(
-        path.join(destination, 'dist/broker/win32-x64/broker-manifest.json'),
+        path.join(destination, 'dist/overlay-manifest.json'),
         'utf8',
       ),
     )
     for (const file of manifest.files) {
-      const bytes = readFileSync(
-        path.join(destination, 'dist/broker/win32-x64', file.path),
-      )
+      const bytes = readFileSync(path.join(destination, 'dist', file.path))
       assert.equal(
         createHash('sha256').update(bytes).digest('hex'),
         file.sha256,
         file.path,
       )
     }
-    assert.equal(manifest.files.length, 54)
+    assert.equal(manifest.files.length, 154)
+    const { verifyOverlayPackage } = consumer('electron-game-overlay/packaging')
+    assert.deepEqual(await verifyOverlayPackage(destination), {
+      sealedPayloads: 154,
+    })
+    // Exercise the physical ASAR-unpacked package's default source discovery.
+    // Only the test registry is overridden; no build-account registration occurs.
+    const installed = require(path.join(destination, 'dist/preload.js'))
+    const storageRoot = path.join(temporary, 'isolated-preload-registry')
+    const installation = await installed.registerOverlayAddonInstallation({
+      applicationId: builder.appId,
+      storageRoot,
+    })
+    assert.equal(installation.applicationId, 'com.nhs.izabela')
+    for (const [cached, bits] of [
+      [installation.addonPath, 64],
+      [installation.x86AddonPath, 32],
+    ])
+      assert.deepEqual(
+        readFileSync(cached),
+        readFileSync(
+          path.join(
+            destination,
+            `dist/runtime/win32-x64/reshade/electron_game_overlay.addon${bits}`,
+          ),
+        ),
+      )
+    await installed.unregisterOverlayAddonInstallation({
+      applicationId: installation.applicationId,
+      registrationId: installation.registrationId,
+      storageRoot,
+    })
+    assert.equal(
+      JSON.parse(
+        readFileSync(path.join(storageRoot, 'registrations.json'), 'utf8'),
+      ).registrations.length,
+      0,
+    )
   } finally {
     rmSync(temporary, { recursive: true, force: true })
   }
 })
 
-test('packaged experimental SDK remains outside ASAR for sealed broker and native executables', () => {
+test('packaged experimental SDK remains outside ASAR for sealed engines and native executables', () => {
   const builder = require('../apps/app/electron-builder.config.js')
   assert.ok(
     builder.asarUnpack.includes('node_modules/electron-game-overlay/**/*'),
