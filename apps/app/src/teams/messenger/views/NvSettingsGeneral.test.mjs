@@ -6,6 +6,57 @@ import { parse, compileScript } from '@vue/compiler-sfc'
 import * as vue from 'vue'
 import { renderToString } from 'vue/server-renderer'
 import loadTypescript from '../../../../../../tests/load-typescript.cjs'
+import ts from 'typescript'
+import flatten from 'lodash/flatten.js'
+import get from 'lodash/get.js'
+import { compileVariables } from '../../../../../../packages/design-tokens/tools/figma-import.mjs'
+
+const registryFile = fileURLToPath(
+  new URL('../../../../../../packages/ui/src/themes/index.ts', import.meta.url),
+)
+const generated = JSON.parse(
+  readFileSync(
+    new URL(
+      '../../../../../../packages/design-tokens/src/figma.generated.json',
+      import.meta.url,
+    ),
+    'utf8',
+  ),
+)
+const selectFile = fileURLToPath(
+  new URL(
+    '../../../../../../packages/ui/src/components/forms/Select/NvSelect.vue',
+    import.meta.url,
+  ),
+)
+const selectScript = ts.createSourceFile(
+  selectFile,
+  parse(readFileSync(selectFile, 'utf8')).descriptor.scriptSetup.content,
+  ts.ScriptTarget.Latest,
+  true,
+)
+const selectComputations = new Set([
+  'selectedValues',
+  'options',
+  'selectedOptions',
+  'inputValue',
+])
+// Execute the control's actual equality and display computations, without loading its overlay/recipe graph.
+const selectSource = selectScript.statements
+  .filter(
+    (node) =>
+      ts.isVariableStatement(node) &&
+      node.declarationList.declarations.some((declaration) =>
+        selectComputations.has(declaration.name.getText(selectScript)),
+      ),
+  )
+  .map((node) => node.getText(selectScript))
+  .join('\n')
+assert.ok(
+  [...selectComputations].every((name) =>
+    selectSource.includes(`const ${name}`),
+  ),
+)
 
 const filename = fileURLToPath(
   new URL('./NvSettingsGeneral.vue', import.meta.url),
@@ -13,11 +64,7 @@ const filename = fileURLToPath(
 const { descriptor } = parse(readFileSync(filename, 'utf8'), { filename })
 const templateAst = structuredClone(descriptor.template.ast)
 
-async function renderSettings(
-  disabled,
-  savedAutoUpdate,
-  pendingRestart = false,
-) {
+async function renderSettings(disabled, savedAutoUpdate, initial = {}) {
   const script = compileScript(descriptor, {
     id: filename,
     inlineTemplate: true,
@@ -54,17 +101,75 @@ async function renderSettings(
           onClick: () => emit('update:modelValue', !props.modelValue),
         }),
   }
-  const patches = []
-  const messengerPatches = []
-  const messengerStateStore = {
-    markForRestart: pendingRestart,
-    $patch: (value) => {
-      messengerPatches.push(value)
-      Object.assign(messengerStateStore, value)
+  const selects = []
+  const selectedStates = []
+  const inventory =
+    initial.inventory ??
+    (initial.themeOptions
+      ? {
+          ...generated,
+          defaultThemeId: initial.themeOptions[0].value,
+          themes: initial.themeOptions.map(({ value: id, label }) => ({
+            id,
+            label,
+            values: {},
+          })),
+        }
+      : generated)
+  const registry = loadTypescript(registryFile, {
+    '../../../design-tokens/src/figma.generated.json': inventory,
+  })
+  Object.assign(ui, registry)
+  ui.NvSelect = {
+    props: {
+      modelValue: String,
+      options: Array,
+      multiple: Boolean,
+      valueKey: { default: '' },
+    },
+    setup(props) {
+      selects.push(props)
+      const state = loadTypescript(
+        selectFile,
+        {},
+        {
+          computed: vue.computed,
+          props,
+          flatten,
+          get,
+          uuid: () => 'option-id',
+          hasFocus: vue.ref(false),
+          search: vue.ref(''),
+        },
+        `${selectSource}\nexport { selectedOptions, inputValue }`,
+      )
+      selectedStates.push(state)
+      return () =>
+        vue.h('input', {
+          'data-theme-select': '',
+          value: state.inputValue.value,
+        })
     },
   }
+  const patches = []
+  const restartWrites = []
+  const messengerStateStore = new Proxy(
+    {
+      markForRestart: initial.markForRestart ?? false,
+      $patch(value) {
+        Object.assign(messengerStateStore, value)
+      },
+    },
+    {
+      set(target, key, value) {
+        restartWrites.push({ key, value })
+        target[key] = value
+        return true
+      },
+    },
+  )
   const settingsStore = {
-    theme: 'dark',
+    theme: initial.theme ?? 'light',
     enableAutoUpdate: savedAutoUpdate,
     updateChannel: 'beta',
     keybindings: {},
@@ -114,7 +219,9 @@ async function renderSettings(
           (prop) =>
             prop.name === 'bind' &&
             prop.arg?.content === 'modelValue' &&
-            prop.exp?.content === `settingsStore.${property}`,
+            (prop.exp?.content === `settingsStore.${property}` ||
+              (property === 'theme' &&
+                prop.exp?.content === 'resolveThemeId(settingsStore.theme)')),
         )
       ) {
         return node
@@ -145,30 +252,157 @@ async function renderSettings(
     settingsStore,
     invokeUpdate,
     messengerStateStore,
-    messengerPatches,
+    restartWrites,
+    selects,
+    selectedStates,
   }
 }
 
-for (const pendingRestart of [false, true]) {
-  test(`theme changes preserve pending restart ${pendingRestart} without requesting a restart`, async () => {
-    const {
-      invokeUpdate,
-      settingsStore,
-      patches,
-      messengerStateStore,
-      messengerPatches,
-    } = await renderSettings(undefined, false, pendingRestart)
-    for (const theme of ['light', 'dark']) {
-      invokeUpdate('theme', theme)
-      assert.equal(settingsStore.theme, theme)
-      assert.equal(messengerStateStore.markForRestart, pendingRestart)
-    }
+for (const [saved, expectedId] of [
+  [undefined, 'izabela-light'],
+  ['light', 'izabela-light'],
+  ['dark', 'izabela-dark'],
+  ['removed-theme', generated.defaultThemeId],
+  ...generated.themes.map(({ id }) => [id, id]),
+]) {
+  test(`theme ${
+    saved ?? '(fresh default)'
+  } displays and selects its canonical imported option without store writes`, async () => {
+    const result = await renderSettings(undefined, true, {
+      theme: saved,
+      markForRestart: true,
+    })
+    const expected = generated.themes.find(({ id }) => id === expectedId)
+    const state = result.selectedStates[0]
+    assert.equal(state.inputValue.value, expected.label)
     assert.deepEqual(
-      patches.map((patch) => ({ ...patch })),
-      [{ theme: 'light' }, { theme: 'dark' }],
+      Array.from(state.selectedOptions.value, ({ value }) => value),
+      [expectedId],
     )
-    assert.deepEqual(messengerPatches, [])
+    assert.ok(result.html.includes(`value="${expected.label}"`))
+    assert.equal(result.selects[0].modelValue, expectedId)
+    assert.equal(result.settingsStore.theme, saved ?? 'light')
+    assert.deepEqual(result.patches, [])
+    assert.deepEqual(result.restartWrites, [])
+    assert.equal(result.messengerStateStore.markForRestart, true)
+    assert.deepEqual(
+      Array.from(result.selects[0].options, ({ value }) => value),
+      generated.themes.map(({ id }) => id),
+    )
   })
+}
+
+test('future canonical Light/Dark modes remain selected through the actual settings binding', async () => {
+  const snapshot = JSON.parse(
+    readFileSync(
+      new URL(
+        '../../../../../../packages/design-tokens/figma/variables.json',
+        import.meta.url,
+      ),
+      'utf8',
+    ),
+  )
+  const semantic = snapshot.collections.find(
+    ({ name }) => name === 'Semantic Tokens',
+  )
+  for (const name of ['Light', 'Dark']) {
+    const from = semantic.modes.find(
+      (mode) => mode.name === `GitHub ${name}`,
+    ).modeId
+    const modeId = `future-${name.toLowerCase()}`
+    semantic.modes.push({ modeId, name })
+    for (const variable of snapshot.variables.filter(
+      ({ variableCollectionId }) => variableCollectionId === semantic.id,
+    )) {
+      variable.valuesByMode[modeId] = structuredClone(
+        variable.valuesByMode[from],
+      )
+    }
+  }
+  const inventory = compileVariables(snapshot, snapshot)
+  for (const id of ['light', 'dark']) {
+    const result = await renderSettings(undefined, true, {
+      theme: 'github-light',
+      inventory,
+      markForRestart: true,
+    })
+    result.invokeUpdate('theme', id)
+    assert.equal(result.settingsStore.theme, id)
+    const selected = await renderSettings(undefined, true, {
+      theme: result.settingsStore.theme,
+      inventory,
+      markForRestart: true,
+    })
+    const expected = inventory.themes.find((theme) => theme.id === id)
+    assert.equal(selected.selects[0].modelValue, id)
+    assert.equal(selected.selectedStates[0].inputValue.value, expected.label)
+    assert.deepEqual(
+      Array.from(
+        selected.selectedStates[0].selectedOptions.value,
+        ({ value }) => value,
+      ),
+      [id],
+    )
+    assert.ok(selected.html.includes(`value="${expected.label}"`))
+    assert.deepEqual(
+      result.patches.map((patch) => ({ ...patch })),
+      [{ theme: id }],
+    )
+    assert.deepEqual(selected.patches, [])
+    assert.deepEqual(result.restartWrites, [])
+    assert.deepEqual(selected.restartWrites, [])
+    assert.equal(selected.messengerStateStore.markForRestart, true)
+  }
+})
+
+for (const count of [1, 3, 17]) {
+  test(`theme select exposes all ${count} imported modes with exact labels and IDs`, async () => {
+    const themeOptions = Array.from({ length: count }, (_, index) => ({
+      label: `Custom Theme ${index} / Mode ${index}`,
+      value: `custom-theme-${index}-mode-${index}`,
+    }))
+    const theme = themeOptions.at(-1).value
+    const result = await renderSettings(undefined, true, {
+      theme,
+      themeOptions,
+    })
+    assert.equal(result.selects.length, 1)
+    assert.deepEqual(
+      Array.from(result.selects[0].options, (option) => ({ ...option })),
+      themeOptions,
+    )
+    assert.equal(result.selects[0].modelValue, theme)
+    assert.equal(
+      result.selectedStates[0].inputValue.value,
+      themeOptions.at(-1).label,
+    )
+    assert.equal(result.selectedStates[0].selectedOptions.value[0].value, theme)
+    result.invokeUpdate('theme', themeOptions[0].value)
+    assert.equal(result.settingsStore.theme, themeOptions[0].value)
+    assert.deepEqual(result.restartWrites, [])
+  })
+}
+
+for (const markForRestart of [false, true]) {
+  for (const [from, to] of [
+    ['light', 'dark'],
+    ['dark', 'light'],
+  ]) {
+    test(`theme handler ${from} → ${to} preserves pending restart ${markForRestart} without writes`, async () => {
+      const result = await renderSettings(undefined, true, {
+        theme: from,
+        markForRestart,
+      })
+      result.invokeUpdate('theme', to)
+      assert.equal(result.settingsStore.theme, to)
+      assert.deepEqual(
+        result.patches.map((patch) => ({ ...patch })),
+        [{ theme: to }],
+      )
+      assert.deepEqual(result.restartWrites, [])
+      assert.equal(result.messengerStateStore.markForRestart, markForRestart)
+    })
+  }
 }
 
 for (const savedAutoUpdate of [false, true]) {

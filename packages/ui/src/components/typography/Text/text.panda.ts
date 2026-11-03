@@ -6,30 +6,31 @@ import { props } from './text.shared'
 
 /** Default typography for consumers sharing the Text component's visual contract. */
 export const defaultTextStyle = ({ theme }: any) => ({
-  color: theme?.text.color ?? 'var(--nv-text-color)',
-  fontFamily: tokens.fontFamily.sans.join(', '),
+  color: theme?.text?.body?.foreground ?? 'var(--nv-text-body-foreground)',
+  fontFamily: tokens.fontFamily.sans,
   ...fontSizeStyle(tokens.fontSize[2]),
 })
 
 export const text = cva({
   base: {
-    color: 'var(--nv-text-color)',
+    color: 'text.body.foreground',
     fontFamily: 'sans',
     fontSize: '2',
-    lineHeight: '2',
-    letterSpacing: '2',
+    lineHeight: 'default',
+    letterSpacing: 'default',
     '& a': {
       // The underline is positioned relative to its link, not the text container.
       position: 'relative',
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        bottom: 'calc(-1 * {spacing.1})',
-        left: 0,
-        right: 0,
-        height: '1',
-        backgroundColor: 'var(--nv-text-link-underline-color)',
-      },
+    },
+    // Text provides a fallback; a composing control owns its link color.
+    '& :where(a)::before': {
+      content: '""',
+      position: 'absolute',
+      bottom: 'calc(-1 * {spacing.1})',
+      left: 0,
+      right: 0,
+      height: '1',
+      backgroundColor: 'text.body.linkUnderline',
     },
   },
   variants: {
@@ -45,19 +46,45 @@ export const text = cva({
     },
     type: {
       caption: {
-        color: 'var(--nv-text-caption-color)',
+        color: 'text.caption.foreground',
+        '& :where(a)::before': {
+          backgroundColor: 'text.caption.linkUnderline',
+        },
         fontSize: '1',
-        lineHeight: '1',
-        letterSpacing: '1',
+        lineHeight: 'default',
+        letterSpacing: 'default',
       },
-      label: { fontWeight: 700 },
-      'body-small': { fontSize: '1', lineHeight: '1', letterSpacing: '1' },
-      body: {},
-      subtitle: { fontWeight: 700 },
+      label: {
+        color: 'text.label.foreground',
+        '& :where(a)::before': { backgroundColor: 'text.label.linkUnderline' },
+        fontWeight: 700,
+      },
+      'body-small': {
+        color: 'text.body-small.foreground',
+        '& :where(a)::before': {
+          backgroundColor: 'text.body-small.linkUnderline',
+        },
+        fontSize: '1',
+        lineHeight: 'default',
+        letterSpacing: 'default',
+      },
+      body: {
+        color: 'text.body.foreground',
+        '& :where(a)::before': { backgroundColor: 'text.body.linkUnderline' },
+      },
+      subtitle: {
+        color: 'text.subtitle.foreground',
+        '& :where(a)::before': {
+          backgroundColor: 'text.subtitle.linkUnderline',
+        },
+        fontWeight: 700,
+      },
       title: {
+        color: 'text.title.foreground',
+        '& :where(a)::before': { backgroundColor: 'text.title.linkUnderline' },
         fontSize: '4',
-        lineHeight: '4',
-        letterSpacing: '4',
+        lineHeight: 'default',
+        letterSpacing: 'default',
         fontWeight: 700,
       },
     },

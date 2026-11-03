@@ -217,17 +217,8 @@
               <NvText type="label">Theme</NvText>
             </NvStack>
             <NvSelect
-              :modelValue="settingsStore.theme"
-              :options="[
-                {
-                  label: 'Light',
-                  value: 'light',
-                },
-                {
-                  label: 'Dark',
-                  value: 'dark',
-                },
-              ]"
+              :modelValue="resolveThemeId(settingsStore.theme)"
+              :options="themeOptions"
               @update:modelValue="
                 (value) => settingsStore.$patch({ theme: value })
               "
@@ -350,6 +341,8 @@ import {
   NvStack,
   NvSwitch,
   NvText,
+  resolveThemeId,
+  themeOptions,
 } from '@packages/ui'
 import { useSettingsStore } from '@/features/settings/store'
 import NvDisplaySelect from '@/features/display/components/inputs/DisplaySelect.vue'

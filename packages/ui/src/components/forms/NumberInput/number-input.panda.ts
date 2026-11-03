@@ -10,15 +10,22 @@ export const numberInputRecipe = cva({
     '& > *': { width: '100%' },
     '& input': {
       minWidth: '11',
-      color: 'var(--nv-number-input-color)',
-      backgroundColor: 'var(--nv-number-input-background-color)',
-      borderColor: 'var(--nv-number-input-border-color)',
-      '&:hover': { borderColor: 'var(--nv-number-input-hover-border-color)' },
-      '&:focus': {
-        borderColor: 'var(--nv-number-input-focus-border-color)',
-        boxShadow: '0 0 0 0.25rem var(--nv-number-input-focus-box-shadow)',
+      color: 'number-input.default.text',
+      backgroundColor: 'number-input.default.background',
+      borderColor: 'number-input.default.border',
+      '&:hover': {
+        borderColor: 'number-input.default.hover.border',
+        color: 'number-input.default.hover.text',
+        backgroundColor: 'number-input.default.hover.background',
       },
-      '&::placeholder': { color: 'var(--nv-number-input-placeholder-color)' },
+      '&:focus': {
+        color: 'number-input.default.focus.text',
+        backgroundColor: 'number-input.default.focus.background',
+        borderColor: 'number-input.default.focus.border',
+        boxShadow:
+          '0 0 0 0.25rem {colors.number-input.default.focus.focus-ring}',
+      },
+      '&::placeholder': { color: 'number-input.default.placeholder' },
     },
   },
 })

@@ -12,8 +12,7 @@ export const accessBlockerReason = cva({
     position: 'absolute',
     inset: 0,
     zIndex: 3000,
-    backgroundColor:
-      'color-mix(in srgb, var(--nv-disabled-item-background-backdrop-color) calc(var(--nv-disabled-item-background-backdrop-opacity) * 100%), transparent)',
+    backgroundColor: 'accessBlocker.default.denied.background',
   },
 })
 export const StAccessBlocker = pandaComponent('div', props, accessBlocker)

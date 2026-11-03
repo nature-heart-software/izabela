@@ -143,7 +143,7 @@ const inputAttrs = computed(() => omit(attrs, ['class', 'style']))
 const isLocked = computed(() => props.disabled || props.readonly)
 const emit = defineEmits(['update:modelValue'])
 const iconSize = computed(() => {
-  const sizes: Record<Size, keyof typeof tokens.spacing> = {
+  const sizes: Record<Size, keyof typeof tokens.fontSize> = {
     sm: 3,
     md: 5,
     lg: 5,
@@ -230,7 +230,7 @@ watch(
   },
 )
 
-const fuseOptions = computed<UseFuseOptions<(typeof options.value)[number]>>(
+const fuseOptions = computed<UseFuseOptions<typeof options.value[number]>>(
   () => ({
     fuseOptions: {
       keys: ['label', 'category', 'searchValue'],

@@ -6,8 +6,15 @@ import {
   watch,
   type PropType,
 } from 'vue'
+import { themeVariables, THEME_BOUNDARY } from '../utils/panda'
 
-/** Shares a stable, reactive theme with Panda and legacy styled components. */
+/**
+ * Shares a stable, reactive theme and a scoped CSS-variable boundary.
+ * @example
+ * ```ts
+ * h(ThemeProvider, { theme: resolveTheme('github-dark') }, () => h('main'))
+ * ```
+ */
 export const ThemeProvider = defineComponent({
   name: 'NvThemeProvider',
   props: {
@@ -29,6 +36,12 @@ export const ThemeProvider = defineComponent({
       { immediate: true },
     )
     provide('theme', theme)
-    return () => h('div', slots.default?.())
+    provide(THEME_BOUNDARY, theme)
+    return () =>
+      h(
+        'div',
+        { 'data-nv-theme': '', style: themeVariables(theme) },
+        slots.default?.(),
+      )
   },
 })

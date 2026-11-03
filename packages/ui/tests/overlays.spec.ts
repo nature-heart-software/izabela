@@ -20,7 +20,7 @@ function render(component: unknown, options: Record<string, any> = {}) {
     ...options,
     global: {
       provide: {
-        theme: ui.themes.get('dark'),
+        theme: ui.themes.get('izabela-dark'),
         [ui.PORTAL_TARGET]: document.body,
       },
       ...options.global,

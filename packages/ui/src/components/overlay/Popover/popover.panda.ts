@@ -12,13 +12,36 @@ export const StPopoverPositioner = pandaComponent(
 )
 export const StPopoverContent = pandaComponent(
   Popover.Content,
-  {},
+  props,
   cva({
     base: {
       // The portalled primitive owns the surface and its maximum width.
       maxWidth: '18.75rem',
       outline: 'none',
     },
+    variants: {
+      size: {
+        sm: {
+          '& > *': {
+            backgroundColor: 'popover.sm.background',
+            boxShadow: 'popover.sm.shadow',
+          },
+        },
+        md: {
+          '& > *': {
+            backgroundColor: 'popover.md.background',
+            boxShadow: 'popover.md.shadow',
+          },
+        },
+        lg: {
+          '& > *': {
+            backgroundColor: 'popover.lg.background',
+            boxShadow: 'popover.lg.shadow',
+          },
+        },
+      },
+    },
+    defaultVariants: { size: 'md' },
   }),
 )
 export const popoverShield = cva({

@@ -65,7 +65,7 @@ import pkg from '@root/package.json'
 import { useGameOverlayStore } from '@/features/game-overlay/store'
 import { onIPCApplyProfile } from '@/electron/events/renderer.ts'
 import { useProfilesStore } from '@/features/profiles/store.ts'
-import { themes, GlobalStyles, PORTAL_TARGET } from '@packages/ui'
+import { resolveTheme, GlobalStyles, PORTAL_TARGET } from '@packages/ui'
 
 const offscreenFocusFix = ref()
 provide('offscreen-focus-fix', offscreenFocusFix)
@@ -78,7 +78,7 @@ const displayOffscreenFocusFix = ref(isGameOverlay)
 
 const theme = computed(() => ({
   ...tokens,
-  ...themes.get(settingsStore.theme),
+  ...resolveTheme(settingsStore.theme),
 }))
 
 const globalStyles = ref()

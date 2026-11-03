@@ -9,10 +9,10 @@ const autocomplete = cva({
     width: 'var(--reference-width)',
     borderWidth: '1px',
     borderStyle: 'solid',
-    borderColor: 'var(--nv-autocomplete-border-color)',
-    boxShadow: 'lg',
+    borderColor: 'autocomplete.default.border',
+    boxShadow: 'autocomplete.default.shadow-color',
     overflow: 'hidden',
-    backgroundColor: 'var(--nv-autocomplete-background-color)',
+    backgroundColor: 'autocomplete.default.background',
     '& .autocomplete__list': { maxHeight: '12.5rem', overflowY: 'auto' },
   },
   variants: {

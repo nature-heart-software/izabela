@@ -1,16 +1,17 @@
 import { tokens } from './src/main'
+import generated from './src/figma.generated.json'
 
-const tokenLeaves = (
-  values: Record<string, unknown>,
-): Record<string, unknown> =>
+const leaves = (
+  values: Record<string, number | string>,
+  convert: (value: number | string) => string = String,
+) =>
   Object.fromEntries(
     Object.entries(values).map(([key, value]) => [
       key,
-      value && typeof value === 'object' && !Array.isArray(value)
-        ? tokenLeaves(value as Record<string, unknown>)
-        : { value },
+      { value: convert(value) },
     ]),
   )
+const rem = (value: number | string) => `${Number(value) / 16}rem`
 
 export const pandaLayers = {
   reset: 'reset',
@@ -23,69 +24,17 @@ export const pandaLayers = {
 export const pandaTheme = {
   extend: {
     tokens: {
-      colors: tokenLeaves(tokens.colors),
-      fonts: tokenLeaves(
-        Object.fromEntries(
-          Object.entries(tokens.fontFamily).map(([key, value]) => [
-            key,
-            value.join(', '),
-          ]),
-        ),
-      ),
-      fontSizes: tokenLeaves(
-        Object.fromEntries(
-          Object.entries(tokens.fontSize).map(([key, value]) => [
-            key,
-            `${Number(value[0]) / 16}rem`,
-          ]),
-        ),
-      ),
-      lineHeights: tokenLeaves(
-        Object.fromEntries(
-          Object.entries(tokens.fontSize).map(([key, value]) => [
-            key,
-            String((value[1] as { lineHeight: number }).lineHeight),
-          ]),
-        ),
-      ),
-      letterSpacings: tokenLeaves(
-        Object.fromEntries(
-          Object.entries(tokens.fontSize).map(([key, value]) => [
-            key,
-            `${(value[1] as { letterSpacing: number }).letterSpacing / 16}rem`,
-          ]),
-        ),
-      ),
-      borderWidths: {
-        thin: { value: `${tokens.borderWidth.DEFAULT}px` },
-        thick: { value: `${tokens.borderWidth.lg}px` },
-      },
-      spacing: tokenLeaves(
-        Object.fromEntries(
-          Object.entries(tokens.spacing).map(([key, value]) => [
-            key,
-            `${value / 16}rem`,
-          ]),
-        ),
-      ),
-      sizes: tokenLeaves(
-        Object.fromEntries(
-          Object.entries(tokens.spacing).map(([key, value]) => [
-            key,
-            `${value / 16}rem`,
-          ]),
-        ),
-      ),
-      radii: tokenLeaves(
-        Object.fromEntries(
-          Object.entries(tokens.borderRadius).map(([key, value]) => [
-            key,
-            `${value / 16}rem`,
-          ]),
-        ),
-      ),
-      shadows: tokenLeaves(tokens.boxShadow),
+      colors: {},
+      fonts: leaves(tokens.fontFamily),
+      fontSizes: leaves(tokens.fontSize, rem),
+      lineHeights: leaves(tokens.lineHeight),
+      letterSpacings: leaves(tokens.letterSpacing, rem),
+      borderWidths: leaves(tokens.border, (value) => `${value}px`),
+      spacing: leaves(tokens.spacing, rem),
+      sizes: leaves(tokens.spacing, rem),
+      radii: leaves(tokens.radius, rem),
     },
+    semanticTokens: generated.semanticTokens,
     keyframes: {
       spin: { to: { transform: 'rotate(360deg)' } },
       'nv-tooltip-in': { from: { opacity: 0 }, to: { opacity: 1 } },

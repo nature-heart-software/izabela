@@ -22,7 +22,7 @@ function render(component: unknown, options: Record<string, any> = {}) {
     ...options,
     global: {
       provide: {
-        theme: ui.themes.get('dark'),
+        theme: ui.themes.get('izabela-dark'),
         [ui.PORTAL_TARGET]: document.body,
       },
       ...options.global,
@@ -557,9 +557,11 @@ describe('rendered composition and helper contracts', () => {
     expect(
       ui.fontSize(['20px', { lineHeight: '24px', letterSpacing: '2px' }]),
     ).toBe('1.25rem')
-    expect(ui.lineHeight(16)).toBe(1)
+    expect(ui.lineHeight(16)).toBe(ui.tokens.lineHeight.default)
     expect(ui.lineHeight([16, { lineHeight: 1.5 }])).toBe(1.5)
-    expect(ui.letterSpacing(16)).toBe('normal')
+    expect(ui.letterSpacing(16)).toBe(
+      `${ui.tokens.letterSpacing.default / 16}rem`,
+    )
     expect(
       ui.fontSizeStyle(['20px', { lineHeight: '24px', letterSpacing: '2px' }]),
     ).toEqual({

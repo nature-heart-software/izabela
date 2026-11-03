@@ -155,7 +155,7 @@ function renderSelect(props: Record<string, any> = {}) {
     attrs: { 'data-v-step': 'engine-voice-select' },
     global: {
       provide: {
-        theme: ui.themes.get('dark'),
+        theme: ui.themes.get('izabela-dark'),
         [ui.PORTAL_TARGET]: document.body,
       },
     },

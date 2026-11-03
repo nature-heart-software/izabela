@@ -10,23 +10,23 @@ export { PORTAL_TARGET } from './consts'
 
 const globalRecipe = cva({
   base: {
-    color: 'var(--nv-text-color)',
+    color: 'text.body.foreground',
     '& *::-webkit-scrollbar': { width: '5' },
     '& *::-webkit-scrollbar-thumb': {
       borderLeft: '0.5rem solid transparent',
       backgroundClip: 'padding-box',
-      backgroundColor: 'var(--nv-button-plain-background-color)',
+      backgroundColor: 'button.plain.background',
       _hover: {
-        backgroundColor: 'var(--nv-button-plain-hover-background-color)',
+        backgroundColor: 'button.plain.hover.background',
       },
       _active: {
-        backgroundColor: 'var(--nv-button-plain-active-background-color)',
+        backgroundColor: 'button.plain.pressed.background',
       },
     },
     '& #vjt-tooltip': {
-      backgroundColor: 'var(--nv-button-plain-background-color)',
-      color: 'var(--nv-button-plain-color)',
-      boxShadow: 'lg',
+      backgroundColor: 'tooltip.default.background',
+      color: 'tooltip.default.text',
+      boxShadow: 'tooltip.default.shadow',
       borderRadius: 'md',
       fontSize: 'inherit',
       padding: '5',
@@ -37,11 +37,11 @@ const globalRecipe = cva({
       '&[data-hidden]': { display: 'none !important' },
     },
     '& #vjt-arrow::before': {
-      backgroundColor: 'var(--nv-button-plain-background-color)',
-      boxShadow: 'lg',
+      backgroundColor: 'tooltip.default.background',
+      boxShadow: 'tooltip.default.shadow',
     },
     '& .vjt-highlight': {
-      outline: '2px solid var(--nv-button-plain-background-color)',
+      outline: '2px solid {colors.button.plain.background}',
       borderRadius: 'inherit',
     },
   },

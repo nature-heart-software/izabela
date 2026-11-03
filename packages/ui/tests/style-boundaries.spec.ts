@@ -40,6 +40,10 @@ export { pandaComponent } from '@/utils/panda'
 export { card } from '@/components/display/Card/card.panda'
 export { divider } from '@/components/miscellaneous/Divider/divider.panda'
 export { table } from '@/components/display/Table/table.panda'
+export { default as NvText } from '@/components/typography/Text/NvText.vue'
+export { default as NvAlert } from '@/components/feedback/Alert/NvAlert.vue'
+export { default as NvTable } from '@/components/display/Table/NvTable.vue'
+export { default as NvTableColumn } from '@/components/display/Table/NvTableColumn.vue'
 export { tooltipPositioner } from '@/components/overlay/Tooltip/tooltip.panda'
 export { default as NvButton } from '@/components/forms/Button/NvButton.vue'
 export { default as NvTextarea } from '@/components/forms/Textarea/NvTextarea.vue'
@@ -209,17 +213,13 @@ describe('Ark as-child button appearance', () => {
       const button = wrapper.get('button')
       const role = appearance || 'default'
       expect(button.attributes('type')).toBe('button')
-      expect(button.classes()).toContain(
-        `bg-c_var(--nv-button-${role}-background-color)`,
-      )
-      expect(button.classes()).toContain(`c_var(--nv-button-${role}-color)`)
-      expect(button.classes()).toContain(
-        `bd-c_var(--nv-button-${role}-border-color)`,
-      )
+      expect(button.classes()).toContain(`bg-c_button.${role}.background`)
+      expect(button.classes()).toContain(`c_button.${role}.text`)
+      expect(button.classes()).toContain(`bd-c_button.${role}.border`)
       expect(
         emittedRules(button.classes()).map((rule) => rule.declarations),
       ).toContainEqual({
-        'background-color': `var(--nv-button-${role}-background-color)`,
+        'background-color': `var(--colors-button-${role}-background)`,
       })
     },
   )
@@ -339,8 +339,96 @@ describe('wrapper-owned polymorphism', () => {
   })
 })
 
+// Resolve the emitted utility cascade on real mounted markup. These probes are
+// deliberately limited to normal utility declarations in the same Panda layer.
+function winningRole(element: Element, property: string, pseudo = '') {
+  const candidates: { value: string; weight: number; order: number }[] = []
+  function weight(node: any): number {
+    if (node.type === 'id') return 10000
+    if (node.type === 'class' || node.type === 'attribute') return 100
+    if (node.type === 'tag') return 1
+    if (node.type === 'pseudo') {
+      if (node.value === ':where') return 0
+      if ([':is', ':not', ':has'].includes(node.value))
+        return Math.max(...node.nodes.map(weight))
+      return node.value.startsWith('::') ? 1 : 100
+    }
+    return (
+      node.nodes?.reduce((sum: number, child: any) => sum + weight(child), 0) ??
+      0
+    )
+  }
+  rules.forEach((rule, order) => {
+    const value =
+      rule.declarations[property] ??
+      (property === 'border-bottom-color'
+        ? rule.declarations['border-color'] ??
+          rule.declarations['border-bottom']?.match(
+            /var\(--colors-[^)]+\)/,
+          )?.[0]
+        : undefined)
+    if (!value) return
+    parseSelector((selectors: any) =>
+      selectors.each((selector: any) => {
+        const text = selector.toString()
+        if (pseudo ? !text.endsWith(pseudo) : text.includes('::')) return
+        if (element.matches(pseudo ? text.slice(0, -pseudo.length) : text))
+          candidates.push({ value, weight: weight(selector), order })
+      }),
+    ).processSync(rule.selector)
+  })
+  return candidates
+    .sort((a, b) => a.weight - b.weight || a.order - b.order)
+    .at(-1)?.value
+}
+
+describe('canonical role cascade', () => {
+  it.each(['caption', 'label', 'body-small', 'body', 'subtitle', 'title'])(
+    'lets the %s Text underline role own its pseudo-element',
+    (type) => {
+      const wrapper = render(ui.NvText, {
+        props: { type },
+        slots: { default: () => h('a', { href: '#' }, 'Link') },
+      })
+      expect(
+        winningRole(wrapper.get('a').element, 'background-color', '::before'),
+      ).toBe(`var(--colors-text-${type}-link-underline)`)
+    },
+  )
+  it.each(['info', 'success', 'warning', 'error'])(
+    'lets the %s Alert underline role override its composed NvText',
+    (type) => {
+      const wrapper = render(ui.NvAlert, {
+        props: { type },
+        slots: { default: () => h('a', { href: '#' }, 'Link') },
+      })
+      expect(
+        winningRole(wrapper.get('a').element, 'background-color', '::before'),
+      ).toBe(`var(--colors-alert-${type}-link-underline)`)
+    },
+  )
+  it.each([undefined, 'left', 'right'])(
+    'lets the %s column own both native cell border colors',
+    (fixed) => {
+      const wrapper = render(ui.NvTable, {
+        props: { data: [{ value: 'Cell' }] },
+        slots: {
+          default: () =>
+            h(ui.NvTableColumn, { prop: 'value', label: 'Header', fixed }),
+        },
+      })
+      for (const cell of wrapper.findAll('th, td'))
+        expect(winningRole(cell.element, 'border-bottom-color')).toBe(
+          fixed
+            ? 'var(--colors-table-frozen-border)'
+            : 'var(--colors-table-column-default-border)',
+        )
+    },
+  )
+})
+
 describe('generated style boundaries', () => {
-  it('uses the legacy disabled-item backdrop theme roles without changing pending host behavior', async () => {
+  it('uses loading-owned pending roles without changing native host behavior', async () => {
     const Host = defineComponent({
       props: { busy: Boolean },
       setup: (props) => () =>
@@ -356,9 +444,14 @@ describe('generated style boundaries', () => {
       global: {
         provide: {
           theme: {
-            disabledItemBackground: {
-              backdropColor: '#123456',
-              backdropOpacity: 0.25,
+            loading: {
+              default: {
+                pending: {
+                  background: 'rgba(18, 52, 86, 0.25)',
+                  foreground: '#123456',
+                  spinner: '#abcdef',
+                },
+              },
             },
           },
         },
@@ -369,19 +462,18 @@ describe('generated style boundaries', () => {
     expect(
       emittedRules(mask.classes()).map((rule) => rule.declarations),
     ).toContainEqual({
-      'background-color':
-        'color-mix(in srgb, var(--nv-disabled-item-background-backdrop-color) calc(var(--nv-disabled-item-background-backdrop-opacity) * 100%), transparent)',
+      'background-color': 'var(--colors-loading-default-pending-background)',
     })
     expect(
       (wrapper.element as HTMLElement).style.getPropertyValue(
-        '--nv-disabled-item-background-backdrop-color',
+        '--nv-loading-default-pending-foreground',
       ),
     ).toBe('#123456')
     expect(
       (wrapper.element as HTMLElement).style.getPropertyValue(
-        '--nv-disabled-item-background-backdrop-opacity',
+        '--nv-loading-default-pending-background',
       ),
-    ).toBe('0.25')
+    ).toBe('rgba(18, 52, 86, 0.25)')
     expect(button.attributes('aria-busy')).toBe('true')
     expect((button.element as HTMLButtonElement).disabled).toBe(false)
     expect(button.attributes('disabled')).toBeUndefined()
@@ -390,16 +482,16 @@ describe('generated style boundaries', () => {
     expect(button.attributes('aria-busy')).toBe('false')
   })
 
-  it('emits valid legacy-equivalent Card radius and shadow declarations', () => {
+  it('emits canonical Card radius and shadow declarations', () => {
     const declarations = emittedRules(
       ui.card({ size: 'md', variant: 'default' }).split(' '),
     ).map((rule) => rule.declarations)
     expect(declarations).toContainEqual({ 'border-radius': 'var(--radii-md)' })
-    expect(declarations).toContainEqual({ 'box-shadow': 'var(--shadows-lg)' })
+    expect(declarations).toContainEqual({
+      'box-shadow': 'var(--shadows-card-default-shadow)',
+    })
     expect(css).toContain('--radii-md: 0.5rem;')
-    expect(css).toContain(
-      '--shadows-lg: 0 0.125rem 0.063rem rgba(0, 0, 0, 0.05);',
-    )
+    expect(css).toContain('--shadows-card-default-shadow:')
   })
 
   it.each([
@@ -410,9 +502,9 @@ describe('generated style boundaries', () => {
       (rule) => rule.declarations,
     )
     expect(declarations).toContainEqual({
-      [property]: 'var(--border-widths-thin)',
+      [property]: 'var(--border-widths-default)',
     })
-    expect(css).toContain('--border-widths-thin: 1px;')
+    expect(css).toContain('--border-widths-default: 1px;')
   })
 
   it('emits a resolved thin border token for native table cells', () => {
@@ -420,19 +512,21 @@ describe('generated style boundaries', () => {
       (rule) => rule.declarations,
     )
     expect(declarations).toContainEqual({
-      'border-bottom':
-        'var(--border-widths-thin) solid var(--nv-table-border-color, var(--nv-divider-border-color))',
+      'border-bottom-width': 'var(--border-widths-default)',
     })
+    expect(declarations).toContainEqual({ 'border-bottom-style': 'solid' })
   })
 
-  it('emits valid legacy-equivalent shadows on both global tour surfaces', () => {
+  it('emits tooltip-owned shadows on both global tour surfaces', () => {
     const wrapper = render(ui.GlobalStyles)
     for (const selector of [' #vjt-tooltip', ' #vjt-arrow::before']) {
       expect(
         emittedRules(wrapper.classes())
           .filter((rule) => rule.selector.includes(selector))
           .map((rule) => rule.declarations),
-      ).toContainEqual({ 'box-shadow': 'var(--shadows-lg)' })
+      ).toContainEqual({
+        'box-shadow': 'var(--shadows-tooltip-default-shadow)',
+      })
     }
   })
 

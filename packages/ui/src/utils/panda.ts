@@ -4,11 +4,26 @@ import {
   h,
   inject,
   mergeProps,
+  normalizeStyle,
   ref,
   unref,
+  withDirectives,
   type Component,
   type ComponentObjectPropsOptions,
+  type DirectiveBinding,
+  type ObjectDirective,
+  type VNode,
 } from 'vue'
+
+/**
+ * Marks a provider that owns inherited theme custom properties.
+ * @internal
+ * @example
+ * ```ts
+ * provide(THEME_BOUNDARY, theme)
+ * ```
+ */
+export const THEME_BOUNDARY = Symbol('nv-theme-boundary')
 
 /**
  * Maps a nested theme to inheritable CSS custom properties.
@@ -29,12 +44,75 @@ export function themeVariables(theme: unknown): Record<string, string> {
       const key = path
         .join('-')
         .replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)
+        .replace(/[^a-z0-9_-]/g, '-')
       result[`--nv-${key}`] = String(value)
     }
   }
   visit(unref(theme), [])
   return result
 }
+
+type ThemeVariables = Record<string, string>
+interface ThemeStyleBinding {
+  variables: ThemeVariables
+}
+
+function applyThemeVariables(
+  element: HTMLElement,
+  binding: DirectiveBinding<ThemeStyleBinding>,
+  vnode: VNode,
+) {
+  const { variables: value } = binding.value
+  // Directive hooks receive the final native root, including primitive styles.
+  const consumerStyle = normalizeStyle(vnode.props?.style)
+  const oldValue = binding.oldValue?.variables
+  const owned = new Set([...Object.keys(oldValue ?? {}), ...Object.keys(value)])
+  for (const key of Object.keys(oldValue ?? {})) {
+    if (
+      !(key in value) &&
+      consumerStyle &&
+      typeof consumerStyle === 'object' &&
+      Object.hasOwn(consumerStyle, key)
+    ) {
+      owned.delete(key)
+      element.style.setProperty(key, String(consumerStyle[key] ?? ''))
+    }
+  }
+  const unsafe = /[;{}"'\\]|\/\*|!\s*important/i
+  let propertySafe = Object.values(value).some((entry) => unsafe.test(entry))
+  const retained: string[] = []
+  for (let index = 0; index < element.style.length; index++) {
+    const key = element.style.item(index)
+    if (!owned.has(key)) {
+      const entry = element.style.getPropertyValue(key)
+      propertySafe ||= unsafe.test(entry)
+      const priority = element.style.getPropertyPriority(key)
+      retained.push(`${key}:${entry}${priority ? `!${priority}` : ''};`)
+    }
+  }
+  // Retained consumer literals must not be reparsed as declarations either.
+  if (propertySafe) {
+    for (const key of Object.keys(oldValue ?? {}))
+      if (!(key in value) && owned.has(key)) element.style.removeProperty(key)
+    for (const [key, entry] of Object.entries(value))
+      element.style.setProperty(key, entry)
+    return
+  }
+  // Apply after primitive fallthrough: Vue otherwise expands style strings back
+  // into hundreds of individual property writes on every primitive update.
+  element.style.cssText =
+    retained.join('') +
+    Object.entries(value)
+      .map(([key, entry]) => `${key}:${entry};`)
+      .join('')
+}
+
+const themeVariableDirective: ObjectDirective<HTMLElement, ThemeStyleBinding> =
+  {
+    mounted: applyThemeVariables,
+    updated: applyThemeVariables,
+    getSSRProps: ({ value }) => ({ style: value.variables }),
+  }
 
 /**
  * Adapts a static Panda recipe to Vue's existing styled-wrapper contract.
@@ -61,6 +139,7 @@ export function pandaComponent(
       const values = props as Record<string, unknown>
       const element = ref<HTMLElement>()
       const theme = inject<unknown>('theme', undefined)
+      // Vue injection survives Teleport; DOM custom-property inheritance does not.
       const variables = computed(() => themeVariables(unref(theme)))
       expose({
         get input() {
@@ -109,15 +188,21 @@ export function pandaComponent(
               )
           }
         }
-        return h(
+        const merged = mergeProps(forwarded, attrs, {
+          ref: element,
+          class: recipe(props),
+          ...(theme === undefined ? {} : { 'data-nv-theme': '' }),
+        })
+        const rendered = h(
           target as any,
-          mergeProps(forwarded, attrs, {
-            ref: element,
-            class: recipe(props),
-            style: variables.value,
-          }),
+          merged,
           typeof target === 'string' ? slots.default?.() : slots,
         )
+        return theme === undefined
+          ? rendered
+          : withDirectives(rendered, [
+              [themeVariableDirective, { variables: variables.value }],
+            ])
       }
     },
   })

@@ -28,7 +28,7 @@
           @pointerup.stop.prevent
         />
         <StPopoverPositioner>
-          <StPopoverContent :hidden="false">
+          <StPopoverContent :hidden="false" :size="props.size">
             <Transition>
               <Card v-if="open" :size="props.size === 'lg' ? 'md' : props.size">
                 <slot />
