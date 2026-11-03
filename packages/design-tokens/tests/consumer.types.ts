@@ -3,8 +3,8 @@ import { tokens } from '..'
 type IsAny<T> = 0 extends 1 & T ? true : false
 type Assert<T extends true> = T
 type NotAny<T> = IsAny<T> extends true ? false : true
-type SpacingIsTyped = Assert<NotAny<typeof tokens.spacing[1]>>
-type FontSizeIsTyped = Assert<NotAny<typeof tokens.fontSize[3]>>
+type SpacingIsTyped = Assert<NotAny<(typeof tokens.spacing)[1]>>
+type FontSizeIsTyped = Assert<NotAny<(typeof tokens.fontSize)[3]>>
 const spacing: number = tokens.spacing[1]
 const sizeValue: number = tokens.fontSize[3]
 const leading: number = tokens.lineHeight.default

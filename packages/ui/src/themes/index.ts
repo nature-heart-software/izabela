@@ -8,7 +8,7 @@ export { ThemeProvider } from './provider'
  * const selected: Theme = resolveTheme('github-dark')
  * ```
  */
-export type Theme = typeof generated.themes[number]['values']
+export type Theme = (typeof generated.themes)[number]['values']
 
 /**
  * Every authored mode, using its source label and selection key.
