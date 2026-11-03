@@ -246,9 +246,14 @@ const activate = () => {
   cancelAnimationFrame(closingFrame)
   if (!isLocked.value) activateTrap()
 }
-function onInputFocus() {
-  if (closing) selectInput.value?.$el.blur()
-  else activate()
+function onInputFocus(event: FocusEvent) {
+  if (closing) {
+    // A user may already be typing in another field when Ark's close callback
+    // restores focus. Return it to that field instead of leaving focus on body.
+    const previous = event.relatedTarget
+    selectInput.value?.$el.blur()
+    if (previous instanceof HTMLElement) previous.focus({ preventScroll: true })
+  } else activate()
 }
 const updateSearch = (value: string) => {
   if (!isLocked.value) search.value = value

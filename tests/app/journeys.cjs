@@ -148,7 +148,14 @@ async function runJourneys(context) {
         ),
       'route ' + value,
     )
-    await sleep(100)
+    await until(
+      () =>
+        evaluate(
+          messenger,
+          () => !document.querySelector('.settings .v-leave-active'),
+        ),
+      'previous settings view removed',
+    )
   }
   const clickText = async (text) => {
     await evaluate(

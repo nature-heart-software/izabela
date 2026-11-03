@@ -401,6 +401,41 @@ describe('real select composition', () => {
     expect(w.emitted('update:modelValue')).toEqual([[['b']]])
     expect(values).toEqual(['a', 'b'])
   })
+  it('keeps focus on the message input when typing immediately after choosing a voice', async () => {
+    const selected = ref('a')
+    const submitted = vi.fn()
+    const w = render({
+      setup: () => () =>
+        h('div', [
+          h('input', {
+            'data-draft': '',
+            onKeydown: (event: KeyboardEvent) => {
+              if (event.key === 'Enter') submitted()
+            },
+          }),
+          h(ui.NvSelect, {
+            options,
+            modelValue: selected.value,
+            'onUpdate:modelValue': (value: string) => {
+              selected.value = value
+            },
+          }),
+        ]),
+    })
+    await settle()
+    ;(w.get('[role="combobox"]').element as HTMLElement).focus()
+    await settle()
+    ;(document.querySelector('[title="Beta"]') as HTMLElement).click()
+    const draft = w.get('[data-draft]').element as HTMLInputElement
+    draft.focus()
+    await settle()
+    expect(selected.value).toBe('b')
+    expect(document.activeElement).toBe(draft)
+    document.activeElement!.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }),
+    )
+    expect(submitted).toHaveBeenCalledOnce()
+  })
   it('matches object values using valueKey and responds to external model changes', async () => {
     const w = render(ui.NvSelect, {
       props: {
