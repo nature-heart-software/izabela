@@ -1,4 +1,4 @@
-import { execFileSync } from 'node:child_process'
+import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { expect, it } from 'vitest'
 
@@ -13,10 +13,13 @@ it('executes the application selection and Storybook theme integration contracts
   ]
   const env = { ...process.env }
   delete env.NODE_TEST_CONTEXT
-  const output = execFileSync(
+  const result = spawnSync(
     process.execPath,
     ['--test', ...files.map((file) => fileURLToPath(new URL(file, root)))],
     { env, encoding: 'utf8', timeout: 60000 },
   )
-  expect(output).toMatch(/(?:fail|failed) 0/)
+  const output = [result.stdout, result.stderr].filter(Boolean).join('\n')
+  expect(result.error, output).toBeUndefined()
+  expect(result.status, output).toBe(0)
+  expect(result.stdout).toMatch(/(?:fail|failed) 0/)
 }, 70000)
