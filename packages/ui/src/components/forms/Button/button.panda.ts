@@ -26,8 +26,8 @@ export const buttonRecipe = cva({
       pointerEvents: 'none',
     },
     '& .nv-button__loading > span': {
-      width: '4',
-      height: '4',
+      width: '1rem',
+      height: '1rem',
       border: '2px solid currentColor',
       borderRightColor: 'transparent',
       borderRadius: '50%',
@@ -45,6 +45,10 @@ export const buttonRecipe = cva({
         lineHeight: '1.4',
         letterSpacing: '0.02rem',
         '& .nv-button__icon': { right: '1' },
+        '& .nv-button__loading > span': {
+          width: '0.75rem',
+          height: '0.75rem',
+        },
       },
       sm: {
         height: '6',

@@ -1,6 +1,7 @@
 <template>
   <Combobox.RootProvider :value="combobox" as-child>
     <NvAutocomplete
+      data-nv-loading-target="[data-nv-select-control]"
       :class="$attrs.class"
       :style="$attrs.style"
       :placement="props.placement"
@@ -18,6 +19,7 @@
     >
       <template #reference>
         <StSelect
+          data-nv-select-control
           ref="select"
           :class="box({ width: '100%' })"
           v-bind="{ ...props, isFocused: hasFocus }"

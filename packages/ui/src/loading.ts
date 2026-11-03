@@ -31,11 +31,87 @@ const spinnerRecipe = cva({
 })
 const states = new WeakMap<
   HTMLElement,
-  { mask: HTMLElement; previousBusy: string | null; addedClass: boolean }
+  {
+    mask: HTMLElement
+    previousBusy: string | null
+    addedClass: boolean
+    cleanup: () => void
+  }
 >()
+
+function alignMask(element: HTMLElement, mask: HTMLElement) {
+  const selector = element.getAttribute('data-nv-loading-target')
+  const surface = selector
+    ? element.querySelector<HTMLElement>(selector) || element
+    : element
+  const update = () => {
+    const style = getComputedStyle(surface)
+    const border = {
+      top: parseFloat(style.borderTopWidth) || 0,
+      right: parseFloat(style.borderRightWidth) || 0,
+      bottom: parseFloat(style.borderBottomWidth) || 0,
+      left: parseFloat(style.borderLeftWidth) || 0,
+    }
+    const rect = surface.getBoundingClientRect()
+    if (surface !== element) {
+      const host = element.getBoundingClientRect()
+      const hostStyle = getComputedStyle(element)
+      // Absolute positioning starts at the host's padding edge. Keep the mask
+      // on its original host so it retains the same click/keyboard behavior.
+      mask.style.top = `${
+        rect.top +
+        border.top -
+        host.top -
+        (parseFloat(hostStyle.borderTopWidth) || 0)
+      }px`
+      mask.style.right = `${
+        host.right -
+        (parseFloat(hostStyle.borderRightWidth) || 0) -
+        rect.right +
+        border.right
+      }px`
+      mask.style.bottom = `${
+        host.bottom -
+        (parseFloat(hostStyle.borderBottomWidth) || 0) -
+        rect.bottom +
+        border.bottom
+      }px`
+      mask.style.left = `${
+        rect.left +
+        border.left -
+        host.left -
+        (parseFloat(hostStyle.borderLeftWidth) || 0)
+      }px`
+    }
+    for (const [corner, horizontal, vertical] of [
+      ['TopLeft', border.left, border.top],
+      ['TopRight', border.right, border.top],
+      ['BottomRight', border.right, border.bottom],
+      ['BottomLeft', border.left, border.bottom],
+    ] as const) {
+      const [x, y = x] = style[`border${corner}Radius`].split(' ')
+      const resolve = (value: string, size: number) =>
+        (parseFloat(value) || 0) * (value.endsWith('%') ? size / 100 : 1)
+      mask.style[`border${corner}Radius`] = `${Math.max(
+        0,
+        resolve(x, rect.width) - horizontal,
+      )}px ${Math.max(0, resolve(y, rect.height) - vertical)}px`
+    }
+  }
+  update()
+  const observer =
+    typeof ResizeObserver === 'undefined'
+      ? undefined
+      : new ResizeObserver(update)
+  observer?.observe(element)
+  if (surface !== element) observer?.observe(surface)
+  return () => observer?.disconnect()
+}
+
 function clear(element: HTMLElement) {
   const state = states.get(element)
   if (!state) return
+  state.cleanup()
   state.mask.remove()
   if (state.previousBusy === null) element.removeAttribute('aria-busy')
   else element.setAttribute('aria-busy', state.previousBusy)
@@ -65,10 +141,12 @@ function update(element: HTMLElement, busy: unknown) {
     mask,
     addedClass,
     previousBusy: element.getAttribute('aria-busy'),
+    cleanup: () => {},
   })
   element.classList.add(...classes)
   element.setAttribute('aria-busy', 'true')
   element.append(mask)
+  states.get(element)!.cleanup = alignMask(element, mask)
 }
 
 /**
