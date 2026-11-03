@@ -1,20 +1,20 @@
 # Experimental overlay SDK distribution
 
-`vendor/electron-game-overlay-0.1.0-rc.11.tgz` is the complete, unmodified upstream
+`vendor/electron-game-overlay-0.1.0-rc.12.tgz` is the complete, unmodified upstream
 SDK candidate. `@packages/electron-game-overlay` remains the legacy backend.
 
 - Source: `Wurielle/electron-game-overlay`, commit
-  `f51777621927ff090d0281ad069b720ed553d589`, branch
+  `b89eeb6bf3efb94185e5041be582ac11df6342f6`, branch
   `codex/explore-independent-overlay-instances`, plus the uncommitted upstream
-  registered add-on long-path loading and activation fixes. The base commit alone does not identify this candidate;
+  initial read-only inspection recovery. The base commit alone does not identify this candidate;
   its matching source ZIP and manifest identify the exact supplied changes.
 - Tarball SHA-256:
-  `ddc09fe1b2851469ad057601374320d299fe6cac915731e1859f7db27c5efca6`.
+  `10ecef4b7a46a870ea8cf5c1160321bf449712c5a93808e11a2a214051e708af`.
 - Matching source ZIP SHA-256:
-  `66044d29b286390d05bf061e137c360e0a6aa0263960eb7adf2847e05147ab8d`.
+  `f1052a4877d6cd4e75f436d6ada6dfcb269cb1173ca7e23d752c22e1822c67ca`.
 - Source manifest SHA-256:
-  `d62a162cacac2c77e247f9013a7e1de6292fdd0f88876cf070285f9e49c2294e`.
-- Native generation: 21; add-on build ID:
+  `289d7003ef386e2de166ed726df60e91bf88de4fcb201862d2b9e31a086968c1`.
+- Native generation: 22; add-on build ID:
   `CCE20935ADD44EF6A5A7973014B2E07F`.
 - License: GPL-3.0-only. Both architectures, nested dependency notices and
   `SDK_PROVENANCE.json` are retained. No SDK patches or native rebuild are applied.
@@ -69,18 +69,30 @@ fixed-size path records could not inspect a target after the long DLL loaded and
 incorrectly held the graphics startup barrier. The initial RC.11 harness failure
 and earlier RC.9/RC.10 SDK failures remain retained in their versioned reports.
 
+RC.12 consumer validation passes all 217 unit/package checks, typecheck and
+Electron smoke, plus the complete 10-case native matrix and three separate
+no-barrier positive/focus-control pairs (16 of 16 native cases). Those runs cover
+20 authenticated target lifecycles with loaded module paths of 292–322 characters.
+No Windows 299 error recurred. No native recovery-phase record was emitted, so
+these passing consumer samples do not directly demonstrate a 299-to-success
+recovery. Exact logs, phase observations and limits are retained in
+`coverage/experimental-overlay/rc12-validation.json`.
+
 Consumer checks cover 217 unit/package tests, isolated real-SDK registration,
 both-architecture ASAR-unpacked registration, type checking and Electron loading.
 The original long-profile positive/negative pair passes, and the complete native
 matrix passes 10 of 10 cases: D3D9/10/11/12 x64, D3D9/10 x86, 125%/150% scaling,
 exact-path two-launch rearming and the native focus negative control. Each target
 records a loaded module path beyond 260 characters with successful inspection.
-The separate no-barrier `fast-folder` diagnostic failed preflight with the known
-Windows 299 error. That is retained separately; its investigation remains paused
-and no uncertain live target is retried.
+The RC.11 no-barrier `fast-folder` diagnostic failed preflight with Windows 299;
+that failed evidence is preserved. RC.12 adds a 250 ms bounded window for transient
+read-only inspection errors on the same retained process handle, before loading
+any payload. Persistent failures keep the strict diagnostic/ownership boundary.
+This SDK recovery does not retry an indeterminate injection, reopen the process
+or change security settings. Izabela adds no recovery delay or retry of its own.
 The test runtime isolates both setup and launch configuration in an owned
 registry, preserving real per-user registrations. Native tests retain the default
-long profiles and check actual loaded module lengths. Current evidence is indexed
+long profiles and check actual loaded module lengths. RC.11 evidence is indexed
 in `coverage/experimental-overlay/rc11-validation.json`; earlier preload failures
 remain in `preload-integration-validation.json` and `rc10-validation.json` beside it.
 
@@ -99,8 +111,8 @@ ready/blockage observations before launching its controlled target. It preserves
 the asynchronous startup policy changes and adds no consumer sleeps or retries.
 
 Historical preflight Windows 299 failures remain in `rc9-validation.json`.
-Fresh repeats passed both before and after the user disabled real-time Defender
-protection; this does not establish causation. That investigation remains paused.
+Passing fresh repeats do not establish the cause of those earlier failures.
+RC.12 validation concerns the SDK's read-only startup inspection behavior.
 
 Attach before graphics initialization. Managed watcher readiness is not a
 universal fast-start guarantee; generic late D3D12 recovery remains unsupported.

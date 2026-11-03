@@ -19,19 +19,19 @@ test('experimental SDK is the pinned complete upstream RC, distinct from legacy'
   )
   assert.equal(
     app.dependencies['electron-game-overlay'],
-    'file:../../vendor/electron-game-overlay-0.1.0-rc.11.tgz',
+    'file:../../vendor/electron-game-overlay-0.1.0-rc.12.tgz',
   )
   const bytes = readFileSync(
-    new URL('vendor/electron-game-overlay-0.1.0-rc.11.tgz', root),
+    new URL('vendor/electron-game-overlay-0.1.0-rc.12.tgz', root),
   )
   assert.equal(
     createHash('sha256').update(bytes).digest('hex'),
-    'ddc09fe1b2851469ad057601374320d299fe6cac915731e1859f7db27c5efca6',
+    '10ecef4b7a46a870ea8cf5c1160321bf449712c5a93808e11a2a214051e708af',
   )
   const consumer = createRequire(new URL('apps/app/package.json', root))
   assert.equal(
     consumer('electron-game-overlay/package.json').version,
-    '0.1.0-rc.11',
+    '0.1.0-rc.12',
   )
   const sdkRoot = path.dirname(
     consumer.resolve('electron-game-overlay/package.json'),
@@ -39,20 +39,20 @@ test('experimental SDK is the pinned complete upstream RC, distinct from legacy'
   const provenance = JSON.parse(
     readFileSync(path.join(sdkRoot, 'SDK_PROVENANCE.json'), 'utf8'),
   )
-  assert.equal(provenance.version, '0.1.0-rc.11')
+  assert.equal(provenance.version, '0.1.0-rc.12')
   assert.equal(
     provenance.baseCommit,
-    'f51777621927ff090d0281ad069b720ed553d589',
+    'b89eeb6bf3efb94185e5041be582ac11df6342f6',
   )
   assert.equal(provenance.workingTreeDirty, true)
   for (const [entry, expected] of [
     [
       provenance.sourceSnapshot,
-      '66044d29b286390d05bf061e137c360e0a6aa0263960eb7adf2847e05147ab8d',
+      'f1052a4877d6cd4e75f436d6ada6dfcb269cb1173ca7e23d752c22e1822c67ca',
     ],
     [
       provenance.sourceManifest,
-      'd62a162cacac2c77e247f9013a7e1de6292fdd0f88876cf070285f9e49c2294e',
+      '289d7003ef386e2de166ed726df60e91bf88de4fcb201862d2b9e31a086968c1',
     ],
   ]) {
     assert.equal(entry.sha256, expected)
@@ -71,7 +71,7 @@ test('unpublished vendored RC has only an exact-version release-age exception', 
     .split('\n')
     .map((line) => line.trim())
     .filter((line) => /^- ['"]?electron-game-overlay(?:@|['"]?$)/.test(line))
-  assert.deepEqual(exemptions, ['- electron-game-overlay@0.1.0-rc.11'])
+  assert.deepEqual(exemptions, ['- electron-game-overlay@0.1.0-rc.12'])
   assert.doesNotMatch(config, /^  electron-game-overlay@.*: patches\//m)
   assert.doesNotMatch(config, /^minimumReleaseAge:\s*0\s*$/m)
 })
@@ -91,7 +91,7 @@ test('both native architectures carry the fixed identity and verified artifacts'
       ).replace(/^\uFEFF/, ''),
     )
     assert.equal(stamp.addonBuildId, 'CCE20935ADD44EF6A5A7973014B2E07F')
-    assert.equal(stamp.runtimeGeneration, 21)
+    assert.equal(stamp.runtimeGeneration, 22)
     assert.equal(stamp.injectorFutureTargets, 2)
     assert.equal(stamp.cooperativeAddonProtocol, 1)
     assert.equal(stamp.addonPreloadProtocol, 1)

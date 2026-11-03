@@ -37,7 +37,7 @@ const evidence = {
   pointerClicks: 0,
   realAppBundle: true,
   realRenderer: true,
-  nativeInjectionExecuted: false,
+  nativeInjectionConfirmed: false,
   checks: [],
   diagnostics: [],
   keyTimings: [],
@@ -918,7 +918,6 @@ async function startTarget() {
       ),
     )
   }
-  evidence.nativeInjectionExecuted = true
   await until(
     () =>
       targetConnected &&
@@ -929,6 +928,7 @@ async function startTarget() {
     'authenticated graphics surface',
     30000,
   )
+  evidence.nativeInjectionConfirmed = true
   const inspection = drive('module')
   assert.equal(inspection.queryError, 0, 'Owned module inspection succeeds')
   assert.ok(inspection.module, 'Owned ReShade module is present')

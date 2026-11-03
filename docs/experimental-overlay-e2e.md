@@ -101,6 +101,10 @@ The driver enumerates module handles with bounded K32 queries and growing path
 buffers; Toolhelp's fixed-size records fail once such a DLL is loaded. Reports
 record successful module inspection and actual path lengths for each target
 lifecycle, including no-barrier launches.
+`nativeInjectionConfirmed` is set only after the authenticated target surface
+arrives. Spawning a target, especially without a graphics barrier, does not prove
+that injection started or succeeded; failed runs retain the SDK's native phase
+and diagnostic records for that distinction.
 Raster comparison uses actual PNG dimensions rather than assuming NativeImage
 DIP dimensions are bitmap pixels.
 
