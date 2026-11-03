@@ -41,6 +41,7 @@ export { card } from '@/components/display/Card/card.panda'
 export { divider } from '@/components/miscellaneous/Divider/divider.panda'
 export { table } from '@/components/display/Table/table.panda'
 export { tooltipPositioner } from '@/components/overlay/Tooltip/tooltip.panda'
+export { StSelectGroupLabel } from '@/components/forms/Select/select.panda'
 export { default as NvButton } from '@/components/forms/Button/NvButton.vue'
 export { default as NvTextarea } from '@/components/forms/Textarea/NvTextarea.vue'
 export { default as NvRangeInput } from '@/components/forms/RangeInput/NvRangeInput.vue'
@@ -446,6 +447,58 @@ describe('generated style boundaries', () => {
     expect(selectors).toContain('#vjt-tooltip')
     expect(selectors).toContain('#vjt-arrow::before')
     expect(selectors).toContain('.vjt-highlight')
+  })
+
+  it('attaches scrollbar hover and active states to each thumb', () => {
+    const wrapper = render(ui.GlobalStyles)
+    const thumbRules = emittedRules(wrapper.classes()).filter((rule) =>
+      rule.selector.includes('::-webkit-scrollbar-thumb'),
+    )
+    for (const state of ['hover', 'active']) {
+      const stateRules = thumbRules.filter(
+        (rule) =>
+          rule.declarations['background-color'] ===
+          `var(--nv-button-plain-${state}-background-color)`,
+      )
+      expect(stateRules).toHaveLength(1)
+      expect(stateRules[0].selector).toMatch(
+        new RegExp(`::\\-webkit-scrollbar-thumb:${state}$`),
+      )
+    }
+  })
+
+  it('draws a themed divider behind group labels without an option highlight', () => {
+    const wrapper = render(ui.StSelectGroupLabel, {
+      global: { provide: { theme: ui.themes.get('dark') } },
+      slots: { default: () => h('span', 'Voices') },
+    })
+    const labelRules = emittedRules(wrapper.classes())
+    expect(labelRules).toContainEqual(
+      expect.objectContaining({
+        declarations: { color: 'var(--nv-select-option-readonly-color)' },
+      }),
+    )
+    const lineRules = labelRules.filter((rule) =>
+      rule.selector.includes('::before'),
+    )
+    expect(
+      Object.assign({}, ...lineRules.map((rule) => rule.declarations)),
+    ).toMatchObject({
+      content: "''",
+      position: 'absolute',
+      top: '50%',
+      height: '1px',
+      width: '100%',
+      'background-color': 'var(--nv-select-option-readonly-border-color)',
+    })
+    expect(
+      wrapper.element.style.getPropertyValue(
+        '--nv-select-option-readonly-border-color',
+      ),
+    ).toBeTruthy()
+    expect(labelRules.some((rule) => rule.selector.includes(':hover'))).toBe(
+      false,
+    )
   })
 
   it('extracts actual directive mask and spinner classes including reduced motion', () => {

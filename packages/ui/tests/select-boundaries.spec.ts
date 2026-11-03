@@ -45,7 +45,11 @@ async function key(target: EventTarget, key: string) {
     bubbles: true,
     cancelable: true,
   })
-  target.dispatchEvent(event)
+  const focused = document.activeElement
+  ;(target === window && focused && focused !== document.body
+    ? focused
+    : target
+  ).dispatchEvent(event)
   await settle()
   return event
 }

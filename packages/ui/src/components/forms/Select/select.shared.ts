@@ -2,7 +2,7 @@ import { ExtractPropTypes, PropType } from 'vue'
 import { props as autocompleteProps } from '../Autocomplete/autocomplete.shared'
 
 export const sizeValues = ['sm', 'md', 'lg'] as const
-export type Size = (typeof sizeValues)[number]
+export type Size = typeof sizeValues[number]
 
 export const optionProps = {
   active: {
@@ -23,6 +23,12 @@ export type Option = {
   attr?: Record<string, number | string>
   attrs?: Record<string, unknown>
   children?: Omit<Option, 'children'>[]
+}
+
+// Row identity is private to the list. Consumers use Option.id for favorites.
+export type SelectOption = Omit<Option, 'children'> & {
+  key: string
+  children?: SelectOption[]
 }
 
 export const selectProps = {

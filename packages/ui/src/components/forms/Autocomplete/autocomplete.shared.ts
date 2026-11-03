@@ -3,7 +3,7 @@ import { tokens } from '@/styles/tokens'
 import { ComputePositionConfig } from '@floating-ui/vue'
 
 export const sizeValues = ['sm', 'md', 'lg'] as const
-export type Size = (typeof sizeValues)[number]
+export type Size = typeof sizeValues[number]
 export const defaultWidth = 300 as const
 
 export const props = {
@@ -39,6 +39,10 @@ export const props = {
   selectOnTab: {
     type: Boolean,
     default: false,
+  },
+  keyboardNavigation: {
+    type: Boolean,
+    default: true,
   },
 }
 export type Props = ExtractPropTypes<typeof props>

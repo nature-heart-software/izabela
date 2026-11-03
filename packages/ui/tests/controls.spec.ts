@@ -284,7 +284,8 @@ async function key(key: string) {
     bubbles: true,
     cancelable: true,
   })
-  window.dispatchEvent(event)
+  const target = document.activeElement
+  ;(target && target !== document.body ? target : window).dispatchEvent(event)
   await nextTick()
   return event
 }
@@ -469,12 +470,201 @@ describe('real select composition', () => {
     await settle()
     ;(w.get('input').element as HTMLElement).focus()
     await settle()
-    await key('ArrowDown')
-    await key('Enter')
+    const group = document.querySelector(
+      '[data-part="item-group"][role="group"]',
+    )!
+    const label = document.getElementById(
+      group.getAttribute('aria-labelledby')!,
+    )!
+    expect(label.textContent).toBe('Group')
+    expect(label.getAttribute('role')).not.toBe('option')
+    expect(group.querySelectorAll('[role="option"]')).toHaveLength(1)
+    ;(label as HTMLElement).click()
     expect(w.emitted('update:modelValue')).toBeUndefined()
     await key('ArrowDown')
     await key('Enter')
     expect(w.emitted('update:modelValue')).toEqual([[7]])
+  })
+
+  it('filters groups by their matching children and skips disabled children during keyboard navigation', async () => {
+    const w = render(ui.NvSelect, {
+      props: {
+        options: [
+          {
+            label: 'First',
+            children: [
+              { label: 'Blocked', value: 'blocked', disabled: true },
+              { label: 'Alpha', value: 'a' },
+            ],
+          },
+          { label: 'Second', children: [{ label: 'Beta', value: 'b' }] },
+        ],
+      },
+    })
+    await settle()
+    ;(w.get('input').element as HTMLElement).focus()
+    await settle()
+    await key('ArrowDown')
+    const input = w.get('input').element
+    expect(
+      document.getElementById(input.getAttribute('aria-activedescendant')!)
+        ?.textContent,
+    ).toContain('Alpha')
+    await w.get('input').setValue('Beta')
+    await settle()
+    const groups = document.querySelectorAll('[data-part="item-group"]')
+    expect(groups).toHaveLength(1)
+    expect(groups[0].textContent).toContain('Second')
+    expect(groups[0].textContent).not.toContain('First')
+    await key('Enter')
+    expect(w.emitted('update:modelValue')).toEqual([['b']])
+  })
+
+  it('keeps selected values from other groups when choosing a filtered multiple option', async () => {
+    const value = ref(['a'])
+    const w = render({
+      setup: () => () =>
+        h(ui.NvSelect, {
+          options: [
+            { label: 'First', children: [{ label: 'Alpha', value: 'a' }] },
+            { label: 'Second', children: [{ label: 'Beta', value: 'b' }] },
+          ],
+          multiple: true,
+          modelValue: value.value,
+          'onUpdate:modelValue': (next: string[]) => {
+            value.value = next
+          },
+        }),
+    })
+    await settle()
+    ;(w.get('input').element as HTMLElement).focus()
+    await settle()
+    await w.get('input').setValue('Beta')
+    await settle()
+    ;(document.querySelector('[title="Beta"]') as HTMLElement).click()
+    await settle()
+    expect(value.value).toEqual(['a', 'b'])
+    expect(document.querySelector('.autocomplete')).not.toBeNull()
+  })
+
+  it('toggles a repeated public value once across favorite and catalog groups', async () => {
+    const w = render(ui.NvSelect, {
+      props: {
+        options: [
+          {
+            label: 'Favorites',
+            children: [{ label: 'Favorite Alpha', value: 'a' }],
+          },
+          {
+            label: 'Catalog',
+            children: [{ label: 'Catalog Alpha', value: 'a' }],
+          },
+        ],
+        multiple: true,
+        modelValue: ['a'],
+      },
+    })
+    await settle()
+    ;(w.get('input').element as HTMLElement).focus()
+    await settle()
+    ;(document.querySelector('[title="Catalog Alpha"]') as HTMLElement).click()
+    await settle()
+    expect(w.emitted('update:modelValue')).toEqual([[[]]])
+  })
+
+  it('preserves voice IDs in optionAfter so favorites keep their remove button', async () => {
+    const favorites = ref(['voice-elf'])
+    const voice = { id: 'voice-elf', label: 'Elf', value: { name: 'Elf' } }
+    const seenIds: unknown[] = []
+    const w = render(ui.NvSelect, {
+      props: {
+        options: [
+          { label: 'Favorites', children: [voice] },
+          { label: 'Catalog', children: [voice] },
+        ],
+      },
+      slots: {
+        optionAfter: ({ option, hover }: any) => {
+          seenIds.push(option.id)
+          const favorite = favorites.value.includes(option.id)
+          return h(
+            'span',
+            { style: { display: favorite || hover ? undefined : 'none' } },
+            [
+              h(ui.NvButton, {
+                iconName: favorite ? 'times' : 'heart',
+                title: favorite ? 'Remove from favorites' : 'Add to favorites',
+                size: 'sm',
+                onMousedown: (event: MouseEvent) => {
+                  event.preventDefault()
+                  event.stopPropagation()
+                  favorites.value = favorites.value.filter(
+                    (id) => id !== option.id,
+                  )
+                },
+              }),
+            ],
+          )
+        },
+      },
+    })
+    await settle()
+    ;(w.get('input').element as HTMLElement).focus()
+    await settle()
+    const buttons = [
+      ...document.querySelectorAll<HTMLButtonElement>(
+        'button[title="Remove from favorites"]',
+      ),
+    ]
+    expect(buttons).toHaveLength(2)
+    expect(new Set(seenIds)).toEqual(new Set(['voice-elf']))
+    expect(buttons[0].querySelector('svg')).not.toBeNull()
+    expect(getComputedStyle(buttons[0].parentElement!).display).not.toBe('none')
+    const optionIds = [...document.querySelectorAll('[role="option"]')].map(
+      (item) => item.id,
+    )
+    expect(new Set(optionIds).size).toBe(2)
+    buttons[0].dispatchEvent(
+      new MouseEvent('mousedown', { bubbles: true, cancelable: true }),
+    )
+    await settle()
+    expect(favorites.value).toEqual([])
+    expect(
+      document.querySelector('button[title="Remove from favorites"]'),
+    ).toBeNull()
+    expect(w.emitted('update:modelValue')).toBeUndefined()
+    expect(document.querySelector('.autocomplete')).not.toBeNull()
+  })
+
+  it('assigns distinct option IDs for repeated values across groups and object values', async () => {
+    const first = { voice: 'one' },
+      second = { voice: 'two' }
+    const w = render(ui.NvSelect, {
+      props: {
+        options: [
+          {
+            label: 'Favorites',
+            children: [{ label: 'Favorite', value: first }],
+          },
+          {
+            label: 'Catalog',
+            children: [
+              { label: 'One', value: first },
+              { label: 'Two', value: second },
+            ],
+          },
+        ],
+      },
+    })
+    await settle()
+    ;(w.get('input').element as HTMLElement).focus()
+    await settle()
+    const options = [...document.querySelectorAll('[role="option"]')]
+    expect(options).toHaveLength(3)
+    expect(new Set(options.map((option) => option.id)).size).toBe(3)
+    ;(document.querySelector('[title="Two"]') as HTMLElement).click()
+    await settle()
+    expect(w.emitted('update:modelValue')).toEqual([[second]])
   })
 })
 

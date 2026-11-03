@@ -16,12 +16,12 @@ const globalRecipe = cva({
       borderLeft: '0.5rem solid transparent',
       backgroundClip: 'padding-box',
       backgroundColor: 'var(--nv-button-plain-background-color)',
-      _hover: {
-        backgroundColor: 'var(--nv-button-plain-hover-background-color)',
-      },
-      _active: {
-        backgroundColor: 'var(--nv-button-plain-active-background-color)',
-      },
+    },
+    '& *::-webkit-scrollbar-thumb:hover': {
+      backgroundColor: 'var(--nv-button-plain-hover-background-color)',
+    },
+    '& *::-webkit-scrollbar-thumb:active': {
+      backgroundColor: 'var(--nv-button-plain-active-background-color)',
     },
     '& #vjt-tooltip': {
       backgroundColor: 'var(--nv-button-plain-background-color)',
