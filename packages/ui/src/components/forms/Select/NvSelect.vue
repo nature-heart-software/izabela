@@ -82,12 +82,12 @@
               :disabled="item.disabled"
               :readonly="item.readonly"
               :selected="
-          selectedValues.some(
-            (v: Value) =>
-              (get(item.value, props.valueKey) || item.value) ===
-              (get(v, props.valueKey) || v),
-          )
-        "
+                selectedValues.some(
+                  (v: Value) =>
+                    (get(item.value, props.valueKey) || item.value) ===
+                    (get(v, props.valueKey) || v),
+                )
+              "
               :title="item.label"
               v-bind="item.attrs || {}"
             >
@@ -265,7 +265,7 @@ watch(
   },
 )
 
-const fuseOptions = computed<UseFuseOptions<typeof options.value[number]>>(
+const fuseOptions = computed<UseFuseOptions<(typeof options.value)[number]>>(
   () => ({
     fuseOptions: {
       keys: ['label', 'category', 'searchValue'],

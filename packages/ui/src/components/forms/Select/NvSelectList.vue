@@ -74,7 +74,7 @@ const sections = computed(() => {
     index: number
     indices: number[]
   }[] = []
-  let current: typeof result[number] | undefined
+  let current: (typeof result)[number] | undefined
   let childKeys = new Set<string>()
   props.rows.forEach((row, index) => {
     if (row.children) {
