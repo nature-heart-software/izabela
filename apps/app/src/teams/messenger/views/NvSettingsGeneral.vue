@@ -229,12 +229,7 @@
                 },
               ]"
               @update:modelValue="
-                (value) => {
-                  settingsStore.$patch({ theme: value })
-                  messengerStateStore.$patch({
-                    markForRestart: true,
-                  })
-                }
+                (value) => settingsStore.$patch({ theme: value })
               "
             />
           </NvGroup>
@@ -362,12 +357,10 @@ import NvKeybinding from '@/features/app/components/inputs/NvKeybinding.vue'
 import NvUpdateChannelSelect from '@/features/update/components/inputs/NvUpdateChannelSelect.vue'
 import { useConfirmAdmin } from '@/hooks/use-confirm-admin.ts'
 import { useClearCacheMutation } from '@/features/app/queries.ts'
-import { useMessengerStateStore } from '@/teams/messenger/store'
 
 const confirmAdmin = useConfirmAdmin()
 const autoUpdateDisabled = import.meta.env.VITE_DISABLE_AUTO_UPDATE === 'true'
 const settingsStore = useSettingsStore()
-const messengerStateStore = useMessengerStateStore()
 
 const {
   mutateAsync: clearCacheMutation,
