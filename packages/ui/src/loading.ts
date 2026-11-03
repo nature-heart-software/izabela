@@ -1,5 +1,6 @@
 import type { App, Directive } from 'vue'
 import { cva } from '@/styled-system/css'
+import { createLoadingSpinner } from '@/utils/loading-spinner'
 
 const targetRecipe = cva({ base: { position: 'relative' } })
 const maskRecipe = cva({
@@ -15,18 +16,6 @@ const maskRecipe = cva({
     cursor: 'progress',
     zIndex: '1',
     borderRadius: 'inherit',
-  },
-})
-const spinnerRecipe = cva({
-  base: {
-    width: '1rem',
-    height: '1rem',
-    border: '2px solid currentColor',
-    borderTopColor: 'transparent',
-    borderRadius: '50%',
-    animation: 'spin 0.8s linear infinite',
-    color: 'var(--nv-text-color)',
-    _motionReduce: { animation: 'none' },
   },
 })
 const states = new WeakMap<
@@ -131,10 +120,7 @@ function update(element: HTMLElement, busy: unknown) {
     'aria-label',
     element.getAttribute('data-loading-label') || 'Loading',
   )
-  const spinner = document.createElement('span')
-  spinner.className = spinnerRecipe()
-  spinner.setAttribute('aria-hidden', 'true')
-  mask.append(spinner)
+  mask.append(createLoadingSpinner())
   const classes = targetRecipe().split(' ')
   const addedClass = !classes.every((name) => element.classList.contains(name))
   states.set(element, {

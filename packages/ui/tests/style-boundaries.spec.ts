@@ -522,10 +522,10 @@ describe('generated style boundaries', () => {
       expect.objectContaining({ height: '1rem' }),
     )
     expect(declarations).toContainEqual(
-      expect.objectContaining({ border: '2px solid currentColor' }),
+      expect.objectContaining({ stroke: 'currentColor' }),
     )
     expect(declarations).toContainEqual(
-      expect.objectContaining({ animation: 'spin 0.8s linear infinite' }),
+      expect.objectContaining({ animation: 'spin 2s linear infinite' }),
     )
     expect(emittedRules(spinner.classes())).toContainEqual(
       expect.objectContaining({
@@ -534,5 +534,6 @@ describe('generated style boundaries', () => {
       }),
     )
     expect(css).toContain('@keyframes spin')
+    expect(css).toContain('@keyframes nv-loading-dash')
   })
 })

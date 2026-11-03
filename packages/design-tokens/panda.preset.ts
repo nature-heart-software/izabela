@@ -88,6 +88,11 @@ export const pandaTheme = {
     },
     keyframes: {
       spin: { to: { transform: 'rotate(360deg)' } },
+      'nv-loading-dash': {
+        '0%': { strokeDasharray: '1, 200', strokeDashoffset: '0' },
+        '50%': { strokeDasharray: '90, 150', strokeDashoffset: '-40px' },
+        '100%': { strokeDasharray: '90, 150', strokeDashoffset: '-120px' },
+      },
       'nv-tooltip-in': { from: { opacity: 0 }, to: { opacity: 1 } },
     },
   },

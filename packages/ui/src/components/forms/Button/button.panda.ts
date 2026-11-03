@@ -25,15 +25,6 @@ export const buttonRecipe = cva({
       backgroundColor: 'inherit',
       pointerEvents: 'none',
     },
-    '& .nv-button__loading > span': {
-      width: '1rem',
-      height: '1rem',
-      border: '2px solid currentColor',
-      borderRightColor: 'transparent',
-      borderRadius: '50%',
-      animation: 'spin .75s linear infinite',
-      '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
-    },
   },
   variants: {
     size: {
@@ -45,7 +36,7 @@ export const buttonRecipe = cva({
         lineHeight: '1.4',
         letterSpacing: '0.02rem',
         '& .nv-button__icon': { right: '1' },
-        '& .nv-button__loading > span': {
+        '& .nv-button__loading > svg': {
           width: '0.75rem',
           height: '0.75rem',
         },
