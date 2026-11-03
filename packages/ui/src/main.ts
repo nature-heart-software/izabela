@@ -33,7 +33,7 @@ const globalRecipe = cva({
       display: 'flex',
       flexDirection: 'column',
       gap: '5',
-      '& [type="body"]': { color: 'inherit' },
+      '& [data-nv-tour-content]': { color: 'inherit' },
       '&[data-hidden]': { display: 'none !important' },
     },
     '& #vjt-arrow::before': {
