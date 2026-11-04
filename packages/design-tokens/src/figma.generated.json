@@ -3457,7 +3457,7 @@
             "readonly": {
               "text": "#a1a1a1",
               "separator": "#262626",
-              "label-mask-background": "#171717"
+              "label-mask-background": "#0f0f0f"
             }
           }
         },
@@ -4504,7 +4504,7 @@
             "readonly": {
               "text": "#818b98",
               "separator": "rgba(209, 217, 224, 0.7019608020782471)",
-              "label-mask-background": "#f6f8fa"
+              "label-mask-background": "#ffffff"
             }
           }
         },
@@ -5551,7 +5551,7 @@
             "readonly": {
               "text": "#656c76",
               "separator": "rgba(61, 68, 77, 0.7019608020782471)",
-              "label-mask-background": "#212830"
+              "label-mask-background": "#0d1117"
             }
           }
         },
