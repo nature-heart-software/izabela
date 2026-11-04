@@ -59,32 +59,34 @@
                   <template v-if="props.options.length === 0">
                     <slot name="fallback" />
                   </template>
-                  <NvVirtualListContainer
-                    v-show="props.options.length > 0"
-                    class="autocomplete__list"
-                  >
-                    <NvVirtualList
-                      ref="list"
-                      :count="props.options.length"
-                      :estimateSize="() => props.estimateSize"
-                      :options="{
-                        getItemKey: itemKey,
-                      }"
-                      @visible="onVisible"
-                      @wheel="selection = null"
+                  <slot name="list">
+                    <NvVirtualListContainer
+                      v-show="props.options.length > 0"
+                      class="autocomplete__list"
                     >
-                      <template #default="scope">
-                        <slot
-                          name="default"
-                          v-bind="{
-                            ...scope,
-                            active: selection === scope.index,
-                            item: props.options[scope.index],
-                          }"
-                        />
-                      </template>
-                    </NvVirtualList>
-                  </NvVirtualListContainer>
+                      <NvVirtualList
+                        ref="list"
+                        :count="props.options.length"
+                        :estimateSize="() => props.estimateSize"
+                        :options="{
+                          getItemKey: itemKey,
+                        }"
+                        @visible="onVisible"
+                        @wheel="selection = null"
+                      >
+                        <template #default="scope">
+                          <slot
+                            name="default"
+                            v-bind="{
+                              ...scope,
+                              active: selection === scope.index,
+                              item: props.options[scope.index],
+                            }"
+                          />
+                        </template>
+                      </NvVirtualList>
+                    </NvVirtualListContainer>
+                  </slot>
                 </StAutocomplete>
               </Transition>
             </div>
@@ -117,6 +119,7 @@ const props = defineProps(propsDefinition)
 defineSlots<{
   reference(): unknown
   fallback(): unknown
+  list(): unknown
   default(props: { active: boolean; item: any; index: number }): unknown
 }>()
 function itemKey(index: number) {
@@ -194,6 +197,7 @@ function isValidIndex(index: unknown): index is number {
 }
 
 onKeyStroke('ArrowDown', (e) => {
+  if (!props.keyboardNavigation) return
   if (!props.visible || props.options.length === 0) return
   e.preventDefault()
   if (!isValidIndex(selection.value)) {
@@ -210,6 +214,7 @@ onKeyStroke('ArrowDown', (e) => {
 })
 
 onKeyStroke('ArrowUp', (e) => {
+  if (!props.keyboardNavigation) return
   if (!props.visible || props.options.length === 0) return
   e.preventDefault()
   if (!isValidIndex(selection.value)) {
@@ -226,6 +231,7 @@ onKeyStroke('ArrowUp', (e) => {
 })
 
 onKeyStroke('Enter', (e) => {
+  if (!props.keyboardNavigation) return
   if (
     !props.visible ||
     !isValidIndex(selection.value) ||
@@ -237,6 +243,7 @@ onKeyStroke('Enter', (e) => {
 })
 
 onKeyStroke('Tab', (e) => {
+  if (!props.keyboardNavigation) return
   if (
     !props.visible ||
     !isValidIndex(selection.value) ||

@@ -93,7 +93,10 @@ test('native rebuild tooling recognizes the application Electron ABI', () => {
   )
 })
 
-test('direct desktop development rebuilds native modules before launching Vite', () => {
+test('direct desktop development generates styles and rebuilds native modules before launching Vite', () => {
   const pkg = readPackage('apps/app')
-  assert.match(pkg.scripts.dev, /^pnpm run rebuild && vite$/)
+  assert.match(
+    pkg.scripts.dev,
+    /^pnpm run panda:prepare && pnpm run rebuild && vite$/,
+  )
 })

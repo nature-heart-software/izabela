@@ -44,6 +44,7 @@ async function renderSettings({
   }
   const mocks = {
     '@packages/ui': ui,
+    '@/styled-system/css': { css: () => '' },
     '@/features/speech/components/inputs/NvSpeechEngineSelect.vue': layout,
     '@/features/speech/components/forms/NvUniversalApiForm.vue': layout,
     '@/features/speech/components/inputs/NvSpeechRegionSelect.vue': {

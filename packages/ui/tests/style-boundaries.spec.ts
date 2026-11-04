@@ -45,6 +45,7 @@ export { default as NvAlert } from '@/components/feedback/Alert/NvAlert.vue'
 export { default as NvTable } from '@/components/display/Table/NvTable.vue'
 export { default as NvTableColumn } from '@/components/display/Table/NvTableColumn.vue'
 export { tooltipPositioner } from '@/components/overlay/Tooltip/tooltip.panda'
+export { StSelectGroupLabel } from '@/components/forms/Select/select.panda'
 export { default as NvButton } from '@/components/forms/Button/NvButton.vue'
 export { default as NvTextarea } from '@/components/forms/Textarea/NvTextarea.vue'
 export { default as NvRangeInput } from '@/components/forms/RangeInput/NvRangeInput.vue'
@@ -362,10 +363,10 @@ function winningRole(element: Element, property: string, pseudo = '') {
     const value =
       rule.declarations[property] ??
       (property === 'border-bottom-color'
-        ? (rule.declarations['border-color'] ??
+        ? rule.declarations['border-color'] ??
           rule.declarations['border-bottom']?.match(
             /var\(--colors-[^)]+\)/,
-          )?.[0])
+          )?.[0]
         : undefined)
     if (!value) return
     parseSelector((selectors: any) =>
@@ -542,6 +543,83 @@ describe('generated style boundaries', () => {
     expect(selectors).toContain('.vjt-highlight')
   })
 
+  it('attaches scrollbar hover and active states to each thumb', () => {
+    const wrapper = render(ui.GlobalStyles)
+    const thumbRules = emittedRules(wrapper.classes()).filter((rule) =>
+      rule.selector.includes('::-webkit-scrollbar-thumb'),
+    )
+    for (const state of ['hover', 'active']) {
+      const stateRules = thumbRules.filter(
+        (rule) =>
+          rule.declarations['background-color'] ===
+          `var(--colors-button-plain-${
+            state === 'active' ? 'pressed' : state
+          }-background)`,
+      )
+      expect(stateRules).toHaveLength(1)
+      expect(stateRules[0].selector).toMatch(
+        new RegExp(`::\\-webkit-scrollbar-thumb:${state}$`),
+      )
+    }
+  })
+
+  it.each([...ui.themes.keys()])(
+    'draws the %s group label with its authored readonly roles and no option highlight',
+    (themeId) => {
+      const wrapper = render(ui.StSelectGroupLabel, {
+        global: { provide: { theme: ui.themes.get(themeId) } },
+        slots: { default: () => h('span', 'Voices') },
+      })
+      const labelRules = emittedRules(wrapper.classes())
+      expect(labelRules).toContainEqual(
+        expect.objectContaining({
+          declarations: { color: 'var(--colors-option-default-readonly-text)' },
+        }),
+      )
+      const lineRules = labelRules.filter((rule) =>
+        rule.selector.includes('::before'),
+      )
+      expect(
+        Object.assign({}, ...lineRules.map((rule) => rule.declarations)),
+      ).toMatchObject({
+        content: "''",
+        position: 'absolute',
+        top: '50%',
+        height: '1px',
+        width: '100%',
+        'background-color': 'var(--colors-option-default-readonly-separator)',
+      })
+      expect(
+        wrapper.element.style.getPropertyValue(
+          '--nv-option-default-readonly-separator',
+        ),
+      ).toBe(ui.themes.get(themeId).option.default.readonly.separator)
+      expect(
+        labelRules
+          .filter((rule) => rule.selector.includes('> span'))
+          .map((rule) => rule.declarations),
+      ).toContainEqual({
+        'background-color':
+          'var(--colors-option-default-readonly-label-mask-background)',
+      })
+      expect(labelRules.some((rule) => rule.selector.includes(':hover'))).toBe(
+        false,
+      )
+    },
+  )
+
+  it('extracts the xs button loading-size override from the shared scale', () => {
+    const wrapper = render(ui.NvButton, {
+      props: { size: 'xs', loading: true },
+    })
+    const spinnerRules = emittedRules(wrapper.classes()).filter((rule) =>
+      rule.selector.includes('.nv-button__loading > svg'),
+    )
+    const declarations = spinnerRules.map((rule) => rule.declarations)
+    expect(declarations).toContainEqual({ width: 'var(--sizes-4)' })
+    expect(declarations).toContainEqual({ height: 'var(--sizes-4)' })
+  })
+
   it('extracts actual directive mask and spinner classes including reduced motion', () => {
     const Host = defineComponent({
       setup: () => () =>
@@ -557,16 +635,15 @@ describe('generated style boundaries', () => {
       (rule) => rule.declarations,
     )
     expect(declarations).toContainEqual(
-      expect.objectContaining({ width: '1rem' }),
+      expect.objectContaining({ stroke: 'currentColor' }),
     )
+    expect(declarations).toContainEqual({ width: 'var(--sizes-5)' })
+    expect(declarations).toContainEqual({ height: 'var(--sizes-5)' })
+    expect(declarations).toContainEqual({
+      color: 'var(--colors-loading-default-pending-spinner)',
+    })
     expect(declarations).toContainEqual(
-      expect.objectContaining({ height: '1rem' }),
-    )
-    expect(declarations).toContainEqual(
-      expect.objectContaining({ border: '2px solid currentColor' }),
-    )
-    expect(declarations).toContainEqual(
-      expect.objectContaining({ animation: 'spin 0.8s linear infinite' }),
+      expect.objectContaining({ animation: 'spin 2s linear infinite' }),
     )
     expect(emittedRules(spinner.classes())).toContainEqual(
       expect.objectContaining({
@@ -575,5 +652,6 @@ describe('generated style boundaries', () => {
       }),
     )
     expect(css).toContain('@keyframes spin')
+    expect(css).toContain('@keyframes nv-loading-dash')
   })
 })

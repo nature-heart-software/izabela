@@ -191,7 +191,44 @@ const option = cva({
     },
   },
 })
+export const groupLabel = cva({
+  base: {
+    position: 'absolute',
+    top: '0',
+    left: '0',
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    paddingInline: '5',
+    height: '7',
+    fontFamily: 'sans',
+    fontSize: '2',
+    lineHeight: 'default',
+    letterSpacing: 'default',
+    cursor: 'default',
+    color: 'option.default.readonly.text',
+    '&[hidden]': { display: 'none' },
+    _before: {
+      content: "''",
+      position: 'absolute',
+      top: '50%',
+      left: '0',
+      width: '100%',
+      height: '1px',
+      backgroundColor: 'option.default.readonly.separator',
+    },
+    '& > span': {
+      position: 'relative',
+      paddingInline: '2',
+      backgroundColor: 'option.default.readonly.label-mask-background',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+    },
+  },
+})
 export const StSelect = pandaComponent('div', selectProps, select)
+export const StSelectGroupLabel = pandaComponent('div', {}, groupLabel)
 export const StSelectWrapper = pandaComponent('div', selectProps, wrapper)
 export const StSelectTagsWrapper = pandaComponent('div', {}, tags)
 export const StSelectInput = pandaComponent('input', selectProps, input)

@@ -92,9 +92,15 @@ export const EmptySelect = {
 
 export const Loading = {
   render: () => ({
-    components: { NvButton },
+    components: { NvButton, NvSelect, NvStack },
     directives: { loading: loadingDirective },
-    template:
-      '<div v-loading="true" data-test="loading-host"><NvButton>Pending content</NvButton></div>',
+    setup: () => ({ options: [{ label: 'Alpha', value: 'a' }] }),
+    template: `
+      <NvStack spacing="5" style="width: 260px">
+        <div data-test="loading-select"><NvSelect v-loading="true" :options="options" model-value="a" /></div>
+        <NvButton v-loading="true" data-test="loading-host">Pending content</NvButton>
+        <NvButton loading data-test="loading-button">Pending content</NvButton>
+      </NvStack>
+    `,
   }),
 }

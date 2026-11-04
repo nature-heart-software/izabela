@@ -215,6 +215,9 @@ try {
     )
   })
   await journey('loading-styles', async () => {
+    await call('Emulation.setEmulatedMedia', {
+      features: [{ name: 'prefers-reduced-motion', value: 'no-preference' }],
+    })
     await story('integration-overlays--loading')
     await check(
       'Named loading status',
@@ -223,10 +226,44 @@ try {
     )
     assert.equal(
       await evaluate(
-        "(() => {let e=document.querySelector('[role=status] > span'),s=getComputedStyle(e);return e.getBoundingClientRect().width>0&&e.getBoundingClientRect().height>0&&s.animationName!=='none'&&s.borderTopWidth!=='0px'})()",
+        "(() => {let e=document.querySelector('[role=status] > svg'),s=getComputedStyle(e);return e.getBoundingClientRect().width>0&&e.getBoundingClientRect().height>0&&s.animationName!=='none'&&getComputedStyle(e.querySelector('circle')).animationName==='nv-loading-dash'})()",
       ),
       true,
     )
+    const sample = () =>
+      evaluate(
+        "[...document.querySelectorAll('[role=status] > svg')].map(e=>({rotation:getComputedStyle(e).transform,arc:getComputedStyle(e.querySelector('circle')).strokeDasharray,offset:getComputedStyle(e.querySelector('circle')).strokeDashoffset}))",
+      )
+    const samples = [await sample()]
+    // The arc holds its longest length for half a cycle. Sample beyond that
+    // interval so the assertion does not depend on the initial animation phase.
+    for (let frame = 0; frame < 4; frame++) {
+      await delay(220)
+      samples.push(await sample())
+    }
+    assert.equal(
+      samples[0].length,
+      3,
+      'Both loading modes and the select render',
+    )
+    for (let index = 0; index < 3; index++) {
+      for (const property of ['rotation', 'arc', 'offset']) {
+        assert.ok(
+          new Set(samples.map((frame) => frame[index][property])).size > 1,
+          `Spinner ${index} changes ${property}`,
+        )
+      }
+    }
+    await call('Emulation.setEmulatedMedia', {
+      features: [{ name: 'prefers-reduced-motion', value: 'reduce' }],
+    })
+    await delay(50)
+    await check(
+      'Reduced motion stops rotation and arc animation',
+      "[...document.querySelectorAll('[role=status] > svg, [role=status] > svg > circle')].map(e=>getComputedStyle(e).animationName)",
+      Array(6).fill('none'),
+    )
+    await call('Emulation.setEmulatedMedia', { features: [] })
   })
   await journey('disabled-select', async () => {
     await story('integration-overlays--disabled-select')

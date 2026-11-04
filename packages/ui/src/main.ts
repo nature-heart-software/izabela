@@ -16,12 +16,12 @@ const globalRecipe = cva({
       borderLeft: '0.5rem solid transparent',
       backgroundClip: 'padding-box',
       backgroundColor: 'button.plain.background',
-      _hover: {
-        backgroundColor: 'button.plain.hover.background',
-      },
-      _active: {
-        backgroundColor: 'button.plain.pressed.background',
-      },
+    },
+    '& *::-webkit-scrollbar-thumb:hover': {
+      backgroundColor: 'button.plain.hover.background',
+    },
+    '& *::-webkit-scrollbar-thumb:active': {
+      backgroundColor: 'button.plain.pressed.background',
     },
     '& #vjt-tooltip': {
       backgroundColor: 'tooltip.default.background',
@@ -33,7 +33,7 @@ const globalRecipe = cva({
       display: 'flex',
       flexDirection: 'column',
       gap: '5',
-      '& [type="body"]': { color: 'inherit' },
+      '& [data-nv-tour-content]': { color: 'inherit' },
       '&[data-hidden]': { display: 'none !important' },
     },
     '& #vjt-arrow::before': {

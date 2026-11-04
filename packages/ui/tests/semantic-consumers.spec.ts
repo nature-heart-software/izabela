@@ -80,8 +80,7 @@ const contracts: Record<
         [
           'globalRecipe',
           'base',
-          '& *::-webkit-scrollbar-thumb',
-          '_hover',
+          '& *::-webkit-scrollbar-thumb:hover',
           'backgroundColor',
         ],
         'button.plain.hover.background',
@@ -90,8 +89,7 @@ const contracts: Record<
         [
           'globalRecipe',
           'base',
-          '& *::-webkit-scrollbar-thumb',
-          '_active',
+          '& *::-webkit-scrollbar-thumb:active',
           'backgroundColor',
         ],
         'button.plain.pressed.background',
@@ -541,7 +539,28 @@ const contracts: Record<
         'loading.default.pending.background',
       ],
       [['maskRecipe', 'base', 'color'], 'loading.default.pending.foreground'],
-      [['spinnerRecipe', 'base', 'color'], 'loading.default.pending.spinner'],
+    ],
+  },
+
+  LoadingSpinner: {
+    file: 'utils/loading-spinner.ts',
+    values: [
+      [['loadingSpinner', 'base', 'color'], 'loading.default.pending.spinner'],
+    ],
+  },
+
+  SelectGroupLabel: {
+    file: 'components/forms/Select/select.panda.ts',
+    values: [
+      [['groupLabel', 'base', 'color'], 'option.default.readonly.text'],
+      [
+        ['groupLabel', 'base', '_before', 'backgroundColor'],
+        'option.default.readonly.separator',
+      ],
+      [
+        ['groupLabel', 'base', '& > span', 'backgroundColor'],
+        'option.default.readonly.label-mask-background',
+      ],
     ],
   },
 

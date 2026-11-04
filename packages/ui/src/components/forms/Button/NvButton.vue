@@ -16,7 +16,9 @@
       role="status"
       aria-label="Loading"
     >
-      <span aria-hidden="true" />
+      <svg :class="loadingSpinner()" viewBox="0 0 50 50" aria-hidden="true">
+        <circle cx="25" cy="25" r="20" />
+      </svg>
     </span>
     <NvIcon
       v-if="props.iconName"
@@ -29,6 +31,7 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { isVNodeEmpty } from '@/utils/vue'
+import { loadingSpinner } from '@/utils/loading-spinner'
 import { tokens } from '@/styles/tokens'
 import { StButton } from './button.panda'
 import { props as propsDefinition, Size } from './button.shared'
