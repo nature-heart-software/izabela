@@ -1,4 +1,4 @@
-import './prepare-panda.mjs'
+import { buildForSession } from './client-build-session.mjs'
 import { fileURLToPath } from 'node:url'
 import { build } from 'vite'
 import vue from '@vitejs/plugin-vue'
@@ -44,4 +44,13 @@ export async function buildClient() {
     },
   })
 }
-await buildClient()
+await buildForSession(
+  process.env.IZABELA_UI_TEST_RUN_ID,
+  fileURLToPath(
+    new URL('../../../coverage/ui-client/test-client.js', import.meta.url),
+  ),
+  async () => {
+    await import('./prepare-panda.mjs')
+    await buildClient()
+  },
+)
