@@ -3,10 +3,7 @@ import type { ComputePositionConfig } from '@floating-ui/vue'
 /** Options interpreted by the shared Ark tooltip and context-menu controls. */
 export interface OverlayOptions {
   placement?:
-    | ComputePositionConfig['placement']
-    | 'auto'
-    | 'auto-start'
-    | 'auto-end'
+    ComputePositionConfig['placement'] | 'auto' | 'auto-start' | 'auto-end'
   offset?: [number, number]
   delay?: number | [number | null, number | null]
   duration?: number | [number | null, number | null]
