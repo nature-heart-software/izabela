@@ -98,7 +98,7 @@
 </template>
 <script lang="ts" setup>
 import { Popover } from '@ark-ui/vue'
-import { computed, inject, provide, ref, watch } from 'vue'
+import { computed, inject, nextTick, provide, ref, watch } from 'vue'
 import {
   StAutocomplete,
   shield,
@@ -277,8 +277,10 @@ provide(
 
 watch(
   [() => props.visible, shieldElement, portalTarget],
-  ([visible, element], _, onCleanup) => {
+  async ([visible, element], _, onCleanup) => {
     if (!visible || !element) return
+    let cancelled = false
+    let observer: MutationObserver | undefined
     const update = () => {
       // A containing Ark positioner's transform establishes a fixed containing
       // block. Cancel that displacement while keeping the shield physically
@@ -289,7 +291,17 @@ watch(
         shieldOffset.value = { x: x - rect.left, y: y - rect.top }
       }
     }
-    const observer = new MutationObserver(update)
+    onCleanup(() => {
+      cancelled = true
+      observer?.disconnect()
+      window.removeEventListener('resize', update)
+      window.removeEventListener('scroll', update, true)
+    })
+    // A nested teleport can move after the child's post-flush watcher. Measure
+    // and observe its final ancestors once the whole render has finished.
+    await nextTick()
+    if (cancelled) return
+    observer = new MutationObserver(update)
     for (
       let parent = element.parentElement;
       parent;
@@ -303,11 +315,6 @@ watch(
     window.addEventListener('resize', update)
     window.addEventListener('scroll', update, true)
     update()
-    onCleanup(() => {
-      observer.disconnect()
-      window.removeEventListener('resize', update)
-      window.removeEventListener('scroll', update, true)
-    })
   },
   { flush: 'post' },
 )
