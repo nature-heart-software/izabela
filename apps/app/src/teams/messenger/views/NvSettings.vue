@@ -144,7 +144,7 @@
                       "
                     >
                       <div
-                        :key="Component"
+                        :key="currentRoute.path"
                         :class="
                           css({
                             position: 'absolute',

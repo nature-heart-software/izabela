@@ -8,6 +8,8 @@ import {
   NvTextarea,
   NvAutocomplete,
   NvDialog,
+  NvTooltip,
+  NvContextMenu,
   themes,
   tokens,
   PORTAL_TARGET,
@@ -38,6 +40,20 @@ const autocomplete: Props<typeof NvAutocomplete> = {
   selectOnTab: true,
 }
 const dialog: Props<typeof NvDialog> = { open: false }
+const tooltip: Props<typeof NvTooltip> = {
+  tippyOptions: {
+    placement: 'auto-start',
+    delay: [0, null],
+    duration: [100, 0],
+    offset: [0, 12],
+    interactive: true,
+    animation: false,
+  },
+}
+const menu: Props<typeof NvContextMenu> = {
+  tippyOptions: { placement: 'bottom-end', offset: [2, 8] },
+  options: [{ label: 'Open', onClick: () => {} }],
+}
 type IsAny<T> = 0 extends 1 & T ? true : false
 const buttonIsNotAny: IsAny<typeof NvButton> = false
 const propsAreNotAny: IsAny<Props<typeof NvButton>> = false
@@ -51,6 +67,8 @@ void [
   textarea,
   autocomplete,
   dialog,
+  tooltip,
+  menu,
   themes,
   tokens,
   PORTAL_TARGET,

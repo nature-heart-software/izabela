@@ -7,7 +7,6 @@
     "@packages/vite-plugin-generate-exports": "workspace:*",
     "@zag-js/interact-outside": "0.71.0",
     "csstype": "^3.2.3",
-    "tippy.js": "^6.3.7",
     "@ark-ui/vue": "^3.11.0"
   },
   "files": [

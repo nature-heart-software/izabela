@@ -311,6 +311,11 @@ try {
     )
     await click('input[aria-label="Nested choice"]')
     await check(
+      'Nested select shield covers the viewport outside its parent popover',
+      "(() => {const e=document.querySelector('[data-nv-overlay-shield]'),r=e.getBoundingClientRect();return Math.abs(r.x)<1&&Math.abs(r.y)<1&&Math.abs(r.width-innerWidth)<1&&Math.abs(r.height-innerHeight)<1&&document.elementFromPoint(8,8)===e})()",
+      true,
+    )
+    await check(
       'Option hit testing',
       "(() => {let e=document.querySelector('[data-test=beta]'),r=e.getBoundingClientRect();return e.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2))})()",
       true,

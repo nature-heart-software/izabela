@@ -2,7 +2,7 @@
 
 Shared Vue components use Panda CSS for styling, Ark UI for overlay and switch
 behavior, and semantic native controls where no additional headless primitive is
-needed. Element Plus is not required.
+needed. Element Plus and Tippy are not required.
 
 ## Development
 
@@ -78,7 +78,8 @@ types and table instance methods are not a compatibility surface.
 
 The legacy `tippyOptions` prop remains available for existing tooltip/menu call
 sites; the wrappers map the positioning/delay/interaction options they support
-to Ark. They do not expose a Tippy instance or arbitrary Tippy plugins.
+to Ark using package-owned option types, without a Tippy dependency. They do
+not expose a Tippy instance or arbitrary Tippy plugins.
 
 ## Verification boundaries
 
