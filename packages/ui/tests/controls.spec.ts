@@ -107,6 +107,40 @@ describe('real shared controls', () => {
     await settle()
     expect(w.emitted('update:modelValue')).toEqual([[true], [false]])
   })
+  it.each([false, true])(
+    'switch keeps the accepted value %s when a toggle is declined or awaiting confirmation',
+    async (modelValue) => {
+      const w = render(ui.NvSwitch, { props: { modelValue } })
+      const input = w.get('input[role="switch"]')
+      const expectChecked = (checked: boolean) => {
+        expect((input.element as HTMLInputElement).checked).toBe(checked)
+        expect(input.attributes('aria-checked')).toBe(String(checked))
+        expect(w.get('[data-part="thumb"]').attributes('data-state')).toBe(
+          checked ? 'checked' : 'unchecked',
+        )
+      }
+
+      ;(input.element as HTMLInputElement).click()
+      await settle()
+      expect(w.emitted('update:modelValue')).toEqual([[!modelValue]])
+      expectChecked(modelValue)
+
+      // A declined attempt must not prevent asking again.
+      ;(input.element as HTMLInputElement).click()
+      await settle()
+      expect(w.emitted('update:modelValue')).toEqual([
+        [!modelValue],
+        [!modelValue],
+      ])
+      expectChecked(modelValue)
+
+      // An asynchronous confirmation updates the control through its model.
+      await w.setProps({ modelValue: !modelValue })
+      await settle()
+      expectChecked(!modelValue)
+      expect(w.emitted('update:modelValue')).toHaveLength(2)
+    },
+  )
   it('disabled switch prevents native activation and focus', async () => {
     const w = render(ui.NvSwitch, { props: { disabled: true } })
     const input = w.get('input').element as HTMLInputElement
