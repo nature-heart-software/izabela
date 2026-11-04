@@ -22,19 +22,19 @@ export const StPopoverContent = pandaComponent(
     variants: {
       size: {
         sm: {
-          '& > *': {
+          '& > [data-nv-popover-surface]': {
             backgroundColor: 'popover.sm.background',
             boxShadow: 'popover.sm.shadow',
           },
         },
         md: {
-          '& > *': {
+          '& > [data-nv-popover-surface]': {
             backgroundColor: 'popover.md.background',
             boxShadow: 'popover.md.shadow',
           },
         },
         lg: {
-          '& > *': {
+          '& > [data-nv-popover-surface]': {
             backgroundColor: 'popover.lg.background',
             boxShadow: 'popover.lg.shadow',
           },

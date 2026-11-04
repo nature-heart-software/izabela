@@ -721,7 +721,11 @@
         "VariableID:370:1153",
         "VariableID:370:1154",
         "VariableID:370:1155",
-        "VariableID:370:1156"
+        "VariableID:370:1156",
+        "VariableID:417:1071",
+        "VariableID:417:1072",
+        "VariableID:417:1073",
+        "VariableID:417:1074"
       ]
     }
   ],
@@ -3824,19 +3828,19 @@
         },
         "370:0": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:320:1179"
+          "id": "VariableID:417:1071"
         },
         "370:1": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:370:1115"
+          "id": "VariableID:417:1072"
         },
         "370:2": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:320:1180"
+          "id": "VariableID:417:1073"
         },
         "370:3": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:370:1116"
+          "id": "VariableID:417:1074"
         }
       }
     },
@@ -17433,6 +17437,86 @@
           "g": 0.01568627543747425,
           "b": 0.03529411926865578,
           "a": 0.11999999731779099
+        }
+      }
+    },
+    {
+      "id": "VariableID:417:1071",
+      "name": "Kumo Ink/Light/cardMask",
+      "variableCollectionId": "VariableCollectionId:193:379",
+      "resolvedType": "COLOR",
+      "valuesByMode": {
+        "193:0": {
+          "r": 1,
+          "g": 1,
+          "b": 1,
+          "a": 0.8999999761581421
+        },
+        "193:1": {
+          "r": 1,
+          "g": 1,
+          "b": 1,
+          "a": 0.8999999761581421
+        }
+      }
+    },
+    {
+      "id": "VariableID:417:1072",
+      "name": "Kumo Ink/Dark/cardMask",
+      "variableCollectionId": "VariableCollectionId:193:379",
+      "resolvedType": "COLOR",
+      "valuesByMode": {
+        "193:0": {
+          "r": 0.06016319990158081,
+          "g": 0.06016319990158081,
+          "b": 0.06016319990158081,
+          "a": 0.8999999761581421
+        },
+        "193:1": {
+          "r": 0.06016319990158081,
+          "g": 0.06016319990158081,
+          "b": 0.06016319990158081,
+          "a": 0.8999999761581421
+        }
+      }
+    },
+    {
+      "id": "VariableID:417:1073",
+      "name": "GitHub/Light/cardMask",
+      "variableCollectionId": "VariableCollectionId:193:379",
+      "resolvedType": "COLOR",
+      "valuesByMode": {
+        "193:0": {
+          "r": 1,
+          "g": 1,
+          "b": 1,
+          "a": 0.8999999761581421
+        },
+        "193:1": {
+          "r": 1,
+          "g": 1,
+          "b": 1,
+          "a": 0.8999999761581421
+        }
+      }
+    },
+    {
+      "id": "VariableID:417:1074",
+      "name": "GitHub/Dark/cardMask",
+      "variableCollectionId": "VariableCollectionId:193:379",
+      "resolvedType": "COLOR",
+      "valuesByMode": {
+        "193:0": {
+          "r": 0.05098039284348488,
+          "g": 0.06666667014360428,
+          "b": 0.09019608050584793,
+          "a": 0.8999999761581421
+        },
+        "193:1": {
+          "r": 0.05098039284348488,
+          "g": 0.06666667014360428,
+          "b": 0.09019608050584793,
+          "a": 0.8999999761581421
         }
       }
     }

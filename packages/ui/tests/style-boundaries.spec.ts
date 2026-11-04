@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-import { afterEach, describe, expect, it } from 'vitest'
-import { mount, type VueWrapper } from '@vue/test-utils'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { mount, flushPromises, type VueWrapper } from '@vue/test-utils'
 import { defineComponent, h, markRaw, withDirectives } from 'vue'
 import { execFileSync } from 'node:child_process'
 import { createRequire } from 'node:module'
@@ -52,6 +52,8 @@ export { default as NvRangeInput } from '@/components/forms/RangeInput/NvRangeIn
 export { default as NvInput } from '@/components/forms/Input/NvInput.vue'
 export { default as NvNumberInput } from '@/components/forms/NumberInput/NvNumberInput.vue'
 export { themes } from '@/themes'
+export { default as NvPopover } from '@/components/overlay/Popover/NvPopover.vue'
+export { default as NvSelect } from '@/components/forms/Select/NvSelect.vue'
 export { Popover, Dialog, Menu, Tooltip } from '@ark-ui/vue'
 `
 // The real SFC graph needs the library alias. Keep it in this local build, not
@@ -360,6 +362,7 @@ function winningRole(element: Element, property: string, pseudo = '') {
     )
   }
   rules.forEach((rule, order) => {
+    if (!rule.classes.length) return
     const value =
       rule.declarations[property] ??
       (property === 'border-bottom-color'
@@ -429,6 +432,101 @@ describe('canonical role cascade', () => {
 })
 
 describe('generated style boundaries', () => {
+  it.each(
+    [...ui.themes.keys()].flatMap((themeId) =>
+      ['sm', 'md', 'lg'].map((size) => [themeId, size]),
+    ),
+  )(
+    'keeps nested shields undecorated and the owned Card themed (%s, %s)',
+    async (themeId, size) => {
+      vi.stubGlobal(
+        'ResizeObserver',
+        class {
+          observe() {}
+          unobserve() {}
+          disconnect() {}
+        },
+      )
+      const geometry = vi
+        .spyOn(HTMLElement.prototype, 'getClientRects')
+        .mockReturnValue([
+          {
+            width: 300,
+            height: 100,
+            top: 0,
+            left: 0,
+            right: 300,
+            bottom: 100,
+            x: 0,
+            y: 0,
+            toJSON() {},
+          },
+        ] as any)
+      try {
+        const wrapper = render(ui.NvPopover, {
+          props: { size },
+          global: {
+            provide: { theme: ui.themes.get(themeId) },
+            stubs: { transition: false },
+          },
+          slots: {
+            reference: () => h('button', 'Open'),
+            default: () =>
+              h(ui.NvSelect, {
+                options: [{ label: 'Alpha', value: 'a' }],
+                modelValue: 'a',
+              }),
+          },
+        })
+        await wrapper.get('button').trigger('click')
+        await flushPromises()
+        await new Promise((resolve) => setTimeout(resolve, 50))
+        const content = document.querySelector(
+          '[data-scope="popover"][data-part="content"]',
+        )!
+        const input = content.querySelector('input')!
+        input.focus()
+        await flushPromises()
+        await new Promise((resolve) => setTimeout(resolve, 50))
+        const shield = content.querySelector('[data-nv-overlay-shield]')!
+        expect(shield).not.toBeNull()
+        expect(shield.parentElement).toBe(content)
+        for (const boundary of [
+          shield,
+          document.querySelector('[data-overlay-shield="popover"]')!,
+        ]) {
+          expect(boundary).not.toBeNull()
+          expect(winningRole(boundary, 'background-color')).toBeUndefined()
+          expect(winningRole(boundary, 'background-image')).toBeUndefined()
+          expect(winningRole(boundary, 'box-shadow')).toBeUndefined()
+        }
+        const card = Array.from(content.children).find((child) =>
+          child.hasAttribute('data-nv-popover-surface'),
+        )!
+        expect(card, content.innerHTML).toBeTruthy()
+        expect(winningRole(card, 'background-color')).toBe(
+          `var(--colors-popover-${size}-background)`,
+        )
+        expect(winningRole(card, 'box-shadow')).toBe(
+          `var(--shadows-popover-${size}-shadow)`,
+        )
+        expect(
+          (card as HTMLElement).style.getPropertyValue(
+            `--nv-popover-${size}-background`,
+          ),
+        ).toBe(ui.themes.get(themeId).popover[size].background)
+        expect(
+          (card as HTMLElement).style.getPropertyValue(
+            `--nv-popover-${size}-shadow`,
+          ),
+        ).toBe(ui.themes.get(themeId).popover[size].shadow)
+      } finally {
+        geometry.mockRestore()
+        vi.unstubAllGlobals()
+      }
+    },
+  )
+
   it('uses loading-owned pending roles without changing native host behavior', async () => {
     const Host = defineComponent({
       props: { busy: Boolean },

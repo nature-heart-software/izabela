@@ -30,7 +30,11 @@
         <StPopoverPositioner>
           <StPopoverContent :hidden="false" :size="props.size">
             <Transition>
-              <Card v-if="open" :size="props.size === 'lg' ? 'md' : props.size">
+              <Card
+                v-if="open"
+                data-nv-popover-surface
+                :size="props.size === 'lg' ? 'md' : props.size"
+              >
                 <slot />
               </Card>
             </Transition>

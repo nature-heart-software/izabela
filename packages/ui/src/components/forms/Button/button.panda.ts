@@ -84,15 +84,34 @@ export const buttonRecipe = cva({
     },
     type: {
       default: {
+        // The directive owns geometry; only the background layer uses source alpha.
+        '& > .nv-loading-mask': { backgroundColor: 'transparent' },
+        '& > .nv-loading-mask::before': {
+          content: '""',
+          position: 'absolute',
+          inset: '0',
+          borderRadius: 'inherit',
+          pointerEvents: 'none',
+          backgroundColor: 'var(--nv-button-loading-surface)',
+          maskImage:
+            'linear-gradient({colors.loading.default.pending.background}, {colors.loading.default.pending.background})',
+          maskMode: 'alpha',
+        },
+        '& > .nv-loading-mask > svg': { position: 'relative', zIndex: '1' },
         color: 'button.default.text',
         backgroundColor: 'button.default.background',
+        '--nv-button-loading-surface': '{colors.button.default.background}',
         borderColor: 'button.default.border',
         '&:hover': {
           backgroundColor: 'button.default.hover.background',
+          '--nv-button-loading-surface':
+            '{colors.button.default.hover.background}',
           borderColor: 'button.default.hover.border',
         },
         '&:active': {
           backgroundColor: 'button.default.pressed.background',
+          '--nv-button-loading-surface':
+            '{colors.button.default.pressed.background}',
           borderColor: 'button.default.pressed.border',
         },
         '&:focus': {
@@ -100,20 +119,41 @@ export const buttonRecipe = cva({
         },
         '&[data-selected]': {
           backgroundColor: 'button.default.selected.background',
+          '--nv-button-loading-surface':
+            '{colors.button.default.selected.background}',
           borderColor: 'button.default.selected.border',
         },
       },
       active: {
+        // The directive owns geometry; only the background layer uses source alpha.
+        '& > .nv-loading-mask': { backgroundColor: 'transparent' },
+        '& > .nv-loading-mask::before': {
+          content: '""',
+          position: 'absolute',
+          inset: '0',
+          borderRadius: 'inherit',
+          pointerEvents: 'none',
+          backgroundColor: 'var(--nv-button-loading-surface)',
+          maskImage:
+            'linear-gradient({colors.loading.default.pending.background}, {colors.loading.default.pending.background})',
+          maskMode: 'alpha',
+        },
+        '& > .nv-loading-mask > svg': { position: 'relative', zIndex: '1' },
         color: 'button.active.text',
         backgroundColor: 'button.active.background',
+        '--nv-button-loading-surface': '{colors.button.active.background}',
         borderColor: 'button.active.border',
         borderWidth: '2px',
         '&:hover': {
           backgroundColor: 'button.active.hover.background',
+          '--nv-button-loading-surface':
+            '{colors.button.active.hover.background}',
           borderColor: 'button.active.hover.border',
         },
         '&:active': {
           backgroundColor: 'button.active.pressed.background',
+          '--nv-button-loading-surface':
+            '{colors.button.active.pressed.background}',
           borderColor: 'button.active.pressed.border',
         },
         '&:focus': {
@@ -121,20 +161,41 @@ export const buttonRecipe = cva({
         },
         '&[data-selected]': {
           backgroundColor: 'button.active.selected.background',
+          '--nv-button-loading-surface':
+            '{colors.button.active.selected.background}',
           borderColor: 'button.active.selected.border',
         },
       },
       plain: {
+        // The directive owns geometry; only the background layer uses source alpha.
+        '& > .nv-loading-mask': { backgroundColor: 'transparent' },
+        '& > .nv-loading-mask::before': {
+          content: '""',
+          position: 'absolute',
+          inset: '0',
+          borderRadius: 'inherit',
+          pointerEvents: 'none',
+          backgroundColor: 'var(--nv-button-loading-surface)',
+          maskImage:
+            'linear-gradient({colors.loading.default.pending.background}, {colors.loading.default.pending.background})',
+          maskMode: 'alpha',
+        },
+        '& > .nv-loading-mask > svg': { position: 'relative', zIndex: '1' },
         color: 'button.plain.text',
         backgroundColor: 'button.plain.background',
+        '--nv-button-loading-surface': '{colors.button.plain.background}',
         borderColor: 'button.plain.border',
         '&:hover': {
           borderColor: 'button.plain.hover.border',
           backgroundColor: 'button.plain.hover.background',
+          '--nv-button-loading-surface':
+            '{colors.button.plain.hover.background}',
         },
         '&:active': {
           borderColor: 'button.plain.pressed.border',
           backgroundColor: 'button.plain.pressed.background',
+          '--nv-button-loading-surface':
+            '{colors.button.plain.pressed.background}',
         },
         '&:focus': {
           boxShadow: '0 0 0 0.25rem {colors.button.plain.focus.ring}',
@@ -142,6 +203,8 @@ export const buttonRecipe = cva({
         '&[data-selected]': {
           borderColor: 'button.plain.selected.border',
           backgroundColor: 'button.plain.selected.background',
+          '--nv-button-loading-surface':
+            '{colors.button.plain.selected.background}',
         },
       },
       ghost: {
