@@ -22,6 +22,8 @@ export const ElectronMessengerWindow = () => {
    * focus again.
    *  */
   let isFocused = false
+  let visibilityRequest = 0
+  let hiding = false
   // let lastKeypressTime = 0
   // const doubleKeypressDelta = 500
   let registeredWindow: BrowserWindow | null = null
@@ -29,7 +31,8 @@ export const ElectronMessengerWindow = () => {
   let hitboxesStore: ReturnType<typeof useHitboxesStore> | undefined
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
   let messengerWindowStore:
-    ReturnType<typeof useMessengerWindowStore> | undefined
+    | ReturnType<typeof useMessengerWindowStore>
+    | undefined
   const ready = Deferred<BrowserWindow>()
   const isReady = () => ready.promise
   let foregroundWindow: string | number | null = null
@@ -84,6 +87,8 @@ export const ElectronMessengerWindow = () => {
       const window = getWindow()
       if (window) {
         if (!isFocused) {
+          visibilityRequest++
+          hiding = false
           if (native) {
             // Need to call ensureNativeFocus as late as possible otherwise it can break the foreground window
             window.once('focus', () => {
@@ -145,12 +150,41 @@ export const ElectronMessengerWindow = () => {
       }
       const window = getWindow()
       if (window) {
+        const request = ++visibilityRequest
+        hiding = true
         blur(returnFocus)
-          .then(() => {
-            window.hide()
+          .then(async () => {
+            if (request !== visibilityRequest) return resolve(true)
+            // A transparent Electron window can show its last composited frame
+            // when reopened. Paint a cleared backdrop before hiding it.
+            if (window.isVisible() && !window.isDestroyed()) {
+              let timeout: ReturnType<typeof setTimeout> | undefined
+              try {
+                await Promise.race([
+                  window.webContents.executeJavaScript(`new Promise(resolve => {
+                    window.dispatchEvent(new Event('nv-messenger-prepare-hide'))
+                    requestAnimationFrame(() => requestAnimationFrame(() => resolve(true)))
+                  })`),
+                  new Promise((done) => {
+                    timeout = setTimeout(done, 250)
+                  }),
+                ])
+              } catch {
+                // Hiding must remain available if the renderer has exited.
+              } finally {
+                if (timeout !== undefined) clearTimeout(timeout)
+              }
+            }
+            if (request === visibilityRequest) {
+              hiding = false
+              if (!window.isDestroyed()) window.hide()
+            }
             resolve(true)
           })
-          .catch(reject)
+          .catch((error) => {
+            if (request === visibilityRequest) hiding = false
+            reject(error)
+          })
       } else {
         reject()
       }
@@ -240,7 +274,7 @@ export const ElectronMessengerWindow = () => {
       }
       const window = getWindow()
       if (window) {
-        if (window.isVisible()) {
+        if (window.isVisible() && !hiding) {
           hide()
         } else {
           focus(context, native)
