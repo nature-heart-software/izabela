@@ -393,9 +393,6 @@ importers:
       vue-router:
         specifier: ^4.0.14
         version: 4.6.4(vue@3.5.11(typescript@5.9.3))
-      vue-tippy:
-        specifier: 6.7.0
-        version: 6.7.0(vue@3.5.11(typescript@5.9.3))
       vue-tsc:
         specifier: ^2.0.6
         version: 2.2.12(typescript@5.9.3)
@@ -771,9 +768,6 @@ importers:
       csstype:
         specifier: ^3.2.3
         version: 3.2.3
-      tippy.js:
-        specifier: ^6.3.7
-        version: 6.3.7
     devDependencies:
       '@pandacss/dev':
         specifier: 1.12.1
@@ -7023,7 +7017,7 @@ packages:
     engines: {node: '>=22'}
 
   gelectron@https://github.com/hiitiger/goverlay/tarball/3ca1f040b180dc6ce84baca093c6f726748461ad:
-    resolution: {tarball: https://github.com/hiitiger/goverlay/tarball/3ca1f040b180dc6ce84baca093c6f726748461ad}
+    resolution: {tarball: 'https://github.com/hiitiger/goverlay/tarball/3ca1f040b180dc6ce84baca093c6f726748461ad'}
     version: 1.0.1
 
   generate-function@2.3.1:
@@ -10229,7 +10223,7 @@ packages:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
 
   sam-js@https://codeload.github.com/Imrane03/better-sam/tar.gz/88789236c62e9f1b49f3d3c47ad12706da28eace:
-    resolution: {gitHosted: true, integrity: sha512-21QP+dLXqrEZDmIpaOI6KF2Co4628ba6l+OdPEJeu65MlmWVWMriUziPJGgXN8qpB1vh6iZFIfdCNx082RU4xg==, tarball: https://codeload.github.com/Imrane03/better-sam/tar.gz/88789236c62e9f1b49f3d3c47ad12706da28eace}
+    resolution: {gitHosted: true, integrity: sha512-21QP+dLXqrEZDmIpaOI6KF2Co4628ba6l+OdPEJeu65MlmWVWMriUziPJGgXN8qpB1vh6iZFIfdCNx082RU4xg==, tarball: 'https://codeload.github.com/Imrane03/better-sam/tar.gz/88789236c62e9f1b49f3d3c47ad12706da28eace'}
     version: 0.1.2
     engines: {node: '>= 4.0.0', yarn: '>= 1.17.3'}
 
@@ -10854,9 +10848,6 @@ packages:
   tinyspy@4.0.6:
     resolution: {integrity: sha512-u8KszXvGfU68hVcZpRHKG28T0krMuv2G5nDhiHaMLen/gIuFEgIJhaJuO69qjnXg5paSrbPMFfx3brNuN8eVSg==}
     engines: {node: '>=14.0.0'}
-
-  tippy.js@6.3.7:
-    resolution: {integrity: sha512-E1d3oP2emgJ9dRQZdf3Kkn0qJgI6ZLpyS5z6ZkY1DF3kaQaBsGZsndEpHwx+eC+tYM41HaSNvNtLx8tU57FzTQ==}
 
   tldts-core@7.4.19:
     resolution: {integrity: sha512-goNXV6Ho9TIOfpJZanTd6CKG5DyYgYAL+k+22T0SLh8l6+KHIfBUPFuePuSZv05UttIaaLmI9tb7TmGIdK5AkQ==}
@@ -11523,11 +11514,6 @@ packages:
     resolution: {integrity: sha512-Hz9q5sa33Yhduglwz6g9skT8OBPii+4bFn88w6J+J4MfEo4KRRpmiNG/hHHkdbRFlLBOqxN8y8gf2Fb0MTUgVg==}
     peerDependencies:
       vue: ^3.5.0
-
-  vue-tippy@6.7.0:
-    resolution: {integrity: sha512-e0w6UA+A+J79GhDYNw5xZjGu7Tc2ksYypwF5RjkJVWgAGNSpXkLVNx4gZ8cMUa8FRHqmGAZxN3ue7MeXgbeZAQ==}
-    peerDependencies:
-      vue: ^3.2.0
 
   vue-tsc@2.2.12:
     resolution: {integrity: sha512-P7OP77b2h/Pmk+lZdJ0YWs+5tJ6J2+uOQPo7tlBnY44QqQSPYvS0qVT4wqDJgwrZaLe47etJLLQRFia71GYITw==}
@@ -24401,10 +24387,6 @@ snapshots:
 
   tinyspy@4.0.6: {}
 
-  tippy.js@6.3.7:
-    dependencies:
-      '@popperjs/core': 2.11.8
-
   tldts-core@7.4.19: {}
 
   tldts@7.4.19:
@@ -25061,11 +25043,6 @@ snapshots:
   vue-router@4.6.4(vue@3.5.11(typescript@5.9.3)):
     dependencies:
       '@vue/devtools-api': 6.6.4
-      vue: 3.5.11(typescript@5.9.3)
-
-  vue-tippy@6.7.0(vue@3.5.11(typescript@5.9.3)):
-    dependencies:
-      tippy.js: 6.3.7
       vue: 3.5.11(typescript@5.9.3)
 
   vue-tsc@2.2.12(typescript@5.9.3):

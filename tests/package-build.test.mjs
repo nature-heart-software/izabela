@@ -59,11 +59,7 @@ for (const directory of ['packages/icons', 'packages/ui']) {
 test('UI public declaration dependencies are directly resolvable', () => {
   const pkg = readPackage('packages/ui')
   const require = createRequire(resolve(root, 'packages/ui/package.json'))
-  for (const dependency of [
-    'csstype',
-    'tippy.js',
-    '@zag-js/interact-outside',
-  ]) {
+  for (const dependency of ['csstype', '@zag-js/interact-outside']) {
     assert.ok(
       pkg.dependencies[dependency],
       `missing direct dependency: ${dependency}`,
