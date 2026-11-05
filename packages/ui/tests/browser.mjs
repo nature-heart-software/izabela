@@ -265,6 +265,79 @@ try {
     )
     await call('Emulation.setEmulatedMedia', { features: [] })
   })
+  await journey('select-tooltip-hover-boundary', async () => {
+    await story('integration-overlays--select-tooltips')
+    for (const variant of [
+      'sm',
+      'md',
+      'lg',
+      'multiple',
+      'disabled',
+      'readonly',
+    ]) {
+      const input = `#tooltip-select-${variant}`
+      const indicator = `[data-nv-select-control]:has(${input}) > :last-child svg`
+      await pointer('mouseMoved', await point(indicator))
+      await waitFor(
+        `document.querySelector('[role=tooltip]')?.textContent.includes('(${variant})')`,
+      )
+      const tooltipId = await evaluate(
+        "document.querySelector('[role=tooltip]').id",
+      )
+      await check(
+        'Input retains its accessible tooltip description',
+        `document.querySelector('${input}').getAttribute('aria-describedby')`,
+        tooltipId,
+      )
+      await pointer('mouseMoved', await point(input))
+      await pointer('mouseMoved', await point(indicator))
+      await delay(140)
+      await check(
+        'Moving between text and indicator retains the same tooltip',
+        "document.querySelector('[role=tooltip]')?.id",
+        tooltipId,
+      )
+      await pointer('mouseMoved', { x: 10, y: 10 })
+      await waitFor("!document.querySelector('[role=tooltip]')")
+      // Leaving before the opening delay must not show a tooltip later.
+      await pointer('mouseMoved', await point(indicator))
+      await pointer('mouseMoved', { x: 10, y: 10 })
+      await delay(140)
+      await check(
+        'Pending indicator hover is cancelled on leave',
+        "Boolean(document.querySelector('[role=tooltip]'))",
+        false,
+      )
+      await click(indicator)
+      if (['disabled', 'readonly'].includes(variant)) {
+        await check(
+          'Locked Select does not open from its indicator',
+          `document.querySelector('${input}').getAttribute('aria-expanded')`,
+          'false',
+        )
+      } else {
+        await waitFor(
+          `document.querySelector('${input}').getAttribute('aria-expanded') === 'true'`,
+        )
+        await check(
+          'Indicator still focuses the real input',
+          'document.activeElement.id',
+          `tooltip-select-${variant}`,
+        )
+        await check(
+          'Focused Select suppresses its tooltip',
+          "Boolean(document.querySelector('[role=tooltip]'))",
+          false,
+        )
+        await key('Escape', 'Escape', 27)
+        // The previous Select's full-gesture shield owns hits until its leave
+        // transition completes; settle it before hovering the next control.
+        await waitFor("!document.querySelector('.autocomplete')")
+      }
+      await pointer('mouseMoved', { x: 10, y: 10 })
+      await waitFor("!document.querySelector('[role=tooltip]')")
+    }
+  })
   await journey('disabled-select', async () => {
     await story('integration-overlays--disabled-select')
     await check(

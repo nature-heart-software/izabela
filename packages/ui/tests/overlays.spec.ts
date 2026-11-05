@@ -269,6 +269,58 @@ describe('overlay interaction boundaries', () => {
     ).toBeNull()
   })
 
+  it.each(['sm', 'md', 'lg'])(
+    'shows a Select tooltip over the %s indicator and keeps one hover boundary across its text',
+    async (size) => {
+      const wrapper = render(ui.NvTooltip, {
+        props: { tippyOptions: { delay: 0, duration: 0 } },
+        slots: {
+          reference: () =>
+            h(ui.NvSelect, {
+              id: `tooltip-select-${size}`,
+              'aria-label': 'Speech engine',
+              size,
+              modelValue: 'a',
+              options: [{ label: 'Alpha', value: 'a' }],
+            }),
+          default: 'Choose a speech engine',
+        },
+      })
+      await settle()
+      const control = wrapper.get('[data-nv-select-control]')
+      const input = wrapper.get('input')
+      // The decorative indicator has pointer-events:none: Chromium hits its
+      // containing control, not the input that occupies the text region.
+      await control.trigger('pointermove', { pointerType: 'mouse' })
+      await settle()
+      const tooltip = document.querySelector('[role="tooltip"]')
+      expect(tooltip?.textContent).toContain('Choose a speech engine')
+      expect(input.attributes('id')).toBe(`tooltip-select-${size}`)
+      expect(input.attributes('aria-label')).toBe('Speech engine')
+      expect(input.attributes('aria-describedby')).toBe(tooltip?.id)
+      await input.trigger('pointermove', { pointerType: 'mouse' })
+      input.element.dispatchEvent(
+        new MouseEvent('pointerleave', { relatedTarget: control.element }),
+      )
+      await settle()
+      expect(document.querySelector('[role="tooltip"]')).toBe(tooltip)
+      control.element.dispatchEvent(
+        new MouseEvent('pointerleave', { relatedTarget: document.body }),
+      )
+      await settle()
+      expect(document.querySelector('[role="tooltip"]')).toBeNull()
+      await control.trigger('pointermove', { pointerType: 'mouse' })
+      await settle()
+      expect(document.querySelector('[role="tooltip"]')).not.toBeNull()
+      await control.trigger('pointerdown', { pointerType: 'mouse' })
+      await control.trigger('click')
+      await settle()
+      expect(document.querySelector('[role="tooltip"]')).toBeNull()
+      expect(document.activeElement).toBe(input.element)
+      expect(input.attributes('aria-expanded')).toBe('true')
+    },
+  )
+
   it('dismisses tooltips and cancels pending hover opens when the window loses focus', async () => {
     const wrapper = render(ui.NvTooltip, {
       props: { tippyOptions: { delay: [80, 0] } },

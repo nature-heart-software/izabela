@@ -7,6 +7,7 @@ import {
   NvContextMenu,
   NvSelect,
   NvStack,
+  NvTooltip,
 } from './components'
 
 export default { title: 'Integration/Overlays' }
@@ -69,6 +70,38 @@ export const Nested = {
             </NvStack>
           </template>
         </NvDialog>
+      </NvStack>
+    `,
+  }),
+}
+
+export const SelectTooltips = {
+  render: () => ({
+    components: { NvSelect, NvStack, NvTooltip },
+    setup: () => ({
+      variants: [
+        { id: 'sm', size: 'sm' },
+        { id: 'md', size: 'md' },
+        { id: 'lg', size: 'lg' },
+        { id: 'multiple', size: 'md', multiple: true },
+        { id: 'disabled', size: 'md', disabled: true },
+        { id: 'readonly', size: 'md', readonly: true },
+      ],
+      options: [
+        { label: 'Alpha', value: 'a' },
+        { label: 'Beta', value: 'b' },
+      ],
+    }),
+    template: `
+      <NvStack spacing="5" style="width: 260px; margin: 80px">
+        <NvTooltip v-for="variant in variants" :key="variant.id" :tippy-options="{ delay: [80, 0], duration: 0 }">
+          Choose a speech engine ({{ variant.id }})
+          <template #reference>
+            <NvSelect :id="'tooltip-select-' + variant.id" :aria-label="'Speech engine ' + variant.id"
+              :size="variant.size" :multiple="variant.multiple" :disabled="variant.disabled" :readonly="variant.readonly"
+              :model-value="variant.multiple ? ['a'] : 'a'" :options="options" />
+          </template>
+        </NvTooltip>
       </NvStack>
     `,
   }),

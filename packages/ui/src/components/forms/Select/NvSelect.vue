@@ -22,7 +22,7 @@
           data-nv-select-control
           ref="select"
           :class="box({ width: '100%' })"
-          v-bind="{ ...props, isFocused: hasFocus }"
+          v-bind="{ ...props, ...pointerAttrs, isFocused: hasFocus }"
           @click="activate"
         >
           <StSelectWrapper :class="box({ width: '100%' })" v-bind="props">
@@ -167,7 +167,16 @@ import omit from 'lodash/omit'
 const props = defineProps(propsDefinition)
 defineOptions({ inheritAttrs: false })
 const attrs = useAttrs()
-const inputAttrs = computed(() => omit(attrs, ['class', 'style']))
+// Pointer listeners describe the whole control, including its indicator and tags.
+// Native input attributes and keyboard/focus listeners still belong to the input.
+const pointerAttrs = computed(() =>
+  Object.fromEntries(
+    Object.entries(attrs).filter(([name]) => name.startsWith('onPointer')),
+  ),
+)
+const inputAttrs = computed(() =>
+  omit(attrs, ['class', 'style', ...Object.keys(pointerAttrs.value)]),
+)
 const isLocked = computed(() => props.disabled || props.readonly)
 const emit = defineEmits(['update:modelValue'])
 const iconSize = computed(() => {
@@ -272,7 +281,7 @@ watch(
   },
 )
 
-const fuseOptions = computed<UseFuseOptions<(typeof options.value)[number]>>(
+const fuseOptions = computed<UseFuseOptions<typeof options.value[number]>>(
   () => ({
     fuseOptions: {
       keys: ['label', 'category', 'searchValue'],
