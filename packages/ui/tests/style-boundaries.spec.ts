@@ -366,10 +366,10 @@ function winningRole(element: Element, property: string, pseudo = '') {
     const value =
       rule.declarations[property] ??
       (property === 'border-bottom-color'
-        ? rule.declarations['border-color'] ??
+        ? (rule.declarations['border-color'] ??
           rule.declarations['border-bottom']?.match(
             /var\(--colors-[^)]+\)/,
-          )?.[0]
+          )?.[0])
         : undefined)
     if (!value) return
     parseSelector((selectors: any) =>
