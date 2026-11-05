@@ -7,6 +7,8 @@ export const buttonRecipe = cva({
     flexShrink: '0',
     position: 'relative',
     display: 'inline-flex',
+    cursor: 'pointer',
+    _disabled: { cursor: 'not-allowed' },
     alignItems: 'center',
     fontWeight: '600',
     borderWidth: '1px',
