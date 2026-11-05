@@ -9,18 +9,27 @@ function fixture() {
   let visible = false
   let destroyed = false
   let nativeFocuses = 0
-  let paint = Promise.resolve(true)
   let paintRequests = 0
-  let timerId = 0
-  const timers = new Map()
+  let mouse
+  const timers = []
+  const store = { $patch() {} }
+  const settings = {
+    $whenReady: () => Promise.resolve(),
+    hideWindowOnClickOutside: false,
+  }
   Object.assign(window, {
     isVisible: () => visible,
     isDestroyed: () => destroyed,
+    getPosition: () => [0, 0],
+    setBounds() {},
     show() {
+      const wasVisible = visible
       visible = true
+      if (!wasVisible) window.emit('show')
     },
     hide() {
       visible = false
+      window.emit('hide')
     },
     focus() {
       window.emit('focus')
@@ -31,8 +40,9 @@ function fixture() {
     webContents: {
       executeJavaScript() {
         paintRequests++
-        return paint
+        throw new Error('Window hiding must not depend on renderer paint')
       },
+      setWindowOpenHandler() {},
     },
   })
   const { ElectronMessengerWindow } = loadTypescript(
@@ -41,11 +51,30 @@ function fixture() {
       '@/modules/electron-window-manager': {
         getInstanceByName: () => ({ window }),
       },
-      '@/modules/node-mouse': {},
-      electron: {},
-      '@/teams/messenger/store': {},
-      '@/features/settings/store': {},
-      '@/modules/vue-hitboxes/hitboxes.store': {},
+      '@/modules/node-mouse': {
+        startMouse: (_event, callback) => {
+          mouse = callback
+          return 'test-mouse'
+        },
+        stopMouse: () => {
+          mouse = undefined
+        },
+      },
+      electron: {
+        screen: {
+          screenToDipPoint: (point) => point,
+          getDisplayNearestPoint: () => ({ scaleFactor: 1 }),
+          getAllDisplays: () => [],
+          getPrimaryDisplay: () => ({ bounds: {} }),
+        },
+      },
+      '@/teams/messenger/store': { useMessengerWindowStore: () => store },
+      '@/features/settings/store': { useSettingsStore: () => settings },
+      '@/modules/vue-hitboxes/hitboxes.store': {
+        useHitboxesStore: () => ({
+          hitboxes: [{ x: 0, y: 0, w: 100, h: 100 }],
+        }),
+      },
       '@packages/toolbox': {
         Deferred() {
           let resolve
@@ -64,33 +93,34 @@ function fixture() {
       },
       koffi: { load: () => ({ func: () => () => 2 }) },
       '@/modules/electron-dialog': { dialogsMap: new Map() },
-      '@/features/display/utils': {},
-    },
-    {
-      setTimeout: (fn) => {
-        const id = ++timerId
-        timers.set(id, fn)
-        return id
+      '@/features/display/utils': { findDisplay: () => undefined },
+      'win-control': {
+        Window: { getForeground: () => ({ getPid: () => 42 }) },
       },
-      clearTimeout: (id) => timers.delete(id),
     },
+    { setTimeout: (fn) => timers.push(fn) },
   )
+  const controller = ElectronMessengerWindow()
   return {
-    controller: ElectronMessengerWindow(),
-    flush: () => {
-      const callbacks = [...timers.values()]
-      timers.clear()
-      callbacks.forEach((fn) => fn())
+    controller,
+    start: async () => {
+      controller.start(window)
+      await Promise.resolve()
+      await Promise.resolve()
     },
+    close: () => {
+      let prevented = false
+      window.emit('close', {
+        preventDefault() {
+          prevented = true
+        },
+      })
+      assert.equal(prevented, true)
+    },
+    move: (x, y) => mouse?.('move', x, y),
     visible: () => visible,
     paintRequests: () => paintRequests,
-    deferPaint: () => {
-      let finish
-      paint = new Promise((resolve) => {
-        finish = resolve
-      })
-      return () => finish(true)
-    },
+    flush: () => timers.splice(0).forEach((fn) => fn()),
     nativeFocuses: () => nativeFocuses,
     destroy: () => {
       destroyed = true
@@ -121,38 +151,26 @@ test('destroying the messenger also invalidates delayed native focus', () => {
   assert.equal(f.nativeFocuses(), 0)
 })
 
-test('hides only after the renderer has painted a transparent backdrop', async () => {
+test('native close still hides after inside-to-outside mouse motion without waiting for renderer paint', async () => {
   const f = fixture()
+  await f.start()
   f.controller.focus('keyboard')
-  const finishPaint = f.deferPaint()
-  const hiding = f.controller.hide()
+  f.close()
+  f.move(50, 50)
+  f.move(200, 200)
   await Promise.resolve()
-  assert.equal(f.visible(), true)
-  assert.equal(f.paintRequests(), 1)
-  finishPaint()
-  await hiding
+  await Promise.resolve()
   assert.equal(f.visible(), false)
+  assert.equal(f.paintRequests(), 0)
 })
 
-test('a shortcut during pending hide reopens instead of hiding the new activation', async () => {
+test('an explicit show reopens the window after hide completes', async () => {
   const f = fixture()
+  await f.start()
   f.controller.focus('keyboard')
-  const finishPaint = f.deferPaint()
-  const hiding = f.controller.hide()
-  await Promise.resolve()
-  f.controller.toggleWindow('keyboard')
-  finishPaint()
-  await hiding
-  assert.equal(f.visible(), true)
-})
-
-test('an unresponsive renderer cannot prevent the native window from hiding', async () => {
-  const f = fixture()
-  f.controller.focus('keyboard')
-  f.deferPaint()
-  const hiding = f.controller.hide()
-  await Promise.resolve()
-  f.flush()
-  await hiding
+  await f.controller.hide()
   assert.equal(f.visible(), false)
+  assert.equal(f.paintRequests(), 0)
+  await f.controller.show()
+  assert.equal(f.visible(), true)
 })
