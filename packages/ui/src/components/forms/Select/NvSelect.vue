@@ -22,7 +22,12 @@
           data-nv-select-control
           ref="select"
           :class="box({ width: '100%' })"
-          v-bind="{ ...props, ...pointerAttrs, isFocused: hasFocus }"
+          v-bind="{
+            ...props,
+            ...pointerAttrs,
+            ...tooltipTriggerAttrs,
+            isFocused: hasFocus,
+          }"
           @click="activate"
         >
           <StSelectWrapper :class="box({ width: '100%' })" v-bind="props">
@@ -130,6 +135,7 @@ import {
   reactive,
   ref,
   useAttrs,
+  useId,
   watch,
 } from 'vue'
 import { Combobox, useCombobox } from '@ark-ui/vue'
@@ -174,8 +180,28 @@ const pointerAttrs = computed(() =>
     Object.entries(attrs).filter(([name]) => name.startsWith('onPointer')),
   ),
 )
-const inputAttrs = computed(() =>
-  omit(attrs, ['class', 'style', ...Object.keys(pointerAttrs.value)]),
+const controlId = `nv-select-${useId()}-control`
+const tooltipTriggerAttrs = computed(() =>
+  attrs['data-scope'] === 'tooltip' && attrs['data-part'] === 'trigger'
+    ? {
+        id: controlId,
+        'data-scope': attrs['data-scope'],
+        'data-part': attrs['data-part'],
+        'data-state': attrs['data-state'],
+        'data-expanded': attrs['data-expanded'],
+      }
+    : {},
+)
+const inputAttrs = computed<Record<string, unknown>>(() =>
+  omit(attrs, [
+    'class',
+    'style',
+    ...Object.keys(pointerAttrs.value),
+    ...Object.keys(tooltipTriggerAttrs.value).filter((name) => name !== 'id'),
+    // Ark's generated trigger ID belongs to the control. Keep a caller's own
+    // input ID, but never duplicate the control ID onto the editable input.
+    ...(attrs.id === controlId ? ['id'] : []),
+  ]),
 )
 const isLocked = computed(() => props.disabled || props.readonly)
 const emit = defineEmits(['update:modelValue'])
@@ -351,7 +377,10 @@ const combobox = useCombobox<SelectOption>(
     // NvAutocomplete owns positioning, nested layers and the dismissal shield.
     disableLayer: true,
     ids: computed(() => ({
-      input: typeof attrs.id === 'string' ? attrs.id : undefined,
+      input:
+        typeof inputAttrs.value.id === 'string'
+          ? inputAttrs.value.id
+          : undefined,
     })),
     onInputValueChange: ({ inputValue }: { inputValue: string }) =>
       updateSearch(inputValue),

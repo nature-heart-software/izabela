@@ -86,6 +86,64 @@ afterEach(async () => {
 })
 
 describe('overlay trigger ownership', () => {
+  it.each(['custom', 'generated'])(
+    'Select tooltip measures its complete control with a %s input ID',
+    async (kind) => {
+      const wrapper = render(ui.NvTooltip, {
+        props: { tippyOptions: { delay: 0, placement: 'top' } },
+        slots: {
+          reference: () =>
+            h(ui.NvSelect, {
+              ...(kind === 'custom' ? { id: 'consumer-select-input' } : {}),
+              'aria-label': 'Speech engine',
+              options: [{ label: 'Alpha', value: 'a' }],
+              modelValue: 'a',
+            }),
+          default: 'Choose a speech engine',
+        },
+      })
+      await settle()
+      const control = wrapper.get('[data-nv-select-control]')
+        .element as HTMLElement
+      const input = wrapper.get('input').element as HTMLInputElement
+      vi.spyOn(control, 'getBoundingClientRect').mockReturnValue(
+        new DOMRect(20, 30, 320, 48),
+      )
+      vi.spyOn(input, 'getBoundingClientRect').mockReturnValue(
+        new DOMRect(40, 38, 260, 24),
+      )
+      control.dispatchEvent(new MouseEvent('pointermove', { bubbles: true }))
+      await settle()
+      const positioner = document.querySelector(
+        '[data-scope="tooltip"][data-part="positioner"]',
+      ) as HTMLElement
+      expect(positioner).not.toBeNull()
+      await vi.waitFor(() =>
+        expect(positioner.style.getPropertyValue('--reference-width')).toBe(
+          '320px',
+        ),
+      )
+      expect(
+        wrapper.get('[data-scope="tooltip"][data-part="trigger"]').element,
+      ).toBe(control)
+      expect(control.id).not.toBe('')
+      expect(input.id).not.toBe(control.id)
+      if (kind === 'custom') expect(input.id).toBe('consumer-select-input')
+      expect(document.getElementById(input.id)).toBe(input)
+      expect(input.getAttribute('aria-label')).toBe('Speech engine')
+      expect(input.getAttribute('aria-describedby')).toBe(
+        document.querySelector('[role="tooltip"]')?.id,
+      )
+      expect(
+        new Set(
+          [...wrapper.element.querySelectorAll('[id]')].map(
+            (element) => element.id,
+          ),
+        ).size,
+      ).toBe(wrapper.element.querySelectorAll('[id]').length)
+    },
+  )
+
   it.each(['native', 'shared', 'custom', 'generated'])(
     'menu restores focus to its actual %s trigger after nested Escape',
     async (kind) => {

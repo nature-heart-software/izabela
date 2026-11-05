@@ -94,7 +94,7 @@ export const SelectTooltips = {
     }),
     template: `
       <NvStack spacing="5" style="width: 260px; margin: 80px">
-        <NvTooltip v-for="variant in variants" :key="variant.id" :tippy-options="{ delay: [80, 0], duration: 0 }">
+        <NvTooltip v-for="variant in variants" :key="variant.id" :tippy-options="{ delay: [80, 0], duration: 0, offset: [0, 12] }">
           Choose a speech engine ({{ variant.id }})
           <template #reference>
             <NvSelect :id="'tooltip-select-' + variant.id" :aria-label="'Speech engine ' + variant.id"

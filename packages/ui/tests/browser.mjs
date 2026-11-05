@@ -282,8 +282,23 @@ try {
         `document.querySelector('[role=tooltip]')?.textContent.includes('(${variant})')`,
       )
       const tooltipId = await evaluate(
-        "document.querySelector('[role=tooltip]').id",
+        "(() => {window.__nvSelectTooltipNode = document.querySelector('[role=tooltip]'); return window.__nvSelectTooltipNode.id})()",
       )
+      await check(
+        'Tooltip trigger is the complete Select control',
+        `document.querySelector('${input}').closest('[data-nv-select-control]').matches('[data-scope="tooltip"][data-part="trigger"]')`,
+        true,
+      )
+      await waitFor(`(() => {
+        const control = document.querySelector('${input}').closest('[data-nv-select-control]');
+        const tooltip = document.querySelector('[role=tooltip]');
+        const positioner = document.querySelector('[data-scope=tooltip][data-part=positioner]');
+        const r = control.getBoundingClientRect(), t = tooltip.getBoundingClientRect();
+        return Math.abs(parseFloat(positioner.style.getPropertyValue('--reference-width')) - r.width) < 1
+          && Math.abs((t.left + t.width / 2) - (r.left + r.width / 2)) < 1
+          && Math.abs((r.top - t.bottom) - 12) < 1;
+      })()`)
+
       await check(
         'Input retains its accessible tooltip description',
         `document.querySelector('${input}').getAttribute('aria-describedby')`,
@@ -293,9 +308,9 @@ try {
       await pointer('mouseMoved', await point(indicator))
       await delay(140)
       await check(
-        'Moving between text and indicator retains the same tooltip',
-        "document.querySelector('[role=tooltip]')?.id",
-        tooltipId,
+        'Moving between text and indicator retains the same tooltip node',
+        "window.__nvSelectTooltipNode.isConnected && document.querySelector('[role=tooltip]') === window.__nvSelectTooltipNode",
+        true,
       )
       await pointer('mouseMoved', { x: 10, y: 10 })
       await waitFor("!document.querySelector('[role=tooltip]')")

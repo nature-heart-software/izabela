@@ -39,7 +39,13 @@ const triggerId = ref(`nv-tooltip-${useId()}-trigger`)
 watchPostEffect(() => {
   // Zag measures the trigger by ID even when Ark composes a consumer element.
   const element = getElement(trigger.value)
-  if (element?.id) triggerId.value = element.id
+  const selector = '[data-scope="tooltip"][data-part="trigger"]'
+  // Composite references can own an input and a separate full-control trigger.
+  // Resolve the marked primitive owner, not an incidental component root.
+  const target = element?.matches(selector)
+    ? element
+    : element?.querySelector<HTMLElement>(selector) || element
+  if (target?.id) triggerId.value = target.id
 })
 const tooltip = ref<MaybeElement>()
 const { focused } = useFocusWithin(tooltip)
