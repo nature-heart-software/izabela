@@ -12,6 +12,8 @@ export const buttonRecipe = cva({
     borderWidth: '1px',
     borderStyle: 'solid',
     outline: '0',
+    cursor: 'pointer',
+    _disabled: { cursor: 'not-allowed' },
     transition: 'all .3s',
     overflow: 'hidden',
     '& .nv-button__icon': { pointerEvents: 'none' },

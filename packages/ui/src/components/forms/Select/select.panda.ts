@@ -15,14 +15,13 @@ const select = cva({
     borderColor: 'select.default.border',
     color: 'select.default.text',
     backgroundColor: 'select.default.background',
-    transition: 'all 0.15s ease',
+    transition: 'all .3s',
     _hover: {
       borderColor: 'select.default.hover.border',
       color: 'select.default.hover.text',
       backgroundColor: 'select.default.hover.background',
       '& input': {
         color: 'select.default.hover.text',
-        backgroundColor: 'select.default.hover.background',
       },
       '& svg': { color: 'select.default.hover.icon' },
     },
@@ -66,7 +65,6 @@ const select = cva({
         backgroundColor: 'select.default.focus.background',
         '& input': {
           color: 'select.default.focus.text',
-          backgroundColor: 'select.default.focus.background',
         },
         '& svg': { color: 'select.default.focus.icon' },
         boxShadow: '0 0 0 0.25rem {colors.select.default.focus.focus-ring}',
@@ -97,7 +95,7 @@ const input = cva({
     font: 'inherit',
     letterSpacing: 'inherit',
     color: 'select.default.text',
-    backgroundColor: 'select.default.background',
+    backgroundColor: 'transparent',
     _placeholder: {
       color: 'select.default.placeholder',
       fontWeight: '300',

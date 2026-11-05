@@ -2392,7 +2392,7 @@
             "hover": {
               "text": "#171717",
               "background": "#f3f3f3",
-              "border": "#0c0c0c"
+              "border": "rgba(10, 10, 10, 0.10000000149011612)"
             },
             "focus": {
               "text": "#171717",
@@ -2497,7 +2497,7 @@
             "hover": {
               "text": "#171717",
               "background": "#f3f3f3",
-              "border": "#0c0c0c"
+              "border": "rgba(10, 10, 10, 0.10000000149011612)"
             },
             "focus": {
               "text": "#171717",
@@ -2545,7 +2545,7 @@
             "hover": {
               "text": "#171717",
               "background": "#f3f3f3",
-              "border": "#0c0c0c"
+              "border": "rgba(10, 10, 10, 0.10000000149011612)"
             },
             "focus": {
               "text": "#171717",
@@ -2573,7 +2573,7 @@
               "text": "#171717",
               "icon": "#171717",
               "background": "#f3f3f3",
-              "border": "#0c0c0c"
+              "border": "rgba(10, 10, 10, 0.10000000149011612)"
             },
             "focus": {
               "text": "#171717",
@@ -3446,7 +3446,7 @@
             "hover": {
               "text": "#f5f5f5",
               "background": "#262626",
-              "border": "#505050"
+              "border": "#333333"
             },
             "focus": {
               "text": "#f5f5f5",
@@ -3551,7 +3551,7 @@
             "hover": {
               "text": "#f5f5f5",
               "background": "#262626",
-              "border": "#505050"
+              "border": "#333333"
             },
             "focus": {
               "text": "#f5f5f5",
@@ -3599,7 +3599,7 @@
             "hover": {
               "text": "#f5f5f5",
               "background": "#262626",
-              "border": "#505050"
+              "border": "#333333"
             },
             "focus": {
               "text": "#f5f5f5",
@@ -3627,7 +3627,7 @@
               "text": "#f5f5f5",
               "icon": "#f5f5f5",
               "background": "#262626",
-              "border": "#505050"
+              "border": "#333333"
             },
             "focus": {
               "text": "#f5f5f5",
@@ -4500,7 +4500,7 @@
             "hover": {
               "text": "#1f2328",
               "background": "#eff2f5",
-              "border": "#818b98"
+              "border": "#d1d9e0"
             },
             "focus": {
               "text": "#1f2328",
@@ -4605,7 +4605,7 @@
             "hover": {
               "text": "#1f2328",
               "background": "#eff2f5",
-              "border": "#818b98"
+              "border": "#d1d9e0"
             },
             "focus": {
               "text": "#1f2328",
@@ -4653,7 +4653,7 @@
             "hover": {
               "text": "#1f2328",
               "background": "#eff2f5",
-              "border": "#818b98"
+              "border": "#d1d9e0"
             },
             "focus": {
               "text": "#1f2328",
@@ -4681,7 +4681,7 @@
               "text": "#1f2328",
               "icon": "#1f2328",
               "background": "#eff2f5",
-              "border": "#818b98"
+              "border": "#d1d9e0"
             },
             "focus": {
               "text": "#1f2328",
@@ -5554,7 +5554,7 @@
             "hover": {
               "text": "#f0f6fc",
               "background": "#262c36",
-              "border": "#656c76"
+              "border": "#3d444d"
             },
             "focus": {
               "text": "#f0f6fc",
@@ -5659,7 +5659,7 @@
             "hover": {
               "text": "#f0f6fc",
               "background": "#262c36",
-              "border": "#656c76"
+              "border": "#3d444d"
             },
             "focus": {
               "text": "#f0f6fc",
@@ -5707,7 +5707,7 @@
             "hover": {
               "text": "#f0f6fc",
               "background": "#262c36",
-              "border": "#656c76"
+              "border": "#3d444d"
             },
             "focus": {
               "text": "#f0f6fc",
@@ -5735,7 +5735,7 @@
               "text": "#f0f6fc",
               "icon": "#f0f6fc",
               "background": "#262c36",
-              "border": "#656c76"
+              "border": "#3d444d"
             },
             "focus": {
               "text": "#f0f6fc",

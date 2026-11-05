@@ -386,6 +386,82 @@ function winningRole(element: Element, property: string, pseudo = '') {
     .at(-1)?.value
 }
 
+describe('Select search surface ownership', () => {
+  it('matches the transition timing of Buttons and Inputs', () => {
+    const select = render(ui.NvSelect)
+    const button = render(ui.NvButton)
+    const input = render(ui.NvInput)
+    const transition = winningRole(button.get('button').element, 'transition')
+    expect(transition).toBe('all .3s')
+    expect(winningRole(input.get('input').element, 'transition')).toBe(
+      transition,
+    )
+    expect(
+      winningRole(select.get('[data-nv-select-control]').element, 'transition'),
+    ).toBe(transition)
+  })
+
+  it.each(['sm', 'md', 'lg'])(
+    'keeps the %s multi-select search input transparent at rest and focus',
+    async (size) => {
+      const wrapper = render(ui.NvSelect, {
+        props: {
+          size,
+          multiple: true,
+          modelValue: ['speakers'],
+          options: [
+            { value: 'speakers', label: 'Speakers' },
+            { value: 'headphones', label: 'Headphones' },
+          ],
+        },
+      })
+      expect(
+        rules.some(
+          (rule) =>
+            rule.declarations['--colors-transparent'] === 'rgb(0 0 0 / 0)',
+        ),
+      ).toBe(true)
+      const input = wrapper.get('input')
+      expect(winningRole(input.element, 'background-color')).toBe(
+        'var(--colors-transparent)',
+      )
+      await input.trigger('focus')
+      expect(winningRole(input.element, 'background-color')).toBe(
+        'var(--colors-transparent)',
+      )
+      expect(
+        wrapper.get('[data-nv-select-control]').classes().length,
+      ).toBeGreaterThan(0)
+      expect(wrapper.text()).toContain('Speakers')
+    },
+  )
+})
+
+describe('Button cursor affordance', () => {
+  it.each(['default', 'plain', 'ghost', 'ghost-alt', 'active'])(
+    'uses a pointer for enabled %s buttons',
+    (type) => {
+      const wrapper = render(ui.NvButton, {
+        props: { type },
+        slots: { default: 'Run' },
+      })
+      expect(winningRole(wrapper.get('button').element, 'cursor')).toBe(
+        'pointer',
+      )
+    },
+  )
+
+  it('keeps disabled buttons non-interactive with a not-allowed cursor', () => {
+    const wrapper = render(ui.NvButton, {
+      attrs: { disabled: true },
+      slots: { default: 'Unavailable' },
+    })
+    const button = wrapper.get('button')
+    expect((button.element as HTMLButtonElement).disabled).toBe(true)
+    expect(winningRole(button.element, 'cursor')).toBe('not-allowed')
+  })
+})
+
 describe('canonical role cascade', () => {
   it.each(['caption', 'label', 'body-small', 'body', 'subtitle', 'title'])(
     'lets the %s Text underline role own its pseudo-element',
