@@ -44,7 +44,7 @@ export { default as NvText } from '@/components/typography/Text/NvText.vue'
 export { default as NvAlert } from '@/components/feedback/Alert/NvAlert.vue'
 export { default as NvTable } from '@/components/display/Table/NvTable.vue'
 export { default as NvTableColumn } from '@/components/display/Table/NvTableColumn.vue'
-export { tooltipPositioner } from '@/components/overlay/Tooltip/tooltip.panda'
+export { tooltipPositioner, StTooltipContent } from '@/components/overlay/Tooltip/tooltip.panda'
 export { StSelectGroupLabel } from '@/components/forms/Select/select.panda'
 export { default as NvButton } from '@/components/forms/Button/NvButton.vue'
 export { default as NvTextarea } from '@/components/forms/Textarea/NvTextarea.vue'
@@ -366,10 +366,10 @@ function winningRole(element: Element, property: string, pseudo = '') {
     const value =
       rule.declarations[property] ??
       (property === 'border-bottom-color'
-        ? (rule.declarations['border-color'] ??
+        ? rule.declarations['border-color'] ??
           rule.declarations['border-bottom']?.match(
             /var\(--colors-[^)]+\)/,
-          )?.[0])
+          )?.[0]
         : undefined)
     if (!value) return
     parseSelector((selectors: any) =>
@@ -616,16 +616,147 @@ describe('generated style boundaries', () => {
     expect(declarations).toContainEqual({ 'border-bottom-style': 'solid' })
   })
 
-  it('emits tooltip-owned shadows on both global tour surfaces', () => {
-    const wrapper = render(ui.GlobalStyles)
-    for (const selector of [' #vjt-tooltip', ' #vjt-arrow::before']) {
-      expect(
-        emittedRules(wrapper.classes())
-          .filter((rule) => rule.selector.includes(selector))
-          .map((rule) => rule.declarations),
-      ).toContainEqual({
-        'box-shadow': 'var(--shadows-tooltip-default-shadow)',
+  it.each([...ui.themes.keys()])(
+    'emits inverse-themed Tour colors without recoloring Tooltip (%s)',
+    (themeId) => {
+      const theme = ui.themes.get(themeId)
+      expect(theme.tourGuide?.default).toEqual({
+        background: theme.tooltip.default.background,
+        text: theme.tooltip.default.text,
+        shadow: theme.tooltip.default.shadow,
       })
+      const wrapper = render(ui.GlobalStyles, {
+        global: { provide: { theme } },
+        slots: {
+          default: () => [
+            h('div', { id: 'vjt-tooltip' }, [
+              h(ui.NvText, { 'data-nv-tour-content': '' }, () => 'Tour body'),
+              h('div', { id: 'vjt-arrow' }),
+            ]),
+            h(
+              ui.Tooltip.Root,
+              { open: true },
+              {
+                default: () =>
+                  h(ui.Tooltip.Positioner, null, {
+                    default: () =>
+                      h(ui.StTooltipContent, null, () => 'Tooltip body'),
+                  }),
+              },
+            ),
+          ],
+        },
+      })
+      const surface = wrapper.get('#vjt-tooltip').element
+      const arrow = wrapper.get('#vjt-arrow').element
+      const content = wrapper.get('[data-nv-tour-content]').element
+      const tooltip = wrapper.get(
+        '[data-scope="tooltip"][data-part="content"]',
+      ).element
+      for (const [element, property, role, pseudo] of [
+        [
+          surface,
+          'background-color',
+          'colors-tour-guide-default-background',
+          '',
+        ],
+        [surface, 'color', 'colors-tour-guide-default-text', ''],
+        [surface, 'box-shadow', 'shadows-tour-guide-default-shadow', ''],
+        [
+          arrow,
+          'background-color',
+          'colors-tour-guide-default-background',
+          '::before',
+        ],
+        [arrow, 'box-shadow', 'shadows-tour-guide-default-shadow', '::before'],
+        [tooltip, 'background-color', 'colors-tooltip-default-background', ''],
+        [tooltip, 'color', 'colors-tooltip-default-text', ''],
+        [tooltip, 'box-shadow', 'shadows-tooltip-default-shadow', ''],
+      ] as const) {
+        expect(winningRole(element, property, pseudo)).toBe(`var(--${role})`)
+      }
+      expect(winningRole(content, 'color')).toBe('inherit')
+      for (const [group, values] of [
+        ['tour-guide', theme.tourGuide.default],
+        ['tooltip', theme.tooltip.default],
+      ] as const) {
+        for (const [role, value] of Object.entries(values)) {
+          const variable = `--nv-${group}-default-${role}`
+          expect(
+            (wrapper.element as HTMLElement).style.getPropertyValue(variable),
+          ).toBe(value)
+          expect(
+            rules.some(
+              (rule) =>
+                rule.declarations[`--colors-${group}-default-${role}`] ===
+                `var(${variable})`,
+            ),
+            `${group}.${role} resolves the runtime theme variable`,
+          ).toBe(true)
+          if (role === 'shadow')
+            expect(
+              rules.some((rule) =>
+                rule.declarations[
+                  `--shadows-${group}-default-shadow`
+                ]?.includes(`var(--colors-${group}-default-shadow)`),
+              ),
+            ).toBe(true)
+        }
+      }
+    },
+  )
+
+  it('keeps divergent Tour and Tooltip roles independently owned', () => {
+    const theme = JSON.parse(JSON.stringify(ui.themes.values().next().value))
+    theme.tourGuide = {
+      default: {
+        background: '#123456',
+        text: '#abcdef',
+        shadow: 'rgba(12, 34, 56, 0.7)',
+      },
+    }
+    theme.tooltip.default = {
+      background: '#654321',
+      text: '#fedcba',
+      shadow: 'rgba(65, 43, 21, 0.3)',
+      border: '#987654',
+      icon: '#456789',
+    }
+    const wrapper = render(ui.GlobalStyles, {
+      global: { provide: { theme } },
+      slots: {
+        default: () =>
+          h('div', { id: 'vjt-tooltip' }, [h('div', { id: 'vjt-arrow' })]),
+      },
+    })
+    const surface = wrapper.get('#vjt-tooltip').element
+    expect(winningRole(surface, 'background-color')).toBe(
+      'var(--colors-tour-guide-default-background)',
+    )
+    expect(winningRole(surface, 'color')).toBe(
+      'var(--colors-tour-guide-default-text)',
+    )
+    expect(winningRole(surface, 'box-shadow')).toBe(
+      'var(--shadows-tour-guide-default-shadow)',
+    )
+    expect(
+      winningRole(
+        wrapper.get('#vjt-arrow').element,
+        'background-color',
+        '::before',
+      ),
+    ).toBe('var(--colors-tour-guide-default-background)')
+    for (const [group, values] of Object.entries({
+      'tour-guide': theme.tourGuide.default,
+      tooltip: theme.tooltip.default,
+    })) {
+      for (const [role, value] of Object.entries(values)) {
+        expect(
+          (wrapper.element as HTMLElement).style.getPropertyValue(
+            `--nv-${group}-default-${role}`,
+          ),
+        ).toBe(value)
+      }
     }
   })
 

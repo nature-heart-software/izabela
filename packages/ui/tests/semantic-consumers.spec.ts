@@ -96,23 +96,37 @@ const contracts: Record<
       ],
       [
         ['globalRecipe', 'base', '& #vjt-tooltip', 'backgroundColor'],
-        'tooltip.default.background',
+        'tourGuide.default.background',
       ],
       [
         ['globalRecipe', 'base', '& #vjt-tooltip', 'color'],
-        'tooltip.default.text',
+        'tourGuide.default.text',
       ],
       [
         ['globalRecipe', 'base', '& #vjt-tooltip', 'boxShadow'],
-        'tooltip.default.shadow',
+        'tourGuide.default.shadow',
+      ],
+      [
+        [
+          'globalRecipe',
+          'base',
+          '& #vjt-tooltip',
+          '& [data-nv-tour-content]',
+          'color',
+        ],
+        'inherit',
       ],
       [
         ['globalRecipe', 'base', '& #vjt-arrow::before', 'backgroundColor'],
-        'tooltip.default.background',
+        'tourGuide.default.background',
       ],
       [
         ['globalRecipe', 'base', '& #vjt-arrow::before', 'boxShadow'],
-        'tooltip.default.shadow',
+        'tourGuide.default.shadow',
+      ],
+      [
+        ['globalRecipe', 'base', '& .vjt-highlight', 'outline'],
+        '2px solid {colors.button.plain.background}',
       ],
     ],
   },

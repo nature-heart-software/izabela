@@ -749,6 +749,13 @@
             "transparent": "rgba(0, 0, 0, 0)"
           }
         },
+        "tourGuide": {
+          "default": {
+            "background": "#0e0e2c",
+            "text": "#ffffff",
+            "shadow": "rgba(0, 0, 0, 0.05000000074505806)"
+          }
+        },
         "Cloudflare Kumo": {
           "color": {
             "kumo-base": "#ffffff",
@@ -1794,6 +1801,13 @@
           },
           "background": {
             "transparent": "rgba(0, 0, 0, 0)"
+          }
+        },
+        "tourGuide": {
+          "default": {
+            "background": "#acacac",
+            "text": "#444444",
+            "shadow": "rgba(0, 0, 0, 0.05000000074505806)"
           }
         },
         "Cloudflare Kumo": {
@@ -2843,6 +2857,13 @@
             "transparent": "rgba(255, 255, 255, 0)"
           }
         },
+        "tourGuide": {
+          "default": {
+            "background": "#060606",
+            "text": "#f5f5f5",
+            "shadow": "rgba(0, 0, 0, 0.05000000074505806)"
+          }
+        },
         "Cloudflare Kumo": {
           "color": {
             "kumo-base": "#ffffff",
@@ -3888,6 +3909,13 @@
           },
           "background": {
             "transparent": "rgba(15, 15, 15, 0)"
+          }
+        },
+        "tourGuide": {
+          "default": {
+            "background": "#fafafa",
+            "text": "#171717",
+            "shadow": "rgba(0, 0, 0, 0.05000000074505806)"
           }
         },
         "Cloudflare Kumo": {
@@ -4937,6 +4965,13 @@
             "transparent": "rgba(255, 255, 255, 0)"
           }
         },
+        "tourGuide": {
+          "default": {
+            "background": "#25292e",
+            "text": "#ffffff",
+            "shadow": "rgba(31, 35, 40, 0.05000000074505806)"
+          }
+        },
         "Cloudflare Kumo": {
           "color": {
             "kumo-base": "#ffffff",
@@ -5982,6 +6017,13 @@
           },
           "background": {
             "transparent": "rgba(0, 0, 0, 0)"
+          }
+        },
+        "tourGuide": {
+          "default": {
+            "background": "#ffffff",
+            "text": "#010409",
+            "shadow": "rgba(1, 4, 9, 0.05000000074505806)"
           }
         },
         "Cloudflare Kumo": {
@@ -7637,6 +7679,19 @@
             "value": "var(--nv-theme-background-transparent)"
           }
         }
+      },
+      "tourGuide": {
+        "default": {
+          "background": {
+            "value": "var(--nv-tour-guide-default-background)"
+          },
+          "text": {
+            "value": "var(--nv-tour-guide-default-text)"
+          },
+          "shadow": {
+            "value": "var(--nv-tour-guide-default-shadow)"
+          }
+        }
       }
     },
     "shadows": {
@@ -7708,6 +7763,13 @@
         "filter": {
           "shadow": {
             "value": "0 2px 1.0080000162124634px 0px {colors.tableColumn.filter.shadow}"
+          }
+        }
+      },
+      "tourGuide": {
+        "default": {
+          "shadow": {
+            "value": "0 2px 1.0080000162124634px 0px {colors.tourGuide.default.shadow}"
           }
         }
       }

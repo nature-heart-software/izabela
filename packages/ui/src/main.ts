@@ -24,9 +24,9 @@ const globalRecipe = cva({
       backgroundColor: 'button.plain.pressed.background',
     },
     '& #vjt-tooltip': {
-      backgroundColor: 'tooltip.default.background',
-      color: 'tooltip.default.text',
-      boxShadow: 'tooltip.default.shadow',
+      backgroundColor: 'tourGuide.default.background',
+      color: 'tourGuide.default.text',
+      boxShadow: 'tourGuide.default.shadow',
       borderRadius: 'md',
       fontSize: 'inherit',
       padding: '5',
@@ -37,8 +37,8 @@ const globalRecipe = cva({
       '&[data-hidden]': { display: 'none !important' },
     },
     '& #vjt-arrow::before': {
-      backgroundColor: 'tooltip.default.background',
-      boxShadow: 'tooltip.default.shadow',
+      backgroundColor: 'tourGuide.default.background',
+      boxShadow: 'tourGuide.default.shadow',
     },
     '& .vjt-highlight': {
       outline: '2px solid {colors.button.plain.background}',
