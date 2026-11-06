@@ -265,12 +265,18 @@ const onVisible = () => {
 }
 const injectedPortalTarget = inject(PORTAL_TARGET)
 const portalTarget = computed(() => {
-  // A child's physical host must be inside the nearest containing popup, not
-  // merely its dialog sibling. This also supports legacy portal providers.
+  // Respect a more local provider (such as a scrolling Settings pane), while
+  // keeping nested popups inside their nearest dismissable/focus layer.
+  const providedTarget = getElement(injectedPortalTarget)
   const parentContent = getElement(reference.value)?.closest(
     '[data-scope="popover"][data-part="content"], [data-scope="dialog"][data-part="content"]',
   )
-  return parentContent || getElement(injectedPortalTarget) || 'body'
+  if (
+    providedTarget &&
+    (!parentContent || parentContent.contains(providedTarget))
+  )
+    return providedTarget
+  return parentContent || providedTarget || 'body'
 })
 provide(
   PORTAL_TARGET,

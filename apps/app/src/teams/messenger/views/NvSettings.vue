@@ -120,7 +120,7 @@
               class="settings__content"
               :class="css({ flex: '1 1 0%', paddingLeft: '4' })"
             >
-              <NvPortalTarget
+              <div
                 :class="
                   css({
                     height: '100%',
@@ -143,7 +143,7 @@
                         })
                       "
                     >
-                      <div
+                      <NvPortalTarget
                         :key="currentRoute.path"
                         :class="
                           css({
@@ -154,11 +154,11 @@
                         "
                       >
                         <component :is="Component" />
-                      </div>
+                      </NvPortalTarget>
                     </Transition>
                   </router-view>
                 </div>
-              </NvPortalTarget>
+              </div>
             </div>
           </div>
         </div>
