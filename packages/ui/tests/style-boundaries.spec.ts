@@ -148,6 +148,41 @@ afterEach(() => {
 })
 
 describe('Ark as-child button appearance', () => {
+  it.each(['default', 'plain', 'ghost', 'ghost-alt', 'active'])(
+    'uses a pointer cursor on enabled %s buttons',
+    (type) => {
+      const wrapper = render(ui.NvButton, {
+        props: { type },
+        slots: { default: 'Action' },
+      })
+      expect(wrapper.element.tagName).toBe('BUTTON')
+      expect(
+        emittedRules(wrapper.classes()).map((rule) => rule.declarations),
+      ).toContainEqual({ cursor: 'pointer' })
+    },
+  )
+
+  it.each(['default', 'plain', 'ghost', 'ghost-alt', 'active'])(
+    'keeps disabled %s buttons unavailable rather than showing a pointer',
+    (type) => {
+      let clicks = 0
+      const wrapper = render(ui.NvButton, {
+        props: { type },
+        attrs: { disabled: true, onClick: () => clicks++ },
+        slots: { default: 'Unavailable' },
+      })
+      const button = wrapper.element as HTMLButtonElement
+      expect(button.disabled).toBe(true)
+      button.click()
+      expect(clicks).toBe(0)
+      expect(
+        emittedRules(wrapper.classes())
+          .filter((rule) => rule.selector.includes(':disabled'))
+          .map((rule) => rule.declarations),
+      ).toContainEqual({ cursor: 'not-allowed' })
+    },
+  )
+
   it('extracts the tooltip opacity fade without adding movement', () => {
     const extracted = emittedRules(ui.tooltipPositioner().split(' '))
     expect(extracted.map((rule) => rule.declarations)).toContainEqual({

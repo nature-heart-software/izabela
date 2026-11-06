@@ -14,6 +14,10 @@ execFileSync(
 const clientPath = '../../../coverage/ui-client/test-client.js'
 const ui = await import(/* @vite-ignore */ clientPath)
 const wrappers: VueWrapper[] = []
+const hitTestDescriptor = Object.getOwnPropertyDescriptor(
+  document,
+  'elementsFromPoint',
+)
 function render(component: unknown, options: Record<string, any> = {}) {
   const wrapper = mount(component as any, {
     attachTo: document.body,
@@ -80,11 +84,91 @@ beforeEach(() => {
 afterEach(() => {
   for (const wrapper of wrappers.splice(0)) wrapper.unmount()
   document.body.innerHTML = ''
+  if (hitTestDescriptor)
+    Object.defineProperty(document, 'elementsFromPoint', hitTestDescriptor)
+  else Reflect.deleteProperty(document, 'elementsFromPoint')
   vi.restoreAllMocks()
   vi.unstubAllGlobals()
 })
 
 describe('overlay interaction boundaries', () => {
+  it.each(['select', 'popover'])(
+    'allows page scrolling through the %s shield without dismissing or clicking through',
+    async (kind) => {
+      const page = document.createElement('div')
+      page.style.overflowX = page.style.overflowY = 'auto'
+      const action = document.createElement('button')
+      const clicked = vi.fn()
+      action.addEventListener('click', clicked)
+      page.append(action)
+      document.body.append(page)
+      Object.defineProperties(page, {
+        clientHeight: { value: 200 },
+        scrollHeight: { value: 1000 },
+        clientWidth: { value: 200 },
+        scrollWidth: { value: 1000 },
+      })
+      Object.defineProperty(page, 'scrollTo', {
+        configurable: true,
+        value: ({ top, left }: ScrollToOptions) => {
+          if (top !== undefined) page.scrollTop = top
+          if (left !== undefined) page.scrollLeft = left
+        },
+      })
+      const wrapper =
+        kind === 'select'
+          ? render(ui.NvSelect, {
+              props: { options: [{ label: 'Alpha', value: 'a' }] },
+            })
+          : render(ui.NvPopover, {
+              slots: {
+                reference: () => h('button', 'Open'),
+                default: 'Content',
+              },
+            })
+      await settle()
+      const trigger = wrapper.get(kind === 'select' ? 'input' : 'button')
+        .element as HTMLElement
+      // HTMLElement.click() does not perform the browser's focus default in jsdom.
+      trigger.focus()
+      trigger.click()
+      await settle()
+      const shield = document.querySelector<HTMLElement>(
+        kind === 'select'
+          ? '[data-nv-overlay-shield]'
+          : '[data-overlay-shield="popover"]',
+      )!
+      expect(shield).not.toBeNull()
+      expect(getComputedStyle(shield).display).not.toBe('none')
+      Object.defineProperty(document, 'elementsFromPoint', {
+        configurable: true,
+        value: () => [
+          shield,
+          action,
+          page,
+          document.body,
+          document.documentElement,
+        ],
+      })
+      const wheel = new WheelEvent('wheel', {
+        deltaY: 120,
+        deltaX: 35,
+        clientX: 30,
+        clientY: 40,
+        bubbles: true,
+        cancelable: true,
+      })
+      shield.dispatchEvent(wheel)
+      await settle()
+      expect(page.scrollTop).toBe(120)
+      expect(page.scrollLeft).toBe(35)
+      expect(wheel.defaultPrevented).toBe(true)
+      expect(shield.isConnected).toBe(true)
+      expect(getComputedStyle(shield).display).not.toBe('none')
+      expect(clicked).not.toHaveBeenCalled()
+    },
+  )
+
   it('nested popover stays inside the dialog portal and Escape closes only the top layer', async () => {
     const parentEscape = vi.fn()
     const wrapper = render(ui.NvDialog, {
@@ -268,6 +352,58 @@ describe('overlay interaction boundaries', () => {
       document.querySelector('[data-scope="tooltip"][role="tooltip"]'),
     ).toBeNull()
   })
+
+  it.each(['sm', 'md', 'lg'])(
+    'shows a Select tooltip over the %s indicator and keeps one hover boundary across its text',
+    async (size) => {
+      const wrapper = render(ui.NvTooltip, {
+        props: { tippyOptions: { delay: 0, duration: 0 } },
+        slots: {
+          reference: () =>
+            h(ui.NvSelect, {
+              id: `tooltip-select-${size}`,
+              'aria-label': 'Speech engine',
+              size,
+              modelValue: 'a',
+              options: [{ label: 'Alpha', value: 'a' }],
+            }),
+          default: 'Choose a speech engine',
+        },
+      })
+      await settle()
+      const control = wrapper.get('[data-nv-select-control]')
+      const input = wrapper.get('input')
+      // The decorative indicator has pointer-events:none: Chromium hits its
+      // containing control, not the input that occupies the text region.
+      await control.trigger('pointermove', { pointerType: 'mouse' })
+      await settle()
+      const tooltip = document.querySelector('[role="tooltip"]')
+      expect(tooltip?.textContent).toContain('Choose a speech engine')
+      expect(input.attributes('id')).toBe(`tooltip-select-${size}`)
+      expect(input.attributes('aria-label')).toBe('Speech engine')
+      expect(input.attributes('aria-describedby')).toBe(tooltip?.id)
+      await input.trigger('pointermove', { pointerType: 'mouse' })
+      input.element.dispatchEvent(
+        new MouseEvent('pointerleave', { relatedTarget: control.element }),
+      )
+      await settle()
+      expect(document.querySelector('[role="tooltip"]')).toBe(tooltip)
+      control.element.dispatchEvent(
+        new MouseEvent('pointerleave', { relatedTarget: document.body }),
+      )
+      await settle()
+      expect(document.querySelector('[role="tooltip"]')).toBeNull()
+      await control.trigger('pointermove', { pointerType: 'mouse' })
+      await settle()
+      expect(document.querySelector('[role="tooltip"]')).not.toBeNull()
+      await control.trigger('pointerdown', { pointerType: 'mouse' })
+      await control.trigger('click')
+      await settle()
+      expect(document.querySelector('[role="tooltip"]')).toBeNull()
+      expect(document.activeElement).toBe(input.element)
+      expect(input.attributes('aria-expanded')).toBe('true')
+    },
+  )
 
   it('dismisses tooltips and cancels pending hover opens when the window loses focus', async () => {
     const wrapper = render(ui.NvTooltip, {

@@ -114,18 +114,15 @@ useEventListener(offscreenFocusFix, 'click', () => {
   inputRef.value.focus()
 })
 
-// Clear retained DOM focus before a mouse activation can restore it. The shared
-// window-store notification may arrive after the browser's native focus event.
-useEventListener(window, 'blur', () => {
-  onWindowBlur()
-  if (isGameOverlay && settingsStore.clearMessageOnWindowHide) {
-    inputValue.value = ''
-  }
-})
-
 if (isGameOverlay) {
-  useEventListener(window, 'focus', () => {
-    inputRef.value?.focus()
+  window.addEventListener('focus', () => {
+    inputRef.value.focus()
+  })
+  window.addEventListener('blur', () => {
+    inputRef.value.blur()
+    if (settingsStore.clearMessageOnWindowHide) {
+      inputValue.value = ''
+    }
   })
 }
 

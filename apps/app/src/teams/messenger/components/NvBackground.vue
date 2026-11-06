@@ -53,143 +53,64 @@ const onBackgroundClick = () => {
 }
 
 const showBackground = ref(false)
-let hideTimeout: ReturnType<typeof setTimeout> | undefined
-let nativeWindowFocused = false
-let preparingToHide = false
-let activation = 0
-
-function cancelPendingHide() {
-  if (hideTimeout !== undefined) {
-    clearTimeout(hideTimeout)
-    hideTimeout = undefined
-  }
-}
-
-function resetBackground() {
-  cancelPendingHide()
-  showBackground.value = false
-  if (background.value) {
-    gsap.set(background.value, { opacity: 0, overwrite: true })
-  }
-}
 
 const isBackgroundShown = computed(() => isGameOverlay || showBackground.value)
 
 // this prevents click outside to close immediately when the backdrop is still visible in some cases
 watch(
   () => messengerWindowStore.isInputFocused,
-  (value) => {
-    cancelPendingHide()
-    if (preparingToHide || document.visibilityState === 'hidden') {
-      resetBackground()
-      return
-    }
+  (value, _oldValue, onCleanup) => {
     if (value) {
       showBackground.value = true
     } else {
-      hideTimeout = setTimeout(() => {
-        hideTimeout = undefined
-        showBackground.value = false
+      const timer = setTimeout(() => {
+        if (!messengerWindowStore.isInputFocused) {
+          showBackground.value = false
+        }
       }, 100)
+      onCleanup(() => clearTimeout(timer))
     }
   },
 )
 
-watch(isBackgroundShown, (newValue) => {
-  if (preparingToHide || document.visibilityState === 'hidden') {
-    gsap.set(background.value, { opacity: 0, overwrite: true })
-    return
-  }
-  gsap.to(background.value, {
-    opacity: Number(newValue),
-    duration: 0.3,
-    ease: 'power3.out',
-    overwrite: true,
-  })
-})
-
 watch(
-  () => [messengerWindowStore.focusContext, messengerWindowStore.isFocused],
-  ([context, focused]) => {
-    if (
-      context !== 'mouse' ||
-      (!focused && !nativeWindowFocused) ||
-      messengerWindowStore.isInputFocused
-    )
-      return
-    // A mouse activation must not briefly reveal the previous keyboard fade.
-    resetBackground()
+  isBackgroundShown,
+  (newValue) => {
+    gsap.to(background.value, {
+      opacity: Number(newValue),
+      duration: 0.3,
+      ease: 'power3.out',
+      overwrite: true,
+    })
   },
+  // Native blur/focus can occur in one turn without changing input focus.
+  { flush: 'sync' },
 )
 
-function onWindowBlur() {
-  nativeWindowFocused = false
-  cancelPendingHide()
+const onWindowBlur = () => {
+  gsap.set(background.value, {
+    opacity: 0,
+    overwrite: true,
+  })
   showBackground.value = false
 }
 
-function onWindowFocus() {
-  activation++
-  preparingToHide = false
-  nativeWindowFocused = true
-  showForActivation()
-}
-
-function showForActivation() {
-  cancelPendingHide()
-  if (
-    !preparingToHide &&
-    document.visibilityState !== 'hidden' &&
-    messengerWindowStore.focusContext === 'keyboard'
-  ) {
+const onWindowFocus = () => {
+  // Restoring the backdrop must not depend on another input focus event:
+  // Electron can retain the focused input while the window is hidden.
+  if (messengerWindowStore.isInputFocused) {
     showBackground.value = true
-  } else {
-    resetBackground()
   }
-}
-
-function onVisibilityChange() {
-  if (document.visibilityState === 'hidden') {
-    // Hidden Electron windows suspend animation frames. Do not leave an opaque
-    // frame or unfinished fade to be replayed when the native window reappears.
-    nativeWindowFocused = false
-    resetBackground()
-  } else {
-    // Native visibility precedes the IPC-shared focus state by a frame or more.
-    showForActivation()
-  }
-}
-
-function onHideActivation(event: Event) {
-  const respond = (event as CustomEvent<(value: number) => void>).detail
-  respond(activation)
-}
-
-function onPrepareHide(event: Event) {
-  const requestedActivation = (event as CustomEvent<number>).detail
-  if (requestedActivation !== undefined && requestedActivation !== activation)
-    return
-  preparingToHide = true
-  resetBackground()
 }
 
 onMounted(() => {
-  nativeWindowFocused = document.hasFocus()
   window.addEventListener('blur', onWindowBlur)
   window.addEventListener('focus', onWindowFocus)
-  window.addEventListener('nv-messenger-hide-activation', onHideActivation)
-  window.addEventListener('nv-messenger-prepare-hide', onPrepareHide)
-  document.addEventListener('visibilitychange', onVisibilityChange)
-  if (document.visibilityState === 'hidden') resetBackground()
 })
 
 onBeforeUnmount(() => {
-  cancelPendingHide()
   window.removeEventListener('blur', onWindowBlur)
   window.removeEventListener('focus', onWindowFocus)
-  window.removeEventListener('nv-messenger-hide-activation', onHideActivation)
-  window.removeEventListener('nv-messenger-prepare-hide', onPrepareHide)
-  document.removeEventListener('visibilitychange', onVisibilityChange)
   gsap.killTweensOf(background.value)
 })
 </script>

@@ -36,6 +36,7 @@
           @mousedown.stop.prevent
           @pointerdown.stop.prevent
           @pointerup.stop.prevent
+          @wheel="onOverlayShieldWheel"
         />
         <Popover.Positioner ref="positioner" :class="positionerStyle()">
           <Popover.Content :hidden="false" asChild>
@@ -114,6 +115,7 @@ import get from 'lodash/get'
 import { Virtualizer } from '@tanstack/virtual-core'
 import { getElement } from '@/utils/vue'
 import { PORTAL_TARGET } from '@/consts'
+import { onOverlayShieldWheel } from '@/utils/overlay-scroll'
 
 const props = defineProps(propsDefinition)
 defineSlots<{

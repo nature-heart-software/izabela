@@ -112,6 +112,16 @@ async function key(key, code, virtualKey) {
   report.nativeInputExecuted = true
   await delay(200)
 }
+async function wheel(position, deltaY, deltaX = 0) {
+  await call('Input.dispatchMouseEvent', {
+    type: 'mouseWheel',
+    ...position,
+    deltaY,
+    deltaX,
+  })
+  report.nativeInputExecuted = true
+  await delay(200)
+}
 async function check(name, expression, expected) {
   const actual = await evaluate(expression)
   assert.deepEqual(actual, expected, name)
@@ -265,6 +275,178 @@ try {
     )
     await call('Emulation.setEmulatedMedia', { features: [] })
   })
+  await journey('select-tooltip-hover-boundary', async () => {
+    await story('integration-overlays--select-tooltips')
+    for (const variant of [
+      'sm',
+      'md',
+      'lg',
+      'multiple',
+      'disabled',
+      'readonly',
+      'async',
+    ]) {
+      const input = `#tooltip-select-${variant}`
+      const indicator = `[data-nv-select-control]:has(${input}) > :last-child svg`
+      await pointer('mouseMoved', await point(indicator))
+      await waitFor(
+        `document.querySelector('[role=tooltip]')?.textContent.includes('(${variant})')`,
+      )
+      const tooltipId = await evaluate(
+        "(() => {window.__nvSelectTooltipNode = document.querySelector('[role=tooltip]'); return window.__nvSelectTooltipNode.id})()",
+      )
+      await check(
+        'Tooltip trigger is the complete Select control',
+        `document.querySelector('${input}').closest('[data-nv-select-control]').matches('[data-scope="tooltip"][data-part="trigger"]')`,
+        true,
+      )
+      await waitFor(`(() => {
+        const control = document.querySelector('${input}').closest('[data-nv-select-control]');
+        const tooltip = document.querySelector('[role=tooltip]');
+        const positioner = document.querySelector('[data-scope=tooltip][data-part=positioner]');
+        const r = control.getBoundingClientRect(), t = tooltip.getBoundingClientRect();
+        return Math.abs(parseFloat(positioner.style.getPropertyValue('--reference-width')) - r.width) < 1
+          && Math.abs((t.left + t.width / 2) - (r.left + r.width / 2)) < 1
+          && Math.abs((r.top - t.bottom) - 12) < 1;
+      })()`)
+
+      await check(
+        'Input retains its accessible tooltip description',
+        `document.querySelector('${input}').getAttribute('aria-describedby')`,
+        tooltipId,
+      )
+      await pointer('mouseMoved', await point(input))
+      await pointer('mouseMoved', await point(indicator))
+      await delay(140)
+      await check(
+        'Moving between text and indicator retains the same tooltip node',
+        "window.__nvSelectTooltipNode.isConnected && document.querySelector('[role=tooltip]') === window.__nvSelectTooltipNode",
+        true,
+      )
+      await pointer('mouseMoved', { x: 10, y: 10 })
+      await waitFor("!document.querySelector('[role=tooltip]')")
+      // Leaving before the opening delay must not show a tooltip later.
+      await pointer('mouseMoved', await point(indicator))
+      await pointer('mouseMoved', { x: 10, y: 10 })
+      await delay(140)
+      await check(
+        'Pending indicator hover is cancelled on leave',
+        "Boolean(document.querySelector('[role=tooltip]'))",
+        false,
+      )
+      await click(indicator)
+      if (['disabled', 'readonly'].includes(variant)) {
+        await check(
+          'Locked Select does not open from its indicator',
+          `document.querySelector('${input}').getAttribute('aria-expanded')`,
+          'false',
+        )
+      } else {
+        await waitFor(
+          `document.querySelector('${input}').getAttribute('aria-expanded') === 'true'`,
+        )
+        await check(
+          'Indicator still focuses the real input',
+          'document.activeElement.id',
+          `tooltip-select-${variant}`,
+        )
+        await check(
+          'Focused Select suppresses its tooltip',
+          "Boolean(document.querySelector('[role=tooltip]'))",
+          false,
+        )
+        await key('Escape', 'Escape', 27)
+        // The previous Select's full-gesture shield owns hits until its leave
+        // transition completes; settle it before hovering the next control.
+        await waitFor("!document.querySelector('.autocomplete')")
+      }
+      await pointer('mouseMoved', { x: 10, y: 10 })
+      await waitFor("!document.querySelector('[role=tooltip]')")
+    }
+  })
+  for (const kind of ['select', 'popover']) {
+    await journey(`${kind}-outside-scroll-through`, async () => {
+      await story(`integration-overlays--${kind}-scroll-through`)
+      await click(
+        kind === 'select' ? '#scroll-select' : '#scroll-popover-trigger',
+      )
+      const outside = await evaluate(
+        `(() => {const r=document.getElementById('scroll-page').getBoundingClientRect();return {x:r.right-20,y:r.bottom-24}})()`,
+      )
+      await wheel(outside, 40, 25)
+      await waitFor(
+        "Math.abs(document.getElementById('scroll-page').scrollTop - 40) < 1 && Math.abs(document.getElementById('scroll-page').scrollLeft - 25) < 1",
+      )
+      await check(
+        'Scrolling does not activate underlying actions',
+        "document.getElementById('scroll-action-count').textContent",
+        '0',
+      )
+      if (kind === 'select') {
+        await check(
+          'Select remains open during page scrolling',
+          "document.getElementById('scroll-select').getAttribute('aria-expanded')",
+          'true',
+        )
+        await evaluate(
+          `window.__scrollList=Array.from(document.querySelector('.autocomplete').querySelectorAll('*')).find(e=>e.scrollHeight>e.clientHeight+2 && /auto|scroll/.test(getComputedStyle(e).overflowY));true`,
+        )
+        await waitFor('Boolean(window.__scrollList)')
+        const inside = await evaluate(
+          `(() => {const r=window.__scrollList.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()`,
+        )
+        const before = await evaluate(
+          "document.getElementById('scroll-page').scrollTop",
+        )
+        await wheel(inside, 90)
+        await waitFor('window.__scrollList.scrollTop > 0')
+        await check(
+          'Inside dropdown scrolling stays inside the dropdown',
+          "document.getElementById('scroll-page').scrollTop",
+          before,
+        )
+      } else {
+        const panelPoint = await evaluate(
+          `(() => {const r=document.getElementById('scroll-panel').getBoundingClientRect();return {x:r.right-12,y:r.top+8}})()`,
+        )
+        await wheel(panelPoint, 40)
+        await waitFor(
+          "Math.abs(document.getElementById('scroll-panel').scrollTop - 40) < 1",
+        )
+        await wheel(panelPoint, -40)
+        await waitFor("document.getElementById('scroll-panel').scrollTop === 0")
+        await click('#scroll-nested-select')
+        await waitFor(
+          "document.getElementById('scroll-nested-select').getAttribute('aria-expanded') === 'true'",
+        )
+        await wheel(panelPoint, 40)
+        await waitFor(
+          "Math.abs(document.getElementById('scroll-panel').scrollTop - 40) < 1",
+        )
+        await wheel(outside, 20)
+        await waitFor(
+          "Math.abs(document.getElementById('scroll-page').scrollTop - 60) < 1",
+        )
+        await check(
+          'Nested scrolling keeps both layers open',
+          "document.getElementById('scroll-nested-select').getAttribute('aria-expanded') === 'true' && !!document.querySelector('[data-overlay-shield=popover]')",
+          true,
+        )
+      }
+      await click('#scroll-underlying-action')
+      await check(
+        'Outside click still cannot activate the underlying action',
+        "document.getElementById('scroll-action-count').textContent",
+        '0',
+      )
+      if (kind === 'popover')
+        await check(
+          'Only the nested Select dismisses',
+          "Boolean(document.querySelector('[data-overlay-shield=popover]'))",
+          true,
+        )
+    })
+  }
   await journey('disabled-select', async () => {
     await story('integration-overlays--disabled-select')
     await check(

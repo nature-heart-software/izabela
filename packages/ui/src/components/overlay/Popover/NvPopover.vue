@@ -26,6 +26,7 @@
           @mousedown.stop.prevent
           @pointerdown.stop.prevent
           @pointerup.stop.prevent
+          @wheel="onOverlayShieldWheel"
         />
         <StPopoverPositioner>
           <StPopoverContent :hidden="false" :size="props.size">
@@ -58,6 +59,7 @@ import { Popover } from '@ark-ui/vue'
 import Card from '@/components/display/Card/NvCard.vue'
 import { getElement } from '@/utils/vue'
 import { PORTAL_TARGET } from '@/consts'
+import { onOverlayShieldWheel } from '@/utils/overlay-scroll'
 
 const open = ref(false)
 const trigger = ref()

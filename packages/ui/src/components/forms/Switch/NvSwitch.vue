@@ -19,7 +19,7 @@
   </StSwitch>
 </template>
 <script lang="ts" setup>
-import { computed, useAttrs } from 'vue'
+import { computed, nextTick, ref, useAttrs, watch } from 'vue'
 import { Switch, useSwitch } from '@ark-ui/vue'
 import { StSwitch, switchRecipe } from './switch.panda'
 import { props as propsDefinition } from './switch.shared'
@@ -29,6 +29,13 @@ const props = defineProps(propsDefinition)
 const emit = defineEmits<{ 'update:modelValue': [value: boolean] }>()
 const attrs = useAttrs()
 const classes = switchRecipe()
+const checkedState = ref(props.modelValue)
+watch(
+  () => props.modelValue,
+  (value) => {
+    checkedState.value = value
+  },
+)
 const inputAttrs = computed(() =>
   Object.fromEntries(
     Object.entries(attrs).filter(
@@ -41,7 +48,7 @@ const inputAttrs = computed(() =>
 )
 const switchApi = useSwitch({
   get checked() {
-    return props.modelValue
+    return checkedState.value
   },
   get disabled() {
     return props.disabled
@@ -65,7 +72,13 @@ const switchApi = useSwitch({
     return attrs.value as string | undefined
   },
   onCheckedChange({ checked }) {
+    // Ark mutates its state before emitting. Reconcile even when the parent
+    // leaves the model unchanged (for example, while confirming a toggle).
+    checkedState.value = checked
     emit('update:modelValue', checked)
+    nextTick(() => {
+      checkedState.value = props.modelValue
+    })
   },
 })
 </script>
