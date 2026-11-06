@@ -52,8 +52,8 @@
         </NvFormItem>
         <NvDivider direction="horizontal" />
         <template v-if="currentEngineSettingsComponent">
-          <component
-            :is="currentEngineSettingsComponent"
+          <NvAsyncRegion
+            :component="currentEngineSettingsComponent"
             :form="form"
             :size="size"
           />
@@ -64,6 +64,7 @@
 </template>
 <script lang="ts" setup>
 import { css } from '@/styled-system/css'
+import NvAsyncRegion from '@/components/NvAsyncRegion.vue'
 import {
   NvAccessBlocker,
   NvDivider,

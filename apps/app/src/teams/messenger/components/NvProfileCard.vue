@@ -32,8 +32,9 @@
                 size="sm"
               />
               <template v-if="speechEngine">
-                <component
-                  :is="speechEngine.voiceSelectComponent"
+                <NvAsyncRegion
+                  :component="speechEngine.voiceSelectComponent"
+                  mode="control"
                   v-if="speechEngine.voiceSelectComponent"
                   v-model="
                     form.states[
@@ -107,8 +108,8 @@
                 </NvFormItem>
                 <NvDivider direction="horizontal" />
                 <template v-if="currentEngineSettingsComponent">
-                  <component
-                    :is="currentEngineSettingsComponent"
+                  <NvAsyncRegion
+                    :component="currentEngineSettingsComponent"
                     :form="form.states"
                   />
                 </template>
@@ -134,6 +135,7 @@
 </template>
 <script lang="ts" setup>
 import { css } from '@/styled-system/css'
+import NvAsyncRegion from '@/components/NvAsyncRegion.vue'
 import {
   NvButton,
   NvCard,
