@@ -279,7 +279,7 @@ function geometry(initial: Record<string, number> = {}) {
     function (this: HTMLElement) {
       const name =
         this.querySelector('[data-provider]')?.getAttribute('data-provider')
-      return new DOMRect(0, 0, 320, name ? heights[name] ?? 0 : 17)
+      return new DOMRect(0, 0, 320, name ? (heights[name] ?? 0) : 17)
     },
   )
   vi.stubGlobal(
@@ -530,8 +530,10 @@ describe('stable async panel', () => {
 
   it('keeps fragment rows in the inherited-gap grid through a layout-transparent host', async () => {
     const fragment = Vue.defineComponent({
-      setup: () => () =>
-        [Vue.h('section', 'First'), Vue.h('section', 'Second')],
+      setup: () => () => [
+        Vue.h('section', 'First'),
+        Vue.h('section', 'Second'),
+      ],
     })
     const wrapper = region(fragment)
     await settle()
