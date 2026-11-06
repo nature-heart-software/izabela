@@ -112,6 +112,16 @@ async function key(key, code, virtualKey) {
   report.nativeInputExecuted = true
   await delay(200)
 }
+async function wheel(position, deltaY, deltaX = 0) {
+  await call('Input.dispatchMouseEvent', {
+    type: 'mouseWheel',
+    ...position,
+    deltaY,
+    deltaX,
+  })
+  report.nativeInputExecuted = true
+  await delay(200)
+}
 async function check(name, expression, expected) {
   const actual = await evaluate(expression)
   assert.deepEqual(actual, expected, name)
@@ -354,6 +364,89 @@ try {
       await waitFor("!document.querySelector('[role=tooltip]')")
     }
   })
+  for (const kind of ['select', 'popover']) {
+    await journey(`${kind}-outside-scroll-through`, async () => {
+      await story(`integration-overlays--${kind}-scroll-through`)
+      await click(
+        kind === 'select' ? '#scroll-select' : '#scroll-popover-trigger',
+      )
+      const outside = await evaluate(
+        `(() => {const r=document.getElementById('scroll-page').getBoundingClientRect();return {x:r.right-20,y:r.bottom-24}})()`,
+      )
+      await wheel(outside, 40, 25)
+      await waitFor(
+        "Math.abs(document.getElementById('scroll-page').scrollTop - 40) < 1 && Math.abs(document.getElementById('scroll-page').scrollLeft - 25) < 1",
+      )
+      await check(
+        'Scrolling does not activate underlying actions',
+        "document.getElementById('scroll-action-count').textContent",
+        '0',
+      )
+      if (kind === 'select') {
+        await check(
+          'Select remains open during page scrolling',
+          "document.getElementById('scroll-select').getAttribute('aria-expanded')",
+          'true',
+        )
+        await evaluate(
+          `window.__scrollList=Array.from(document.querySelector('.autocomplete').querySelectorAll('*')).find(e=>e.scrollHeight>e.clientHeight+2 && /auto|scroll/.test(getComputedStyle(e).overflowY));true`,
+        )
+        await waitFor('Boolean(window.__scrollList)')
+        const inside = await evaluate(
+          `(() => {const r=window.__scrollList.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()`,
+        )
+        const before = await evaluate(
+          "document.getElementById('scroll-page').scrollTop",
+        )
+        await wheel(inside, 90)
+        await waitFor('window.__scrollList.scrollTop > 0')
+        await check(
+          'Inside dropdown scrolling stays inside the dropdown',
+          "document.getElementById('scroll-page').scrollTop",
+          before,
+        )
+      } else {
+        const panelPoint = await evaluate(
+          `(() => {const r=document.getElementById('scroll-panel').getBoundingClientRect();return {x:r.right-12,y:r.top+8}})()`,
+        )
+        await wheel(panelPoint, 40)
+        await waitFor(
+          "Math.abs(document.getElementById('scroll-panel').scrollTop - 40) < 1",
+        )
+        await wheel(panelPoint, -40)
+        await waitFor("document.getElementById('scroll-panel').scrollTop === 0")
+        await click('#scroll-nested-select')
+        await waitFor(
+          "document.getElementById('scroll-nested-select').getAttribute('aria-expanded') === 'true'",
+        )
+        await wheel(panelPoint, 40)
+        await waitFor(
+          "Math.abs(document.getElementById('scroll-panel').scrollTop - 40) < 1",
+        )
+        await wheel(outside, 20)
+        await waitFor(
+          "Math.abs(document.getElementById('scroll-page').scrollTop - 60) < 1",
+        )
+        await check(
+          'Nested scrolling keeps both layers open',
+          "document.getElementById('scroll-nested-select').getAttribute('aria-expanded') === 'true' && !!document.querySelector('[data-overlay-shield=popover]')",
+          true,
+        )
+      }
+      await click('#scroll-underlying-action')
+      await check(
+        'Outside click still cannot activate the underlying action',
+        "document.getElementById('scroll-action-count').textContent",
+        '0',
+      )
+      if (kind === 'popover')
+        await check(
+          'Only the nested Select dismisses',
+          "Boolean(document.querySelector('[data-overlay-shield=popover]'))",
+          true,
+        )
+    })
+  }
   await journey('disabled-select', async () => {
     await story('integration-overlays--disabled-select')
     await check(

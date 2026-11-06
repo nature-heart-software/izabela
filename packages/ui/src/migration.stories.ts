@@ -75,6 +75,43 @@ export const Nested = {
   }),
 }
 
+function scrollingOverlay(popover: boolean) {
+  return {
+    render: () => ({
+      components: { NvSelect, NvPopover, NvButton },
+      setup: () => ({
+        popover,
+        choice: ref('0'),
+        clicks: ref(0),
+        options: Array.from({ length: 100 }, (_, index) => ({
+          label: `Option ${index}`,
+          value: String(index),
+        })),
+      }),
+      template: `
+        <div id="scroll-page" style="width:720px;height:300px;overflow:auto;position:relative">
+          <div style="width:1100px;min-height:1200px;padding:100px 16px 0">
+            <NvSelect v-if="!popover" id="scroll-select" v-model="choice" :options="options" aria-label="Scrolling choice" style="width:220px" />
+            <NvPopover v-else>
+              <template #reference><NvButton id="scroll-popover-trigger">Open popover</NvButton></template>
+              <div id="scroll-panel" style="width:240px;height:200px;overflow:auto">
+                <div style="min-height:900px;padding-top:40px">
+                  <NvSelect id="scroll-nested-select" v-model="choice" :options="options" aria-label="Nested scrolling choice" />
+                </div>
+              </div>
+            </NvPopover>
+            <NvButton id="scroll-underlying-action" style="position:sticky;left:500px;top:240px" @click="clicks++">Underlying action</NvButton>
+          </div>
+        </div>
+        <output id="scroll-action-count">{{ clicks }}</output>
+      `,
+    }),
+  }
+}
+
+export const SelectScrollThrough = scrollingOverlay(false)
+export const PopoverScrollThrough = scrollingOverlay(true)
+
 export const SelectTooltips = {
   render: () => ({
     components: {
