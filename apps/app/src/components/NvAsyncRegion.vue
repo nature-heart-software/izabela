@@ -28,11 +28,12 @@
       <template v-if="pending">
         <NvSelect
           v-if="mode === 'control'"
+          v-loading="true"
           v-bind="loadingAttrs()"
           :disabled="true"
-          placeholder="Loading…"
+          placeholder=""
         />
-        <NvText v-else role="status">Loading…</NvText>
+        <div v-else v-loading="true" :class="box({ minHeight: '1rem' })" />
       </template>
       <div
         :class="
@@ -60,7 +61,12 @@ import {
   type Component as VueComponent,
   type PropType,
 } from 'vue'
-import { NvButton, NvSelect, NvText } from '@packages/ui'
+import {
+  NvButton,
+  NvSelect,
+  NvText,
+  loadingDirective as vLoading,
+} from '@packages/ui'
 import { box, grid } from '@/styled-system/patterns'
 
 defineOptions({ inheritAttrs: false })

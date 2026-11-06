@@ -95,6 +95,7 @@ it('resolves a cold region with real portalled Select controls without deferred-
               component: Async,
               mode: 'control',
               size: 'sm',
+              placeholder: 'Provider placeholder',
               'aria-label': 'Voice',
             }),
         },
@@ -115,6 +116,9 @@ it('resolves a cold region with real portalled Select controls without deferred-
   await flushPromises()
   await Vue.nextTick()
   expect(wrapper.find('input:disabled').exists()).toBe(true)
+  expect(wrapper.get('input:disabled').attributes('placeholder')).toBe('')
+  expect(wrapper.find('.nv-loading-mask svg').exists()).toBe(true)
+  expect(wrapper.get('.nv-loading-mask').text()).toBe('')
   release(
     Vue.defineComponent({
       render: () =>
@@ -132,7 +136,43 @@ it('resolves a cold region with real portalled Select controls without deferred-
   expect(wrapper.find('[role=alert]').exists()).toBe(false)
   expect(wrapper.find('input:not(:disabled)').exists()).toBe(true)
   expect(wrapper.find('input:disabled').exists()).toBe(false)
+  expect(wrapper.find('.nv-loading-mask').exists()).toBe(false)
   expect(wrapper.get('[data-async-region]').attributes('aria-busy')).toBe(
     'false',
   )
+})
+
+it('uses a text-free spinner for a pending panel and removes it when the form resolves', async () => {
+  let release!: (component: Vue.Component) => void
+  const Async = Vue.markRaw(
+    Vue.defineAsyncComponent(
+      () =>
+        new Promise<Vue.Component>((resolve) => {
+          release = resolve
+        }),
+    ),
+  )
+  const wrapper = mount(module.exports.default, {
+    attachTo: document.body,
+    props: { component: Async, mode: 'panel' },
+    global: {
+      provide: {
+        theme: ui.themes.get('dark'),
+        [ui.PORTAL_TARGET]: document.body,
+      },
+    },
+  })
+  wrappers.push(wrapper)
+  await flushPromises()
+  await Vue.nextTick()
+  expect(wrapper.text()).toBe('')
+  expect(wrapper.find('.nv-loading-mask svg').exists()).toBe(true)
+  expect(wrapper.get('[role=status]').attributes('aria-label')).toBe('Loading')
+  expect(wrapper.attributes('aria-busy')).toBe('true')
+  release(Vue.defineComponent({ render: () => Vue.h('section', 'Ready form') }))
+  await flushPromises()
+  await Vue.nextTick()
+  expect(wrapper.find('.nv-loading-mask').exists()).toBe(false)
+  expect(wrapper.attributes('aria-busy')).toBe('false')
+  expect(wrapper.text()).toBe('Ready form')
 })

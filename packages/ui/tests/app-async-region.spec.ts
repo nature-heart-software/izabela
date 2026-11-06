@@ -22,7 +22,7 @@ const esm = (component: Vue.Component) => ({
   __esModule: true,
 })
 // Presentation-only boundary: the region must request the real control's disabled
-// and sizing props. Vue's async loader, Suspense and client renderer are not stubbed.
+// and sizing props. Vue's async loader and client renderer are not stubbed.
 const Select = Vue.defineComponent({
   props: ['disabled', 'size', 'options', 'placeholder', 'modelValue'],
   setup: (props) => () =>
@@ -51,7 +51,21 @@ const Reference = Vue.defineComponent({
     () =>
       Vue.h('div', slots.reference?.()),
 })
+// The real directive's spinner, styling and cleanup are covered by the real-UI
+// suite; this presentation boundary records the requested busy indicator.
+const loadingDirective: Vue.Directive<HTMLElement, boolean> = {
+  mounted(element, binding) {
+    if (!binding.value) return
+    element.setAttribute('data-loader-requested', 'true')
+    if (element.tagName === 'INPUT') return
+    const status = document.createElement('span')
+    status.setAttribute('role', 'status')
+    status.append(document.createElementNS('http://www.w3.org/2000/svg', 'svg'))
+    element.append(status)
+  },
+}
 const ui = {
+  loadingDirective,
   NvSelect: Select,
   NvButton: Button,
   NvCard: Div,
@@ -240,7 +254,8 @@ describe('AudioBar stable voice control', () => {
       'cold voice must not collapse to an empty async comment',
     ).toBe(true)
     expect(fallback.attributes('data-select-size')).toBe('sm')
-    expect(fallback.attributes('placeholder')).toBe('Loading…')
+    expect(fallback.attributes('placeholder')).toBe('')
+    expect(fallback.attributes('data-loader-requested')).toBe('true')
     expect(fallback.element.closest('.voice-width-13')).not.toBeNull()
     held.resolve(provider('B'))
     await settle()
@@ -264,7 +279,7 @@ function geometry(initial: Record<string, number> = {}) {
     function (this: HTMLElement) {
       const name =
         this.querySelector('[data-provider]')?.getAttribute('data-provider')
-      return new DOMRect(0, 0, 320, name ? (heights[name] ?? 0) : 17)
+      return new DOMRect(0, 0, 320, name ? heights[name] ?? 0 : 17)
     },
   )
   vi.stubGlobal(
@@ -515,10 +530,8 @@ describe('stable async panel', () => {
 
   it('keeps fragment rows in the inherited-gap grid through a layout-transparent host', async () => {
     const fragment = Vue.defineComponent({
-      setup: () => () => [
-        Vue.h('section', 'First'),
-        Vue.h('section', 'Second'),
-      ],
+      setup: () => () =>
+        [Vue.h('section', 'First'), Vue.h('section', 'Second')],
     })
     const wrapper = region(fragment)
     await settle()
@@ -569,7 +582,8 @@ describe('stable async panel', () => {
     geometry()
     const held = deferred<Vue.Component>()
     const wrapper = region(Vue.defineAsyncComponent(() => held.promise))
-    expect(wrapper.get('[role="status"]').text()).toBe('Loading…')
+    expect(wrapper.get('[role="status"]').text()).toBe('')
+    expect(wrapper.find('[role="status"] svg').exists()).toBe(true)
     expect(wrapper.attributes('aria-busy')).toBe('true')
     expect((wrapper.element as HTMLElement).style.minHeight).toBe('')
     held.resolve(provider('Ready'))
@@ -710,7 +724,8 @@ describe('stable async panel', () => {
       component: Vue.markRaw(Vue.defineAsyncComponent(() => held.promise)),
     })
     expect(root.style.minHeight).toBe('316px')
-    expect(wrapper.get('[role="status"]').text()).toBe('Loading…')
+    expect(wrapper.get('[role="status"]').text()).toBe('')
+    expect(wrapper.find('[role="status"] svg').exists()).toBe(true)
     expect(root.getAttribute('aria-busy')).toBe('true')
     expect(wrapper.find('[data-provider="A"]').exists()).toBe(false)
     g.resize()
