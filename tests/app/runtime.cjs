@@ -960,7 +960,7 @@ async function main() {
         await evaluate(messenger, () => {
           location.hash = '/'
         })
-        await evaluate(messenger, async () => {
+        await evaluate(worker, async () => {
           await window.ElectronMessengerWindow.hide(false)
           await window.ElectronMessengerWindow.show()
         })

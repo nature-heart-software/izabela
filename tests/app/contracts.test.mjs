@@ -2,7 +2,9 @@ import assert from 'node:assert/strict'
 import { readFileSync, readdirSync } from 'node:fs'
 import test from 'node:test'
 import { createRequire } from 'node:module'
+import { runInNewContext } from 'node:vm'
 const require = createRequire(import.meta.url)
+const ts = require('typescript')
 const {
   providers,
   inventory,
@@ -116,3 +118,173 @@ test('reports redact injected credentials, parsed service-account fields, and be
   assert.ok(!text.includes('synthetic'))
   assert.ok(!text.includes('example.test'))
 })
+
+test('tray journey hides through the worker bridge without awaiting a hidden renderer', async () => {
+  const module = { exports: {} }
+  const display = { bounds: { x: 0, y: 0, width: 800, height: 600 } }
+  const app = { relaunch() {}, exit() {} }
+  let visible = true
+  let hideRequests = 0
+  let trayClicks = 0
+  let resets = 0
+  let bounds = { x: 0, y: 0, width: 800, height: 600 }
+  const screen = {
+    getPrimaryDisplay: () => display,
+    getAllDisplays: () => [display],
+    emit: () => {
+      bounds = { ...display.bounds }
+    },
+  }
+  runInNewContext(
+    readFileSync(new URL('./resilience-journeys.cjs', import.meta.url), 'utf8'),
+    {
+      module,
+      exports: module.exports,
+      require: (id) => (id === 'electron' ? { app, screen } : require(id)),
+    },
+  )
+  const messenger = {
+    isVisible: () => visible,
+    setPosition(x, y) {
+      bounds = { ...bounds, x, y }
+    },
+    getBounds: () => bounds,
+  }
+  const { resilienceCases, runResilience } = module.exports
+  const worker = {}
+  await runResilience({
+    messenger,
+    worker,
+    check: async (name, fn) => {
+      if (name === resilienceCases[5]) await fn()
+    },
+    selectTts: async () => {},
+    patch: async () => {},
+    keyEvent() {},
+    read: async () => {
+      assert.equal(resets, 1)
+      return null
+    },
+    until: async (check, label) => {
+      for (let attempt = 0; attempt < 3; attempt++) {
+        if (await check()) return
+        await Promise.resolve()
+      }
+      assert.fail(label)
+    },
+    evaluate: async (target, fn) => {
+      assert.equal(target, worker, 'journey awaited a hidden renderer reply')
+      const value = runInNewContext(`(${fn.toString()})()`, {
+        window: {
+          ElectronMessengerWindow: {
+            hide() {
+              hideRequests++
+              visible = false
+              return Promise.resolve(true)
+            },
+          },
+        },
+      })
+      return value
+    },
+    trayRecords: [
+      {
+        tray: {
+          emit(event) {
+            assert.equal(event, 'click')
+            trayClicks++
+            visible = true
+          },
+        },
+        menu: {
+          items: [
+            {
+              label: 'Settings',
+              submenu: {
+                items: [
+                  {
+                    label: 'Reset Display',
+                    click() {
+                      resets++
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              label: 'Restart',
+              click() {
+                app.relaunch()
+                app.exit()
+              },
+            },
+          ],
+        },
+      },
+    ],
+  })
+  assert.equal(hideRequests, 1)
+  assert.equal(trayClicks, 1)
+  assert.equal(resets, 1)
+  assert.equal(visible, true)
+  assert.deepEqual(bounds, display.bounds)
+})
+
+for (const [filename, expected] of [
+  ['edge-journeys.cjs', 2],
+  ['runtime.cjs', 1],
+]) {
+  test(`${filename} hide/reopen callbacks run through the worker bridge`, async () => {
+    const source = readFileSync(new URL(filename, import.meta.url), 'utf8')
+    const parsed = ts.createSourceFile(
+      filename,
+      source,
+      ts.ScriptTarget.Latest,
+      true,
+    )
+    const calls = []
+    const visit = (node) => {
+      if (
+        ts.isCallExpression(node) &&
+        node.expression.getText(parsed) === 'evaluate'
+      ) {
+        const callback = node.arguments[1]
+        if (
+          callback &&
+          /ElectronMessengerWindow\.hide\(/.test(callback.getText(parsed))
+        )
+          calls.push(node)
+      }
+      ts.forEachChild(node, visit)
+    }
+    visit(parsed)
+    assert.equal(
+      calls.length,
+      expected,
+      'every hide/reopen callback is exercised',
+    )
+    for (const call of calls) {
+      assert.equal(
+        call.arguments[0].getText(parsed),
+        'worker',
+        'hide/reopen must not await the renderer being hidden',
+      )
+      const observed = []
+      await runInNewContext(`(${call.arguments[1].getText(parsed)})()`, {
+        window: {
+          ElectronMessengerWindow: {
+            hide: async (returnFocus) => {
+              observed.push(['hide', returnFocus])
+              return true
+            },
+            show: async () => {
+              observed.push(['show'])
+              return true
+            },
+          },
+        },
+      })
+      assert.deepEqual(observed, [['hide', false], ['show']])
+    }
+  })
+}
