@@ -51,7 +51,9 @@ export function themeVariables(theme: unknown): Record<string, string> {
 export function pandaComponent(
   tag: string | Component,
   propsDefinition: ComponentObjectPropsOptions = {},
-  recipe: (props: any) => string | undefined = () => '',
+  recipe: ((props: any) => string | undefined) & {
+    variantKeys?: string[]
+  } = () => '',
 ) {
   return defineComponent({
     inheritAttrs: false,
@@ -62,6 +64,17 @@ export function pandaComponent(
       const element = ref<HTMLElement>()
       const theme = inject<unknown>('theme', undefined)
       const variables = computed(() => themeVariables(unref(theme)))
+      // Panda memoizes recipes by serializing their arguments. Only styling
+      // variants belong in that key, never an entire voice catalog or model.
+      const className = computed(() =>
+        recipe(
+          recipe.variantKeys
+            ? Object.fromEntries(
+                recipe.variantKeys.map((key) => [key, values[key]]),
+              )
+            : props,
+        ),
+      )
       expose({
         get input() {
           return element.value
@@ -113,7 +126,7 @@ export function pandaComponent(
           target as any,
           mergeProps(forwarded, attrs, {
             ref: element,
-            class: recipe(props),
+            class: className.value,
             style: variables.value,
           }),
           typeof target === 'string' ? slots.default?.() : slots,

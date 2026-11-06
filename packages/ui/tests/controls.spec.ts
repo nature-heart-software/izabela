@@ -410,6 +410,55 @@ describe('client autocomplete keyboard and lifecycle', () => {
 })
 
 describe('real select composition', () => {
+  it('does not traverse provider payloads on tooltip changes, opening, highlighting, or search', async () => {
+    installGeometry()
+    let payloadReads = 0
+    const voices = Array.from({ length: 500 }, (_, index) => ({
+      label: `Voice ${index}`,
+      value: {
+        name: `voice-${index}`,
+        get metadata() {
+          payloadReads++
+          return { description: 'Unrelated provider metadata' }
+        },
+      },
+    }))
+    const catalog = [{ label: 'Catalog', children: voices }]
+    const tooltipState = ref('closed')
+    const wrapper = render({
+      render: () =>
+        h(ui.NvSelect, {
+          options: catalog,
+          modelValue: voices[0].value,
+          valueKey: 'name',
+          id: 'large-voice-select',
+          'data-scope': 'tooltip',
+          'data-part': 'trigger',
+          'data-state': tooltipState.value,
+        }),
+    })
+    await settle()
+    payloadReads = 0
+    for (const state of ['open', 'closed', 'open', 'closed']) {
+      tooltipState.value = state
+      await settle()
+    }
+    expect(payloadReads).toBe(0)
+    const input = wrapper.get('input').element as HTMLInputElement
+    input.focus()
+    await settle()
+    expect(payloadReads).toBe(0)
+    expect(document.querySelectorAll('[role="option"]').length).toBeLessThan(30)
+    await key('ArrowDown')
+    await settle()
+    expect(payloadReads).toBe(0)
+    await wrapper.get('input').setValue('Voice 49')
+    await settle()
+    expect(payloadReads).toBe(0)
+    expect(document.querySelector('[role="option"]')).not.toBeNull()
+    expect(input.id).toBe('large-voice-select')
+  })
+
   beforeEach(installGeometry)
   it('single selection updates the public model from the actual keyboard autocomplete', async () => {
     const w = render(ui.NvSelect, {

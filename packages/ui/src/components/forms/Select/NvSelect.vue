@@ -203,6 +203,11 @@ const inputAttrs = computed<Record<string, unknown>>(() =>
     ...(attrs.id === controlId ? ['id'] : []),
   ]),
 )
+// Keep Ark's IDs independent of changing tooltip/pointer attributes. Rebuilding
+// its context on hover also rebuilds and deeply watches the entire collection.
+const inputId = computed(() =>
+  typeof attrs.id === 'string' && attrs.id !== controlId ? attrs.id : undefined,
+)
 const isLocked = computed(() => props.disabled || props.readonly)
 const emit = defineEmits(['update:modelValue'])
 const iconSize = computed(() => {
@@ -307,7 +312,7 @@ watch(
   },
 )
 
-const fuseOptions = computed<UseFuseOptions<(typeof options.value)[number]>>(
+const fuseOptions = computed<UseFuseOptions<typeof options.value[number]>>(
   () => ({
     fuseOptions: {
       keys: ['label', 'category', 'searchValue'],
@@ -319,14 +324,11 @@ const fuseOptions = computed<UseFuseOptions<(typeof options.value)[number]>>(
 const { results } = useFuse(search, options, fuseOptions)
 const searchResults = computed(() => {
   if (search.value) {
-    const filteredOptions = results.value.map(({ item }) => item) || []
+    const matchingKeys = new Set(results.value.map(({ item }) => item.key))
     return options.value.filter((option) => {
-      if ('children' in option) {
-        return filteredOptions.some((o) =>
-          (option.children as SelectOption[]).find((c) => c.key === o.key),
-        )
-      }
-      return filteredOptions.some((o) => o.key === option.key)
+      if (option.children)
+        return option.children.some((child) => matchingKeys.has(child.key))
+      return matchingKeys.has(option.key)
     })
   }
   return options.value || []
@@ -352,16 +354,30 @@ const autoScrollIndex = computed(() => {
 })
 
 const optionList = ref<InstanceType<typeof NvSelectList>>()
+// Ark only needs identity, text and availability. Keep provider voice payloads
+// out of the machine's deep context watcher; public values stay in options.
+type ComboboxOption = Pick<
+  SelectOption,
+  'key' | 'label' | 'disabled' | 'readonly'
+>
 const collectionItems = computed(() =>
-  searchResults.value.filter((item) => !item.children),
+  searchResults.value
+    .filter((item) => !item.children)
+    .map(({ key, label, disabled, readonly }) => ({
+      key,
+      label,
+      disabled,
+      readonly,
+    })),
 )
 const highlightedValue = ref<string | null>(null)
-const combobox = useCombobox<SelectOption>(
+const combobox = useCombobox<ComboboxOption>(
   reactive({
     items: collectionItems,
-    itemToString: (item: SelectOption) => item.label,
-    itemToValue: (item: SelectOption) => item.key,
-    isItemDisabled: (item: SelectOption) => !!(item.disabled || item.readonly),
+    itemToString: (item: ComboboxOption) => item.label,
+    itemToValue: (item: ComboboxOption) => item.key,
+    isItemDisabled: (item: ComboboxOption) =>
+      !!(item.disabled || item.readonly),
     modelValue: computed(() => selectedOptions.value.map((item) => item!.key)),
     inputValue,
     open: isAutocompleteVisible,
@@ -377,10 +393,7 @@ const combobox = useCombobox<SelectOption>(
     // NvAutocomplete owns positioning, nested layers and the dismissal shield.
     disableLayer: true,
     ids: computed(() => ({
-      input:
-        typeof inputAttrs.value.id === 'string'
-          ? inputAttrs.value.id
-          : undefined,
+      input: inputId.value,
     })),
     onInputValueChange: ({ inputValue }: { inputValue: string }) =>
       updateSearch(inputValue),
@@ -404,7 +417,9 @@ const combobox = useCombobox<SelectOption>(
     },
     scrollToIndexFn: ({ index }: { index: number }) => {
       const item = collectionItems.value[index]
-      const row = item ? searchResults.value.indexOf(item) : -1
+      const row = item
+        ? searchResults.value.findIndex((row) => row.key === item.key)
+        : -1
       if (row >= 0) optionList.value?.scrollToIndex(row)
     },
   }),
