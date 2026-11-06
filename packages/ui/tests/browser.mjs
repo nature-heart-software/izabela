@@ -274,6 +274,7 @@ try {
       'multiple',
       'disabled',
       'readonly',
+      'async',
     ]) {
       const input = `#tooltip-select-${variant}`
       const indicator = `[data-nv-select-control]:has(${input}) > :last-child svg`

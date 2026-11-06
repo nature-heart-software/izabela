@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { defineAsyncComponent, ref } from 'vue'
 import { loadingDirective } from './loading'
 import {
   NvButton,
@@ -77,7 +77,17 @@ export const Nested = {
 
 export const SelectTooltips = {
   render: () => ({
-    components: { NvSelect, NvStack, NvTooltip },
+    components: {
+      NvSelect,
+      NvStack,
+      NvTooltip,
+      LazySelect: defineAsyncComponent(
+        () =>
+          new Promise<typeof NvSelect>((resolve) => {
+            setTimeout(() => resolve(NvSelect), 150)
+          }),
+      ),
+    },
     setup: () => ({
       variants: [
         { id: 'sm', size: 'sm' },
@@ -86,6 +96,7 @@ export const SelectTooltips = {
         { id: 'multiple', size: 'md', multiple: true },
         { id: 'disabled', size: 'md', disabled: true },
         { id: 'readonly', size: 'md', readonly: true },
+        { id: 'async', size: 'sm', async: true },
       ],
       options: [
         { label: 'Alpha', value: 'a' },
@@ -97,7 +108,7 @@ export const SelectTooltips = {
         <NvTooltip v-for="variant in variants" :key="variant.id" :tippy-options="{ delay: [80, 0], duration: 0, offset: [0, 12] }">
           Choose a speech engine ({{ variant.id }})
           <template #reference>
-            <NvSelect :id="'tooltip-select-' + variant.id" :aria-label="'Speech engine ' + variant.id"
+            <component :is="variant.async ? 'LazySelect' : 'NvSelect'" :id="'tooltip-select-' + variant.id" :aria-label="'Speech engine ' + variant.id"
               :size="variant.size" :multiple="variant.multiple" :disabled="variant.disabled" :readonly="variant.readonly"
               :model-value="variant.multiple ? ['a'] : 'a'" :options="options" />
           </template>

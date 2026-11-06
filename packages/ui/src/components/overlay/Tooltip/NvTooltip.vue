@@ -29,6 +29,7 @@ import {
   type MaybeElement,
   useEventListener,
   useFocusWithin,
+  useMutationObserver,
 } from '@vueuse/core'
 import { getElement } from '@/utils/vue'
 import { PORTAL_TARGET } from '@/consts'
@@ -36,7 +37,7 @@ import { PORTAL_TARGET } from '@/consts'
 const props = defineProps(propsDefinition)
 const trigger = ref()
 const triggerId = ref(`nv-tooltip-${useId()}-trigger`)
-watchPostEffect(() => {
+function syncTrigger() {
   // Zag measures the trigger by ID even when Ark composes a consumer element.
   const element = getElement(trigger.value)
   const selector = '[data-scope="tooltip"][data-part="trigger"]'
@@ -46,8 +47,12 @@ watchPostEffect(() => {
     ? element
     : element?.querySelector<HTMLElement>(selector) || element
   if (target?.id) triggerId.value = target.id
-})
+}
+watchPostEffect(syncTrigger)
 const tooltip = ref<MaybeElement>()
+// Async voice components can replace a comment with their control without
+// changing Tooltip.Trigger's component ref. Observe that scoped DOM boundary.
+useMutationObserver(tooltip, syncTrigger, { childList: true, subtree: true })
 const { focused } = useFocusWithin(tooltip)
 const injectedPortalTarget = inject(PORTAL_TARGET)
 const portalTarget = computed(
