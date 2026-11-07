@@ -4,7 +4,12 @@
       <NvTooltip>
         <NvText>Guided tour</NvText>
         <template #reference>
-          <NvButton icon-name="question-circle" size="sm" @click="startTour" />
+          <NvButton
+            aria-label="Guided tour"
+            icon-name="question-circle"
+            size="sm"
+            @click="startTour"
+          />
         </template>
       </NvTooltip>
       <NvTooltip>
@@ -53,47 +58,39 @@
       </NvTooltip>
     </NvGroup>
   </NvCard>
-  <VTour ref="tour" :steps="steps">
+  <VTour ref="tour" :steps="steps" @onTourStart="focusTourAction">
     <template #content="{ step }">
       <NvText data-nv-tour-content>
         {{ steps[step.currentStep].content }}
       </NvText>
     </template>
     <template #actions="scope">
-      <NvGroup :key="step" justify="apart">
+      <NvGroup :key="scope.step.currentStep" justify="apart">
         <span></span>
         <NvGroup>
           <NvButton
-            :type="step !== steps.length - 1 ? 'plain' : 'default'"
-            size="sm"
-            @click.prevent="
-              () => {
-                step = 0
-                scope.endTour()
-              }
+            data-nv-tour-close
+            :type="
+              scope.step.currentStep !== steps.length - 1 ? 'plain' : 'default'
             "
+            size="sm"
+            @click.prevent="scope.endTour()"
             >Close
           </NvButton>
           <NvButton
-            v-if="step > 0 && step !== steps.length - 1"
-            size="sm"
-            @click.prevent="
-              () => {
-                step -= 1
-                scope.prevStep()
-              }
+            v-if="
+              scope.step.currentStep > 0 &&
+              scope.step.currentStep !== steps.length - 1
             "
+            size="sm"
+            @click.prevent="scope.prevStep()"
             >Previous
           </NvButton>
           <NvButton
-            v-if="step !== steps.length - 1"
+            v-if="scope.step.currentStep !== steps.length - 1"
+            data-nv-tour-next
             size="sm"
-            @click.prevent="
-              () => {
-                step += 1
-                scope.nextStep()
-              }
-            "
+            @click.prevent="scope.nextStep()"
             >Next
           </NvButton>
         </NvGroup>
@@ -103,7 +100,7 @@
 </template>
 <script lang="ts" setup>
 import { NvButton, NvCard, NvGroup, NvText, NvTooltip } from '@packages/ui'
-import { inject, ref } from 'vue'
+import { inject, nextTick, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useSettingsStore } from '@/features/settings/store'
 import { isGameOverlay } from '@/consts.ts'
@@ -120,12 +117,19 @@ const hide = () => {
     emitIPCGameOverlayStopIntercept()
   }
 }
-const tour = ref(null)
-const step = ref(0)
+const tour = ref<{ resetTour: () => void }>()
 const startTour = () => {
-  step.value = 0
-  tour.value.resetTour()
-  tour.value.startTour()
+  // resetTour starts the installed tour after resetting its saved progress.
+  tour.value?.resetTour()
+}
+async function focusTourAction() {
+  await nextTick()
+  const panel = document.getElementById('vjt-tooltip')
+  if (!panel || panel.hasAttribute('data-hidden')) return
+  const action =
+    panel.querySelector<HTMLButtonElement>('[data-nv-tour-next]') ||
+    panel.querySelector<HTMLButtonElement>('[data-nv-tour-close]')
+  action?.focus({ preventScroll: true })
 }
 const steps = [
   {
@@ -222,5 +226,5 @@ const steps = [
       )}. If the text input is focused, you can also press [Esc] to close the window.`,
     placement: 'top',
   },
-]
+].map((step) => ({ ...step, onShow: focusTourAction }))
 </script>

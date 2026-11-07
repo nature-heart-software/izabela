@@ -74,6 +74,7 @@ const trigger = ref()
 const expanded = ref(false)
 let focusRequest = 0
 let focusFrame: number | undefined
+let focusDismissed = false
 const triggerId = ref(`nv-tooltip-${useId()}-trigger`)
 const referenceId = () =>
   typeof attrs.id === 'string' ? attrs.id : triggerId.value
@@ -103,11 +104,15 @@ const ReferenceTrigger = defineComponent({
           onFocusin: onReferenceFocus,
           onFocusout: onReferenceBlur,
           onClick: (event: MouseEvent) => {
+            focusDismissed = false
             cancelFocusActivation()
             triggerProps.onClick?.(event)
           },
           onPointermove: (event: PointerEvent) => {
-            if (!expanded.value) triggerProps.onPointermove?.(event)
+            if (!expanded.value) {
+              focusDismissed = false
+              triggerProps.onPointermove?.(event)
+            }
           },
         },
         attrs,
@@ -152,18 +157,18 @@ const portalTarget = computed(
 )
 const openDelay = computed(() =>
   Array.isArray(props.tippyOptions.delay)
-    ? (props.tippyOptions.delay[0] ?? 250)
-    : (props.tippyOptions.delay ?? 250),
+    ? props.tippyOptions.delay[0] ?? 250
+    : props.tippyOptions.delay ?? 250,
 )
 const closeDelay = computed(() =>
   Array.isArray(props.tippyOptions.delay)
-    ? (props.tippyOptions.delay[1] ?? 0)
-    : (props.tippyOptions.delay ?? 0),
+    ? props.tippyOptions.delay[1] ?? 0
+    : props.tippyOptions.delay ?? 0,
 )
 const enterDuration = computed(() => {
   if (props.tippyOptions.animation === false) return 0
   const duration = props.tippyOptions.duration
-  return Array.isArray(duration) ? (duration[0] ?? 300) : (duration ?? 300)
+  return Array.isArray(duration) ? duration[0] ?? 300 : duration ?? 300
 })
 const positioning = computed<TooltipRootProps['positioning']>(() => ({
   placement:
@@ -200,13 +205,17 @@ function cancelFocusActivation() {
   focusFrame = undefined
 }
 onBeforeUnmount(cancelFocusActivation)
-async function onReferenceFocus(event: FocusEvent) {
+function onReferenceFocus(event: FocusEvent) {
+  focusDismissed = false
+  return activateFocusedReference(event)
+}
+async function activateFocusedReference(event?: Event) {
   cancelFocusActivation()
   const request = focusRequest
   // Focus can arrive during mounting or while its handler closes a popover.
   // Resolve the retained owner and expanded state after that render completes.
   await nextTick()
-  if (request !== focusRequest || event.defaultPrevented) return
+  if (request !== focusRequest || event?.defaultPrevented) return
   // Native Escape handlers can restore focus before that same key finishes
   // propagating. Open on the next frame so it cannot dismiss the new tooltip.
   focusFrame = requestAnimationFrame(() => {
@@ -234,7 +243,8 @@ function onReferenceBlur(event: FocusEvent) {
   }
   deactivate(event)
 }
-function deactivate(event: Event) {
+function deactivate(event: Event, dismissFocus = true) {
+  if (dismissFocus) focusDismissed = true
   cancelFocusActivation()
   // The click-through Electron window can miss pointerleave when it loses focus.
   // Reset hover as well as visibility so the next pointer entry can reopen normally.
@@ -246,9 +256,21 @@ function onOutsidePointerDown(event: PointerEvent) {
   const reference = getElement(tooltip.value)
   const contentId = tooltipApi.value.getContentProps().id
   const content = contentId ? document.getElementById(contentId) : null
+  // Select options live in a portal. Choosing one is an interaction with the
+  // reference's popup, rather than an outside dismissal of its tooltip.
+  const controlledPopups = reference
+    ? Array.from(
+        reference.querySelectorAll<HTMLElement>('[aria-controls]'),
+      ).flatMap((owner) =>
+        (owner.getAttribute('aria-controls') || '')
+          .split(/\s+/)
+          .map((id) => document.getElementById(id)),
+      )
+    : []
   if (
     (reference && path.includes(reference)) ||
-    (content && path.includes(content))
+    (content && path.includes(content)) ||
+    controlledPopups.some((popup) => popup && path.includes(popup))
   )
     return
   // An outside click can leave the trigger focused. Dismiss independently of
@@ -259,7 +281,10 @@ useEventListener(document, 'pointerdown', onOutsidePointerDown, {
   capture: true,
 })
 watch(expanded, (expanded) => {
-  if (expanded) deactivate(new Event('pointerleave'))
+  if (expanded) {
+    focusDismissed = false
+    deactivate(new Event('pointerleave'), false)
+  } else if (!focusDismissed) void activateFocusedReference()
 })
 useEventListener(window, 'blur', deactivate)
 useEventListener(document, 'visibilitychange', (event) => {

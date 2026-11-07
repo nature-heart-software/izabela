@@ -974,13 +974,80 @@ describe('overlay interaction boundaries', () => {
     expect(input.getAttribute('aria-expanded')).toBe('true')
     expect(document.querySelector('[role="tooltip"]')).toBeNull()
     await key(input, 'Escape')
-    await control.trigger('pointermove', { pointerType: 'mouse' })
     await settle()
     expect(document.activeElement).toBe(input)
     expect(document.querySelector('[role="tooltip"]')?.textContent).toContain(
       'Choose a voice',
     )
   })
+
+  it.each(['Escape', 'keyboard selection', 'option click', 'outside click'])(
+    'restores a focused Select tooltip after %s unless dismissed outside',
+    async (method) => {
+      const value = ref('a')
+      const wrapper = render(ui.NvTooltip, {
+        props: { tippyOptions: { delay: 0, duration: 0 } },
+        slots: {
+          reference: () =>
+            h(ui.NvSelect, {
+              id: 'returning-select',
+              modelValue: value.value,
+              'onUpdate:modelValue': (next: string) => {
+                value.value = next
+              },
+              options: [
+                { label: 'Alpha', value: 'a' },
+                { label: 'Beta', value: 'b' },
+              ],
+            }),
+          default: 'Choose a voice',
+        },
+      })
+      await settle()
+      const input = wrapper.get('input').element as HTMLInputElement
+      input.focus()
+      await key(input, 'Enter')
+      expect(input.getAttribute('aria-expanded')).toBe('true')
+      expect(document.querySelector('[role="tooltip"]')).toBeNull()
+      if (method === 'keyboard selection') {
+        await key(input, 'ArrowDown')
+        await key(input, 'Enter')
+      } else if (method === 'option click') {
+        const option = document.querySelector<HTMLElement>('[title="Beta"]')!
+        option.dispatchEvent(
+          new MouseEvent('pointerdown', { bubbles: true, cancelable: true }),
+        )
+        option.dispatchEvent(
+          new MouseEvent('mousedown', { bubbles: true, cancelable: true }),
+        )
+        option.click()
+      } else if (method === 'outside click') {
+        const shield = document.querySelector<HTMLElement>(
+          '[data-nv-overlay-shield]',
+        )!
+        shield.dispatchEvent(
+          new MouseEvent('pointerdown', { bubbles: true, cancelable: true }),
+        )
+        shield.click()
+      } else await key(input, 'Escape')
+      await settle()
+      expect(input.getAttribute('aria-expanded')).toBe('false')
+      expect(document.activeElement).toBe(input)
+      if (method === 'outside click') {
+        expect(document.querySelector('[role="tooltip"]')).toBeNull()
+        // A subsequent keyboard-opened session gets its own dismissal state.
+        await key(input, 'Enter')
+        await key(input, 'Escape')
+        await settle()
+        expect(
+          document.querySelector('[role="tooltip"]')?.textContent,
+        ).toContain('Choose a voice')
+      } else
+        expect(
+          document.querySelector('[role="tooltip"]')?.textContent,
+        ).toContain('Choose a voice')
+    },
+  )
 
   it.each(['click', 'pointer', 'Space'])(
     'context menu activates one option exactly once through %s',
