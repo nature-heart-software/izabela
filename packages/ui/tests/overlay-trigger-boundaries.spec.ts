@@ -588,7 +588,9 @@ describe('overlay trigger ownership', () => {
       if (!tooltip)
         await vi.waitFor(() =>
           expect(document.activeElement).toBe(
-            document.querySelector('[data-scope="popover"][data-part="content"]'),
+            document.querySelector(
+              '[data-scope="popover"][data-part="content"]',
+            ),
           ),
         )
       await key(
