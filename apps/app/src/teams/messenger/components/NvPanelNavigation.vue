@@ -32,14 +32,14 @@
           size="sm"
           :class="css({ minWidth: '220px' })"
         >
-          <NvStack :spacing="4">
+          <NvStack>
             <Popover.Title as-child>
               <NvText type="subtitle">Navigate to</NvText>
             </Popover.Title>
-            <NvButton size="lg" @click="focusArea(props.sidebar, true)">
+            <NvButton @click="focusArea(props.sidebar, true)">
               Navigation
             </NvButton>
-            <NvButton size="lg" @click="focusArea(props.content)">
+            <NvButton @click="focusArea(props.content)">
               Page content
             </NvButton>
           </NvStack>
