@@ -391,16 +391,16 @@ describe('overlay trigger ownership', () => {
         kind === 'text'
           ? 'Open text'
           : kind === 'shared'
-          ? h(ui.NvButton, { id: 'dialog-reference' }, () => 'Open shared')
-          : h(
-              (kind === 'custom'
-                ? custom
-                : kind === 'span'
-                ? 'span'
-                : 'button') as any,
-              { id: 'dialog-reference' },
-              kind === 'custom' ? undefined : 'Open reference',
-            )
+            ? h(ui.NvButton, { id: 'dialog-reference' }, () => 'Open shared')
+            : h(
+                (kind === 'custom'
+                  ? custom
+                  : kind === 'span'
+                    ? 'span'
+                    : 'button') as any,
+                { id: 'dialog-reference' },
+                kind === 'custom' ? undefined : 'Open reference',
+              )
       const wrapper = render(ui.NvDialog, {
         slots: { reference, title: 'Example' },
       })
@@ -447,8 +447,8 @@ describe('overlay trigger ownership', () => {
               kind === 'shared'
                 ? ui.NvButton
                 : kind === 'custom'
-                ? custom
-                : 'button',
+                  ? custom
+                  : 'button',
               { id: 'disabled-reference', disabled: true },
               kind === 'shared' ? () => 'Unavailable' : undefined,
             ),

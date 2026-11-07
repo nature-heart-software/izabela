@@ -100,7 +100,7 @@ const commands = computed(
 const inputValue = computed(() => props.modelValue)
 const isInputFocused = ref(false)
 const latestCommands = ref<string[]>([])
-const fuseOptions = computed<UseFuseOptions<typeof commands.value[number]>>(
+const fuseOptions = computed<UseFuseOptions<(typeof commands.value)[number]>>(
   () => ({
     fuseOptions: {
       keys: ['command'],
@@ -137,7 +137,7 @@ const isAutocompleteVisible = computed(
     inputValue.value.split(' ').length < 2,
 )
 
-const onAutocompleteSelect = (value: typeof commands.value[number]) => {
+const onAutocompleteSelect = (value: (typeof commands.value)[number]) => {
   emit('update:modelValue', `${value.command} `)
   if (latestCommands.value.includes(value.command)) {
     latestCommands.value.splice(latestCommands.value.indexOf(value.command), 1)
