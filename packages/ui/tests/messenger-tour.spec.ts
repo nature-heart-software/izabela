@@ -80,6 +80,14 @@ beforeEach(() => {
       disconnect() {}
     },
   )
+  vi.stubGlobal(
+    'IntersectionObserver',
+    class {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    },
+  )
 })
 afterEach(async () => {
   const popup = document.getElementById('vjt-tooltip')
@@ -135,6 +143,56 @@ function action(label: string) {
     ...document.querySelectorAll<HTMLButtonElement>('#vjt-tooltip button'),
   ].find((button) => button.textContent?.trim() === label)!
 }
+async function tab(target: HTMLElement, shiftKey = false) {
+  const event = new KeyboardEvent('keydown', {
+    key: 'Tab',
+    shiftKey,
+    bubbles: true,
+    cancelable: true,
+  })
+  target.dispatchEvent(event)
+  await settle()
+  return event
+}
+
+it('traps forward, reverse, and programmatic focus inside the active tour', async () => {
+  await renderTour()
+  const popup = document.getElementById('vjt-tooltip')!
+  expect(popup.getAttribute('role')).toBe('dialog')
+  expect(popup.getAttribute('aria-modal')).toBe('true')
+  expect((await tab(action('Next'))).defaultPrevented).toBe(true)
+  expect(document.activeElement).toBe(action('Close'))
+  expect((await tab(action('Close'), true)).defaultPrevented).toBe(true)
+  expect(document.activeElement).toBe(action('Next'))
+  document
+    .querySelector<HTMLButtonElement>('[data-v-step="messenger-text-input"]')!
+    .focus()
+  expect(popup.contains(document.activeElement)).toBe(true)
+  action('Next').click()
+  await settle()
+  await tab(action('Next'))
+  expect(document.activeElement).toBe(action('Close'))
+  await tab(action('Close'), true)
+  expect(document.activeElement).toBe(action('Next'))
+})
+
+it('releases the trap and restores the guided-tour button when closed', async () => {
+  const { wrapper } = await renderTour()
+  action('Close').click()
+  await settle()
+  const start = wrapper.get('button[aria-label="Guided tour"]')
+    .element as HTMLButtonElement
+  expect(document.activeElement).toBe(start)
+  expect(
+    document.getElementById('vjt-tooltip')!.hasAttribute('aria-modal'),
+  ).toBe(false)
+  expect((await tab(start)).defaultPrevented).toBe(false)
+  document
+    .querySelector<HTMLButtonElement>('[data-v-step="messenger-text-input"]')!
+    .focus()
+  await settle()
+  expect(document.activeElement).not.toBe(start)
+})
 
 it('focuses Next when the actual tour starts, advances, and goes back', async () => {
   await renderTour()
@@ -163,6 +221,10 @@ it('focuses Close on the last step and Next again when restarted', async () => {
     document.getElementById('vjt-tooltip')?.hasAttribute('data-hidden'),
   ).toBe(false)
   await vi.waitFor(() => expect(document.activeElement).toBe(action('Close')))
+  expect((await tab(action('Close'))).defaultPrevented).toBe(true)
+  expect(document.activeElement).toBe(action('Close'))
+  expect((await tab(action('Close'), true)).defaultPrevented).toBe(true)
+  expect(document.activeElement).toBe(action('Close'))
   action('Close').click()
   await settle()
   expect(

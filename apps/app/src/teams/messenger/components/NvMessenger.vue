@@ -226,6 +226,8 @@ useEventListener(document, 'keydown', (event: KeyboardEvent) => {
   if (!panel) return
   const stops = getTabStops(panel)
   const active = document.activeElement
+  const modal = active?.closest('[aria-modal="true"]')
+  if (modal && !panel.contains(modal)) return
   // Nested controls own handled keys while focus remains inside. Ark's
   // portalled Tab proxy can already have moved it outside in capture phase.
   if (event.defaultPrevented && panel.contains(active)) return
@@ -354,7 +356,8 @@ function onHandlePointerDown(event: PointerEvent) {
   // Moveable prevents the native mouse default and only blurs text fields.
   // Release buttons too when pressing the drag surface, before drag handling.
   const active = document.activeElement
-  if (active instanceof HTMLElement) active.blur()
+  if (active instanceof HTMLElement && !active.closest('[aria-modal="true"]'))
+    active.blur()
 }
 
 const onDrag = (event: any) => {

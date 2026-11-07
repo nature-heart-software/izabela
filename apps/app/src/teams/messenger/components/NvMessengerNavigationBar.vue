@@ -58,7 +58,12 @@
       </NvTooltip>
     </NvGroup>
   </NvCard>
-  <VTour ref="tour" :steps="steps" @onTourStart="focusTourAction">
+  <VTour
+    ref="tour"
+    :steps="steps"
+    @onTourStart="focusTourAction"
+    @onTourEnd="releaseTourFocus"
+  >
     <template #content="{ step }">
       <NvText data-nv-tour-content>
         {{ steps[step.currentStep].content }}
@@ -100,7 +105,8 @@
 </template>
 <script lang="ts" setup>
 import { NvButton, NvCard, NvGroup, NvText, NvTooltip } from '@packages/ui'
-import { inject, nextTick, ref } from 'vue'
+import { inject, nextTick, onBeforeUnmount, ref } from 'vue'
+import { createFocusTrap, type FocusTrap } from 'focus-trap'
 import { useRoute } from 'vue-router'
 import { useSettingsStore } from '@/features/settings/store'
 import { isGameOverlay } from '@/consts.ts'
@@ -118,6 +124,13 @@ const hide = () => {
   }
 }
 const tour = ref<{ resetTour: () => void }>()
+let tourFocusTrap: FocusTrap | undefined
+function releaseTourFocus(returnFocus = true) {
+  tourFocusTrap?.deactivate({ returnFocus })
+  tourFocusTrap = undefined
+  document.getElementById('vjt-tooltip')?.removeAttribute('aria-modal')
+}
+onBeforeUnmount(() => releaseTourFocus(false))
 const startTour = () => {
   // resetTour starts the installed tour after resetting its saved progress.
   tour.value?.resetTour()
@@ -126,10 +139,25 @@ async function focusTourAction() {
   await nextTick()
   const panel = document.getElementById('vjt-tooltip')
   if (!panel || panel.hasAttribute('data-hidden')) return
-  const action =
+  panel.setAttribute('role', 'dialog')
+  panel.setAttribute('aria-label', 'Guided tour')
+  panel.setAttribute('aria-modal', 'true')
+  panel.tabIndex = -1
+  const primaryAction = () =>
     panel.querySelector<HTMLButtonElement>('[data-nv-tour-next]') ||
-    panel.querySelector<HTMLButtonElement>('[data-nv-tour-close]')
-  action?.focus({ preventScroll: true })
+    panel.querySelector<HTMLButtonElement>('[data-nv-tour-close]') ||
+    panel
+  tourFocusTrap ??= createFocusTrap(panel, {
+    initialFocus: primaryAction,
+    fallbackFocus: panel,
+    delayInitialFocus: false,
+    escapeDeactivates: false,
+    setReturnFocus: () =>
+      document.querySelector<HTMLElement>('button[aria-label="Guided tour"]') ||
+      false,
+  })
+  tourFocusTrap.activate()
+  primaryAction().focus({ preventScroll: true })
 }
 const steps = [
   {

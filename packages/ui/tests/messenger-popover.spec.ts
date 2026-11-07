@@ -233,6 +233,35 @@ afterEach(async () => {
 })
 
 describe('messenger routed popover', () => {
+  it('yields Tab navigation to a modal outside the open panel', async () => {
+    const f = await fixture()
+    await f.messenger.navigateTo({ name: 'settings' })
+    await flushPromises()
+    await delay(40)
+    const modal = document.createElement('div')
+    modal.setAttribute('aria-modal', 'true')
+    const button = document.createElement('button')
+    modal.append(button)
+    document.body.append(modal)
+    button.focus()
+    const event = new KeyboardEvent('keydown', {
+      key: 'Tab',
+      bubbles: true,
+      cancelable: true,
+    })
+    button.dispatchEvent(event)
+    expect(event.defaultPrevented).toBe(false)
+    expect(document.activeElement).toBe(button)
+    expect(f.messenger.isViewShown.value).toBe(true)
+    f.wrapper.get('.moveable-handle').element.dispatchEvent(
+      new MouseEvent('pointerdown', {
+        bubbles: true,
+        cancelable: true,
+        button: 0,
+      }),
+    )
+    expect(document.activeElement).toBe(button)
+  })
   it.each(['settings', 'messages'])(
     'wraps Tab and Shift+Tab inside the %s panel, skipping blocked controls',
     async (name) => {
