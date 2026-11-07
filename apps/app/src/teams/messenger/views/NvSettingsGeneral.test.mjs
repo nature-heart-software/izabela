@@ -139,6 +139,7 @@ async function renderSettings(disabled, savedAutoUpdate, initial = {}) {
           get,
           uuid: () => 'option-id',
           hasFocus: vue.ref(false),
+          isAutocompleteVisible: vue.ref(false),
           search: vue.ref(''),
         },
         `${selectSource}\nexport { selectedOptions, inputValue }`,

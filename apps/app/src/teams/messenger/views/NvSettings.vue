@@ -100,9 +100,13 @@
                       >
                         <router-link
                           :to="entry.to || { name: 'settings' }"
-                          :class="css({ width: '100%' })"
+                          custom
+                          v-slot="{ href, navigate }"
                         >
                           <NvButton
+                            as="a"
+                            :href="href"
+                            @click="navigate"
                             :selected="currentRoute.name === entry.to?.name"
                             :class="css({ width: '100%' })"
                             size="sm"
@@ -120,7 +124,7 @@
               class="settings__content"
               :class="css({ flex: '1 1 0%', paddingLeft: '4' })"
             >
-              <NvPortalTarget
+              <div
                 :class="
                   css({
                     height: '100%',
@@ -143,7 +147,7 @@
                         })
                       "
                     >
-                      <div
+                      <NvPortalTarget
                         :key="currentRoute.path"
                         :class="
                           css({
@@ -154,11 +158,11 @@
                         "
                       >
                         <component :is="Component" />
-                      </div>
+                      </NvPortalTarget>
                     </Transition>
                   </router-view>
                 </div>
-              </NvPortalTarget>
+              </div>
             </div>
           </div>
         </div>

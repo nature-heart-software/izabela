@@ -30,8 +30,9 @@
                 size="sm"
               />
               <template v-if="engine">
-                <component
-                  :is="engine.voiceSelectComponent"
+                <NvAsyncRegion
+                  :component="engine.voiceSelectComponent"
+                  mode="control"
                   v-if="engine.voiceSelectComponent"
                   v-model="data.selectedVoice[data.engine]"
                   :class="css({ width: '33.333333%' })"
@@ -80,6 +81,7 @@
 </template>
 <script lang="ts" setup>
 import { css } from '@/styled-system/css'
+import NvAsyncRegion from '@/components/NvAsyncRegion.vue'
 import { NvButton, NvCard, NvContextMenu, NvGroup, NvStack } from '@packages/ui'
 import { useMessagesStore } from '@/features/messages/store'
 import { storeToRefs } from 'pinia'

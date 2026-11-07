@@ -11,15 +11,32 @@ export function onOverlayShieldWheel(event: WheelEvent) {
   const doc = shield.ownerDocument
   const view = doc.defaultView
   if (!view) return
+  const body = doc.body.style
+  const pointerEvents = body.getPropertyValue('pointer-events')
+  const pointerPriority = body.getPropertyPriority('pointer-events')
+  const pointerLocked = view.getComputedStyle(doc.body).pointerEvents === 'none'
+  let hits: Element[]
+  try {
+    // Modal primitives lock inherited pointer events. Temporarily include the
+    // underlying page in this synchronous hit test, then restore before routing
+    // or yielding; native pointer events still belong to the shield.
+    if (pointerLocked)
+      body.setProperty('pointer-events', 'auto', pointerPriority)
+    hits = doc.elementsFromPoint(event.clientX, event.clientY)
+  } finally {
+    if (pointerLocked) {
+      if (pointerEvents)
+        body.setProperty('pointer-events', pointerEvents, pointerPriority)
+      else body.removeProperty('pointer-events')
+    }
+  }
   const target =
-    doc
-      .elementsFromPoint(event.clientX, event.clientY)
-      .find(
-        (element): element is HTMLElement =>
-          element instanceof HTMLElement &&
-          !element.matches(shieldSelector) &&
-          !element.contains(shield),
-      ) || doc.scrollingElement
+    hits.find(
+      (element): element is HTMLElement =>
+        element instanceof HTMLElement &&
+        !element.matches(shieldSelector) &&
+        !element.contains(shield),
+    ) || doc.scrollingElement
   if (!(target instanceof HTMLElement)) return
 
   let x = event.shiftKey && !event.deltaX ? event.deltaY : event.deltaX

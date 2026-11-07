@@ -10,7 +10,7 @@
     @select="onAutocompleteSelect"
   >
     <template #reference>
-      <div ref="inputWrapper">
+      <div>
         <NvInput
           ref="inputRef"
           :modelValue="props.modelValue"
@@ -18,7 +18,7 @@
           @blur="onInputBlur"
           @focus="onInputFocus"
           @update:modelValue="(value) => emit('update:modelValue', value)"
-          @keydown.tab.prevent="onInputTab"
+          @keydown.tab="onInputTab"
           @keydown.enter="onInputEnter"
           @keydown.space="onInputSpace"
           @keydown.esc.prevent="onInputEsc"
@@ -62,7 +62,6 @@ import throttle from 'lodash/throttle'
 import { useMessagesStore } from '@/features/messages/store'
 import { onKeyStroke } from '@vueuse/core'
 import { useSpeechStore } from '@/features/speech/store'
-import { useFocusTrap } from '@vueuse/integrations/useFocusTrap'
 
 const props = defineProps({
   engine: {
@@ -133,6 +132,7 @@ const autocompleteValues = computed(() => {
 
 const isAutocompleteVisible = computed(
   () =>
+    isInputFocused.value &&
     commands.value.length > 0 &&
     inputValue.value.startsWith('/') &&
     inputValue.value.split(' ').length < 2,
@@ -146,11 +146,13 @@ const onAutocompleteSelect = (value: (typeof commands.value)[number]) => {
   latestCommands.value.push(value.command)
 }
 
-const onInputTab = (e: KeyboardEvent) => {
-  if (!isAutocompleteVisible.value) e.stopPropagation()
-  if (!inputValue.value && commands.value.length > 0) {
-    emit('update:modelValue', '/')
-  }
+const onInputTab = (event: KeyboardEvent) => {
+  if (event.shiftKey || inputValue.value || commands.value.length === 0) return
+  // Open the command picker with its most recent choice highlighted. Keep this
+  // keystroke from also accepting a command in the autocomplete's Tab handler.
+  event.preventDefault()
+  event.stopPropagation()
+  emit('update:modelValue', '/')
 }
 
 watch(historyMessageIndex, () => {
@@ -231,15 +233,5 @@ const onInputBlur = () => {
 const input = computed(() => inputRef.value?.input)
 defineExpose({
   input,
-})
-
-const inputWrapper = ref()
-const { activate, deactivate } = useFocusTrap(inputWrapper)
-watch(isAutocompleteVisible, (value) => {
-  if (value) {
-    activate()
-  } else {
-    deactivate()
-  }
 })
 </script>

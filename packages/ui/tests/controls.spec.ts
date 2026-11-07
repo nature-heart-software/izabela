@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mount, flushPromises, type VueWrapper } from '@vue/test-utils'
 import { h, nextTick, ref, Comment } from 'vue'
 import { execFileSync } from 'node:child_process'
-import { existsSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 
@@ -40,20 +40,25 @@ afterEach(() => {
 })
 
 describe('client build artifact isolation', () => {
-  it('keeps the real client bundle outside the production artifact directory', () => {
+  it('emits the script and stylesheet required by the client build cache outside production artifacts', () => {
     const dist = resolve(dirname(fileURLToPath(import.meta.url)), '../dist')
     const artifacts = existsSync(dist)
       ? readdirSync(dist, { recursive: true }).map(String)
       : []
     expect(artifacts.filter((name) => /test-client/i.test(name))).toEqual([])
-    expect(
-      existsSync(
-        resolve(
-          dirname(fileURLToPath(import.meta.url)),
-          '../../../coverage/ui-client/test-client.js',
-        ),
-      ),
-    ).toBe(true)
+    const client = resolve(
+      dirname(fileURLToPath(import.meta.url)),
+      '../../../coverage/ui-client',
+    )
+    for (const file of ['test-client.js', 'style.css'])
+      expect(
+        existsSync(resolve(client, file)),
+        `missing client artifact: ${file}`,
+      ).toBe(true)
+    if (process.env.UI_TEST_RUN_ID?.trim())
+      expect(
+        readFileSync(resolve(client, '.client-build-success'), 'utf8'),
+      ).toBe(process.env.UI_TEST_RUN_ID)
   })
 })
 
@@ -410,6 +415,56 @@ describe('client autocomplete keyboard and lifecycle', () => {
 })
 
 describe('real select composition', () => {
+  it('does not traverse provider payloads on tooltip changes, opening, highlighting, or search', async () => {
+    installGeometry()
+    let payloadReads = 0
+    const voices = Array.from({ length: 500 }, (_, index) => ({
+      label: `Voice ${index}`,
+      value: {
+        name: `voice-${index}`,
+        get metadata() {
+          payloadReads++
+          return { description: 'Unrelated provider metadata' }
+        },
+      },
+    }))
+    const catalog = [{ label: 'Catalog', children: voices }]
+    const tooltipState = ref('closed')
+    const wrapper = render({
+      render: () =>
+        h(ui.NvSelect, {
+          options: catalog,
+          modelValue: voices[0].value,
+          valueKey: 'name',
+          id: 'large-voice-select',
+          'data-scope': 'tooltip',
+          'data-part': 'trigger',
+          'data-state': tooltipState.value,
+        }),
+    })
+    await settle()
+    payloadReads = 0
+    for (const state of ['open', 'closed', 'open', 'closed']) {
+      tooltipState.value = state
+      await settle()
+    }
+    expect(payloadReads).toBe(0)
+    const input = wrapper.get('input').element as HTMLInputElement
+    input.focus()
+    input.click()
+    await settle()
+    expect(payloadReads).toBe(0)
+    expect(document.querySelectorAll('[role="option"]').length).toBeLessThan(30)
+    await key('ArrowDown')
+    await settle()
+    expect(payloadReads).toBe(0)
+    await wrapper.get('input').setValue('Voice 49')
+    await settle()
+    expect(payloadReads).toBe(0)
+    expect(document.querySelector('[role="option"]')).not.toBeNull()
+    expect(input.id).toBe('large-voice-select')
+  })
+
   beforeEach(installGeometry)
   it('single selection updates the public model from the actual keyboard autocomplete', async () => {
     const w = render(ui.NvSelect, {
@@ -419,6 +474,7 @@ describe('real select composition', () => {
     const input = w.get('input')
     await settle()
     ;(input.element as HTMLInputElement).focus()
+    ;(input.element as HTMLInputElement).click()
     await settle()
     await key('ArrowDown')
     await key('Enter')
@@ -458,6 +514,7 @@ describe('real select composition', () => {
     })
     await settle()
     ;(w.get('[role="combobox"]').element as HTMLElement).focus()
+    ;(w.get('[role="combobox"]').element as HTMLElement).click()
     await settle()
     ;(document.querySelector('[title="Beta"]') as HTMLElement).click()
     const draft = w.get('[data-draft]').element as HTMLInputElement
@@ -492,6 +549,7 @@ describe('real select composition', () => {
     await settle()
     const input = w.get('input')
     ;(input.element as HTMLElement).focus()
+    ;(input.element as HTMLElement).click()
     await settle()
     await input.setValue('Gamma')
     await settle()
@@ -516,6 +574,7 @@ describe('real select composition', () => {
     })
     await settle()
     ;(w.get('input').element as HTMLElement).focus()
+    ;(w.get('input').element as HTMLElement).click()
     await settle()
     await key('ArrowDown')
     await key('Enter')
@@ -538,6 +597,7 @@ describe('real select composition', () => {
     })
     await settle()
     ;(w.get('input').element as HTMLElement).focus()
+    ;(w.get('input').element as HTMLElement).click()
     await settle()
     const group = document.querySelector(
       '[data-part="item-group"][role="group"]',
@@ -572,6 +632,7 @@ describe('real select composition', () => {
     })
     await settle()
     ;(w.get('input').element as HTMLElement).focus()
+    ;(w.get('input').element as HTMLElement).click()
     await settle()
     await key('ArrowDown')
     const input = w.get('input').element
@@ -607,6 +668,7 @@ describe('real select composition', () => {
     })
     await settle()
     ;(w.get('input').element as HTMLElement).focus()
+    ;(w.get('input').element as HTMLElement).click()
     await settle()
     await w.get('input').setValue('Beta')
     await settle()
@@ -635,6 +697,7 @@ describe('real select composition', () => {
     })
     await settle()
     ;(w.get('input').element as HTMLElement).focus()
+    ;(w.get('input').element as HTMLElement).click()
     await settle()
     ;(document.querySelector('[title="Catalog Alpha"]') as HTMLElement).click()
     await settle()
@@ -679,6 +742,7 @@ describe('real select composition', () => {
     })
     await settle()
     ;(w.get('input').element as HTMLElement).focus()
+    ;(w.get('input').element as HTMLElement).click()
     await settle()
     const buttons = [
       ...document.querySelectorAll<HTMLButtonElement>(
@@ -727,6 +791,7 @@ describe('real select composition', () => {
     })
     await settle()
     ;(w.get('input').element as HTMLElement).focus()
+    ;(w.get('input').element as HTMLElement).click()
     await settle()
     const options = [...document.querySelectorAll('[role="option"]')]
     expect(options).toHaveLength(3)

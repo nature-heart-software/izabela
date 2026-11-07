@@ -48,6 +48,9 @@ export const contextMenuShield = cva({
     // The hit-test surface must cover the viewport, including inside dialogs.
     position: 'fixed',
     inset: 0,
+    width: '100vw',
+    height: '100vh',
+    transform: 'translate(var(--nv-shield-x, 0px), var(--nv-shield-y, 0px))',
     pointerEvents: 'auto',
     zIndex: 9999,
   },

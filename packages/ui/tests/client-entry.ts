@@ -1,3 +1,5 @@
+import '../src/styles'
+
 export * from '../src/components'
 export { themes } from '../src/themes'
 export * from '../src/utils/vue'

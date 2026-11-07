@@ -86,6 +86,74 @@ afterEach(async () => {
 })
 
 describe('overlay trigger ownership', () => {
+  it.each(['popover', 'dialog'])(
+    '%s uses the native button inside a tooltip as its single trigger and focus-return target',
+    async (kind) => {
+      const click = vi.fn((event: MouseEvent) => {
+        if (event.ctrlKey) event.preventDefault()
+      })
+      const wrapper = render(kind === 'dialog' ? ui.NvDialog : ui.NvPopover, {
+        slots: {
+          reference: () =>
+            h(
+              ui.NvTooltip,
+              {},
+              {
+                reference: () =>
+                  h(
+                    ui.NvButton,
+                    { id: 'tooltip-owned-button', onClick: click },
+                    () => 'Open',
+                  ),
+                default: () => 'More settings',
+              },
+            ),
+          title: 'Settings',
+          default: () => h('input', { id: 'popover-control' }),
+          footer: () => h('input', { id: 'dialog-control' }),
+        },
+      })
+      await settle()
+      const button = wrapper.get('#tooltip-owned-button')
+        .element as HTMLButtonElement
+      expect(
+        wrapper
+          .findAll('button, [tabindex]')
+          .filter((node) => (node.element as HTMLElement).tabIndex >= 0),
+      ).toHaveLength(1)
+      expect(
+        wrapper.get(`[data-scope="${kind}"][data-part="trigger"]`).element,
+      ).toBe(button)
+      button.focus()
+      button.dispatchEvent(
+        new MouseEvent('click', {
+          ctrlKey: true,
+          bubbles: true,
+          cancelable: true,
+        }),
+      )
+      await settle()
+      expect(button.getAttribute('aria-expanded')).toBe('false')
+      expect(click).toHaveBeenCalledOnce()
+      click.mockClear()
+      button.click()
+      await settle()
+      expect(click).toHaveBeenCalledOnce()
+      const field = document.getElementById(`${kind}-control`)!
+      expect(field).not.toBeNull()
+      if (kind === 'popover')
+        await vi.waitFor(() => expect(document.activeElement).toBe(field))
+      else
+        await vi.waitFor(() =>
+          expect(
+            document.activeElement?.closest('[role="dialog"]'),
+          ).not.toBeNull(),
+        )
+      await key(field, 'Escape')
+      await vi.waitFor(() => expect(document.activeElement).toBe(button))
+    },
+  )
+
   it.each(['custom', 'generated'])(
     'retargets a lazy-loaded voice control and its replacement with a %s input ID',
     async (kind) => {
@@ -275,6 +343,9 @@ describe('overlay trigger ownership', () => {
       const triggerId = trigger.id
       expect(triggerId).toBeTruthy()
       if (kind !== 'generated') expect(triggerId).toBe('consumer-menu-trigger')
+      // Modal Popover activates its focus trap asynchronously. Observe its
+      // initial focus before opening a child; forcing focus can race that work.
+      await vi.waitFor(() => expect(document.activeElement).toBe(trigger))
       trigger.focus()
       await key(trigger, 'ArrowDown')
       const menu = document.querySelector('[role="menu"]') as HTMLElement
@@ -283,11 +354,15 @@ describe('overlay trigger ownership', () => {
         menu.closest('[data-part="positioner"]')?.getAttribute('style'),
       ).toContain('--reference-width: 200px')
       expect(menu.closest('[role="dialog"]')).not.toBeNull()
+      expect(
+        menu.closest('[data-scope="popover"][data-part="content"]'),
+      ).not.toBeNull()
       expect(menu.querySelector('[data-highlighted]')?.textContent).toContain(
         'Run',
       )
       menu.focus()
       await settle()
+      expect(document.activeElement).toBe(menu)
       await key(menu, 'Escape')
       expect(document.querySelector('[role="menu"]')).toBeNull()
       expect(document.querySelector('[role="dialog"]')).not.toBeNull()
@@ -510,6 +585,12 @@ describe('overlay trigger ownership', () => {
       )
       expect(positioner.style.position).toBe('absolute')
       expect(trigger.id).toBe('consumer-anchor')
+      if (!tooltip)
+        await vi.waitFor(() =>
+          expect(document.activeElement).toBe(
+            document.querySelector('[data-scope="popover"][data-part="content"]'),
+          ),
+        )
       await key(
         tooltip
           ? trigger
@@ -518,7 +599,8 @@ describe('overlay trigger ownership', () => {
             )!,
         'Escape',
       )
-      if (!tooltip) expect(document.activeElement === trigger).toBe(true)
+      if (!tooltip)
+        await vi.waitFor(() => expect(document.activeElement).toBe(trigger))
     },
   )
 })

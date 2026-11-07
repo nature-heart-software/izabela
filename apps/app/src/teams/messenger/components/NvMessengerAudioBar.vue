@@ -40,9 +40,10 @@
         <NvTooltip>
           <NvText>Speech engine voice</NvText>
           <template #reference>
-            <component
-              :is="speechStore.currentSpeechEngine.voiceSelectComponent"
+            <NvAsyncRegion
+              :component="speechStore.currentSpeechEngine.voiceSelectComponent"
               v-if="speechStore.currentSpeechEngine.voiceSelectComponent"
+              mode="control"
               :class="css({ width: '13' })"
               data-v-step="engine-voice-select"
               placeholder="Speech Voice"
@@ -142,6 +143,7 @@ import NvAudioOutputsSelect from '@/features/audio/components/inputs/NvAudioOutp
 import { computed, inject } from 'vue'
 import { useRoute } from 'vue-router'
 import NvAudioInputForm from '@/features/speech/components/forms/NvAudioInputForm.vue'
+import NvAsyncRegion from '@/components/NvAsyncRegion.vue'
 import { useAudioDevices } from '@/features/audio/hooks'
 
 const speechStore = useSpeechStore()

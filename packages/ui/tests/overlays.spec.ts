@@ -38,9 +38,14 @@ async function settle() {
   await new Promise((resolve) => setTimeout(resolve, 40))
   await flushPromises()
 }
-async function key(target: Element, key: string) {
+async function key(target: Element, key: string, shiftKey = false) {
   target.dispatchEvent(
-    new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }),
+    new KeyboardEvent('keydown', {
+      key,
+      shiftKey,
+      bubbles: true,
+      cancelable: true,
+    }),
   )
   await settle()
 }
@@ -92,6 +97,77 @@ afterEach(() => {
 })
 
 describe('overlay interaction boundaries', () => {
+  it.each(['popover', 'dialog'])(
+    '%s traps Tab and Shift+Tab at its edges and restores focus after Escape',
+    async (kind) => {
+      const outside = document.createElement('button')
+      outside.textContent = 'Outside'
+      document.body.append(outside)
+      const fields = () => [
+        h('input', { id: 'trap-first' }),
+        h('button', { id: 'trap-last' }, 'Last'),
+      ]
+      const wrapper = render(kind === 'popover' ? ui.NvPopover : ui.NvDialog, {
+        slots: {
+          reference: () => h('button', { id: 'trap-trigger' }, 'Open'),
+          title: 'Focus trap',
+          default: fields,
+          footer: fields,
+        },
+      })
+      const trigger = wrapper.get('#trap-trigger').element as HTMLElement
+      trigger.focus()
+      trigger.click()
+      await vi.waitFor(() =>
+        expect(
+          document.activeElement?.closest(
+            `[data-scope="${kind}"][data-part="content"]`,
+          ),
+        ).not.toBeNull(),
+      )
+      const content = document.querySelector(
+        `[data-scope="${kind}"][data-part="content"]`,
+      )!
+      const first = content.querySelector<HTMLElement>('button, input')!
+      const last = document.getElementById('trap-last')!
+      last.focus()
+      await key(last, 'Tab')
+      expect(document.activeElement).toBe(first)
+      await key(first, 'Tab', true)
+      expect(document.activeElement).toBe(last)
+      outside.focus()
+      expect(content.contains(document.activeElement)).toBe(true)
+      await key(document.activeElement!, 'Escape')
+      await vi.waitFor(() => expect(document.activeElement).toBe(trigger))
+      outside.focus()
+      expect(document.activeElement).toBe(outside)
+    },
+  )
+
+  it('focuses the first enabled control on popover open and restores its trigger on Escape', async () => {
+    const wrapper = render(ui.NvPopover, {
+      slots: {
+        reference: () => h('button', { id: 'focus-popover-trigger' }, 'Open'),
+        default: () => [
+          h('button', { disabled: true }, 'Unavailable'),
+          h('input', { id: 'first-popover-control' }),
+          h('button', 'Last control'),
+        ],
+      },
+    })
+    const trigger = wrapper.get('#focus-popover-trigger').element as HTMLElement
+    const previous = document.createElement('input')
+    document.body.append(previous)
+    previous.focus()
+    trigger.click()
+    await settle()
+    const input = document.getElementById('first-popover-control')!
+    await vi.waitFor(() => expect(document.activeElement).toBe(input))
+    await key(input, 'Escape')
+    expect(document.activeElement).toBe(trigger)
+    expect(document.getElementById('first-popover-control')).toBeNull()
+  })
+
   it.each(['select', 'popover'])(
     'allows page scrolling through the %s shield without dismissing or clicking through',
     async (kind) => {
@@ -232,6 +308,121 @@ describe('overlay interaction boundaries', () => {
       document.querySelector('[data-scope="dialog"][role="dialog"]'),
     ).toBeNull()
   })
+
+  it.each(['popover', 'dialog'])(
+    'keeps a nested popover and its parent %s open when outside focus is reclaimed',
+    async (kind) => {
+      const outside = document.createElement('button')
+      document.body.append(outside)
+      const child = () =>
+        h(
+          ui.NvPopover,
+          {},
+          {
+            reference: () => h('button', { id: 'child-trap-trigger' }, 'Child'),
+            default: () => [
+              h('input', { id: 'child-trap-first' }),
+              h('button', { id: 'child-trap-last' }, 'Last'),
+            ],
+          },
+        )
+      const wrapper = render(kind === 'popover' ? ui.NvPopover : ui.NvDialog, {
+        slots: {
+          reference: () => h('button', { id: 'parent-trap-trigger' }, 'Parent'),
+          title: 'Parent',
+          default: child,
+          footer: child,
+        },
+      })
+      const parent = wrapper.get('#parent-trap-trigger').element as HTMLElement
+      parent.focus()
+      parent.click()
+      await vi.waitFor(() =>
+        expect(
+          document.activeElement?.closest('[data-part="content"]'),
+        ).not.toBeNull(),
+      )
+      const trigger = document.getElementById('child-trap-trigger')!
+      trigger.focus()
+      trigger.click()
+      await vi.waitFor(() =>
+        expect(document.activeElement).toBe(
+          document.getElementById('child-trap-first'),
+        ),
+      )
+      const childContent = document.activeElement!.closest(
+        '[data-part="content"]',
+      )!
+      outside.focus()
+      await settle()
+      expect(childContent.contains(document.activeElement)).toBe(true)
+      expect(parent.getAttribute('aria-expanded')).toBe('true')
+      expect(trigger.getAttribute('aria-expanded')).toBe('true')
+      await key(document.activeElement!, 'Escape')
+      await vi.waitFor(() => expect(document.activeElement).toBe(trigger))
+      expect(childContent.hasAttribute('inert')).toBe(true)
+      expect(parent.getAttribute('aria-expanded')).toBe('true')
+      await key(trigger, 'Escape')
+      await vi.waitFor(() => expect(document.activeElement).toBe(parent))
+    },
+  )
+
+  it.each(['popover', 'dialog'])(
+    'keeps a nested context menu inside the parent %s trap and dismisses only the menu through its shield',
+    async (kind) => {
+      const selected = vi.fn()
+      const child = () =>
+        h(
+          ui.NvContextMenu,
+          { options: [{ label: 'Run', onClick: selected }] },
+          {
+            default: () => h('button', { id: 'nested-trap-menu' }, 'Menu'),
+          },
+        )
+      const wrapper = render(kind === 'popover' ? ui.NvPopover : ui.NvDialog, {
+        slots: {
+          reference: () => h('button', { id: 'menu-parent-trigger' }, 'Parent'),
+          title: 'Parent',
+          default: child,
+          footer: child,
+        },
+      })
+      const parent = wrapper.get('#menu-parent-trigger').element as HTMLElement
+      parent.click()
+      await vi.waitFor(() =>
+        expect(
+          document.activeElement?.closest('[data-part="content"]'),
+        ).not.toBeNull(),
+      )
+      const trigger = document.getElementById('nested-trap-menu')!
+      trigger.focus()
+      await key(trigger, 'ArrowDown')
+      const menu = document.querySelector('[role="menu"]') as HTMLElement
+      expect(
+        menu.closest(`[data-scope="${kind}"][data-part="content"]`),
+      ).not.toBeNull()
+      await vi.waitFor(() => expect(document.activeElement).toBe(menu))
+      const shield = document.querySelector(
+        '[data-overlay-shield="context-menu"]',
+      )!
+      // Let the deferred outside event run after click removes the nested shield.
+      for (const type of [
+        'pointerdown',
+        'mousedown',
+        'pointerup',
+        'mouseup',
+        'click',
+      ])
+        shield.dispatchEvent(
+          new MouseEvent(type, { bubbles: true, cancelable: true }),
+        )
+      await settle()
+      expect(document.querySelector('[role="menu"]')).toBeNull()
+      expect(parent.getAttribute('aria-expanded')).toBe('true')
+      expect(selected).not.toHaveBeenCalled()
+      await vi.waitFor(() => expect(document.activeElement).toBe(trigger))
+    },
+  )
 
   it('popover shield survives pointerdown/up and consumes the dismissal click without activating content below', async () => {
     const activate = vi.fn()

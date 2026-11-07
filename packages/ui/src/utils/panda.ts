@@ -129,7 +129,9 @@ const themeVariableDirective: ObjectDirective<HTMLElement, ThemeStyleBinding> =
 export function pandaComponent(
   tag: string | Component,
   propsDefinition: ComponentObjectPropsOptions = {},
-  recipe: (props: any) => string | undefined = () => '',
+  recipe: ((props: any) => string | undefined) & {
+    variantKeys?: string[]
+  } = () => '',
 ) {
   return defineComponent({
     inheritAttrs: false,
@@ -141,6 +143,17 @@ export function pandaComponent(
       const theme = inject<unknown>('theme', undefined)
       // Vue injection survives Teleport; DOM custom-property inheritance does not.
       const variables = computed(() => themeVariables(unref(theme)))
+      // Panda memoizes recipes by serializing their arguments. Only styling
+      // variants belong in that key, never an entire voice catalog or model.
+      const className = computed(() =>
+        recipe(
+          recipe.variantKeys
+            ? Object.fromEntries(
+                recipe.variantKeys.map((key) => [key, values[key]]),
+              )
+            : props,
+        ),
+      )
       expose({
         get input() {
           return element.value
@@ -190,7 +203,7 @@ export function pandaComponent(
         }
         const merged = mergeProps(forwarded, attrs, {
           ref: element,
-          class: recipe(props),
+          class: className.value,
           ...(theme === undefined ? {} : { 'data-nv-theme': '' }),
         })
         const rendered = h(

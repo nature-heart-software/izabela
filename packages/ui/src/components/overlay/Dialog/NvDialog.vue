@@ -3,6 +3,8 @@
     v-bind="$attrs"
     v-model:open="dialogOpen"
     :ids="{ trigger: triggerId }"
+    @focus-outside.prevent
+    @interact-outside="onOverlayShieldInteractOutside"
   >
     <ReferenceTrigger>
       <slot name="reference" />
@@ -105,6 +107,7 @@ import {
   StDialogTrigger,
 } from './dialog.panda'
 import { PORTAL_TARGET } from '@/consts'
+import { onOverlayShieldInteractOutside } from '@/utils/overlay-shield'
 
 const PortalTargetProvider = defineComponent({
   name: 'PortalTargetProvider',
@@ -148,8 +151,11 @@ const ReferenceTrigger = defineComponent({
     const needsButtonSemantics = ref(false)
     const disabled = ref(false)
     const syncTrigger = () => {
+      const root = getElement(trigger.value?.$el) || getElement(trigger.value)
       const element =
-        getElement(trigger.value?.$el) || getElement(trigger.value)
+        root?.querySelector<HTMLElement>(
+          '[data-scope="dialog"][data-part="trigger"]',
+        ) || root
       if (element?.id) triggerId.value = element.id
       needsButtonSemantics.value =
         !!element &&

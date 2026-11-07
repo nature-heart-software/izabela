@@ -48,7 +48,7 @@
                 <NvDivider direction="horizontal" />
               </template>
               <template v-if="currentEngineSettingsComponent">
-                <component :is="currentEngineSettingsComponent" />
+                <NvAsyncRegion :component="currentEngineSettingsComponent" />
               </template>
             </NvStack>
           </NvCard>
@@ -84,6 +84,7 @@
 </template>
 <script lang="ts" setup>
 import { css } from '@/styled-system/css'
+import NvAsyncRegion from '@/components/NvAsyncRegion.vue'
 import { computed, ref, watch } from 'vue'
 import {
   NvButton,
