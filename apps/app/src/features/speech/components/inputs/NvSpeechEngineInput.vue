@@ -18,6 +18,7 @@
           @blur="onInputBlur"
           @focus="onInputFocus"
           @update:modelValue="(value) => emit('update:modelValue', value)"
+          @keydown.tab="onInputTab"
           @keydown.enter="onInputEnter"
           @keydown.space="onInputSpace"
           @keydown.esc.prevent="onInputEsc"
@@ -143,6 +144,15 @@ const onAutocompleteSelect = (value: (typeof commands.value)[number]) => {
     latestCommands.value.splice(latestCommands.value.indexOf(value.command), 1)
   }
   latestCommands.value.push(value.command)
+}
+
+const onInputTab = (event: KeyboardEvent) => {
+  if (event.shiftKey || inputValue.value || commands.value.length === 0) return
+  // Open the command picker with its most recent choice highlighted. Keep this
+  // keystroke from also accepting a command in the autocomplete's Tab handler.
+  event.preventDefault()
+  event.stopPropagation()
+  emit('update:modelValue', '/')
 }
 
 watch(historyMessageIndex, () => {

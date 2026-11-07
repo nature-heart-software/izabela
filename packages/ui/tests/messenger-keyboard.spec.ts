@@ -18,6 +18,9 @@ execFileSync(process.execPath, [resolve(here, 'build-client.mjs')], {
 const clientPath = '../../../coverage/ui-client/test-client.js'
 const ui = await import(/* @vite-ignore */ clientPath)
 const wrappers: VueWrapper[] = []
+const speech = Vue.reactive({
+  customCommands: [{ value: 'wave', description: 'Wave' }],
+})
 const imports: Record<string, unknown> = {
   vue: Vue,
   '@packages/ui': ui,
@@ -29,9 +32,7 @@ const imports: Record<string, unknown> = {
     useMessagesStore: () => ({ history: [], reversedHistory: [] }),
   },
   '@/features/speech/store': {
-    useSpeechStore: () => ({
-      customCommands: [{ value: 'wave', description: 'Wave' }],
-    }),
+    useSpeechStore: () => speech,
   },
 }
 function compile(file: string) {
@@ -108,6 +109,7 @@ async function key(input: HTMLElement, key: string, shiftKey = false) {
   return event
 }
 beforeEach(() => {
+  speech.customCommands = [{ value: 'wave', description: 'Wave' }]
   const rect = new DOMRect(0, 0, 300, 40)
   vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(rect)
   vi.spyOn(HTMLElement.prototype, 'getClientRects').mockReturnValue([
@@ -143,8 +145,9 @@ it('renders the four messenger links as single native keyboard targets', async (
 })
 
 it.each(['', 'Hello'])(
-  'lets Tab and Shift+Tab leave the editor with %j text',
+  'lets Tab and Shift+Tab leave the editor without commands with %j text',
   async (value) => {
+    speech.customCommands = []
     const { wrapper, model } = editor(value)
     const input = wrapper.get('input').element as HTMLInputElement
     input.focus()
@@ -154,6 +157,55 @@ it.each(['', 'Hello'])(
     expect(model.value).toBe(value)
   },
 )
+
+it('keeps normal text and Shift+Tab navigation when commands are available', async () => {
+  const { wrapper, model } = editor('Hello')
+  const input = wrapper.get('input').element as HTMLInputElement
+  input.focus()
+  await settle()
+  expect((await key(input, 'Tab')).defaultPrevented).toBe(false)
+  await wrapper.get('input').setValue('')
+  expect((await key(input, 'Tab', true)).defaultPrevented).toBe(false)
+  expect(model.value).toBe('')
+  expect(document.querySelector('.autocomplete')).toBeNull()
+})
+
+it('opens commands from an empty input with Tab and accepts the latest selected command on the next Tab', async () => {
+  speech.customCommands = [
+    { value: 'alpha', description: 'Alpha' },
+    { value: 'wave', description: 'Wave' },
+    { value: 'zulu', description: 'Zulu' },
+  ]
+  const { wrapper, model } = editor()
+  const input = wrapper.get('input').element as HTMLInputElement
+  input.focus()
+  await settle()
+  expect((await key(input, 'Tab')).defaultPrevented).toBe(true)
+  expect(model.value).toBe('/')
+  expect(document.activeElement).toBe(input)
+  expect(document.querySelector('.autocomplete')).not.toBeNull()
+
+  for (const command of ['zulu', 'alpha']) {
+    await wrapper.get('input').setValue(`/${command}`)
+    await settle()
+    await key(input, 'Tab')
+    expect(model.value).toBe(`/${command} `)
+    await wrapper.get('input').setValue('')
+    await key(input, 'Tab')
+    expect(model.value).toBe('/')
+    await key(input, 'Tab')
+    expect(model.value).toBe(`/${command} `)
+    expect(document.activeElement).toBe(input)
+  }
+
+  speech.customCommands = speech.customCommands.filter(
+    (command) => command.value !== 'alpha',
+  )
+  await wrapper.get('input').setValue('')
+  await key(input, 'Tab')
+  await key(input, 'Tab')
+  expect(model.value).toBe('/zulu ')
+})
 
 it('completes a visible slash command with Tab while Shift+Tab can leave without selecting', async () => {
   const { wrapper, model, entered } = editor('/')
