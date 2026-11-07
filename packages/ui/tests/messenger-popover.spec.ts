@@ -136,7 +136,11 @@ async function fixture() {
           }),
           Vue.h(
             'button',
-            { 'data-close': '', onClick: () => emit('close') },
+            {
+              'data-close': '',
+              'data-messenger-panel-close': '',
+              onClick: () => emit('close'),
+            },
             'Close',
           ),
         ])
@@ -319,7 +323,7 @@ describe('messenger routed popover', () => {
     expect(f.reposition).toHaveBeenCalledTimes(1)
   })
 
-  it('keeps manual dismissal and focus without blocking navigation buttons', async () => {
+  it('focuses Close on opening while keeping manual dismissal and navigation buttons', async () => {
     const f = await fixture()
     const navigation =
       f.wrapper.get<HTMLButtonElement>('[data-navigation]').element
@@ -327,7 +331,7 @@ describe('messenger routed popover', () => {
     navigation.click()
     await flushPromises()
     await delay(40)
-    expect(document.activeElement).toBe(navigation)
+    expect(document.activeElement).toBe(f.portal.querySelector('[data-close]'))
     const input = f.portal.querySelector<HTMLInputElement>('[data-draft]')!
     input.focus()
     await delay(40)
@@ -348,6 +352,27 @@ describe('messenger routed popover', () => {
     navigation.click()
     await flushPromises()
     expect(f.messenger.isViewShown.value).toBe(false)
+  })
+
+  it('focuses Close when reopening a retained panel during its exit transition', async () => {
+    const f = await fixture()
+    await f.messenger.navigateTo({ name: 'settings' })
+    await flushPromises()
+    await delay(40)
+    const input = f.portal.querySelector<HTMLInputElement>('[data-draft]')!
+    input.value = 'Retained draft'
+    input.dispatchEvent(new Event('input', { bubbles: true }))
+    input.focus()
+    f.portal.querySelector<HTMLButtonElement>('[data-close]')!.click()
+    await Vue.nextTick()
+    await f.messenger.navigateTo({ name: 'settings' })
+    await flushPromises()
+    await delay(40)
+    expect(document.activeElement).toBe(f.portal.querySelector('[data-close]'))
+    expect(f.mounts()).toBe(1)
+    expect(
+      f.portal.querySelector<HTMLInputElement>('[data-draft]')!.value,
+    ).toBe('Retained draft')
   })
 
   it('cancels delayed drag and focus work when the messenger unmounts', async () => {

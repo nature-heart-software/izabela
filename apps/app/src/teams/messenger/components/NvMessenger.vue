@@ -176,8 +176,11 @@ const moveableTarget = ref<ComponentPublicInstance>()
 
 const popover = usePopover({
   ids: { anchor: 'messenger-panel-anchor' },
-  // Route actions own dismissal, and opening must not steal editor focus.
-  autoFocus: false,
+  // Route actions own dismissal; opening starts keyboard navigation at Close.
+  initialFocusEl: () =>
+    routerOverlay?.value?.querySelector<HTMLElement>(
+      '[data-messenger-panel-close]',
+    ) || null,
   closeOnEscape: false,
   closeOnInteractOutside: false,
   positioning: {
