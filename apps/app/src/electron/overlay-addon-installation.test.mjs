@@ -225,12 +225,15 @@ test('overlapping activations share registration and persistence work', async (t
   assert.deepEqual(await f.read(), f.state(currentId))
 })
 
-test('real unmodified SDK registration caches both architectures idempotently in isolated test storage', async (t) => {
+test('real unmodified SDK registration installs both architectures idempotently in an isolated add-on directory', async (t) => {
   const actual = require('electron-game-overlay/preload')
   let storageRoot
   const f = await fixture(t, {
     register: (options) =>
-      actual.registerOverlayAddonInstallation({ ...options, storageRoot }),
+      actual.registerOverlayAddonInstallation({
+        ...options,
+        addonDirectory: storageRoot,
+      }),
   })
   storageRoot = path.join(f.directory, 'isolated-sdk-registry')
   await f.ensureOverlayAddonInstallation()
@@ -238,25 +241,31 @@ test('real unmodified SDK registration caches both architectures idempotently in
   await f.ensureOverlayAddonInstallation()
   assert.deepEqual(await f.read(), first)
   const registry = JSON.parse(
-    await fs.readFile(path.join(storageRoot, 'registrations.json'), 'utf8'),
+    await fs.readFile(
+      path.join(storageRoot, '.electron-game-overlay', 'registrations.json'),
+      'utf8',
+    ),
   )
   assert.equal(registry.registrations.length, 1)
   assert.equal(registry.registrations[0].applicationId, identity.applicationId)
   assert.equal(registry.registrations[0].registrationId, first.registrationId)
   const installation = await actual.registerOverlayAddonInstallation({
     applicationId: identity.applicationId,
-    storageRoot,
+    addonDirectory: storageRoot,
   })
   for (const file of [installation.addonPath, installation.x86AddonPath])
     assert.ok((await fs.stat(file)).size > 0)
   await actual.unregisterOverlayAddonInstallation({
     applicationId: first.applicationId,
     registrationId: first.registrationId,
-    storageRoot,
+    addonDirectory: storageRoot,
   })
   assert.equal(
     JSON.parse(
-      await fs.readFile(path.join(storageRoot, 'registrations.json'), 'utf8'),
+      await fs.readFile(
+        path.join(storageRoot, '.electron-game-overlay', 'registrations.json'),
+        'utf8',
+      ),
     ).registrations.length,
     0,
   )

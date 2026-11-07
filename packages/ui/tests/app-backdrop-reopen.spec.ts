@@ -41,6 +41,7 @@ const tick = async () => {
 
 function fixture(initiallyFocused = false, isGameOverlay = false) {
   const stopIntercept = vi.fn()
+  const styles: Record<string, unknown>[] = []
   const state = Vue.reactive({
     isInputFocused: initiallyFocused,
     isShown: false,
@@ -66,8 +67,10 @@ function fixture(initiallyFocused = false, isGameOverlay = false) {
     vue: Vue,
     gsap: { default: gsap, __esModule: true },
     '@/styled-system/css': {
-      css: (style: Record<string, unknown>) =>
-        style.opacity === 0 ? 'fixture-backdrop' : '',
+      css: (style: Record<string, unknown>) => {
+        styles.push(style)
+        return style.opacity === 0 ? 'fixture-backdrop' : ''
+      },
     },
     '@/modules/vue-hitboxes/NvHitbox.vue': {
       default: Vue.defineComponent({
@@ -149,6 +152,7 @@ function fixture(initiallyFocused = false, isGameOverlay = false) {
     close,
     assertFocusedBackdrop,
     stopIntercept,
+    styles,
   }
 }
 
@@ -214,10 +218,13 @@ describe('application backdrop across shortcut reopen', () => {
 
   it('retains the game-overlay click shield and stop-intercept action', async () => {
     const f = fixture(false, true)
+    expect(f.styles.some((style) => style.opacity === 1)).toBe(true)
+    const reset = vi.spyOn(gsap, 'set')
     await f.wrapper.get('[data-backdrop-hitbox]').trigger('click')
     expect(f.stopIntercept).toHaveBeenCalledOnce()
     await f.close()
     expect(f.wrapper.find('[data-backdrop-hitbox]').exists()).toBe(true)
+    expect(reset).not.toHaveBeenCalled()
   })
 
   it('removes native listeners, pending hides and fades when unmounted', async () => {

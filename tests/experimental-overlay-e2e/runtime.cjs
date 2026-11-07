@@ -45,11 +45,14 @@ const evidence = {
   policyUpdates: [],
   elevationRequests: 0,
 }
-// Override only the app bundle's public SDK imports. Production omits storageRoot;
+// Override only the app bundle's public SDK imports. Production omits addonDirectory;
 // the E2E setup and launcher both use this owned registry instead of the account's.
-const preloadStorageRoot = path.join(
+const preloadAddonDirectory = path.join(
   config.directory,
   'isolated-addon-registry',
+  // The nightly uses shorter shared-directory filenames. Keep the long-path
+  // regression deliberate instead of depending on its previous cache layout.
+  'long-path-regression-' + 'x'.repeat(64),
 )
 const preload = requireApp('electron-game-overlay/preload')
 const loadModule = Module._load
@@ -61,6 +64,7 @@ Module._load = function (request, parent, isMain) {
         ...sdk,
         createReShadeLaunchConfig(options) {
           assert.ok(options.addonPreload?.applicationId)
+          assert.equal(options.addonPreload.addonDirectory, undefined)
           assert.equal(options.addonPreload.storageRoot, undefined)
           evidence.preloadRuntimeApplicationId =
             options.addonPreload.applicationId
@@ -68,7 +72,7 @@ Module._load = function (request, parent, isMain) {
             ...options,
             addonPreload: {
               ...options.addonPreload,
-              storageRoot: preloadStorageRoot,
+              addonDirectory: preloadAddonDirectory,
             },
           })
         },
@@ -77,11 +81,12 @@ Module._load = function (request, parent, isMain) {
       return {
         ...preload,
         async registerOverlayAddonInstallation(options) {
+          assert.equal(options.addonDirectory, undefined)
           assert.equal(options.storageRoot, undefined)
           assert.equal(options.packageRoot, undefined)
           const result = await preload.registerOverlayAddonInstallation({
             ...options,
-            storageRoot: preloadStorageRoot,
+            addonDirectory: preloadAddonDirectory,
           })
           evidence.preloadRegistration = {
             applicationId: result.applicationId,
@@ -93,7 +98,7 @@ Module._load = function (request, parent, isMain) {
         unregisterOverlayAddonInstallation(options) {
           return preload.unregisterOverlayAddonInstallation({
             ...options,
-            storageRoot: preloadStorageRoot,
+            addonDirectory: preloadAddonDirectory,
           })
         },
       }
@@ -544,9 +549,12 @@ async function openAndType(key, expected, label) {
     )
   }
 }
-async function pointerAt(selector) {
+async function pointerAt(
+  selector,
+  elementExpression = `document.querySelector(${JSON.stringify(selector)})`,
+) {
   const point = await overlay.webContents.executeJavaScript(`(() => {
-    const element = document.querySelector(${JSON.stringify(selector)})
+    const element = ${elementExpression}
     if (!element) return null
     const r = element.getBoundingClientRect()
     const x = r.x + r.width / 2, y = r.y + r.height / 2
@@ -587,10 +595,15 @@ async function verifyPointerAndScroll() {
   }
   drive('click')
   evidence.pointerClicks++
-  const scroller = '#settings .settings__content .overflow-y-auto'
+  const scroller = '#settings .settings__content'
+  // Locate the actual overflow region by behavior, independent of generated
+  // Panda class names or the previous Tailwind utility.
+  const scrollElement = `Array.from(document.querySelectorAll('${scroller}, ${scroller} *'))
+    .find(e => /^(auto|scroll)$/.test(getComputedStyle(e).overflowY)
+      && e.clientHeight >= 40 && e.scrollHeight > e.clientHeight + 100)`
   const scrollState = () =>
     overlay.webContents.executeJavaScript(`(() => {
-    const e = document.querySelector(${JSON.stringify(scroller)})
+    const e = ${scrollElement}
     if (!e || e.clientHeight < 40 || e.scrollHeight <= e.clientHeight + 100) return null
     const r = e.getBoundingClientRect()
     return { top: e.scrollTop, height: e.clientHeight, content: e.scrollHeight,
@@ -601,7 +614,7 @@ async function verifyPointerAndScroll() {
     'real settings overflow panel',
     10000,
   )
-  await pointerAt(scroller)
+  await pointerAt(scroller, scrollElement)
   await until(
     async () => (await read()).probe.pointerDowns === evidence.pointerClicks,
     'native settings click reached renderer',

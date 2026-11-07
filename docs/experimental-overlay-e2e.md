@@ -93,10 +93,13 @@ D3D11 x64 at 125% and 150%, plus D3D11 x64 using the managed early controller.
 Every positive case includes rendering, typing,
 pointer/cursor and scrolling assertions; the negative focus control runs once.
 Installed add-on registration and launch configuration use the real SDK with the
-same owned test registry. The test's public-import boundary overrides only
-`storageRoot`; it never registers test builds in the real account registry.
+same owned test add-on directory. The test's public-import boundary overrides
+only `addonDirectory`; it never registers test builds in the real account directory.
 Reports verify setup and runtime use the same stable application identity.
-Default profiles deliberately create preload DLL paths beyond 260 characters.
+A deliberately deep test add-on directory keeps preload DLL paths beyond 260
+characters even with the nightly's shorter shared-directory filenames. The scroll
+test locates the real overflow panel by computed overflow and dimensions, so
+generated styling classes do not determine test coverage.
 The driver enumerates module handles with bounded K32 queries and growing path
 buffers; Toolhelp's fixed-size records fail once such a DLL is loaded. Reports
 record successful module inspection and actual path lengths for each target

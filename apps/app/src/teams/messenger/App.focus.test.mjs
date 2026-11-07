@@ -52,6 +52,7 @@ function compile(path, imports) {
 
 async function fixture(t, mode = 'experimental', late = false) {
   const calls = { clicks: 0, osFocus: 0, hide: 0, events: [] }
+  const styles = []
   const listeners = new Set()
   const add = window.addEventListener
   const remove = window.removeEventListener
@@ -110,6 +111,12 @@ async function fixture(t, mode = 'experimental', late = false) {
     },
   })
   const common = {
+    '@/styled-system/css': {
+      css: (style) => {
+        styles.push(style)
+        return ''
+      },
+    },
     '@/consts.ts': {
       isGameOverlay: mode !== 'desktop',
       isExperimentalGameOverlay: mode === 'experimental',
@@ -121,6 +128,7 @@ async function fixture(t, mode = 'experimental', late = false) {
     '@/features/settings/store': { useSettingsStore: () => settings },
     '@/services': { socket: { emit: (...args) => calls.events.push(args) } },
     '@packages/ui': {
+      ThemeProvider: layout,
       NvButton: layout,
       NvCard: layout,
       NvGroup: layout,
@@ -179,7 +187,7 @@ async function fixture(t, mode = 'experimental', late = false) {
     window.dispatchEvent(new window.Event(name))
     await vue.nextTick()
   }
-  return { wrapper, calls, ready, settings, store, event, unmount }
+  return { wrapper, calls, styles, ready, settings, store, event, unmount }
 }
 
 test('experimental focuses a late input ref without a window focus event', async (t) => {
@@ -228,8 +236,9 @@ test('legacy keeps the full-screen button, click-focus hook and blur rearm', asy
   const button = f.wrapper.get('[data-offscreen-focus-fix]')
   const input = f.wrapper.get('input')
   assert.notEqual(document.activeElement, input.element)
-  assert.ok(button.classes().includes('fixed'))
-  assert.ok(button.classes().includes('inset-0'))
+  assert.ok(
+    f.styles.some((style) => style.position === 'fixed' && style.inset === '0'),
+  )
   assert.equal(button.element.style.display, '')
   await button.trigger('click')
   assert.equal(button.element.style.display, 'none')

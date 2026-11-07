@@ -14,6 +14,11 @@ for (const name of [
   'HTMLElement',
   'SVGElement',
   'Node',
+  'Document',
+  'HTMLInputElement',
+  'HTMLLabelElement',
+  'ShadowRoot',
+  'MutationObserver',
 ]) {
   globalThis[name] = dom.window[name]
 }
@@ -34,7 +39,7 @@ function compile(url, imports) {
   })
   return loadTypescript(
     filename,
-    { vue, ...imports },
+    { vue, '@/styled-system/css': { css: () => '' }, ...imports },
     { window },
     script.content,
   ).default
@@ -53,7 +58,8 @@ const NvSwitch = compile(
     import.meta.url,
   ),
   {
-    './switch.styled': {
+    './switch.panda': {
+      switchRecipe: () => ({}),
       StSwitch: {
         render() {
           return vue.h('span', this.$slots.default?.())
@@ -162,7 +168,7 @@ function fixture(t, saved = {}, decision = 'confirm') {
   async function toggle(index, value) {
     const control = wrapper.findAllComponents(NvSwitch)[index]
     assert.ok(control, `Missing overlay switch ${index}`)
-    if (value === undefined) await control.trigger('click')
+    if (value === undefined) control.get('input[role="switch"]').element.click()
     else control.vm.$emit('update:modelValue', value)
     await Promise.resolve()
     await vue.nextTick()

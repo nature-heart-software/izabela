@@ -1,23 +1,29 @@
 # Experimental overlay SDK distribution
 
-`vendor/electron-game-overlay-0.1.0-rc.12.tgz` is the complete, unmodified upstream
-SDK candidate. `@packages/electron-game-overlay` remains the legacy backend.
+`vendor/electron-game-overlay-1.0.0-nightly.1.tgz` is the complete, unmodified
+published upstream nightly release. `@packages/electron-game-overlay` remains
+the legacy backend.
 
-- Source: `Wurielle/electron-game-overlay`, commit
-  `b89eeb6bf3efb94185e5041be582ac11df6342f6`, branch
-  `codex/explore-independent-overlay-instances`, plus the uncommitted upstream
-  initial read-only inspection recovery. The base commit alone does not identify this candidate;
-  its matching source ZIP and manifest identify the exact supplied changes.
-- Tarball SHA-256:
-  `10ecef4b7a46a870ea8cf5c1160321bf449712c5a93808e11a2a214051e708af`.
-- Matching source ZIP SHA-256:
-  `f1052a4877d6cd4e75f436d6ada6dfcb269cb1173ca7e23d752c22e1822c67ca`.
-- Source manifest SHA-256:
-  `289d7003ef386e2de166ed726df60e91bf88de4fcb201862d2b9e31a086968c1`.
-- Native generation: 22; add-on build ID:
+- Release: [v1.0.0-nightly.1](https://github.com/Wurielle/electron-game-overlay/releases/tag/v1.0.0-nightly.1).
+- Source commit: `cb5acf47e1793f1b0e5ed5e8ebfa5e7f513afe6c`, recorded in the
+  packaged `SDK_PROVENANCE.json`. This release replaces the earlier local RC
+  tarball and its separate source ZIP/manifest.
+- Tarball SHA-256 (verified against the GitHub release asset digest):
+  `437526e5da73130e995aabc2e9c890dab0caa6f110016cd409483765dff12871`.
+- Native generation: 23; add-on build ID:
   `CCE20935ADD44EF6A5A7973014B2E07F`.
 - License: GPL-3.0-only. Both architectures, nested dependency notices and
   `SDK_PROVENANCE.json` are retained. No SDK patches or native rebuild are applied.
+
+Nightly consumer validation after merging `dev` passes 92 overlay/package checks,
+127 app checks, seven backdrop checks, helper type checking, the workspace/app
+builds, frozen installation and the genuine Electron smoke. All 12 native E2E
+cases pass: the full ten-case graphics/scaling/rearming/focus-control matrix and
+a separate no-barrier D3D11 positive/control pair. These runs cover
+14 authenticated target lifecycles and 330–360-character loaded module paths.
+The tests use the public `addonDirectory` option for isolated setup and launch;
+production keeps SDK defaults. Exact evidence and retained initial harness
+failures are indexed in `coverage/experimental-overlay/nightly1-validation.json`.
 
 The SDK uses independent per-app engines and authenticated transports with a shared
 ReShade host, rather than selecting a broker version across applications. The
@@ -40,8 +46,11 @@ the source provenance and every packaged SDK file.
 Experimental overlay startup explicitly registers the installed add-on through
 `electron-game-overlay/preload` before constructing its existing launch config.
 The stable identity `com.nhs.izabela` is shared with electron-builder through
-`apps/app/application-identity.json`. Setup omits `packageRoot` and `storageRoot`:
-the SDK resolves its physical installation and shared per-user cache/registry.
+`apps/app/application-identity.json`. Setup omits `packageRoot`, `addonDirectory`
+and the deprecated `storageRoot`:
+the SDK resolves its physical installation and the shared per-user ReShade add-on
+directory (`AppData/Local/ReShade/Addons`). The SDK owns its registration metadata
+in that directory; Izabela does not manage that layout.
 Izabela's userData stores only registration metadata in
 `experimental-game-overlay/addon-installation.json`.
 
@@ -54,11 +63,13 @@ disabling the overlay and development reloads do not unregister installed builds
 There is no installer Node hook in this app, so this per-user startup step handles
 first-run/update registration; afterPack and CI builds never register the builder.
 Saved IDs can also be passed to the SDK's selective uninstall API without
-removing other applications or manually deleting immutable payload caches.
+removing other applications or manually deleting native payloads that a game may
+still have mapped.
 
 Only after setup succeeds, the existing watcher receives
-`addonPreload: { applicationId: 'com.nhs.izabela' }`. The SDK owns snapshot copying
-and AddonPath configuration. This affects a newly initialized owned host; it does
+`addonPreload: { applicationId: 'com.nhs.izabela' }`. The SDK owns add-on
+installation and AddonPath configuration. This affects a newly initialized owned
+host; it does
 not rescan an existing host or provide a universal early-loading guarantee.
 
 RC.11 fixes registered add-on loading and activation beyond MAX_PATH. The original
@@ -91,7 +102,7 @@ any payload. Persistent failures keep the strict diagnostic/ownership boundary.
 This SDK recovery does not retry an indeterminate injection, reopen the process
 or change security settings. Izabela adds no recovery delay or retry of its own.
 The test runtime isolates both setup and launch configuration in an owned
-registry, preserving real per-user registrations. Native tests retain the default
+add-on directory, preserving real per-user registrations. Native tests retain the default
 long profiles and check actual loaded module lengths. RC.11 evidence is indexed
 in `coverage/experimental-overlay/rc11-validation.json`; earlier preload failures
 remain in `preload-integration-validation.json` and `rc10-validation.json` beside it.
