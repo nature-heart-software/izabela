@@ -88,7 +88,7 @@ async function runEdges(c) {
       await patch('messages', { shortcutMessages: saved })
       // The scenario deliberately hides the native window. Restore through its
       // controller so later UI tests also have correct focus state.
-      await evaluate(messenger, async () => {
+      await evaluate(worker, async () => {
         await window.ElectronMessengerWindow.hide(false)
         await window.ElectronMessengerWindow.show()
       })
@@ -143,7 +143,7 @@ async function runEdges(c) {
   await check(edgeCases[2], async () => {
     await patch('settings', { theme: 'dark' })
     await crash(messenger)
-    await evaluate(messenger, async () => {
+    await evaluate(worker, async () => {
       await window.ElectronMessengerWindow.hide(false)
       await window.ElectronMessengerWindow.show()
     })

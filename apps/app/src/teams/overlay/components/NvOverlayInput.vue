@@ -24,7 +24,7 @@
               css({
                 borderWidth: '1px',
                 borderStyle: 'solid',
-                borderColor: '#e5e7eb',
+                borderColor: 'input.default.border',
                 borderRadius: 'md',
                 paddingInline: '5',
                 height: '8',
@@ -96,12 +96,12 @@ import { useElementSize } from '@vueuse/core'
 import { rem } from 'polished'
 import styled from 'vue3-styled-components'
 
-const NvInput = styled('div')`
-  color: ${({ theme }) => theme.text.color};
-  border-color: ${({ theme }) => theme.input.borderColor};
+const NvInput = styled('div', {})`
+  color: ${({ theme }) => theme.input.default.text};
+  border-color: ${({ theme }) => theme.input.default.border};
   .activeIndex {
     &:after {
-      background-color: ${({ theme }) => theme.input.color};
+      background-color: ${({ theme }) => theme.input.default.text};
     }
   }
 `
@@ -367,7 +367,7 @@ watch(carretIndex, () => {
 <style lang="scss" scoped>
 @keyframes caret {
   50% {
-    background-color: transparent;
+    background-color: var(--nv-theme-background-transparent);
   }
 }
 
@@ -413,13 +413,13 @@ watch(carretIndex, () => {
     }
 
     &.inSelection {
-      background-color: #444444;
-      color: #ffffff;
+      background-color: var(--nv-option-default-selected-background);
+      color: var(--nv-option-default-selected-text);
     }
   }
 
   .overlayInput__placeholder {
-    color: #bebebe;
+    color: var(--nv-input-default-placeholder);
     opacity: 0.7;
   }
 

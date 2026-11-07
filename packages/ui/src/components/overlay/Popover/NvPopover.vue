@@ -30,9 +30,17 @@
           @wheel="onOverlayShieldWheel"
         />
         <StPopoverPositioner>
-          <StPopoverContent :hidden="false" :inert="open ? undefined : true">
+          <StPopoverContent
+            :hidden="false"
+            :size="props.size"
+            :inert="open ? undefined : true"
+          >
             <Transition>
-              <Card v-if="open" :size="props.size === 'lg' ? 'md' : props.size">
+              <Card
+                v-if="open"
+                data-nv-popover-surface
+                :size="props.size === 'lg' ? 'md' : props.size"
+              >
                 <slot />
               </Card>
             </Transition>

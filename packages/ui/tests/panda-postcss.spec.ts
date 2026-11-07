@@ -55,7 +55,7 @@ describe('live Panda stylesheet integration', () => {
   })
   it('extracts shared component styles and registers watch dependencies', async () => {
     const result = processStyles(root, 'ui')
-    expect(result.css).toContain('--nv-text-color')
+    expect(result.css).toContain('--nv-text-body-foreground')
     expect(result.css).toContain('--font-sizes-2')
     expect(result.css).toContain('@layer reset')
     expect(result.hasWatchDependencies).toBe(true)

@@ -12,8 +12,7 @@ export const StDialogBackdrop = pandaComponent(
       position: 'absolute',
       zIndex: 9999,
       inset: 0,
-      backgroundColor: 'var(--nv-dialog-backdrop-color)',
-      opacity: 'var(--nv-dialog-backdrop-opacity)',
+      backgroundColor: 'dialog.default.backdrop',
     },
   }),
 )
@@ -28,7 +27,36 @@ export const StDialogContent = pandaComponent(
   'div',
   {},
   cva({
-    base: { maxWidth: '30rem', width: '100%' },
+    base: {
+      maxWidth: '30rem',
+      width: '100%',
+      '& > *': {
+        backgroundColor: 'dialog.default.background',
+        boxShadow: 'dialog.default.shadow',
+      },
+      '& [data-part="title"]': { color: 'dialog.default.title' },
+      '& [data-part="description"] > *': {
+        color: 'dialog.default.description',
+      },
+      '& [data-part="close-trigger"]': {
+        color: 'dialog.close.icon',
+        backgroundColor: 'dialog.close.background',
+        borderColor: 'dialog.close.border',
+        '&:hover': {
+          color: 'dialog.close.hover.icon',
+          backgroundColor: 'dialog.close.hover.background',
+          borderColor: 'dialog.close.hover.border',
+        },
+        '&:active': {
+          color: 'dialog.close.active.icon',
+          backgroundColor: 'dialog.close.active.background',
+          borderColor: 'dialog.close.active.border',
+        },
+        '&:focus': {
+          boxShadow: '0 0 0 0.25rem {colors.dialog.close.focus.ring}',
+        },
+      },
+    },
   }),
 )
 export const StDialogContentWrapper = pandaComponent(

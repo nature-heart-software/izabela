@@ -3,9 +3,9 @@ import { cva } from '@/styled-system/css'
 export const loadingSpinner = cva({
   base: {
     display: 'block',
-    width: '1rem',
-    height: '1rem',
-    color: 'var(--nv-button-plain-background-color)',
+    width: '5',
+    height: '5',
+    color: 'loading.default.pending.spinner',
     animation: 'spin 2s linear infinite',
     _motionReduce: { animation: 'none' },
     '& > circle': {

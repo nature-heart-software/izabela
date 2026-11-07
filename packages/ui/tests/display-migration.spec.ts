@@ -76,7 +76,7 @@ function render(component: any, options: any = {}) {
   const wrapper = mount(component, {
     attachTo: document.body,
     ...options,
-    global: { provide: { theme: ui.themes.get('dark') } },
+    global: { provide: { theme: ui.themes.get('izabela-dark') } },
   })
   wrappers.push(wrapper)
   return wrapper
@@ -151,9 +151,9 @@ describe('display migration', () => {
     expect(wrapper.get('strong').text()).toBe('Details')
     expect(
       (wrapper.element as HTMLElement).style.getPropertyValue(
-        '--nv-text-color',
+        '--nv-text-body-foreground',
       ),
-    ).toBe(ui.themes.get('dark').text.color)
+    ).toBe(ui.themes.get('izabela-dark').text.body.foreground)
     await wrapper.trigger('click')
     expect(clicked).toHaveBeenCalledTimes(1)
     const blocker = render(ui.NvAccessBlocker, {

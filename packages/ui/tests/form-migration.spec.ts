@@ -20,7 +20,10 @@ function render(component: unknown, options: Record<string, any> = {}) {
   const wrapper = mount(component as any, {
     attachTo: document.body,
     ...options,
-    global: { provide: { theme: ui.themes.get('dark') }, ...options.global },
+    global: {
+      provide: { theme: ui.themes.get('izabela-dark') },
+      ...options.global,
+    },
   })
   wrappers.push(wrapper)
   return wrapper

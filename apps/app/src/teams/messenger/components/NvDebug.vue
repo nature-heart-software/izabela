@@ -5,13 +5,13 @@
     <template v-for="hitbox in hitboxStore.hitboxes" :key="hitbox.id">
       <div
         :data-debug-hitbox-id="hitbox.id"
+        :class="css({ border: '1px solid {colors.alert.error.foreground}' })"
         :style="{
           position: 'absolute',
           top: rem(hitbox.y / pixelRatio),
           left: rem(hitbox.x / pixelRatio),
           width: rem(hitbox.w / pixelRatio),
           height: rem(hitbox.h / pixelRatio),
-          border: '1px solid red',
           pointerEvents: 'none',
         }"
       ></div>

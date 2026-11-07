@@ -134,7 +134,10 @@ export default defineComponent({
                   h('tr', [
                     h(
                       'td',
-                      { colspan: Math.max(columns.length, 1) },
+                      {
+                        colspan: Math.max(columns.length, 1),
+                        'data-empty': '',
+                      },
                       slots.empty?.() ?? props.emptyText,
                     ),
                   ]),

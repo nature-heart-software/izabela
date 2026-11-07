@@ -213,7 +213,7 @@ const inputId = computed(() =>
 const isLocked = computed(() => props.disabled || props.readonly)
 const emit = defineEmits(['update:modelValue'])
 const iconSize = computed(() => {
-  const sizes: Record<Size, keyof typeof tokens.spacing> = {
+  const sizes: Record<Size, keyof typeof tokens.fontSize> = {
     sm: 3,
     md: 5,
     lg: 5,

@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-import { afterEach, describe, expect, it } from 'vitest'
-import { mount, type VueWrapper } from '@vue/test-utils'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { mount, flushPromises, type VueWrapper } from '@vue/test-utils'
 import { defineComponent, h, markRaw, withDirectives } from 'vue'
 import { execFileSync } from 'node:child_process'
 import { createRequire } from 'node:module'
@@ -40,7 +40,11 @@ export { pandaComponent } from '@/utils/panda'
 export { card } from '@/components/display/Card/card.panda'
 export { divider } from '@/components/miscellaneous/Divider/divider.panda'
 export { table } from '@/components/display/Table/table.panda'
-export { tooltipPositioner } from '@/components/overlay/Tooltip/tooltip.panda'
+export { default as NvText } from '@/components/typography/Text/NvText.vue'
+export { default as NvAlert } from '@/components/feedback/Alert/NvAlert.vue'
+export { default as NvTable } from '@/components/display/Table/NvTable.vue'
+export { default as NvTableColumn } from '@/components/display/Table/NvTableColumn.vue'
+export { tooltipPositioner, StTooltipContent } from '@/components/overlay/Tooltip/tooltip.panda'
 export { StSelectGroupLabel } from '@/components/forms/Select/select.panda'
 export { default as NvButton } from '@/components/forms/Button/NvButton.vue'
 export { default as NvTextarea } from '@/components/forms/Textarea/NvTextarea.vue'
@@ -48,6 +52,8 @@ export { default as NvRangeInput } from '@/components/forms/RangeInput/NvRangeIn
 export { default as NvInput } from '@/components/forms/Input/NvInput.vue'
 export { default as NvNumberInput } from '@/components/forms/NumberInput/NvNumberInput.vue'
 export { themes } from '@/themes'
+export { default as NvPopover } from '@/components/overlay/Popover/NvPopover.vue'
+export { default as NvSelect } from '@/components/forms/Select/NvSelect.vue'
 export { Popover, Dialog, Menu, Tooltip } from '@ark-ui/vue'
 `
 // The real SFC graph needs the library alias. Keep it in this local build, not
@@ -245,17 +251,13 @@ describe('Ark as-child button appearance', () => {
       const button = wrapper.get('button')
       const role = appearance || 'default'
       expect(button.attributes('type')).toBe('button')
-      expect(button.classes()).toContain(
-        `bg-c_var(--nv-button-${role}-background-color)`,
-      )
-      expect(button.classes()).toContain(`c_var(--nv-button-${role}-color)`)
-      expect(button.classes()).toContain(
-        `bd-c_var(--nv-button-${role}-border-color)`,
-      )
+      expect(button.classes()).toContain(`bg-c_button.${role}.background`)
+      expect(button.classes()).toContain(`c_button.${role}.text`)
+      expect(button.classes()).toContain(`bd-c_button.${role}.border`)
       expect(
         emittedRules(button.classes()).map((rule) => rule.declarations),
       ).toContainEqual({
-        'background-color': `var(--nv-button-${role}-background-color)`,
+        'background-color': `var(--colors-button-${role}-background)`,
       })
     },
   )
@@ -375,8 +377,268 @@ describe('wrapper-owned polymorphism', () => {
   })
 })
 
+// Resolve the emitted utility cascade on real mounted markup. These probes are
+// deliberately limited to normal utility declarations in the same Panda layer.
+function winningRole(element: Element, property: string, pseudo = '') {
+  const candidates: { value: string; weight: number; order: number }[] = []
+  function weight(node: any): number {
+    if (node.type === 'id') return 10000
+    if (node.type === 'class' || node.type === 'attribute') return 100
+    if (node.type === 'tag') return 1
+    if (node.type === 'pseudo') {
+      if (node.value === ':where') return 0
+      if ([':is', ':not', ':has'].includes(node.value))
+        return Math.max(...node.nodes.map(weight))
+      return node.value.startsWith('::') ? 1 : 100
+    }
+    return (
+      node.nodes?.reduce((sum: number, child: any) => sum + weight(child), 0) ??
+      0
+    )
+  }
+  rules.forEach((rule, order) => {
+    if (!rule.classes.length) return
+    const value =
+      rule.declarations[property] ??
+      (property === 'border-bottom-color'
+        ? (rule.declarations['border-color'] ??
+          rule.declarations['border-bottom']?.match(
+            /var\(--colors-[^)]+\)/,
+          )?.[0])
+        : undefined)
+    if (!value) return
+    parseSelector((selectors: any) =>
+      selectors.each((selector: any) => {
+        const text = selector.toString()
+        if (pseudo ? !text.endsWith(pseudo) : text.includes('::')) return
+        if (element.matches(pseudo ? text.slice(0, -pseudo.length) : text))
+          candidates.push({ value, weight: weight(selector), order })
+      }),
+    ).processSync(rule.selector)
+  })
+  return candidates
+    .sort((a, b) => a.weight - b.weight || a.order - b.order)
+    .at(-1)?.value
+}
+
+describe('Select search surface ownership', () => {
+  it('matches the transition timing of Buttons and Inputs', () => {
+    const select = render(ui.NvSelect)
+    const button = render(ui.NvButton)
+    const input = render(ui.NvInput)
+    const transition = winningRole(button.get('button').element, 'transition')
+    expect(transition).toBe('all .3s')
+    expect(winningRole(input.get('input').element, 'transition')).toBe(
+      transition,
+    )
+    expect(
+      winningRole(select.get('[data-nv-select-control]').element, 'transition'),
+    ).toBe(transition)
+  })
+
+  it.each(['sm', 'md', 'lg'])(
+    'keeps the %s multi-select search input transparent at rest and focus',
+    async (size) => {
+      const wrapper = render(ui.NvSelect, {
+        props: {
+          size,
+          multiple: true,
+          modelValue: ['speakers'],
+          options: [
+            { value: 'speakers', label: 'Speakers' },
+            { value: 'headphones', label: 'Headphones' },
+          ],
+        },
+      })
+      expect(
+        rules.some(
+          (rule) =>
+            rule.declarations['--colors-transparent'] === 'rgb(0 0 0 / 0)',
+        ),
+      ).toBe(true)
+      const input = wrapper.get('input')
+      expect(winningRole(input.element, 'background-color')).toBe(
+        'var(--colors-transparent)',
+      )
+      await input.trigger('focus')
+      expect(winningRole(input.element, 'background-color')).toBe(
+        'var(--colors-transparent)',
+      )
+      expect(
+        wrapper.get('[data-nv-select-control]').classes().length,
+      ).toBeGreaterThan(0)
+      expect(wrapper.text()).toContain('Speakers')
+    },
+  )
+})
+
+describe('Button cursor affordance', () => {
+  it.each(['default', 'plain', 'ghost', 'ghost-alt', 'active'])(
+    'uses a pointer for enabled %s buttons',
+    (type) => {
+      const wrapper = render(ui.NvButton, {
+        props: { type },
+        slots: { default: 'Run' },
+      })
+      expect(winningRole(wrapper.get('button').element, 'cursor')).toBe(
+        'pointer',
+      )
+    },
+  )
+
+  it('keeps disabled buttons non-interactive with a not-allowed cursor', () => {
+    const wrapper = render(ui.NvButton, {
+      attrs: { disabled: true },
+      slots: { default: 'Unavailable' },
+    })
+    const button = wrapper.get('button')
+    expect((button.element as HTMLButtonElement).disabled).toBe(true)
+    expect(winningRole(button.element, 'cursor')).toBe('not-allowed')
+  })
+})
+
+describe('canonical role cascade', () => {
+  it.each(['caption', 'label', 'body-small', 'body', 'subtitle', 'title'])(
+    'lets the %s Text underline role own its pseudo-element',
+    (type) => {
+      const wrapper = render(ui.NvText, {
+        props: { type },
+        slots: { default: () => h('a', { href: '#' }, 'Link') },
+      })
+      expect(
+        winningRole(wrapper.get('a').element, 'background-color', '::before'),
+      ).toBe(`var(--colors-text-${type}-link-underline)`)
+    },
+  )
+  it.each(['info', 'success', 'warning', 'error'])(
+    'lets the %s Alert underline role override its composed NvText',
+    (type) => {
+      const wrapper = render(ui.NvAlert, {
+        props: { type },
+        slots: { default: () => h('a', { href: '#' }, 'Link') },
+      })
+      expect(
+        winningRole(wrapper.get('a').element, 'background-color', '::before'),
+      ).toBe(`var(--colors-alert-${type}-link-underline)`)
+    },
+  )
+  it.each([undefined, 'left', 'right'])(
+    'lets the %s column own both native cell border colors',
+    (fixed) => {
+      const wrapper = render(ui.NvTable, {
+        props: { data: [{ value: 'Cell' }] },
+        slots: {
+          default: () =>
+            h(ui.NvTableColumn, { prop: 'value', label: 'Header', fixed }),
+        },
+      })
+      for (const cell of wrapper.findAll('th, td'))
+        expect(winningRole(cell.element, 'border-bottom-color')).toBe(
+          fixed
+            ? 'var(--colors-table-frozen-border)'
+            : 'var(--colors-table-column-default-border)',
+        )
+    },
+  )
+})
+
 describe('generated style boundaries', () => {
-  it('uses the legacy disabled-item backdrop theme roles without changing pending host behavior', async () => {
+  it.each(
+    [...ui.themes.keys()].flatMap((themeId) =>
+      ['sm', 'md', 'lg'].map((size) => [themeId, size]),
+    ),
+  )(
+    'keeps nested shields undecorated and the owned Card themed (%s, %s)',
+    async (themeId, size) => {
+      vi.stubGlobal(
+        'ResizeObserver',
+        class {
+          observe() {}
+          unobserve() {}
+          disconnect() {}
+        },
+      )
+      const geometry = vi
+        .spyOn(HTMLElement.prototype, 'getClientRects')
+        .mockReturnValue([
+          {
+            width: 300,
+            height: 100,
+            top: 0,
+            left: 0,
+            right: 300,
+            bottom: 100,
+            x: 0,
+            y: 0,
+            toJSON() {},
+          },
+        ] as any)
+      try {
+        const wrapper = render(ui.NvPopover, {
+          props: { size },
+          global: {
+            provide: { theme: ui.themes.get(themeId) },
+            stubs: { transition: false },
+          },
+          slots: {
+            reference: () => h('button', 'Open'),
+            default: () =>
+              h(ui.NvSelect, {
+                options: [{ label: 'Alpha', value: 'a' }],
+                modelValue: 'a',
+              }),
+          },
+        })
+        await wrapper.get('button').trigger('click')
+        await flushPromises()
+        await new Promise((resolve) => setTimeout(resolve, 50))
+        const content = document.querySelector(
+          '[data-scope="popover"][data-part="content"]',
+        )!
+        const input = content.querySelector('input')!
+        input.focus()
+        await flushPromises()
+        await new Promise((resolve) => setTimeout(resolve, 50))
+        const shield = content.querySelector('[data-nv-overlay-shield]')!
+        expect(shield).not.toBeNull()
+        expect(shield.parentElement).toBe(content)
+        for (const boundary of [
+          shield,
+          document.querySelector('[data-overlay-shield="popover"]')!,
+        ]) {
+          expect(boundary).not.toBeNull()
+          expect(winningRole(boundary, 'background-color')).toBeUndefined()
+          expect(winningRole(boundary, 'background-image')).toBeUndefined()
+          expect(winningRole(boundary, 'box-shadow')).toBeUndefined()
+        }
+        const card = Array.from(content.children).find((child) =>
+          child.hasAttribute('data-nv-popover-surface'),
+        )!
+        expect(card, content.innerHTML).toBeTruthy()
+        expect(winningRole(card, 'background-color')).toBe(
+          `var(--colors-popover-${size}-background)`,
+        )
+        expect(winningRole(card, 'box-shadow')).toBe(
+          `var(--shadows-popover-${size}-shadow)`,
+        )
+        expect(
+          (card as HTMLElement).style.getPropertyValue(
+            `--nv-popover-${size}-background`,
+          ),
+        ).toBe(ui.themes.get(themeId).popover[size].background)
+        expect(
+          (card as HTMLElement).style.getPropertyValue(
+            `--nv-popover-${size}-shadow`,
+          ),
+        ).toBe(ui.themes.get(themeId).popover[size].shadow)
+      } finally {
+        geometry.mockRestore()
+        vi.unstubAllGlobals()
+      }
+    },
+  )
+
+  it('uses loading-owned pending roles without changing native host behavior', async () => {
     const Host = defineComponent({
       props: { busy: Boolean },
       setup: (props) => () =>
@@ -392,9 +654,14 @@ describe('generated style boundaries', () => {
       global: {
         provide: {
           theme: {
-            disabledItemBackground: {
-              backdropColor: '#123456',
-              backdropOpacity: 0.25,
+            loading: {
+              default: {
+                pending: {
+                  background: 'rgba(18, 52, 86, 0.25)',
+                  foreground: '#123456',
+                  spinner: '#abcdef',
+                },
+              },
             },
           },
         },
@@ -405,19 +672,18 @@ describe('generated style boundaries', () => {
     expect(
       emittedRules(mask.classes()).map((rule) => rule.declarations),
     ).toContainEqual({
-      'background-color':
-        'color-mix(in srgb, var(--nv-disabled-item-background-backdrop-color) calc(var(--nv-disabled-item-background-backdrop-opacity) * 100%), transparent)',
+      'background-color': 'var(--colors-loading-default-pending-background)',
     })
     expect(
       (wrapper.element as HTMLElement).style.getPropertyValue(
-        '--nv-disabled-item-background-backdrop-color',
+        '--nv-loading-default-pending-foreground',
       ),
     ).toBe('#123456')
     expect(
       (wrapper.element as HTMLElement).style.getPropertyValue(
-        '--nv-disabled-item-background-backdrop-opacity',
+        '--nv-loading-default-pending-background',
       ),
-    ).toBe('0.25')
+    ).toBe('rgba(18, 52, 86, 0.25)')
     expect(button.attributes('aria-busy')).toBe('true')
     expect((button.element as HTMLButtonElement).disabled).toBe(false)
     expect(button.attributes('disabled')).toBeUndefined()
@@ -426,16 +692,16 @@ describe('generated style boundaries', () => {
     expect(button.attributes('aria-busy')).toBe('false')
   })
 
-  it('emits valid legacy-equivalent Card radius and shadow declarations', () => {
+  it('emits canonical Card radius and shadow declarations', () => {
     const declarations = emittedRules(
       ui.card({ size: 'md', variant: 'default' }).split(' '),
     ).map((rule) => rule.declarations)
     expect(declarations).toContainEqual({ 'border-radius': 'var(--radii-md)' })
-    expect(declarations).toContainEqual({ 'box-shadow': 'var(--shadows-lg)' })
+    expect(declarations).toContainEqual({
+      'box-shadow': 'var(--shadows-card-default-shadow)',
+    })
     expect(css).toContain('--radii-md: 0.5rem;')
-    expect(css).toContain(
-      '--shadows-lg: 0 0.125rem 0.063rem rgba(0, 0, 0, 0.05);',
-    )
+    expect(css).toContain('--shadows-card-default-shadow:')
   })
 
   it.each([
@@ -446,9 +712,9 @@ describe('generated style boundaries', () => {
       (rule) => rule.declarations,
     )
     expect(declarations).toContainEqual({
-      [property]: 'var(--border-widths-thin)',
+      [property]: 'var(--border-widths-default)',
     })
-    expect(css).toContain('--border-widths-thin: 1px;')
+    expect(css).toContain('--border-widths-default: 1px;')
   })
 
   it('emits a resolved thin border token for native table cells', () => {
@@ -456,19 +722,152 @@ describe('generated style boundaries', () => {
       (rule) => rule.declarations,
     )
     expect(declarations).toContainEqual({
-      'border-bottom':
-        'var(--border-widths-thin) solid var(--nv-table-border-color, var(--nv-divider-border-color))',
+      'border-bottom-width': 'var(--border-widths-default)',
     })
+    expect(declarations).toContainEqual({ 'border-bottom-style': 'solid' })
   })
 
-  it('emits valid legacy-equivalent shadows on both global tour surfaces', () => {
-    const wrapper = render(ui.GlobalStyles)
-    for (const selector of [' #vjt-tooltip', ' #vjt-arrow::before']) {
-      expect(
-        emittedRules(wrapper.classes())
-          .filter((rule) => rule.selector.includes(selector))
-          .map((rule) => rule.declarations),
-      ).toContainEqual({ 'box-shadow': 'var(--shadows-lg)' })
+  it.each([...ui.themes.keys()])(
+    'emits inverse-themed Tour colors without recoloring Tooltip (%s)',
+    (themeId) => {
+      const theme = ui.themes.get(themeId)
+      expect(theme.tourGuide?.default).toEqual({
+        background: theme.tooltip.default.background,
+        text: theme.tooltip.default.text,
+        shadow: theme.tooltip.default.shadow,
+      })
+      const wrapper = render(ui.GlobalStyles, {
+        global: { provide: { theme } },
+        slots: {
+          default: () => [
+            h('div', { id: 'vjt-tooltip' }, [
+              h(ui.NvText, { 'data-nv-tour-content': '' }, () => 'Tour body'),
+              h('div', { id: 'vjt-arrow' }),
+            ]),
+            h(
+              ui.Tooltip.Root,
+              { open: true },
+              {
+                default: () =>
+                  h(ui.Tooltip.Positioner, null, {
+                    default: () =>
+                      h(ui.StTooltipContent, null, () => 'Tooltip body'),
+                  }),
+              },
+            ),
+          ],
+        },
+      })
+      const surface = wrapper.get('#vjt-tooltip').element
+      const arrow = wrapper.get('#vjt-arrow').element
+      const content = wrapper.get('[data-nv-tour-content]').element
+      const tooltip = wrapper.get(
+        '[data-scope="tooltip"][data-part="content"]',
+      ).element
+      for (const [element, property, role, pseudo] of [
+        [
+          surface,
+          'background-color',
+          'colors-tour-guide-default-background',
+          '',
+        ],
+        [surface, 'color', 'colors-tour-guide-default-text', ''],
+        [surface, 'box-shadow', 'shadows-tour-guide-default-shadow', ''],
+        [
+          arrow,
+          'background-color',
+          'colors-tour-guide-default-background',
+          '::before',
+        ],
+        [arrow, 'box-shadow', 'shadows-tour-guide-default-shadow', '::before'],
+        [tooltip, 'background-color', 'colors-tooltip-default-background', ''],
+        [tooltip, 'color', 'colors-tooltip-default-text', ''],
+        [tooltip, 'box-shadow', 'shadows-tooltip-default-shadow', ''],
+      ] as const) {
+        expect(winningRole(element, property, pseudo)).toBe(`var(--${role})`)
+      }
+      expect(winningRole(content, 'color')).toBe('inherit')
+      for (const [group, values] of [
+        ['tour-guide', theme.tourGuide.default],
+        ['tooltip', theme.tooltip.default],
+      ] as const) {
+        for (const [role, value] of Object.entries(values)) {
+          const variable = `--nv-${group}-default-${role}`
+          expect(
+            (wrapper.element as HTMLElement).style.getPropertyValue(variable),
+          ).toBe(value)
+          expect(
+            rules.some(
+              (rule) =>
+                rule.declarations[`--colors-${group}-default-${role}`] ===
+                `var(${variable})`,
+            ),
+            `${group}.${role} resolves the runtime theme variable`,
+          ).toBe(true)
+          if (role === 'shadow')
+            expect(
+              rules.some((rule) =>
+                rule.declarations[
+                  `--shadows-${group}-default-shadow`
+                ]?.includes(`var(--colors-${group}-default-shadow)`),
+              ),
+            ).toBe(true)
+        }
+      }
+    },
+  )
+
+  it('keeps divergent Tour and Tooltip roles independently owned', () => {
+    const theme = JSON.parse(JSON.stringify(ui.themes.values().next().value))
+    theme.tourGuide = {
+      default: {
+        background: '#123456',
+        text: '#abcdef',
+        shadow: 'rgba(12, 34, 56, 0.7)',
+      },
+    }
+    theme.tooltip.default = {
+      background: '#654321',
+      text: '#fedcba',
+      shadow: 'rgba(65, 43, 21, 0.3)',
+      border: '#987654',
+      icon: '#456789',
+    }
+    const wrapper = render(ui.GlobalStyles, {
+      global: { provide: { theme } },
+      slots: {
+        default: () =>
+          h('div', { id: 'vjt-tooltip' }, [h('div', { id: 'vjt-arrow' })]),
+      },
+    })
+    const surface = wrapper.get('#vjt-tooltip').element
+    expect(winningRole(surface, 'background-color')).toBe(
+      'var(--colors-tour-guide-default-background)',
+    )
+    expect(winningRole(surface, 'color')).toBe(
+      'var(--colors-tour-guide-default-text)',
+    )
+    expect(winningRole(surface, 'box-shadow')).toBe(
+      'var(--shadows-tour-guide-default-shadow)',
+    )
+    expect(
+      winningRole(
+        wrapper.get('#vjt-arrow').element,
+        'background-color',
+        '::before',
+      ),
+    ).toBe('var(--colors-tour-guide-default-background)')
+    for (const [group, values] of Object.entries({
+      'tour-guide': theme.tourGuide.default,
+      tooltip: theme.tooltip.default,
+    })) {
+      for (const [role, value] of Object.entries(values)) {
+        expect(
+          (wrapper.element as HTMLElement).style.getPropertyValue(
+            `--nv-${group}-default-${role}`,
+          ),
+        ).toBe(value)
+      }
     }
   })
 
@@ -493,7 +892,9 @@ describe('generated style boundaries', () => {
       const stateRules = thumbRules.filter(
         (rule) =>
           rule.declarations['background-color'] ===
-          `var(--nv-button-plain-${state}-background-color)`,
+          `var(--colors-button-plain-${
+            state === 'active' ? 'pressed' : state
+          }-background)`,
       )
       expect(stateRules).toHaveLength(1)
       expect(stateRules[0].selector).toMatch(
@@ -502,38 +903,61 @@ describe('generated style boundaries', () => {
     }
   })
 
-  it('draws a themed divider behind group labels without an option highlight', () => {
-    const wrapper = render(ui.StSelectGroupLabel, {
-      global: { provide: { theme: ui.themes.get('dark') } },
-      slots: { default: () => h('span', 'Voices') },
+  it.each([...ui.themes.keys()])(
+    'draws the %s group label with its authored readonly roles and no option highlight',
+    (themeId) => {
+      const wrapper = render(ui.StSelectGroupLabel, {
+        global: { provide: { theme: ui.themes.get(themeId) } },
+        slots: { default: () => h('span', 'Voices') },
+      })
+      const labelRules = emittedRules(wrapper.classes())
+      expect(labelRules).toContainEqual(
+        expect.objectContaining({
+          declarations: { color: 'var(--colors-option-default-readonly-text)' },
+        }),
+      )
+      const lineRules = labelRules.filter((rule) =>
+        rule.selector.includes('::before'),
+      )
+      expect(
+        Object.assign({}, ...lineRules.map((rule) => rule.declarations)),
+      ).toMatchObject({
+        content: "''",
+        position: 'absolute',
+        top: '50%',
+        height: '1px',
+        width: '100%',
+        'background-color': 'var(--colors-option-default-readonly-separator)',
+      })
+      expect(
+        wrapper.element.style.getPropertyValue(
+          '--nv-option-default-readonly-separator',
+        ),
+      ).toBe(ui.themes.get(themeId).option.default.readonly.separator)
+      expect(
+        labelRules
+          .filter((rule) => rule.selector.includes('> span'))
+          .map((rule) => rule.declarations),
+      ).toContainEqual({
+        'background-color':
+          'var(--colors-option-default-readonly-label-mask-background)',
+      })
+      expect(labelRules.some((rule) => rule.selector.includes(':hover'))).toBe(
+        false,
+      )
+    },
+  )
+
+  it('extracts the xs button loading-size override from the shared scale', () => {
+    const wrapper = render(ui.NvButton, {
+      props: { size: 'xs', loading: true },
     })
-    const labelRules = emittedRules(wrapper.classes())
-    expect(labelRules).toContainEqual(
-      expect.objectContaining({
-        declarations: { color: 'var(--nv-select-option-readonly-color)' },
-      }),
+    const spinnerRules = emittedRules(wrapper.classes()).filter((rule) =>
+      rule.selector.includes('.nv-button__loading > svg'),
     )
-    const lineRules = labelRules.filter((rule) =>
-      rule.selector.includes('::before'),
-    )
-    expect(
-      Object.assign({}, ...lineRules.map((rule) => rule.declarations)),
-    ).toMatchObject({
-      content: "''",
-      position: 'absolute',
-      top: '50%',
-      height: '1px',
-      width: '100%',
-      'background-color': 'var(--nv-select-option-readonly-border-color)',
-    })
-    expect(
-      wrapper.element.style.getPropertyValue(
-        '--nv-select-option-readonly-border-color',
-      ),
-    ).toBeTruthy()
-    expect(labelRules.some((rule) => rule.selector.includes(':hover'))).toBe(
-      false,
-    )
+    const declarations = spinnerRules.map((rule) => rule.declarations)
+    expect(declarations).toContainEqual({ width: 'var(--sizes-4)' })
+    expect(declarations).toContainEqual({ height: 'var(--sizes-4)' })
   })
 
   it('extracts actual directive mask and spinner classes including reduced motion', () => {
@@ -551,14 +975,13 @@ describe('generated style boundaries', () => {
       (rule) => rule.declarations,
     )
     expect(declarations).toContainEqual(
-      expect.objectContaining({ width: '1rem' }),
-    )
-    expect(declarations).toContainEqual(
-      expect.objectContaining({ height: '1rem' }),
-    )
-    expect(declarations).toContainEqual(
       expect.objectContaining({ stroke: 'currentColor' }),
     )
+    expect(declarations).toContainEqual({ width: 'var(--sizes-5)' })
+    expect(declarations).toContainEqual({ height: 'var(--sizes-5)' })
+    expect(declarations).toContainEqual({
+      color: 'var(--colors-loading-default-pending-spinner)',
+    })
     expect(declarations).toContainEqual(
       expect.objectContaining({ animation: 'spin 2s linear infinite' }),
     )

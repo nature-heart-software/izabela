@@ -7,13 +7,13 @@ export const buttonRecipe = cva({
     flexShrink: '0',
     position: 'relative',
     display: 'inline-flex',
-    cursor: 'pointer',
-    _disabled: { cursor: 'not-allowed' },
     alignItems: 'center',
     fontWeight: '600',
     borderWidth: '1px',
     borderStyle: 'solid',
     outline: '0',
+    cursor: 'pointer',
+    _disabled: { cursor: 'not-allowed' },
     transition: 'all .3s',
     overflow: 'hidden',
     '& .nv-button__icon': { pointerEvents: 'none' },
@@ -35,12 +35,12 @@ export const buttonRecipe = cva({
         paddingX: '2',
         borderRadius: 'xs',
         fontSize: '0.75rem',
-        lineHeight: '1.4',
-        letterSpacing: '0.02rem',
+        lineHeight: 'default',
+        letterSpacing: 'default',
         '& .nv-button__icon': { right: '1' },
         '& .nv-button__loading > svg': {
-          width: '0.75rem',
-          height: '0.75rem',
+          width: '4',
+          height: '4',
         },
       },
       sm: {
@@ -48,8 +48,8 @@ export const buttonRecipe = cva({
         paddingX: '3',
         borderRadius: 'sm',
         fontSize: '0.75rem',
-        lineHeight: '1.4',
-        letterSpacing: '0.02rem',
+        lineHeight: 'default',
+        letterSpacing: 'default',
         '& .nv-button__icon': { right: '2' },
       },
       md: {
@@ -57,8 +57,8 @@ export const buttonRecipe = cva({
         paddingX: '5',
         borderRadius: 'md',
         fontSize: '0.75rem',
-        lineHeight: '1.4',
-        letterSpacing: '0.02rem',
+        lineHeight: 'default',
+        letterSpacing: 'default',
         '& .nv-button__icon': { right: '2' },
       },
       lg: {
@@ -66,8 +66,8 @@ export const buttonRecipe = cva({
         paddingX: '5',
         borderRadius: 'md',
         fontSize: '0.875rem',
-        lineHeight: '1.4',
-        letterSpacing: '0.02rem',
+        lineHeight: 'default',
+        letterSpacing: 'default',
         '& .nv-button__icon': { right: '3' },
       },
     },
@@ -86,95 +86,168 @@ export const buttonRecipe = cva({
     },
     type: {
       default: {
-        color: 'var(--nv-button-default-color)',
-        backgroundColor: 'var(--nv-button-default-background-color)',
-        borderColor: 'var(--nv-button-default-border-color)',
+        // The directive owns geometry; only the background layer uses source alpha.
+        '& > .nv-loading-mask': { backgroundColor: 'transparent' },
+        '& > .nv-loading-mask::before': {
+          content: '""',
+          position: 'absolute',
+          inset: '0',
+          borderRadius: 'inherit',
+          pointerEvents: 'none',
+          backgroundColor: 'var(--nv-button-loading-surface)',
+          maskImage:
+            'linear-gradient({colors.loading.default.pending.background}, {colors.loading.default.pending.background})',
+          maskMode: 'alpha',
+        },
+        '& > .nv-loading-mask > svg': { position: 'relative', zIndex: '1' },
+        color: 'button.default.text',
+        backgroundColor: 'button.default.background',
+        '--nv-button-loading-surface': '{colors.button.default.background}',
+        borderColor: 'button.default.border',
         '&:hover': {
-          backgroundColor: 'var(--nv-button-default-hover-background-color)',
+          backgroundColor: 'button.default.hover.background',
+          '--nv-button-loading-surface':
+            '{colors.button.default.hover.background}',
+          borderColor: 'button.default.hover.border',
         },
         '&:active': {
-          backgroundColor: 'var(--nv-button-default-active-background-color)',
+          backgroundColor: 'button.default.pressed.background',
+          '--nv-button-loading-surface':
+            '{colors.button.default.pressed.background}',
+          borderColor: 'button.default.pressed.border',
         },
         '&:focus': {
-          boxShadow: '0 0 0 0.25rem var(--nv-button-default-focus-box-shadow)',
+          boxShadow: '0 0 0 0.25rem {colors.button.default.focus.ring}',
         },
         '&[data-selected]': {
-          backgroundColor: 'var(--nv-button-default-selected-background-color)',
+          backgroundColor: 'button.default.selected.background',
+          '--nv-button-loading-surface':
+            '{colors.button.default.selected.background}',
+          borderColor: 'button.default.selected.border',
         },
       },
       active: {
-        color: 'var(--nv-button-active-color)',
-        backgroundColor: 'var(--nv-button-active-background-color)',
-        borderColor: 'var(--nv-button-active-border-color)',
+        // The directive owns geometry; only the background layer uses source alpha.
+        '& > .nv-loading-mask': { backgroundColor: 'transparent' },
+        '& > .nv-loading-mask::before': {
+          content: '""',
+          position: 'absolute',
+          inset: '0',
+          borderRadius: 'inherit',
+          pointerEvents: 'none',
+          backgroundColor: 'var(--nv-button-loading-surface)',
+          maskImage:
+            'linear-gradient({colors.loading.default.pending.background}, {colors.loading.default.pending.background})',
+          maskMode: 'alpha',
+        },
+        '& > .nv-loading-mask > svg': { position: 'relative', zIndex: '1' },
+        color: 'button.active.text',
+        backgroundColor: 'button.active.background',
+        '--nv-button-loading-surface': '{colors.button.active.background}',
+        borderColor: 'button.active.border',
         borderWidth: '2px',
         '&:hover': {
-          backgroundColor: 'var(--nv-button-active-hover-background-color)',
+          backgroundColor: 'button.active.hover.background',
+          '--nv-button-loading-surface':
+            '{colors.button.active.hover.background}',
+          borderColor: 'button.active.hover.border',
         },
         '&:active': {
-          backgroundColor: 'var(--nv-button-active-active-background-color)',
+          backgroundColor: 'button.active.pressed.background',
+          '--nv-button-loading-surface':
+            '{colors.button.active.pressed.background}',
+          borderColor: 'button.active.pressed.border',
         },
         '&:focus': {
-          boxShadow: '0 0 0 0.25rem var(--nv-button-active-focus-box-shadow)',
+          boxShadow: '0 0 0 0.25rem {colors.button.active.focus.ring}',
         },
         '&[data-selected]': {
-          backgroundColor: 'var(--nv-button-active-selected-background-color)',
+          backgroundColor: 'button.active.selected.background',
+          '--nv-button-loading-surface':
+            '{colors.button.active.selected.background}',
+          borderColor: 'button.active.selected.border',
         },
       },
       plain: {
-        color: 'var(--nv-button-plain-color)',
-        backgroundColor: 'var(--nv-button-plain-background-color)',
-        borderColor: 'var(--nv-button-plain-border-color)',
+        // The directive owns geometry; only the background layer uses source alpha.
+        '& > .nv-loading-mask': { backgroundColor: 'transparent' },
+        '& > .nv-loading-mask::before': {
+          content: '""',
+          position: 'absolute',
+          inset: '0',
+          borderRadius: 'inherit',
+          pointerEvents: 'none',
+          backgroundColor: 'var(--nv-button-loading-surface)',
+          maskImage:
+            'linear-gradient({colors.loading.default.pending.background}, {colors.loading.default.pending.background})',
+          maskMode: 'alpha',
+        },
+        '& > .nv-loading-mask > svg': { position: 'relative', zIndex: '1' },
+        color: 'button.plain.text',
+        backgroundColor: 'button.plain.background',
+        '--nv-button-loading-surface': '{colors.button.plain.background}',
+        borderColor: 'button.plain.border',
         '&:hover': {
-          borderColor: 'var(--nv-button-plain-hover-border-color)',
-          backgroundColor: 'var(--nv-button-plain-hover-background-color)',
+          borderColor: 'button.plain.hover.border',
+          backgroundColor: 'button.plain.hover.background',
+          '--nv-button-loading-surface':
+            '{colors.button.plain.hover.background}',
         },
         '&:active': {
-          borderColor: 'var(--nv-button-plain-active-border-color)',
-          backgroundColor: 'var(--nv-button-plain-active-background-color)',
+          borderColor: 'button.plain.pressed.border',
+          backgroundColor: 'button.plain.pressed.background',
+          '--nv-button-loading-surface':
+            '{colors.button.plain.pressed.background}',
         },
         '&:focus': {
-          boxShadow: '0 0 0 0.25rem var(--nv-button-plain-focus-box-shadow)',
+          boxShadow: '0 0 0 0.25rem {colors.button.plain.focus.ring}',
         },
         '&[data-selected]': {
-          borderColor: 'var(--nv-button-plain-selected-border-color)',
-          backgroundColor: 'var(--nv-button-plain-selected-background-color)',
+          borderColor: 'button.plain.selected.border',
+          backgroundColor: 'button.plain.selected.background',
+          '--nv-button-loading-surface':
+            '{colors.button.plain.selected.background}',
         },
       },
       ghost: {
-        color: 'var(--nv-button-ghost-color)',
-        backgroundColor: 'var(--nv-button-ghost-background-color)',
-        borderColor: 'var(--nv-button-ghost-border-color)',
+        color: 'button.ghost.text',
+        backgroundColor: 'button.ghost.background',
+        borderColor: 'button.ghost.border',
         '&:hover': {
-          backgroundColor: 'var(--nv-button-ghost-hover-background-color)',
+          backgroundColor: 'button.ghost.hover.background',
+          borderColor: 'button.ghost.hover.border',
         },
         '&:active': {
-          backgroundColor: 'var(--nv-button-ghost-active-background-color)',
+          backgroundColor: 'button.ghost.pressed.background',
+          borderColor: 'button.ghost.pressed.border',
         },
         '&:focus': {
-          boxShadow: '0 0 0 0.25rem var(--nv-button-ghost-focus-box-shadow)',
+          boxShadow: '0 0 0 0.25rem {colors.button.ghost.focus.ring}',
         },
         '&[data-selected]': {
-          backgroundColor: 'var(--nv-button-ghost-selected-background-color)',
+          backgroundColor: 'button.ghost.selected.background',
+          borderColor: 'button.ghost.selected.border',
         },
       },
       'ghost-alt': {
-        color: 'var(--nv-button-ghost-alt-color)',
-        backgroundColor: 'var(--nv-button-ghost-alt-background-color)',
-        borderColor: 'var(--nv-button-ghost-alt-border-color)',
+        color: 'button.ghost-alt.text',
+        backgroundColor: 'button.ghost-alt.background',
+        borderColor: 'button.ghost-alt.border',
         '&:hover': {
-          backgroundColor: 'var(--nv-button-ghost-alt-hover-background-color)',
+          backgroundColor: 'button.ghost-alt.hover.background',
+          borderColor: 'button.ghost-alt.hover.border',
         },
         '&:active': {
-          backgroundColor: 'var(--nv-button-ghost-alt-active-background-color)',
+          backgroundColor: 'button.ghost-alt.pressed.background',
+          borderColor: 'button.ghost-alt.pressed.border',
         },
         '&:focus': {
-          boxShadow:
-            '0 0 0 0.25rem var(--nv-button-ghost-alt-focus-box-shadow)',
+          boxShadow: '0 0 0 0.25rem {colors.button.ghost-alt.focus.ring}',
         },
         '&[data-selected]': {
-          boxShadow: 'lg',
-          backgroundColor:
-            'var(--nv-button-ghost-alt-selected-background-color)',
+          boxShadow: 'card.default.shadow',
+          backgroundColor: 'button.ghost-alt.selected.background',
+          borderColor: 'button.ghost-alt.selected.border',
         },
       },
     },

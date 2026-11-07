@@ -38,7 +38,7 @@ import { props as propsDefinition, Size } from './button.shared'
 import NvIcon from '@/components/typography/Icon/NvIcon.vue'
 const props = defineProps(propsDefinition)
 const iconSize = computed(() => {
-  const sizes: Record<Size, keyof typeof tokens.spacing> = {
+  const sizes: Record<Size, keyof typeof tokens.fontSize> = {
     xs: 1,
     sm: 3,
     md: 5,

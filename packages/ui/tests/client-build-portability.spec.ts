@@ -1,9 +1,27 @@
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { runInNewContext } from 'node:vm'
+import ts from 'typescript'
+import { fileURLToPath } from 'node:url'
 import { posix, win32 } from 'node:path'
 
 describe('compiled component virtual entries', () => {
+  it('keeps the production typecheck from emitting source-adjacent duplicate stories', () => {
+    const config = ts.getParsedCommandLineOfConfigFile(
+      fileURLToPath(new URL('../tsconfig.json', import.meta.url)),
+      {},
+      {
+        ...ts.sys,
+        onUnRecoverableConfigFileDiagnostic(diagnostic) {
+          throw new Error(
+            ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n'),
+          )
+        },
+      },
+    )
+    expect(config?.errors).toEqual([])
+    expect(config?.options.noEmit).toBe(true)
+  })
   it.each([
     ['display-migration.spec.ts', 'display-client'],
     ['style-boundaries.spec.ts', 'style-boundaries-client'],

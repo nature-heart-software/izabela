@@ -20,7 +20,7 @@ function render(component: unknown, options: Record<string, any> = {}) {
     ...options,
     global: {
       provide: {
-        theme: ui.themes.get('dark'),
+        theme: ui.themes.get('izabela-dark'),
         [ui.PORTAL_TARGET]: document.body,
       },
     },
@@ -343,6 +343,9 @@ describe('overlay trigger ownership', () => {
       const triggerId = trigger.id
       expect(triggerId).toBeTruthy()
       if (kind !== 'generated') expect(triggerId).toBe('consumer-menu-trigger')
+      // Modal Popover activates its focus trap asynchronously. Observe its
+      // initial focus before opening a child; forcing focus can race that work.
+      await vi.waitFor(() => expect(document.activeElement).toBe(trigger))
       trigger.focus()
       await key(trigger, 'ArrowDown')
       const menu = document.querySelector('[role="menu"]') as HTMLElement
@@ -582,6 +585,14 @@ describe('overlay trigger ownership', () => {
       )
       expect(positioner.style.position).toBe('absolute')
       expect(trigger.id).toBe('consumer-anchor')
+      if (!tooltip)
+        await vi.waitFor(() =>
+          expect(document.activeElement).toBe(
+            document.querySelector(
+              '[data-scope="popover"][data-part="content"]',
+            ),
+          ),
+        )
       await key(
         tooltip
           ? trigger
@@ -590,7 +601,8 @@ describe('overlay trigger ownership', () => {
             )!,
         'Escape',
       )
-      if (!tooltip) expect(document.activeElement === trigger).toBe(true)
+      if (!tooltip)
+        await vi.waitFor(() => expect(document.activeElement).toBe(trigger))
     },
   )
 })

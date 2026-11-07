@@ -1,7 +1,7 @@
 import '@/styles'
-import { themes } from '@/themes'
-import { GlobalStyles } from '@/main'
-import { provide } from 'vue'
+import { resolveTheme, themeOptions } from '@/themes'
+import { GlobalStyles, ThemeProvider } from '@/main'
+import { shallowRef } from 'vue'
 
 export const parameters = {
   options: { storySort: { method: 'configure' } },
@@ -10,12 +10,31 @@ export const parameters = {
   },
 }
 
-export const decorators = [
-  (story) => ({
-    components: { story, GlobalStyles },
-    setup() {
-      provide('theme', themes.get('dark'))
+export const globalTypes = {
+  theme: {
+    name: 'Theme',
+    description: 'Application theme',
+    defaultValue: 'dark',
+    toolbar: {
+      icon: 'paintbrush',
+      items: themeOptions.map(({ label, value }) => ({ title: label, value })),
+      dynamicTitle: true,
     },
-    template: '<GlobalStyles><story /></GlobalStyles>',
-  }),
+  },
+}
+
+const selectedTheme = shallowRef()
+
+export const decorators = [
+  (story, context) => {
+    selectedTheme.value = resolveTheme(context.globals.theme ?? 'dark')
+    return {
+      components: { story, GlobalStyles, ThemeProvider },
+      setup() {
+        return { theme: selectedTheme }
+      },
+      template:
+        '<ThemeProvider :theme="theme"><GlobalStyles><story /></GlobalStyles></ThemeProvider>',
+    }
+  },
 ]

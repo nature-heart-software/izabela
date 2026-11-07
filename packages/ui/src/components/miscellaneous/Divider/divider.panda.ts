@@ -3,15 +3,20 @@ import { pandaComponent } from '@/utils/panda'
 import { props } from './divider.shared'
 
 export const divider = cva({
-  base: { borderColor: 'var(--nv-divider-border-color)' },
+  base: {},
   variants: {
     direction: {
       vertical: {
+        borderColor: 'divider.vertical.border',
         display: 'inline-flex',
-        borderRightWidth: 'thin',
+        borderRightWidth: 'default',
         borderRightStyle: 'solid',
       },
-      horizontal: { borderTopWidth: 'thin', borderTopStyle: 'solid' },
+      horizontal: {
+        borderColor: 'divider.horizontal.border',
+        borderTopWidth: 'default',
+        borderTopStyle: 'solid',
+      },
     },
   },
 })

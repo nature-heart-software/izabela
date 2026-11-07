@@ -15,7 +15,7 @@ import { props as propsDefinition } from './icon.shared'
 import * as Icons from '@packages/icons'
 
 const props = defineProps(propsDefinition)
-const sizeValue = computed(() => tokens.fontSize[props.size][0])
+const sizeValue = computed(() => tokens.fontSize[props.size])
 const component = computed(() =>
   Object.values(Icons as any).find((i: any) =>
     [props.name, `nv-${props.name}`].includes(i.name),

@@ -25,7 +25,7 @@ function render(component: any, config: Record<string, any> = {}) {
     ...config,
     global: {
       provide: {
-        theme: ui.themes.get('dark'),
+        theme: ui.themes.get('izabela-dark'),
         [ui.PORTAL_TARGET]: document.body,
       },
       ...config.global,
@@ -489,7 +489,7 @@ describe('compiled Select and Autocomplete interaction boundaries', () => {
     expect(w.emitted('update:modelValue')).toBeUndefined()
   })
 
-  it('preserves legacy option typography/color and small Select padding in emitted CSS', async () => {
+  it('preserves option typography and canonical role colors and small Select padding in emitted CSS', async () => {
     const option = render(ui.NvOption, { slots: { default: 'Alpha' } })
     const select = render(ui.NvSelect, { props: { options, size: 'sm' } })
     await settle()
@@ -518,7 +518,7 @@ describe('compiled Select and Autocomplete interaction boundaries', () => {
     const styles = emitted(option.element)
     expect(styles['font-size']).toBe('var(--font-sizes-2)')
     expect(styles['font-family']).toBe('var(--fonts-sans)')
-    expect(styles.color).toBe('var(--nv-text-color)')
+    expect(styles.color).toBe('var(--colors-option-default-text)')
     expect(css).toMatch(/--font-sizes-2:\s*0\.875rem/)
     expect(css).toMatch(/--fonts-sans:[^;]*Nunito/)
     expect(

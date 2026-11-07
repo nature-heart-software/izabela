@@ -1,5 +1,6 @@
 import {
   NvButton,
+  NvIcon,
   NvSwitch,
   NvRangeInput,
   NvSelect,
@@ -75,6 +76,11 @@ void [
   propsAreNotAny,
   modelIsNotAny,
 ]
+const icon: Props<typeof NvIcon> = { size: 2 }
+const iconIsNotAny: IsAny<Props<typeof NvIcon>['size']> = false
+void [icon, iconIsNotAny]
+// @ts-expect-error Spacing-only zero is not an icon font-size key.
+const badIcon: Props<typeof NvIcon> = { size: 'zero' }
 // @ts-expect-error Button variants are constrained.
 const badButton: Props<typeof NvButton> = { type: 'danger' }
 // @ts-expect-error Sizes are constrained.

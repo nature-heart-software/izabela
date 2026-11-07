@@ -21,7 +21,7 @@ export const switchRecipe = sva({
       position: 'relative',
       borderRadius: 'sm',
       outline: '0',
-      backgroundColor: 'var(--nv-switch-background-color)',
+      backgroundColor: 'switch.off.background',
       transition: 'all .3s',
       '&::after': {
         content: '""',
@@ -29,19 +29,30 @@ export const switchRecipe = sva({
         inset: '0',
         width: '100%',
         height: '100%',
-        border: '1px solid var(--nv-switch-border-color)',
+        border: '1px solid {colors.switch.off.border}',
         borderRadius: 'sm',
         pointerEvents: 'none',
         transition: 'all .3s',
       },
+      '&[data-hover]': { backgroundColor: 'switch.off.hover.background' },
       '&[data-hover]::after': {
-        borderColor: 'var(--nv-switch-hover-border-color)',
+        borderColor: 'switch.off.hover.border',
       },
       '&[data-focus]': {
-        boxShadow: '0 0 0 0.25rem var(--nv-switch-focus-box-shadow)',
+        backgroundColor: 'switch.off.focus.background',
+        boxShadow: '0 0 0 0.25rem {colors.switch.off.focus.focus-ring}',
       },
-      '&[data-focus]::after': {
-        borderColor: 'var(--nv-switch-focus-border-color)',
+      '&[data-focus]::after': { borderColor: 'switch.off.focus.border' },
+      '&[data-state="checked"]': {
+        backgroundColor: 'switch.on.background',
+        '&::after': { border: '1px solid {colors.switch.on.border}' },
+        '&[data-hover]': { backgroundColor: 'switch.on.hover.background' },
+        '&[data-hover]::after': { borderColor: 'switch.on.hover.border' },
+        '&[data-focus]': {
+          backgroundColor: 'switch.on.focus.background',
+          boxShadow: '0 0 0 0.25rem {colors.switch.on.focus.focus-ring}',
+        },
+        '&[data-focus]::after': { borderColor: 'switch.on.focus.border' },
       },
     },
     thumb: {
@@ -51,10 +62,18 @@ export const switchRecipe = sva({
       height: '5',
       borderRadius: 'xs',
       left: '0',
-      backgroundColor: 'var(--nv-switch-thumb-color)',
+      backgroundColor: 'switch.off.thumb-background',
+      '&[data-hover]': { backgroundColor: 'switch.off.hover.thumb-background' },
+      '&[data-focus]': { backgroundColor: 'switch.off.focus.thumb-background' },
       transition: 'all .3s',
       '&[data-state="checked"]': {
-        backgroundColor: 'var(--nv-switch-active-thumb-color)',
+        backgroundColor: 'switch.on.thumb-background',
+        '&[data-hover]': {
+          backgroundColor: 'switch.on.hover.thumb-background',
+        },
+        '&[data-focus]': {
+          backgroundColor: 'switch.on.focus.thumb-background',
+        },
         left: '5',
       },
     },

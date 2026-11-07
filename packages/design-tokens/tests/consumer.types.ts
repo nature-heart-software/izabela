@@ -5,22 +5,23 @@ type Assert<T extends true> = T
 type NotAny<T> = IsAny<T> extends true ? false : true
 type SpacingIsTyped = Assert<NotAny<(typeof tokens.spacing)[1]>>
 type FontSizeIsTyped = Assert<NotAny<(typeof tokens.fontSize)[3]>>
-const spacing: 2 = tokens.spacing[1]
-const [size, options] = tokens.fontSize[3]
-const sizeValue: 16 = size
-const leading: 1.4 = options.lineHeight
-const tracking: 0.32 = options.letterSpacing
-const radius: 8 = tokens.borderRadius.DEFAULT
-const width: 4 = tokens.borderWidth.lg
+const spacing: number = tokens.spacing[1]
+const sizeValue: number = tokens.fontSize[3]
+const leading: number = tokens.lineHeight.default
+const tracking: number = tokens.letterSpacing.default
+const radius: number = tokens.radius.md
+const width: number = tokens.border.lg
 // @ts-expect-error tokens are readonly
 tokens.spacing[1] = 3
 // @ts-expect-error only declared spacing keys are available
 tokens.spacing[99]
-// @ts-expect-error font options are not strings
-const invalidOptions: string = options
+// @ts-expect-error font sizes are scalar numbers
+const invalidSize: string = tokens.fontSize[3]
 // @ts-expect-error raw dimensions are numbers
-const invalidRadius: string = tokens.borderRadius.sm
+const invalidRadius: string = tokens.radius.sm
 // @ts-expect-error unknown border width
-tokens.borderWidth.xl
+tokens.border.xl
+// @ts-expect-error token namespaces follow the source collection
+tokens.borderRadius
 void [spacing, sizeValue, leading, tracking, radius, width]
 export type { SpacingIsTyped, FontSizeIsTyped }

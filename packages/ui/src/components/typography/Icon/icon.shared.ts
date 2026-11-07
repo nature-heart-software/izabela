@@ -7,7 +7,7 @@ export const props = {
     default: 'times-square',
   },
   size: {
-    type: Number as PropType<keyof typeof tokens.spacing>,
+    type: Number as PropType<keyof typeof tokens.fontSize>,
     default: 5,
   },
 }
