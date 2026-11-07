@@ -39,11 +39,12 @@ async function settle() {
   await new Promise((done) => setTimeout(done, 40))
   await flushPromises()
 }
-async function key(target: EventTarget, key: string) {
+async function key(target: EventTarget, key: string, repeat = false) {
   const event = new KeyboardEvent('keydown', {
     key,
     bubbles: true,
     cancelable: true,
+    repeat,
   })
   const focused = document.activeElement
   ;(target === window && focused && focused !== document.body
@@ -112,6 +113,44 @@ afterEach(() => {
 })
 
 describe('compiled Select and Autocomplete interaction boundaries', () => {
+  it('reuses the option collection while holding Arrow Down through a long list', async () => {
+    const options = Array.from({ length: 1000 }, (_, index) => ({
+      label: `Voice ${index}`,
+      value: index,
+    }))
+    vi.spyOn(Element.prototype, 'scrollTo').mockImplementation(function (
+      this: Element,
+      position: ScrollToOptions | number,
+    ) {
+      if (typeof position !== 'object') return
+      this.scrollTop = position.top ?? this.scrollTop
+      this.dispatchEvent(new Event('scroll'))
+    })
+    const w = render(ui.NvSelect, { props: { options, modelValue: 0 } })
+    const input = w.get('input').element as HTMLInputElement
+    input.focus()
+    input.click()
+    await settle()
+    const provider = w.findComponent({ name: 'combobox-root-provider' })
+    const collection = provider.props('value').collection
+    for (let index = 1; index <= 20; index++) {
+      await key(input, 'ArrowDown', true)
+      expect(provider.props('value').collection).toBe(collection)
+      const active = document.getElementById(
+        input.getAttribute('aria-activedescendant')!,
+      )
+      expect(active?.textContent).toContain(`Voice ${index}`)
+      expect(document.querySelectorAll('[role="option"]').length).toBeLessThan(
+        30,
+      )
+    }
+    expect(
+      document.querySelector('.autocomplete__list')!.scrollTop,
+    ).toBeGreaterThan(0)
+    await key(input, 'Enter')
+    expect(w.emitted('update:modelValue')).toEqual([[20]])
+  })
+
   it('accepts Tab focus into consecutive selects and lets Tab and Shift+Tab leave them', async () => {
     const w = render({
       render: () =>

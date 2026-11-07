@@ -57,12 +57,30 @@ interface ThemeStyleBinding {
   variables: ThemeVariables
 }
 
+const appliedThemeStyles = new WeakMap<
+  HTMLElement,
+  { variables: ThemeVariables; style: string | null }
+>()
+
 function applyThemeVariables(
   element: HTMLElement,
   binding: DirectiveBinding<ThemeStyleBinding>,
   vnode: VNode,
 ) {
   const { variables: value } = binding.value
+  const applied = appliedThemeStyles.get(element)
+  // Highlight and slot updates run this hook too. Avoid enumerating and
+  // rewriting hundreds of tokens unless the theme or native styles changed.
+  if (
+    applied?.variables === value &&
+    applied.style === element.getAttribute('style')
+  )
+    return
+  const rememberStyles = () =>
+    appliedThemeStyles.set(element, {
+      variables: value,
+      style: element.getAttribute('style'),
+    })
   // Directive hooks receive the final native root, including primitive styles.
   const consumerStyle = normalizeStyle(vnode.props?.style)
   const oldValue = binding.oldValue?.variables
@@ -96,6 +114,7 @@ function applyThemeVariables(
       if (!(key in value) && owned.has(key)) element.style.removeProperty(key)
     for (const [key, entry] of Object.entries(value))
       element.style.setProperty(key, entry)
+    rememberStyles()
     return
   }
   // Apply after primitive fallthrough: Vue otherwise expands style strings back
@@ -105,6 +124,7 @@ function applyThemeVariables(
     Object.entries(value)
       .map(([key, entry]) => `${key}:${entry};`)
       .join('')
+  rememberStyles()
 }
 
 const themeVariableDirective: ObjectDirective<HTMLElement, ThemeStyleBinding> =

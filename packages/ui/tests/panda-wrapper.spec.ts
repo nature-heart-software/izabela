@@ -14,6 +14,34 @@ import { pandaComponent, themeVariables } from '../src/utils/panda'
 import light from '../src/themes/light'
 
 describe('Panda Vue wrappers', () => {
+  it('keeps unchanged theme styles through highlight and content updates', async () => {
+    const Surface = pandaComponent('div', { active: Boolean }, (props) =>
+      props.active ? 'active' : '',
+    )
+    const text = ref('First voice')
+    const wrapper = mount(Surface, {
+      slots: { default: () => text.value },
+      global: { provide: { theme: light } },
+    })
+    const cssText = vi.spyOn(CSSStyleDeclaration.prototype, 'cssText', 'set')
+    try {
+      await wrapper.setProps({ active: true })
+      text.value = 'Next voice'
+      await nextTick()
+      expect(wrapper.classes()).toContain('active')
+      expect(wrapper.text()).toBe('Next voice')
+      expect(cssText).not.toHaveBeenCalled()
+      await wrapper.setProps({ style: { width: '200px' } })
+      const element = wrapper.element as HTMLElement
+      expect(element.style.width).toBe('200px')
+      for (const [key, value] of Object.entries(themeVariables(light)))
+        expect(element.style.getPropertyValue(key)).toBe(value)
+    } finally {
+      wrapper.unmount()
+      cssText.mockRestore()
+    }
+  })
+
   it('keeps bulk theme application after component fallthrough and primitive style updates', async () => {
     const width = ref('100px')
     const Primitive = defineComponent({
