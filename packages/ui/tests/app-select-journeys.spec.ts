@@ -311,7 +311,7 @@ describe('packaged app Select renderer callbacks', () => {
     },
   )
 
-  it('retains the favorite-button mousedown contract without selecting the voice', async () => {
+  it('activates favorites with click without selecting the voice', async () => {
     const wrapper = renderSelect({ options: [{ label: 'Elf', value: 'Elf' }] })
     await settle()
     ;(wrapper.get('input').element as HTMLInputElement).focus()
@@ -337,7 +337,7 @@ describe('packaged app Select renderer callbacks', () => {
     )
     addFavorite()
     await settle()
-    expect(events).toEqual(['mousedown'])
+    expect(events).toEqual(['click'])
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
     expect(document.querySelector('.autocomplete')).not.toBeNull()
   })
