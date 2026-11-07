@@ -1,6 +1,8 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
+import { createRequire } from 'node:module'
+import ts from 'typescript'
 import { generateExportsPlugin } from '@packages/vite-plugin-generate-exports'
 import {
   declarations as dts,
@@ -9,11 +11,30 @@ import {
   getRootExternal,
 } from '../../utils/vite'
 
-// https://vitejs.dev/config/
+const require = createRequire(import.meta.url)
+const processorRequire = createRequire(require.resolve('vite-plugin-dts'))
+const { createParsedCommandLine, createGlobalTypesWriter } =
+  processorRequire('@vue/language-core')
+const declarationConfig = resolve(__dirname, 'tsconfig.build.json')
+const { vueOptions } = createParsedCommandLine(
+  ts,
+  ts.sys,
+  declarationConfig.replace(/\\/g, '/'),
+)
+// The Vue declaration processor references these helpers but does not emit them.
+createGlobalTypesWriter(
+  vueOptions,
+  ts.sys.writeFile,
+)(resolve(__dirname, 'src/main.ts'))
+
 export default defineConfig(({ mode }) => ({
   plugins: [
     vue(),
-    dts({ entryRoot: 'src', processor: 'vue' }),
+    dts({
+      entryRoot: 'src',
+      processor: 'vue',
+      tsconfigPath: declarationConfig,
+    }),
     generateExportsPlugin({
       watch: mode === 'development',
       entries: [
@@ -49,7 +70,7 @@ export default defineConfig(({ mode }) => ({
       fileName: (...args) => getFileName(...args),
     },
     rollupOptions: {
-      external: [...getRootExternal(['element-plus'])],
+      external: [...getRootExternal()],
     },
   },
 }))

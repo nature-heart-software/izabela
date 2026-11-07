@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mount, flushPromises, type VueWrapper } from '@vue/test-utils'
 import { h, nextTick, ref, Comment } from 'vue'
 import { execFileSync } from 'node:child_process'
-import { existsSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 
@@ -40,20 +40,25 @@ afterEach(() => {
 })
 
 describe('client build artifact isolation', () => {
-  it('keeps the real client bundle outside the production artifact directory', () => {
+  it('emits the script and stylesheet required by the client build cache outside production artifacts', () => {
     const dist = resolve(dirname(fileURLToPath(import.meta.url)), '../dist')
     const artifacts = existsSync(dist)
       ? readdirSync(dist, { recursive: true }).map(String)
       : []
     expect(artifacts.filter((name) => /test-client/i.test(name))).toEqual([])
-    expect(
-      existsSync(
-        resolve(
-          dirname(fileURLToPath(import.meta.url)),
-          '../../../coverage/ui-client/test-client.js',
-        ),
-      ),
-    ).toBe(true)
+    const client = resolve(
+      dirname(fileURLToPath(import.meta.url)),
+      '../../../coverage/ui-client',
+    )
+    for (const file of ['test-client.js', 'style.css'])
+      expect(
+        existsSync(resolve(client, file)),
+        `missing client artifact: ${file}`,
+      ).toBe(true)
+    if (process.env.UI_TEST_RUN_ID?.trim())
+      expect(
+        readFileSync(resolve(client, '.client-build-success'), 'utf8'),
+      ).toBe(process.env.UI_TEST_RUN_ID)
   })
 })
 
@@ -79,7 +84,7 @@ describe('real shared controls', () => {
     expect(document.activeElement).toBe(w.element)
     await w.setProps({ loading: true })
     await nextTick()
-    expect(w.find('.el-loading-mask').exists()).toBe(true)
+    expect(w.find('[role="status"]').exists()).toBe(true)
     await w.setProps({ loading: false })
     await flushPromises()
   })
@@ -92,41 +97,74 @@ describe('real shared controls', () => {
     ;(w.element as HTMLButtonElement).click()
     expect(w.emitted('click')).toHaveLength(1)
   })
-  it('switch toggles from external model updates without inventing native semantics', async () => {
-    const w = render(ui.NvSwitch, { props: { modelValue: false } })
-    expect(w.element.tagName).toBe('SPAN')
-    expect(w.attributes('tabindex')).toBe('0')
-    await w.trigger('click')
+  it('switch toggles through its real Ark native control and external model updates', async () => {
+    const w = render(ui.NvSwitch, {
+      props: { modelValue: false },
+      attrs: { 'aria-label': 'Enable speech' },
+    })
+    const input = w.get('input[role="switch"]')
+    expect(input.attributes('aria-checked')).toBe('false')
+    ;(input.element as HTMLInputElement).click()
+    await settle()
     expect(w.emitted('update:modelValue')).toEqual([[true]])
     await w.setProps({ modelValue: true })
-    await w.trigger('click')
+    ;(input.element as HTMLInputElement).click()
+    await settle()
     expect(w.emitted('update:modelValue')).toEqual([[true], [false]])
   })
-  it('switch currently accepts clicks with a disabled attribute and ignores Space/Enter', async () => {
-    const w = render(ui.NvSwitch, { attrs: { disabled: true } })
-    ;(w.element as HTMLElement).focus()
-    expect(document.activeElement).toBe(w.element)
-    await w.trigger('keydown', { key: ' ' })
-    await w.trigger('keydown', { key: 'Enter' })
-    expect(w.emitted('update:modelValue')).toBeUndefined()
-    await w.trigger('click')
-    expect(w.emitted('update:modelValue')).toEqual([[true]])
-  })
-  it.fails('[known issue] disabled switch prevents model updates', async () => {
-    const w = render(ui.NvSwitch, { attrs: { disabled: true } })
-    await w.trigger('click')
-    expect(w.emitted('update:modelValue')).toBeUndefined()
-  })
-  it.fails(
-    '[known issue] focused switch supports keyboard Space activation',
-    async () => {
-      const w = render(ui.NvSwitch)
-      ;(w.element as HTMLElement).focus()
-      await w.trigger('keydown', { key: ' ' })
-      expect(w.emitted('update:modelValue')).toEqual([[true]])
+  it.each([false, true])(
+    'switch keeps the accepted value %s when a toggle is declined or awaiting confirmation',
+    async (modelValue) => {
+      const w = render(ui.NvSwitch, { props: { modelValue } })
+      const input = w.get('input[role="switch"]')
+      const expectChecked = (checked: boolean) => {
+        expect((input.element as HTMLInputElement).checked).toBe(checked)
+        expect(input.attributes('aria-checked')).toBe(String(checked))
+        expect(w.get('[data-part="thumb"]').attributes('data-state')).toBe(
+          checked ? 'checked' : 'unchecked',
+        )
+      }
+
+      ;(input.element as HTMLInputElement).click()
+      await settle()
+      expect(w.emitted('update:modelValue')).toEqual([[!modelValue]])
+      expectChecked(modelValue)
+
+      // A declined attempt must not prevent asking again.
+      ;(input.element as HTMLInputElement).click()
+      await settle()
+      expect(w.emitted('update:modelValue')).toEqual([
+        [!modelValue],
+        [!modelValue],
+      ])
+      expectChecked(modelValue)
+
+      // An asynchronous confirmation updates the control through its model.
+      await w.setProps({ modelValue: !modelValue })
+      await settle()
+      expectChecked(!modelValue)
+      expect(w.emitted('update:modelValue')).toHaveLength(2)
     },
   )
-  it('range forwards bounds and currently emits strings from the styled input', async () => {
+  it('disabled switch prevents native activation and focus', async () => {
+    const w = render(ui.NvSwitch, { props: { disabled: true } })
+    const input = w.get('input').element as HTMLInputElement
+    expect(input.disabled).toBe(true)
+    input.focus()
+    expect(document.activeElement).not.toBe(input)
+    input.click()
+    await settle()
+    expect(w.emitted('update:modelValue')).toBeUndefined()
+  })
+  it('switch exposes keyboard-focusable native semantics and an accessible name', () => {
+    const w = render(ui.NvSwitch, { attrs: { 'aria-label': 'Enable speech' } })
+    const input = w.get('input').element as HTMLInputElement
+    expect(input.type).toBe('checkbox')
+    expect(input.getAttribute('aria-label')).toBe('Enable speech')
+    input.focus()
+    expect(document.activeElement).toBe(input)
+  })
+  it('range forwards bounds and emits numeric model updates', async () => {
     const w = render(ui.NvRangeInput, {
       props: { modelValue: 2 },
       attrs: { min: 0, max: 10, step: 0.5 },
@@ -134,8 +172,8 @@ describe('real shared controls', () => {
     const input = w.element as HTMLInputElement
     expect(input.type).toBe('range')
     expect(input.value).toBe('2')
-    await w.setValue('4.5')
-    expect(w.emitted('update:modelValue')).toEqual([['4.5']])
+    await w.get('input').setValue('4.5')
+    expect(w.emitted('update:modelValue')).toEqual([[4.5]])
     await w.setProps({ modelValue: 8 })
     expect(input.value).toBe('8')
     expect(input.step).toBe('0.5')
@@ -155,7 +193,7 @@ describe('real shared controls', () => {
     [ui.NvInput, 'text'],
     [ui.NvNumberInput, 'number'],
   ])(
-    'input wrapper uses the real Element Plus input (%s)',
+    'input wrapper uses the real native input (%s)',
     async (component, type) => {
       const w = render(component, {
         props: { modelValue: '12' },
@@ -208,17 +246,14 @@ describe('real shared controls', () => {
     await w.get('button').trigger('click')
     expect(w.emitted('close')).toEqual([[]])
   })
-  it.fails(
-    '[known issue] range model updates are numbers rather than strings',
-    async () => {
-      const w = render(ui.NvRangeInput, {
-        props: { modelValue: 2 },
-        attrs: { min: 0, max: 10, step: 0.5 },
-      })
-      await w.setValue('4.5')
-      expect(w.emitted('update:modelValue')).toEqual([[4.5]])
-    },
-  )
+  it('range model updates match the numeric public model contract', async () => {
+    const w = render(ui.NvRangeInput, {
+      props: { modelValue: 2 },
+      attrs: { min: 0, max: 10, step: 0.5 },
+    })
+    await w.get('input').setValue('4.5')
+    expect(w.emitted('update:modelValue')).toEqual([[4.5]])
+  })
 })
 
 const rect = {
@@ -288,7 +323,8 @@ async function key(key: string) {
     bubbles: true,
     cancelable: true,
   })
-  window.dispatchEvent(event)
+  const target = document.activeElement
+  ;(target && target !== document.body ? target : window).dispatchEvent(event)
   await nextTick()
   return event
 }
@@ -379,6 +415,56 @@ describe('client autocomplete keyboard and lifecycle', () => {
 })
 
 describe('real select composition', () => {
+  it('does not traverse provider payloads on tooltip changes, opening, highlighting, or search', async () => {
+    installGeometry()
+    let payloadReads = 0
+    const voices = Array.from({ length: 500 }, (_, index) => ({
+      label: `Voice ${index}`,
+      value: {
+        name: `voice-${index}`,
+        get metadata() {
+          payloadReads++
+          return { description: 'Unrelated provider metadata' }
+        },
+      },
+    }))
+    const catalog = [{ label: 'Catalog', children: voices }]
+    const tooltipState = ref('closed')
+    const wrapper = render({
+      render: () =>
+        h(ui.NvSelect, {
+          options: catalog,
+          modelValue: voices[0].value,
+          valueKey: 'name',
+          id: 'large-voice-select',
+          'data-scope': 'tooltip',
+          'data-part': 'trigger',
+          'data-state': tooltipState.value,
+        }),
+    })
+    await settle()
+    payloadReads = 0
+    for (const state of ['open', 'closed', 'open', 'closed']) {
+      tooltipState.value = state
+      await settle()
+    }
+    expect(payloadReads).toBe(0)
+    const input = wrapper.get('input').element as HTMLInputElement
+    input.focus()
+    input.click()
+    await settle()
+    expect(payloadReads).toBe(0)
+    expect(document.querySelectorAll('[role="option"]').length).toBeLessThan(30)
+    await key('ArrowDown')
+    await settle()
+    expect(payloadReads).toBe(0)
+    await wrapper.get('input').setValue('Voice 49')
+    await settle()
+    expect(payloadReads).toBe(0)
+    expect(document.querySelector('[role="option"]')).not.toBeNull()
+    expect(input.id).toBe('large-voice-select')
+  })
+
   beforeEach(installGeometry)
   it('single selection updates the public model from the actual keyboard autocomplete', async () => {
     const w = render(ui.NvSelect, {
@@ -388,6 +474,7 @@ describe('real select composition', () => {
     const input = w.get('input')
     await settle()
     ;(input.element as HTMLInputElement).focus()
+    ;(input.element as HTMLInputElement).click()
     await settle()
     await key('ArrowDown')
     await key('Enter')
@@ -403,6 +490,42 @@ describe('real select composition', () => {
     await w.findAll('button')[0].trigger('click')
     expect(w.emitted('update:modelValue')).toEqual([[['b']]])
     expect(values).toEqual(['a', 'b'])
+  })
+  it('keeps focus on the message input when typing immediately after choosing a voice', async () => {
+    const selected = ref('a')
+    const submitted = vi.fn()
+    const w = render({
+      setup: () => () =>
+        h('div', [
+          h('input', {
+            'data-draft': '',
+            onKeydown: (event: KeyboardEvent) => {
+              if (event.key === 'Enter') submitted()
+            },
+          }),
+          h(ui.NvSelect, {
+            options,
+            modelValue: selected.value,
+            'onUpdate:modelValue': (value: string) => {
+              selected.value = value
+            },
+          }),
+        ]),
+    })
+    await settle()
+    ;(w.get('[role="combobox"]').element as HTMLElement).focus()
+    ;(w.get('[role="combobox"]').element as HTMLElement).click()
+    await settle()
+    ;(document.querySelector('[title="Beta"]') as HTMLElement).click()
+    const draft = w.get('[data-draft]').element as HTMLInputElement
+    draft.focus()
+    await settle()
+    expect(selected.value).toBe('b')
+    expect(document.activeElement).toBe(draft)
+    document.activeElement!.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }),
+    )
+    expect(submitted).toHaveBeenCalledOnce()
   })
   it('matches object values using valueKey and responds to external model changes', async () => {
     const w = render(ui.NvSelect, {
@@ -426,6 +549,7 @@ describe('real select composition', () => {
     await settle()
     const input = w.get('input')
     ;(input.element as HTMLElement).focus()
+    ;(input.element as HTMLElement).click()
     await settle()
     await input.setValue('Gamma')
     await settle()
@@ -450,22 +574,20 @@ describe('real select composition', () => {
     })
     await settle()
     ;(w.get('input').element as HTMLElement).focus()
+    ;(w.get('input').element as HTMLElement).click()
     await settle()
     await key('ArrowDown')
     await key('Enter')
     return w
   }
-  it('currently selects disabled options through keyboard even though their pointer style is disabled', async () => {
+  it('retains the model when the only keyboard option is disabled', async () => {
     const w = await blockedSelection()
-    expect(w.emitted('update:modelValue')).toEqual([['blocked']])
+    expect(w.emitted('update:modelValue')).toBeUndefined()
   })
-  it.fails(
-    '[known issue] select keyboard activation ignores disabled options',
-    async () => {
-      const w = await blockedSelection()
-      expect(w.emitted('update:modelValue')).toBeUndefined()
-    },
-  )
+  it('select keyboard activation ignores disabled options', async () => {
+    const w = await blockedSelection()
+    expect(w.emitted('update:modelValue')).toBeUndefined()
+  })
   it('group headings are not selectable but their actual child options are', async () => {
     const w = render(ui.NvSelect, {
       props: {
@@ -475,13 +597,208 @@ describe('real select composition', () => {
     })
     await settle()
     ;(w.get('input').element as HTMLElement).focus()
+    ;(w.get('input').element as HTMLElement).click()
     await settle()
-    await key('ArrowDown')
-    await key('Enter')
+    const group = document.querySelector(
+      '[data-part="item-group"][role="group"]',
+    )!
+    const label = document.getElementById(
+      group.getAttribute('aria-labelledby')!,
+    )!
+    expect(label.textContent).toBe('Group')
+    expect(label.getAttribute('role')).not.toBe('option')
+    expect(group.querySelectorAll('[role="option"]')).toHaveLength(1)
+    ;(label as HTMLElement).click()
     expect(w.emitted('update:modelValue')).toBeUndefined()
     await key('ArrowDown')
     await key('Enter')
     expect(w.emitted('update:modelValue')).toEqual([[7]])
+  })
+
+  it('filters groups by their matching children and skips disabled children during keyboard navigation', async () => {
+    const w = render(ui.NvSelect, {
+      props: {
+        options: [
+          {
+            label: 'First',
+            children: [
+              { label: 'Blocked', value: 'blocked', disabled: true },
+              { label: 'Alpha', value: 'a' },
+            ],
+          },
+          { label: 'Second', children: [{ label: 'Beta', value: 'b' }] },
+        ],
+      },
+    })
+    await settle()
+    ;(w.get('input').element as HTMLElement).focus()
+    ;(w.get('input').element as HTMLElement).click()
+    await settle()
+    await key('ArrowDown')
+    const input = w.get('input').element
+    expect(
+      document.getElementById(input.getAttribute('aria-activedescendant')!)
+        ?.textContent,
+    ).toContain('Alpha')
+    await w.get('input').setValue('Beta')
+    await settle()
+    const groups = document.querySelectorAll('[data-part="item-group"]')
+    expect(groups).toHaveLength(1)
+    expect(groups[0].textContent).toContain('Second')
+    expect(groups[0].textContent).not.toContain('First')
+    await key('Enter')
+    expect(w.emitted('update:modelValue')).toEqual([['b']])
+  })
+
+  it('keeps selected values from other groups when choosing a filtered multiple option', async () => {
+    const value = ref(['a'])
+    const w = render({
+      setup: () => () =>
+        h(ui.NvSelect, {
+          options: [
+            { label: 'First', children: [{ label: 'Alpha', value: 'a' }] },
+            { label: 'Second', children: [{ label: 'Beta', value: 'b' }] },
+          ],
+          multiple: true,
+          modelValue: value.value,
+          'onUpdate:modelValue': (next: string[]) => {
+            value.value = next
+          },
+        }),
+    })
+    await settle()
+    ;(w.get('input').element as HTMLElement).focus()
+    ;(w.get('input').element as HTMLElement).click()
+    await settle()
+    await w.get('input').setValue('Beta')
+    await settle()
+    ;(document.querySelector('[title="Beta"]') as HTMLElement).click()
+    await settle()
+    expect(value.value).toEqual(['a', 'b'])
+    expect(document.querySelector('.autocomplete')).not.toBeNull()
+  })
+
+  it('toggles a repeated public value once across favorite and catalog groups', async () => {
+    const w = render(ui.NvSelect, {
+      props: {
+        options: [
+          {
+            label: 'Favorites',
+            children: [{ label: 'Favorite Alpha', value: 'a' }],
+          },
+          {
+            label: 'Catalog',
+            children: [{ label: 'Catalog Alpha', value: 'a' }],
+          },
+        ],
+        multiple: true,
+        modelValue: ['a'],
+      },
+    })
+    await settle()
+    ;(w.get('input').element as HTMLElement).focus()
+    ;(w.get('input').element as HTMLElement).click()
+    await settle()
+    ;(document.querySelector('[title="Catalog Alpha"]') as HTMLElement).click()
+    await settle()
+    expect(w.emitted('update:modelValue')).toEqual([[[]]])
+  })
+
+  it('preserves voice IDs in optionAfter so favorites keep their remove button', async () => {
+    const favorites = ref(['voice-elf'])
+    const voice = { id: 'voice-elf', label: 'Elf', value: { name: 'Elf' } }
+    const seenIds: unknown[] = []
+    const w = render(ui.NvSelect, {
+      props: {
+        options: [
+          { label: 'Favorites', children: [voice] },
+          { label: 'Catalog', children: [voice] },
+        ],
+      },
+      slots: {
+        optionAfter: ({ option, hover }: any) => {
+          seenIds.push(option.id)
+          const favorite = favorites.value.includes(option.id)
+          return h(
+            'span',
+            { style: { display: favorite || hover ? undefined : 'none' } },
+            [
+              h(ui.NvButton, {
+                iconName: favorite ? 'times' : 'heart',
+                title: favorite ? 'Remove from favorites' : 'Add to favorites',
+                size: 'sm',
+                onMousedown: (event: MouseEvent) => {
+                  event.preventDefault()
+                  event.stopPropagation()
+                  favorites.value = favorites.value.filter(
+                    (id) => id !== option.id,
+                  )
+                },
+              }),
+            ],
+          )
+        },
+      },
+    })
+    await settle()
+    ;(w.get('input').element as HTMLElement).focus()
+    ;(w.get('input').element as HTMLElement).click()
+    await settle()
+    const buttons = [
+      ...document.querySelectorAll<HTMLButtonElement>(
+        'button[title="Remove from favorites"]',
+      ),
+    ]
+    expect(buttons).toHaveLength(2)
+    expect(new Set(seenIds)).toEqual(new Set(['voice-elf']))
+    expect(buttons[0].querySelector('svg')).not.toBeNull()
+    expect(getComputedStyle(buttons[0].parentElement!).display).not.toBe('none')
+    const optionIds = [...document.querySelectorAll('[role="option"]')].map(
+      (item) => item.id,
+    )
+    expect(new Set(optionIds).size).toBe(2)
+    buttons[0].dispatchEvent(
+      new MouseEvent('mousedown', { bubbles: true, cancelable: true }),
+    )
+    await settle()
+    expect(favorites.value).toEqual([])
+    expect(
+      document.querySelector('button[title="Remove from favorites"]'),
+    ).toBeNull()
+    expect(w.emitted('update:modelValue')).toBeUndefined()
+    expect(document.querySelector('.autocomplete')).not.toBeNull()
+  })
+
+  it('assigns distinct option IDs for repeated values across groups and object values', async () => {
+    const first = { voice: 'one' },
+      second = { voice: 'two' }
+    const w = render(ui.NvSelect, {
+      props: {
+        options: [
+          {
+            label: 'Favorites',
+            children: [{ label: 'Favorite', value: first }],
+          },
+          {
+            label: 'Catalog',
+            children: [
+              { label: 'One', value: first },
+              { label: 'Two', value: second },
+            ],
+          },
+        ],
+      },
+    })
+    await settle()
+    ;(w.get('input').element as HTMLElement).focus()
+    ;(w.get('input').element as HTMLElement).click()
+    await settle()
+    const options = [...document.querySelectorAll('[role="option"]')]
+    expect(options).toHaveLength(3)
+    expect(new Set(options.map((option) => option.id)).size).toBe(3)
+    ;(document.querySelector('[title="Two"]') as HTMLElement).click()
+    await settle()
+    expect(w.emitted('update:modelValue')).toEqual([[second]])
   })
 })
 
@@ -709,7 +1026,7 @@ describe('real overlay controls', () => {
     await settle()
     expect(onClick).toHaveBeenCalledExactlyOnceWith()
   })
-  it('tooltip uses the real Tippy renderer and cleans up its generated popper', async () => {
+  it('tooltip uses Ark rendering, suppresses focused content and cleans up its portal', async () => {
     const w = render(ui.NvTooltip, {
       props: { tippyOptions: { delay: 0, duration: 0 } },
       slots: {
@@ -718,21 +1035,14 @@ describe('real overlay controls', () => {
       },
     })
     await settle()
-    await w.get('[data-v-tippy]').trigger('mouseenter')
+    await w.get('button').trigger('pointermove', { pointerType: 'mouse' })
     await settle()
     expect(
       document.body.querySelector('[role="tooltip"]')?.textContent,
     ).toContain('Tooltip content')
-    const reference = w.get('[data-v-tippy]').element as HTMLElement & {
-      _tippy: { state: { isEnabled: boolean } }
-    }
-    expect(reference._tippy.state.isEnabled).toBe(true)
     ;(w.get('button').element as HTMLElement).focus()
-    await nextTick()
-    expect(reference._tippy.state.isEnabled).toBe(false)
-    ;(w.get('button').element as HTMLElement).blur()
-    await nextTick()
-    expect(reference._tippy.state.isEnabled).toBe(true)
+    await settle()
+    expect(document.body.querySelector('[role="tooltip"]')).toBeNull()
     w.unmount()
     wrappers.splice(wrappers.indexOf(w), 1)
     await settle()

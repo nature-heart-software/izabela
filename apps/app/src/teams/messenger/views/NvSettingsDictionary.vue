@@ -14,7 +14,7 @@
             </NvStack>
           </NvGroup>
         </NvCard>
-        <div class="pl-8">
+        <div :class="css({ paddingLeft: '8' })">
           <NvCard>
             <NvStack spacing="5">
               <NvGroup justify="apart">
@@ -63,26 +63,38 @@
                   >
                 </div>
                 <NvDivider direction="horizontal" />
-                <NvGroup class="w-full" grow no-wrap>
-                  <NvText class="w-1/2" type="label">Word</NvText>
-                  <NvDivider class="!grow-0 h-5" direction="vertical" />
-                  <NvText class="w-1/2" type="label">Definition</NvText>
+                <NvGroup :class="css({ width: '100%' })" grow no-wrap>
+                  <NvText :class="css({ width: '50%' })" type="label"
+                    >Word</NvText
+                  >
+                  <NvDivider
+                    :class="css({ flexGrow: '0 !important', height: '5' })"
+                    direction="vertical"
+                  />
+                  <NvText :class="css({ width: '50%' })" type="label"
+                    >Definition</NvText
+                  >
                   <NvButton
-                    class="!grow-0 invisible"
+                    :class="
+                      css({ flexGrow: '0 !important', visibility: 'hidden' })
+                    "
                     icon-name="times"
                     size="xs"
                     type="plain"
                   />
                 </NvGroup>
                 <template v-for="(definition, i) in definitions" :key="i">
-                  <NvGroup class="w-full" grow>
+                  <NvGroup :class="css({ width: '100%' })" grow>
                     <NvInput
                       :modelValue="definition[0]"
                       @update:modelValue="
                         (value) => updateDefinition(i, [value, definition[1]])
                       "
                     />
-                    <NvDivider class="!grow-0 h-5" direction="vertical" />
+                    <NvDivider
+                      :class="css({ flexGrow: '0 !important', height: '5' })"
+                      direction="vertical"
+                    />
                     <NvInput
                       :modelValue="definition[1]"
                       @update:modelValue="
@@ -90,7 +102,7 @@
                       "
                     />
                     <NvButton
-                      class="!grow-0"
+                      :class="css({ flexGrow: '0 !important' })"
                       icon-name="times"
                       size="xs"
                       type="plain"
@@ -107,6 +119,7 @@
   </NvStack>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import {
   NvButton,
   NvCard,

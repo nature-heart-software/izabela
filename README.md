@@ -173,6 +173,14 @@ rebuild native modules for the app's Electron version. No separate preparation,
 package build, environment file, or credential setup is required to launch the app.
 Credentials are only needed for speech services that require them.
 
+The app and shared UI use Panda CSS. Both configurations share
+`packages/design-tokens/panda.preset.ts`; the app's utilities layer follows the
+shared UI layer so app layout overrides remain effective. Development and build
+scripts generate each package's ignored `src/styled-system` directory automatically.
+App class names use the `app` prefix to keep those overrides separate from shared
+component recipes. In Vue templates, import `css` from `@/styled-system/css` and
+bind the returned class with `:class`.
+
 To verify native modules in Electron, run `pnpm test:native`. After packaging, run
 `pnpm test:native apps/app/dist_electron/win-unpacked/resources/app.asar` to verify
 the packaged dependencies and unpacked native binaries.

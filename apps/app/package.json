@@ -41,6 +41,7 @@
     "@packages/electron-pinia": "workspace:*",
     "@packages/toolbox": "workspace:*",
     "@packages/ui": "workspace:*",
+    "@pandacss/dev": "1.12.1",
     "@types/wav": "^1.0.4",
     "@vitalets/google-translate-api": "^9.2.1",
     "@vscode/sudo-prompt": "9.3.2",
@@ -81,13 +82,14 @@
   },
   "repository": "https://github.com/nature-heart-software/izabela",
   "scripts": {
-    "build": "vite build && pnpm run rebuild && pnpm run electron:build",
-    "build:prod": "vue-tsc && pnpm run build",
-    "dev": "pnpm run rebuild && vite",
+    "build": "pnpm run panda:prepare && vite build && pnpm run rebuild && pnpm run electron:build",
+    "build:prod": "pnpm run panda:prepare && vue-tsc && pnpm run build",
+    "dev": "pnpm run panda:prepare && pnpm run rebuild && vite",
     "electron:build": "electron-builder --config electron-builder.config.js --publish never",
     "generate:app-icon": "pnpm dlx electron-icon-builder --input=./assets/app-icon.png --output=./build --flatten && pnpm dlx electron-icon-builder --input=./assets/app-icon.png --output=./public --flatten",
-    "lint": "vue-tsc",
+    "lint": "pnpm run panda:prepare && vue-tsc",
     "preview": "vite preview",
-    "rebuild": "pnpm nx run izabela-next:rebuild-native"
+    "rebuild": "pnpm nx run izabela-next:rebuild-native",
+    "panda:prepare": "panda codegen && panda cssgen"
   }
 }

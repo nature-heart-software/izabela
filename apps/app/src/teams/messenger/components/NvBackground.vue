@@ -4,26 +4,33 @@
     :style="{
       willChange: 'opacity',
     }"
-    :class="{ 'opacity-0': !isGameOverlay }"
-    class="absolute inset-0 pointer-events-none"
+    :class="
+      css({
+        position: 'absolute',
+        inset: '0',
+        opacity: isGameOverlay ? 1 : 0,
+        pointerEvents: 'none',
+      })
+    "
   >
     <div
       :style="{
         opacity: settingsStore.backgroundDimOpacity / 100,
       }"
-      class="w-full h-full bg-black"
+      :class="css({ width: '100%', height: '100%', backgroundColor: 'black' })"
     >
       <NvHitbox
         v-if="isBackgroundShown"
-        class="w-full h-full pointer-events-auto"
+        :class="css({ width: '100%', height: '100%', pointerEvents: 'auto' })"
         @click="onBackgroundClick"
       />
     </div>
   </div>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import NvHitbox from '@/modules/vue-hitboxes/NvHitbox.vue'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useMessengerWindowStore } from '@/teams/messenger/store'
 import { useSettingsStore } from '@/features/settings/store'
 import { isGameOverlay } from '@/consts.ts'
@@ -46,33 +53,60 @@ const isBackgroundShown = computed(() => isGameOverlay || showBackground.value)
 // this prevents click outside to close immediately when the backdrop is still visible in some cases
 watch(
   () => messengerWindowStore.isInputFocused,
-  (value) => {
+  (value, _oldValue, onCleanup) => {
     if (value) {
       showBackground.value = true
     } else {
-      setTimeout(() => {
-        showBackground.value = false
+      const timer = setTimeout(() => {
+        if (!messengerWindowStore.isInputFocused) {
+          showBackground.value = false
+        }
       }, 100)
+      onCleanup(() => clearTimeout(timer))
     }
   },
 )
 
-watch(isBackgroundShown, (newValue) => {
-  gsap.to(background.value, {
-    opacity: Number(newValue),
-    duration: 0.3,
-    ease: 'power3.out',
-  })
-})
-
-onMounted(() => {
-  if (isGameOverlay) return
-  window.addEventListener('blur', () => {
-    gsap.set(background.value, {
-      opacity: 0,
+watch(
+  isBackgroundShown,
+  (newValue) => {
+    gsap.to(background.value, {
+      opacity: Number(newValue),
+      duration: 0.3,
+      ease: 'power3.out',
       overwrite: true,
     })
-    showBackground.value = false
+  },
+  // Native blur/focus can occur in one turn without changing input focus.
+  { flush: 'sync' },
+)
+
+const onWindowBlur = () => {
+  if (isGameOverlay) return
+  gsap.set(background.value, {
+    opacity: 0,
+    overwrite: true,
   })
+  showBackground.value = false
+}
+
+const onWindowFocus = () => {
+  if (isGameOverlay) return
+  // Restoring the backdrop must not depend on another input focus event:
+  // Electron can retain the focused input while the window is hidden.
+  if (messengerWindowStore.isInputFocused) {
+    showBackground.value = true
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('blur', onWindowBlur)
+  window.addEventListener('focus', onWindowFocus)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('blur', onWindowBlur)
+  window.removeEventListener('focus', onWindowFocus)
+  gsap.killTweensOf(background.value)
 })
 </script>

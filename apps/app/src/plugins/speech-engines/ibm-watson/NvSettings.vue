@@ -17,7 +17,7 @@
             :max="300"
             :min="-300"
             :step="1"
-            class="!grow"
+            :class="css({ flexGrow: '1 !important' })"
             v-bind="{
               modelValue: getProperty('ratePercentage'),
               'onUpdate:modelValue': (value) =>
@@ -43,7 +43,7 @@
             :max="300"
             :min="-300"
             :step="1"
-            class="!grow"
+            :class="css({ flexGrow: '1 !important' })"
             v-bind="{
               modelValue: getProperty('pitchPercentage'),
               'onUpdate:modelValue': (value) =>
@@ -73,7 +73,7 @@
           </NvStack>
           <NvSwitch
             :modelValue="getProperty('streamAudio')"
-            class="shrink-0"
+            :class="css({ flexShrink: 0 })"
             @update:modelValue="(value) => setProperty('streamAudio', value)"
           />
         </NvGroup>
@@ -96,7 +96,7 @@
           </NvStack>
           <NvSwitch
             :modelValue="getProperty('includeTimestamps')"
-            class="shrink-0"
+            :class="css({ flexShrink: 0 })"
             @update:modelValue="
               (value) => setProperty('includeTimestamps', value)
             "
@@ -149,6 +149,7 @@
   </template>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import {
   NvAccessBlocker,
   NvDivider,

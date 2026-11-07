@@ -2,42 +2,47 @@
   <NvCard>
     <NvStack>
       <NvGroup align="start" justify="between" noWrap>
-        <NvGroup align="start" class="!flex-1 min-w-0" noWrap>
+        <NvGroup
+          align="start"
+          :class="css({ flex: '1 1 0% !important', minWidth: '0' })"
+          noWrap
+        >
           <NvButton
             :loading="isLoading"
-            class="shrink-0"
+            :class="css({ flexShrink: 0 })"
             icon-name="play"
             size="sm"
             @click="() => play()"
           />
-          <NvStack class="!flex-1 min-h-0">
+          <NvStack :class="css({ flex: '1 1 0% !important', minHeight: '0' })">
             <NvSpeechEngineInput
               v-model="data.originalMessage"
               :engine="data.engine"
               :voice="data.selectedVoice[data.engine]"
-              class="w-full"
+              :class="css({ width: '100%' })"
               size="sm"
               @enter="() => play()"
             />
             <NvGroup noWrap>
               <NvSpeechEngineSelect
                 v-model="data.engine"
-                class="w-1/3"
+                :class="css({ width: '33.333333%' })"
                 size="sm"
               />
               <template v-if="engine">
-                <component
-                  :is="engine.voiceSelectComponent"
+                <NvAsyncRegion
+                  :component="engine.voiceSelectComponent"
+                  mode="control"
                   v-if="engine.voiceSelectComponent"
                   v-model="data.selectedVoice[data.engine]"
-                  class="w-1/3"
+                  :class="css({ width: '33.333333%' })"
                   placeholder="Speech Voice"
                   size="sm"
                 />
               </template>
               <NvKeybinding
                 v-model="data.shortcut"
-                class="w-1/3"
+                :class="css({ width: '33.333333%' })"
                 multiple
                 size="sm"
               />
@@ -55,16 +60,28 @@
             },
           ]"
         >
-          <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm" />
+          <NvButton
+            :class="css({ flexShrink: 0 })"
+            icon-name="ellipsis-v"
+            size="sm"
+          />
         </NvContextMenu>
       </NvGroup>
-      <NvBarWrapper v-if="isPlaying" class="h-2 relative">
-        <NvBar :style="{ width: `${progress * 100}%` }" class="h-full"></NvBar>
+      <NvBarWrapper
+        v-if="isPlaying"
+        :class="css({ height: '2', position: 'relative' })"
+      >
+        <NvBar
+          :style="{ width: `${progress * 100}%` }"
+          :class="css({ height: '100%' })"
+        ></NvBar>
       </NvBarWrapper>
     </NvStack>
   </NvCard>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
+import NvAsyncRegion from '@/components/NvAsyncRegion.vue'
 import { NvButton, NvCard, NvContextMenu, NvGroup, NvStack } from '@packages/ui'
 import { useMessagesStore } from '@/features/messages/store'
 import { storeToRefs } from 'pinia'

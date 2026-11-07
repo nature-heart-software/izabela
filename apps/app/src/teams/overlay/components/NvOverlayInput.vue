@@ -2,14 +2,40 @@
   <NvCard
     variant="transparent"
     ref="messenger"
-    class="messenger rounded grid p-4 gap-4 grid-rows-3 grid-rows-none min-w-[480px]"
+    class="messenger"
+    :class="
+      css({
+        borderRadius: 'md',
+        display: 'grid',
+        padding: '4',
+        gap: '4',
+        gridTemplateRows: 'none',
+        minWidth: '480px',
+      })
+    "
     data-v-step="messenger-window"
   >
-    <NvGroup :spacing="4" class="min-w-0" grow>
-      <NvCard class="min-w-0" size="sm">
+    <NvGroup :spacing="4" :class="css({ minWidth: '0' })" grow>
+      <NvCard :class="css({ minWidth: '0' })" size="sm">
         <NvGroup noWrap>
           <NvInput
-            class="overlayInput border rounded px-5 h-8 text-2 flex items-center focused font-semibold"
+            class="overlayInput focused"
+            :class="
+              css({
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                borderColor: '#e5e7eb',
+                borderRadius: 'md',
+                paddingInline: '5',
+                height: '8',
+                fontSize: '2',
+                lineHeight: '2',
+                letterSpacing: '2',
+                display: 'flex',
+                alignItems: 'center',
+                fontWeight: 600,
+              })
+            "
             tabindex="-1"
           >
             <!--.overlayInput-->
@@ -41,7 +67,7 @@
                   >{{ key }}</span
                 >
               </template>
-              <label class="hidden">
+              <label :class="css({ display: 'none' })">
                 <input
                   ref="selectionValueRef"
                   :value="selectionValue"
@@ -57,6 +83,7 @@
 </template>
 
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import { NvCard, NvGroup } from '@packages/ui'
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useSettingsStore } from '@/features/settings/store'

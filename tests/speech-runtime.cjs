@@ -112,6 +112,7 @@ async function run() {
     }}}
     const mocks = {
       vue, hark,
+      '@/styled-system/css': {css:()=>''},
       '@/features/settings/store': {useSettingsStore:()=>settings},
       '@/features/speech/store': {useSpeechRecognitionStore:()=>recognition},
       '@/utils/media-devices': {getSoxMediaDeviceByIndex:async (index)=>({deviceId:'synthetic-'+index})},

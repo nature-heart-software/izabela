@@ -1,5 +1,10 @@
 <template>
-  <div class="animation-wrapper bg-gray-0 opacity-50 rounded">
+  <div
+    class="animation-wrapper"
+    :class="
+      css({ backgroundColor: 'gray.0', opacity: 0.5, borderRadius: 'md' })
+    "
+  >
     <div id="outer-circle" class="circle"></div>
     <div id="inner-circle" class="circle"></div>
   </div>
@@ -76,3 +81,7 @@
   animation-delay: 0.25s;
 }
 </style>
+
+<script setup lang="ts">
+import { css } from '@/styled-system/css'
+</script>

@@ -7,6 +7,7 @@ import {
   writeFileSync,
 } from 'node:fs'
 import { createRequire } from 'node:module'
+import { randomUUID } from 'node:crypto'
 import { dirname, join, relative, resolve } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
@@ -84,7 +85,7 @@ for (const pkg of selected) {
     [vitest, 'run', pkg.directory, '--reporter=json', `--outputFile=${report}`],
     {
       cwd: root,
-      env: process.env,
+      env: { ...process.env, UI_TEST_RUN_ID: randomUUID() },
       stdio: 'inherit',
       timeout: 180000,
     },

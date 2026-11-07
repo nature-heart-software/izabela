@@ -1,13 +1,13 @@
 <template>
   <StAlert v-bind="props">
-    <NvText :style="{ color: 'inherit' }">
+    <NvText>
       <slot />
     </NvText>
   </StAlert>
 </template>
 <script lang="ts" setup>
 import NvText from '@/components/typography/Text/NvText.vue'
-import { StAlert } from './alert.styled'
+import { StAlert } from './alert.panda'
 import { props as propsDefinition } from './alert.shared'
 
 const props = defineProps(propsDefinition)

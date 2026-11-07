@@ -40,10 +40,11 @@ function runFixture(packages, selections = []) {
     writeFileSync(
       join(directory, 'node_modules/vitest/vitest.mjs'),
       `
-      import { readFileSync, writeFileSync } from 'node:fs'
+      import { appendFileSync, readFileSync, writeFileSync } from 'node:fs'
       import { join } from 'node:path'
       const pkg = JSON.parse(readFileSync(join(process.argv[3], 'package.json'), 'utf8'))
       const output = process.argv.find(arg => arg.startsWith('--outputFile=')).slice('--outputFile='.length)
+      appendFileSync('invocations.jsonl', JSON.stringify({ name: pkg.name, id: process.env.UI_TEST_RUN_ID }) + '\\n')
       writeFileSync(output, pkg.fixtureMalformed ? 'incomplete-json' : JSON.stringify({ testResults: [{ assertionResults: pkg.fixtureAssertions }] }))
     `,
     )
@@ -92,14 +93,27 @@ function runFixture(packages, selections = []) {
       process.exit(pkg.fixtureTypeExit)
     `,
     )
+    writeFileSync(
+      join(directory, 'fixture-runner.mjs'),
+      `
+      import { writeFileSync } from 'node:fs'
+      const before = process.env.UI_TEST_RUN_ID
+      await import('./tools/test-packages.mjs')
+      writeFileSync('parent-environment.json', JSON.stringify({ before, after: process.env.UI_TEST_RUN_ID }))
+    `,
+    )
     const run = spawnSync(
       process.execPath,
-      ['tools/test-packages.mjs', ...selections],
+      ['fixture-runner.mjs', ...selections],
       {
         cwd: directory,
         encoding: 'utf8',
         timeout: 30000,
-        env: { ...process.env, npm_execpath: packageManager },
+        env: {
+          ...process.env,
+          npm_execpath: packageManager,
+          UI_TEST_RUN_ID: 'inherited-identity-must-not-be-reused',
+        },
       },
     )
     assert.ifError(run.error)
@@ -126,6 +140,17 @@ function runFixture(packages, selections = []) {
       exitCode: run.status,
       summary,
       reports,
+      invocations: existsSync(join(directory, 'invocations.jsonl'))
+        ? readFileSync(join(directory, 'invocations.jsonl'), 'utf8')
+            .trim()
+            .split('\n')
+            .map((line) => JSON.parse(line))
+        : [],
+      parentEnvironment: existsSync(join(directory, 'parent-environment.json'))
+        ? JSON.parse(
+            readFileSync(join(directory, 'parent-environment.json'), 'utf8'),
+          )
+        : null,
       output: run.stdout + run.stderr,
     }
   } finally {
@@ -134,6 +159,38 @@ function runFixture(packages, selections = []) {
 }
 
 const passed = { fullName: 'fixture ordinary contract', status: 'passed' }
+
+test('package runner gives every Vitest invocation a fresh UUID without changing its inherited environment', () => {
+  const original = process.env.UI_TEST_RUN_ID
+  const results = Array.from({ length: 2 }, () =>
+    runFixture([
+      { name: 'a-covered', assertions: [passed] },
+      { name: 'b-covered', assertions: [passed] },
+    ]),
+  )
+  for (const result of results) {
+    assert.equal(result.exitCode, 0, result.output)
+    assert.deepEqual(
+      result.invocations.map((item) => item.name),
+      ['a-covered', 'b-covered'],
+    )
+    assert.deepEqual(result.parentEnvironment, {
+      before: 'inherited-identity-must-not-be-reused',
+      after: 'inherited-identity-must-not-be-reused',
+    })
+  }
+  const ids = results.flatMap((result) =>
+    result.invocations.map((item) => item.id),
+  )
+  for (const id of ids) {
+    assert.match(
+      id,
+      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+    )
+  }
+  assert.equal(new Set(ids).size, 4)
+  assert.equal(process.env.UI_TEST_RUN_ID, original)
+})
 
 test('package runner includes the local server while excluding the desktop app', () => {
   const result = runFixture([

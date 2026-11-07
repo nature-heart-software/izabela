@@ -286,7 +286,7 @@ async function runRecovery(c) {
           (el) => el.textContent.trim() === 'Fixture French',
         )
         if (!option) throw new Error('Missing French catalog option')
-        option.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+        option.click()
       })
       await until(
         async () =>

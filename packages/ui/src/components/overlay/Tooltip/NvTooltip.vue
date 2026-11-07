@@ -1,51 +1,180 @@
 <template>
-  <StTooltip ref="tooltip" v-bind="props">
-    <tippy ref="tippyInstance" v-bind="tippyProps">
-      <slot name="reference" />
-      <template #content>
-        <slot />
-      </template>
-    </tippy>
+  <StTooltip
+    ref="tooltip"
+    v-bind="props"
+    :class="$attrs.class"
+    :style="$attrs.style"
+  >
+    <Tooltip.RootProvider :value="tooltipApi">
+      <ReferenceTrigger
+        ref="trigger"
+        v-bind="referenceAttrs()"
+        :id="referenceId()"
+      >
+        <slot name="reference" />
+      </ReferenceTrigger>
+      <Teleport :to="portalTarget" defer>
+        <StTooltipPositioner
+          v-if="open && !focused"
+          :style="{ '--nv-tooltip-enter-duration': `${enterDuration}ms` }"
+        >
+          <StTooltipContent><slot /></StTooltipContent>
+        </StTooltipPositioner>
+      </Teleport>
+    </Tooltip.RootProvider>
   </StTooltip>
 </template>
 <script lang="ts" setup>
-import { computed, inject, ref, watch } from 'vue'
-import { StTooltip } from './tooltip.styled'
+import {
+  cloneVNode,
+  Comment,
+  computed,
+  defineComponent,
+  Fragment,
+  inject,
+  mergeProps,
+  reactive,
+  ref,
+  Text,
+  useAttrs,
+  useId,
+  watchPostEffect,
+  type VNode,
+} from 'vue'
+import { Tooltip, useTooltip, type TooltipRootProps } from '@ark-ui/vue'
+import {
+  StTooltip,
+  StTooltipContent,
+  StTooltipPositioner,
+} from './tooltip.panda'
 import { props as propsDefinition } from './tooltip.shared'
-import { Tippy, TippyInstance, TippyOptions } from 'vue-tippy'
 import { tokens } from '@/styles/tokens'
-import { MaybeElement, useFocusWithin } from '@vueuse/core'
+import {
+  type MaybeElement,
+  useEventListener,
+  useFocusWithin,
+  useMutationObserver,
+} from '@vueuse/core'
 import { getElement } from '@/utils/vue'
 import { PORTAL_TARGET } from '@/consts'
 
 const props = defineProps(propsDefinition)
+defineOptions({ inheritAttrs: false })
+const attrs = useAttrs()
+const referenceAttrs = () =>
+  Object.fromEntries(
+    Object.entries(attrs).filter(([key]) => key !== 'class' && key !== 'style'),
+  )
+const trigger = ref()
+const triggerId = ref(`nv-tooltip-${useId()}-trigger`)
+const referenceId = () =>
+  typeof attrs.id === 'string' ? attrs.id : triggerId.value
+const ReferenceTrigger = defineComponent({
+  inheritAttrs: false,
+  setup(_, { attrs, slots }) {
+    function flatten(nodes: VNode[]): VNode[] {
+      return nodes.flatMap((node) =>
+        node.type === Fragment ? flatten(node.children as VNode[]) : [node],
+      )
+    }
+    return () => {
+      const [node, ...rest] = flatten(slots.default?.() || []).filter(
+        (node) =>
+          node.type !== Comment &&
+          (node.type !== Text || String(node.children).trim()),
+      )
+      if (!node) return null
+      // Vue can supply an array of listeners when overlay triggers are nested.
+      // Ark 3's as-child merger only composes functions and drops those arrays
+      // when the native control also has a listener (e.g. Ctrl-click to toggle).
+      const merged = mergeProps(
+        node.props || {},
+        { ...tooltipApi.value.getTriggerProps() },
+        attrs,
+      )
+      merged.id = node.props?.id || attrs.id || triggerId.value
+      const cloned = cloneVNode(node)
+      cloned.props = merged
+      return rest.length ? [cloned, ...rest] : cloned
+    }
+  },
+})
+// A tooltip is transparent when used as another overlay's reference: the
+// native control owns its trigger attributes, focus and restoration target.
+function syncTrigger() {
+  // Zag measures the trigger by ID even when Ark composes a consumer element.
+  const element = getElement(trigger.value)
+  const selector = '[data-part="trigger"]'
+  // Composite references can own an input and a separate full-control trigger.
+  // Resolve the marked primitive owner, not an incidental component root.
+  const target = element?.matches(selector)
+    ? element
+    : element?.querySelector<HTMLElement>(selector) || element
+  if (target?.id) triggerId.value = target.id
+}
+watchPostEffect(syncTrigger)
+const tooltip = ref<MaybeElement>()
+// Async voice components can replace a comment with their control without
+// changing the reference's component ref. Observe that scoped DOM boundary.
+useMutationObserver(tooltip, syncTrigger, { childList: true, subtree: true })
+const { focused } = useFocusWithin(tooltip)
 const injectedPortalTarget = inject(PORTAL_TARGET)
 const portalTarget = computed(
   () => getElement(injectedPortalTarget) || document.body,
 )
-const tippyProps = computed<TippyOptions>(
-  () =>
-    ({
-      trigger: 'mouseenter focus',
-      delay: [250, 0],
-      interactive: false,
-      placement: 'top',
-      offset: [0, tokens.spacing['4']],
-      appendTo: portalTarget.value,
-      theme: `tooltip`,
-      maxWidth: 300,
-      ...props.tippyOptions,
-    }) as TippyOptions,
+const openDelay = computed(() =>
+  Array.isArray(props.tippyOptions.delay)
+    ? (props.tippyOptions.delay[0] ?? 250)
+    : (props.tippyOptions.delay ?? 250),
 )
-const tooltip = ref<MaybeElement>()
-const tippyInstance = ref<TippyInstance>()
-const { focused } = useFocusWithin(tooltip)
-watch(focused, (value) => {
-  const instance = tippyInstance.value
-  if (value) {
-    if (instance && 'disable' in instance) instance.disable()
-  } else {
-    if (instance && 'enable' in instance) instance.enable()
-  }
+const closeDelay = computed(() =>
+  Array.isArray(props.tippyOptions.delay)
+    ? (props.tippyOptions.delay[1] ?? 0)
+    : (props.tippyOptions.delay ?? 0),
+)
+const enterDuration = computed(() => {
+  if (props.tippyOptions.animation === false) return 0
+  const duration = props.tippyOptions.duration
+  return Array.isArray(duration) ? (duration[0] ?? 300) : (duration ?? 300)
+})
+const positioning = computed<TooltipRootProps['positioning']>(() => ({
+  placement:
+    !props.tippyOptions.placement ||
+    props.tippyOptions.placement === 'auto' ||
+    props.tippyOptions.placement === 'auto-start' ||
+    props.tippyOptions.placement === 'auto-end'
+      ? 'top'
+      : props.tippyOptions.placement,
+  offset: {
+    mainAxis: Array.isArray(props.tippyOptions.offset)
+      ? props.tippyOptions.offset[1]
+      : tokens.spacing['4'],
+    crossAxis: Array.isArray(props.tippyOptions.offset)
+      ? props.tippyOptions.offset[0]
+      : 0,
+  },
+}))
+// Let Ark cancel its opening delay when the pointer leaves before becoming visible.
+// Mirroring a still-false controlled `open` value loses that cancellation transition.
+const tooltipApi = useTooltip(
+  reactive({
+    ids: computed(() => ({ trigger: triggerId.value })),
+    disabled: focused,
+    openDelay,
+    closeDelay,
+    positioning,
+    interactive: computed(() => props.tippyOptions.interactive ?? false),
+  }),
+)
+const open = computed(() => tooltipApi.value.open)
+function deactivate(event: Event) {
+  // The click-through Electron window can miss pointerleave when it loses focus.
+  // Reset hover as well as visibility so the next pointer entry can reopen normally.
+  tooltipApi.value.getTriggerProps().onPointerleave?.(event as PointerEvent)
+  tooltipApi.value.setOpen(false)
+}
+useEventListener(window, 'blur', deactivate)
+useEventListener(document, 'visibilitychange', (event) => {
+  if (document.hidden) deactivate(event)
 })
 </script>

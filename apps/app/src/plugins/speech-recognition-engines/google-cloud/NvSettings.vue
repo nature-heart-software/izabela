@@ -10,7 +10,7 @@
         </NvStack>
         <NvSwitch
           :modelValue="store.getProperty('profanityFilter')"
-          class="shrink-0"
+          :class="css({ flexShrink: 0 })"
           @update:modelValue="
             (value) => store.setProperty('profanityFilter', value)
           "
@@ -30,6 +30,7 @@
   </NvGoogleCloudCredentialsFormPart>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import {
   NvAccessBlocker,
   NvDivider,

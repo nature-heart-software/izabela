@@ -11,7 +11,7 @@
             </NvStack>
           </NvGroup>
         </NvCard>
-        <div class="pl-8">
+        <div :class="css({ paddingLeft: '8' })">
           <NvCard>
             <NvStack spacing="5">
               <NvTranslationForm />
@@ -23,6 +23,7 @@
   </NvStack>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import { NvCard, NvGroup, NvStack, NvText } from '@packages/ui'
 import { useSettingsStore } from '@/features/settings/store'
 import NvTranslationForm from '@/features/translation/components/forms/NvTranslationForm.vue'

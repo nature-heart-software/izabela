@@ -1,4 +1,5 @@
 import { ExtractPropTypes, PropType } from 'vue'
+import { props as autocompleteProps } from '../Autocomplete/autocomplete.shared'
 
 export const sizeValues = ['sm', 'md', 'lg'] as const
 export type Size = (typeof sizeValues)[number]
@@ -20,10 +21,20 @@ export type Option = {
   category?: string
   searchValue?: string
   attr?: Record<string, number | string>
+  attrs?: Record<string, unknown>
   children?: Omit<Option, 'children'>[]
 }
 
+// Row identity is private to the list. Consumers use Option.id for favorites.
+export type SelectOption = Omit<Option, 'children'> & {
+  key: string
+  children?: SelectOption[]
+}
+
 export const selectProps = {
+  placement: autocompleteProps.placement,
+  disabled: { type: Boolean, default: false },
+  readonly: { type: Boolean, default: false },
   multiple: {
     type: Boolean,
     default: false,

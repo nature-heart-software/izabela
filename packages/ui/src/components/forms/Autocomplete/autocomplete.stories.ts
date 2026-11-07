@@ -1,3 +1,4 @@
+import { css } from '@/styled-system/css'
 /* eslint-disable import/no-extraneous-dependencies */
 import { StoryFn } from '@storybook/vue3'
 import { NvAutocomplete, NvInput } from '@/components'
@@ -20,6 +21,7 @@ const Template: StoryFn = (args) => ({
   components: { NvAutocomplete, NvInput },
   setup() {
     return {
+      css,
       inputValue: ref(),
       data: ref(voices),
       args,
@@ -28,10 +30,10 @@ const Template: StoryFn = (args) => ({
   template: `
       <NvAutocomplete v-bind="args" :data="data" valueKey="voicemodel_uuid">
       <template #reference>
-        <NvInput v-model="inputValue" class="w-full"/>
+        <NvInput v-model="inputValue" :class="css({'width':'100%'})"/>
       </template>
       <template #default="{ item }">
-        <div class="h-7 flex items-center">
+        <div :class="css({'height':'7','display':'flex','alignItems':'center'})">
           {{ item.display_name }}
         </div>
       </template>

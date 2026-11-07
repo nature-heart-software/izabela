@@ -1,3 +1,4 @@
+import { css } from '@/styled-system/css'
 /* eslint-disable import/no-extraneous-dependencies */
 import { StoryFn } from '@storybook/vue3'
 import { tokens } from '@/styles/tokens'
@@ -30,14 +31,15 @@ const Template: StoryFn = (args) => ({
   components: { NvStack, NvButton },
   setup() {
     return {
+      css,
       args,
     }
   },
   template: `
       <NvStack v-bind="args" :style="{height: '300px'}">
-      <NvButton class="!h-auto">1</NvButton>
-      <NvButton class="!h-auto">2</NvButton>
-      <NvButton class="!h-auto">3</NvButton>
+      <NvButton :class="css({'height':'auto !important'})">1</NvButton>
+      <NvButton :class="css({'height':'auto !important'})">2</NvButton>
+      <NvButton :class="css({'height':'auto !important'})">3</NvButton>
       </NvStack>`,
 })
 

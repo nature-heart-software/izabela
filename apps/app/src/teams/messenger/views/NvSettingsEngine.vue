@@ -19,7 +19,7 @@
             />
           </NvGroup>
         </NvCard>
-        <div class="pl-8">
+        <div :class="css({ paddingLeft: '8' })">
           <NvCard>
             <NvStack spacing="5">
               <NvGroup grow>
@@ -48,7 +48,7 @@
                 <NvDivider direction="horizontal" />
               </template>
               <template v-if="currentEngineSettingsComponent">
-                <component :is="currentEngineSettingsComponent" />
+                <NvAsyncRegion :component="currentEngineSettingsComponent" />
               </template>
             </NvStack>
           </NvCard>
@@ -73,7 +73,7 @@
             </NvStack>
           </NvStack>
         </NvCard>
-        <div class="pl-8">
+        <div :class="css({ paddingLeft: '8' })">
           <NvCard>
             <NvUniversalApiForm />
           </NvCard>
@@ -83,6 +83,8 @@
   </NvStack>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
+import NvAsyncRegion from '@/components/NvAsyncRegion.vue'
 import { computed, ref, watch } from 'vue'
 import {
   NvButton,
