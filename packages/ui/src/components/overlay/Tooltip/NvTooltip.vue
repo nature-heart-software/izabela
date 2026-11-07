@@ -16,7 +16,10 @@
       <Teleport :to="portalTarget" defer>
         <StTooltipPositioner
           v-if="open && !expanded"
-          :style="{ '--nv-tooltip-enter-duration': `${enterDuration}ms` }"
+          :style="{
+            '--nv-tooltip-enter-duration': `${enterDuration}ms`,
+            pointerEvents: props.tippyOptions.interactive ? undefined : 'none',
+          }"
         >
           <StTooltipContent><slot /></StTooltipContent>
         </StTooltipPositioner>
@@ -33,6 +36,8 @@ import {
   Fragment,
   inject,
   mergeProps,
+  nextTick,
+  onBeforeUnmount,
   reactive,
   ref,
   Text,
@@ -67,6 +72,8 @@ const referenceAttrs = () =>
   )
 const trigger = ref()
 const expanded = ref(false)
+let focusRequest = 0
+let focusFrame: number | undefined
 const triggerId = ref(`nv-tooltip-${useId()}-trigger`)
 const referenceId = () =>
   typeof attrs.id === 'string' ? attrs.id : triggerId.value
@@ -93,8 +100,11 @@ const ReferenceTrigger = defineComponent({
         node.props || {},
         {
           ...triggerProps,
-          onFocus: (event: FocusEvent) => {
-            if (!expanded.value) triggerProps.onFocus?.(event)
+          onFocusin: onReferenceFocus,
+          onFocusout: onReferenceBlur,
+          onClick: (event: MouseEvent) => {
+            cancelFocusActivation()
+            triggerProps.onClick?.(event)
           },
           onPointermove: (event: PointerEvent) => {
             if (!expanded.value) triggerProps.onPointermove?.(event)
@@ -142,18 +152,18 @@ const portalTarget = computed(
 )
 const openDelay = computed(() =>
   Array.isArray(props.tippyOptions.delay)
-    ? (props.tippyOptions.delay[0] ?? 250)
-    : (props.tippyOptions.delay ?? 250),
+    ? props.tippyOptions.delay[0] ?? 250
+    : props.tippyOptions.delay ?? 250,
 )
 const closeDelay = computed(() =>
   Array.isArray(props.tippyOptions.delay)
-    ? (props.tippyOptions.delay[1] ?? 0)
-    : (props.tippyOptions.delay ?? 0),
+    ? props.tippyOptions.delay[1] ?? 0
+    : props.tippyOptions.delay ?? 0,
 )
 const enterDuration = computed(() => {
   if (props.tippyOptions.animation === false) return 0
   const duration = props.tippyOptions.duration
-  return Array.isArray(duration) ? (duration[0] ?? 300) : (duration ?? 300)
+  return Array.isArray(duration) ? duration[0] ?? 300 : duration ?? 300
 })
 const positioning = computed<TooltipRootProps['positioning']>(() => ({
   placement:
@@ -184,7 +194,48 @@ const tooltipApi = useTooltip(
   }),
 )
 const open = computed(() => tooltipApi.value.open)
+function cancelFocusActivation() {
+  focusRequest++
+  if (focusFrame !== undefined) cancelAnimationFrame(focusFrame)
+  focusFrame = undefined
+}
+onBeforeUnmount(cancelFocusActivation)
+async function onReferenceFocus(event: FocusEvent) {
+  cancelFocusActivation()
+  const request = focusRequest
+  // Focus can arrive during mounting or while its handler closes a popover.
+  // Resolve the retained owner and expanded state after that render completes.
+  await nextTick()
+  if (request !== focusRequest || event.defaultPrevented) return
+  // Native Escape handlers can restore focus before that same key finishes
+  // propagating. Open on the next frame so it cannot dismiss the new tooltip.
+  focusFrame = requestAnimationFrame(() => {
+    focusFrame = undefined
+    if (request !== focusRequest) return
+    syncTrigger()
+    const reference = getElement(tooltip.value)
+    if (!expanded.value && reference?.contains(document.activeElement)) {
+      tooltipApi.value.setOpen(true)
+    }
+  })
+}
+function onReferenceBlur(event: FocusEvent) {
+  const next = event.relatedTarget
+  const reference = getElement(tooltip.value)
+  const contentId = tooltipApi.value.getContentProps().id
+  const content = contentId ? document.getElementById(contentId) : null
+  if (
+    next instanceof Node &&
+    (reference?.contains(next) ||
+      (props.tippyOptions.interactive && content?.contains(next)))
+  ) {
+    cancelFocusActivation()
+    return
+  }
+  deactivate(event)
+}
 function deactivate(event: Event) {
+  cancelFocusActivation()
   // The click-through Electron window can miss pointerleave when it loses focus.
   // Reset hover as well as visibility so the next pointer entry can reopen normally.
   tooltipApi.value.getTriggerProps().onPointerleave?.(event as PointerEvent)
@@ -204,7 +255,9 @@ function onOutsidePointerDown(event: PointerEvent) {
   // blur, without consuming the click or interfering with interactive content.
   deactivate(event)
 }
-useEventListener(document, 'pointerdown', onOutsidePointerDown, { capture: true })
+useEventListener(document, 'pointerdown', onOutsidePointerDown, {
+  capture: true,
+})
 watch(expanded, (expanded) => {
   if (expanded) deactivate(new Event('pointerleave'))
 })
