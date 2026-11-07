@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mount, flushPromises, type VueWrapper } from '@vue/test-utils'
 import { h, nextTick, ref, Comment } from 'vue'
 import { execFileSync } from 'node:child_process'
-import { existsSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 
@@ -40,20 +40,25 @@ afterEach(() => {
 })
 
 describe('client build artifact isolation', () => {
-  it('keeps the real client bundle outside the production artifact directory', () => {
+  it('emits the script and stylesheet required by the client build cache outside production artifacts', () => {
     const dist = resolve(dirname(fileURLToPath(import.meta.url)), '../dist')
     const artifacts = existsSync(dist)
       ? readdirSync(dist, { recursive: true }).map(String)
       : []
     expect(artifacts.filter((name) => /test-client/i.test(name))).toEqual([])
-    expect(
-      existsSync(
-        resolve(
-          dirname(fileURLToPath(import.meta.url)),
-          '../../../coverage/ui-client/test-client.js',
-        ),
-      ),
-    ).toBe(true)
+    const client = resolve(
+      dirname(fileURLToPath(import.meta.url)),
+      '../../../coverage/ui-client',
+    )
+    for (const file of ['test-client.js', 'style.css'])
+      expect(
+        existsSync(resolve(client, file)),
+        `missing client artifact: ${file}`,
+      ).toBe(true)
+    if (process.env.UI_TEST_RUN_ID?.trim())
+      expect(
+        readFileSync(resolve(client, '.client-build-success'), 'utf8'),
+      ).toBe(process.env.UI_TEST_RUN_ID)
   })
 })
 
