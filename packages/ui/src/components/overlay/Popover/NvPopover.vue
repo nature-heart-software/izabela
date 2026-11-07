@@ -2,6 +2,7 @@
   <StPopover v-bind="props">
     <Popover.Root
       v-model:open="open"
+      modal
       :ids="{ trigger: triggerId }"
       :positioning="{
         placement: props.placement,
@@ -10,7 +11,8 @@
         offset: { mainAxis: tokens.spacing['4'] },
       }"
       portalled
-      @interact-outside="onInteractOutside"
+      @focus-outside.prevent
+      @interact-outside="onOverlayShieldInteractOutside"
     >
       <Popover.Trigger ref="trigger" :id="triggerId" as-child>
         <slot name="reference" />
@@ -28,7 +30,7 @@
           @wheel="onOverlayShieldWheel"
         />
         <StPopoverPositioner>
-          <StPopoverContent :hidden="false">
+          <StPopoverContent :hidden="false" :inert="open ? undefined : true">
             <Transition>
               <Card v-if="open" :size="props.size === 'lg' ? 'md' : props.size">
                 <slot />
@@ -41,7 +43,7 @@
   </StPopover>
 </template>
 <script lang="ts" setup>
-import { computed, inject, ref, useId, watchPostEffect } from 'vue'
+import { computed, inject, ref, useId, watch, watchPostEffect } from 'vue'
 import {
   StPopover,
   StPopoverContent,
@@ -55,10 +57,17 @@ import Card from '@/components/display/Card/NvCard.vue'
 import { getElement } from '@/utils/vue'
 import { PORTAL_TARGET } from '@/consts'
 import { onOverlayShieldWheel } from '@/utils/overlay-scroll'
+import { onOverlayShieldInteractOutside } from '@/utils/overlay-shield'
 
 const open = ref(false)
 const trigger = ref()
 const triggerId = ref(`nv-popover-${useId()}-trigger`)
+watch(open, (isOpen) => {
+  // Establish the owner before Ark activates its deferred focus trap, including
+  // triggers opened programmatically without the browser's click-focus default.
+  if (isOpen)
+    document.getElementById(triggerId.value)?.focus({ preventScroll: true })
+})
 watchPostEffect(() => {
   // Positioning and focus lookup must use the as-child owner's retained ID.
   const root = getElement(trigger.value)
@@ -71,9 +80,4 @@ watchPostEffect(() => {
 const props = defineProps(propsDefinition)
 const injectedPortalTarget = inject(PORTAL_TARGET)
 const portalTarget = computed(() => getElement(injectedPortalTarget) || 'body')
-function onInteractOutside(event: CustomEvent) {
-  // Dismiss on click, not pointerdown: the full pointer sequence must hit the shield.
-  const target = event.detail?.originalEvent?.target as HTMLElement | undefined
-  if (target?.closest('[data-overlay-shield="popover"]')) event.preventDefault()
-}
 </script>

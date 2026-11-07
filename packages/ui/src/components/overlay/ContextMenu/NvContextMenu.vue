@@ -8,16 +8,21 @@
       lazy-mount
       unmount-on-exit
       @select="selectOption"
-      @interact-outside="onInteractOutside"
+      @interact-outside="onOverlayShieldInteractOutside"
     >
       <Menu.Trigger ref="trigger" :id="triggerId" as-child>
         <slot />
       </Menu.Trigger>
       <Teleport :to="portalTarget" defer>
         <div
+          ref="shieldElement"
           v-if="open"
           data-overlay-shield="context-menu"
           :class="contextMenuShield()"
+          :style="{
+            '--nv-shield-x': `${shieldOffset.x}px`,
+            '--nv-shield-y': `${shieldOffset.y}px`,
+          }"
           @click.stop.prevent="open = false"
           @mouseup.stop.prevent
           @mousedown.stop.prevent
@@ -76,20 +81,32 @@ import NvGroup from '@/components/miscellaneous/Group/NvGroup.vue'
 import NvIcon from '@/components/typography/Icon/NvIcon.vue'
 import { getElement } from '@/utils/vue'
 import { PORTAL_TARGET } from '@/consts'
+import {
+  onOverlayShieldInteractOutside,
+  useViewportShield,
+} from '@/utils/overlay-shield'
 
 const props = defineProps(propsDefinition)
 const open = ref(false)
 const trigger = ref()
 const triggerId = ref(`nv-menu-${useId()}-trigger`)
+const shieldElement = ref<HTMLElement>()
+const shieldOffset = ref({ x: 0, y: 0 })
 watchPostEffect(() => {
   // As-child preserves consumer IDs; Zag must query that same native owner.
   const element = getElement(trigger.value)
   if (element?.id) triggerId.value = element.id
 })
 const injectedPortalTarget = inject(PORTAL_TARGET)
-const portalTarget = computed(
-  () => getElement(injectedPortalTarget) || document.body,
-)
+const portalTarget = computed(() => {
+  const provided = getElement(injectedPortalTarget)
+  const parent = getElement(trigger.value)?.closest(
+    '[data-scope="popover"][data-part="content"], [data-scope="dialog"][data-part="content"]',
+  )
+  if (provided && (!parent || parent.contains(provided))) return provided
+  return parent || provided || document.body
+})
+useViewportShield(open, shieldElement, portalTarget, shieldOffset)
 const positioning = computed<MenuRootProps['positioning']>(() => ({
   placement:
     !props.tippyOptions.placement ||
@@ -111,11 +128,5 @@ function selectOption({ value }: { value: string }) {
   const option = props.options[Number(value)]
   if (option && option.type !== 'divider' && !option.disabled)
     option.onClick?.()
-}
-function onInteractOutside(event: CustomEvent) {
-  // Keep the shield until click finishes instead of exposing controls on pointerup.
-  const target = event.detail?.originalEvent?.target as HTMLElement | undefined
-  if (target?.closest('[data-overlay-shield="context-menu"]'))
-    event.preventDefault()
 }
 </script>

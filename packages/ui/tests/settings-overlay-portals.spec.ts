@@ -157,6 +157,11 @@ it.each(['select', 'popover'])(
     wrappers.push(wrapper)
     ;(document.getElementById('open-settings') as HTMLElement).click()
     await settle()
+    await vi.waitFor(() =>
+      expect(
+        document.activeElement?.closest('[data-scope="popover"][data-part="content"]'),
+      ).not.toBeNull(),
+    )
     const pane = document.querySelector('.route-scroll-area')!
     const trigger = document.getElementById(
       kind === 'select' ? 'settings-choice' : 'settings-more',

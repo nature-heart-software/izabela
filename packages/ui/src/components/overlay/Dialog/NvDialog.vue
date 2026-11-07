@@ -3,6 +3,8 @@
     v-bind="$attrs"
     v-model:open="dialogOpen"
     :ids="{ trigger: triggerId }"
+    @focus-outside.prevent
+    @interact-outside="onOverlayShieldInteractOutside"
   >
     <ReferenceTrigger>
       <slot name="reference" />
@@ -105,6 +107,7 @@ import {
   StDialogTrigger,
 } from './dialog.panda'
 import { PORTAL_TARGET } from '@/consts'
+import { onOverlayShieldInteractOutside } from '@/utils/overlay-shield'
 
 const PortalTargetProvider = defineComponent({
   name: 'PortalTargetProvider',

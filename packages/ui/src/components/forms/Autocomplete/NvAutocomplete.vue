@@ -99,7 +99,7 @@
 </template>
 <script lang="ts" setup>
 import { Popover } from '@ark-ui/vue'
-import { computed, inject, nextTick, provide, ref, watch } from 'vue'
+import { computed, inject, provide, ref, watch } from 'vue'
 import {
   StAutocomplete,
   shield,
@@ -116,6 +116,7 @@ import { Virtualizer } from '@tanstack/virtual-core'
 import { getElement } from '@/utils/vue'
 import { PORTAL_TARGET } from '@/consts'
 import { onOverlayShieldWheel } from '@/utils/overlay-scroll'
+import { useViewportShield } from '@/utils/overlay-shield'
 
 // The list is teleported below, but its keyboard focus stays on the input.
 // Ark's portalled popover proxy captures Tab before completion can handle it.
@@ -286,49 +287,7 @@ provide(
   computed(() => contentHost.value || getElement(injectedPortalTarget)),
 )
 
-watch(
-  [() => props.visible, shieldElement, portalTarget],
-  async ([visible, element], _, onCleanup) => {
-    if (!visible || !element) return
-    let cancelled = false
-    let observer: MutationObserver | undefined
-    const update = () => {
-      // A containing Ark positioner's transform establishes a fixed containing
-      // block. Cancel that displacement while keeping the shield physically
-      // inside the parent popup for nested dismissable/focus-layer ownership.
-      const rect = element.getBoundingClientRect()
-      const { x, y } = shieldOffset.value
-      if (rect.left !== 0 || rect.top !== 0) {
-        shieldOffset.value = { x: x - rect.left, y: y - rect.top }
-      }
-    }
-    onCleanup(() => {
-      cancelled = true
-      observer?.disconnect()
-      window.removeEventListener('resize', update)
-      window.removeEventListener('scroll', update, true)
-    })
-    // A nested teleport can move after the child's post-flush watcher. Measure
-    // and observe its final ancestors once the whole render has finished.
-    await nextTick()
-    if (cancelled) return
-    observer = new MutationObserver(update)
-    for (
-      let parent = element.parentElement;
-      parent;
-      parent = parent.parentElement
-    ) {
-      observer.observe(parent, {
-        attributes: true,
-        attributeFilter: ['style', 'class'],
-      })
-    }
-    window.addEventListener('resize', update)
-    window.addEventListener('scroll', update, true)
-    update()
-  },
-  { flush: 'post' },
-)
+useViewportShield(() => props.visible, shieldElement, portalTarget, shieldOffset)
 
 function onOutside(
   name: 'focusOutside' | 'interactOutside' | 'pointerDownOutside',

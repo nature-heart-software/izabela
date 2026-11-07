@@ -141,7 +141,8 @@ describe('overlay trigger ownership', () => {
       expect(click).toHaveBeenCalledOnce()
       const field = document.getElementById(`${kind}-control`)!
       expect(field).not.toBeNull()
-      if (kind === 'popover') expect(document.activeElement).toBe(field)
+      if (kind === 'popover')
+        await vi.waitFor(() => expect(document.activeElement).toBe(field))
       else
         await vi.waitFor(() =>
           expect(
@@ -350,11 +351,15 @@ describe('overlay trigger ownership', () => {
         menu.closest('[data-part="positioner"]')?.getAttribute('style'),
       ).toContain('--reference-width: 200px')
       expect(menu.closest('[role="dialog"]')).not.toBeNull()
+      expect(
+        menu.closest('[data-scope="popover"][data-part="content"]'),
+      ).not.toBeNull()
       expect(menu.querySelector('[data-highlighted]')?.textContent).toContain(
         'Run',
       )
       menu.focus()
       await settle()
+      expect(document.activeElement).toBe(menu)
       await key(menu, 'Escape')
       expect(document.querySelector('[role="menu"]')).toBeNull()
       expect(document.querySelector('[role="dialog"]')).not.toBeNull()
