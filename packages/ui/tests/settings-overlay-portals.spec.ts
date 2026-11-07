@@ -197,6 +197,10 @@ it.each(['settings', 'messages'] as const)(
     expect(chooser.textContent).toContain('Navigate to')
     const choices = chooser.querySelectorAll<HTMLButtonElement>('button')
     expect(choices).toHaveLength(2)
+    expect([...choices].map((choice) => choice.textContent?.trim())).toEqual([
+      'Navigation',
+      'Page content',
+    ])
     expect(document.activeElement).toBe(choices[0])
     choices[0].click()
     await settle()
