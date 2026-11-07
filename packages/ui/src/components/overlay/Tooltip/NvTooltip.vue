@@ -190,6 +190,21 @@ function deactivate(event: Event) {
   tooltipApi.value.getTriggerProps().onPointerleave?.(event as PointerEvent)
   tooltipApi.value.setOpen(false)
 }
+function onOutsidePointerDown(event: PointerEvent) {
+  const path = event.composedPath()
+  const reference = getElement(tooltip.value)
+  const contentId = tooltipApi.value.getContentProps().id
+  const content = contentId ? document.getElementById(contentId) : null
+  if (
+    (reference && path.includes(reference)) ||
+    (content && path.includes(content))
+  )
+    return
+  // An outside click can leave the trigger focused. Dismiss independently of
+  // blur, without consuming the click or interfering with interactive content.
+  deactivate(event)
+}
+useEventListener(document, 'pointerdown', onOutsidePointerDown, { capture: true })
 watch(expanded, (expanded) => {
   if (expanded) deactivate(new Event('pointerleave'))
 })
