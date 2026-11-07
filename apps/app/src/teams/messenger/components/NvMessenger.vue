@@ -29,6 +29,7 @@
               <NvGroup :spacing="4" :class="css({ flex: '1 1 0% !important' })">
                 <div
                   class="moveable-handle"
+                  @pointerdown.capture="onHandlePointerDown"
                   :class="
                     css({ cursor: 'all-scroll', flex: '1 1 0% !important' })
                   "
@@ -288,6 +289,22 @@ const savePosition = debounce((event: any) => {
     },
   })
 }, 1000)
+
+function onHandlePointerDown(event: PointerEvent) {
+  if (event.button !== 0 || event.isPrimary === false) return
+  const target = event.target
+  if (
+    target instanceof Element &&
+    target.closest(
+      'button, a[href], input, select, textarea, [tabindex], [contenteditable]',
+    )
+  )
+    return
+  // Moveable prevents the native mouse default and only blurs text fields.
+  // Release buttons too when pressing the drag surface, before drag handling.
+  const active = document.activeElement
+  if (active instanceof HTMLElement) active.blur()
+}
 
 const onDrag = (event: any) => {
   const { target, transform } = event

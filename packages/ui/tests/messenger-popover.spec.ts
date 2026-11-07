@@ -200,6 +200,79 @@ afterEach(async () => {
 })
 
 describe('messenger routed popover', () => {
+  it.each(['button', 'panel-input'])(
+    'releases a focused %s when the drag bar prevents the mouse default',
+    async (kind) => {
+      const f = await fixture()
+      if (kind === 'panel-input') {
+        await f.messenger.navigateTo({ name: 'settings' })
+        await flushPromises()
+      }
+      const focused =
+        kind === 'button'
+          ? f.wrapper.get<HTMLButtonElement>('[data-navigation]').element
+          : f.portal.querySelector<HTMLInputElement>('[data-draft]')!
+      focused.focus()
+      const handle = f.wrapper.get<HTMLElement>('.moveable-handle').element
+      const surface = document.createElement('span')
+      handle.append(surface)
+      handle.addEventListener('mousedown', (event) => event.preventDefault())
+      const pointer = new MouseEvent('pointerdown', {
+        bubbles: true,
+        cancelable: true,
+        button: 0,
+      })
+      surface.dispatchEvent(pointer)
+      const mouse = new MouseEvent('mousedown', {
+        bubbles: true,
+        cancelable: true,
+        button: 0,
+      })
+      surface.dispatchEvent(mouse)
+      await Vue.nextTick()
+      expect(mouse.defaultPrevented).toBe(true)
+      expect(pointer.defaultPrevented).toBe(false)
+      expect(document.activeElement).not.toBe(focused)
+      expect(f.messenger.isViewShown.value).toBe(kind === 'panel-input')
+    },
+  )
+
+  it('preserves focus when pressing an interactive control within the drag bar', async () => {
+    const f = await fixture()
+    const handle = f.wrapper.get<HTMLElement>('.moveable-handle').element
+    const control = document.createElement('button')
+    const icon = document.createElement('span')
+    control.append(icon)
+    handle.append(control)
+    control.focus()
+    icon.dispatchEvent(
+      new MouseEvent('pointerdown', {
+        bubbles: true,
+        cancelable: true,
+        button: 0,
+      }),
+    )
+    expect(document.activeElement).toBe(control)
+  })
+
+  it.each([1, 2])(
+    'does not clear focus on drag-bar mouse button %s',
+    async (button) => {
+      const f = await fixture()
+      const focused =
+        f.wrapper.get<HTMLButtonElement>('[data-navigation]').element
+      focused.focus()
+      f.wrapper.get('.moveable-handle').element.dispatchEvent(
+        new MouseEvent('pointerdown', {
+          bubbles: true,
+          cancelable: true,
+          button,
+        }),
+      )
+      expect(document.activeElement).toBe(focused)
+    },
+  )
+
   it('does not let the closing reset cancel a later guarded navigation', async () => {
     const f = await fixture()
     await f.messenger.navigateTo({ name: 'settings' })
