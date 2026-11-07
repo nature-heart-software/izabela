@@ -53,6 +53,7 @@ import { onMounted, useId } from 'vue'
 import { Popover, usePopover } from '@ark-ui/vue'
 import { NvButton, NvCard, NvStack, NvText, NvTooltip } from '@packages/ui'
 import { css } from '@/styled-system/css'
+import { getTabStops } from '@/utils/focus'
 
 const props = defineProps<{
   sidebar?: HTMLElement
@@ -81,18 +82,7 @@ function onCloseTab(event: KeyboardEvent) {
 
 function focusArea(area?: HTMLElement, preferCurrent = false) {
   if (!area) return
-  const candidates = [
-    ...area.querySelectorAll<HTMLElement>(
-      'a[href], button, input, select, textarea, [tabindex], [contenteditable="true"]',
-    ),
-  ].filter(
-    (element) =>
-      element.tabIndex >= 0 &&
-      !element.matches(':disabled') &&
-      !element.closest('[inert], [hidden], [aria-hidden="true"]') &&
-      element.getClientRects().length > 0 &&
-      getComputedStyle(element).visibility !== 'hidden',
-  )
+  const candidates = getTabStops(area)
   const target =
     (preferCurrent &&
       candidates.find(

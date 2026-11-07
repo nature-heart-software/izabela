@@ -10,6 +10,7 @@ import { readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { execFileSync } from 'node:child_process'
+import { getTabStops } from '../../../apps/app/src/utils/focus'
 
 const here = dirname(fileURLToPath(import.meta.url))
 execFileSync(process.execPath, [resolve(here, 'build-client.mjs')], {
@@ -23,6 +24,7 @@ const imports: Record<string, unknown> = {
   'vue-router': Router,
   '@ark-ui/vue': Ark,
   '@packages/ui': ui,
+  '@/utils/focus': { getTabStops },
   '@/styled-system/css': {
     css: (styles: Record<string, string>) =>
       styles.overflowY === 'auto' ? 'route-scroll-area' : '',

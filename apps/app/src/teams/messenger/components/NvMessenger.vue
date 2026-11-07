@@ -133,6 +133,7 @@ import { useElementSize, useEventListener, useWindowSize } from '@vueuse/core'
 import throttle from 'lodash/throttle'
 import { isGameOverlay } from '@/consts.ts'
 import { Popover, usePopover } from '@ark-ui/vue'
+import { getTabStops } from '@/utils/focus'
 
 const routerOverlay = inject<Ref<HTMLElement | undefined>>('router-overlay')
 // import gsap from 'gsap'
@@ -195,10 +196,58 @@ let pendingNavigation = 0
 let hasLeft = true
 let disposed = false
 const closePanel = () => {
+  const wasOpen = popover.value.open
+  const isSettings = String(router.currentRoute.value.name).startsWith(
+    'settings',
+  )
+  const returnTarget =
+    document.querySelector<HTMLElement>(
+      isSettings
+        ? '[data-v-step="settings-button"]'
+        : '[data-v-step="message-history-button"]',
+    ) || document.querySelector<HTMLElement>('[data-v-step="messages-button"]')
   navigationId++
   pendingNavigation = 0
   popover.value.setOpen(false)
+  if (wasOpen) returnTarget?.focus({ preventScroll: true })
 }
+
+useEventListener(document, 'keydown', (event: KeyboardEvent) => {
+  if (
+    event.key !== 'Tab' ||
+    event.altKey ||
+    event.ctrlKey ||
+    event.metaKey ||
+    !popover.value.open
+  )
+    return
+  const panel = routerOverlay?.value?.querySelector<HTMLElement>(
+    '[aria-label="Messenger panel"]',
+  )
+  if (!panel) return
+  const stops = getTabStops(panel)
+  const active = document.activeElement
+  // Nested controls own handled keys while focus remains inside. Ark's
+  // portalled Tab proxy can already have moved it outside in capture phase.
+  if (event.defaultPrevented && panel.contains(active)) return
+  const edge = event.shiftKey ? stops[0] : stops.at(-1)
+  // A focused content region can have no controls after it (empty History).
+  // Let ordinary Tab behavior run inside the panel; intercept only its edges.
+  const hasNext =
+    active &&
+    stops.some(
+      (element) =>
+        active.compareDocumentPosition(element) &
+        (event.shiftKey
+          ? Node.DOCUMENT_POSITION_PRECEDING
+          : Node.DOCUMENT_POSITION_FOLLOWING),
+    )
+  if (!panel.contains(active) || active === edge || !hasNext) {
+    event.preventDefault()
+    const target = (event.shiftKey ? stops.at(-1) : stops[0]) || panel
+    target.focus()
+  }
+})
 const resetRoute = () => {
   hasLeft = true
   // Reset only after the panel has fully left, so retained route drafts survive
