@@ -15,7 +15,7 @@
       </ReferenceTrigger>
       <Teleport :to="portalTarget" defer>
         <StTooltipPositioner
-          v-if="open && !focused"
+          v-if="open && !expanded"
           :style="{ '--nv-tooltip-enter-duration': `${enterDuration}ms` }"
         >
           <StTooltipContent><slot /></StTooltipContent>
@@ -38,6 +38,7 @@ import {
   Text,
   useAttrs,
   useId,
+  watch,
   watchPostEffect,
   type VNode,
 } from 'vue'
@@ -52,7 +53,6 @@ import { tokens } from '@/styles/tokens'
 import {
   type MaybeElement,
   useEventListener,
-  useFocusWithin,
   useMutationObserver,
 } from '@vueuse/core'
 import { getElement } from '@/utils/vue'
@@ -66,6 +66,7 @@ const referenceAttrs = () =>
     Object.entries(attrs).filter(([key]) => key !== 'class' && key !== 'style'),
   )
 const trigger = ref()
+const expanded = ref(false)
 const triggerId = ref(`nv-tooltip-${useId()}-trigger`)
 const referenceId = () =>
   typeof attrs.id === 'string' ? attrs.id : triggerId.value
@@ -87,9 +88,18 @@ const ReferenceTrigger = defineComponent({
       // Vue can supply an array of listeners when overlay triggers are nested.
       // Ark 3's as-child merger only composes functions and drops those arrays
       // when the native control also has a listener (e.g. Ctrl-click to toggle).
+      const triggerProps = tooltipApi.value.getTriggerProps()
       const merged = mergeProps(
         node.props || {},
-        { ...tooltipApi.value.getTriggerProps() },
+        {
+          ...triggerProps,
+          onFocus: (event: FocusEvent) => {
+            if (!expanded.value) triggerProps.onFocus?.(event)
+          },
+          onPointermove: (event: PointerEvent) => {
+            if (!expanded.value) triggerProps.onPointermove?.(event)
+          },
+        },
         attrs,
       )
       merged.id = node.props?.id || attrs.id || triggerId.value
@@ -111,13 +121,21 @@ function syncTrigger() {
     ? element
     : element?.querySelector<HTMLElement>(selector) || element
   if (target?.id) triggerId.value = target.id
+  expanded.value = !!(
+    target?.matches('[aria-expanded="true"]') ||
+    target?.querySelector('[aria-expanded="true"]')
+  )
 }
 watchPostEffect(syncTrigger)
 const tooltip = ref<MaybeElement>()
 // Async voice components can replace a comment with their control without
 // changing the reference's component ref. Observe that scoped DOM boundary.
-useMutationObserver(tooltip, syncTrigger, { childList: true, subtree: true })
-const { focused } = useFocusWithin(tooltip)
+useMutationObserver(tooltip, syncTrigger, {
+  childList: true,
+  subtree: true,
+  attributes: true,
+  attributeFilter: ['aria-expanded'],
+})
 const injectedPortalTarget = inject(PORTAL_TARGET)
 const portalTarget = computed(
   () => getElement(injectedPortalTarget) || document.body,
@@ -159,7 +177,6 @@ const positioning = computed<TooltipRootProps['positioning']>(() => ({
 const tooltipApi = useTooltip(
   reactive({
     ids: computed(() => ({ trigger: triggerId.value })),
-    disabled: focused,
     openDelay,
     closeDelay,
     positioning,
@@ -173,6 +190,24 @@ function deactivate(event: Event) {
   tooltipApi.value.getTriggerProps().onPointerleave?.(event as PointerEvent)
   tooltipApi.value.setOpen(false)
 }
+function onOutsidePointerDown(event: PointerEvent) {
+  const path = event.composedPath()
+  const reference = getElement(tooltip.value)
+  const contentId = tooltipApi.value.getContentProps().id
+  const content = contentId ? document.getElementById(contentId) : null
+  if (
+    (reference && path.includes(reference)) ||
+    (content && path.includes(content))
+  )
+    return
+  // An outside click can leave the trigger focused. Dismiss independently of
+  // blur, without consuming the click or interfering with interactive content.
+  deactivate(event)
+}
+useEventListener(document, 'pointerdown', onOutsidePointerDown, { capture: true })
+watch(expanded, (expanded) => {
+  if (expanded) deactivate(new Event('pointerleave'))
+})
 useEventListener(window, 'blur', deactivate)
 useEventListener(document, 'visibilitychange', (event) => {
   if (document.hidden) deactivate(event)

@@ -827,6 +827,28 @@ describe('rendered composition and helper contracts', () => {
     expect(w.text()).not.toContain('Sign in')
     expect(w.text()).toContain('Protected content')
   })
+  it('makes only protected content inert and removes focus when access is revoked', async () => {
+    const w = render(ui.NvAccessBlocker, {
+      props: { allowed: true },
+      slots: {
+        default: () => h('input', { id: 'protected-input', tabindex: 2 }),
+        reason: () => h('button', { id: 'access-action' }, 'Sign in'),
+      },
+    })
+    const input = w.get('input').element as HTMLInputElement
+    input.focus()
+    expect(document.activeElement).toBe(input)
+    await w.setProps({ allowed: false })
+    expect(input.closest('[inert]')).not.toBeNull()
+    expect(document.activeElement).not.toBe(input)
+    expect(w.get('#access-action').element.closest('[inert]')).toBeNull()
+    await w.setProps({ allowed: true })
+    expect(w.get('input').element).toBe(input)
+    expect(input.closest('[inert]')).toBeNull()
+    expect(input.getAttribute('tabindex')).toBe('2')
+    input.focus()
+    expect(document.activeElement).toBe(input)
+  })
   it.each(['success', 'warning', 'info', 'error'])(
     'alert renders %s content without claiming an implicit alert role',
     (type) => {
@@ -1028,7 +1050,7 @@ describe('real overlay controls', () => {
     await settle()
     expect(onClick).toHaveBeenCalledExactlyOnceWith()
   })
-  it('tooltip uses Ark rendering, suppresses focused content and cleans up its portal', async () => {
+  it('tooltip uses Ark rendering, supports focused references and cleans up its portal', async () => {
     const w = render(ui.NvTooltip, {
       props: { tippyOptions: { delay: 0, duration: 0 } },
       slots: {
@@ -1044,7 +1066,9 @@ describe('real overlay controls', () => {
     ).toContain('Tooltip content')
     ;(w.get('button').element as HTMLElement).focus()
     await settle()
-    expect(document.body.querySelector('[role="tooltip"]')).toBeNull()
+    expect(
+      document.body.querySelector('[role="tooltip"]')?.textContent,
+    ).toContain('Tooltip content')
     w.unmount()
     wrappers.splice(wrappers.indexOf(w), 1)
     await settle()

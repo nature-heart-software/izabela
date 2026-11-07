@@ -39,11 +39,12 @@ async function settle() {
   await new Promise((done) => setTimeout(done, 40))
   await flushPromises()
 }
-async function key(target: EventTarget, key: string) {
+async function key(target: EventTarget, key: string, repeat = false) {
   const event = new KeyboardEvent('keydown', {
     key,
     bubbles: true,
     cancelable: true,
+    repeat,
   })
   const focused = document.activeElement
   ;(target === window && focused && focused !== document.body
@@ -112,6 +113,44 @@ afterEach(() => {
 })
 
 describe('compiled Select and Autocomplete interaction boundaries', () => {
+  it('reuses the option collection while holding Arrow Down through a long list', async () => {
+    const options = Array.from({ length: 1000 }, (_, index) => ({
+      label: `Voice ${index}`,
+      value: index,
+    }))
+    vi.spyOn(Element.prototype, 'scrollTo').mockImplementation(function (
+      this: Element,
+      position: ScrollToOptions | number,
+    ) {
+      if (typeof position !== 'object') return
+      this.scrollTop = position.top ?? this.scrollTop
+      this.dispatchEvent(new Event('scroll'))
+    })
+    const w = render(ui.NvSelect, { props: { options, modelValue: 0 } })
+    const input = w.get('input').element as HTMLInputElement
+    input.focus()
+    input.click()
+    await settle()
+    const provider = w.findComponent({ name: 'combobox-root-provider' })
+    const collection = provider.props('value').collection
+    for (let index = 1; index <= 20; index++) {
+      await key(input, 'ArrowDown', true)
+      expect(provider.props('value').collection).toBe(collection)
+      const active = document.getElementById(
+        input.getAttribute('aria-activedescendant')!,
+      )
+      expect(active?.textContent).toContain(`Voice ${index}`)
+      expect(document.querySelectorAll('[role="option"]').length).toBeLessThan(
+        30,
+      )
+    }
+    expect(
+      document.querySelector('.autocomplete__list')!.scrollTop,
+    ).toBeGreaterThan(0)
+    await key(input, 'Enter')
+    expect(w.emitted('update:modelValue')).toEqual([[20]])
+  })
+
   it('accepts Tab focus into consecutive selects and lets Tab and Shift+Tab leave them', async () => {
     const w = render({
       render: () =>
@@ -160,7 +199,7 @@ describe('compiled Select and Autocomplete interaction boundaries', () => {
     expect(document.activeElement).toBe(before)
   })
 
-  it.each(['click', 'arrow', 'typing'])(
+  it.each(['click', 'arrow', 'enter', 'typing'])(
     'stays closed on repeated focus and opens deliberately by %s',
     async (method) => {
       const w = render(ui.NvSelect, { props: { options, modelValue: 'a' } })
@@ -178,12 +217,33 @@ describe('compiled Select and Autocomplete interaction boundaries', () => {
       input.focus()
       if (method === 'click') input.click()
       else if (method === 'arrow') await key(input, 'ArrowDown')
+      else if (method === 'enter') await key(input, 'Enter')
       else await w.get('input').setValue('Beta')
       await settle()
       expect(input.getAttribute('aria-expanded')).toBe('true')
       await key(input, 'Escape')
       expect(document.activeElement).toBe(input)
       expect(input.getAttribute('aria-expanded')).toBe('false')
+    },
+  )
+
+  it.each([false, true])(
+    'opens with Enter without selecting, then accepts an option with Enter (multiple=%s)',
+    async (multiple) => {
+      const w = render(ui.NvSelect, {
+        props: { options, multiple, modelValue: multiple ? ['a'] : 'a' },
+      })
+      const input = w.get('input').element as HTMLInputElement
+      input.focus()
+      const opening = await key(input, 'Enter')
+      expect(opening.defaultPrevented).toBe(true)
+      expect(input.getAttribute('aria-expanded')).toBe('true')
+      expect(w.emitted('update:modelValue')).toBeUndefined()
+      await key(input, 'ArrowDown')
+      await key(input, 'Enter')
+      expect(w.emitted('update:modelValue')).toEqual([
+        [multiple ? ['a', 'b'] : 'b'],
+      ])
     },
   )
 
