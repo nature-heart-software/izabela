@@ -1062,7 +1062,7 @@ async function runJourneys(context) {
       await evaluate(messenger, () => {
         document
           .querySelector('[title="Elf"] button[title="Add to favorites"]')
-          .dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+          .click()
       })
       await until(
         () =>

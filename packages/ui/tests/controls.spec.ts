@@ -730,6 +730,10 @@ describe('real select composition', () => {
                 onMousedown: (event: MouseEvent) => {
                   event.preventDefault()
                   event.stopPropagation()
+                },
+                onClick: (event: MouseEvent) => {
+                  event.preventDefault()
+                  event.stopPropagation()
                   favorites.value = favorites.value.filter(
                     (id) => id !== option.id,
                   )
@@ -760,6 +764,12 @@ describe('real select composition', () => {
     buttons[0].dispatchEvent(
       new MouseEvent('mousedown', { bubbles: true, cancelable: true }),
     )
+    await settle()
+    expect(favorites.value).toEqual(['voice-elf'])
+    buttons[0].dispatchEvent(
+      new MouseEvent('mouseup', { bubbles: true, cancelable: true }),
+    )
+    buttons[0].click()
     await settle()
     expect(favorites.value).toEqual([])
     expect(

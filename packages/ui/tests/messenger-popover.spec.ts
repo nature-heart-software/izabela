@@ -4,6 +4,8 @@ import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
 import * as Vue from 'vue'
 import * as VueRouter from 'vue-router'
 import * as Ark from '@ark-ui/vue'
+import { useEventListener } from '@vueuse/core'
+import { getTabStops } from '../../../apps/app/src/utils/focus'
 import { compileScript, parse } from '@vue/compiler-sfc'
 import ts from 'typescript'
 import { readFileSync } from 'node:fs'
@@ -46,14 +48,35 @@ async function fixture() {
     setup() {
       messenger = Vue.inject<Messenger>('messenger')!
       return () =>
-        Vue.h(
-          'button',
-          {
-            'data-navigation': '',
-            onClick: () => messenger.navigateTo({ name: 'settings' }),
-          },
-          'Settings',
-        )
+        Vue.h('div', [
+          Vue.h(
+            'button',
+            {
+              'data-navigation': '',
+              'data-v-step': 'settings-button',
+              onClick: () => messenger.navigateTo({ name: 'settings' }),
+            },
+            'Settings',
+          ),
+          Vue.h(
+            'button',
+            {
+              'data-messages': '',
+              'data-v-step': 'messages-button',
+              onClick: () => messenger.navigateTo({ name: 'messages' }),
+            },
+            'Messages',
+          ),
+          Vue.h(
+            'button',
+            {
+              'data-history': '',
+              'data-v-step': 'message-history-button',
+              onClick: () => messenger.navigateTo({ name: 'messages' }),
+            },
+            'History',
+          ),
+        ])
     },
   })
   const Moveable = Vue.defineComponent({
@@ -92,6 +115,7 @@ async function fixture() {
       },
     },
     '@/styled-system/css': { css: () => '' },
+    '@/utils/focus': { getTabStops },
     '@packages/ui': {
       NvCard: Div,
       NvGroup: Div,
@@ -105,7 +129,7 @@ async function fixture() {
     '@vueuse/core': {
       useWindowSize: () => ({ width: Vue.ref(1024), height: Vue.ref(768) }),
       useElementSize: () => ({ width: Vue.ref(768), height: Vue.ref(180) }),
-      useEventListener: () => {},
+      useEventListener,
     },
   }
   new Function('require', 'module', 'exports', code)(
@@ -136,7 +160,11 @@ async function fixture() {
           }),
           Vue.h(
             'button',
-            { 'data-close': '', onClick: () => emit('close') },
+            {
+              'data-close': '',
+              'data-messenger-panel-close': '',
+              onClick: () => emit('close'),
+            },
             'Close',
           ),
         ])
@@ -180,6 +208,10 @@ async function fixture() {
 }
 
 beforeEach(() => {
+  const rect = new DOMRect(0, 0, 300, 100)
+  vi.spyOn(HTMLElement.prototype, 'getClientRects').mockReturnValue([
+    rect,
+  ] as any)
   // jsdom has no layout observer; Ark's real positioning lifecycle still runs.
   vi.stubGlobal(
     'ResizeObserver',
@@ -197,9 +229,95 @@ afterEach(async () => {
   await flushPromises()
   vi.useRealTimers()
   vi.unstubAllGlobals()
+  vi.restoreAllMocks()
 })
 
 describe('messenger routed popover', () => {
+  it.each(['settings', 'messages'])(
+    'wraps Tab and Shift+Tab inside the %s panel, skipping blocked controls',
+    async (name) => {
+      const f = await fixture()
+      await f.messenger.navigateTo({ name })
+      await flushPromises()
+      await delay(40)
+      const input = f.portal.querySelector<HTMLInputElement>('[data-draft]')!
+      const close = f.portal.querySelector<HTMLButtonElement>('[data-close]')!
+      const disabled = document.createElement('button')
+      disabled.disabled = true
+      input.before(disabled)
+      const blocked = document.createElement('div')
+      blocked.setAttribute('inert', '')
+      blocked.append(document.createElement('button'))
+      close.after(blocked)
+      const emptyRegion = document.createElement('div')
+      emptyRegion.tabIndex = -1
+      close.after(emptyRegion)
+      for (const [target, shiftKey, expected] of [
+        [input, true, close],
+        [close, false, input],
+      ] as const) {
+        target.focus()
+        const event = new KeyboardEvent('keydown', {
+          key: 'Tab',
+          shiftKey,
+          bubbles: true,
+          cancelable: true,
+        })
+        target.dispatchEvent(event)
+        expect(event.defaultPrevented).toBe(true)
+        expect(document.activeElement).toBe(expected)
+      }
+      emptyRegion.focus()
+      emptyRegion.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: 'Tab',
+          bubbles: true,
+          cancelable: true,
+        }),
+      )
+      expect(document.activeElement).toBe(input)
+      // Mouse access to the messenger remains available, but the next Tab
+      // returns to the panel rather than continuing through the background.
+      const navigation =
+        f.wrapper.get<HTMLButtonElement>('[data-navigation]').element
+      navigation.focus()
+      navigation.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: 'Tab',
+          bubbles: true,
+          cancelable: true,
+        }),
+      )
+      expect(document.activeElement).toBe(input)
+    },
+  )
+
+  it.each([
+    ['settings', '[data-navigation]'],
+    ['messages', '[data-messages]'],
+  ])(
+    'returns focus from %s to its messenger button when closed',
+    async (name, selector) => {
+      const f = await fixture()
+      await f.messenger.navigateTo({ name })
+      await flushPromises()
+      await delay(40)
+      f.portal.querySelector<HTMLButtonElement>('[data-close]')!.click()
+      await flushPromises()
+      await delay(40)
+      expect(f.messenger.isViewShown.value).toBe(false)
+      expect(document.activeElement).toBe(f.wrapper.get(selector).element)
+      // The closing transition must not leave the old panel's trap active.
+      const event = new KeyboardEvent('keydown', {
+        key: 'Tab',
+        bubbles: true,
+        cancelable: true,
+      })
+      document.activeElement!.dispatchEvent(event)
+      expect(event.defaultPrevented).toBe(false)
+    },
+  )
+
   it.each(['button', 'panel-input'])(
     'releases a focused %s when the drag bar prevents the mouse default',
     async (kind) => {
@@ -319,7 +437,7 @@ describe('messenger routed popover', () => {
     expect(f.reposition).toHaveBeenCalledTimes(1)
   })
 
-  it('keeps manual dismissal and focus without blocking navigation buttons', async () => {
+  it('focuses Close on opening while keeping manual dismissal and navigation buttons', async () => {
     const f = await fixture()
     const navigation =
       f.wrapper.get<HTMLButtonElement>('[data-navigation]').element
@@ -327,7 +445,7 @@ describe('messenger routed popover', () => {
     navigation.click()
     await flushPromises()
     await delay(40)
-    expect(document.activeElement).toBe(navigation)
+    expect(document.activeElement).toBe(f.portal.querySelector('[data-close]'))
     const input = f.portal.querySelector<HTMLInputElement>('[data-draft]')!
     input.focus()
     await delay(40)
@@ -348,6 +466,27 @@ describe('messenger routed popover', () => {
     navigation.click()
     await flushPromises()
     expect(f.messenger.isViewShown.value).toBe(false)
+  })
+
+  it('focuses Close when reopening a retained panel during its exit transition', async () => {
+    const f = await fixture()
+    await f.messenger.navigateTo({ name: 'settings' })
+    await flushPromises()
+    await delay(40)
+    const input = f.portal.querySelector<HTMLInputElement>('[data-draft]')!
+    input.value = 'Retained draft'
+    input.dispatchEvent(new Event('input', { bubbles: true }))
+    input.focus()
+    f.portal.querySelector<HTMLButtonElement>('[data-close]')!.click()
+    await Vue.nextTick()
+    await f.messenger.navigateTo({ name: 'settings' })
+    await flushPromises()
+    await delay(40)
+    expect(document.activeElement).toBe(f.portal.querySelector('[data-close]'))
+    expect(f.mounts()).toBe(1)
+    expect(
+      f.portal.querySelector<HTMLInputElement>('[data-draft]')!.value,
+    ).toBe('Retained draft')
   })
 
   it('cancels delayed drag and focus work when the messenger unmounts', async () => {
