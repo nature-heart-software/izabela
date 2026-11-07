@@ -884,7 +884,7 @@
             "buttonPressed": "#e5e5e5",
             "inverseHover": "#191919",
             "inversePressed": "#2c2c2c",
-            "buttonFocus": "#0b0b0b",
+            "buttonFocus": "rgba(11, 11, 11, 0.11999999731779099)",
             "loadingMask": "rgba(255, 255, 255, 0.8999999761581421)",
             "borderHover": "#0c0c0c",
             "disabledText": "#6d6d6d",
@@ -931,7 +931,7 @@
             "buttonPressed": "#262626",
             "inverseHover": "#e8e8e8",
             "inversePressed": "#d6d6d6",
-            "buttonFocus": "#e9e9e9",
+            "buttonFocus": "rgba(233, 233, 233, 0.11999999731779099)",
             "loadingMask": "rgba(23, 23, 23, 0.8999999761581421)",
             "borderHover": "#505050",
             "disabledText": "#a1a1a1",
@@ -980,7 +980,7 @@
             "buttonPressed": "#e6eaef",
             "inverseHover": "#363a3f",
             "inversePressed": "#484b4f",
-            "buttonFocus": "#0969da",
+            "buttonFocus": "rgba(9, 105, 218, 0.25)",
             "loadingMask": "rgba(246, 248, 250, 0.8999999761581421)",
             "borderHover": "#818b98",
             "disabledText": "#818b98",
@@ -1027,7 +1027,7 @@
             "buttonPressed": "#2a313c",
             "inverseHover": "#ebebeb",
             "inversePressed": "#d6d7d8",
-            "buttonFocus": "#1f6feb",
+            "buttonFocus": "rgba(31, 111, 235, 0.25)",
             "loadingMask": "rgba(33, 40, 48, 0.8999999761581421)",
             "borderHover": "#656c76",
             "disabledText": "#656c76",
@@ -1938,7 +1938,7 @@
             "buttonPressed": "#e5e5e5",
             "inverseHover": "#191919",
             "inversePressed": "#2c2c2c",
-            "buttonFocus": "#0b0b0b",
+            "buttonFocus": "rgba(11, 11, 11, 0.11999999731779099)",
             "loadingMask": "rgba(255, 255, 255, 0.8999999761581421)",
             "borderHover": "#0c0c0c",
             "disabledText": "#6d6d6d",
@@ -1985,7 +1985,7 @@
             "buttonPressed": "#262626",
             "inverseHover": "#e8e8e8",
             "inversePressed": "#d6d6d6",
-            "buttonFocus": "#e9e9e9",
+            "buttonFocus": "rgba(233, 233, 233, 0.11999999731779099)",
             "loadingMask": "rgba(23, 23, 23, 0.8999999761581421)",
             "borderHover": "#505050",
             "disabledText": "#a1a1a1",
@@ -2034,7 +2034,7 @@
             "buttonPressed": "#e6eaef",
             "inverseHover": "#363a3f",
             "inversePressed": "#484b4f",
-            "buttonFocus": "#0969da",
+            "buttonFocus": "rgba(9, 105, 218, 0.25)",
             "loadingMask": "rgba(246, 248, 250, 0.8999999761581421)",
             "borderHover": "#818b98",
             "disabledText": "#818b98",
@@ -2081,7 +2081,7 @@
             "buttonPressed": "#2a313c",
             "inverseHover": "#ebebeb",
             "inversePressed": "#d6d7d8",
-            "buttonFocus": "#1f6feb",
+            "buttonFocus": "rgba(31, 111, 235, 0.25)",
             "loadingMask": "rgba(33, 40, 48, 0.8999999761581421)",
             "borderHover": "#656c76",
             "disabledText": "#656c76",
@@ -2211,7 +2211,7 @@
             },
             "border": "rgba(10, 10, 10, 0.10000000149011612)",
             "focus": {
-              "ring": "#0b0b0b"
+              "ring": "rgba(11, 11, 11, 0.11999999731779099)"
             }
           },
           "plain": {
@@ -2231,7 +2231,7 @@
             },
             "border": "#060606",
             "focus": {
-              "ring": "#0b0b0b"
+              "ring": "rgba(11, 11, 11, 0.11999999731779099)"
             }
           },
           "ghost": {
@@ -2251,7 +2251,7 @@
             },
             "border": "rgba(255, 255, 255, 0)",
             "focus": {
-              "ring": "#0b0b0b"
+              "ring": "rgba(11, 11, 11, 0.11999999731779099)"
             }
           },
           "ghost-alt": {
@@ -2271,7 +2271,7 @@
             },
             "border": "rgba(255, 255, 255, 0)",
             "focus": {
-              "ring": "#0b0b0b"
+              "ring": "rgba(11, 11, 11, 0.11999999731779099)"
             }
           },
           "active": {
@@ -2291,7 +2291,7 @@
             },
             "border": "#060606",
             "focus": {
-              "ring": "#0b0b0b"
+              "ring": "rgba(11, 11, 11, 0.11999999731779099)"
             }
           }
         },
@@ -2398,7 +2398,7 @@
               "text": "#171717",
               "background": "#ffffff",
               "border": "#0c0c0c",
-              "focus-ring": "#0b0b0b"
+              "focus-ring": "rgba(11, 11, 11, 0.11999999731779099)"
             },
             "placeholder": "#6d6d6d"
           }
@@ -2442,7 +2442,7 @@
               "background": "#ffffff",
               "thumb-background": "#6d6d6d",
               "border": "#0c0c0c",
-              "focus-ring": "#0b0b0b"
+              "focus-ring": "rgba(11, 11, 11, 0.11999999731779099)"
             }
           },
           "on": {
@@ -2458,7 +2458,7 @@
               "background": "#060606",
               "thumb-background": "#f5f5f5",
               "border": "#060606",
-              "focus-ring": "#0b0b0b"
+              "focus-ring": "rgba(11, 11, 11, 0.11999999731779099)"
             }
           }
         },
@@ -2485,7 +2485,7 @@
               "icon": "#171717",
               "background": "rgba(255, 255, 255, 0)",
               "border": "rgba(255, 255, 255, 0)",
-              "focus-ring": "#0b0b0b"
+              "focus-ring": "rgba(11, 11, 11, 0.11999999731779099)"
             }
           }
         },
@@ -2503,7 +2503,7 @@
               "text": "#171717",
               "background": "#ffffff",
               "border": "#0c0c0c",
-              "focus-ring": "#0b0b0b"
+              "focus-ring": "rgba(11, 11, 11, 0.11999999731779099)"
             },
             "placeholder": "#6d6d6d"
           }
@@ -2533,7 +2533,7 @@
               "track-background": "#e9e9e9"
             },
             "thumb-focus": {
-              "focus-ring": "#0b0b0b"
+              "focus-ring": "rgba(11, 11, 11, 0.11999999731779099)"
             }
           }
         },
@@ -2551,7 +2551,7 @@
               "text": "#171717",
               "background": "#ffffff",
               "border": "#0c0c0c",
-              "focus-ring": "#0b0b0b"
+              "focus-ring": "rgba(11, 11, 11, 0.11999999731779099)"
             },
             "placeholder": "#6d6d6d"
           }
@@ -2580,7 +2580,7 @@
               "icon": "#171717",
               "background": "#ffffff",
               "border": "#0c0c0c",
-              "focus-ring": "#0b0b0b"
+              "focus-ring": "rgba(11, 11, 11, 0.11999999731779099)"
             },
             "placeholder": "#6d6d6d"
           }
@@ -2631,7 +2631,7 @@
               "icon": "#f5f5f5"
             },
             "focus": {
-              "ring": "#0b0b0b"
+              "ring": "rgba(11, 11, 11, 0.11999999731779099)"
             }
           }
         },
@@ -2992,7 +2992,7 @@
             "buttonPressed": "#e5e5e5",
             "inverseHover": "#191919",
             "inversePressed": "#2c2c2c",
-            "buttonFocus": "#0b0b0b",
+            "buttonFocus": "rgba(11, 11, 11, 0.11999999731779099)",
             "loadingMask": "rgba(255, 255, 255, 0.8999999761581421)",
             "borderHover": "#0c0c0c",
             "disabledText": "#6d6d6d",
@@ -3039,7 +3039,7 @@
             "buttonPressed": "#262626",
             "inverseHover": "#e8e8e8",
             "inversePressed": "#d6d6d6",
-            "buttonFocus": "#e9e9e9",
+            "buttonFocus": "rgba(233, 233, 233, 0.11999999731779099)",
             "loadingMask": "rgba(23, 23, 23, 0.8999999761581421)",
             "borderHover": "#505050",
             "disabledText": "#a1a1a1",
@@ -3088,7 +3088,7 @@
             "buttonPressed": "#e6eaef",
             "inverseHover": "#363a3f",
             "inversePressed": "#484b4f",
-            "buttonFocus": "#0969da",
+            "buttonFocus": "rgba(9, 105, 218, 0.25)",
             "loadingMask": "rgba(246, 248, 250, 0.8999999761581421)",
             "borderHover": "#818b98",
             "disabledText": "#818b98",
@@ -3135,7 +3135,7 @@
             "buttonPressed": "#2a313c",
             "inverseHover": "#ebebeb",
             "inversePressed": "#d6d7d8",
-            "buttonFocus": "#1f6feb",
+            "buttonFocus": "rgba(31, 111, 235, 0.25)",
             "loadingMask": "rgba(33, 40, 48, 0.8999999761581421)",
             "borderHover": "#656c76",
             "disabledText": "#656c76",
@@ -3265,7 +3265,7 @@
             },
             "border": "#333333",
             "focus": {
-              "ring": "#e9e9e9"
+              "ring": "rgba(233, 233, 233, 0.11999999731779099)"
             }
           },
           "plain": {
@@ -3285,7 +3285,7 @@
             },
             "border": "#fafafa",
             "focus": {
-              "ring": "#e9e9e9"
+              "ring": "rgba(233, 233, 233, 0.11999999731779099)"
             }
           },
           "ghost": {
@@ -3305,7 +3305,7 @@
             },
             "border": "rgba(15, 15, 15, 0)",
             "focus": {
-              "ring": "#e9e9e9"
+              "ring": "rgba(233, 233, 233, 0.11999999731779099)"
             }
           },
           "ghost-alt": {
@@ -3325,7 +3325,7 @@
             },
             "border": "rgba(15, 15, 15, 0)",
             "focus": {
-              "ring": "#e9e9e9"
+              "ring": "rgba(233, 233, 233, 0.11999999731779099)"
             }
           },
           "active": {
@@ -3345,7 +3345,7 @@
             },
             "border": "#fafafa",
             "focus": {
-              "ring": "#e9e9e9"
+              "ring": "rgba(233, 233, 233, 0.11999999731779099)"
             }
           }
         },
@@ -3452,7 +3452,7 @@
               "text": "#f5f5f5",
               "background": "#171717",
               "border": "#505050",
-              "focus-ring": "#e9e9e9"
+              "focus-ring": "rgba(233, 233, 233, 0.11999999731779099)"
             },
             "placeholder": "#a1a1a1"
           }
@@ -3496,7 +3496,7 @@
               "background": "#171717",
               "thumb-background": "#a1a1a1",
               "border": "#505050",
-              "focus-ring": "#e9e9e9"
+              "focus-ring": "rgba(233, 233, 233, 0.11999999731779099)"
             }
           },
           "on": {
@@ -3512,7 +3512,7 @@
               "background": "#fafafa",
               "thumb-background": "#171717",
               "border": "#fafafa",
-              "focus-ring": "#e9e9e9"
+              "focus-ring": "rgba(233, 233, 233, 0.11999999731779099)"
             }
           }
         },
@@ -3539,7 +3539,7 @@
               "icon": "#f5f5f5",
               "background": "rgba(15, 15, 15, 0)",
               "border": "rgba(15, 15, 15, 0)",
-              "focus-ring": "#e9e9e9"
+              "focus-ring": "rgba(233, 233, 233, 0.11999999731779099)"
             }
           }
         },
@@ -3557,7 +3557,7 @@
               "text": "#f5f5f5",
               "background": "#171717",
               "border": "#505050",
-              "focus-ring": "#e9e9e9"
+              "focus-ring": "rgba(233, 233, 233, 0.11999999731779099)"
             },
             "placeholder": "#a1a1a1"
           }
@@ -3587,7 +3587,7 @@
               "track-background": "#262626"
             },
             "thumb-focus": {
-              "focus-ring": "#e9e9e9"
+              "focus-ring": "rgba(233, 233, 233, 0.11999999731779099)"
             }
           }
         },
@@ -3605,7 +3605,7 @@
               "text": "#f5f5f5",
               "background": "#171717",
               "border": "#505050",
-              "focus-ring": "#e9e9e9"
+              "focus-ring": "rgba(233, 233, 233, 0.11999999731779099)"
             },
             "placeholder": "#a1a1a1"
           }
@@ -3634,7 +3634,7 @@
               "icon": "#f5f5f5",
               "background": "#171717",
               "border": "#505050",
-              "focus-ring": "#e9e9e9"
+              "focus-ring": "rgba(233, 233, 233, 0.11999999731779099)"
             },
             "placeholder": "#a1a1a1"
           }
@@ -3685,7 +3685,7 @@
               "icon": "#171717"
             },
             "focus": {
-              "ring": "#e9e9e9"
+              "ring": "rgba(233, 233, 233, 0.11999999731779099)"
             }
           }
         },
@@ -4046,7 +4046,7 @@
             "buttonPressed": "#e5e5e5",
             "inverseHover": "#191919",
             "inversePressed": "#2c2c2c",
-            "buttonFocus": "#0b0b0b",
+            "buttonFocus": "rgba(11, 11, 11, 0.11999999731779099)",
             "loadingMask": "rgba(255, 255, 255, 0.8999999761581421)",
             "borderHover": "#0c0c0c",
             "disabledText": "#6d6d6d",
@@ -4093,7 +4093,7 @@
             "buttonPressed": "#262626",
             "inverseHover": "#e8e8e8",
             "inversePressed": "#d6d6d6",
-            "buttonFocus": "#e9e9e9",
+            "buttonFocus": "rgba(233, 233, 233, 0.11999999731779099)",
             "loadingMask": "rgba(23, 23, 23, 0.8999999761581421)",
             "borderHover": "#505050",
             "disabledText": "#a1a1a1",
@@ -4142,7 +4142,7 @@
             "buttonPressed": "#e6eaef",
             "inverseHover": "#363a3f",
             "inversePressed": "#484b4f",
-            "buttonFocus": "#0969da",
+            "buttonFocus": "rgba(9, 105, 218, 0.25)",
             "loadingMask": "rgba(246, 248, 250, 0.8999999761581421)",
             "borderHover": "#818b98",
             "disabledText": "#818b98",
@@ -4189,7 +4189,7 @@
             "buttonPressed": "#2a313c",
             "inverseHover": "#ebebeb",
             "inversePressed": "#d6d7d8",
-            "buttonFocus": "#1f6feb",
+            "buttonFocus": "rgba(31, 111, 235, 0.25)",
             "loadingMask": "rgba(33, 40, 48, 0.8999999761581421)",
             "borderHover": "#656c76",
             "disabledText": "#656c76",
@@ -4319,7 +4319,7 @@
             },
             "border": "#d1d9e0",
             "focus": {
-              "ring": "#0969da"
+              "ring": "rgba(9, 105, 218, 0.25)"
             }
           },
           "plain": {
@@ -4339,7 +4339,7 @@
             },
             "border": "#25292e",
             "focus": {
-              "ring": "#0969da"
+              "ring": "rgba(9, 105, 218, 0.25)"
             }
           },
           "ghost": {
@@ -4359,7 +4359,7 @@
             },
             "border": "rgba(255, 255, 255, 0)",
             "focus": {
-              "ring": "#0969da"
+              "ring": "rgba(9, 105, 218, 0.25)"
             }
           },
           "ghost-alt": {
@@ -4379,7 +4379,7 @@
             },
             "border": "rgba(255, 255, 255, 0)",
             "focus": {
-              "ring": "#0969da"
+              "ring": "rgba(9, 105, 218, 0.25)"
             }
           },
           "active": {
@@ -4399,7 +4399,7 @@
             },
             "border": "#25292e",
             "focus": {
-              "ring": "#0969da"
+              "ring": "rgba(9, 105, 218, 0.25)"
             }
           }
         },
@@ -4506,7 +4506,7 @@
               "text": "#1f2328",
               "background": "#f6f8fa",
               "border": "#818b98",
-              "focus-ring": "#0969da"
+              "focus-ring": "rgba(9, 105, 218, 0.25)"
             },
             "placeholder": "#59636e"
           }
@@ -4550,7 +4550,7 @@
               "background": "#f6f8fa",
               "thumb-background": "#59636e",
               "border": "#818b98",
-              "focus-ring": "#0969da"
+              "focus-ring": "rgba(9, 105, 218, 0.25)"
             }
           },
           "on": {
@@ -4566,7 +4566,7 @@
               "background": "#0969da",
               "thumb-background": "#ffffff",
               "border": "#0969da",
-              "focus-ring": "#0969da"
+              "focus-ring": "rgba(9, 105, 218, 0.25)"
             }
           }
         },
@@ -4593,7 +4593,7 @@
               "icon": "#1f2328",
               "background": "rgba(255, 255, 255, 0)",
               "border": "rgba(255, 255, 255, 0)",
-              "focus-ring": "#0969da"
+              "focus-ring": "rgba(9, 105, 218, 0.25)"
             }
           }
         },
@@ -4611,7 +4611,7 @@
               "text": "#1f2328",
               "background": "#f6f8fa",
               "border": "#818b98",
-              "focus-ring": "#0969da"
+              "focus-ring": "rgba(9, 105, 218, 0.25)"
             },
             "placeholder": "#59636e"
           }
@@ -4641,7 +4641,7 @@
               "track-background": "rgba(209, 217, 224, 0.7019608020782471)"
             },
             "thumb-focus": {
-              "focus-ring": "#0969da"
+              "focus-ring": "rgba(9, 105, 218, 0.25)"
             }
           }
         },
@@ -4659,7 +4659,7 @@
               "text": "#1f2328",
               "background": "#f6f8fa",
               "border": "#818b98",
-              "focus-ring": "#0969da"
+              "focus-ring": "rgba(9, 105, 218, 0.25)"
             },
             "placeholder": "#59636e"
           }
@@ -4688,7 +4688,7 @@
               "icon": "#1f2328",
               "background": "#f6f8fa",
               "border": "#818b98",
-              "focus-ring": "#0969da"
+              "focus-ring": "rgba(9, 105, 218, 0.25)"
             },
             "placeholder": "#59636e"
           }
@@ -4739,7 +4739,7 @@
               "icon": "#ffffff"
             },
             "focus": {
-              "ring": "#0969da"
+              "ring": "rgba(9, 105, 218, 0.25)"
             }
           }
         },
@@ -5100,7 +5100,7 @@
             "buttonPressed": "#e5e5e5",
             "inverseHover": "#191919",
             "inversePressed": "#2c2c2c",
-            "buttonFocus": "#0b0b0b",
+            "buttonFocus": "rgba(11, 11, 11, 0.11999999731779099)",
             "loadingMask": "rgba(255, 255, 255, 0.8999999761581421)",
             "borderHover": "#0c0c0c",
             "disabledText": "#6d6d6d",
@@ -5147,7 +5147,7 @@
             "buttonPressed": "#262626",
             "inverseHover": "#e8e8e8",
             "inversePressed": "#d6d6d6",
-            "buttonFocus": "#e9e9e9",
+            "buttonFocus": "rgba(233, 233, 233, 0.11999999731779099)",
             "loadingMask": "rgba(23, 23, 23, 0.8999999761581421)",
             "borderHover": "#505050",
             "disabledText": "#a1a1a1",
@@ -5196,7 +5196,7 @@
             "buttonPressed": "#e6eaef",
             "inverseHover": "#363a3f",
             "inversePressed": "#484b4f",
-            "buttonFocus": "#0969da",
+            "buttonFocus": "rgba(9, 105, 218, 0.25)",
             "loadingMask": "rgba(246, 248, 250, 0.8999999761581421)",
             "borderHover": "#818b98",
             "disabledText": "#818b98",
@@ -5243,7 +5243,7 @@
             "buttonPressed": "#2a313c",
             "inverseHover": "#ebebeb",
             "inversePressed": "#d6d7d8",
-            "buttonFocus": "#1f6feb",
+            "buttonFocus": "rgba(31, 111, 235, 0.25)",
             "loadingMask": "rgba(33, 40, 48, 0.8999999761581421)",
             "borderHover": "#656c76",
             "disabledText": "#656c76",
@@ -5373,7 +5373,7 @@
             },
             "border": "#3d444d",
             "focus": {
-              "ring": "#1f6feb"
+              "ring": "rgba(31, 111, 235, 0.25)"
             }
           },
           "plain": {
@@ -5393,7 +5393,7 @@
             },
             "border": "#ffffff",
             "focus": {
-              "ring": "#1f6feb"
+              "ring": "rgba(31, 111, 235, 0.25)"
             }
           },
           "ghost": {
@@ -5413,7 +5413,7 @@
             },
             "border": "rgba(0, 0, 0, 0)",
             "focus": {
-              "ring": "#1f6feb"
+              "ring": "rgba(31, 111, 235, 0.25)"
             }
           },
           "ghost-alt": {
@@ -5433,7 +5433,7 @@
             },
             "border": "rgba(0, 0, 0, 0)",
             "focus": {
-              "ring": "#1f6feb"
+              "ring": "rgba(31, 111, 235, 0.25)"
             }
           },
           "active": {
@@ -5453,7 +5453,7 @@
             },
             "border": "#ffffff",
             "focus": {
-              "ring": "#1f6feb"
+              "ring": "rgba(31, 111, 235, 0.25)"
             }
           }
         },
@@ -5560,7 +5560,7 @@
               "text": "#f0f6fc",
               "background": "#212830",
               "border": "#656c76",
-              "focus-ring": "#1f6feb"
+              "focus-ring": "rgba(31, 111, 235, 0.25)"
             },
             "placeholder": "#9198a1"
           }
@@ -5604,7 +5604,7 @@
               "background": "#212830",
               "thumb-background": "#9198a1",
               "border": "#656c76",
-              "focus-ring": "#1f6feb"
+              "focus-ring": "rgba(31, 111, 235, 0.25)"
             }
           },
           "on": {
@@ -5620,7 +5620,7 @@
               "background": "#1f6feb",
               "thumb-background": "#ffffff",
               "border": "#1f6feb",
-              "focus-ring": "#1f6feb"
+              "focus-ring": "rgba(31, 111, 235, 0.25)"
             }
           }
         },
@@ -5647,7 +5647,7 @@
               "icon": "#f0f6fc",
               "background": "rgba(0, 0, 0, 0)",
               "border": "rgba(0, 0, 0, 0)",
-              "focus-ring": "#1f6feb"
+              "focus-ring": "rgba(31, 111, 235, 0.25)"
             }
           }
         },
@@ -5665,7 +5665,7 @@
               "text": "#f0f6fc",
               "background": "#212830",
               "border": "#656c76",
-              "focus-ring": "#1f6feb"
+              "focus-ring": "rgba(31, 111, 235, 0.25)"
             },
             "placeholder": "#9198a1"
           }
@@ -5695,7 +5695,7 @@
               "track-background": "rgba(61, 68, 77, 0.7019608020782471)"
             },
             "thumb-focus": {
-              "focus-ring": "#1f6feb"
+              "focus-ring": "rgba(31, 111, 235, 0.25)"
             }
           }
         },
@@ -5713,7 +5713,7 @@
               "text": "#f0f6fc",
               "background": "#212830",
               "border": "#656c76",
-              "focus-ring": "#1f6feb"
+              "focus-ring": "rgba(31, 111, 235, 0.25)"
             },
             "placeholder": "#9198a1"
           }
@@ -5742,7 +5742,7 @@
               "icon": "#f0f6fc",
               "background": "#212830",
               "border": "#656c76",
-              "focus-ring": "#1f6feb"
+              "focus-ring": "rgba(31, 111, 235, 0.25)"
             },
             "placeholder": "#9198a1"
           }
@@ -5793,7 +5793,7 @@
               "icon": "#010409"
             },
             "focus": {
-              "ring": "#1f6feb"
+              "ring": "rgba(31, 111, 235, 0.25)"
             }
           }
         },
@@ -6154,7 +6154,7 @@
             "buttonPressed": "#e5e5e5",
             "inverseHover": "#191919",
             "inversePressed": "#2c2c2c",
-            "buttonFocus": "#0b0b0b",
+            "buttonFocus": "rgba(11, 11, 11, 0.11999999731779099)",
             "loadingMask": "rgba(255, 255, 255, 0.8999999761581421)",
             "borderHover": "#0c0c0c",
             "disabledText": "#6d6d6d",
@@ -6201,7 +6201,7 @@
             "buttonPressed": "#262626",
             "inverseHover": "#e8e8e8",
             "inversePressed": "#d6d6d6",
-            "buttonFocus": "#e9e9e9",
+            "buttonFocus": "rgba(233, 233, 233, 0.11999999731779099)",
             "loadingMask": "rgba(23, 23, 23, 0.8999999761581421)",
             "borderHover": "#505050",
             "disabledText": "#a1a1a1",
@@ -6250,7 +6250,7 @@
             "buttonPressed": "#e6eaef",
             "inverseHover": "#363a3f",
             "inversePressed": "#484b4f",
-            "buttonFocus": "#0969da",
+            "buttonFocus": "rgba(9, 105, 218, 0.25)",
             "loadingMask": "rgba(246, 248, 250, 0.8999999761581421)",
             "borderHover": "#818b98",
             "disabledText": "#818b98",
@@ -6297,7 +6297,7 @@
             "buttonPressed": "#2a313c",
             "inverseHover": "#ebebeb",
             "inversePressed": "#d6d7d8",
-            "buttonFocus": "#1f6feb",
+            "buttonFocus": "rgba(31, 111, 235, 0.25)",
             "loadingMask": "rgba(33, 40, 48, 0.8999999761581421)",
             "borderHover": "#656c76",
             "disabledText": "#656c76",
