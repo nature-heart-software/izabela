@@ -159,7 +159,9 @@ it.each(['select', 'popover'])(
     await settle()
     await vi.waitFor(() =>
       expect(
-        document.activeElement?.closest('[data-scope="popover"][data-part="content"]'),
+        document.activeElement?.closest(
+          '[data-scope="popover"][data-part="content"]',
+        ),
       ).not.toBeNull(),
     )
     const pane = document.querySelector('.route-scroll-area')!

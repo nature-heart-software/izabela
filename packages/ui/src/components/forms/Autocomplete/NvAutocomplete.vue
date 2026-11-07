@@ -287,7 +287,12 @@ provide(
   computed(() => contentHost.value || getElement(injectedPortalTarget)),
 )
 
-useViewportShield(() => props.visible, shieldElement, portalTarget, shieldOffset)
+useViewportShield(
+  () => props.visible,
+  shieldElement,
+  portalTarget,
+  shieldOffset,
+)
 
 function onOutside(
   name: 'focusOutside' | 'interactOutside' | 'pointerDownOutside',
