@@ -658,7 +658,7 @@ describe('overlay interaction boundaries', () => {
     ).toBeNull()
   })
 
-  it('passive tooltip uses Ark hover/Escape behavior without creating a click shield and suppresses focused references', async () => {
+  it('passive tooltip opens on hover over a focused reference without creating a click shield', async () => {
     const wrapper = render(ui.NvTooltip, {
       props: { tippyOptions: { delay: 0, duration: 0 } },
       slots: {
@@ -679,16 +679,56 @@ describe('overlay interaction boundaries', () => {
     expect(trigger.getAttribute('aria-describedby')).toBe(tooltip?.id)
     await key(trigger, 'Escape')
     expect(document.querySelector('[role="tooltip"]')).toBeNull()
+    trigger.dispatchEvent(new MouseEvent('pointerleave'))
     trigger.focus()
     await settle()
     trigger.dispatchEvent(new MouseEvent('pointermove', { bubbles: true }))
     await settle()
-    expect(document.querySelector('[role="tooltip"]')).toBeNull()
+    expect(document.querySelector('[role="tooltip"]')?.textContent).toContain(
+      'Helpful details',
+    )
     wrapper.unmount()
     wrappers.splice(wrappers.indexOf(wrapper), 1)
     expect(
       document.querySelector('[data-scope="tooltip"][data-part="positioner"]'),
     ).toBeNull()
+  })
+
+  it('shows a focused Select tooltip on hover and suppresses it only while its list is open', async () => {
+    const wrapper = render(ui.NvTooltip, {
+      props: { tippyOptions: { delay: 0, duration: 0 } },
+      slots: {
+        reference: () =>
+          h(ui.NvSelect, {
+            id: 'focused-tooltip-select',
+            options: [{ label: 'Alpha', value: 'a' }],
+            modelValue: 'a',
+          }),
+        default: 'Choose a voice',
+      },
+    })
+    await settle()
+    const input = wrapper.get('input').element as HTMLInputElement
+    const control = wrapper.get('[data-nv-select-control]')
+    input.focus()
+    await settle()
+    await control.trigger('pointermove', { pointerType: 'mouse' })
+    await settle()
+    expect(document.querySelector('[role="tooltip"]')?.textContent).toContain(
+      'Choose a voice',
+    )
+    await key(input, 'Enter')
+    await control.trigger('pointermove', { pointerType: 'mouse' })
+    await settle()
+    expect(input.getAttribute('aria-expanded')).toBe('true')
+    expect(document.querySelector('[role="tooltip"]')).toBeNull()
+    await key(input, 'Escape')
+    await control.trigger('pointermove', { pointerType: 'mouse' })
+    await settle()
+    expect(document.activeElement).toBe(input)
+    expect(document.querySelector('[role="tooltip"]')?.textContent).toContain(
+      'Choose a voice',
+    )
   })
 
   it.each(['click', 'pointer', 'Space'])(

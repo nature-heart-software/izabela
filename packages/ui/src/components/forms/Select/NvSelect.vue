@@ -309,7 +309,22 @@ const updateSearch = (value: string) => {
 }
 
 function onInputKeydown(event: KeyboardEvent) {
-  if (event.key === 'Tab') closeSelect()
+  if (
+    event.key === 'Enter' &&
+    !event.defaultPrevented &&
+    !event.isComposing &&
+    !event.repeat &&
+    !event.ctrlKey &&
+    !event.altKey &&
+    !event.metaKey &&
+    !event.shiftKey &&
+    !isAutocompleteVisible.value &&
+    !isLocked.value
+  ) {
+    event.preventDefault()
+    event.stopPropagation()
+    activate()
+  } else if (event.key === 'Tab') closeSelect()
   else if (event.key === 'Escape' && isAutocompleteVisible.value) {
     event.preventDefault()
     event.stopPropagation()

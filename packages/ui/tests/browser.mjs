@@ -351,7 +351,7 @@ try {
           `tooltip-select-${variant}`,
         )
         await check(
-          'Focused Select suppresses its tooltip',
+          'Open Select suppresses its tooltip',
           "Boolean(document.querySelector('[role=tooltip]'))",
           false,
         )

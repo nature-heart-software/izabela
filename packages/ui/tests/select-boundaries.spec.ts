@@ -199,7 +199,7 @@ describe('compiled Select and Autocomplete interaction boundaries', () => {
     expect(document.activeElement).toBe(before)
   })
 
-  it.each(['click', 'arrow', 'typing'])(
+  it.each(['click', 'arrow', 'enter', 'typing'])(
     'stays closed on repeated focus and opens deliberately by %s',
     async (method) => {
       const w = render(ui.NvSelect, { props: { options, modelValue: 'a' } })
@@ -217,12 +217,33 @@ describe('compiled Select and Autocomplete interaction boundaries', () => {
       input.focus()
       if (method === 'click') input.click()
       else if (method === 'arrow') await key(input, 'ArrowDown')
+      else if (method === 'enter') await key(input, 'Enter')
       else await w.get('input').setValue('Beta')
       await settle()
       expect(input.getAttribute('aria-expanded')).toBe('true')
       await key(input, 'Escape')
       expect(document.activeElement).toBe(input)
       expect(input.getAttribute('aria-expanded')).toBe('false')
+    },
+  )
+
+  it.each([false, true])(
+    'opens with Enter without selecting, then accepts an option with Enter (multiple=%s)',
+    async (multiple) => {
+      const w = render(ui.NvSelect, {
+        props: { options, multiple, modelValue: multiple ? ['a'] : 'a' },
+      })
+      const input = w.get('input').element as HTMLInputElement
+      input.focus()
+      const opening = await key(input, 'Enter')
+      expect(opening.defaultPrevented).toBe(true)
+      expect(input.getAttribute('aria-expanded')).toBe('true')
+      expect(w.emitted('update:modelValue')).toBeUndefined()
+      await key(input, 'ArrowDown')
+      await key(input, 'Enter')
+      expect(w.emitted('update:modelValue')).toEqual([
+        [multiple ? ['a', 'b'] : 'b'],
+      ])
     },
   )
 
