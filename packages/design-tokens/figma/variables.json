@@ -448,7 +448,8 @@
         "VariableID:370:1160",
         "VariableID:437:1371",
         "VariableID:437:1372",
-        "VariableID:437:1373"
+        "VariableID:437:1373",
+        "VariableID:467:1071"
       ]
     },
     {
@@ -12264,6 +12265,134 @@
       }
     },
     {
+      "id": "VariableID:437:1371",
+      "name": "tourGuide/default/background",
+      "variableCollectionId": "VariableCollectionId:5:3",
+      "resolvedType": "COLOR",
+      "valuesByMode": {
+        "5:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:320:1071"
+        },
+        "20:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:320:1085"
+        },
+        "370:0": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:320:1164"
+        },
+        "370:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:370:1101"
+        },
+        "370:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:320:1165"
+        },
+        "370:3": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:370:1102"
+        }
+      }
+    },
+    {
+      "id": "VariableID:437:1372",
+      "name": "tourGuide/default/text",
+      "variableCollectionId": "VariableCollectionId:5:3",
+      "resolvedType": "COLOR",
+      "valuesByMode": {
+        "5:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:320:1081"
+        },
+        "20:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:320:1073"
+        },
+        "370:0": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:320:1166"
+        },
+        "370:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:370:1103"
+        },
+        "370:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:320:1167"
+        },
+        "370:3": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:370:1104"
+        }
+      }
+    },
+    {
+      "id": "VariableID:437:1373",
+      "name": "tourGuide/default/shadow",
+      "variableCollectionId": "VariableCollectionId:5:3",
+      "resolvedType": "COLOR",
+      "valuesByMode": {
+        "5:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:320:1095"
+        },
+        "20:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:320:1095"
+        },
+        "370:0": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:320:1189"
+        },
+        "370:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:370:1125"
+        },
+        "370:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:320:1190"
+        },
+        "370:3": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:370:1126"
+        }
+      }
+    },
+    {
+      "id": "VariableID:467:1071",
+      "name": "tourGuide/default/action-focus/ring",
+      "variableCollectionId": "VariableCollectionId:5:3",
+      "resolvedType": "COLOR",
+      "valuesByMode": {
+        "5:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:320:1081"
+        },
+        "20:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:320:1073"
+        },
+        "370:0": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:320:1166"
+        },
+        "370:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:370:1103"
+        },
+        "370:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:320:1167"
+        },
+        "370:3": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:370:1104"
+        }
+      }
+    },
+    {
       "id": "VariableID:193:380",
       "name": "Cloudflare Kumo/color/kumo-base",
       "variableCollectionId": "VariableCollectionId:193:379",
@@ -17520,102 +17649,6 @@
           "g": 0.06666667014360428,
           "b": 0.09019608050584793,
           "a": 0.8999999761581421
-        }
-      }
-    },
-    {
-      "id": "VariableID:437:1371",
-      "name": "tourGuide/default/background",
-      "variableCollectionId": "VariableCollectionId:5:3",
-      "resolvedType": "COLOR",
-      "valuesByMode": {
-        "5:1": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:320:1071"
-        },
-        "20:1": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:320:1085"
-        },
-        "370:0": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:320:1164"
-        },
-        "370:1": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:370:1101"
-        },
-        "370:2": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:320:1165"
-        },
-        "370:3": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:370:1102"
-        }
-      }
-    },
-    {
-      "id": "VariableID:437:1372",
-      "name": "tourGuide/default/text",
-      "variableCollectionId": "VariableCollectionId:5:3",
-      "resolvedType": "COLOR",
-      "valuesByMode": {
-        "5:1": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:320:1081"
-        },
-        "20:1": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:320:1073"
-        },
-        "370:0": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:320:1166"
-        },
-        "370:1": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:370:1103"
-        },
-        "370:2": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:320:1167"
-        },
-        "370:3": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:370:1104"
-        }
-      }
-    },
-    {
-      "id": "VariableID:437:1373",
-      "name": "tourGuide/default/shadow",
-      "variableCollectionId": "VariableCollectionId:5:3",
-      "resolvedType": "COLOR",
-      "valuesByMode": {
-        "5:1": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:320:1095"
-        },
-        "20:1": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:320:1095"
-        },
-        "370:0": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:320:1189"
-        },
-        "370:1": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:370:1125"
-        },
-        "370:2": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:320:1190"
-        },
-        "370:3": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:370:1126"
         }
       }
     }

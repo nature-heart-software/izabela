@@ -34,6 +34,12 @@ const globalRecipe = cva({
       flexDirection: 'column',
       gap: '5',
       '& [data-nv-tour-content]': { color: 'inherit' },
+      '& button:focus': {
+        outline:
+          '{borderWidths.active} solid {colors.tourGuide.default.action-focus.ring}',
+        outlineOffset: '{spacing.1}',
+        boxShadow: 'none',
+      },
       '&[data-hidden]': { display: 'none !important' },
     },
     '& #vjt-arrow::before': {
