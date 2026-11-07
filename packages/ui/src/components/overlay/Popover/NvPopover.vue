@@ -3,7 +3,6 @@
     <Popover.Root
       v-model:open="open"
       :ids="{ trigger: triggerId }"
-      :auto-focus="false"
       :positioning="{
         placement: props.placement,
         flip: true,
@@ -62,7 +61,11 @@ const trigger = ref()
 const triggerId = ref(`nv-popover-${useId()}-trigger`)
 watchPostEffect(() => {
   // Positioning and focus lookup must use the as-child owner's retained ID.
-  const element = getElement(trigger.value)
+  const root = getElement(trigger.value)
+  const element =
+    root?.querySelector<HTMLElement>(
+      '[data-scope="popover"][data-part="trigger"]',
+    ) || root
   if (element?.id) triggerId.value = element.id
 })
 const props = defineProps(propsDefinition)

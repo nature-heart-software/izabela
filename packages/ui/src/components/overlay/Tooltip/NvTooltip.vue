@@ -1,9 +1,18 @@
 <template>
-  <StTooltip ref="tooltip" v-bind="props">
+  <StTooltip
+    ref="tooltip"
+    v-bind="props"
+    :class="$attrs.class"
+    :style="$attrs.style"
+  >
     <Tooltip.RootProvider :value="tooltipApi">
-      <Tooltip.Trigger ref="trigger" :id="triggerId" as-child>
+      <ReferenceTrigger
+        ref="trigger"
+        v-bind="referenceAttrs()"
+        :id="referenceId()"
+      >
         <slot name="reference" />
-      </Tooltip.Trigger>
+      </ReferenceTrigger>
       <Teleport :to="portalTarget" defer>
         <StTooltipPositioner
           v-if="open && !focused"
@@ -16,7 +25,22 @@
   </StTooltip>
 </template>
 <script lang="ts" setup>
-import { computed, inject, reactive, ref, useId, watchPostEffect } from 'vue'
+import {
+  cloneVNode,
+  Comment,
+  computed,
+  defineComponent,
+  Fragment,
+  inject,
+  mergeProps,
+  reactive,
+  ref,
+  Text,
+  useAttrs,
+  useId,
+  watchPostEffect,
+  type VNode,
+} from 'vue'
 import { Tooltip, useTooltip, type TooltipRootProps } from '@ark-ui/vue'
 import {
   StTooltip,
@@ -35,12 +59,52 @@ import { getElement } from '@/utils/vue'
 import { PORTAL_TARGET } from '@/consts'
 
 const props = defineProps(propsDefinition)
+defineOptions({ inheritAttrs: false })
+const attrs = useAttrs()
+const referenceAttrs = () =>
+  Object.fromEntries(
+    Object.entries(attrs).filter(([key]) => key !== 'class' && key !== 'style'),
+  )
 const trigger = ref()
 const triggerId = ref(`nv-tooltip-${useId()}-trigger`)
+const referenceId = () =>
+  typeof attrs.id === 'string' ? attrs.id : triggerId.value
+const ReferenceTrigger = defineComponent({
+  inheritAttrs: false,
+  setup(_, { attrs, slots }) {
+    function flatten(nodes: VNode[]): VNode[] {
+      return nodes.flatMap((node) =>
+        node.type === Fragment ? flatten(node.children as VNode[]) : [node],
+      )
+    }
+    return () => {
+      const [node, ...rest] = flatten(slots.default?.() || []).filter(
+        (node) =>
+          node.type !== Comment &&
+          (node.type !== Text || String(node.children).trim()),
+      )
+      if (!node) return null
+      // Vue can supply an array of listeners when overlay triggers are nested.
+      // Ark 3's as-child merger only composes functions and drops those arrays
+      // when the native control also has a listener (e.g. Ctrl-click to toggle).
+      const merged = mergeProps(
+        node.props || {},
+        { ...tooltipApi.value.getTriggerProps() },
+        attrs,
+      )
+      merged.id = node.props?.id || attrs.id || triggerId.value
+      const cloned = cloneVNode(node)
+      cloned.props = merged
+      return rest.length ? [cloned, ...rest] : cloned
+    }
+  },
+})
+// A tooltip is transparent when used as another overlay's reference: the
+// native control owns its trigger attributes, focus and restoration target.
 function syncTrigger() {
   // Zag measures the trigger by ID even when Ark composes a consumer element.
   const element = getElement(trigger.value)
-  const selector = '[data-scope="tooltip"][data-part="trigger"]'
+  const selector = '[data-part="trigger"]'
   // Composite references can own an input and a separate full-control trigger.
   // Resolve the marked primitive owner, not an incidental component root.
   const target = element?.matches(selector)
@@ -51,7 +115,7 @@ function syncTrigger() {
 watchPostEffect(syncTrigger)
 const tooltip = ref<MaybeElement>()
 // Async voice components can replace a comment with their control without
-// changing Tooltip.Trigger's component ref. Observe that scoped DOM boundary.
+// changing the reference's component ref. Observe that scoped DOM boundary.
 useMutationObserver(tooltip, syncTrigger, { childList: true, subtree: true })
 const { focused } = useFocusWithin(tooltip)
 const injectedPortalTarget = inject(PORTAL_TARGET)
@@ -60,18 +124,18 @@ const portalTarget = computed(
 )
 const openDelay = computed(() =>
   Array.isArray(props.tippyOptions.delay)
-    ? (props.tippyOptions.delay[0] ?? 250)
-    : (props.tippyOptions.delay ?? 250),
+    ? props.tippyOptions.delay[0] ?? 250
+    : props.tippyOptions.delay ?? 250,
 )
 const closeDelay = computed(() =>
   Array.isArray(props.tippyOptions.delay)
-    ? (props.tippyOptions.delay[1] ?? 0)
-    : (props.tippyOptions.delay ?? 0),
+    ? props.tippyOptions.delay[1] ?? 0
+    : props.tippyOptions.delay ?? 0,
 )
 const enterDuration = computed(() => {
   if (props.tippyOptions.animation === false) return 0
   const duration = props.tippyOptions.duration
-  return Array.isArray(duration) ? (duration[0] ?? 300) : (duration ?? 300)
+  return Array.isArray(duration) ? duration[0] ?? 300 : duration ?? 300
 })
 const positioning = computed<TooltipRootProps['positioning']>(() => ({
   placement:

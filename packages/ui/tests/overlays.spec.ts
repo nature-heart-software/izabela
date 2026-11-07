@@ -92,6 +92,28 @@ afterEach(() => {
 })
 
 describe('overlay interaction boundaries', () => {
+  it('focuses the first enabled control on popover open and restores its trigger on Escape', async () => {
+    const wrapper = render(ui.NvPopover, {
+      slots: {
+        reference: () => h('button', { id: 'focus-popover-trigger' }, 'Open'),
+        default: () => [
+          h('button', { disabled: true }, 'Unavailable'),
+          h('input', { id: 'first-popover-control' }),
+          h('button', 'Last control'),
+        ],
+      },
+    })
+    const trigger = wrapper.get('#focus-popover-trigger').element as HTMLElement
+    trigger.focus()
+    trigger.click()
+    await settle()
+    const input = document.getElementById('first-popover-control')!
+    expect(document.activeElement).toBe(input)
+    await key(input, 'Escape')
+    expect(document.activeElement).toBe(trigger)
+    expect(document.getElementById('first-popover-control')).toBeNull()
+  })
+
   it.each(['select', 'popover'])(
     'allows page scrolling through the %s shield without dismissing or clicking through',
     async (kind) => {

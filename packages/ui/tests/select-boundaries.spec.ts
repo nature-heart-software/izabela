@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mount, flushPromises, type VueWrapper } from '@vue/test-utils'
-import { h, nextTick } from 'vue'
+import { h, nextTick, ref } from 'vue'
 import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -112,6 +112,118 @@ afterEach(() => {
 })
 
 describe('compiled Select and Autocomplete interaction boundaries', () => {
+  it('accepts Tab focus into consecutive selects and lets Tab and Shift+Tab leave them', async () => {
+    const w = render({
+      render: () =>
+        h('div', [
+          h('button', { id: 'before-select' }, 'Before'),
+          h(ui.NvSelect, { id: 'first-select', options }),
+          h(ui.NvSelect, { id: 'second-select', options }),
+          h('button', { id: 'after-select' }, 'After'),
+        ]),
+    })
+    await settle()
+    const before = w.get('#before-select').element as HTMLElement
+    const first = w.get('#first-select').element as HTMLInputElement
+    const second = w.get('#second-select').element as HTMLInputElement
+    const after = w.get('#after-select').element as HTMLElement
+    before.focus()
+    expect((await key(before, 'Tab')).defaultPrevented).toBe(false)
+    first.focus() // jsdom does not execute the browser's Tab default action.
+    await settle()
+    expect(document.activeElement).toBe(first)
+    expect(first.tabIndex).toBe(0)
+    expect(first.getAttribute('aria-expanded')).toBe('false')
+    expect((await key(first, 'Tab')).defaultPrevented).toBe(false)
+    second.focus()
+    await settle()
+    expect(document.activeElement).toBe(second)
+    expect(second.getAttribute('aria-expanded')).toBe('false')
+    expect(first.getAttribute('aria-expanded')).toBe('false')
+    expect((await key(second, 'Tab')).defaultPrevented).toBe(false)
+    after.focus()
+    await settle()
+    expect(document.activeElement).toBe(after)
+    expect(second.getAttribute('aria-expanded')).toBe('false')
+    first.focus()
+    await settle()
+    const backwards = new KeyboardEvent('keydown', {
+      key: 'Tab',
+      shiftKey: true,
+      bubbles: true,
+      cancelable: true,
+    })
+    first.dispatchEvent(backwards)
+    expect(backwards.defaultPrevented).toBe(false)
+    before.focus()
+    await settle()
+    expect(document.activeElement).toBe(before)
+  })
+
+  it.each(['click', 'arrow', 'typing'])(
+    'stays closed on repeated focus and opens deliberately by %s',
+    async (method) => {
+      const w = render(ui.NvSelect, { props: { options, modelValue: 'a' } })
+      const input = w.get('input').element as HTMLInputElement
+      for (let i = 0; i < 3; i++) {
+        input.focus()
+        await settle()
+        expect(document.activeElement).toBe(input)
+        expect(input.getAttribute('aria-expanded')).toBe('false')
+        expect(input.selectionStart).toBe(0)
+        expect(input.selectionEnd).toBe(input.value.length)
+        input.blur()
+        await settle()
+      }
+      input.focus()
+      if (method === 'click') input.click()
+      else if (method === 'arrow') await key(input, 'ArrowDown')
+      else await w.get('input').setValue('Beta')
+      await settle()
+      expect(input.getAttribute('aria-expanded')).toBe('true')
+      await key(input, 'Escape')
+      expect(document.activeElement).toBe(input)
+      expect(input.getAttribute('aria-expanded')).toBe('false')
+    },
+  )
+
+  it.each(['pointer', 'keyboard', 'escape'])(
+    'keeps focus on the select trigger with its dropdown closed after %s',
+    async (method) => {
+      const model = ref('a')
+      const w = render({
+        render: () =>
+          h(ui.NvSelect, {
+            id: 'focus-select',
+            options,
+            modelValue: model.value,
+            'onUpdate:modelValue': (value: string) => {
+              model.value = value
+            },
+          }),
+      })
+      await settle()
+      const input = w.get('input').element as HTMLInputElement
+      input.focus()
+      input.click()
+      await settle()
+      if (method === 'pointer')
+        (document.querySelector('[title="Beta"]') as HTMLElement).click()
+      else if (method === 'keyboard') {
+        await key(input, 'ArrowDown')
+        await key(input, 'Enter')
+      } else await key(input, 'Escape')
+      await settle()
+      expect(document.activeElement).toBe(input)
+      expect(input.getAttribute('aria-expanded')).toBe('false')
+      expect(input.value).toBe(method === 'escape' ? 'Alpha' : 'Beta')
+      expect(document.querySelector('.autocomplete')).toBeNull()
+      input.click()
+      await settle()
+      expect(input.getAttribute('aria-expanded')).toBe('true')
+    },
+  )
+
   it('forwards placement to its floating dropdown instead of the native input', async () => {
     const wrapper = render(ui.NvSelect, {
       props: { options, placement: 'top-start' },
@@ -197,6 +309,7 @@ describe('compiled Select and Autocomplete interaction boundaries', () => {
       }
       const input = document.querySelector('input') as HTMLInputElement
       input.focus()
+      input.click()
       await settle()
       const shield = document.querySelector(
         '[data-nv-overlay-shield]',
@@ -362,6 +475,7 @@ describe('compiled Select and Autocomplete interaction boundaries', () => {
     expect(autocomplete.props('autoScrollIndex')).toBeUndefined()
     await w.setProps({ modelValue: ['b'] })
     ;(w.get('input').element as HTMLInputElement).focus()
+    ;(w.get('input').element as HTMLInputElement).click()
     await settle()
     await w.get('input').setValue('Beta')
     await settle()
@@ -446,6 +560,7 @@ describe('compiled Select and Autocomplete interaction boundaries', () => {
       new MouseEvent('pointerdown', { bubbles: true, cancelable: true }),
     )
     input.focus()
+    input.click()
     await settle()
     expect(w.emitted('interactOutside')).toBeUndefined()
     expect(w.emitted('focusOutside')).toBeUndefined()
@@ -455,6 +570,7 @@ describe('compiled Select and Autocomplete interaction boundaries', () => {
     const w = render(ui.NvSelect, { props: { options, modelValue: 'a' } })
     await settle()
     ;(w.get('input').element as HTMLInputElement).focus()
+    ;(w.get('input').element as HTMLInputElement).click()
     await settle()
     const option = [
       ...document.querySelectorAll('.autocomplete .option__content'),

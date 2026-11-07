@@ -141,7 +141,13 @@ it.each(['select', 'popover'])(
       },
       global: {
         plugins: [router],
-        stubs: { RouterLink: { template: '<a><slot /></a>' } },
+        stubs: {
+          RouterLink: {
+            setup(_, { slots }) {
+              return () => slots.default?.({ href: '#', navigate: () => {} })
+            },
+          },
+        },
         provide: {
           theme: ui.themes.get('dark'),
           [ui.PORTAL_TARGET]: document.body,

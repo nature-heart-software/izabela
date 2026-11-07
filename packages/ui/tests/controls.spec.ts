@@ -446,6 +446,7 @@ describe('real select composition', () => {
     expect(payloadReads).toBe(0)
     const input = wrapper.get('input').element as HTMLInputElement
     input.focus()
+    input.click()
     await settle()
     expect(payloadReads).toBe(0)
     expect(document.querySelectorAll('[role="option"]').length).toBeLessThan(30)
@@ -468,6 +469,7 @@ describe('real select composition', () => {
     const input = w.get('input')
     await settle()
     ;(input.element as HTMLInputElement).focus()
+    ;(input.element as HTMLInputElement).click()
     await settle()
     await key('ArrowDown')
     await key('Enter')
@@ -507,6 +509,7 @@ describe('real select composition', () => {
     })
     await settle()
     ;(w.get('[role="combobox"]').element as HTMLElement).focus()
+    ;(w.get('[role="combobox"]').element as HTMLElement).click()
     await settle()
     ;(document.querySelector('[title="Beta"]') as HTMLElement).click()
     const draft = w.get('[data-draft]').element as HTMLInputElement
@@ -541,6 +544,7 @@ describe('real select composition', () => {
     await settle()
     const input = w.get('input')
     ;(input.element as HTMLElement).focus()
+    ;(input.element as HTMLElement).click()
     await settle()
     await input.setValue('Gamma')
     await settle()
@@ -565,6 +569,7 @@ describe('real select composition', () => {
     })
     await settle()
     ;(w.get('input').element as HTMLElement).focus()
+    ;(w.get('input').element as HTMLElement).click()
     await settle()
     await key('ArrowDown')
     await key('Enter')
@@ -587,6 +592,7 @@ describe('real select composition', () => {
     })
     await settle()
     ;(w.get('input').element as HTMLElement).focus()
+    ;(w.get('input').element as HTMLElement).click()
     await settle()
     const group = document.querySelector(
       '[data-part="item-group"][role="group"]',
@@ -621,6 +627,7 @@ describe('real select composition', () => {
     })
     await settle()
     ;(w.get('input').element as HTMLElement).focus()
+    ;(w.get('input').element as HTMLElement).click()
     await settle()
     await key('ArrowDown')
     const input = w.get('input').element
@@ -656,6 +663,7 @@ describe('real select composition', () => {
     })
     await settle()
     ;(w.get('input').element as HTMLElement).focus()
+    ;(w.get('input').element as HTMLElement).click()
     await settle()
     await w.get('input').setValue('Beta')
     await settle()
@@ -684,6 +692,7 @@ describe('real select composition', () => {
     })
     await settle()
     ;(w.get('input').element as HTMLElement).focus()
+    ;(w.get('input').element as HTMLElement).click()
     await settle()
     ;(document.querySelector('[title="Catalog Alpha"]') as HTMLElement).click()
     await settle()
@@ -728,6 +737,7 @@ describe('real select composition', () => {
     })
     await settle()
     ;(w.get('input').element as HTMLElement).focus()
+    ;(w.get('input').element as HTMLElement).click()
     await settle()
     const buttons = [
       ...document.querySelectorAll<HTMLButtonElement>(
@@ -776,6 +786,7 @@ describe('real select composition', () => {
     })
     await settle()
     ;(w.get('input').element as HTMLElement).focus()
+    ;(w.get('input').element as HTMLElement).click()
     await settle()
     const options = [...document.querySelectorAll('[role="option"]')]
     expect(options).toHaveLength(3)

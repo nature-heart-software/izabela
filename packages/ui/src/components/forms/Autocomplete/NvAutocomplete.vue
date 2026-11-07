@@ -3,7 +3,7 @@
     <Popover.Root
       :autoFocus="false"
       :open="props.visible"
-      :portalled="true"
+      :portalled="false"
       :positioning="{
         placement: props.placement,
         flip: true,
@@ -117,6 +117,8 @@ import { getElement } from '@/utils/vue'
 import { PORTAL_TARGET } from '@/consts'
 import { onOverlayShieldWheel } from '@/utils/overlay-scroll'
 
+// The list is teleported below, but its keyboard focus stays on the input.
+// Ark's portalled popover proxy captures Tab before completion can handle it.
 const props = defineProps(propsDefinition)
 defineSlots<{
   reference(): unknown
@@ -245,6 +247,7 @@ onKeyStroke('Enter', (e) => {
 })
 
 onKeyStroke('Tab', (e) => {
+  if (e.shiftKey) return
   if (!props.keyboardNavigation) return
   if (
     !props.visible ||

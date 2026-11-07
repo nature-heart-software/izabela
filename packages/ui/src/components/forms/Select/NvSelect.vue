@@ -13,9 +13,9 @@
       :keyboardNavigation="false"
       @select="selectOption"
       @positioner-change="autocomplete = $event"
-      @pointer-down-outside="blurInput"
-      @focus-outside="blurInput"
-      @interact-outside="blurInput"
+      @pointer-down-outside="closeSelect"
+      @focus-outside="closeSelect"
+      @interact-outside="closeSelect"
     >
       <template #reference>
         <StSelect
@@ -45,7 +45,7 @@
                           !isLocked && !option.disabled && !option.readonly
                         "
                         @close="selectOption(option)"
-                        @mousedown="blurInput()"
+                        @mousedown="closeSelect()"
                         @click.stop
                       >
                         {{ option.label }}
@@ -65,6 +65,8 @@
                       ...inputAttrs,
                     }"
                     @focus="onInputFocus"
+                    @blur="closeSelect"
+                    @keydown="onInputKeydown"
                     @update:modelValue="updateSearch"
                   />
                 </Combobox.Input>
@@ -140,9 +142,8 @@ import {
 } from 'vue'
 import { Combobox, useCombobox } from '@ark-ui/vue'
 import { box } from '@/styled-system/patterns'
-import { useFocusTrap } from '@vueuse/integrations/useFocusTrap'
 import { useFuse, UseFuseOptions } from '@vueuse/integrations/useFuse'
-import { onKeyStroke } from '@vueuse/core'
+import { useFocusWithin } from '@vueuse/core'
 import { tokens } from '@/styles/tokens'
 import {
   StSelect,
@@ -169,6 +170,7 @@ import NvSelectList from './NvSelectList.vue'
 import flatten from 'lodash/flatten'
 import get from 'lodash/get'
 import omit from 'lodash/omit'
+import { getElement } from '@/utils/vue'
 
 const props = defineProps(propsDefinition)
 defineOptions({ inheritAttrs: false })
@@ -262,23 +264,12 @@ const selectedOptions = computed(() =>
 )
 
 const search = ref('')
-const isFocused = ref(false)
 const select = ref()
 const selectInput = ref()
 const inputWrapper = ref()
 const autocomplete = ref()
-const {
-  hasFocus,
-  activate: activateTrap,
-  deactivate,
-} = useFocusTrap(inputWrapper, {
-  returnFocusOnDeactivate: false,
-  allowOutsideClick: true,
-  preventScroll: true,
-  onDeactivate() {
-    if (selectInput.value) selectInput.value.$el.blur()
-  },
-})
+// A combobox keeps focus on its input without trapping normal Tab navigation.
+const { focused: hasFocus } = useFocusWithin(inputWrapper)
 
 const isAutocompleteVisible = ref(false)
 let closing = false
@@ -286,31 +277,45 @@ let closingFrame = 0
 const activate = () => {
   closing = false
   cancelAnimationFrame(closingFrame)
-  if (!isLocked.value) activateTrap()
+  if (isLocked.value) return
+  getElement(selectInput.value)?.focus({ preventScroll: true })
+  isAutocompleteVisible.value = true
 }
 function onInputFocus(event: FocusEvent) {
   if (closing) {
     // A user may already be typing in another field when Ark's close callback
     // restores focus. Return it to that field instead of leaving focus on body.
     const previous = event.relatedTarget
-    selectInput.value?.$el.blur()
-    if (previous instanceof HTMLElement) previous.focus({ preventScroll: true })
-  } else activate()
+    if (
+      previous instanceof HTMLElement &&
+      previous !== document.body &&
+      !getElement(select.value)?.contains(previous) &&
+      !getElement(autocomplete.value)?.contains(previous)
+    ) {
+      getElement(selectInput.value)?.blur()
+      previous.focus({ preventScroll: true })
+      return
+    }
+  }
+  const input = getElement(selectInput.value)
+  if (input instanceof HTMLInputElement) input.select()
 }
 const updateSearch = (value: string) => {
-  if (!isLocked.value) search.value = value
-  else if (selectInput.value?.$el)
+  if (!isLocked.value) {
+    search.value = value
+    if (hasFocus.value) isAutocompleteVisible.value = true
+  } else if (selectInput.value?.$el)
     selectInput.value.$el.value = inputValue.value
 }
 
-watch(
-  () => hasFocus.value,
-  (value) => {
-    if (value && !isLocked.value) {
-      isAutocompleteVisible.value = true
-    }
-  },
-)
+function onInputKeydown(event: KeyboardEvent) {
+  if (event.key === 'Tab') closeSelect()
+  else if (event.key === 'Escape' && isAutocompleteVisible.value) {
+    event.preventDefault()
+    event.stopPropagation()
+    closeSelect()
+  }
+}
 
 const fuseOptions = computed<UseFuseOptions<(typeof options.value)[number]>>(
   () => ({
@@ -335,7 +340,9 @@ const searchResults = computed(() => {
 })
 const inputValue = computed(
   () =>
-    (!hasFocus.value && !props.multiple && selectedOptions.value[0]?.label) ||
+    (!isAutocompleteVisible.value &&
+      !props.multiple &&
+      selectedOptions.value[0]?.label) ||
     search.value,
 )
 
@@ -398,7 +405,7 @@ const combobox = useCombobox<ComboboxOption>(
     onInputValueChange: ({ inputValue }: { inputValue: string }) =>
       updateSearch(inputValue),
     onOpenChange: ({ open }: { open: boolean }) => {
-      if (!open) blurInput()
+      if (!open) closeSelect()
       else if (!isLocked.value && hasFocus.value)
         isAutocompleteVisible.value = true
     },
@@ -456,7 +463,7 @@ const handleValue = (value: Value) => {
     emit('update:modelValue', newValue)
   } else {
     emit('update:modelValue', value)
-    blurInput()
+    closeSelect()
   }
 }
 const selectOption = (item?: Option) => {
@@ -470,9 +477,9 @@ const selectOption = (item?: Option) => {
     return
   handleValue(item.value)
 }
-const blurInput = () => {
-  // Ark restores focus in the next frame after closing. Preserve this control's
-  // blur-on-dismiss contract without treating that restoration as a new open.
+const closeSelect = () => {
+  // Track Ark's deferred focus restoration so it cannot take focus from a field
+  // the user has already moved to after selecting an option.
   if (!closing) {
     closing = true
     closingFrame = requestAnimationFrame(() => {
@@ -482,16 +489,13 @@ const blurInput = () => {
     })
   }
   search.value = ''
-  deactivate()
   isAutocompleteVisible.value = false
 }
 watch(isLocked, (locked) => {
-  if (locked) blurInput()
+  if (locked) closeSelect()
 })
-onKeyStroke('Escape', blurInput)
-onKeyStroke('Tab', blurInput)
 onBeforeUnmount(() => {
-  blurInput()
+  closeSelect()
   cancelAnimationFrame(closingFrame)
 })
 </script>

@@ -238,6 +238,7 @@ describe('packaged app Select renderer callbacks', () => {
     })
     await settle()
     ;(wrapper.get('input').element as HTMLInputElement).focus()
+    ;(wrapper.get('input').element as HTMLInputElement).click()
     await settle()
     const option = document.querySelector(
       '[title="Fixture French"]',
@@ -293,6 +294,7 @@ describe('packaged app Select renderer callbacks', () => {
       })
       await settle()
       ;(wrapper.get('input').element as HTMLInputElement).focus()
+      ;(wrapper.get('input').element as HTMLInputElement).click()
       await settle()
       expect(document.querySelector(`[title="${label}"]`)).not.toBeNull()
       const activate = evaluateCallback(root, (callback) =>
@@ -313,6 +315,7 @@ describe('packaged app Select renderer callbacks', () => {
     const wrapper = renderSelect({ options: [{ label: 'Elf', value: 'Elf' }] })
     await settle()
     ;(wrapper.get('input').element as HTMLInputElement).focus()
+    ;(wrapper.get('input').element as HTMLInputElement).click()
     await settle()
     const option = document.querySelector('[title="Elf"]') as HTMLElement
     expect(option).not.toBeNull()

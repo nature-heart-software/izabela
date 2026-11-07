@@ -100,9 +100,13 @@
                       >
                         <router-link
                           :to="entry.to || { name: 'settings' }"
-                          :class="css({ width: '100%' })"
+                          custom
+                          v-slot="{ href, navigate }"
                         >
                           <NvButton
+                            as="a"
+                            :href="href"
+                            @click="navigate"
                             :selected="currentRoute.name === entry.to?.name"
                             :class="css({ width: '100%' })"
                             size="sm"

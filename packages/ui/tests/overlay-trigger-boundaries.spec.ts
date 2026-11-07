@@ -86,6 +86,73 @@ afterEach(async () => {
 })
 
 describe('overlay trigger ownership', () => {
+  it.each(['popover', 'dialog'])(
+    '%s uses the native button inside a tooltip as its single trigger and focus-return target',
+    async (kind) => {
+      const click = vi.fn((event: MouseEvent) => {
+        if (event.ctrlKey) event.preventDefault()
+      })
+      const wrapper = render(kind === 'dialog' ? ui.NvDialog : ui.NvPopover, {
+        slots: {
+          reference: () =>
+            h(
+              ui.NvTooltip,
+              {},
+              {
+                reference: () =>
+                  h(
+                    ui.NvButton,
+                    { id: 'tooltip-owned-button', onClick: click },
+                    () => 'Open',
+                  ),
+                default: () => 'More settings',
+              },
+            ),
+          title: 'Settings',
+          default: () => h('input', { id: 'popover-control' }),
+          footer: () => h('input', { id: 'dialog-control' }),
+        },
+      })
+      await settle()
+      const button = wrapper.get('#tooltip-owned-button')
+        .element as HTMLButtonElement
+      expect(
+        wrapper
+          .findAll('button, [tabindex]')
+          .filter((node) => (node.element as HTMLElement).tabIndex >= 0),
+      ).toHaveLength(1)
+      expect(
+        wrapper.get(`[data-scope="${kind}"][data-part="trigger"]`).element,
+      ).toBe(button)
+      button.focus()
+      button.dispatchEvent(
+        new MouseEvent('click', {
+          ctrlKey: true,
+          bubbles: true,
+          cancelable: true,
+        }),
+      )
+      await settle()
+      expect(button.getAttribute('aria-expanded')).toBe('false')
+      expect(click).toHaveBeenCalledOnce()
+      click.mockClear()
+      button.click()
+      await settle()
+      expect(click).toHaveBeenCalledOnce()
+      const field = document.getElementById(`${kind}-control`)!
+      expect(field).not.toBeNull()
+      if (kind === 'popover') expect(document.activeElement).toBe(field)
+      else
+        await vi.waitFor(() =>
+          expect(
+            document.activeElement?.closest('[role="dialog"]'),
+          ).not.toBeNull(),
+        )
+      await key(field, 'Escape')
+      await vi.waitFor(() => expect(document.activeElement).toBe(button))
+    },
+  )
+
   it.each(['custom', 'generated'])(
     'retargets a lazy-loaded voice control and its replacement with a %s input ID',
     async (kind) => {
@@ -324,16 +391,16 @@ describe('overlay trigger ownership', () => {
         kind === 'text'
           ? 'Open text'
           : kind === 'shared'
-            ? h(ui.NvButton, { id: 'dialog-reference' }, () => 'Open shared')
-            : h(
-                (kind === 'custom'
-                  ? custom
-                  : kind === 'span'
-                    ? 'span'
-                    : 'button') as any,
-                { id: 'dialog-reference' },
-                kind === 'custom' ? undefined : 'Open reference',
-              )
+          ? h(ui.NvButton, { id: 'dialog-reference' }, () => 'Open shared')
+          : h(
+              (kind === 'custom'
+                ? custom
+                : kind === 'span'
+                ? 'span'
+                : 'button') as any,
+              { id: 'dialog-reference' },
+              kind === 'custom' ? undefined : 'Open reference',
+            )
       const wrapper = render(ui.NvDialog, {
         slots: { reference, title: 'Example' },
       })
@@ -380,8 +447,8 @@ describe('overlay trigger ownership', () => {
               kind === 'shared'
                 ? ui.NvButton
                 : kind === 'custom'
-                  ? custom
-                  : 'button',
+                ? custom
+                : 'button',
               { id: 'disabled-reference', disabled: true },
               kind === 'shared' ? () => 'Unavailable' : undefined,
             ),
