@@ -1,3 +1,4 @@
+import { css } from '@/styled-system/css'
 /* eslint-disable import/no-extraneous-dependencies */
 import { StoryFn } from '@storybook/vue3'
 import { NvButton, NvCenter } from '@/components'
@@ -18,11 +19,12 @@ const Template: StoryFn = (args) => ({
   components: { NvCenter, NvButton },
   setup() {
     return {
+      css,
       args,
     }
   },
   template: `
-      <NvCenter v-bind="args" class="bg-gray-10" :style="{height: '200px'}">
+      <NvCenter v-bind="args" :class="css({'backgroundColor':'gray.10'})" :style="{height: '200px'}">
       <NvButton>centered</NvButton>
       </NvCenter>`,
 })

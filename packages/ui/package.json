@@ -7,7 +7,7 @@
     "@packages/vite-plugin-generate-exports": "workspace:*",
     "@zag-js/interact-outside": "0.71.0",
     "csstype": "^3.2.3",
-    "tippy.js": "^6.3.7"
+    "@ark-ui/vue": "^3.11.0"
   },
   "files": [
     "./dist"
@@ -16,13 +16,18 @@
   "module": "./dist/main.js",
   "private": true,
   "scripts": {
-    "test:types": "node tests/build-types.mjs && vue-tsc --noEmit -p tests/tsconfig.json",
-    "build": "vite build",
-    "build-storybook": "storybook build",
-    "build:prod": "vue-tsc && vite build",
-    "dev": "vite build --watch --mode development",
-    "storybook": "storybook dev -p 6006"
+    "test:browser": "node tests/browser.mjs",
+    "test:types": "pnpm run build && vue-tsc --noEmit -p tests/tsconfig.json",
+    "build": "pnpm run panda:prepare && vite build",
+    "build-storybook": "pnpm run panda:prepare && storybook build",
+    "build:prod": "pnpm run panda:prepare && vue-tsc && vite build",
+    "dev": "pnpm run panda:prepare && vite build --watch --mode development",
+    "storybook": "pnpm run panda:prepare && storybook dev -p 6006",
+    "panda:prepare": "panda codegen && panda cssgen"
   },
   "type": "module",
-  "types": "./dist/main.d.ts"
+  "types": "./dist/main.d.ts",
+  "devDependencies": {
+    "@pandacss/dev": "1.12.1"
+  }
 }

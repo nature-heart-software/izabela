@@ -40,5 +40,9 @@ export const props = {
     type: Boolean,
     default: false,
   },
+  keyboardNavigation: {
+    type: Boolean,
+    default: true,
+  },
 }
 export type Props = ExtractPropTypes<typeof props>

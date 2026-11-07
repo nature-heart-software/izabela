@@ -7,6 +7,8 @@ import {
   NvTextarea,
   NvAutocomplete,
   NvDialog,
+  NvTooltip,
+  NvContextMenu,
   themes,
   tokens,
   PORTAL_TARGET,
@@ -37,6 +39,20 @@ const autocomplete: Props<typeof NvAutocomplete> = {
   selectOnTab: true,
 }
 const dialog: Props<typeof NvDialog> = { open: false }
+const tooltip: Props<typeof NvTooltip> = {
+  tippyOptions: {
+    placement: 'auto-start',
+    delay: [0, null],
+    duration: [100, 0],
+    offset: [0, 12],
+    interactive: true,
+    animation: false,
+  },
+}
+const menu: Props<typeof NvContextMenu> = {
+  tippyOptions: { placement: 'bottom-end', offset: [2, 8] },
+  options: [{ label: 'Open', onClick: () => {} }],
+}
 type IsAny<T> = 0 extends 1 & T ? true : false
 const buttonIsNotAny: IsAny<typeof NvButton> = false
 const propsAreNotAny: IsAny<Props<typeof NvButton>> = false
@@ -50,6 +66,8 @@ void [
   textarea,
   autocomplete,
   dialog,
+  tooltip,
+  menu,
   themes,
   tokens,
   PORTAL_TARGET,
@@ -63,7 +81,7 @@ const badButton: Props<typeof NvButton> = { type: 'danger' }
 const badSize: Props<typeof NvInput> = { size: 'huge' }
 // @ts-expect-error Switch models are boolean.
 const badToggle: Props<typeof NvSwitch> = { modelValue: 'yes' }
-// @ts-expect-error Range model props are numeric (string update is a runtime known issue).
+// @ts-expect-error Range model props are numeric.
 const badRange: Props<typeof NvRangeInput> = { modelValue: '2' }
 // @ts-expect-error Select options require labels.
 const badSelect: Props<typeof NvSelect> = { options: [{ value: 1 }] }

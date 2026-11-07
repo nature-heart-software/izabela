@@ -1,60 +1,82 @@
 <template>
-  <Popover.Root
-    v-model:open="open"
-    :autoFocus="false"
-    :positioning="{
-      placement: props.placement,
-      flip: true,
-      overflowPadding: tokens.spacing['3'],
-      offset: {
-        mainAxis: tokens.spacing['4'],
-      },
-    }"
-    asChild
-    portalled
-  >
-    <StPopover v-bind="props">
-      <Popover.Trigger asChild>
+  <StPopover v-bind="props">
+    <Popover.Root
+      v-model:open="open"
+      modal
+      :ids="{ trigger: triggerId }"
+      :positioning="{
+        placement: props.placement,
+        flip: true,
+        overflowPadding: tokens.spacing['3'],
+        offset: { mainAxis: tokens.spacing['4'] },
+      }"
+      portalled
+      @focus-outside.prevent
+      @interact-outside="onOverlayShieldInteractOutside"
+    >
+      <Popover.Trigger ref="trigger" :id="triggerId" as-child>
         <slot name="reference" />
       </Popover.Trigger>
       <Teleport :to="portalTarget" defer>
         <div
-          v-show="open"
-          class="fixed inset-0 pointer-events-auto"
-          :style="{ zIndex: 9999 }"
-          @click.stop.prevent
+          v-if="open"
+          data-overlay-shield="popover"
+          :class="popoverShield()"
+          @click.stop.prevent="open = false"
           @mouseup.stop.prevent
           @mousedown.stop.prevent
+          @pointerdown.stop.prevent
+          @pointerup.stop.prevent
+          @wheel="onOverlayShieldWheel"
         />
-        <Popover.Positioner :style="{ zIndex: 9999 }">
-          <Popover.Content :hidden="false">
+        <StPopoverPositioner>
+          <StPopoverContent :hidden="false" :inert="open ? undefined : true">
             <Transition>
-              <Card
-                v-if="open"
-                :size="props.size"
-                :style="{ maxWidth: rem(300) }"
-              >
+              <Card v-if="open" :size="props.size === 'lg' ? 'md' : props.size">
                 <slot />
               </Card>
             </Transition>
-          </Popover.Content>
-        </Popover.Positioner>
+          </StPopoverContent>
+        </StPopoverPositioner>
       </Teleport>
-    </StPopover>
-  </Popover.Root>
+    </Popover.Root>
+  </StPopover>
 </template>
 <script lang="ts" setup>
-import { computed, inject, ref } from 'vue'
-import { StPopover } from './popover.styled'
+import { computed, inject, ref, useId, watch, watchPostEffect } from 'vue'
+import {
+  StPopover,
+  StPopoverContent,
+  StPopoverPositioner,
+  popoverShield,
+} from './popover.panda'
 import { props as propsDefinition } from './popover.shared'
 import { tokens } from '@/styles/tokens'
 import { Popover } from '@ark-ui/vue'
 import Card from '@/components/display/Card/NvCard.vue'
-import { rem } from 'polished'
 import { getElement } from '@/utils/vue'
 import { PORTAL_TARGET } from '@/consts'
+import { onOverlayShieldWheel } from '@/utils/overlay-scroll'
+import { onOverlayShieldInteractOutside } from '@/utils/overlay-shield'
 
 const open = ref(false)
+const trigger = ref()
+const triggerId = ref(`nv-popover-${useId()}-trigger`)
+watch(open, (isOpen) => {
+  // Establish the owner before Ark activates its deferred focus trap, including
+  // triggers opened programmatically without the browser's click-focus default.
+  if (isOpen)
+    document.getElementById(triggerId.value)?.focus({ preventScroll: true })
+})
+watchPostEffect(() => {
+  // Positioning and focus lookup must use the as-child owner's retained ID.
+  const root = getElement(trigger.value)
+  const element =
+    root?.querySelector<HTMLElement>(
+      '[data-scope="popover"][data-part="trigger"]',
+    ) || root
+  if (element?.id) triggerId.value = element.id
+})
 const props = defineProps(propsDefinition)
 const injectedPortalTarget = inject(PORTAL_TARGET)
 const portalTarget = computed(() => getElement(injectedPortalTarget) || 'body')

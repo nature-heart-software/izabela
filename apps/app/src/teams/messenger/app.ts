@@ -6,7 +6,7 @@ import router from '@/teams/messenger/router'
 import { pinia } from '@/store'
 import { NvLoading } from '@packages/ui'
 import VueJsTour from '@globalhive/vuejs-tour'
-import '@globalhive/vuejs-tour/dist/style.css'
+import '@/styles/tour.css'
 import './styles'
 import { loadStores } from '@/store/stores.ts'
 

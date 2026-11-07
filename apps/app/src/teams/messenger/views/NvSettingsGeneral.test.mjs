@@ -13,7 +13,11 @@ const filename = fileURLToPath(
 const { descriptor } = parse(readFileSync(filename, 'utf8'), { filename })
 const templateAst = structuredClone(descriptor.template.ast)
 
-async function renderSettings(disabled, savedAutoUpdate) {
+async function renderSettings(
+  disabled,
+  savedAutoUpdate,
+  pendingRestart = false,
+) {
   const script = compileScript(descriptor, {
     id: filename,
     inlineTemplate: true,
@@ -51,7 +55,16 @@ async function renderSettings(disabled, savedAutoUpdate) {
         }),
   }
   const patches = []
+  const messengerPatches = []
+  const messengerStateStore = {
+    markForRestart: pendingRestart,
+    $patch: (value) => {
+      messengerPatches.push(value)
+      Object.assign(messengerStateStore, value)
+    },
+  }
   const settingsStore = {
+    theme: 'dark',
     enableAutoUpdate: savedAutoUpdate,
     updateChannel: 'beta',
     keybindings: {},
@@ -64,6 +77,7 @@ async function renderSettings(disabled, savedAutoUpdate) {
     filename,
     {
       vue,
+      '@/styled-system/css': { css: () => '' },
       '@packages/ui': ui,
       '@/features/settings/store': {
         useSettingsStore: () => settingsStore,
@@ -77,7 +91,9 @@ async function renderSettings(disabled, savedAutoUpdate) {
       '@/features/app/queries.ts': {
         useClearCacheMutation: () => ({ reset: vue.ref(() => {}) }),
       },
-      '@/teams/messenger/store': { useMessengerStateStore: () => ({}) },
+      '@/teams/messenger/store': {
+        useMessengerStateStore: () => messengerStateStore,
+      },
     },
     {
       __importMetaEnv: { VITE_DISABLE_AUTO_UPDATE: disabled },
@@ -114,11 +130,45 @@ async function renderSettings(disabled, savedAutoUpdate) {
     loadTypescript(
       filename,
       {},
-      { settingsStore, autoUpdateDisabled: disabled === 'true' },
+      {
+        settingsStore,
+        messengerStateStore,
+        autoUpdateDisabled: disabled === 'true',
+      },
       `export default (${handler})`,
     ).default(value)
   }
-  return { html, updateSection, patches, settingsStore, invokeUpdate }
+  return {
+    html,
+    updateSection,
+    patches,
+    settingsStore,
+    invokeUpdate,
+    messengerStateStore,
+    messengerPatches,
+  }
+}
+
+for (const pendingRestart of [false, true]) {
+  test(`theme changes preserve pending restart ${pendingRestart} without requesting a restart`, async () => {
+    const {
+      invokeUpdate,
+      settingsStore,
+      patches,
+      messengerStateStore,
+      messengerPatches,
+    } = await renderSettings(undefined, false, pendingRestart)
+    for (const theme of ['light', 'dark']) {
+      invokeUpdate('theme', theme)
+      assert.equal(settingsStore.theme, theme)
+      assert.equal(messengerStateStore.markForRestart, pendingRestart)
+    }
+    assert.deepEqual(
+      patches.map((patch) => ({ ...patch })),
+      [{ theme: 'light' }, { theme: 'dark' }],
+    )
+    assert.deepEqual(messengerPatches, [])
+  })
 }
 
 for (const savedAutoUpdate of [false, true]) {

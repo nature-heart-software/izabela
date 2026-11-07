@@ -1,9 +1,9 @@
 import { ExtractPropTypes, PropType } from 'vue'
-import { TippyOptions } from 'vue-tippy'
+import type { OverlayOptions } from '../overlay-options'
 
 export const props = {
   tippyOptions: {
-    type: Object as PropType<TippyOptions>,
+    type: Object as PropType<OverlayOptions>,
     default: () => ({}),
   },
   options: {

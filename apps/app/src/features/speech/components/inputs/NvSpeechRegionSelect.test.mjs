@@ -44,6 +44,12 @@ async function renderSettings({
   }
   const mocks = {
     '@packages/ui': ui,
+    '@/styled-system/css': { css: () => '' },
+    // Region visibility is independent of async presentation and geometry.
+    '@/components/NvAsyncRegion.vue': {
+      props: ['component'],
+      setup: (props) => () => h(props.component),
+    },
     '@/features/speech/components/inputs/NvSpeechEngineSelect.vue': layout,
     '@/features/speech/components/forms/NvUniversalApiForm.vue': layout,
     '@/features/speech/components/inputs/NvSpeechRegionSelect.vue': {

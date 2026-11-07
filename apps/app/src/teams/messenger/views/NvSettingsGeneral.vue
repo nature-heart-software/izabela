@@ -132,7 +132,7 @@
             </NvStack>
             <NvSwitch
               :modelValue="settingsStore.enableOverlayWindow"
-              class="shrink-0"
+              :class="css({ flexShrink: 0 })"
               @update:modelValue="
                 (value) => {
                   if (value) {
@@ -152,7 +152,12 @@
           </NvGroup>
           <template v-if="settingsStore.enableOverlayWindow">
             <NvDivider direction="horizontal" />
-            <NvGroup :spacing="5" class="pl-6" justify="apart" no-wrap>
+            <NvGroup
+              :spacing="5"
+              :class="css({ paddingLeft: '6' })"
+              justify="apart"
+              no-wrap
+            >
               <NvStack>
                 <NvText type="label">Show Overlay window</NvText>
               </NvStack>
@@ -224,12 +229,7 @@
                 },
               ]"
               @update:modelValue="
-                (value) => {
-                  settingsStore.$patch({ theme: value })
-                  messengerStateStore.$patch({
-                    markForRestart: true,
-                  })
-                }
+                (value) => settingsStore.$patch({ theme: value })
               "
             />
           </NvGroup>
@@ -287,7 +287,12 @@
             v-if="!autoUpdateDisabled && settingsStore.enableAutoUpdate"
           >
             <NvDivider direction="horizontal" />
-            <NvGroup :spacing="5" class="pl-6" justify="apart" no-wrap>
+            <NvGroup
+              :spacing="5"
+              :class="css({ paddingLeft: '6' })"
+              justify="apart"
+              no-wrap
+            >
               <NvStack>
                 <NvText type="label">Update channel</NvText>
               </NvStack>
@@ -333,6 +338,7 @@
   </NvStack>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import {
   NvButton,
   NvCard,
@@ -351,12 +357,10 @@ import NvKeybinding from '@/features/app/components/inputs/NvKeybinding.vue'
 import NvUpdateChannelSelect from '@/features/update/components/inputs/NvUpdateChannelSelect.vue'
 import { useConfirmAdmin } from '@/hooks/use-confirm-admin.ts'
 import { useClearCacheMutation } from '@/features/app/queries.ts'
-import { useMessengerStateStore } from '@/teams/messenger/store'
 
 const confirmAdmin = useConfirmAdmin()
 const autoUpdateDisabled = import.meta.env.VITE_DISABLE_AUTO_UPDATE === 'true'
 const settingsStore = useSettingsStore()
-const messengerStateStore = useMessengerStateStore()
 
 const {
   mutateAsync: clearCacheMutation,

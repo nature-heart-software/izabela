@@ -1,103 +1,149 @@
 <template>
-  <NvAutocomplete
-    :autoScrollIndex="autoScrollIndex"
-    :options="searchResults"
-    :valueKey="props.valueKey"
-    :visible="isAutocompleteVisible"
-    :width="props.autocompleteWidth"
-    @select="(item: Option) => !item.children && handleValue(item.value)"
-    @positioner-change="autocomplete = $event"
-    @pointer-down-outside="blurInput"
-    @focus-outside="blurInput"
-    @interact-outside="blurInput"
-  >
-    <template #reference>
-      <StSelect
-        ref="select"
-        class="w-full"
-        v-bind="{ ...props, isFocused: hasFocus }"
-        @click="activate"
-      >
-        <StSelectWrapper class="w-full" v-bind="props">
-          <NvStack :spacing="2" class="w-full">
-            <template v-if="props.multiple && selectedOptions.length > 0">
-              <StSelectTagsWrapper>
-                <NvGroup :spacing="2" class="w-full">
-                  <template
-                    v-for="option in selectedOptions"
-                    :key="get(option.value, props.valueKey) || option.value"
-                  >
-                    <NvTag
-                      :title="option.label"
-                      closable
-                      @close="handleValue(option.value)"
-                      @mousedown="blurInput()"
-                      @click.stop
+  <Combobox.RootProvider :value="combobox" as-child>
+    <NvAutocomplete
+      data-nv-loading-target="[data-nv-select-control]"
+      :class="$attrs.class"
+      :style="$attrs.style"
+      :placement="props.placement"
+      :autoScrollIndex="autoScrollIndex"
+      :options="searchResults"
+      :valueKey="props.valueKey"
+      :visible="isAutocompleteVisible"
+      :width="props.autocompleteWidth"
+      :keyboardNavigation="false"
+      @select="selectOption"
+      @positioner-change="autocomplete = $event"
+      @pointer-down-outside="closeSelect"
+      @focus-outside="closeSelect"
+      @interact-outside="closeSelect"
+    >
+      <template #reference>
+        <StSelect
+          data-nv-select-control
+          ref="select"
+          :class="box({ width: '100%' })"
+          v-bind="{
+            ...props,
+            ...pointerAttrs,
+            ...tooltipTriggerAttrs,
+            isFocused: hasFocus,
+          }"
+          @click="activate"
+        >
+          <StSelectWrapper :class="box({ width: '100%' })" v-bind="props">
+            <NvStack :spacing="2" :class="box({ width: '100%' })">
+              <template v-if="props.multiple && selectedOptions.length > 0">
+                <StSelectTagsWrapper>
+                  <NvGroup :spacing="2" :class="box({ width: '100%' })">
+                    <template
+                      v-for="option in selectedOptions"
+                      :key="get(option.value, props.valueKey) || option.value"
                     >
-                      {{ option.label }}
-                    </NvTag>
-                  </template>
-                </NvGroup>
-              </StSelectTagsWrapper>
-            </template>
-            <div ref="inputWrapper" class="inline-flex">
-              <StSelectInput
-                ref="selectInput"
-                :isFocused="hasFocus"
-                :modelValue="inputValue"
-                :placeholder="$attrs.placeholder"
-                v-bind="omit(props, ['modelValue'])"
-                @focus="activate"
-                @update:modelValue="search = $event"
-              />
-            </div>
-          </NvStack>
-        </StSelectWrapper>
-        <StSelectIcon v-bind="props">
-          <NvIcon :size="iconSize" name="direction" />
-        </StSelectIcon>
-      </StSelect>
-    </template>
-    <template #default="{ active, item }">
-      <NvOption
-        v-if="item"
-        :active="active"
-        :disabled="item.disabled"
-        :readonly="item.children"
-        :selected="
-          selectedValues.find(
-            (v: Value) =>
-              (get(item.value, props.valueKey) || item.value) ===
-              (get(v, props.valueKey) || v),
-          )
-        "
-        :title="item.label"
-        v-bind="item.attrs || {}"
-        @mousedown="!item.children && handleValue(item.value)"
-      >
-        <div class="w-full text-ellipsis overflow-hidden">
-          {{ item.label }}
-        </div>
-        <template #after="props">
-          <slot :option="item" name="optionAfter" v-bind="props" />
-        </template>
-      </NvOption>
-    </template>
-    <template #fallback>
-      <StSelectOption
-        v-if="searchResults.length === 0"
-        class="justify-center pointer-events-none"
-      >
-        No Data
-      </StSelectOption>
-    </template>
-  </NvAutocomplete>
+                      <NvTag
+                        :title="option.label"
+                        :closable="
+                          !isLocked && !option.disabled && !option.readonly
+                        "
+                        @close="selectOption(option)"
+                        @mousedown="closeSelect()"
+                        @click.stop
+                      >
+                        {{ option.label }}
+                      </NvTag>
+                    </template>
+                  </NvGroup>
+                </StSelectTagsWrapper>
+              </template>
+              <div ref="inputWrapper" :class="box({ display: 'inline-flex' })">
+                <Combobox.Input as-child>
+                  <StSelectInput
+                    ref="selectInput"
+                    :isFocused="hasFocus"
+                    :modelValue="inputValue"
+                    v-bind="{
+                      ...omit(props, ['modelValue', 'isFocused']),
+                      ...inputAttrs,
+                    }"
+                    @focus="onInputFocus"
+                    @blur="closeSelect"
+                    @keydown="onInputKeydown"
+                    @update:modelValue="updateSearch"
+                  />
+                </Combobox.Input>
+              </div>
+            </NvStack>
+          </StSelectWrapper>
+          <StSelectIcon v-bind="props">
+            <NvIcon :size="iconSize" name="direction" />
+          </StSelectIcon>
+        </StSelect>
+      </template>
+      <template #list>
+        <NvSelectList
+          ref="optionList"
+          :rows="searchResults"
+          @visible="onListVisible"
+        >
+          <template #default="{ active, item }">
+            <NvOption
+              v-if="item"
+              :active="active"
+              :disabled="item.disabled"
+              :readonly="item.readonly"
+              :selected="
+                selectedValues.some(
+                  (v: Value) =>
+                    (get(item.value, props.valueKey) || item.value) ===
+                    (get(v, props.valueKey) || v),
+                )
+              "
+              :title="item.label"
+              v-bind="item.attrs || {}"
+            >
+              <div
+                :class="
+                  box({
+                    width: '100%',
+                    textOverflow: 'ellipsis',
+                    overflow: 'hidden',
+                  })
+                "
+              >
+                {{ item.label }}
+              </div>
+              <template #after="props">
+                <slot :option="item" name="optionAfter" v-bind="props" />
+              </template>
+            </NvOption>
+          </template>
+        </NvSelectList>
+      </template>
+      <template #fallback>
+        <StSelectOption
+          v-if="searchResults.length === 0"
+          :class="box({ justifyContent: 'center', pointerEvents: 'none' })"
+        >
+          No Data
+        </StSelectOption>
+      </template>
+    </NvAutocomplete>
+  </Combobox.RootProvider>
 </template>
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
-import { useFocusTrap } from '@vueuse/integrations/useFocusTrap'
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  reactive,
+  ref,
+  useAttrs,
+  useId,
+  watch,
+} from 'vue'
+import { Combobox, useCombobox } from '@ark-ui/vue'
+import { box } from '@/styled-system/patterns'
 import { useFuse, UseFuseOptions } from '@vueuse/integrations/useFuse'
-import { onClickOutside, onKeyStroke } from '@vueuse/core'
+import { useFocusWithin } from '@vueuse/core'
 import { tokens } from '@/styles/tokens'
 import {
   StSelect,
@@ -106,9 +152,10 @@ import {
   StSelectOption,
   StSelectTagsWrapper,
   StSelectWrapper,
-} from './select.styled'
+} from './select.panda'
 import {
   Option,
+  SelectOption,
   selectProps as propsDefinition,
   Size,
   Value,
@@ -119,12 +166,51 @@ import NvTag from '@/components/forms/Tag/NvTag.vue'
 import NvGroup from '@/components/miscellaneous/Group/NvGroup.vue'
 import NvStack from '@/components/miscellaneous/Stack/NvStack.vue'
 import NvOption from './NvOption.vue'
+import NvSelectList from './NvSelectList.vue'
 import flatten from 'lodash/flatten'
 import get from 'lodash/get'
 import omit from 'lodash/omit'
-import { v4 as uuid } from 'uuid'
+import { getElement } from '@/utils/vue'
 
 const props = defineProps(propsDefinition)
+defineOptions({ inheritAttrs: false })
+const attrs = useAttrs()
+// Pointer listeners describe the whole control, including its indicator and tags.
+// Native input attributes and keyboard/focus listeners still belong to the input.
+const pointerAttrs = computed(() =>
+  Object.fromEntries(
+    Object.entries(attrs).filter(([name]) => name.startsWith('onPointer')),
+  ),
+)
+const controlId = `nv-select-${useId()}-control`
+const tooltipTriggerAttrs = computed(() =>
+  attrs['data-scope'] === 'tooltip' && attrs['data-part'] === 'trigger'
+    ? {
+        id: controlId,
+        'data-scope': attrs['data-scope'],
+        'data-part': attrs['data-part'],
+        'data-state': attrs['data-state'],
+        'data-expanded': attrs['data-expanded'],
+      }
+    : {},
+)
+const inputAttrs = computed<Record<string, unknown>>(() =>
+  omit(attrs, [
+    'class',
+    'style',
+    ...Object.keys(pointerAttrs.value),
+    ...Object.keys(tooltipTriggerAttrs.value).filter((name) => name !== 'id'),
+    // Ark's generated trigger ID belongs to the control. Keep a caller's own
+    // input ID, but never duplicate the control ID onto the editable input.
+    ...(attrs.id === controlId ? ['id'] : []),
+  ]),
+)
+// Keep Ark's IDs independent of changing tooltip/pointer attributes. Rebuilding
+// its context on hover also rebuilds and deeply watches the entire collection.
+const inputId = computed(() =>
+  typeof attrs.id === 'string' && attrs.id !== controlId ? attrs.id : undefined,
+)
+const isLocked = computed(() => props.disabled || props.readonly)
 const emit = defineEmits(['update:modelValue'])
 const iconSize = computed(() => {
   const sizes: Record<Size, keyof typeof tokens.spacing> = {
@@ -139,26 +225,26 @@ const selectedValues = computed(() =>
   props.multiple ? (props.modelValue as Value[]) : [props.modelValue],
 )
 
-const options = computed(() =>
+const options = computed<SelectOption[]>(() =>
   flatten(
-    props.options.map((option) => {
+    props.options.map((option, index) => {
       if (option.children) {
-        const mappedChildren = option.children.map((o) => ({
-          id: get(o.value, props.valueKey) || o.value || uuid(),
+        const mappedChildren = option.children.map((o, childIndex) => ({
           ...o,
+          key: `option-${index}-${childIndex}`,
         }))
         return [
           {
-            id: get(option.value, props.valueKey) || option.value || uuid(),
             ...option,
+            key: `group-${index}`,
             children: mappedChildren,
           },
           ...mappedChildren,
         ]
       }
       return {
-        id: get(option.value, props.valueKey) || option.value || uuid(),
         ...option,
+        key: `option-${index}`,
       }
     }),
   ),
@@ -169,38 +255,67 @@ const selectedOptions = computed(() =>
     .map((value) =>
       options.value.find(
         (option) =>
+          !option.children &&
           get(option.value, props.valueKey, option.value) ===
-          get(value, props.valueKey, value),
+            get(value, props.valueKey, value),
       ),
     )
     .filter((option) => option !== undefined),
 )
 
 const search = ref('')
-const isFocused = ref(false)
 const select = ref()
 const selectInput = ref()
 const inputWrapper = ref()
 const autocomplete = ref()
-const { hasFocus, activate, deactivate } = useFocusTrap(inputWrapper, {
-  returnFocusOnDeactivate: false,
-  allowOutsideClick: true,
-  preventScroll: true,
-  onDeactivate() {
-    if (selectInput.value) selectInput.value.$el.blur()
-  },
-})
+// A combobox keeps focus on its input without trapping normal Tab navigation.
+const { focused: hasFocus } = useFocusWithin(inputWrapper)
 
 const isAutocompleteVisible = ref(false)
-
-watch(
-  () => hasFocus.value,
-  (value) => {
-    if (value) {
-      isAutocompleteVisible.value = true
+let closing = false
+let closingFrame = 0
+const activate = () => {
+  closing = false
+  cancelAnimationFrame(closingFrame)
+  if (isLocked.value) return
+  getElement(selectInput.value)?.focus({ preventScroll: true })
+  isAutocompleteVisible.value = true
+}
+function onInputFocus(event: FocusEvent) {
+  if (closing) {
+    // A user may already be typing in another field when Ark's close callback
+    // restores focus. Return it to that field instead of leaving focus on body.
+    const previous = event.relatedTarget
+    if (
+      previous instanceof HTMLElement &&
+      previous !== document.body &&
+      !getElement(select.value)?.contains(previous) &&
+      !getElement(autocomplete.value)?.contains(previous)
+    ) {
+      getElement(selectInput.value)?.blur()
+      previous.focus({ preventScroll: true })
+      return
     }
-  },
-)
+  }
+  const input = getElement(selectInput.value)
+  if (input instanceof HTMLInputElement) input.select()
+}
+const updateSearch = (value: string) => {
+  if (!isLocked.value) {
+    search.value = value
+    if (hasFocus.value) isAutocompleteVisible.value = true
+  } else if (selectInput.value?.$el)
+    selectInput.value.$el.value = inputValue.value
+}
+
+function onInputKeydown(event: KeyboardEvent) {
+  if (event.key === 'Tab') closeSelect()
+  else if (event.key === 'Escape' && isAutocompleteVisible.value) {
+    event.preventDefault()
+    event.stopPropagation()
+    closeSelect()
+  }
+}
 
 const fuseOptions = computed<UseFuseOptions<(typeof options.value)[number]>>(
   () => ({
@@ -214,42 +329,126 @@ const fuseOptions = computed<UseFuseOptions<(typeof options.value)[number]>>(
 const { results } = useFuse(search, options, fuseOptions)
 const searchResults = computed(() => {
   if (search.value) {
-    const filteredOptions = results.value.map(({ item }) => item) || []
+    const matchingKeys = new Set(results.value.map(({ item }) => item.key))
     return options.value.filter((option) => {
-      if ('children' in option) {
-        return filteredOptions.some((o) =>
-          (option.children as Option[]).find((c) => c.id === o.id),
-        )
-      }
-      return filteredOptions.some((o) => o.id === option.id)
+      if (option.children)
+        return option.children.some((child) => matchingKeys.has(child.key))
+      return matchingKeys.has(option.key)
     })
   }
   return options.value || []
 })
 const inputValue = computed(
   () =>
-    (!hasFocus.value && !props.multiple && selectedOptions.value[0]?.label) ||
+    (!isAutocompleteVisible.value &&
+      !props.multiple &&
+      selectedOptions.value[0]?.label) ||
     search.value,
 )
 
 const autoScrollIndex = computed(() => {
-  return (
-    selectedValues.value.length > 0 &&
-    Math.min(
-      ...selectedValues.value
-        .map((v) =>
-          options.value.findIndex(
-            (o) =>
-              get(o.value, props.valueKey, o.value) ===
-              get(v, props.valueKey, v),
-          ),
-        )
-        .filter((i) => i !== undefined),
+  const indices = selectedValues.value
+    .map((value) =>
+      searchResults.value.findIndex(
+        (option) =>
+          !option.children &&
+          get(option.value, props.valueKey, option.value) ===
+            get(value, props.valueKey, value),
+      ),
     )
+    .filter((index) => index >= 0)
+  return indices.length > 0 ? Math.min(...indices) : undefined
+})
+
+const optionList = ref<InstanceType<typeof NvSelectList>>()
+// Ark only needs identity, text and availability. Keep provider voice payloads
+// out of the machine's deep context watcher; public values stay in options.
+type ComboboxOption = Pick<
+  SelectOption,
+  'key' | 'label' | 'disabled' | 'readonly'
+>
+const collectionItems = computed(() =>
+  searchResults.value
+    .filter((item) => !item.children)
+    .map(({ key, label, disabled, readonly }) => ({
+      key,
+      label,
+      disabled,
+      readonly,
+    })),
+)
+const highlightedValue = ref<string | null>(null)
+const combobox = useCombobox<ComboboxOption>(
+  reactive({
+    items: collectionItems,
+    itemToString: (item: ComboboxOption) => item.label,
+    itemToValue: (item: ComboboxOption) => item.key,
+    isItemDisabled: (item: ComboboxOption) =>
+      !!(item.disabled || item.readonly),
+    modelValue: computed(() => selectedOptions.value.map((item) => item!.key)),
+    inputValue,
+    open: isAutocompleteVisible,
+    highlightedValue,
+    disabled: computed(() => props.disabled),
+    readOnly: computed(() => props.readonly),
+    multiple: computed(() => props.multiple),
+    closeOnSelect: computed(() => !props.multiple),
+    inputBehavior: 'autohighlight' as const,
+    selectionBehavior: 'preserve' as const,
+    loopFocus: true,
+    openOnChange: false,
+    // NvAutocomplete owns positioning, nested layers and the dismissal shield.
+    disableLayer: true,
+    ids: computed(() => ({
+      input: inputId.value,
+    })),
+    onInputValueChange: ({ inputValue }: { inputValue: string }) =>
+      updateSearch(inputValue),
+    onOpenChange: ({ open }: { open: boolean }) => {
+      if (!open) closeSelect()
+      else if (!isLocked.value && hasFocus.value)
+        isAutocompleteVisible.value = true
+    },
+    onHighlightChange: (details: { highlightedValue: string | null }) => {
+      highlightedValue.value = details.highlightedValue
+    },
+    onValueChange: ({ value }: { value: string[] }) => {
+      if (isLocked.value) return
+      const previous = selectedOptions.value.map((item) => item!.key)
+      const changed =
+        value.find((id) => !previous.includes(id)) ??
+        previous.find((id) => !value.includes(id))
+      // Favorites and catalog groups may repeat one public value. Their DOM IDs
+      // stay unique while selection still toggles that public value only once.
+      selectOption(options.value.find((item) => item.key === changed))
+    },
+    scrollToIndexFn: ({ index }: { index: number }) => {
+      const item = collectionItems.value[index]
+      const row = item
+        ? searchResults.value.findIndex((row) => row.key === item.key)
+        : -1
+      if (row >= 0) optionList.value?.scrollToIndex(row)
+    },
+  }),
+)
+function onListVisible() {
+  const index = autoScrollIndex.value
+  const item = index === undefined ? undefined : searchResults.value[index]
+  highlightedValue.value =
+    item && !item.disabled && !item.readonly ? item.key : null
+  if (index !== undefined) optionList.value?.scrollToIndex(index)
+}
+watch(searchResults, async () => {
+  if (!isAutocompleteVisible.value || !search.value) return
+  await nextTick()
+  const item = collectionItems.value.find(
+    (item) => !item.disabled && !item.readonly,
   )
+  highlightedValue.value = item ? item.key : null
 })
 
 const handleValue = (value: Value) => {
+  if (isLocked.value) return
   if (props.multiple) {
     const newValue = [...selectedValues.value]
     const index = newValue.findIndex(
@@ -264,15 +463,39 @@ const handleValue = (value: Value) => {
     emit('update:modelValue', newValue)
   } else {
     emit('update:modelValue', value)
-    blurInput()
+    closeSelect()
   }
 }
-const blurInput = () => {
+const selectOption = (item?: Option) => {
+  if (
+    !item ||
+    item.children ||
+    item.disabled ||
+    item.readonly ||
+    isLocked.value
+  )
+    return
+  handleValue(item.value)
+}
+const closeSelect = () => {
+  // Track Ark's deferred focus restoration so it cannot take focus from a field
+  // the user has already moved to after selecting an option.
+  if (!closing) {
+    closing = true
+    closingFrame = requestAnimationFrame(() => {
+      closingFrame = requestAnimationFrame(() => {
+        closing = false
+      })
+    })
+  }
   search.value = ''
-  deactivate()
   isAutocompleteVisible.value = false
 }
-onKeyStroke('Escape', blurInput)
-onKeyStroke('Tab', blurInput)
-onBeforeUnmount(blurInput)
+watch(isLocked, (locked) => {
+  if (locked) closeSelect()
+})
+onBeforeUnmount(() => {
+  closeSelect()
+  cancelAnimationFrame(closingFrame)
+})
 </script>

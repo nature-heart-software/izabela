@@ -6,7 +6,7 @@
       </NvStack>
       <NvSwitch
         :modelValue="settingsStore.enableSTTTS"
-        class="shrink-0"
+        :class="css({ flexShrink: 0 })"
         @update:modelValue="
           (value) => settingsStore.$patch({ enableSTTTS: value })
         "
@@ -41,7 +41,9 @@
             </NvFormItem>
             <NvDivider direction="horizontal" />
             <NvFormItem label="Recording device">
-              <NvSoxAudioInputSelect class="!w-full" />
+              <NvSoxAudioInputSelect
+                :class="css({ width: '100% !important' })"
+              />
             </NvFormItem>
             <NvDivider direction="horizontal" />
             <NvFormItem label="Speech recognition strategy">
@@ -54,6 +56,7 @@
   </NvStack>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import {
   NvAccessBlocker,
   NvDivider,

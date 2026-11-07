@@ -2,48 +2,53 @@
   <NvCard>
     <NvStack>
       <NvGroup align="start" justify="between" noWrap>
-        <NvGroup align="start" class="!flex-1 min-w-0" noWrap>
+        <NvGroup
+          align="start"
+          :class="css({ flex: '1 1 0% !important', minWidth: '0' })"
+          noWrap
+        >
           <NvTooltip>
             <NvText>Apply</NvText>
             <template #reference>
               <NvButton
-                class="shrink-0"
+                :class="css({ flexShrink: 0 })"
                 icon-name="download-alt"
                 size="sm"
                 @click="() => profilesStore.apply(id)"
               />
             </template>
           </NvTooltip>
-          <NvStack class="!flex-1 min-h-0">
+          <NvStack :class="css({ flex: '1 1 0% !important', minHeight: '0' })">
             <NvInput
               v-model="form.name"
-              class="w-full"
+              :class="css({ width: '100%' })"
               placeholder="Profile name"
               size="sm"
             />
             <NvGroup noWrap>
               <NvSpeechEngineSelect
                 v-model="form.states['settings.selectedSpeechEngine']"
-                class="w-1/3"
+                :class="css({ width: '33.333333%' })"
                 size="sm"
               />
               <template v-if="speechEngine">
-                <component
-                  :is="speechEngine.voiceSelectComponent"
+                <NvAsyncRegion
+                  :component="speechEngine.voiceSelectComponent"
+                  mode="control"
                   v-if="speechEngine.voiceSelectComponent"
                   v-model="
                     form.states[
                       speechEngine.store.getPropertyPath('selectedVoice')
                     ]
                   "
-                  class="w-1/3"
+                  :class="css({ width: '33.333333%' })"
                   placeholder="Speech Voice"
                   size="sm"
                 />
               </template>
               <NvKeybinding
                 v-model="form.shortcut"
-                class="w-1/3"
+                :class="css({ width: '33.333333%' })"
                 multiple
                 size="sm"
               />
@@ -62,7 +67,11 @@
               },
             ]"
           >
-            <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm" />
+            <NvButton
+              :class="css({ flexShrink: 0 })"
+              icon-name="ellipsis-v"
+              size="sm"
+            />
           </NvContextMenu>
           <NvDialog portalTarget="#settings">
             <template #reference>
@@ -79,7 +88,7 @@
                 <NvFormItem label="Name">
                   <NvInput
                     v-model="form.name"
-                    class="w-full"
+                    :class="css({ width: '100%' })"
                     placeholder="Profile name"
                   />
                 </NvFormItem>
@@ -87,7 +96,7 @@
                 <NvFormItem label="Shortcut">
                   <NvKeybinding
                     v-model="form.shortcut"
-                    class="w-full"
+                    :class="css({ width: '100%' })"
                     multiple
                   />
                 </NvFormItem>
@@ -99,8 +108,8 @@
                 </NvFormItem>
                 <NvDivider direction="horizontal" />
                 <template v-if="currentEngineSettingsComponent">
-                  <component
-                    :is="currentEngineSettingsComponent"
+                  <NvAsyncRegion
+                    :component="currentEngineSettingsComponent"
                     :form="form.states"
                   />
                 </template>
@@ -125,6 +134,8 @@
   </NvCard>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
+import NvAsyncRegion from '@/components/NvAsyncRegion.vue'
 import {
   NvButton,
   NvCard,
