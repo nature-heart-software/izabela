@@ -61,6 +61,15 @@ async function fixture() {
           Vue.h(
             'button',
             {
+              'data-messages': '',
+              'data-v-step': 'messages-button',
+              onClick: () => messenger.navigateTo({ name: 'messages' }),
+            },
+            'Messages',
+          ),
+          Vue.h(
+            'button',
+            {
               'data-history': '',
               'data-v-step': 'message-history-button',
               onClick: () => messenger.navigateTo({ name: 'messages' }),
@@ -285,7 +294,7 @@ describe('messenger routed popover', () => {
 
   it.each([
     ['settings', '[data-navigation]'],
-    ['messages', '[data-history]'],
+    ['messages', '[data-messages]'],
   ])(
     'returns focus from %s to its messenger button when closed',
     async (name, selector) => {

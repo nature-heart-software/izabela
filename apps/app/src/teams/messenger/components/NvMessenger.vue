@@ -200,12 +200,11 @@ const closePanel = () => {
   const isSettings = String(router.currentRoute.value.name).startsWith(
     'settings',
   )
-  const returnTarget =
-    document.querySelector<HTMLElement>(
-      isSettings
-        ? '[data-v-step="settings-button"]'
-        : '[data-v-step="message-history-button"]',
-    ) || document.querySelector<HTMLElement>('[data-v-step="messages-button"]')
+  const returnTarget = document.querySelector<HTMLElement>(
+    isSettings
+      ? '[data-v-step="settings-button"]'
+      : '[data-v-step="messages-button"]',
+  )
   navigationId++
   pendingNavigation = 0
   popover.value.setOpen(false)
