@@ -34,11 +34,12 @@ const globalRecipe = cva({
       flexDirection: 'column',
       gap: '5',
       '& [data-nv-tour-content]': { color: 'inherit' },
-      '& button:focus': {
-        outline:
-          '{borderWidths.active} solid {colors.tourGuide.default.action-focus.ring}',
-        outlineOffset: '{spacing.1}',
-        boxShadow: 'none',
+      // Keep the shared Button's focus geometry and transition; only color differs.
+      '& button': {
+        '--colors-button-default-focus-ring':
+          '{colors.tourGuide.default.action-focus.ring}',
+        '--colors-button-plain-focus-ring':
+          '{colors.tourGuide.default.action-focus.ring}',
       },
       '&[data-hidden]': { display: 'none !important' },
     },
