@@ -49,6 +49,7 @@ export { StSelectGroupLabel } from '@/components/forms/Select/select.panda'
 export { default as NvButton } from '@/components/forms/Button/NvButton.vue'
 export { default as NvTextarea } from '@/components/forms/Textarea/NvTextarea.vue'
 export { default as NvRangeInput } from '@/components/forms/RangeInput/NvRangeInput.vue'
+export { default as NvSwitch } from '@/components/forms/Switch/NvSwitch.vue'
 export { default as NvInput } from '@/components/forms/Input/NvInput.vue'
 export { default as NvNumberInput } from '@/components/forms/NumberInput/NvNumberInput.vue'
 export { themes } from '@/themes'
@@ -145,6 +146,69 @@ function expectExtracted(classes: string[]) {
 afterEach(() => {
   wrappers.splice(0).forEach((wrapper) => wrapper.unmount())
   document.body.innerHTML = ''
+})
+
+describe('toggle hover background cascade', () => {
+  it.each(['kumo-ink-light', 'kumo-ink-dark', 'github-light', 'github-dark'])(
+    'matches button hover backgrounds before and after focus in %s',
+    (themeId) => {
+      const theme = ui.themes.get(themeId)
+      const variables: Record<string, string> = {}
+      const visit = (value: any, path: string[] = []) => {
+        for (const [key, child] of Object.entries(value)) {
+          if (child && typeof child === 'object') visit(child, [...path, key])
+          else variables[`--colors-${[...path, key].join('-')}`] = String(child)
+        }
+      }
+      visit(theme)
+      const background = (element: HTMLElement) => {
+        const candidates = emittedRules([...element.classList])
+          .filter(
+            (rule) =>
+              rule.declarations['background-color'] &&
+              element.matches(rule.selector),
+          )
+          .map((rule, order) => {
+            let specificity = 0
+            parseSelector((selectors: any) =>
+              selectors.walk((node: any) => {
+                if (node.type === 'id') specificity += 100
+                if (node.type === 'class' || node.type === 'attribute')
+                  specificity += 10
+                if (node.type === 'tag') specificity += 1
+              }),
+            ).processSync(rule.selector)
+            return { rule, specificity, order }
+          })
+          .sort((a, b) => a.specificity - b.specificity || a.order - b.order)
+        const value = candidates.at(-1)?.rule.declarations['background-color']
+        expect(value).toBeDefined()
+        return value!.replace(
+          /var\((--colors-[^)]+)\)/g,
+          (_, name) => variables[name],
+        )
+      }
+      for (const checked of [false, true]) {
+        const wrapper = render(ui.NvSwitch, {
+          props: { modelValue: checked },
+          global: { provide: { theme } },
+        })
+        const control = wrapper.get('[data-part="control"]')
+          .element as HTMLElement
+        const thumb = wrapper.get('[data-part="thumb"]').element as HTMLElement
+        for (const node of [control, thumb]) node.setAttribute('data-hover', '')
+        for (const focused of [false, true]) {
+          for (const node of [control, thumb])
+            node.toggleAttribute('data-focus', focused)
+          expect(
+            background(control),
+            `checked=${checked}, focused=${focused}`,
+          ).toBe(theme.button.default.hover.background)
+          expect(background(thumb)).not.toBe(background(control))
+        }
+      }
+    },
+  )
 })
 
 describe('Ark as-child button appearance', () => {
@@ -401,10 +465,10 @@ function winningRole(element: Element, property: string, pseudo = '') {
     const value =
       rule.declarations[property] ??
       (property === 'border-bottom-color'
-        ? (rule.declarations['border-color'] ??
+        ? rule.declarations['border-color'] ??
           rule.declarations['border-bottom']?.match(
             /var\(--colors-[^)]+\)/,
-          )?.[0])
+          )?.[0]
         : undefined)
     if (!value) return
     parseSelector((selectors: any) =>
