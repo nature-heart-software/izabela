@@ -63,6 +63,29 @@ describe('client build artifact isolation', () => {
 })
 
 describe('real shared controls', () => {
+  it.each(['plain', 'ghost', 'ghost-alt', 'active'])(
+    'preserves %s Button appearance through a tooltip inside a popover trigger',
+    async (type) => {
+      const wrapper = render(ui.NvPopover, {
+        slots: {
+          reference: () =>
+            h(
+              ui.NvTooltip,
+              {},
+              {
+                reference: () => h(ui.NvButton, { type }, () => 'Input'),
+                default: () => 'Audio input',
+              },
+            ),
+          default: 'Settings',
+        },
+      })
+      await settle()
+      const button = wrapper.get('button')
+      expect((button.element as HTMLButtonElement).type).toBe('button')
+      expect(button.classes()).toContain(`bg-c_button.${type}.background`)
+    },
+  )
   it('button forwards clicks and native disabled prevents HTMLElement.click', async () => {
     const w = render(ui.NvButton, { slots: { default: 'Save' } })
     expect(w.element.tagName).toBe('BUTTON')

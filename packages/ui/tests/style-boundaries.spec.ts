@@ -745,7 +745,11 @@ describe('generated style boundaries', () => {
               h(ui.NvText, { 'data-nv-tour-content': '' }, () => 'Tour body'),
               h('div', { id: 'vjt-arrow' }),
               ...['Previous', 'Next', 'Close'].map((label) =>
-                h(ui.NvButton, {}, () => label),
+                h(
+                  ui.NvButton,
+                  { type: label === 'Close' ? 'plain' : 'default' },
+                  () => label,
+                ),
               ),
             ]),
             h(
@@ -794,13 +798,16 @@ describe('generated style boundaries', () => {
       for (const button of wrapper.findAll('#vjt-tooltip button')) {
         expect(winningRole(button.element, 'outline')).toBe('0')
         button.element.focus()
-        expect(winningRole(button.element, 'outline')).toBe(
-          'var(--border-widths-active) solid var(--colors-tour-guide-default-action-focus-ring)',
+        expect(winningRole(button.element, 'outline')).toBe('0')
+        expect(winningRole(button.element, 'outline-offset')).toBeUndefined()
+        const variant = button.text() === 'Close' ? 'plain' : 'default'
+        expect(winningRole(button.element, 'box-shadow')).toBe(
+          `0 0 0 0.25rem var(--colors-button-${variant}-focus-ring)`,
         )
-        expect(winningRole(button.element, 'outline-offset')).toBe(
-          'var(--spacing-1)',
-        )
-        expect(winningRole(button.element, 'box-shadow')).toBe('none')
+        expect(
+          winningRole(button.element, `--colors-button-${variant}-focus-ring`),
+        ).toBe('var(--colors-tour-guide-default-action-focus-ring)')
+        expect(winningRole(button.element, 'transition')).toBe('all .3s')
         button.element.blur()
       }
       expect(
