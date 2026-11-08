@@ -64,24 +64,24 @@
               })
             "
           >
-            <NvTooltip>
-              <NvText>Close</NvText>
-              <template #reference>
-                <NvButton
-                  icon-name="times"
-                  size="xs"
-                  type="plain"
-                  @click="$emit('close')"
-                />
-              </template>
-            </NvTooltip>
+            <NvPanelNavigation
+              :sidebar="sidebar"
+              :content="content"
+              @close="$emit('close')"
+            />
           </div>
         </NvCard>
       </div>
       <div :class="css({ flex: '1 1 0%', position: 'relative' })">
         <div :class="css({ position: 'absolute', inset: '0' })">
           <div :class="css({ display: 'flex', height: '100%' })">
-            <div class="settings__sidebar">
+            <div
+              ref="sidebar"
+              class="settings__sidebar"
+              role="navigation"
+              aria-label="Settings sections"
+              tabindex="-1"
+            >
               <!-- Side Nav -->
               <NvStack spacing="6">
                 <template v-for="category in navigation" :key="category.name">
@@ -108,6 +108,11 @@
                             :href="href"
                             @click="navigate"
                             :selected="currentRoute.name === entry.to?.name"
+                            :aria-current="
+                              currentRoute.name === entry.to?.name
+                                ? 'page'
+                                : undefined
+                            "
                             :class="css({ width: '100%' })"
                             size="sm"
                             type="ghost-alt"
@@ -121,7 +126,11 @@
               </NvStack>
             </div>
             <div
+              ref="content"
               class="settings__content"
+              role="region"
+              aria-label="Settings content"
+              tabindex="-1"
               :class="css({ flex: '1 1 0%', paddingLeft: '4' })"
             >
               <div
@@ -175,7 +184,8 @@
 </template>
 <script lang="ts" setup>
 import { css } from '@/styled-system/css'
-import { NvButton, NvCard, NvStack, NvText, NvTooltip } from '@packages/ui'
+import { NvButton, NvCard, NvStack, NvText } from '@packages/ui'
+import NvPanelNavigation from '@/teams/messenger/components/NvPanelNavigation.vue'
 import NvStoreDialog from '@/teams/messenger/components/NvStoreDialog.vue'
 import { useRoute } from 'vue-router'
 import { useConfirmStore } from '@/store/use-confirm-store.ts'
@@ -188,6 +198,8 @@ import NvPortalTarget from '@/teams/messenger/components/NvPortalTarget.vue'
 import { ref } from 'vue'
 
 const settings = ref()
+const sidebar = ref<HTMLElement>()
+const content = ref<HTMLElement>()
 const settingsStore = useSettingsStore()
 const navigation = [
   {

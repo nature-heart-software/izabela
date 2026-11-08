@@ -753,7 +753,10 @@
           "default": {
             "background": "#0e0e2c",
             "text": "#ffffff",
-            "shadow": "rgba(0, 0, 0, 0.05000000074505806)"
+            "shadow": "rgba(0, 0, 0, 0.05000000074505806)",
+            "action-focus": {
+              "ring": "#ffffff"
+            }
           }
         },
         "Cloudflare Kumo": {
@@ -1807,7 +1810,10 @@
           "default": {
             "background": "#acacac",
             "text": "#444444",
-            "shadow": "rgba(0, 0, 0, 0.05000000074505806)"
+            "shadow": "rgba(0, 0, 0, 0.05000000074505806)",
+            "action-focus": {
+              "ring": "#444444"
+            }
           }
         },
         "Cloudflare Kumo": {
@@ -2861,7 +2867,10 @@
           "default": {
             "background": "#060606",
             "text": "#f5f5f5",
-            "shadow": "rgba(0, 0, 0, 0.05000000074505806)"
+            "shadow": "rgba(0, 0, 0, 0.05000000074505806)",
+            "action-focus": {
+              "ring": "#f5f5f5"
+            }
           }
         },
         "Cloudflare Kumo": {
@@ -3915,7 +3924,10 @@
           "default": {
             "background": "#fafafa",
             "text": "#171717",
-            "shadow": "rgba(0, 0, 0, 0.05000000074505806)"
+            "shadow": "rgba(0, 0, 0, 0.05000000074505806)",
+            "action-focus": {
+              "ring": "#171717"
+            }
           }
         },
         "Cloudflare Kumo": {
@@ -4969,7 +4981,10 @@
           "default": {
             "background": "#25292e",
             "text": "#ffffff",
-            "shadow": "rgba(31, 35, 40, 0.05000000074505806)"
+            "shadow": "rgba(31, 35, 40, 0.05000000074505806)",
+            "action-focus": {
+              "ring": "#ffffff"
+            }
           }
         },
         "Cloudflare Kumo": {
@@ -6023,7 +6038,10 @@
           "default": {
             "background": "#ffffff",
             "text": "#010409",
-            "shadow": "rgba(1, 4, 9, 0.05000000074505806)"
+            "shadow": "rgba(1, 4, 9, 0.05000000074505806)",
+            "action-focus": {
+              "ring": "#010409"
+            }
           }
         },
         "Cloudflare Kumo": {
@@ -7690,6 +7708,11 @@
           },
           "shadow": {
             "value": "var(--nv-tour-guide-default-shadow)"
+          },
+          "action-focus": {
+            "ring": {
+              "value": "var(--nv-tour-guide-default-action-focus-ring)"
+            }
           }
         }
       }

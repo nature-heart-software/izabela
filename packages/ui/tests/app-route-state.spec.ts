@@ -95,6 +95,7 @@ describe('application route scroll state', () => {
                 'NvPortalTarget',
                 'NvMarkForRestartMessage',
                 'NvStoreDialog',
+                'NvPanelNavigation',
               ].map((component) => [component, passthrough]),
             ),
           },

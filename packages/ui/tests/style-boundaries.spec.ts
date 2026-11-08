@@ -735,6 +735,7 @@ describe('generated style boundaries', () => {
         background: theme.tooltip.default.background,
         text: theme.tooltip.default.text,
         shadow: theme.tooltip.default.shadow,
+        'action-focus': { ring: theme.tooltip.default.text },
       })
       const wrapper = render(ui.GlobalStyles, {
         global: { provide: { theme } },
@@ -743,6 +744,9 @@ describe('generated style boundaries', () => {
             h('div', { id: 'vjt-tooltip' }, [
               h(ui.NvText, { 'data-nv-tour-content': '' }, () => 'Tour body'),
               h('div', { id: 'vjt-arrow' }),
+              ...['Previous', 'Next', 'Close'].map((label) =>
+                h(ui.NvButton, {}, () => label),
+              ),
             ]),
             h(
               ui.Tooltip.Root,
@@ -787,11 +791,37 @@ describe('generated style boundaries', () => {
         expect(winningRole(element, property, pseudo)).toBe(`var(--${role})`)
       }
       expect(winningRole(content, 'color')).toBe('inherit')
+      for (const button of wrapper.findAll('#vjt-tooltip button')) {
+        expect(winningRole(button.element, 'outline')).toBe('0')
+        button.element.focus()
+        expect(winningRole(button.element, 'outline')).toBe(
+          'var(--border-widths-active) solid var(--colors-tour-guide-default-action-focus-ring)',
+        )
+        expect(winningRole(button.element, 'outline-offset')).toBe(
+          'var(--spacing-1)',
+        )
+        expect(winningRole(button.element, 'box-shadow')).toBe('none')
+        button.element.blur()
+      }
+      expect(
+        (wrapper.element as HTMLElement).style.getPropertyValue(
+          '--nv-tour-guide-default-action-focus-ring',
+        ),
+      ).toBe(theme.tourGuide.default['action-focus'].ring)
+      expect(
+        rules.some(
+          (rule) =>
+            rule.declarations[
+              '--colors-tour-guide-default-action-focus-ring'
+            ] === 'var(--nv-tour-guide-default-action-focus-ring)',
+        ),
+      ).toBe(true)
       for (const [group, values] of [
         ['tour-guide', theme.tourGuide.default],
         ['tooltip', theme.tooltip.default],
       ] as const) {
-        for (const [role, value] of Object.entries(values)) {
+        for (const role of ['background', 'text', 'shadow'] as const) {
+          const value = values[role]
           const variable = `--nv-${group}-default-${role}`
           expect(
             (wrapper.element as HTMLElement).style.getPropertyValue(variable),
