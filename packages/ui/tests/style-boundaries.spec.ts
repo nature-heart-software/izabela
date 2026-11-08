@@ -162,7 +162,7 @@ describe('toggle hover background cascade', () => {
       }
       visit(theme)
       const color = (element: HTMLElement, property: string, pseudo = '') => {
-        const declaration = (rule: typeof rules[number]) =>
+        const declaration = (rule: (typeof rules)[number]) =>
           rule.declarations[property] ??
           (property === 'border-color'
             ? rule.declarations.border?.replace(/^1px solid /, '')
@@ -491,10 +491,10 @@ function winningRole(element: Element, property: string, pseudo = '') {
     const value =
       rule.declarations[property] ??
       (property === 'border-bottom-color'
-        ? rule.declarations['border-color'] ??
+        ? (rule.declarations['border-color'] ??
           rule.declarations['border-bottom']?.match(
             /var\(--colors-[^)]+\)/,
-          )?.[0]
+          )?.[0])
         : undefined)
     if (!value) return
     parseSelector((selectors: any) =>
