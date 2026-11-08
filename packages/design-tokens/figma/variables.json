@@ -737,7 +737,9 @@
         "VariableID:417:1074",
         "VariableID:495:10940",
         "VariableID:504:1281",
-        "VariableID:504:1282"
+        "VariableID:504:1282",
+        "VariableID:512:1301",
+        "VariableID:512:1302"
       ]
     }
   ],
@@ -5184,11 +5186,11 @@
         },
         "370:0": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:320:1173"
+          "id": "VariableID:512:1301"
         },
         "370:1": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:370:1109"
+          "id": "VariableID:512:1302"
         },
         "370:2": {
           "type": "VARIABLE_ALIAS",
@@ -17876,6 +17878,46 @@
           "r": 0.19184313714504242,
           "g": 0.48047059774398804,
           "b": 0.9278431534767151,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:512:1301",
+      "name": "Kumo Ink/Light/derived/checkedHover",
+      "variableCollectionId": "VariableCollectionId:193:379",
+      "resolvedType": "COLOR",
+      "valuesByMode": {
+        "193:0": {
+          "r": 0.239215686917305,
+          "g": 0.239215686917305,
+          "b": 0.239215686917305,
+          "a": 1
+        },
+        "193:1": {
+          "r": 0.239215686917305,
+          "g": 0.239215686917305,
+          "b": 0.239215686917305,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:512:1302",
+      "name": "Kumo Ink/Dark/derived/checkedHover",
+      "variableCollectionId": "VariableCollectionId:193:379",
+      "resolvedType": "COLOR",
+      "valuesByMode": {
+        "193:0": {
+          "r": 0.800000011920929,
+          "g": 0.800000011920929,
+          "b": 0.800000011920929,
+          "a": 1
+        },
+        "193:1": {
+          "r": 0.800000011920929,
+          "g": 0.800000011920929,
+          "b": 0.800000011920929,
           "a": 1
         }
       }

@@ -921,7 +921,8 @@
             "tooltipLightText": "#171717",
             "shadow10": "rgba(0, 0, 0, 0.10000000149011612)",
             "derived": {
-              "shadow12": "rgba(0, 0, 0, 0.11999999731779099)"
+              "shadow12": "rgba(0, 0, 0, 0.11999999731779099)",
+              "checkedHover": "#3d3d3d"
             },
             "cardMask": "rgba(255, 255, 255, 0.8999999761581421)"
           },
@@ -968,7 +969,8 @@
             "tooltipLightText": "#171717",
             "shadow10": "rgba(0, 0, 0, 0.10000000149011612)",
             "derived": {
-              "shadow12": "rgba(0, 0, 0, 0.11999999731779099)"
+              "shadow12": "rgba(0, 0, 0, 0.11999999731779099)",
+              "checkedHover": "#cccccc"
             },
             "cardMask": "rgba(15, 15, 15, 0.8999999761581421)"
           }
@@ -1996,7 +1998,8 @@
             "tooltipLightText": "#171717",
             "shadow10": "rgba(0, 0, 0, 0.10000000149011612)",
             "derived": {
-              "shadow12": "rgba(0, 0, 0, 0.11999999731779099)"
+              "shadow12": "rgba(0, 0, 0, 0.11999999731779099)",
+              "checkedHover": "#3d3d3d"
             },
             "cardMask": "rgba(255, 255, 255, 0.8999999761581421)"
           },
@@ -2043,7 +2046,8 @@
             "tooltipLightText": "#171717",
             "shadow10": "rgba(0, 0, 0, 0.10000000149011612)",
             "derived": {
-              "shadow12": "rgba(0, 0, 0, 0.11999999731779099)"
+              "shadow12": "rgba(0, 0, 0, 0.11999999731779099)",
+              "checkedHover": "#cccccc"
             },
             "cardMask": "rgba(15, 15, 15, 0.8999999761581421)"
           }
@@ -2496,7 +2500,7 @@
             "thumb-background": "#f5f5f5",
             "border": "#060606",
             "hover": {
-              "background": "#191919",
+              "background": "#3d3d3d",
               "thumb-background": "#f5f5f5",
               "border": "#060606"
             },
@@ -2507,7 +2511,7 @@
               "focus-ring": "rgba(11, 11, 11, 0.11999999731779099)"
             },
             "hover-focus": {
-              "background": "#191919",
+              "background": "#3d3d3d",
               "thumb-background": "#f5f5f5"
             }
           }
@@ -3071,7 +3075,8 @@
             "tooltipLightText": "#171717",
             "shadow10": "rgba(0, 0, 0, 0.10000000149011612)",
             "derived": {
-              "shadow12": "rgba(0, 0, 0, 0.11999999731779099)"
+              "shadow12": "rgba(0, 0, 0, 0.11999999731779099)",
+              "checkedHover": "#3d3d3d"
             },
             "cardMask": "rgba(255, 255, 255, 0.8999999761581421)"
           },
@@ -3118,7 +3123,8 @@
             "tooltipLightText": "#171717",
             "shadow10": "rgba(0, 0, 0, 0.10000000149011612)",
             "derived": {
-              "shadow12": "rgba(0, 0, 0, 0.11999999731779099)"
+              "shadow12": "rgba(0, 0, 0, 0.11999999731779099)",
+              "checkedHover": "#cccccc"
             },
             "cardMask": "rgba(15, 15, 15, 0.8999999761581421)"
           }
@@ -3571,7 +3577,7 @@
             "thumb-background": "#171717",
             "border": "#fafafa",
             "hover": {
-              "background": "#e8e8e8",
+              "background": "#cccccc",
               "thumb-background": "#171717",
               "border": "#fafafa"
             },
@@ -3582,7 +3588,7 @@
               "focus-ring": "rgba(233, 233, 233, 0.11999999731779099)"
             },
             "hover-focus": {
-              "background": "#e8e8e8",
+              "background": "#cccccc",
               "thumb-background": "#171717"
             }
           }
@@ -4146,7 +4152,8 @@
             "tooltipLightText": "#171717",
             "shadow10": "rgba(0, 0, 0, 0.10000000149011612)",
             "derived": {
-              "shadow12": "rgba(0, 0, 0, 0.11999999731779099)"
+              "shadow12": "rgba(0, 0, 0, 0.11999999731779099)",
+              "checkedHover": "#3d3d3d"
             },
             "cardMask": "rgba(255, 255, 255, 0.8999999761581421)"
           },
@@ -4193,7 +4200,8 @@
             "tooltipLightText": "#171717",
             "shadow10": "rgba(0, 0, 0, 0.10000000149011612)",
             "derived": {
-              "shadow12": "rgba(0, 0, 0, 0.11999999731779099)"
+              "shadow12": "rgba(0, 0, 0, 0.11999999731779099)",
+              "checkedHover": "#cccccc"
             },
             "cardMask": "rgba(15, 15, 15, 0.8999999761581421)"
           }
@@ -5221,7 +5229,8 @@
             "tooltipLightText": "#171717",
             "shadow10": "rgba(0, 0, 0, 0.10000000149011612)",
             "derived": {
-              "shadow12": "rgba(0, 0, 0, 0.11999999731779099)"
+              "shadow12": "rgba(0, 0, 0, 0.11999999731779099)",
+              "checkedHover": "#3d3d3d"
             },
             "cardMask": "rgba(255, 255, 255, 0.8999999761581421)"
           },
@@ -5268,7 +5277,8 @@
             "tooltipLightText": "#171717",
             "shadow10": "rgba(0, 0, 0, 0.10000000149011612)",
             "derived": {
-              "shadow12": "rgba(0, 0, 0, 0.11999999731779099)"
+              "shadow12": "rgba(0, 0, 0, 0.11999999731779099)",
+              "checkedHover": "#cccccc"
             },
             "cardMask": "rgba(15, 15, 15, 0.8999999761581421)"
           }
@@ -6296,7 +6306,8 @@
             "tooltipLightText": "#171717",
             "shadow10": "rgba(0, 0, 0, 0.10000000149011612)",
             "derived": {
-              "shadow12": "rgba(0, 0, 0, 0.11999999731779099)"
+              "shadow12": "rgba(0, 0, 0, 0.11999999731779099)",
+              "checkedHover": "#3d3d3d"
             },
             "cardMask": "rgba(255, 255, 255, 0.8999999761581421)"
           },
@@ -6343,7 +6354,8 @@
             "tooltipLightText": "#171717",
             "shadow10": "rgba(0, 0, 0, 0.10000000149011612)",
             "derived": {
-              "shadow12": "rgba(0, 0, 0, 0.11999999731779099)"
+              "shadow12": "rgba(0, 0, 0, 0.11999999731779099)",
+              "checkedHover": "#cccccc"
             },
             "cardMask": "rgba(15, 15, 15, 0.8999999761581421)"
           }
@@ -8428,6 +8440,9 @@
           "derived": {
             "shadow12": {
               "value": "var(--nv--kumo--ink--light-derived-shadow12)"
+            },
+            "checkedHover": {
+              "value": "var(--nv--kumo--ink--light-derived-checked-hover)"
             }
           },
           "cardMask": {
@@ -8561,6 +8576,9 @@
           "derived": {
             "shadow12": {
               "value": "var(--nv--kumo--ink--dark-derived-shadow12)"
+            },
+            "checkedHover": {
+              "value": "var(--nv--kumo--ink--dark-derived-checked-hover)"
             }
           },
           "cardMask": {

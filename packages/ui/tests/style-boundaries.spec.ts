@@ -238,6 +238,14 @@ describe('toggle hover background cascade', () => {
             )
             expect(background(control)).not.toBe(theme.switch.on.background)
             expect(background(thumb)).toBe(theme.switch.on['thumb-background'])
+            if (themeId.startsWith('kumo-ink-')) {
+              expect(
+                Math.abs(
+                  brightness(background(control)) -
+                    brightness(theme.switch.on.background),
+                ),
+              ).toBeGreaterThanOrEqual(40)
+            }
             if (brightness(theme.switch.on.background) < 128) {
               expect(brightness(background(control))).toBeGreaterThan(
                 brightness(theme.switch.on.background),
