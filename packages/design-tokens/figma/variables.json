@@ -449,7 +449,8 @@
         "VariableID:437:1371",
         "VariableID:437:1372",
         "VariableID:437:1373",
-        "VariableID:467:1071"
+        "VariableID:467:1071",
+        "VariableID:495:10941"
       ]
     },
     {
@@ -729,7 +730,8 @@
         "VariableID:417:1071",
         "VariableID:417:1072",
         "VariableID:417:1073",
-        "VariableID:417:1074"
+        "VariableID:417:1074",
+        "VariableID:495:10940"
       ]
     }
   ],
@@ -12393,6 +12395,38 @@
       }
     },
     {
+      "id": "VariableID:495:10941",
+      "name": "debug/hitbox/border",
+      "variableCollectionId": "VariableCollectionId:5:3",
+      "resolvedType": "COLOR",
+      "valuesByMode": {
+        "5:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:495:10940"
+        },
+        "20:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:495:10940"
+        },
+        "370:0": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:495:10940"
+        },
+        "370:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:495:10940"
+        },
+        "370:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:495:10940"
+        },
+        "370:3": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:495:10940"
+        }
+      }
+    },
+    {
       "id": "VariableID:193:380",
       "name": "Cloudflare Kumo/color/kumo-base",
       "variableCollectionId": "VariableCollectionId:193:379",
@@ -17649,6 +17683,26 @@
           "g": 0.06666667014360428,
           "b": 0.09019608050584793,
           "a": 0.8999999761581421
+        }
+      }
+    },
+    {
+      "id": "VariableID:495:10940",
+      "name": "Debug/red",
+      "variableCollectionId": "VariableCollectionId:193:379",
+      "resolvedType": "COLOR",
+      "valuesByMode": {
+        "193:0": {
+          "r": 1,
+          "g": 0,
+          "b": 0,
+          "a": 1
+        },
+        "193:1": {
+          "r": 1,
+          "g": 0,
+          "b": 0,
+          "a": 1
         }
       }
     }

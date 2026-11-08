@@ -759,6 +759,11 @@
             }
           }
         },
+        "debug": {
+          "hitbox": {
+            "border": "#ff0000"
+          }
+        },
         "Cloudflare Kumo": {
           "color": {
             "kumo-base": "#ffffff",
@@ -1055,6 +1060,9 @@
             },
             "cardMask": "rgba(13, 17, 23, 0.8999999761581421)"
           }
+        },
+        "Debug": {
+          "red": "#ff0000"
         }
       }
     },
@@ -1816,6 +1824,11 @@
             }
           }
         },
+        "debug": {
+          "hitbox": {
+            "border": "#ff0000"
+          }
+        },
         "Cloudflare Kumo": {
           "color": {
             "kumo-base": "#0f0f0f",
@@ -2112,6 +2125,9 @@
             },
             "cardMask": "rgba(13, 17, 23, 0.8999999761581421)"
           }
+        },
+        "Debug": {
+          "red": "#ff0000"
         }
       }
     },
@@ -2873,6 +2889,11 @@
             }
           }
         },
+        "debug": {
+          "hitbox": {
+            "border": "#ff0000"
+          }
+        },
         "Cloudflare Kumo": {
           "color": {
             "kumo-base": "#ffffff",
@@ -3169,6 +3190,9 @@
             },
             "cardMask": "rgba(13, 17, 23, 0.8999999761581421)"
           }
+        },
+        "Debug": {
+          "red": "#ff0000"
         }
       }
     },
@@ -3930,6 +3954,11 @@
             }
           }
         },
+        "debug": {
+          "hitbox": {
+            "border": "#ff0000"
+          }
+        },
         "Cloudflare Kumo": {
           "color": {
             "kumo-base": "#0f0f0f",
@@ -4226,6 +4255,9 @@
             },
             "cardMask": "rgba(13, 17, 23, 0.8999999761581421)"
           }
+        },
+        "Debug": {
+          "red": "#ff0000"
         }
       }
     },
@@ -4987,6 +5019,11 @@
             }
           }
         },
+        "debug": {
+          "hitbox": {
+            "border": "#ff0000"
+          }
+        },
         "Cloudflare Kumo": {
           "color": {
             "kumo-base": "#ffffff",
@@ -5283,6 +5320,9 @@
             },
             "cardMask": "rgba(13, 17, 23, 0.8999999761581421)"
           }
+        },
+        "Debug": {
+          "red": "#ff0000"
         }
       }
     },
@@ -6044,6 +6084,11 @@
             }
           }
         },
+        "debug": {
+          "hitbox": {
+            "border": "#ff0000"
+          }
+        },
         "Cloudflare Kumo": {
           "color": {
             "kumo-base": "#0f0f0f",
@@ -6340,6 +6385,9 @@
             },
             "cardMask": "rgba(13, 17, 23, 0.8999999761581421)"
           }
+        },
+        "Debug": {
+          "red": "#ff0000"
         }
       }
     }
@@ -7715,6 +7763,13 @@
             }
           }
         }
+      },
+      "debug": {
+        "hitbox": {
+          "border": {
+            "value": "var(--nv-debug-hitbox-border)"
+          }
+        }
       }
     },
     "shadows": {
@@ -8703,6 +8758,11 @@
           "cardMask": {
             "value": "var(--nv--git-hub--dark-card-mask)"
           }
+        }
+      },
+      "Debug": {
+        "red": {
+          "value": "var(--nv--debug-red)"
         }
       }
     }

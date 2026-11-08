@@ -5,7 +5,7 @@
     <template v-for="hitbox in hitboxStore.hitboxes" :key="hitbox.id">
       <div
         :data-debug-hitbox-id="hitbox.id"
-        :class="css({ border: '1px solid {colors.alert.error.foreground}' })"
+        :class="css({ border: '1px solid {colors.debug.hitbox.border}' })"
         :style="{
           position: 'absolute',
           top: rem(hitbox.y / pixelRatio),
