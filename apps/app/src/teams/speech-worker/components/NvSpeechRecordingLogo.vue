@@ -1,13 +1,29 @@
 <template>
-  <div
-    class="animation-wrapper"
-    :class="
-      css({ backgroundColor: 'gray.0', opacity: 0.5, borderRadius: 'md' })
-    "
-  >
-    <div id="outer-circle" class="circle"></div>
-    <div id="inner-circle" class="circle"></div>
-  </div>
+  <ThemeProvider :theme="theme">
+    <GlobalStyles
+      class="animation-wrapper"
+      :class="
+        css({
+          backgroundColor: 'loading.default.pending.background',
+          opacity: 0.5,
+          borderRadius: 'md',
+        })
+      "
+    >
+      <div
+        id="outer-circle"
+        class="circle"
+        :class="
+          css({ border: '8px solid {colors.loading.default.pending.spinner}' })
+        "
+      ></div>
+      <div
+        id="inner-circle"
+        class="circle"
+        :class="css({ backgroundColor: 'loading.default.pending.spinner' })"
+      ></div>
+    </GlobalStyles>
+  </ThemeProvider>
 </template>
 <style lang="scss">
 @keyframes outer-border {
@@ -69,14 +85,12 @@
 #outer-circle {
   width: 56px;
   height: 56px;
-  border: 8px solid #444444;
   animation: outer-border ease-out 1s infinite;
 }
 
 #inner-circle {
   width: 24px;
   height: 24px;
-  background-color: #0e0e2c;
   animation: inner-border ease-out 1s infinite;
   animation-delay: 0.25s;
 }
@@ -84,4 +98,10 @@
 
 <script setup lang="ts">
 import { css } from '@/styled-system/css'
+import { computed } from 'vue'
+import { GlobalStyles, resolveTheme, ThemeProvider } from '@packages/ui'
+import { useSettingsStore } from '@/features/settings/store'
+
+const settingsStore = useSettingsStore()
+const theme = computed(() => resolveTheme(settingsStore.theme))
 </script>

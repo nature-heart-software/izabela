@@ -86,6 +86,42 @@ function fixture() {
 }
 
 describe('wheel routing through an overlay click shield', () => {
+  it('routes through a modal pointer lock without leaving pointer events enabled', () => {
+    const f = fixture()
+    document.body.style.setProperty('pointer-events', 'none', 'important')
+    Object.defineProperty(document, 'elementsFromPoint', {
+      configurable: true,
+      value: () =>
+        getComputedStyle(f.page).pointerEvents === 'none'
+          ? [f.shield, document.documentElement]
+          : [f.shield, f.leaf, f.page, document.body, document.documentElement],
+    })
+    f.wheel()
+    expect(f.page.scrollTop).toBe(60)
+    expect(document.body.style.getPropertyValue('pointer-events')).toBe('none')
+    expect(document.body.style.getPropertyPriority('pointer-events')).toBe(
+      'important',
+    )
+  })
+
+  it('restores a modal pointer lock when hit testing throws', () => {
+    const f = fixture()
+    document.body.style.setProperty('pointer-events', 'none', 'important')
+    Object.defineProperty(document, 'elementsFromPoint', {
+      configurable: true,
+      value: () => {
+        throw new Error('hit test failed')
+      },
+    })
+    const event = new WheelEvent('wheel', { cancelable: true, deltaY: 60 })
+    Object.defineProperty(event, 'currentTarget', { value: f.shield })
+    expect(() => onOverlayShieldWheel(event)).toThrow('hit test failed')
+    expect(document.body.style.getPropertyValue('pointer-events')).toBe('none')
+    expect(document.body.style.getPropertyPriority('pointer-events')).toBe(
+      'important',
+    )
+  })
+
   it('chains only the unconsumed delta to the next scroll ancestor', () => {
     const f = fixture()
     const inner = scroller()

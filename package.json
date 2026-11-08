@@ -168,6 +168,8 @@
     ]
   },
   "scripts": {
+    "tokens:import": "node packages/design-tokens/tools/figma-import.mjs",
+    "tokens:check": "node packages/design-tokens/tools/figma-import.mjs --check",
     "prepare:native": "pnpm --filter @packages/native-keymap run build && pnpm --filter win-control run build",
     "build": "pnpm nx build izabela-next",
     "build:app": "pnpm nx build izabela-next",

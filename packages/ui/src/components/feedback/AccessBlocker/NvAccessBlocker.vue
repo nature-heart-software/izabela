@@ -1,6 +1,12 @@
 <template>
   <StAccessBlocker v-bind="props">
-    <slot />
+    <div
+      ref="content"
+      :inert="props.allowed ? undefined : true"
+      :class="css({ display: 'contents' })"
+    >
+      <slot />
+    </div>
     <Transition
       :class="
         css({
@@ -24,6 +30,7 @@
   </StAccessBlocker>
 </template>
 <script lang="ts" setup>
+import { ref, watch } from 'vue'
 import { css } from '@/styled-system/css'
 import NkCenter from '@/components/miscellaneous/Center/NvCenter.vue'
 import NvAlert from '@/components/feedback/Alert/NvAlert.vue'
@@ -35,4 +42,18 @@ import {
 import { props as propsDefinition } from './access-blocker.shared'
 
 const props = defineProps(propsDefinition)
+const content = ref<HTMLElement>()
+watch(
+  () => props.allowed,
+  (allowed) => {
+    const active = document.activeElement
+    if (
+      !allowed &&
+      active instanceof HTMLElement &&
+      content.value?.contains(active)
+    )
+      active.blur()
+  },
+  { flush: 'post' },
+)
 </script>

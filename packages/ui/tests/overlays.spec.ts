@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mount, flushPromises, type VueWrapper } from '@vue/test-utils'
-import { h, nextTick } from 'vue'
+import { defineComponent, h, nextTick, onMounted, ref } from 'vue'
 import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
@@ -24,7 +24,7 @@ function render(component: unknown, options: Record<string, any> = {}) {
     ...options,
     global: {
       provide: {
-        theme: ui.themes.get('dark'),
+        theme: ui.themes.get('izabela-dark'),
         [ui.PORTAL_TARGET]: document.body,
       },
       ...options.global,
@@ -524,6 +524,56 @@ describe('overlay interaction boundaries', () => {
     ).toBeNull()
   })
 
+  it.each(['native', 'shared'])(
+    'dismisses a %s focused-button tooltip on an outside click that leaves focus unchanged',
+    async (kind) => {
+      const wrapper = render(ui.NvTooltip, {
+        props: { tippyOptions: { delay: 0, duration: 0 } },
+        slots: {
+          reference: () =>
+            h(kind === 'shared' ? ui.NvButton : 'button', null, () => 'Help'),
+          default: 'Helpful details',
+        },
+      })
+      await settle()
+      const trigger = wrapper.get('button').element as HTMLButtonElement
+      trigger.focus()
+      await wrapper
+        .get('button')
+        .trigger('pointermove', { pointerType: 'mouse' })
+      await settle()
+      expect(document.querySelector('[role="tooltip"]')?.textContent).toContain(
+        'Helpful details',
+      )
+      const outside = document.createElement('div')
+      document.body.append(outside)
+      const clicked = vi.fn()
+      outside.addEventListener('click', clicked)
+      outside.addEventListener('pointerdown', (event) =>
+        event.stopPropagation(),
+      )
+      const event = new MouseEvent('pointerdown', {
+        bubbles: true,
+        cancelable: true,
+      })
+      outside.dispatchEvent(event)
+      outside.click()
+      await settle()
+      // Blank surfaces and prevented mouse defaults can leave the button focused.
+      expect(document.activeElement).toBe(trigger)
+      expect(event.defaultPrevented).toBe(false)
+      expect(clicked).toHaveBeenCalledOnce()
+      expect(document.querySelector('[role="tooltip"]')).toBeNull()
+      await wrapper
+        .get('button')
+        .trigger('pointermove', { pointerType: 'mouse' })
+      await settle()
+      expect(document.querySelector('[role="tooltip"]')?.textContent).toContain(
+        'Helpful details',
+      )
+    },
+  )
+
   it('cancels a pending tooltip when the pointer leaves before its open delay', async () => {
     const wrapper = render(ui.NvTooltip, {
       props: { tippyOptions: { delay: [100, 0] } },
@@ -542,6 +592,47 @@ describe('overlay interaction boundaries', () => {
     expect(
       document.querySelector('[data-scope="tooltip"][role="tooltip"]'),
     ).toBeNull()
+  })
+
+  it('cancels a pending tooltip on an outside click without a pointerleave', async () => {
+    const wrapper = render(ui.NvTooltip, {
+      props: { tippyOptions: { delay: [150, 0] } },
+      slots: {
+        reference: () => h(ui.NvButton, null, () => 'Help'),
+        default: 'Helpful details',
+      },
+    })
+    await settle()
+    await wrapper.get('button').trigger('pointermove', { pointerType: 'mouse' })
+    document.body.dispatchEvent(
+      new MouseEvent('pointerdown', { bubbles: true }),
+    )
+    await new Promise((resolve) => setTimeout(resolve, 200))
+    await settle()
+    expect(document.querySelector('[role="tooltip"]')).toBeNull()
+  })
+
+  it('keeps interactive tooltip content usable when clicked inside its portal', async () => {
+    const clicked = vi.fn()
+    const wrapper = render(ui.NvTooltip, {
+      props: { tippyOptions: { delay: 0, duration: 0, interactive: true } },
+      slots: {
+        reference: () => h(ui.NvButton, null, () => 'Help'),
+        default: () =>
+          h('button', { id: 'tooltip-action', onClick: clicked }, 'Details'),
+      },
+    })
+    await settle()
+    await wrapper.get('button').trigger('pointermove', { pointerType: 'mouse' })
+    await settle()
+    const action = document.getElementById(
+      'tooltip-action',
+    ) as HTMLButtonElement
+    action.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }))
+    action.click()
+    await settle()
+    expect(clicked).toHaveBeenCalledOnce()
+    expect(document.querySelector('[role="tooltip"]')).not.toBeNull()
   })
 
   it.each(['sm', 'md', 'lg'])(
@@ -658,7 +749,167 @@ describe('overlay interaction boundaries', () => {
     ).toBeNull()
   })
 
-  it('passive tooltip uses Ark hover/Escape behavior without creating a click shield and suppresses focused references', async () => {
+  it('shows a tooltip when its reference is focused during parent mounting', async () => {
+    const Page = defineComponent({
+      setup() {
+        onMounted(() => document.getElementById('initial-focus-help')?.focus())
+        return () =>
+          h(
+            ui.NvTooltip,
+            { tippyOptions: { delay: 0, duration: 0 } },
+            {
+              reference: () =>
+                h(ui.NvButton, { id: 'initial-focus-help' }, () => 'Close'),
+              default: () => 'Close panel',
+            },
+          )
+      },
+    })
+    render(Page)
+    await settle()
+    expect(document.activeElement?.id).toBe('initial-focus-help')
+    expect(document.querySelector('[role="tooltip"]')?.textContent).toContain(
+      'Close panel',
+    )
+    expect(document.activeElement?.getAttribute('aria-describedby')).toBe(
+      document.querySelector('[role="tooltip"]')?.id,
+    )
+  })
+
+  it('shows a tooltip on focus that closes an expanded reference in the same turn', async () => {
+    const expanded = ref(true)
+    const wrapper = render(ui.NvTooltip, {
+      props: { tippyOptions: { delay: 0, duration: 0 } },
+      slots: {
+        reference: () =>
+          h(
+            ui.NvButton,
+            {
+              'aria-expanded': expanded.value,
+              onFocus: () => {
+                expanded.value = false
+              },
+            },
+            () => 'Close',
+          ),
+        default: 'Close panel',
+      },
+    })
+    await settle()
+    const trigger = wrapper.get('button').element as HTMLButtonElement
+    trigger.focus()
+    await settle()
+    expect(document.activeElement).toBe(trigger)
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+    expect(document.querySelector('[role="tooltip"]')?.textContent).toContain(
+      'Close panel',
+    )
+  })
+
+  it('reopens on a new programmatic focus after dismissal, without reopening on an unrelated update', async () => {
+    const label = ref('Settings')
+    const wrapper = render(ui.NvTooltip, {
+      props: { tippyOptions: { delay: 0, duration: 0 } },
+      slots: {
+        reference: () => h(ui.NvButton, null, () => label.value),
+        default: 'Open settings',
+      },
+    })
+    await settle()
+    const trigger = wrapper.get('button').element as HTMLButtonElement
+    trigger.focus()
+    await settle()
+    expect(document.querySelector('[role="tooltip"]')?.textContent).toContain(
+      'Open settings',
+    )
+    document.body.dispatchEvent(
+      new MouseEvent('pointerdown', { bubbles: true }),
+    )
+    await settle()
+    label.value = 'Updated settings'
+    await settle()
+    expect(document.activeElement).toBe(trigger)
+    expect(document.querySelector('[role="tooltip"]')).toBeNull()
+    trigger.blur()
+    trigger.focus()
+    await settle()
+    expect(document.querySelector('[role="tooltip"]')?.textContent).toContain(
+      'Open settings',
+    )
+  })
+
+  it('does not let a suppressed tooltip consume Escape from an expanded control', async () => {
+    const wrapper = render(ui.NvTooltip, {
+      props: { tippyOptions: { delay: 0, duration: 0 } },
+      slots: {
+        reference: () =>
+          h(ui.NvButton, { 'aria-expanded': true }, () => 'More'),
+        default: 'More options',
+      },
+    })
+    await settle()
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }),
+    )
+    const trigger = wrapper.get('button').element as HTMLButtonElement
+    trigger.focus()
+    await settle()
+    expect(document.querySelector('[role="tooltip"]')).toBeNull()
+    const escape = vi.fn()
+    trigger.addEventListener('keydown', escape)
+    await key(trigger, 'Escape')
+    expect(escape).toHaveBeenCalledOnce()
+  })
+
+  it('dismisses a focused tooltip on blur but keeps interactive content usable', async () => {
+    const wrapper = render(ui.NvTooltip, {
+      props: { tippyOptions: { delay: 0, duration: 0, interactive: true } },
+      slots: {
+        reference: () => h(ui.NvButton, null, () => 'Help'),
+        default: () => h('button', { id: 'focus-tooltip-action' }, 'Details'),
+      },
+    })
+    await settle()
+    const trigger = wrapper.get('button').element as HTMLButtonElement
+    trigger.focus()
+    await settle()
+    const action = document.getElementById('focus-tooltip-action')!
+    action.focus()
+    await settle()
+    expect(document.querySelector('[role="tooltip"]')).not.toBeNull()
+    action.blur()
+    trigger.focus()
+    await settle()
+    trigger.blur()
+    await settle()
+    expect(document.querySelector('[role="tooltip"]')).toBeNull()
+  })
+
+  it.each(['outside click', 'blur', 'window blur'])(
+    'cancels pending focus activation on %s',
+    async (dismissal) => {
+      const wrapper = render(ui.NvTooltip, {
+        props: { tippyOptions: { delay: 0, duration: 0 } },
+        slots: {
+          reference: () => h(ui.NvButton, null, () => 'Help'),
+          default: 'Helpful details',
+        },
+      })
+      await settle()
+      const trigger = wrapper.get('button').element as HTMLButtonElement
+      trigger.focus()
+      if (dismissal === 'outside click')
+        document.body.dispatchEvent(
+          new MouseEvent('pointerdown', { bubbles: true }),
+        )
+      else if (dismissal === 'blur') trigger.blur()
+      else window.dispatchEvent(new Event('blur'))
+      await settle()
+      expect(document.querySelector('[role="tooltip"]')).toBeNull()
+    },
+  )
+
+  it('passive tooltip opens on hover over a focused reference without creating a click shield', async () => {
     const wrapper = render(ui.NvTooltip, {
       props: { tippyOptions: { delay: 0, duration: 0 } },
       slots: {
@@ -679,17 +930,124 @@ describe('overlay interaction boundaries', () => {
     expect(trigger.getAttribute('aria-describedby')).toBe(tooltip?.id)
     await key(trigger, 'Escape')
     expect(document.querySelector('[role="tooltip"]')).toBeNull()
+    trigger.dispatchEvent(new MouseEvent('pointerleave'))
     trigger.focus()
     await settle()
     trigger.dispatchEvent(new MouseEvent('pointermove', { bubbles: true }))
     await settle()
-    expect(document.querySelector('[role="tooltip"]')).toBeNull()
+    expect(document.querySelector('[role="tooltip"]')?.textContent).toContain(
+      'Helpful details',
+    )
     wrapper.unmount()
     wrappers.splice(wrappers.indexOf(wrapper), 1)
     expect(
       document.querySelector('[data-scope="tooltip"][data-part="positioner"]'),
     ).toBeNull()
   })
+
+  it('shows a focused Select tooltip on hover and suppresses it only while its list is open', async () => {
+    const wrapper = render(ui.NvTooltip, {
+      props: { tippyOptions: { delay: 0, duration: 0 } },
+      slots: {
+        reference: () =>
+          h(ui.NvSelect, {
+            id: 'focused-tooltip-select',
+            options: [{ label: 'Alpha', value: 'a' }],
+            modelValue: 'a',
+          }),
+        default: 'Choose a voice',
+      },
+    })
+    await settle()
+    const input = wrapper.get('input').element as HTMLInputElement
+    const control = wrapper.get('[data-nv-select-control]')
+    input.focus()
+    await settle()
+    await control.trigger('pointermove', { pointerType: 'mouse' })
+    await settle()
+    expect(document.querySelector('[role="tooltip"]')?.textContent).toContain(
+      'Choose a voice',
+    )
+    await key(input, 'Enter')
+    await control.trigger('pointermove', { pointerType: 'mouse' })
+    await settle()
+    expect(input.getAttribute('aria-expanded')).toBe('true')
+    expect(document.querySelector('[role="tooltip"]')).toBeNull()
+    await key(input, 'Escape')
+    await settle()
+    expect(document.activeElement).toBe(input)
+    expect(document.querySelector('[role="tooltip"]')?.textContent).toContain(
+      'Choose a voice',
+    )
+  })
+
+  it.each(['Escape', 'keyboard selection', 'option click', 'outside click'])(
+    'restores a focused Select tooltip after %s unless dismissed outside',
+    async (method) => {
+      const value = ref('a')
+      const wrapper = render(ui.NvTooltip, {
+        props: { tippyOptions: { delay: 0, duration: 0 } },
+        slots: {
+          reference: () =>
+            h(ui.NvSelect, {
+              id: 'returning-select',
+              modelValue: value.value,
+              'onUpdate:modelValue': (next: string) => {
+                value.value = next
+              },
+              options: [
+                { label: 'Alpha', value: 'a' },
+                { label: 'Beta', value: 'b' },
+              ],
+            }),
+          default: 'Choose a voice',
+        },
+      })
+      await settle()
+      const input = wrapper.get('input').element as HTMLInputElement
+      input.focus()
+      await key(input, 'Enter')
+      expect(input.getAttribute('aria-expanded')).toBe('true')
+      expect(document.querySelector('[role="tooltip"]')).toBeNull()
+      if (method === 'keyboard selection') {
+        await key(input, 'ArrowDown')
+        await key(input, 'Enter')
+      } else if (method === 'option click') {
+        const option = document.querySelector<HTMLElement>('[title="Beta"]')!
+        option.dispatchEvent(
+          new MouseEvent('pointerdown', { bubbles: true, cancelable: true }),
+        )
+        option.dispatchEvent(
+          new MouseEvent('mousedown', { bubbles: true, cancelable: true }),
+        )
+        option.click()
+      } else if (method === 'outside click') {
+        const shield = document.querySelector<HTMLElement>(
+          '[data-nv-overlay-shield]',
+        )!
+        shield.dispatchEvent(
+          new MouseEvent('pointerdown', { bubbles: true, cancelable: true }),
+        )
+        shield.click()
+      } else await key(input, 'Escape')
+      await settle()
+      expect(input.getAttribute('aria-expanded')).toBe('false')
+      expect(document.activeElement).toBe(input)
+      if (method === 'outside click') {
+        expect(document.querySelector('[role="tooltip"]')).toBeNull()
+        // A subsequent keyboard-opened session gets its own dismissal state.
+        await key(input, 'Enter')
+        await key(input, 'Escape')
+        await settle()
+        expect(
+          document.querySelector('[role="tooltip"]')?.textContent,
+        ).toContain('Choose a voice')
+      } else
+        expect(
+          document.querySelector('[role="tooltip"]')?.textContent,
+        ).toContain('Choose a voice')
+    },
+  )
 
   it.each(['click', 'pointer', 'Space'])(
     'context menu activates one option exactly once through %s',

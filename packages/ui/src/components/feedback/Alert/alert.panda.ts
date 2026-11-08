@@ -10,20 +10,24 @@ export const alert = cva({
   variants: {
     type: {
       info: {
-        backgroundColor: 'var(--nv-alert-info-background-color)',
-        color: 'var(--nv-alert-info-color)',
+        backgroundColor: 'alert.info.background',
+        color: 'alert.info.foreground',
+        '& a::before': { backgroundColor: 'alert.info.linkUnderline' },
       },
       success: {
-        backgroundColor: 'var(--nv-alert-success-background-color)',
-        color: 'var(--nv-alert-success-color)',
+        backgroundColor: 'alert.success.background',
+        color: 'alert.success.foreground',
+        '& a::before': { backgroundColor: 'alert.success.linkUnderline' },
       },
       warning: {
-        backgroundColor: 'var(--nv-alert-warning-background-color)',
-        color: 'var(--nv-alert-warning-color)',
+        backgroundColor: 'alert.warning.background',
+        color: 'alert.warning.foreground',
+        '& a::before': { backgroundColor: 'alert.warning.linkUnderline' },
       },
       error: {
-        backgroundColor: 'var(--nv-alert-error-background-color)',
-        color: 'var(--nv-alert-error-color)',
+        backgroundColor: 'alert.error.background',
+        color: 'alert.error.foreground',
+        '& a::before': { backgroundColor: 'alert.error.linkUnderline' },
       },
     },
     size: {

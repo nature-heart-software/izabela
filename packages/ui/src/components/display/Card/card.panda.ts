@@ -4,9 +4,9 @@ import { props } from './card.shared'
 
 export const card = cva({
   base: {
-    backgroundColor: 'var(--nv-card-background-color)',
+    backgroundColor: 'card.default.background',
     borderRadius: 'md',
-    boxShadow: 'lg',
+    boxShadow: 'card.default.shadow',
     fontSize: 0,
   },
   variants: {
@@ -18,8 +18,8 @@ export const card = cva({
     variant: {
       default: {},
       transparent: {
-        backgroundColor:
-          'color-mix(in srgb, var(--nv-card-transparent-backdrop-color) calc(var(--nv-card-transparent-backdrop-opacity) * 100%), transparent)',
+        backgroundColor: 'card.transparent.background',
+        boxShadow: 'card.transparent.shadow',
       },
     },
   },

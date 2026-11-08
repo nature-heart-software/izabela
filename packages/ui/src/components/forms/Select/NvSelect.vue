@@ -213,7 +213,7 @@ const inputId = computed(() =>
 const isLocked = computed(() => props.disabled || props.readonly)
 const emit = defineEmits(['update:modelValue'])
 const iconSize = computed(() => {
-  const sizes: Record<Size, keyof typeof tokens.spacing> = {
+  const sizes: Record<Size, keyof typeof tokens.fontSize> = {
     sm: 3,
     md: 5,
     lg: 5,
@@ -309,7 +309,22 @@ const updateSearch = (value: string) => {
 }
 
 function onInputKeydown(event: KeyboardEvent) {
-  if (event.key === 'Tab') closeSelect()
+  if (
+    event.key === 'Enter' &&
+    !event.defaultPrevented &&
+    !event.isComposing &&
+    !event.repeat &&
+    !event.ctrlKey &&
+    !event.altKey &&
+    !event.metaKey &&
+    !event.shiftKey &&
+    !isAutocompleteVisible.value &&
+    !isLocked.value
+  ) {
+    event.preventDefault()
+    event.stopPropagation()
+    activate()
+  } else if (event.key === 'Tab') closeSelect()
   else if (event.key === 'Escape' && isAutocompleteVisible.value) {
     event.preventDefault()
     event.stopPropagation()
@@ -377,7 +392,6 @@ const collectionItems = computed(() =>
       readonly,
     })),
 )
-const highlightedValue = ref<string | null>(null)
 const combobox = useCombobox<ComboboxOption>(
   reactive({
     items: collectionItems,
@@ -388,7 +402,6 @@ const combobox = useCombobox<ComboboxOption>(
     modelValue: computed(() => selectedOptions.value.map((item) => item!.key)),
     inputValue,
     open: isAutocompleteVisible,
-    highlightedValue,
     disabled: computed(() => props.disabled),
     readOnly: computed(() => props.readonly),
     multiple: computed(() => props.multiple),
@@ -408,9 +421,6 @@ const combobox = useCombobox<ComboboxOption>(
       if (!open) closeSelect()
       else if (!isLocked.value && hasFocus.value)
         isAutocompleteVisible.value = true
-    },
-    onHighlightChange: (details: { highlightedValue: string | null }) => {
-      highlightedValue.value = details.highlightedValue
     },
     onValueChange: ({ value }: { value: string[] }) => {
       if (isLocked.value) return
@@ -434,8 +444,12 @@ const combobox = useCombobox<ComboboxOption>(
 function onListVisible() {
   const index = autoScrollIndex.value
   const item = index === undefined ? undefined : searchResults.value[index]
-  highlightedValue.value =
-    item && !item.disabled && !item.readonly ? item.key : null
+  // Keep navigation inside Ark's machine. Feeding each highlight back through
+  // useCombobox's reactive props rebuilds and deeply watches the whole catalog
+  // on every arrow key, delaying the virtual list while keys repeat.
+  combobox.value.setHighlightValue(
+    item && !item.disabled && !item.readonly ? item.key : '',
+  )
   if (index !== undefined) optionList.value?.scrollToIndex(index)
 }
 watch(searchResults, async () => {
@@ -444,7 +458,7 @@ watch(searchResults, async () => {
   const item = collectionItems.value.find(
     (item) => !item.disabled && !item.readonly,
   )
-  highlightedValue.value = item ? item.key : null
+  combobox.value.setHighlightValue(item ? item.key : '')
 })
 
 const handleValue = (value: Value) => {

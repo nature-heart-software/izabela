@@ -123,7 +123,7 @@ module.exports = async function focusRuntime({ sdkRoot, profile }) {
     )
     const stubs = {
       '@/styled-system/css': `export const css = () => '';`,
-      '@packages/ui': `export { layout as NvButton, layout as NvCard, layout as NvGroup, layout as GlobalStyles, layout as ThemeProvider } from 'controlled'; export const tokens = {}; export const themes = new Map([['test', {}]]); export const PORTAL_TARGET = 'portal';`,
+      '@packages/ui': `export { layout as NvButton, layout as NvCard, layout as NvGroup, layout as GlobalStyles, layout as ThemeProvider } from 'controlled'; export const tokens = {}; export const resolveTheme = () => ({}); export const PORTAL_TARGET = 'portal';`,
       'vue3-styled-components': `export { layout as ThemeProvider } from 'controlled';`,
       '@/teams/messenger/components/NvMessenger.vue': `export { default } from 'actual-bar';`,
       '@/teams/messenger/components/NvBackground.vue': `export { layout as default } from 'controlled';`,

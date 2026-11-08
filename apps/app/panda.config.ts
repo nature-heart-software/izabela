@@ -5,6 +5,7 @@ import {
 
 export default {
   preflight: true,
+  cssVarRoot: ':where(:root, [data-nv-theme])',
   prefix: { className: 'app' },
   layers: { ...pandaLayers, utilities: 'app_utilities' },
   globalCss: {

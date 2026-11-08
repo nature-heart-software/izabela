@@ -22,7 +22,7 @@ function render(component: unknown, options: Record<string, any> = {}) {
     ...options,
     global: {
       provide: {
-        theme: ui.themes.get('dark'),
+        theme: ui.themes.get('izabela-dark'),
         [ui.PORTAL_TARGET]: document.body,
       },
       ...options.global,
@@ -63,6 +63,29 @@ describe('client build artifact isolation', () => {
 })
 
 describe('real shared controls', () => {
+  it.each(['plain', 'ghost', 'ghost-alt', 'active'])(
+    'preserves %s Button appearance through a tooltip inside a popover trigger',
+    async (type) => {
+      const wrapper = render(ui.NvPopover, {
+        slots: {
+          reference: () =>
+            h(
+              ui.NvTooltip,
+              {},
+              {
+                reference: () => h(ui.NvButton, { type }, () => 'Input'),
+                default: () => 'Audio input',
+              },
+            ),
+          default: 'Settings',
+        },
+      })
+      await settle()
+      const button = wrapper.get('button')
+      expect((button.element as HTMLButtonElement).type).toBe('button')
+      expect(button.classes()).toContain(`bg-c_button.${type}.background`)
+    },
+  )
   it('button forwards clicks and native disabled prevents HTMLElement.click', async () => {
     const w = render(ui.NvButton, { slots: { default: 'Save' } })
     expect(w.element.tagName).toBe('BUTTON')
@@ -730,6 +753,10 @@ describe('real select composition', () => {
                 onMousedown: (event: MouseEvent) => {
                   event.preventDefault()
                   event.stopPropagation()
+                },
+                onClick: (event: MouseEvent) => {
+                  event.preventDefault()
+                  event.stopPropagation()
                   favorites.value = favorites.value.filter(
                     (id) => id !== option.id,
                   )
@@ -760,6 +787,12 @@ describe('real select composition', () => {
     buttons[0].dispatchEvent(
       new MouseEvent('mousedown', { bubbles: true, cancelable: true }),
     )
+    await settle()
+    expect(favorites.value).toEqual(['voice-elf'])
+    buttons[0].dispatchEvent(
+      new MouseEvent('mouseup', { bubbles: true, cancelable: true }),
+    )
+    buttons[0].click()
     await settle()
     expect(favorites.value).toEqual([])
     expect(
@@ -827,6 +860,28 @@ describe('rendered composition and helper contracts', () => {
     expect(w.text()).not.toContain('Sign in')
     expect(w.text()).toContain('Protected content')
   })
+  it('makes only protected content inert and removes focus when access is revoked', async () => {
+    const w = render(ui.NvAccessBlocker, {
+      props: { allowed: true },
+      slots: {
+        default: () => h('input', { id: 'protected-input', tabindex: 2 }),
+        reason: () => h('button', { id: 'access-action' }, 'Sign in'),
+      },
+    })
+    const input = w.get('input').element as HTMLInputElement
+    input.focus()
+    expect(document.activeElement).toBe(input)
+    await w.setProps({ allowed: false })
+    expect(input.closest('[inert]')).not.toBeNull()
+    expect(document.activeElement).not.toBe(input)
+    expect(w.get('#access-action').element.closest('[inert]')).toBeNull()
+    await w.setProps({ allowed: true })
+    expect(w.get('input').element).toBe(input)
+    expect(input.closest('[inert]')).toBeNull()
+    expect(input.getAttribute('tabindex')).toBe('2')
+    input.focus()
+    expect(document.activeElement).toBe(input)
+  })
   it.each(['success', 'warning', 'info', 'error'])(
     'alert renders %s content without claiming an implicit alert role',
     (type) => {
@@ -881,9 +936,11 @@ describe('rendered composition and helper contracts', () => {
     expect(
       ui.fontSize(['20px', { lineHeight: '24px', letterSpacing: '2px' }]),
     ).toBe('1.25rem')
-    expect(ui.lineHeight(16)).toBe(1)
+    expect(ui.lineHeight(16)).toBe(ui.tokens.lineHeight.default)
     expect(ui.lineHeight([16, { lineHeight: 1.5 }])).toBe(1.5)
-    expect(ui.letterSpacing(16)).toBe('normal')
+    expect(ui.letterSpacing(16)).toBe(
+      `${ui.tokens.letterSpacing.default / 16}rem`,
+    )
     expect(
       ui.fontSizeStyle(['20px', { lineHeight: '24px', letterSpacing: '2px' }]),
     ).toEqual({
@@ -1026,7 +1083,7 @@ describe('real overlay controls', () => {
     await settle()
     expect(onClick).toHaveBeenCalledExactlyOnceWith()
   })
-  it('tooltip uses Ark rendering, suppresses focused content and cleans up its portal', async () => {
+  it('tooltip uses Ark rendering, supports focused references and cleans up its portal', async () => {
     const w = render(ui.NvTooltip, {
       props: { tippyOptions: { delay: 0, duration: 0 } },
       slots: {
@@ -1042,7 +1099,9 @@ describe('real overlay controls', () => {
     ).toContain('Tooltip content')
     ;(w.get('button').element as HTMLElement).focus()
     await settle()
-    expect(document.body.querySelector('[role="tooltip"]')).toBeNull()
+    expect(
+      document.body.querySelector('[role="tooltip"]')?.textContent,
+    ).toContain('Tooltip content')
     w.unmount()
     wrappers.splice(wrappers.indexOf(w), 1)
     await settle()

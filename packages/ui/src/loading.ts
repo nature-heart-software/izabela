@@ -11,8 +11,8 @@ const maskRecipe = cva({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor:
-      'color-mix(in srgb, var(--nv-disabled-item-background-backdrop-color) calc(var(--nv-disabled-item-background-backdrop-opacity) * 100%), transparent)',
+    backgroundColor: 'loading.default.pending.background',
+    color: 'loading.default.pending.foreground',
     cursor: 'progress',
     zIndex: '1',
     borderRadius: 'inherit',

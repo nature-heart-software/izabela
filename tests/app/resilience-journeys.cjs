@@ -236,7 +236,9 @@ async function runResilience(c) {
   await run(5, async () => {
     const entry = trayRecords.at(-1)
     assert.ok(entry, 'Native tray menu was not installed')
-    await evaluate(messenger, () => window.ElectronMessengerWindow.hide())
+    // Await the same production IPC method from the always-running worker,
+    // not the renderer that the method is about to hide.
+    await evaluate(worker, () => window.ElectronMessengerWindow.hide())
     await until(
       () => !messenger.isVisible(),
       'messenger hidden before tray callback',

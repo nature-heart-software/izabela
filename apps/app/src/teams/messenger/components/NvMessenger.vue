@@ -29,6 +29,7 @@
               <NvGroup :spacing="4" :class="css({ flex: '1 1 0% !important' })">
                 <div
                   class="moveable-handle"
+                  @pointerdown.capture="onHandlePointerDown"
                   :class="
                     css({ cursor: 'all-scroll', flex: '1 1 0% !important' })
                   "
@@ -132,6 +133,7 @@ import { useElementSize, useEventListener, useWindowSize } from '@vueuse/core'
 import throttle from 'lodash/throttle'
 import { isGameOverlay } from '@/consts.ts'
 import { Popover, usePopover } from '@ark-ui/vue'
+import { getTabStops } from '@/utils/focus'
 
 const routerOverlay = inject<Ref<HTMLElement | undefined>>('router-overlay')
 // import gsap from 'gsap'
@@ -175,8 +177,11 @@ const moveableTarget = ref<ComponentPublicInstance>()
 
 const popover = usePopover({
   ids: { anchor: 'messenger-panel-anchor' },
-  // Route actions own dismissal, and opening must not steal editor focus.
-  autoFocus: false,
+  // Route actions own dismissal; opening starts keyboard navigation at Close.
+  initialFocusEl: () =>
+    routerOverlay?.value?.querySelector<HTMLElement>(
+      '[data-messenger-panel-close]',
+    ) || null,
   closeOnEscape: false,
   closeOnInteractOutside: false,
   positioning: {
@@ -191,10 +196,59 @@ let pendingNavigation = 0
 let hasLeft = true
 let disposed = false
 const closePanel = () => {
+  const wasOpen = popover.value.open
+  const isSettings = String(router.currentRoute.value.name).startsWith(
+    'settings',
+  )
+  const returnTarget = document.querySelector<HTMLElement>(
+    isSettings
+      ? '[data-v-step="settings-button"]'
+      : '[data-v-step="messages-button"]',
+  )
   navigationId++
   pendingNavigation = 0
   popover.value.setOpen(false)
+  if (wasOpen) returnTarget?.focus({ preventScroll: true })
 }
+
+useEventListener(document, 'keydown', (event: KeyboardEvent) => {
+  if (
+    event.key !== 'Tab' ||
+    event.altKey ||
+    event.ctrlKey ||
+    event.metaKey ||
+    !popover.value.open
+  )
+    return
+  const panel = routerOverlay?.value?.querySelector<HTMLElement>(
+    '[aria-label="Messenger panel"]',
+  )
+  if (!panel) return
+  const stops = getTabStops(panel)
+  const active = document.activeElement
+  const modal = active?.closest('[aria-modal="true"]')
+  if (modal && !panel.contains(modal)) return
+  // Nested controls own handled keys while focus remains inside. Ark's
+  // portalled Tab proxy can already have moved it outside in capture phase.
+  if (event.defaultPrevented && panel.contains(active)) return
+  const edge = event.shiftKey ? stops[0] : stops.at(-1)
+  // A focused content region can have no controls after it (empty History).
+  // Let ordinary Tab behavior run inside the panel; intercept only its edges.
+  const hasNext =
+    active &&
+    stops.some(
+      (element) =>
+        active.compareDocumentPosition(element) &
+        (event.shiftKey
+          ? Node.DOCUMENT_POSITION_PRECEDING
+          : Node.DOCUMENT_POSITION_FOLLOWING),
+    )
+  if (!panel.contains(active) || active === edge || !hasNext) {
+    event.preventDefault()
+    const target = (event.shiftKey ? stops.at(-1) : stops[0]) || panel
+    target.focus()
+  }
+})
 const resetRoute = () => {
   hasLeft = true
   // Reset only after the panel has fully left, so retained route drafts survive
@@ -288,6 +342,23 @@ const savePosition = debounce((event: any) => {
     },
   })
 }, 1000)
+
+function onHandlePointerDown(event: PointerEvent) {
+  if (event.button !== 0 || event.isPrimary === false) return
+  const target = event.target
+  if (
+    target instanceof Element &&
+    target.closest(
+      'button, a[href], input, select, textarea, [tabindex], [contenteditable]',
+    )
+  )
+    return
+  // Moveable prevents the native mouse default and only blurs text fields.
+  // Release buttons too when pressing the drag surface, before drag handling.
+  const active = document.activeElement
+  if (active instanceof HTMLElement && !active.closest('[aria-modal="true"]'))
+    active.blur()
+}
 
 const onDrag = (event: any) => {
   const { target, transform } = event

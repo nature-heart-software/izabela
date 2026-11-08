@@ -41,7 +41,7 @@ body {
 import { css } from '@/styled-system/css'
 import { useSettingsStore } from '@/features/settings/store'
 import NvOverlayInput from '@/teams/overlay/components/NvOverlayInput.vue'
-import { GlobalStyles, themes, tokens } from '@packages/ui'
+import { GlobalStyles, resolveTheme, tokens } from '@packages/ui'
 import { ThemeProvider } from '@packages/ui'
 import { computed } from 'vue'
 
@@ -49,6 +49,6 @@ const settingsStore = useSettingsStore()
 
 const theme = computed(() => ({
   ...tokens,
-  ...themes.get(settingsStore.theme),
+  ...resolveTheme(settingsStore.theme),
 }))
 </script>

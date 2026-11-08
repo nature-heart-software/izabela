@@ -17,7 +17,13 @@
       :style="{
         opacity: settingsStore.backgroundDimOpacity / 100,
       }"
-      :class="css({ width: '100%', height: '100%', backgroundColor: 'black' })"
+      :class="
+        css({
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'dialog.default.backdrop',
+        })
+      "
     >
       <NvHitbox
         v-if="isBackgroundShown"

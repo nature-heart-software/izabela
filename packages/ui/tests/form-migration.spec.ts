@@ -20,7 +20,10 @@ function render(component: unknown, options: Record<string, any> = {}) {
   const wrapper = mount(component as any, {
     attachTo: document.body,
     ...options,
-    global: { provide: { theme: ui.themes.get('dark') }, ...options.global },
+    global: {
+      provide: { theme: ui.themes.get('izabela-dark') },
+      ...options.global,
+    },
   })
   wrappers.push(wrapper)
   return wrapper
@@ -153,19 +156,42 @@ describe('basic form migration', () => {
     await w.setProps({ readonly: false, disabled: true })
     expect(w.find('button[aria-label="Clear input"]').exists()).toBe(false)
   })
-  it('retains the password reveal action used by API key fields', async () => {
-    const w = render(ui.NvInput, {
-      props: { modelValue: 'secret' },
-      attrs: { type: 'password', 'show-password': true },
-    })
-    const input = w.get('input')
-    expect((input.element as HTMLInputElement).type).toBe('password')
-    await w.get('button[aria-label="Show password"]').trigger('click')
-    expect((input.element as HTMLInputElement).type).toBe('text')
-    await w.get('button[aria-label="Hide password"]').trigger('click')
-    expect((input.element as HTMLInputElement).type).toBe('password')
-    expect(w.emitted('update:modelValue')).toBeUndefined()
-  })
+  it.each(['sm', 'md', 'lg'])(
+    'renders the %s password reveal icon inside an API-key card',
+    async (size) => {
+      const card = render(ui.NvCard, {
+        slots: {
+          default: () =>
+            h(ui.NvInput, {
+              modelValue: 'secret',
+              type: 'password',
+              showPassword: true,
+              size,
+            }),
+        },
+      })
+      const w = card.findComponent(ui.NvInput)
+      const input = w.get('input')
+      expect((input.element as HTMLInputElement).type).toBe('password')
+      const toggle = w.get('button[aria-label="Show password"]')
+      // Card deliberately resets text to font-size: 0. The action must render
+      // a sized SVG rather than inheriting that reset through a text symbol.
+      const icon = toggle.get('svg')
+      expect(icon.attributes('width')).toBe('16')
+      expect(icon.attributes('height')).toBe('16')
+      expect(icon.attributes('aria-hidden')).toBe('true')
+      const hiddenPath = icon.get('path').attributes('d')
+      await toggle.trigger('click')
+      expect((input.element as HTMLInputElement).type).toBe('text')
+      expect(toggle.attributes('aria-pressed')).toBe('true')
+      expect(toggle.get('svg path').attributes('d')).not.toBe(hiddenPath)
+      await w.get('button[aria-label="Hide password"]').trigger('click')
+      expect((input.element as HTMLInputElement).type).toBe('password')
+      expect(toggle.attributes('aria-pressed')).toBe('false')
+      expect((input.element as HTMLInputElement).value).toBe('secret')
+      expect(w.emitted('update:modelValue')).toBeUndefined()
+    },
+  )
   it('keeps prepend, append, prefix, suffix and default content', () => {
     const w = render(ui.NvInput, {
       slots: Object.fromEntries(

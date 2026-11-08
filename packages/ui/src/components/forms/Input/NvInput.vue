@@ -34,7 +34,12 @@
           :disabled="isDisabled"
           @click="passwordVisible = !passwordVisible"
         >
-          <span aria-hidden="true">{{ passwordVisible ? '◉' : '◎' }}</span>
+          <NvIcon
+            :name="passwordVisible ? 'eye-slash' : 'eye'"
+            :size="3"
+            aria-hidden="true"
+            focusable="false"
+          />
         </button>
         <button
           v-if="canClear"
@@ -55,6 +60,7 @@
 import { computed, ref, useAttrs, useSlots } from 'vue'
 import { StInput, inputRecipe } from './input.panda'
 import { props as propsDefinition } from './input.shared'
+import NvIcon from '@/components/typography/Icon/NvIcon.vue'
 
 defineOptions({ inheritAttrs: false })
 const props = defineProps(propsDefinition)

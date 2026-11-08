@@ -15,8 +15,11 @@
       </ReferenceTrigger>
       <Teleport :to="portalTarget" defer>
         <StTooltipPositioner
-          v-if="open && !focused"
-          :style="{ '--nv-tooltip-enter-duration': `${enterDuration}ms` }"
+          v-if="open && !expanded"
+          :style="{
+            '--nv-tooltip-enter-duration': `${enterDuration}ms`,
+            pointerEvents: props.tippyOptions.interactive ? undefined : 'none',
+          }"
         >
           <StTooltipContent><slot /></StTooltipContent>
         </StTooltipPositioner>
@@ -33,11 +36,14 @@ import {
   Fragment,
   inject,
   mergeProps,
+  nextTick,
+  onBeforeUnmount,
   reactive,
   ref,
   Text,
   useAttrs,
   useId,
+  watch,
   watchPostEffect,
   type VNode,
 } from 'vue'
@@ -52,7 +58,6 @@ import { tokens } from '@/styles/tokens'
 import {
   type MaybeElement,
   useEventListener,
-  useFocusWithin,
   useMutationObserver,
 } from '@vueuse/core'
 import { getElement } from '@/utils/vue'
@@ -66,6 +71,10 @@ const referenceAttrs = () =>
     Object.entries(attrs).filter(([key]) => key !== 'class' && key !== 'style'),
   )
 const trigger = ref()
+const expanded = ref(false)
+let focusRequest = 0
+let focusFrame: number | undefined
+let focusDismissed = false
 const triggerId = ref(`nv-tooltip-${useId()}-trigger`)
 const referenceId = () =>
   typeof attrs.id === 'string' ? attrs.id : triggerId.value
@@ -87,11 +96,29 @@ const ReferenceTrigger = defineComponent({
       // Vue can supply an array of listeners when overlay triggers are nested.
       // Ark 3's as-child merger only composes functions and drops those arrays
       // when the native control also has a listener (e.g. Ctrl-click to toggle).
+      const triggerProps = tooltipApi.value.getTriggerProps()
       const merged = mergeProps(
         node.props || {},
-        { ...tooltipApi.value.getTriggerProps() },
+        {
+          ...triggerProps,
+          onFocusin: onReferenceFocus,
+          onFocusout: onReferenceBlur,
+          onClick: (event: MouseEvent) => {
+            focusDismissed = false
+            cancelFocusActivation()
+            triggerProps.onClick?.(event)
+          },
+          onPointermove: (event: PointerEvent) => {
+            if (!expanded.value) {
+              focusDismissed = false
+              triggerProps.onPointermove?.(event)
+            }
+          },
+        },
         attrs,
       )
+      // An outer trigger's native type must not replace the child's visual type.
+      if (node.props?.type !== undefined) merged.type = node.props.type
       merged.id = node.props?.id || attrs.id || triggerId.value
       const cloned = cloneVNode(node)
       cloned.props = merged
@@ -111,13 +138,21 @@ function syncTrigger() {
     ? element
     : element?.querySelector<HTMLElement>(selector) || element
   if (target?.id) triggerId.value = target.id
+  expanded.value = !!(
+    target?.matches('[aria-expanded="true"]') ||
+    target?.querySelector('[aria-expanded="true"]')
+  )
 }
 watchPostEffect(syncTrigger)
 const tooltip = ref<MaybeElement>()
 // Async voice components can replace a comment with their control without
 // changing the reference's component ref. Observe that scoped DOM boundary.
-useMutationObserver(tooltip, syncTrigger, { childList: true, subtree: true })
-const { focused } = useFocusWithin(tooltip)
+useMutationObserver(tooltip, syncTrigger, {
+  childList: true,
+  subtree: true,
+  attributes: true,
+  attributeFilter: ['aria-expanded'],
+})
 const injectedPortalTarget = inject(PORTAL_TARGET)
 const portalTarget = computed(
   () => getElement(injectedPortalTarget) || document.body,
@@ -159,7 +194,6 @@ const positioning = computed<TooltipRootProps['positioning']>(() => ({
 const tooltipApi = useTooltip(
   reactive({
     ids: computed(() => ({ trigger: triggerId.value })),
-    disabled: focused,
     openDelay,
     closeDelay,
     positioning,
@@ -167,12 +201,93 @@ const tooltipApi = useTooltip(
   }),
 )
 const open = computed(() => tooltipApi.value.open)
-function deactivate(event: Event) {
+function cancelFocusActivation() {
+  focusRequest++
+  if (focusFrame !== undefined) cancelAnimationFrame(focusFrame)
+  focusFrame = undefined
+}
+onBeforeUnmount(cancelFocusActivation)
+function onReferenceFocus(event: FocusEvent) {
+  focusDismissed = false
+  return activateFocusedReference(event)
+}
+async function activateFocusedReference(event?: Event) {
+  cancelFocusActivation()
+  const request = focusRequest
+  // Focus can arrive during mounting or while its handler closes a popover.
+  // Resolve the retained owner and expanded state after that render completes.
+  await nextTick()
+  if (request !== focusRequest || event?.defaultPrevented) return
+  // Native Escape handlers can restore focus before that same key finishes
+  // propagating. Open on the next frame so it cannot dismiss the new tooltip.
+  focusFrame = requestAnimationFrame(() => {
+    focusFrame = undefined
+    if (request !== focusRequest) return
+    syncTrigger()
+    const reference = getElement(tooltip.value)
+    if (!expanded.value && reference?.contains(document.activeElement)) {
+      tooltipApi.value.setOpen(true)
+    }
+  })
+}
+function onReferenceBlur(event: FocusEvent) {
+  const next = event.relatedTarget
+  const reference = getElement(tooltip.value)
+  const contentId = tooltipApi.value.getContentProps().id
+  const content = contentId ? document.getElementById(contentId) : null
+  if (
+    next instanceof Node &&
+    (reference?.contains(next) ||
+      (props.tippyOptions.interactive && content?.contains(next)))
+  ) {
+    cancelFocusActivation()
+    return
+  }
+  deactivate(event)
+}
+function deactivate(event: Event, dismissFocus = true) {
+  if (dismissFocus) focusDismissed = true
+  cancelFocusActivation()
   // The click-through Electron window can miss pointerleave when it loses focus.
   // Reset hover as well as visibility so the next pointer entry can reopen normally.
   tooltipApi.value.getTriggerProps().onPointerleave?.(event as PointerEvent)
   tooltipApi.value.setOpen(false)
 }
+function onOutsidePointerDown(event: PointerEvent) {
+  const path = event.composedPath()
+  const reference = getElement(tooltip.value)
+  const contentId = tooltipApi.value.getContentProps().id
+  const content = contentId ? document.getElementById(contentId) : null
+  // Select options live in a portal. Choosing one is an interaction with the
+  // reference's popup, rather than an outside dismissal of its tooltip.
+  const controlledPopups = reference
+    ? Array.from(
+        reference.querySelectorAll<HTMLElement>('[aria-controls]'),
+      ).flatMap((owner) =>
+        (owner.getAttribute('aria-controls') || '')
+          .split(/\s+/)
+          .map((id) => document.getElementById(id)),
+      )
+    : []
+  if (
+    (reference && path.includes(reference)) ||
+    (content && path.includes(content)) ||
+    controlledPopups.some((popup) => popup && path.includes(popup))
+  )
+    return
+  // An outside click can leave the trigger focused. Dismiss independently of
+  // blur, without consuming the click or interfering with interactive content.
+  deactivate(event)
+}
+useEventListener(document, 'pointerdown', onOutsidePointerDown, {
+  capture: true,
+})
+watch(expanded, (expanded) => {
+  if (expanded) {
+    focusDismissed = false
+    deactivate(new Event('pointerleave'), false)
+  } else if (!focusDismissed) void activateFocusedReference()
+})
 useEventListener(window, 'blur', deactivate)
 useEventListener(document, 'visibilitychange', (event) => {
   if (document.hidden) deactivate(event)

@@ -133,7 +133,7 @@ async function fixture(t, mode = 'experimental', late = false) {
       NvCard: layout,
       NvGroup: layout,
       tokens: {},
-      themes: new Map([['test', {}]]),
+      resolveTheme: () => ({}),
       GlobalStyles: layout,
       PORTAL_TARGET: 'portal',
     },
