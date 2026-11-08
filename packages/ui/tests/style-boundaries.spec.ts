@@ -49,6 +49,7 @@ export { StSelectGroupLabel } from '@/components/forms/Select/select.panda'
 export { default as NvButton } from '@/components/forms/Button/NvButton.vue'
 export { default as NvTextarea } from '@/components/forms/Textarea/NvTextarea.vue'
 export { default as NvRangeInput } from '@/components/forms/RangeInput/NvRangeInput.vue'
+export { default as NvSwitch } from '@/components/forms/Switch/NvSwitch.vue'
 export { default as NvInput } from '@/components/forms/Input/NvInput.vue'
 export { default as NvNumberInput } from '@/components/forms/NumberInput/NvNumberInput.vue'
 export { themes } from '@/themes'
@@ -145,6 +146,120 @@ function expectExtracted(classes: string[]) {
 afterEach(() => {
   wrappers.splice(0).forEach((wrapper) => wrapper.unmount())
   document.body.innerHTML = ''
+})
+
+describe('toggle hover background cascade', () => {
+  it.each(['kumo-ink-light', 'kumo-ink-dark', 'github-light', 'github-dark'])(
+    'preserves the checked state while showing hover with and without focus in %s',
+    (themeId) => {
+      const theme = ui.themes.get(themeId)
+      const variables: Record<string, string> = {}
+      const visit = (value: any, path: string[] = []) => {
+        for (const [key, child] of Object.entries(value)) {
+          if (child && typeof child === 'object') visit(child, [...path, key])
+          else variables[`--colors-${[...path, key].join('-')}`] = String(child)
+        }
+      }
+      visit(theme)
+      const color = (element: HTMLElement, property: string, pseudo = '') => {
+        const declaration = (rule: (typeof rules)[number]) =>
+          rule.declarations[property] ??
+          (property === 'border-color'
+            ? rule.declarations.border?.replace(/^1px solid /, '')
+            : undefined)
+        const candidates = emittedRules([...element.classList])
+          .filter(
+            (rule) =>
+              declaration(rule) &&
+              rule.selector.includes('::after') === (pseudo === '::after') &&
+              element.matches(rule.selector.replaceAll('::after', '')),
+          )
+          .map((rule, order) => {
+            let specificity = 0
+            parseSelector((selectors: any) =>
+              selectors.walk((node: any) => {
+                if (node.type === 'id') specificity += 100
+                if (node.type === 'class' || node.type === 'attribute')
+                  specificity += 10
+                if (node.type === 'tag') specificity += 1
+              }),
+            ).processSync(rule.selector)
+            return { rule, specificity, order }
+          })
+          .sort((a, b) => a.specificity - b.specificity || a.order - b.order)
+        const winner = candidates.at(-1)
+        const value = winner && declaration(winner.rule)
+        expect(value).toBeDefined()
+        return value!.replace(
+          /var\((--colors-[^)]+)\)/g,
+          (_, name) => variables[name],
+        )
+      }
+      const background = (element: HTMLElement) =>
+        color(element, 'background-color')
+      const brightness = (hex: string) => {
+        const channels = hex
+          .slice(1)
+          .match(/../g)!
+          .map((channel) => parseInt(channel, 16))
+        return (
+          channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722
+        )
+      }
+      for (const checked of [false, true]) {
+        const wrapper = render(ui.NvSwitch, {
+          props: { modelValue: checked },
+          global: { provide: { theme } },
+        })
+        const control = wrapper.get('[data-part="control"]')
+          .element as HTMLElement
+        const thumb = wrapper.get('[data-part="thumb"]').element as HTMLElement
+        const unfocusedBorder = color(control, 'border-color', '::after')
+        for (const node of [control, thumb]) node.setAttribute('data-hover', '')
+        for (const focused of [false, true]) {
+          for (const node of [control, thumb])
+            node.toggleAttribute('data-focus', focused)
+          control.removeAttribute('data-hover')
+          const restingBorder = color(control, 'border-color', '::after')
+          if (themeId.startsWith('github-'))
+            expect(restingBorder).toBe(unfocusedBorder)
+          control.setAttribute('data-hover', '')
+          expect(
+            background(control),
+            `checked=${checked}, focused=${focused}`,
+          ).toBe(theme.switch[checked ? 'on' : 'off'].hover.background)
+          expect(background(thumb)).not.toBe(background(control))
+          if (checked) {
+            expect(color(control, 'border-color', '::after')).toBe(
+              restingBorder,
+            )
+            expect(background(control)).not.toBe(
+              theme.switch.off.hover.background,
+            )
+            expect(background(control)).not.toBe(theme.switch.on.background)
+            expect(background(thumb)).toBe(theme.switch.on['thumb-background'])
+            if (themeId.startsWith('kumo-ink-')) {
+              expect(
+                Math.abs(
+                  brightness(background(control)) -
+                    brightness(theme.switch.on.background),
+                ),
+              ).toBeGreaterThanOrEqual(40)
+            }
+            if (brightness(theme.switch.on.background) < 128) {
+              expect(brightness(background(control))).toBeGreaterThan(
+                brightness(theme.switch.on.background),
+              )
+            }
+          } else {
+            expect(background(control)).toBe(
+              theme.button.default.hover.background,
+            )
+          }
+        }
+      }
+    },
+  )
 })
 
 describe('Ark as-child button appearance', () => {

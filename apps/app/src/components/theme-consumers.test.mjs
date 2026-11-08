@@ -141,7 +141,7 @@ test('recording indicator uses loading semantics and supplies the selected theme
   assert.doesNotMatch(source, /#[0-9a-f]{3,8}|gray\.0/i)
 })
 
-test('messenger backdrop and diagnostic outlines use existing semantic colors without changing user opacity or geometry', () => {
+test('messenger backdrop and diagnostic outlines use their semantic colors without changing user opacity or geometry', () => {
   const background = readFileSync(
     new URL('../teams/messenger/components/NvBackground.vue', import.meta.url),
     'utf8',
@@ -152,7 +152,7 @@ test('messenger backdrop and diagnostic outlines use existing semantic colors wi
   )
   assert.match(background, /backgroundColor: 'dialog.default.backdrop'/)
   assert.match(background, /opacity: settingsStore.backgroundDimOpacity \/ 100/)
-  assert.match(debug, /border: '1px solid \{colors.alert.error.foreground\}'/)
+  assert.match(debug, /border: '1px solid \{colors.debug.hitbox.border\}'/)
   assert.match(debug, /width: rem\(hitbox.w \/ pixelRatio\)/)
   assert.doesNotMatch(debug, /solid red/)
 })
@@ -174,6 +174,12 @@ const { pandaComponent, themeVariables } = loadTypescript(
 )
 const valueAt = (theme, path) =>
   path.split('.').reduce((value, key) => value[key], theme)
+
+test('hitbox debug borders stay pure red in every imported theme', () => {
+  for (const mode of imported.themes) {
+    assert.equal(mode.values.debug.hitbox.border, '#ff0000', mode.label)
+  }
+})
 
 test('every app-owned color reference is an existing imported semantic path', () => {
   const root = new URL('../', import.meta.url)

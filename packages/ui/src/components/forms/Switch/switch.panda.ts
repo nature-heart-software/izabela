@@ -43,6 +43,9 @@ export const switchRecipe = sva({
         boxShadow: '0 0 0 0.25rem {colors.switch.off.focus.focus-ring}',
       },
       '&[data-focus]::after': { borderColor: 'switch.off.focus.border' },
+      '&[data-focus][data-hover]': {
+        backgroundColor: 'switch.off.hover-focus.background',
+      },
       '&[data-state="checked"]': {
         backgroundColor: 'switch.on.background',
         '&::after': { border: '1px solid {colors.switch.on.border}' },
@@ -53,6 +56,9 @@ export const switchRecipe = sva({
           boxShadow: '0 0 0 0.25rem {colors.switch.on.focus.focus-ring}',
         },
         '&[data-focus]::after': { borderColor: 'switch.on.focus.border' },
+        '&[data-focus][data-hover]': {
+          backgroundColor: 'switch.on.hover-focus.background',
+        },
       },
     },
     thumb: {
@@ -65,6 +71,9 @@ export const switchRecipe = sva({
       backgroundColor: 'switch.off.thumb-background',
       '&[data-hover]': { backgroundColor: 'switch.off.hover.thumb-background' },
       '&[data-focus]': { backgroundColor: 'switch.off.focus.thumb-background' },
+      '&[data-focus][data-hover]': {
+        backgroundColor: 'switch.off.hover-focus.thumb-background',
+      },
       transition: 'all .3s',
       '&[data-state="checked"]': {
         backgroundColor: 'switch.on.thumb-background',
@@ -73,6 +82,9 @@ export const switchRecipe = sva({
         },
         '&[data-focus]': {
           backgroundColor: 'switch.on.focus.thumb-background',
+        },
+        '&[data-focus][data-hover]': {
+          backgroundColor: 'switch.on.hover-focus.thumb-background',
         },
         left: '5',
       },

@@ -13,6 +13,30 @@ const api = registry as typeof registry & {
 }
 
 describe('imported theme registry', () => {
+  it.each(['github-light', 'github-dark'])(
+    'keeps input borders unchanged on focus in %s',
+    (id) => {
+      const values = api.resolveTheme(id)
+      for (const family of ['input', 'textarea', 'number-input', 'select']) {
+        expect(values[family].default.focus.border).toBe(
+          values[family].default.border,
+        )
+      }
+      for (const state of ['off', 'on']) {
+        expect(values.switch[state].focus.border).toBe(
+          values.switch[state].border,
+        )
+        expect(values.switch[state].focus['focus-ring']).toBeTruthy()
+      }
+      expect(values['range-input'].default.focus['thumb-border']).toBe(
+        values['range-input'].default['thumb-border'],
+      )
+      expect(values.tableColumn.selection.focus.checkboxBorder).toBe(
+        values.tableColumn.selection.rest.checkboxBorder,
+      )
+      expect(values.input.default.focus['focus-ring']).toBeTruthy()
+    },
+  )
   it('keeps future canonical Light/Dark modes reachable ahead of legacy aliases', () => {
     const snapshot = JSON.parse(
       readFileSync(
