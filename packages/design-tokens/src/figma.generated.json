@@ -1018,7 +1018,7 @@
             "shadow10": "rgba(31, 35, 40, 0.10000000149011612)",
             "derived": {
               "shadow12": "rgba(31, 35, 40, 0.11999999731779099)",
-              "checkedHover": "#0861c9"
+              "checkedHover": "#1d75dd"
             },
             "cardMask": "rgba(255, 255, 255, 0.8999999761581421)"
           },
@@ -2093,7 +2093,7 @@
             "shadow10": "rgba(31, 35, 40, 0.10000000149011612)",
             "derived": {
               "shadow12": "rgba(31, 35, 40, 0.11999999731779099)",
-              "checkedHover": "#0861c9"
+              "checkedHover": "#1d75dd"
             },
             "cardMask": "rgba(255, 255, 255, 0.8999999761581421)"
           },
@@ -3168,7 +3168,7 @@
             "shadow10": "rgba(31, 35, 40, 0.10000000149011612)",
             "derived": {
               "shadow12": "rgba(31, 35, 40, 0.11999999731779099)",
-              "checkedHover": "#0861c9"
+              "checkedHover": "#1d75dd"
             },
             "cardMask": "rgba(255, 255, 255, 0.8999999761581421)"
           },
@@ -4243,7 +4243,7 @@
             "shadow10": "rgba(31, 35, 40, 0.10000000149011612)",
             "derived": {
               "shadow12": "rgba(31, 35, 40, 0.11999999731779099)",
-              "checkedHover": "#0861c9"
+              "checkedHover": "#1d75dd"
             },
             "cardMask": "rgba(255, 255, 255, 0.8999999761581421)"
           },
@@ -4589,7 +4589,7 @@
             "focus": {
               "text": "#1f2328",
               "background": "#f6f8fa",
-              "border": "#818b98",
+              "border": "#d1d9e0",
               "focus-ring": "rgba(9, 105, 218, 0.25)"
             },
             "placeholder": "#59636e"
@@ -4633,7 +4633,7 @@
             "focus": {
               "background": "#f6f8fa",
               "thumb-background": "#59636e",
-              "border": "#818b98",
+              "border": "#d1d9e0",
               "focus-ring": "rgba(9, 105, 218, 0.25)"
             },
             "hover-focus": {
@@ -4646,7 +4646,7 @@
             "thumb-background": "#ffffff",
             "border": "#0969da",
             "hover": {
-              "background": "#0861c9",
+              "background": "#1d75dd",
               "thumb-background": "#ffffff",
               "border": "#0969da"
             },
@@ -4657,7 +4657,7 @@
               "focus-ring": "rgba(9, 105, 218, 0.25)"
             },
             "hover-focus": {
-              "background": "#0861c9",
+              "background": "#1d75dd",
               "thumb-background": "#ffffff"
             }
           }
@@ -4702,7 +4702,7 @@
             "focus": {
               "text": "#1f2328",
               "background": "#f6f8fa",
-              "border": "#818b98",
+              "border": "#d1d9e0",
               "focus-ring": "rgba(9, 105, 218, 0.25)"
             },
             "placeholder": "#59636e"
@@ -4729,7 +4729,7 @@
               "thumb-border": "#41454a"
             },
             "focus": {
-              "thumb-border": "#0969da",
+              "thumb-border": "#1f2328",
               "track-background": "rgba(209, 217, 224, 0.7019608020782471)"
             },
             "thumb-focus": {
@@ -4750,7 +4750,7 @@
             "focus": {
               "text": "#1f2328",
               "background": "#f6f8fa",
-              "border": "#818b98",
+              "border": "#d1d9e0",
               "focus-ring": "rgba(9, 105, 218, 0.25)"
             },
             "placeholder": "#59636e"
@@ -4779,7 +4779,7 @@
               "text": "#1f2328",
               "icon": "#1f2328",
               "background": "#f6f8fa",
-              "border": "#818b98",
+              "border": "#d1d9e0",
               "focus-ring": "rgba(9, 105, 218, 0.25)"
             },
             "placeholder": "#59636e"
@@ -4970,7 +4970,7 @@
             },
             "focus": {
               "checkboxBackground": "#f6f8fa",
-              "checkboxBorder": "#0969da"
+              "checkboxBorder": "#d1d9e0"
             },
             "checked": {
               "checkboxBackground": "#0969da",
@@ -5318,7 +5318,7 @@
             "shadow10": "rgba(31, 35, 40, 0.10000000149011612)",
             "derived": {
               "shadow12": "rgba(31, 35, 40, 0.11999999731779099)",
-              "checkedHover": "#0861c9"
+              "checkedHover": "#1d75dd"
             },
             "cardMask": "rgba(255, 255, 255, 0.8999999761581421)"
           },
@@ -5664,7 +5664,7 @@
             "focus": {
               "text": "#f0f6fc",
               "background": "#212830",
-              "border": "#656c76",
+              "border": "#3d444d",
               "focus-ring": "rgba(31, 111, 235, 0.25)"
             },
             "placeholder": "#9198a1"
@@ -5708,7 +5708,7 @@
             "focus": {
               "background": "#212830",
               "thumb-background": "#9198a1",
-              "border": "#656c76",
+              "border": "#3d444d",
               "focus-ring": "rgba(31, 111, 235, 0.25)"
             },
             "hover-focus": {
@@ -5777,7 +5777,7 @@
             "focus": {
               "text": "#f0f6fc",
               "background": "#212830",
-              "border": "#656c76",
+              "border": "#3d444d",
               "focus-ring": "rgba(31, 111, 235, 0.25)"
             },
             "placeholder": "#9198a1"
@@ -5804,7 +5804,7 @@
               "thumb-border": "#cfd5db"
             },
             "focus": {
-              "thumb-border": "#1f6feb",
+              "thumb-border": "#f0f6fc",
               "track-background": "rgba(61, 68, 77, 0.7019608020782471)"
             },
             "thumb-focus": {
@@ -5825,7 +5825,7 @@
             "focus": {
               "text": "#f0f6fc",
               "background": "#212830",
-              "border": "#656c76",
+              "border": "#3d444d",
               "focus-ring": "rgba(31, 111, 235, 0.25)"
             },
             "placeholder": "#9198a1"
@@ -5854,7 +5854,7 @@
               "text": "#f0f6fc",
               "icon": "#f0f6fc",
               "background": "#212830",
-              "border": "#656c76",
+              "border": "#3d444d",
               "focus-ring": "rgba(31, 111, 235, 0.25)"
             },
             "placeholder": "#9198a1"
@@ -6045,7 +6045,7 @@
             },
             "focus": {
               "checkboxBackground": "#212830",
-              "checkboxBorder": "#1f6feb"
+              "checkboxBorder": "#3d444d"
             },
             "checked": {
               "checkboxBackground": "#1f6feb",
@@ -6393,7 +6393,7 @@
             "shadow10": "rgba(31, 35, 40, 0.10000000149011612)",
             "derived": {
               "shadow12": "rgba(31, 35, 40, 0.11999999731779099)",
-              "checkedHover": "#0861c9"
+              "checkedHover": "#1d75dd"
             },
             "cardMask": "rgba(255, 255, 255, 0.8999999761581421)"
           },

@@ -197,6 +197,15 @@ describe('toggle hover background cascade', () => {
       }
       const background = (element: HTMLElement) =>
         color(element, 'background-color')
+      const brightness = (hex: string) => {
+        const channels = hex
+          .slice(1)
+          .match(/../g)!
+          .map((channel) => parseInt(channel, 16))
+        return (
+          channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722
+        )
+      }
       for (const checked of [false, true]) {
         const wrapper = render(ui.NvSwitch, {
           props: { modelValue: checked },
@@ -205,12 +214,15 @@ describe('toggle hover background cascade', () => {
         const control = wrapper.get('[data-part="control"]')
           .element as HTMLElement
         const thumb = wrapper.get('[data-part="thumb"]').element as HTMLElement
+        const unfocusedBorder = color(control, 'border-color', '::after')
         for (const node of [control, thumb]) node.setAttribute('data-hover', '')
         for (const focused of [false, true]) {
           for (const node of [control, thumb])
             node.toggleAttribute('data-focus', focused)
           control.removeAttribute('data-hover')
           const restingBorder = color(control, 'border-color', '::after')
+          if (themeId.startsWith('github-'))
+            expect(restingBorder).toBe(unfocusedBorder)
           control.setAttribute('data-hover', '')
           expect(
             background(control),
@@ -226,6 +238,11 @@ describe('toggle hover background cascade', () => {
             )
             expect(background(control)).not.toBe(theme.switch.on.background)
             expect(background(thumb)).toBe(theme.switch.on['thumb-background'])
+            if (brightness(theme.switch.on.background) < 128) {
+              expect(brightness(background(control))).toBeGreaterThan(
+                brightness(theme.switch.on.background),
+              )
+            }
           } else {
             expect(background(control)).toBe(
               theme.button.default.hover.background,

@@ -4328,11 +4328,11 @@
         },
         "370:2": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:320:1182"
+          "id": "VariableID:42:307"
         },
         "370:3": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:370:1118"
+          "id": "VariableID:42:307"
         }
       }
     },
@@ -5032,11 +5032,11 @@
         },
         "370:2": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:320:1182"
+          "id": "VariableID:42:1586"
         },
         "370:3": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:370:1118"
+          "id": "VariableID:42:1586"
         }
       }
     },
@@ -5352,11 +5352,11 @@
         },
         "370:2": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:320:1155"
+          "id": "VariableID:42:1596"
         },
         "370:3": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:370:1092"
+          "id": "VariableID:42:1596"
         }
       }
     },
@@ -6152,11 +6152,11 @@
         },
         "370:2": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:320:1182"
+          "id": "VariableID:42:2001"
         },
         "370:3": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:370:1118"
+          "id": "VariableID:42:2001"
         }
       }
     },
@@ -6568,11 +6568,11 @@
         },
         "370:2": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:320:1155"
+          "id": "VariableID:42:2417"
         },
         "370:3": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:370:1092"
+          "id": "VariableID:42:2417"
         }
       }
     },
@@ -6920,11 +6920,11 @@
         },
         "370:2": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:320:1182"
+          "id": "VariableID:42:2537"
         },
         "370:3": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:370:1118"
+          "id": "VariableID:42:2537"
         }
       }
     },
@@ -7464,11 +7464,11 @@
         },
         "370:2": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:320:1182"
+          "id": "VariableID:44:2920"
         },
         "370:3": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:370:1118"
+          "id": "VariableID:44:2920"
         }
       }
     },
@@ -11208,11 +11208,11 @@
         },
         "370:2": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:320:1155"
+          "id": "VariableID:68:352"
         },
         "370:3": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:370:1092"
+          "id": "VariableID:68:352"
         }
       }
     },
@@ -17847,15 +17847,15 @@
       "resolvedType": "COLOR",
       "valuesByMode": {
         "193:0": {
-          "r": 0.032470591366291046,
-          "g": 0.37882354855537415,
-          "b": 0.7865098118782043,
+          "r": 0.1124705895781517,
+          "g": 0.4588235318660736,
+          "b": 0.8665097951889038,
           "a": 1
         },
         "193:1": {
-          "r": 0.032470591366291046,
-          "g": 0.37882354855537415,
-          "b": 0.7865098118782043,
+          "r": 0.1124705895781517,
+          "g": 0.4588235318660736,
+          "b": 0.8665097951889038,
           "a": 1
         }
       }
