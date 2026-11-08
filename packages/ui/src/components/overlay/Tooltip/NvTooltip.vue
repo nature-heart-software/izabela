@@ -117,6 +117,8 @@ const ReferenceTrigger = defineComponent({
         },
         attrs,
       )
+      // An outer trigger's native type must not replace the child's visual type.
+      if (node.props?.type !== undefined) merged.type = node.props.type
       merged.id = node.props?.id || attrs.id || triggerId.value
       const cloned = cloneVNode(node)
       cloned.props = merged
