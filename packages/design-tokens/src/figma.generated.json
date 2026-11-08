@@ -2403,7 +2403,7 @@
             "focus": {
               "text": "#171717",
               "background": "#ffffff",
-              "border": "#0c0c0c",
+              "border": "rgba(10, 10, 10, 0.10000000149011612)",
               "focus-ring": "rgba(11, 11, 11, 0.11999999731779099)"
             },
             "placeholder": "#6d6d6d"
@@ -2447,7 +2447,7 @@
             "focus": {
               "background": "#ffffff",
               "thumb-background": "#6d6d6d",
-              "border": "#0c0c0c",
+              "border": "rgba(10, 10, 10, 0.10000000149011612)",
               "focus-ring": "rgba(11, 11, 11, 0.11999999731779099)"
             }
           },
@@ -2463,7 +2463,7 @@
             "focus": {
               "background": "#060606",
               "thumb-background": "#f5f5f5",
-              "border": "#060606",
+              "border": "rgba(10, 10, 10, 0.10000000149011612)",
               "focus-ring": "rgba(11, 11, 11, 0.11999999731779099)"
             }
           }
@@ -2508,7 +2508,7 @@
             "focus": {
               "text": "#171717",
               "background": "#ffffff",
-              "border": "#0c0c0c",
+              "border": "rgba(10, 10, 10, 0.10000000149011612)",
               "focus-ring": "rgba(11, 11, 11, 0.11999999731779099)"
             },
             "placeholder": "#6d6d6d"
@@ -2535,7 +2535,7 @@
               "thumb-border": "#3c3c3c"
             },
             "focus": {
-              "thumb-border": "#056dff",
+              "thumb-border": "rgba(10, 10, 10, 0.10000000149011612)",
               "track-background": "#e9e9e9"
             },
             "thumb-focus": {
@@ -2556,7 +2556,7 @@
             "focus": {
               "text": "#171717",
               "background": "#ffffff",
-              "border": "#0c0c0c",
+              "border": "rgba(10, 10, 10, 0.10000000149011612)",
               "focus-ring": "rgba(11, 11, 11, 0.11999999731779099)"
             },
             "placeholder": "#6d6d6d"
@@ -2585,7 +2585,7 @@
               "text": "#171717",
               "icon": "#171717",
               "background": "#ffffff",
-              "border": "#0c0c0c",
+              "border": "rgba(10, 10, 10, 0.10000000149011612)",
               "focus-ring": "rgba(11, 11, 11, 0.11999999731779099)"
             },
             "placeholder": "#6d6d6d"
@@ -2776,7 +2776,7 @@
             },
             "focus": {
               "checkboxBackground": "#ffffff",
-              "checkboxBorder": "#056dff"
+              "checkboxBorder": "rgba(10, 10, 10, 0.10000000149011612)"
             },
             "checked": {
               "checkboxBackground": "#056dff",
@@ -3460,7 +3460,7 @@
             "focus": {
               "text": "#f5f5f5",
               "background": "#171717",
-              "border": "#505050",
+              "border": "#333333",
               "focus-ring": "rgba(233, 233, 233, 0.11999999731779099)"
             },
             "placeholder": "#a1a1a1"
@@ -3504,7 +3504,7 @@
             "focus": {
               "background": "#171717",
               "thumb-background": "#a1a1a1",
-              "border": "#505050",
+              "border": "#333333",
               "focus-ring": "rgba(233, 233, 233, 0.11999999731779099)"
             }
           },
@@ -3520,7 +3520,7 @@
             "focus": {
               "background": "#fafafa",
               "thumb-background": "#171717",
-              "border": "#fafafa",
+              "border": "#333333",
               "focus-ring": "rgba(233, 233, 233, 0.11999999731779099)"
             }
           }
@@ -3565,7 +3565,7 @@
             "focus": {
               "text": "#f5f5f5",
               "background": "#171717",
-              "border": "#505050",
+              "border": "#333333",
               "focus-ring": "rgba(233, 233, 233, 0.11999999731779099)"
             },
             "placeholder": "#a1a1a1"
@@ -3592,7 +3592,7 @@
               "thumb-border": "#d1d1d1"
             },
             "focus": {
-              "thumb-border": "#51a2ff",
+              "thumb-border": "#333333",
               "track-background": "#262626"
             },
             "thumb-focus": {
@@ -3613,7 +3613,7 @@
             "focus": {
               "text": "#f5f5f5",
               "background": "#171717",
-              "border": "#505050",
+              "border": "#333333",
               "focus-ring": "rgba(233, 233, 233, 0.11999999731779099)"
             },
             "placeholder": "#a1a1a1"
@@ -3642,7 +3642,7 @@
               "text": "#f5f5f5",
               "icon": "#f5f5f5",
               "background": "#171717",
-              "border": "#505050",
+              "border": "#333333",
               "focus-ring": "rgba(233, 233, 233, 0.11999999731779099)"
             },
             "placeholder": "#a1a1a1"
@@ -3833,7 +3833,7 @@
             },
             "focus": {
               "checkboxBackground": "#171717",
-              "checkboxBorder": "#51a2ff"
+              "checkboxBorder": "#333333"
             },
             "checked": {
               "checkboxBackground": "#045ede",
