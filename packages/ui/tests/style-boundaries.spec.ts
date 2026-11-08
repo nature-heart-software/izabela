@@ -161,12 +161,18 @@ describe('toggle hover background cascade', () => {
         }
       }
       visit(theme)
-      const background = (element: HTMLElement) => {
+      const color = (element: HTMLElement, property: string, pseudo = '') => {
+        const declaration = (rule: typeof rules[number]) =>
+          rule.declarations[property] ??
+          (property === 'border-color'
+            ? rule.declarations.border?.replace(/^1px solid /, '')
+            : undefined)
         const candidates = emittedRules([...element.classList])
           .filter(
             (rule) =>
-              rule.declarations['background-color'] &&
-              element.matches(rule.selector),
+              declaration(rule) &&
+              rule.selector.includes('::after') === (pseudo === '::after') &&
+              element.matches(rule.selector.replaceAll('::after', '')),
           )
           .map((rule, order) => {
             let specificity = 0
@@ -181,13 +187,16 @@ describe('toggle hover background cascade', () => {
             return { rule, specificity, order }
           })
           .sort((a, b) => a.specificity - b.specificity || a.order - b.order)
-        const value = candidates.at(-1)?.rule.declarations['background-color']
+        const winner = candidates.at(-1)
+        const value = winner && declaration(winner.rule)
         expect(value).toBeDefined()
         return value!.replace(
           /var\((--colors-[^)]+)\)/g,
           (_, name) => variables[name],
         )
       }
+      const background = (element: HTMLElement) =>
+        color(element, 'background-color')
       for (const checked of [false, true]) {
         const wrapper = render(ui.NvSwitch, {
           props: { modelValue: checked },
@@ -200,12 +209,18 @@ describe('toggle hover background cascade', () => {
         for (const focused of [false, true]) {
           for (const node of [control, thumb])
             node.toggleAttribute('data-focus', focused)
+          control.removeAttribute('data-hover')
+          const restingBorder = color(control, 'border-color', '::after')
+          control.setAttribute('data-hover', '')
           expect(
             background(control),
             `checked=${checked}, focused=${focused}`,
           ).toBe(theme.switch[checked ? 'on' : 'off'].hover.background)
           expect(background(thumb)).not.toBe(background(control))
           if (checked) {
+            expect(color(control, 'border-color', '::after')).toBe(
+              restingBorder,
+            )
             expect(background(control)).not.toBe(
               theme.switch.off.hover.background,
             )
@@ -476,10 +491,10 @@ function winningRole(element: Element, property: string, pseudo = '') {
     const value =
       rule.declarations[property] ??
       (property === 'border-bottom-color'
-        ? (rule.declarations['border-color'] ??
+        ? rule.declarations['border-color'] ??
           rule.declarations['border-bottom']?.match(
             /var\(--colors-[^)]+\)/,
-          )?.[0])
+          )?.[0]
         : undefined)
     if (!value) return
     parseSelector((selectors: any) =>

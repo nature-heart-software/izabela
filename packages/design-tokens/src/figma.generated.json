@@ -2498,7 +2498,7 @@
             "hover": {
               "background": "#191919",
               "thumb-background": "#f5f5f5",
-              "border": "rgba(10, 10, 10, 0.10000000149011612)"
+              "border": "#060606"
             },
             "focus": {
               "background": "#060606",
@@ -3573,7 +3573,7 @@
             "hover": {
               "background": "#e8e8e8",
               "thumb-background": "#171717",
-              "border": "#333333"
+              "border": "#fafafa"
             },
             "focus": {
               "background": "#fafafa",
@@ -4648,7 +4648,7 @@
             "hover": {
               "background": "#0861c9",
               "thumb-background": "#ffffff",
-              "border": "#d1d9e0"
+              "border": "#0969da"
             },
             "focus": {
               "background": "#0969da",
@@ -5723,7 +5723,7 @@
             "hover": {
               "background": "#317bed",
               "thumb-background": "#ffffff",
-              "border": "#3d444d"
+              "border": "#1f6feb"
             },
             "focus": {
               "background": "#1f6feb",
