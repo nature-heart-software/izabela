@@ -96,8 +96,7 @@ async function configure(
             throw new Error('Unverified Defender result')
           resolve({
             status: 'added',
-            message:
-              'Injector exclusions are configured. Restart Izabela and the game before testing again.',
+            message: 'Injector exclusions are configured.',
           })
         } catch {
           resolve({
