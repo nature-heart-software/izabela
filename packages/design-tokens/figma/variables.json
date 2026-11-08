@@ -735,7 +735,9 @@
         "VariableID:417:1072",
         "VariableID:417:1073",
         "VariableID:417:1074",
-        "VariableID:495:10940"
+        "VariableID:495:10940",
+        "VariableID:504:1281",
+        "VariableID:504:1282"
       ]
     }
   ],
@@ -5182,19 +5184,19 @@
         },
         "370:0": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:5:35"
+          "id": "VariableID:320:1173"
         },
         "370:1": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:5:35"
+          "id": "VariableID:370:1109"
         },
         "370:2": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:5:35"
+          "id": "VariableID:504:1281"
         },
         "370:3": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:5:35"
+          "id": "VariableID:504:1282"
         }
       }
     },
@@ -5214,19 +5216,19 @@
         },
         "370:0": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:42:1594"
+          "id": "VariableID:42:1595"
         },
         "370:1": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:42:1594"
+          "id": "VariableID:42:1595"
         },
         "370:2": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:42:1594"
+          "id": "VariableID:42:1595"
         },
         "370:3": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:42:1594"
+          "id": "VariableID:42:1595"
         }
       }
     },
@@ -17834,6 +17836,46 @@
           "r": 1,
           "g": 0,
           "b": 0,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:504:1281",
+      "name": "GitHub/Light/derived/checkedHover",
+      "variableCollectionId": "VariableCollectionId:193:379",
+      "resolvedType": "COLOR",
+      "valuesByMode": {
+        "193:0": {
+          "r": 0.032470591366291046,
+          "g": 0.37882354855537415,
+          "b": 0.7865098118782043,
+          "a": 1
+        },
+        "193:1": {
+          "r": 0.032470591366291046,
+          "g": 0.37882354855537415,
+          "b": 0.7865098118782043,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "VariableID:504:1282",
+      "name": "GitHub/Dark/derived/checkedHover",
+      "variableCollectionId": "VariableCollectionId:193:379",
+      "resolvedType": "COLOR",
+      "valuesByMode": {
+        "193:0": {
+          "r": 0.19184313714504242,
+          "g": 0.48047059774398804,
+          "b": 0.9278431534767151,
+          "a": 1
+        },
+        "193:1": {
+          "r": 0.19184313714504242,
+          "g": 0.48047059774398804,
+          "b": 0.9278431534767151,
           "a": 1
         }
       }

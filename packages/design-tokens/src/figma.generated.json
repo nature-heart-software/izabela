@@ -1017,7 +1017,8 @@
             "tooltipLightText": "#1f2328",
             "shadow10": "rgba(31, 35, 40, 0.10000000149011612)",
             "derived": {
-              "shadow12": "rgba(31, 35, 40, 0.11999999731779099)"
+              "shadow12": "rgba(31, 35, 40, 0.11999999731779099)",
+              "checkedHover": "#0861c9"
             },
             "cardMask": "rgba(255, 255, 255, 0.8999999761581421)"
           },
@@ -1064,7 +1065,8 @@
             "tooltipLightText": "#1f2328",
             "shadow10": "rgba(1, 4, 9, 0.10000000149011612)",
             "derived": {
-              "shadow12": "rgba(1, 4, 9, 0.11999999731779099)"
+              "shadow12": "rgba(1, 4, 9, 0.11999999731779099)",
+              "checkedHover": "#317bed"
             },
             "cardMask": "rgba(13, 17, 23, 0.8999999761581421)"
           }
@@ -2090,7 +2092,8 @@
             "tooltipLightText": "#1f2328",
             "shadow10": "rgba(31, 35, 40, 0.10000000149011612)",
             "derived": {
-              "shadow12": "rgba(31, 35, 40, 0.11999999731779099)"
+              "shadow12": "rgba(31, 35, 40, 0.11999999731779099)",
+              "checkedHover": "#0861c9"
             },
             "cardMask": "rgba(255, 255, 255, 0.8999999761581421)"
           },
@@ -2137,7 +2140,8 @@
             "tooltipLightText": "#1f2328",
             "shadow10": "rgba(1, 4, 9, 0.10000000149011612)",
             "derived": {
-              "shadow12": "rgba(1, 4, 9, 0.11999999731779099)"
+              "shadow12": "rgba(1, 4, 9, 0.11999999731779099)",
+              "checkedHover": "#317bed"
             },
             "cardMask": "rgba(13, 17, 23, 0.8999999761581421)"
           }
@@ -2492,8 +2496,8 @@
             "thumb-background": "#f5f5f5",
             "border": "#060606",
             "hover": {
-              "background": "#f3f3f3",
-              "thumb-background": "#060606",
+              "background": "#191919",
+              "thumb-background": "#f5f5f5",
               "border": "rgba(10, 10, 10, 0.10000000149011612)"
             },
             "focus": {
@@ -2503,8 +2507,8 @@
               "focus-ring": "rgba(11, 11, 11, 0.11999999731779099)"
             },
             "hover-focus": {
-              "background": "#f3f3f3",
-              "thumb-background": "#060606"
+              "background": "#191919",
+              "thumb-background": "#f5f5f5"
             }
           }
         },
@@ -3163,7 +3167,8 @@
             "tooltipLightText": "#1f2328",
             "shadow10": "rgba(31, 35, 40, 0.10000000149011612)",
             "derived": {
-              "shadow12": "rgba(31, 35, 40, 0.11999999731779099)"
+              "shadow12": "rgba(31, 35, 40, 0.11999999731779099)",
+              "checkedHover": "#0861c9"
             },
             "cardMask": "rgba(255, 255, 255, 0.8999999761581421)"
           },
@@ -3210,7 +3215,8 @@
             "tooltipLightText": "#1f2328",
             "shadow10": "rgba(1, 4, 9, 0.10000000149011612)",
             "derived": {
-              "shadow12": "rgba(1, 4, 9, 0.11999999731779099)"
+              "shadow12": "rgba(1, 4, 9, 0.11999999731779099)",
+              "checkedHover": "#317bed"
             },
             "cardMask": "rgba(13, 17, 23, 0.8999999761581421)"
           }
@@ -3565,8 +3571,8 @@
             "thumb-background": "#171717",
             "border": "#fafafa",
             "hover": {
-              "background": "#262626",
-              "thumb-background": "#fafafa",
+              "background": "#e8e8e8",
+              "thumb-background": "#171717",
               "border": "#333333"
             },
             "focus": {
@@ -3576,8 +3582,8 @@
               "focus-ring": "rgba(233, 233, 233, 0.11999999731779099)"
             },
             "hover-focus": {
-              "background": "#262626",
-              "thumb-background": "#fafafa"
+              "background": "#e8e8e8",
+              "thumb-background": "#171717"
             }
           }
         },
@@ -4236,7 +4242,8 @@
             "tooltipLightText": "#1f2328",
             "shadow10": "rgba(31, 35, 40, 0.10000000149011612)",
             "derived": {
-              "shadow12": "rgba(31, 35, 40, 0.11999999731779099)"
+              "shadow12": "rgba(31, 35, 40, 0.11999999731779099)",
+              "checkedHover": "#0861c9"
             },
             "cardMask": "rgba(255, 255, 255, 0.8999999761581421)"
           },
@@ -4283,7 +4290,8 @@
             "tooltipLightText": "#1f2328",
             "shadow10": "rgba(1, 4, 9, 0.10000000149011612)",
             "derived": {
-              "shadow12": "rgba(1, 4, 9, 0.11999999731779099)"
+              "shadow12": "rgba(1, 4, 9, 0.11999999731779099)",
+              "checkedHover": "#317bed"
             },
             "cardMask": "rgba(13, 17, 23, 0.8999999761581421)"
           }
@@ -4638,8 +4646,8 @@
             "thumb-background": "#ffffff",
             "border": "#0969da",
             "hover": {
-              "background": "#eff2f5",
-              "thumb-background": "#0969da",
+              "background": "#0861c9",
+              "thumb-background": "#ffffff",
               "border": "#d1d9e0"
             },
             "focus": {
@@ -4649,8 +4657,8 @@
               "focus-ring": "rgba(9, 105, 218, 0.25)"
             },
             "hover-focus": {
-              "background": "#eff2f5",
-              "thumb-background": "#0969da"
+              "background": "#0861c9",
+              "thumb-background": "#ffffff"
             }
           }
         },
@@ -5309,7 +5317,8 @@
             "tooltipLightText": "#1f2328",
             "shadow10": "rgba(31, 35, 40, 0.10000000149011612)",
             "derived": {
-              "shadow12": "rgba(31, 35, 40, 0.11999999731779099)"
+              "shadow12": "rgba(31, 35, 40, 0.11999999731779099)",
+              "checkedHover": "#0861c9"
             },
             "cardMask": "rgba(255, 255, 255, 0.8999999761581421)"
           },
@@ -5356,7 +5365,8 @@
             "tooltipLightText": "#1f2328",
             "shadow10": "rgba(1, 4, 9, 0.10000000149011612)",
             "derived": {
-              "shadow12": "rgba(1, 4, 9, 0.11999999731779099)"
+              "shadow12": "rgba(1, 4, 9, 0.11999999731779099)",
+              "checkedHover": "#317bed"
             },
             "cardMask": "rgba(13, 17, 23, 0.8999999761581421)"
           }
@@ -5711,8 +5721,8 @@
             "thumb-background": "#ffffff",
             "border": "#1f6feb",
             "hover": {
-              "background": "#262c36",
-              "thumb-background": "#1f6feb",
+              "background": "#317bed",
+              "thumb-background": "#ffffff",
               "border": "#3d444d"
             },
             "focus": {
@@ -5722,8 +5732,8 @@
               "focus-ring": "rgba(31, 111, 235, 0.25)"
             },
             "hover-focus": {
-              "background": "#262c36",
-              "thumb-background": "#1f6feb"
+              "background": "#317bed",
+              "thumb-background": "#ffffff"
             }
           }
         },
@@ -6382,7 +6392,8 @@
             "tooltipLightText": "#1f2328",
             "shadow10": "rgba(31, 35, 40, 0.10000000149011612)",
             "derived": {
-              "shadow12": "rgba(31, 35, 40, 0.11999999731779099)"
+              "shadow12": "rgba(31, 35, 40, 0.11999999731779099)",
+              "checkedHover": "#0861c9"
             },
             "cardMask": "rgba(255, 255, 255, 0.8999999761581421)"
           },
@@ -6429,7 +6440,8 @@
             "tooltipLightText": "#1f2328",
             "shadow10": "rgba(1, 4, 9, 0.10000000149011612)",
             "derived": {
-              "shadow12": "rgba(1, 4, 9, 0.11999999731779099)"
+              "shadow12": "rgba(1, 4, 9, 0.11999999731779099)",
+              "checkedHover": "#317bed"
             },
             "cardMask": "rgba(13, 17, 23, 0.8999999761581421)"
           }
@@ -8684,6 +8696,9 @@
           "derived": {
             "shadow12": {
               "value": "var(--nv--git-hub--light-derived-shadow12)"
+            },
+            "checkedHover": {
+              "value": "var(--nv--git-hub--light-derived-checked-hover)"
             }
           },
           "cardMask": {
@@ -8817,6 +8832,9 @@
           "derived": {
             "shadow12": {
               "value": "var(--nv--git-hub--dark-derived-shadow12)"
+            },
+            "checkedHover": {
+              "value": "var(--nv--git-hub--dark-derived-checked-hover)"
             }
           },
           "cardMask": {
