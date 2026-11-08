@@ -2442,7 +2442,7 @@
             "hover": {
               "background": "#ffffff",
               "thumb-background": "#6d6d6d",
-              "border": "#0c0c0c"
+              "border": "rgba(10, 10, 10, 0.10000000149011612)"
             },
             "focus": {
               "background": "#ffffff",
@@ -2458,7 +2458,7 @@
             "hover": {
               "background": "#060606",
               "thumb-background": "#f5f5f5",
-              "border": "#060606"
+              "border": "rgba(10, 10, 10, 0.10000000149011612)"
             },
             "focus": {
               "background": "#060606",
@@ -3499,7 +3499,7 @@
             "hover": {
               "background": "#171717",
               "thumb-background": "#a1a1a1",
-              "border": "#505050"
+              "border": "#333333"
             },
             "focus": {
               "background": "#171717",
@@ -3515,7 +3515,7 @@
             "hover": {
               "background": "#fafafa",
               "thumb-background": "#171717",
-              "border": "#fafafa"
+              "border": "#333333"
             },
             "focus": {
               "background": "#fafafa",
@@ -4556,7 +4556,7 @@
             "hover": {
               "background": "#f6f8fa",
               "thumb-background": "#59636e",
-              "border": "#818b98"
+              "border": "#d1d9e0"
             },
             "focus": {
               "background": "#f6f8fa",
@@ -4572,7 +4572,7 @@
             "hover": {
               "background": "#0969da",
               "thumb-background": "#ffffff",
-              "border": "#0969da"
+              "border": "#d1d9e0"
             },
             "focus": {
               "background": "#0969da",
@@ -5613,7 +5613,7 @@
             "hover": {
               "background": "#212830",
               "thumb-background": "#9198a1",
-              "border": "#656c76"
+              "border": "#3d444d"
             },
             "focus": {
               "background": "#212830",
@@ -5629,7 +5629,7 @@
             "hover": {
               "background": "#1f6feb",
               "thumb-background": "#ffffff",
-              "border": "#1f6feb"
+              "border": "#3d444d"
             },
             "focus": {
               "background": "#1f6feb",
