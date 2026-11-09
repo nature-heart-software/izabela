@@ -59,11 +59,7 @@ for (const directory of ['packages/icons', 'packages/ui']) {
 test('UI public declaration dependencies are directly resolvable', () => {
   const pkg = readPackage('packages/ui')
   const require = createRequire(resolve(root, 'packages/ui/package.json'))
-  for (const dependency of [
-    'csstype',
-    'tippy.js',
-    '@zag-js/interact-outside',
-  ]) {
+  for (const dependency of ['csstype', '@zag-js/interact-outside']) {
     assert.ok(
       pkg.dependencies[dependency],
       `missing direct dependency: ${dependency}`,
@@ -93,7 +89,10 @@ test('native rebuild tooling recognizes the application Electron ABI', () => {
   )
 })
 
-test('direct desktop development rebuilds native modules before launching Vite', () => {
+test('direct desktop development generates styles and rebuilds native modules before launching Vite', () => {
   const pkg = readPackage('apps/app')
-  assert.match(pkg.scripts.dev, /^pnpm run rebuild && vite$/)
+  assert.match(
+    pkg.scripts.dev,
+    /^pnpm run panda:prepare && pnpm run rebuild && vite$/,
+  )
 })

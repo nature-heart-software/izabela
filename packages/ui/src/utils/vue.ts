@@ -1,7 +1,7 @@
 import { Comment, VNode, unref } from 'vue'
 
 export function isVNodeEmpty(
-  slot: (d: object) => VNode | VNode[] | undefined | null,
+  slot: ((d: object) => VNode | VNode[] | undefined | null) | undefined,
   data = {},
 ): boolean {
   if (!slot) return true

@@ -9,9 +9,6 @@ on:
         required: false
         default: ''
         type: string
-  push:
-    branches:
-      - dev
 
 permissions:
   contents: read
@@ -82,7 +79,7 @@ jobs:
           name: installer-test-input
           path: apps/app/dist_electron/*setup*.exe
           if-no-files-found: error
-          retention-days: 3
+          retention-days: 1
       - name: Package the next version for actual auto-update tests
         run: pnpm --filter izabela-next exec electron-builder --config ../../tests/app/updater-builder.cjs --publish never
       - name: Upload automatic update candidate
@@ -91,7 +88,7 @@ jobs:
           name: updater-test-input
           path: apps/app/dist_updater/*setup*.exe
           if-no-files-found: error
-          retention-days: 3
+          retention-days: 1
       - name: Check packaged production app end to end
         run: pnpm test:app:packaged
       - name: Upload app test diagnostics
@@ -101,6 +98,7 @@ jobs:
           name: app-test-diagnostics
           path: coverage/app-results/offline-packaged
           if-no-files-found: ignore
+          retention-days: 1
       - name: Check packages and keyboard routing
         run: node --test tests/package-build.test.mjs tests/keyboard-accelerator.test.mjs
       - name: Check native dependencies in Electron
@@ -143,6 +141,7 @@ jobs:
           name: installer-test-diagnostics
           path: coverage/installer-results
           if-no-files-found: ignore
+          retention-days: 1
 
   updater:
     name: Automatic update and recovery
@@ -180,3 +179,4 @@ jobs:
           name: updater-test-diagnostics
           path: coverage/updater-results
           if-no-files-found: ignore
+          retention-days: 1

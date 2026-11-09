@@ -3,9 +3,8 @@
 </template>
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
-import 'element-plus/lib/components/input/style/css'
 import { props as propsDefinition } from './textarea.shared'
-import { StTextarea } from './textarea.styled'
+import { StTextarea } from './textarea.panda'
 
 const model = defineModel()
 const props = defineProps(propsDefinition)

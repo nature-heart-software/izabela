@@ -72,7 +72,6 @@
     "electron-postman": "workspace:*",
     "electron-store": "^8.1.0",
     "electron-updater": "^5.0.1",
-    "element-plus": "^1.2.0-beta.6",
     "eslint": "^8.12.0",
     "eslint-config-prettier": "^8.5.0",
     "express": "^4.17.3",
@@ -114,7 +113,6 @@
     "socket.io-client": "^4.5.4",
     "storybook": "^7.6.20",
     "syncpack": "^12.3.2",
-    "tailwindcss": "^3.1.8",
     "tone": "^14.7.77",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.4.5",
@@ -127,7 +125,6 @@
     "vue": "3.5.11",
     "vue-query": "^1.22.3",
     "vue-router": "^4.0.14",
-    "vue-tippy": "6.7.0",
     "vue-tsc": "^2.0.6",
     "vue3-moveable": "^0.11.2",
     "vue3-styled-components": "^1.2.1",
@@ -171,6 +168,8 @@
     ]
   },
   "scripts": {
+    "tokens:import": "node packages/design-tokens/tools/figma-import.mjs",
+    "tokens:check": "node packages/design-tokens/tools/figma-import.mjs --check",
     "prepare:native": "pnpm --filter @packages/native-keymap run build && pnpm --filter win-control run build",
     "build": "pnpm nx build izabela-next",
     "build:app": "pnpm nx build izabela-next",

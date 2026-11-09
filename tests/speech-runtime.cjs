@@ -63,6 +63,16 @@ function compile(relative) {
   }).outputText
 }
 
+function compileModule(relative) {
+  return ts.transpileModule(readFileSync(path.join(root, relative), 'utf8'), {
+    compilerOptions: {
+      module: ts.ModuleKind.CommonJS,
+      target: ts.ScriptTarget.ES2022,
+      esModuleInterop: true,
+    },
+  }).outputText
+}
+
 async function run() {
   await app.whenReady()
   window = new BrowserWindow({
@@ -84,6 +94,15 @@ async function run() {
       'apps/app/src/teams/speech-worker/components/NvSpeechRecordingLogo.vue',
     ),
     app: compile('apps/app/src/teams/speech-worker/App.vue'),
+    panda: compileModule('packages/ui/src/utils/panda.ts'),
+    provider: compileModule('packages/ui/src/themes/provider.ts'),
+    themes: compileModule('packages/ui/src/themes/index.ts'),
+    generated: JSON.parse(
+      readFileSync(
+        path.join(root, 'packages/design-tokens/src/figma.generated.json'),
+        'utf8',
+      ),
+    ),
   }
   const paths = { vue: require.resolve('vue'), hark: require.resolve('hark') }
   const result = await window.webContents
@@ -112,20 +131,41 @@ async function run() {
     }}}
     const mocks = {
       vue, hark,
+      '@/styled-system/css': {css:()=>''},
       '@/features/settings/store': {useSettingsStore:()=>settings},
       '@/features/speech/store': {useSpeechRecognitionStore:()=>recognition},
       '@/utils/media-devices': {getSoxMediaDeviceByIndex:async (index)=>({deviceId:'synthetic-'+index})},
       '@/services': {socket:{emit(...args){emitted.push(args)}}},
-      '@/teams/speech-worker/components/NvSpeechSynthesizer.vue': {default:{render:()=>null}},
-      '@/teams/speech-worker/components/NvAudioInputUpdater.vue': {default:{render:()=>null}},
+      '@/teams/speech-worker/components/NvSpeechSynthesizer.vue': {__esModule:true,default:{render:()=>null}},
+      '@/teams/speech-worker/components/NvAudioInputUpdater.vue': {__esModule:true,default:{render:()=>null}},
     }
-    function load(source) {
+    function fixtureRequire(id) {
+      if (!Object.hasOwn(mocks, id)) throw new Error('Unexpected runtime dependency: '+id)
+      return mocks[id]
+    }
+    function loadModule(source) {
       const module = {exports:{}}
-      new Function('require','module','exports','navigator','console',source)(id=>{
-        if (!(id in mocks)) throw new Error('Unexpected runtime dependency: '+id)
-        return mocks[id]
-      },module,module.exports,virtualNavigator,{log(){},error(...args){errors.push(args.map(String).join(' '))}})
-      return module.exports.default
+      new Function('require','module','exports','navigator','console',source)(fixtureRequire,module,module.exports,virtualNavigator,{log(){},error(...args){errors.push(args.map(String).join(' '))}})
+      return module.exports
+    }
+    function load(source) { return loadModule(source).default }
+    // Keep the actual provider, theme registry, and native div component. Only
+    // generated presentation classes are outside this audio/DOM fixture.
+    mocks['../utils/panda'] = loadModule(code.panda)
+    mocks['./provider'] = loadModule(code.provider)
+    mocks['../../../design-tokens/src/figma.generated.json'] = code.generated
+    const themes = loadModule(code.themes)
+    mocks['@packages/ui'] = {
+      ThemeProvider: themes.ThemeProvider,
+      resolveTheme: themes.resolveTheme,
+      GlobalStyles: mocks['../utils/panda'].pandaComponent('div', {}, () => ''),
+    }
+    // Probe the actual loader, including prototype keys: no fallback require.
+    for (const id of ['unexpected-speech-dependency', 'toString', '__proto__']) {
+      let rejected = false
+      try { loadModule('require('+JSON.stringify(id)+')') }
+      catch (error) { rejected = error.message === 'Unexpected runtime dependency: '+id }
+      if (!rejected) throw new Error('Runtime dependency allowlist accepted '+id)
     }
     mocks['@/teams/speech-worker/components/NvSpeechListener.vue'] = {__esModule:true,default:load(code.listener)}
     mocks['@/teams/speech-worker/components/NvSpeechRecordingLogo.vue'] = {__esModule:true,default:load(code.logo)}
@@ -144,6 +184,10 @@ async function run() {
       gains[0].gain.value = 0.25
       await waitFor(()=>recognition.recording,'speech detection')
       const indicatorVisible = !!document.querySelector('.animation-wrapper')
+      const indicator = document.querySelector('[data-nv-theme] .animation-wrapper')
+      if (!indicator?.querySelector('#outer-circle') || !indicator.querySelector('#inner-circle')) {
+        throw new Error('Actual recording indicator DOM missing inside theme provider')
+      }
       gains[0].gain.value = 0
       await waitFor(()=>!recognition.recording,'silence detection')
       const indicatorHidden = !document.querySelector('.animation-wrapper')

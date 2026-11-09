@@ -5,29 +5,29 @@
     :style="{
       height: rem(virtualizer.getTotalSize()),
     }"
-    class="relative"
+    :class="virtualList()"
   >
-    <template
-      v-for="item in virtualizer.getVirtualItems()"
-      :key="`${item.index}-${item.key}`"
-    >
-      <div
-        :style="{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: `${item.size}px`,
-          transform: `translateY(${item.start}px)`,
-        }"
+    <slot name="items" :items="virtualizer.getVirtualItems()">
+      <template
+        v-for="item in virtualizer.getVirtualItems()"
+        :key="`${item.index}-${item.key}`"
       >
-        <slot name="default" v-bind="{ ...item }" />
-      </div>
-    </template>
+        <div
+          :class="virtualListItem()"
+          :style="{
+            height: `${item.size}px`,
+            transform: `translateY(${item.start}px)`,
+          }"
+        >
+          <slot name="default" v-bind="{ ...item }" />
+        </div>
+      </template>
+    </slot>
   </div>
 </template>
 <script lang="ts" setup>
 import { useVirtualizer } from '@/hooks/useVirtualizer'
+import { virtualList, virtualListItem } from './virtual-list.panda'
 import { Virtualizer } from '@tanstack/virtual-core'
 import {
   injectVirtualListContainerContext,

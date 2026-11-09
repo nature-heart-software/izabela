@@ -1,36 +1,69 @@
 <template>
   <NvCard
     variant="transparent"
-    class="settings rounded p-4 flex flex-col space-y-4"
+    class="settings"
+    :class="
+      css({
+        borderRadius: 'md',
+        padding: '4',
+        display: 'flex',
+        flexDirection: 'column',
+        '& > :not([hidden]) ~ :not([hidden])': {
+          marginTop: '4',
+          marginBottom: '0',
+        },
+      })
+    "
   >
     <!-- Top -->
-    <div class="flex justify-between space-x-4">
+    <div
+      :class="
+        css({
+          display: 'flex',
+          justifyContent: 'space-between',
+          '& > :not([hidden]) ~ :not([hidden])': {
+            marginLeft: '4',
+            marginRight: '0',
+          },
+        })
+      "
+    >
       <div></div>
-      <NvCard class="inline-flex" size="sm">
-        <div class="inline-flex space-x-2">
-          <NvTooltip>
-            <NvText>Close</NvText>
-            <template #reference>
-              <NvButton
-                icon-name="times"
-                size="xs"
-                type="plain"
-                @click="$emit('close')"
-              />
-            </template>
-          </NvTooltip>
+      <NvCard :class="css({ display: 'inline-flex' })" size="sm">
+        <div
+          :class="
+            css({
+              display: 'inline-flex',
+              '& > :not([hidden]) ~ :not([hidden])': {
+                marginLeft: '2',
+                marginRight: '0',
+              },
+            })
+          "
+        >
+          <NvPanelNavigation
+            :sidebar="sidebar"
+            :content="content"
+            @close="$emit('close')"
+          />
         </div>
       </NvCard>
     </div>
-    <div class="flex-1 relative">
-      <div class="absolute inset-0">
-        <div class="flex h-full">
-          <div class="settings__sidebar">
+    <div :class="css({ flex: '1 1 0%', position: 'relative' })">
+      <div :class="css({ position: 'absolute', inset: '0' })">
+        <div :class="css({ display: 'flex', height: '100%' })">
+          <div
+            ref="sidebar"
+            class="settings__sidebar"
+            role="navigation"
+            aria-label="Message sections"
+            tabindex="-1"
+          >
             <!-- Side Nav -->
             <NvStack spacing="6">
               <template v-for="category in navigation" :key="category.name">
                 <NvStack>
-                  <NvText class="mx-3" type="subtitle">
+                  <NvText :class="css({ marginInline: '3' })" type="subtitle">
                     {{ category.name }}
                   </NvText>
                   <NvStack spacing="2">
@@ -40,11 +73,20 @@
                     >
                       <router-link
                         :to="entry.to || { name: 'messages' }"
-                        class="w-full"
+                        custom
+                        v-slot="{ href, navigate }"
                       >
                         <NvButton
+                          as="a"
+                          :href="href"
+                          @click="navigate"
                           :selected="currentRoute.name === entry.to?.name"
-                          class="w-full"
+                          :aria-current="
+                            currentRoute.name === entry.to?.name
+                              ? 'page'
+                              : undefined
+                          "
+                          :class="css({ width: '100%' })"
                           size="sm"
                           type="ghost-alt"
                           >{{ entry.name }}
@@ -56,15 +98,46 @@
               </template>
             </NvStack>
           </div>
-          <div class="settings__content flex-1 pl-4">
-            <NvPortalTarget class="h-full relative overflow-hidden">
-              <div class="h-full relative">
+          <div
+            ref="content"
+            class="settings__content"
+            role="region"
+            aria-label="Message content"
+            tabindex="-1"
+            :class="css({ flex: '1 1 0%', paddingLeft: '4' })"
+          >
+            <NvPortalTarget
+              :class="
+                css({
+                  height: '100%',
+                  position: 'relative',
+                  overflow: 'hidden',
+                })
+              "
+            >
+              <div :class="css({ height: '100%', position: 'relative' })">
                 <!-- View -->
                 <router-view v-slot="{ Component }">
-                  <Transition class="transition">
+                  <Transition
+                    :class="
+                      css({
+                        transitionProperty:
+                          'color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter',
+                        transitionTimingFunction:
+                          'cubic-bezier(0.4, 0, 0.2, 1)',
+                        transitionDuration: '150ms',
+                      })
+                    "
+                  >
                     <div
-                      :key="Component"
-                      class="absolute inset-0 overflow-y-auto"
+                      :key="currentRoute.path"
+                      :class="
+                        css({
+                          position: 'absolute',
+                          inset: '0',
+                          overflowY: 'auto',
+                        })
+                      "
                     >
                       <component :is="Component" />
                     </div>
@@ -79,10 +152,15 @@
   </NvCard>
 </template>
 <script lang="ts" setup>
-import { NvButton, NvStack, NvText, NvCard, NvTooltip } from '@packages/ui'
+import { css } from '@/styled-system/css'
+import { NvButton, NvStack, NvText, NvCard } from '@packages/ui'
+import NvPanelNavigation from '@/teams/messenger/components/NvPanelNavigation.vue'
+import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 import NvPortalTarget from '@/teams/messenger/components/NvPortalTarget.vue'
 
+const sidebar = ref<HTMLElement>()
+const content = ref<HTMLElement>()
 const navigation = [
   {
     name: 'Messages',

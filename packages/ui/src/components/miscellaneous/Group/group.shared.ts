@@ -7,6 +7,7 @@ export const justifyValues = [
   'center',
   'right',
   'apart',
+  'between',
   'around',
 ] as const
 export type Justify = (typeof justifyValues)[number]

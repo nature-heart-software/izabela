@@ -10,7 +10,7 @@
 </template>
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { StSelectOption } from './select.styled'
+import { StSelectOption } from './select.panda'
 import { optionProps as propsDefinition } from './select.shared'
 import { useElementHover } from '@vueuse/core'
 

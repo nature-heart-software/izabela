@@ -7,7 +7,7 @@
         :engine="speechStore.selectedSpeechEngine"
         :placeholder="placeholder"
         :voice="speechStore.currentSpeechEngine?.getSelectedVoice()"
-        class="w-full"
+        :class="css({ width: '100%' })"
         data-v-step="messenger-text-input"
         size="lg"
         @blur="onInputBlur"
@@ -32,6 +32,7 @@
   </NvCard>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import { NvButton, NvCard, NvGroup } from '@packages/ui'
 import { computed, inject, ref, Ref, watch } from 'vue'
 import { useMessengerWindowStore } from '@/teams/messenger/store'

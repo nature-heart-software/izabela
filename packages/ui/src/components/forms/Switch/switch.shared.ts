@@ -5,6 +5,8 @@ export const props = {
     type: String,
     default: 'span',
   },
+  disabled: { type: Boolean, default: false },
+  readonly: { type: Boolean, default: false },
   modelValue: {
     type: Boolean,
     default: false,

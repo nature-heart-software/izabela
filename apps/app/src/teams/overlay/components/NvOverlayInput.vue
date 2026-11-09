@@ -2,14 +2,40 @@
   <NvCard
     variant="transparent"
     ref="messenger"
-    class="messenger rounded grid p-4 gap-4 grid-rows-3 grid-rows-none min-w-[480px]"
+    class="messenger"
+    :class="
+      css({
+        borderRadius: 'md',
+        display: 'grid',
+        padding: '4',
+        gap: '4',
+        gridTemplateRows: 'none',
+        minWidth: '480px',
+      })
+    "
     data-v-step="messenger-window"
   >
-    <NvGroup :spacing="4" class="min-w-0" grow>
-      <NvCard class="min-w-0" size="sm">
+    <NvGroup :spacing="4" :class="css({ minWidth: '0' })" grow>
+      <NvCard :class="css({ minWidth: '0' })" size="sm">
         <NvGroup noWrap>
           <NvInput
-            class="overlayInput border rounded px-5 h-8 text-2 flex items-center focused font-semibold"
+            class="overlayInput focused"
+            :class="
+              css({
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                borderColor: 'input.default.border',
+                borderRadius: 'md',
+                paddingInline: '5',
+                height: '8',
+                fontSize: '2',
+                lineHeight: '2',
+                letterSpacing: '2',
+                display: 'flex',
+                alignItems: 'center',
+                fontWeight: 600,
+              })
+            "
             tabindex="-1"
           >
             <!--.overlayInput-->
@@ -41,7 +67,7 @@
                   >{{ key }}</span
                 >
               </template>
-              <label class="hidden">
+              <label :class="css({ display: 'none' })">
                 <input
                   ref="selectionValueRef"
                   :value="selectionValue"
@@ -57,6 +83,7 @@
 </template>
 
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import { NvCard, NvGroup } from '@packages/ui'
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useSettingsStore } from '@/features/settings/store'
@@ -69,12 +96,12 @@ import { useElementSize } from '@vueuse/core'
 import { rem } from 'polished'
 import styled from 'vue3-styled-components'
 
-const NvInput = styled('div')`
-  color: ${({ theme }) => theme.text.color};
-  border-color: ${({ theme }) => theme.input.borderColor};
+const NvInput = styled('div', {})`
+  color: ${({ theme }) => theme.input.default.text};
+  border-color: ${({ theme }) => theme.input.default.border};
   .activeIndex {
     &:after {
-      background-color: ${({ theme }) => theme.input.color};
+      background-color: ${({ theme }) => theme.input.default.text};
     }
   }
 `
@@ -340,7 +367,7 @@ watch(carretIndex, () => {
 <style lang="scss" scoped>
 @keyframes caret {
   50% {
-    background-color: transparent;
+    background-color: var(--nv-theme-background-transparent);
   }
 }
 
@@ -386,13 +413,13 @@ watch(carretIndex, () => {
     }
 
     &.inSelection {
-      background-color: #444444;
-      color: #ffffff;
+      background-color: var(--nv-option-default-selected-background);
+      color: var(--nv-option-default-selected-text);
     }
   }
 
   .overlayInput__placeholder {
-    color: #bebebe;
+    color: var(--nv-input-default-placeholder);
     opacity: 0.7;
   }
 

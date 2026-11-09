@@ -1,6 +1,7 @@
 <template>
   <component
     :is="component"
+    :class="icon({ size: props.size })"
     :height="sizeValue"
     :width="sizeValue"
     fill="currentColor"
@@ -8,12 +9,13 @@
 </template>
 <script lang="ts" setup>
 import { computed } from 'vue'
+import { icon } from './icon.panda'
 import { tokens } from '@/styles/tokens'
 import { props as propsDefinition } from './icon.shared'
 import * as Icons from '@packages/icons'
 
 const props = defineProps(propsDefinition)
-const sizeValue = computed(() => tokens.fontSize[props.size][0])
+const sizeValue = computed(() => tokens.fontSize[props.size])
 const component = computed(() =>
   Object.values(Icons as any).find((i: any) =>
     [props.name, `nv-${props.name}`].includes(i.name),

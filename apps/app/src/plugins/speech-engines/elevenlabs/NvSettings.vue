@@ -25,7 +25,7 @@
             :max="1"
             :min="0"
             :step="0.01"
-            class="!grow"
+            :class="css({ flexGrow: '1 !important' })"
             v-bind="{
               modelValue: getProperty('stability'),
               'onUpdate:modelValue': (value) => setProperty('stability', value),
@@ -49,7 +49,7 @@
             :max="1"
             :min="0"
             :step="0.01"
-            class="!grow"
+            :class="css({ flexGrow: '1 !important' })"
             v-bind="{
               modelValue: getProperty('similarity_boost'),
               'onUpdate:modelValue': (value) =>
@@ -75,7 +75,7 @@
             :max="1"
             :min="0"
             :step="0.01"
-            class="!grow"
+            :class="css({ flexGrow: '1 !important' })"
             v-bind="{
               modelValue: getProperty('style'),
               'onUpdate:modelValue': (value) => setProperty('style', value),
@@ -99,7 +99,7 @@
             :max="1.2"
             :min="0.7"
             :step="0.01"
-            class="!grow"
+            :class="css({ flexGrow: '1 !important' })"
             v-bind="{
               modelValue: getProperty('speed'),
               'onUpdate:modelValue': (value) => setProperty('speed', value),
@@ -139,7 +139,7 @@
           </NvStack>
           <NvSwitch
             :modelValue="getProperty('streamAudio')"
-            class="shrink-0"
+            :class="css({ flexShrink: 0 })"
             @update:modelValue="(value) => setProperty('streamAudio', value)"
           />
         </NvGroup>
@@ -162,7 +162,7 @@
           </NvStack>
           <NvSwitch
             :modelValue="getProperty('includeTimestamps')"
-            class="shrink-0"
+            :class="css({ flexShrink: 0 })"
             @update:modelValue="
               (value) => setProperty('includeTimestamps', value)
             "
@@ -186,6 +186,7 @@
   </template>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import {
   NvAccessBlocker,
   NvDivider,

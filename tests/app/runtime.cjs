@@ -960,7 +960,7 @@ async function main() {
         await evaluate(messenger, () => {
           location.hash = '/'
         })
-        await evaluate(messenger, async () => {
+        await evaluate(worker, async () => {
           await window.ElectronMessengerWindow.hide(false)
           await window.ElectronMessengerWindow.show()
         })
@@ -987,7 +987,7 @@ async function main() {
         )
         await evaluate(messenger, () => {
           const input = document.querySelector(
-            '[data-v-step="engine-voice-select"] input',
+            '[data-v-step="engine-voice-select"] input, input[data-v-step="engine-voice-select"]',
           )
           input.focus()
           input.value = 'Nanami'
@@ -1003,9 +1003,7 @@ async function main() {
           'Nanami in voice picker',
         )
         await evaluate(messenger, () =>
-          document
-            .querySelector('[title="ja-JP Nanami - Female"]')
-            .dispatchEvent(new MouseEvent('mousedown', { bubbles: true })),
+          document.querySelector('[title="ja-JP Nanami - Female"]').click(),
         )
         await until(
           () =>

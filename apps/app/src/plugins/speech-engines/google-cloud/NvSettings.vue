@@ -17,7 +17,7 @@
             :max="4"
             :min="0.25"
             :step="0.01"
-            class="!grow"
+            :class="css({ flexGrow: '1 !important' })"
             v-bind="{
               modelValue: getProperty('speakingRate'),
               'onUpdate:modelValue': (value) =>
@@ -43,7 +43,7 @@
             :max="20"
             :min="-20"
             :step="0.1"
-            class="!grow"
+            :class="css({ flexGrow: '1 !important' })"
             v-bind="{
               modelValue: getProperty('pitch'),
               'onUpdate:modelValue': (value) => setProperty('pitch', value),
@@ -67,7 +67,7 @@
             :max="16"
             :min="-96"
             :step="0.1"
-            class="!grow"
+            :class="css({ flexGrow: '1 !important' })"
             v-bind="{
               modelValue: getProperty('volumeGainDb'),
               'onUpdate:modelValue': (value) =>
@@ -97,7 +97,7 @@
           </NvStack>
           <NvSwitch
             :modelValue="getProperty('streamAudio')"
-            class="shrink-0"
+            :class="css({ flexShrink: 0 })"
             @update:modelValue="(value) => setProperty('streamAudio', value)"
           />
         </NvGroup>
@@ -151,6 +151,7 @@
   </template>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import {
   NvAccessBlocker,
   NvDivider,

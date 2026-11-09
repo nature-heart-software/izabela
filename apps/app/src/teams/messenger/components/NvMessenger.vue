@@ -1,106 +1,75 @@
 <template>
   <div class="messengerWrapper">
-    <NvHitbox id="moveable" ref="moveableTarget" class="inline-flex">
-      <Tippy
-        ref="popover"
-        trigger="manual"
-        interactive
-        :append-to="routerOverlay"
-        max-width="none"
-        :offset="[0, tokens.spacing['4']]"
-        placement="top-start"
-        :hide-on-click="false"
-        @show="
-          (instance) => {
-            instance.popperInstance?.update()
-          }
-        "
-        @shown="
-          (instance) => {
-            instance.popperInstance?.update()
-          }
-        "
-        @create="
-          (instance) => {
-            instance.popperInstance?.update()
-          }
-        "
-        @hidden="
-          (instance) => {
-            // forces refresh of pages when it's opened again
-            router.push({ path: '/' })
-            instance.popperInstance?.update()
-          }
-        "
-        @mount="
-          (instance) => {
-            instance.popperInstance?.update()
-          }
-        "
-        @clickOutside="
-          (instance) => {
-            instance.popperInstance?.update()
-          }
-        "
-        @hide="
-          (instance) => {
-            instance.popperInstance?.update()
-          }
-        "
-        @trigger="
-          (instance) => {
-            instance.popperInstance?.update()
-          }
-        "
-        @destroy="
-          (instance) => {
-            instance.popperInstance?.update()
-          }
-        "
-        @untrigger="
-          (instance) => {
-            instance.popperInstance?.update()
-          }
-        "
-      >
-        <NvCard
-          variant="transparent"
-          ref="messenger"
-          class="messenger rounded grid p-4 gap-4 grid-rows-3 grid-rows-none w-[768px]"
-          data-v-step="messenger-window"
-        >
-          <!-- Top -->
-          <NvGroup :spacing="4">
-            <NvMessengerLinksBar />
-            <NvGroup :spacing="4" class="!flex-1">
-              <div class="moveable-handle cursor-all-scroll !flex-1">
-                <NvMessengerHandleBar />
-              </div>
-              <NvMessengerNavigationBar />
-            </NvGroup>
-          </NvGroup>
-
-          <!-- Middle -->
-          <NvGroup :spacing="4" justify="between">
-            <NvMessengerAudioBar />
-            <NvMessengerMessageBar />
-          </NvGroup>
-
-          <!-- Bottom -->
-          <NvGroup :spacing="4" grow>
-            <NvMessengerInputBar />
-          </NvGroup>
-        </NvCard>
-        <template #content>
-          <RouterView
-            @close="
-              () => {
-                popover?.hide()
-              }
+    <NvHitbox
+      id="moveable"
+      ref="moveableTarget"
+      :class="css({ display: 'inline-flex' })"
+    >
+      <Popover.RootProvider :value="popover">
+        <Popover.Anchor id="messenger-panel-anchor" as-child>
+          <NvCard
+            variant="transparent"
+            ref="messenger"
+            class="messenger"
+            :class="
+              css({
+                borderRadius: 'md',
+                display: 'grid',
+                padding: '4',
+                gap: '4',
+                gridTemplateRows: 'none',
+                width: '768px',
+              })
             "
-          />
-        </template>
-      </Tippy>
+            data-v-step="messenger-window"
+          >
+            <!-- Top -->
+            <NvGroup :spacing="4">
+              <NvMessengerLinksBar />
+              <NvGroup :spacing="4" :class="css({ flex: '1 1 0% !important' })">
+                <div
+                  class="moveable-handle"
+                  @pointerdown.capture="onHandlePointerDown"
+                  :class="
+                    css({ cursor: 'all-scroll', flex: '1 1 0% !important' })
+                  "
+                >
+                  <NvMessengerHandleBar />
+                </div>
+                <NvMessengerNavigationBar />
+              </NvGroup>
+            </NvGroup>
+
+            <!-- Middle -->
+            <NvGroup :spacing="4" justify="between">
+              <NvMessengerAudioBar />
+              <NvMessengerMessageBar />
+            </NvGroup>
+
+            <!-- Bottom -->
+            <NvGroup :spacing="4" grow>
+              <NvMessengerInputBar />
+            </NvGroup>
+          </NvCard>
+        </Popover.Anchor>
+        <Teleport v-if="routerOverlay" :to="routerOverlay">
+          <Popover.Positioner>
+            <Transition
+              name="messenger-panel"
+              :duration="{ enter: 300, leave: 250 }"
+              @after-leave="resetRoute"
+            >
+              <Popover.Content
+                v-show="popover.open"
+                :hidden="false"
+                aria-label="Messenger panel"
+              >
+                <RouterView @close="closePanel" />
+              </Popover.Content>
+            </Transition>
+          </Popover.Positioner>
+        </Teleport>
+      </Popover.RootProvider>
     </NvHitbox>
     <Moveable
       ref="moveable"
@@ -124,26 +93,33 @@
       :snapThreshold="16"
       :snappable="true"
       :verticalGuidelines="[viewport.width / 2]"
-      className="opacity-0"
+      :className="css({ opacity: 0 })"
       target="#moveable"
       @drag="onDrag"
     />
   </div>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import {
   ComponentPublicInstance,
   computed,
   onMounted,
+  onBeforeUnmount,
   provide,
   ref,
-  unref,
+  type Ref,
   watch,
   inject,
 } from 'vue'
 import Moveable from 'vue3-moveable'
 import { NvCard, NvGroup, tokens } from '@packages/ui'
-import { RouteLocationRaw, useRouter } from 'vue-router'
+import {
+  type RouteLocationRaw,
+  isNavigationFailure,
+  NavigationFailureType,
+  useRouter,
+} from 'vue-router'
 import NvHitbox from '@/modules/vue-hitboxes/NvHitbox.vue'
 import { useMessengerStore } from '@/teams/messenger/store'
 import NvMessengerInputBar from '@/teams/messenger/components/NvMessengerInputBar.vue'
@@ -156,9 +132,10 @@ import debounce from 'lodash/debounce'
 import { useElementSize, useEventListener, useWindowSize } from '@vueuse/core'
 import throttle from 'lodash/throttle'
 import { isGameOverlay } from '@/consts.ts'
-import { Tippy } from 'vue-tippy'
+import { Popover, usePopover } from '@ark-ui/vue'
+import { getTabStops } from '@/utils/focus'
 
-const routerOverlay = inject('router-overlay')
+const routerOverlay = inject<Ref<HTMLElement | undefined>>('router-overlay')
 // import gsap from 'gsap'
 // const messengerWindowStore = useMessengerWindowStore()
 const messengerStore = useMessengerStore()
@@ -198,25 +175,134 @@ const messenger = ref()
 const moveable = ref()
 const moveableTarget = ref<ComponentPublicInstance>()
 
-const popover = ref()
+const popover = usePopover({
+  ids: { anchor: 'messenger-panel-anchor' },
+  // Route actions own dismissal; opening starts keyboard navigation at Close.
+  initialFocusEl: () =>
+    routerOverlay?.value?.querySelector<HTMLElement>(
+      '[data-messenger-panel-close]',
+    ) || null,
+  closeOnEscape: false,
+  closeOnInteractOutside: false,
+  positioning: {
+    placement: 'top-start',
+    gutter: tokens.spacing['4'],
+  },
+})
 const { document } = window
 const router = useRouter()
-const navigateTo = (location: RouteLocationRaw) => {
+let navigationId = 0
+let pendingNavigation = 0
+let hasLeft = true
+let disposed = false
+const closePanel = () => {
+  const wasOpen = popover.value.open
+  const isSettings = String(router.currentRoute.value.name).startsWith(
+    'settings',
+  )
+  const returnTarget = document.querySelector<HTMLElement>(
+    isSettings
+      ? '[data-v-step="settings-button"]'
+      : '[data-v-step="messages-button"]',
+  )
+  navigationId++
+  pendingNavigation = 0
+  popover.value.setOpen(false)
+  if (wasOpen) returnTarget?.focus({ preventScroll: true })
+}
+
+useEventListener(document, 'keydown', (event: KeyboardEvent) => {
   if (
-    unref(popover.value?.state)?.isShown &&
+    event.key !== 'Tab' ||
+    event.altKey ||
+    event.ctrlKey ||
+    event.metaKey ||
+    !popover.value.open
+  )
+    return
+  const panel = routerOverlay?.value?.querySelector<HTMLElement>(
+    '[aria-label="Messenger panel"]',
+  )
+  if (!panel) return
+  const stops = getTabStops(panel)
+  const active = document.activeElement
+  const modal = active?.closest('[aria-modal="true"]')
+  if (modal && !panel.contains(modal)) return
+  // Nested controls own handled keys while focus remains inside. Ark's
+  // portalled Tab proxy can already have moved it outside in capture phase.
+  if (event.defaultPrevented && panel.contains(active)) return
+  const edge = event.shiftKey ? stops[0] : stops.at(-1)
+  // A focused content region can have no controls after it (empty History).
+  // Let ordinary Tab behavior run inside the panel; intercept only its edges.
+  const hasNext =
+    active &&
+    stops.some(
+      (element) =>
+        active.compareDocumentPosition(element) &
+        (event.shiftKey
+          ? Node.DOCUMENT_POSITION_PRECEDING
+          : Node.DOCUMENT_POSITION_FOLLOWING),
+    )
+  if (!panel.contains(active) || active === edge || !hasNext) {
+    event.preventDefault()
+    const target = (event.shiftKey ? stops.at(-1) : stops[0]) || panel
+    target.focus()
+  }
+})
+const resetRoute = () => {
+  hasLeft = true
+  // Reset only after the panel has fully left, so retained route drafts survive
+  // a cancelled close and the next fully closed visit gets a fresh page.
+  if (!disposed && !popover.value.open && !pendingNavigation) {
+    return router.push({ path: '/' })
+  }
+}
+const navigateTo = async (location: RouteLocationRaw) => {
+  if (
+    popover.value.open &&
     typeof location === 'object' &&
     'name' in location &&
     router.currentRoute.value.name === location.name
   ) {
-    popover.value?.hide()
+    closePanel()
     return
   }
-  router.push(location)
-  popover.value?.show()
+  const requestId = ++navigationId
+  pendingNavigation = requestId
+  let failure
+  try {
+    failure = await router.push(location)
+  } catch (error) {
+    if (pendingNavigation === requestId) pendingNavigation = 0
+    if (
+      !disposed &&
+      requestId === navigationId &&
+      hasLeft &&
+      !popover.value.open
+    ) {
+      try {
+        await resetRoute()
+      } catch {
+        // Cleanup must not replace the original navigation error.
+      }
+    }
+    throw error
+  } finally {
+    if (pendingNavigation === requestId) pendingNavigation = 0
+  }
+  if (disposed || requestId !== navigationId) return
+  if (
+    !failure ||
+    isNavigationFailure(failure, NavigationFailureType.duplicated)
+  ) {
+    hasLeft = false
+    popover.value.setOpen(true)
+  } else if (hasLeft) {
+    return resetRoute()
+  }
 }
 
-const popoverState = computed<any>(() => popover.value?.state)
-const isViewShown = computed(() => popoverState.value?.isShown)
+const isViewShown = computed(() => popover.value.open)
 provide('messenger', {
   navigateTo,
   isViewShown,
@@ -257,13 +343,30 @@ const savePosition = debounce((event: any) => {
   })
 }, 1000)
 
+function onHandlePointerDown(event: PointerEvent) {
+  if (event.button !== 0 || event.isPrimary === false) return
+  const target = event.target
+  if (
+    target instanceof Element &&
+    target.closest(
+      'button, a[href], input, select, textarea, [tabindex], [contenteditable]',
+    )
+  )
+    return
+  // Moveable prevents the native mouse default and only blurs text fields.
+  // Release buttons too when pressing the drag surface, before drag handling.
+  const active = document.activeElement
+  if (active instanceof HTMLElement && !active.closest('[aria-modal="true"]'))
+    active.blur()
+}
+
 const onDrag = (event: any) => {
   const { target, transform } = event
   target.style.transform = transform
   if (!isGameOverlay) {
     savePosition(event)
   }
-  popover.value?.tippy?.popperInstance?.update()
+  if (popover.value.open) popover.value.reposition()
 }
 // watch(() => messengerWindowStore.isShown, (isShown) => {
 //   console.log(gsap.getProperty(messenger.value, 'y'))
@@ -387,6 +490,20 @@ watch([appWidth, appHeight], () => {
   }
 })
 
+let initialPositionTimeout: ReturnType<typeof setTimeout> | undefined
+let restoreFocusTimeout: ReturnType<typeof setTimeout> | undefined
+
+onBeforeUnmount(() => {
+  disposed = true
+  navigationId++
+  savePosition.cancel()
+  if (convertScreenPositionTimeout) clearTimeout(convertScreenPositionTimeout)
+  if (setGameOverlayMessengerPositionTimeout)
+    clearTimeout(setGameOverlayMessengerPositionTimeout)
+  clearTimeout(initialPositionTimeout)
+  clearTimeout(restoreFocusTimeout)
+})
+
 onMounted(() => {
   // gsap.set(messenger.value, {
   //   opacity: 0,
@@ -405,7 +522,7 @@ onMounted(() => {
   }
   moveable.value.updateTarget()
 
-  setTimeout(() => {
+  initialPositionTimeout = setTimeout(() => {
     if (!props.transform) {
       const rect = moveableTargetEl?.getBoundingClientRect()
       if (!rect) return
@@ -423,9 +540,21 @@ onMounted(() => {
      * the window has been dragged once with draggable for some reasons
      * */
     moveable.value.request('draggable', { deltaX: 0, deltaY: -1 }, true)
-    setTimeout(() => {
+    restoreFocusTimeout = setTimeout(() => {
       moveable.value.request('draggable', { deltaX: 0, deltaY: 1 }, true)
     }, 1000)
   }, 1000)
 })
 </script>
+<style scoped>
+.messenger-panel-enter-active {
+  transition: opacity 300ms ease;
+}
+.messenger-panel-leave-active {
+  transition: opacity 250ms ease;
+}
+.messenger-panel-enter-from,
+.messenger-panel-leave-to {
+  opacity: 0;
+}
+</style>

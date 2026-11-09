@@ -1,6 +1,6 @@
 <template>
   <NvCard
-    class="h-7"
+    :class="css({ height: '7' })"
     data-v-step="handle-bar"
     size="xs"
     @mousedown="dragging = true"
@@ -32,10 +32,14 @@
     </NvGroup>
   </NvCard>
   <Teleport to="body">
-    <NvHitbox v-if="dragging" class="absolute inset-0 z-[-1]" />
+    <NvHitbox
+      v-if="dragging"
+      :class="css({ position: 'absolute', inset: '0', zIndex: '-1' })"
+    />
   </Teleport>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import { NvButton, NvCard, NvGroup, NvText, NvTooltip } from '@packages/ui'
 import { useSettingsStore } from '@/features/settings/store'
 import { useMessengerStateStore } from '@/teams/messenger/store'

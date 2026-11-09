@@ -24,7 +24,8 @@
           "
           size="sm"
           type="default"
-          @mousedown.prevent.stop="
+          @mousedown.prevent.stop
+          @click.prevent.stop="
             setProperty('favoriteVoiceIds', xor(favoriteVoiceIds, [option.id]))
           "
         />

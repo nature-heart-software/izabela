@@ -33,7 +33,7 @@
         </NvStack>
         <NvSwitch
           :modelValue="getProperty('useCommandDescriptionAsInstruction')"
-          class="shrink-0"
+          :class="css({ flexShrink: 0 })"
           @update:modelValue="
             (value) => setProperty('useCommandDescriptionAsInstruction', value)
           "
@@ -50,7 +50,7 @@
           </NvStack>
           <NvSwitch
             :modelValue="getProperty('streamAudio')"
-            class="shrink-0"
+            :class="css({ flexShrink: 0 })"
             @update:modelValue="(value) => setProperty('streamAudio', value)"
           />
         </NvGroup>
@@ -84,6 +84,7 @@
   </template>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import {
   NvAccessBlocker,
   NvDivider,

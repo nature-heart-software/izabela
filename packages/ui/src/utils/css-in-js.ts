@@ -1,55 +1,55 @@
-import { rem, rgba } from 'polished'
+import { rem } from 'polished'
 import { tokens } from '@/styles/tokens'
 import { CSSObject } from '@/types/css-in-js'
 
-const { borderRadius, spacing } = tokens
+const { radius, spacing } = tokens
 export const sizeValues = ['xs', 'sm', 'md', 'lg'] as const
 export type Size = (typeof sizeValues)[number]
 
 type Value = number | string
 type FontSizeProperty = 'lineHeight' | 'letterSpacing'
-type TailwindFontSize =
+type FontSizeToken =
   | Value
   | [Value, Record<FontSizeProperty, Value>]
   | readonly [Value, Record<FontSizeProperty, Value>]
 
-export const fontSize = (tailwindFontSize: TailwindFontSize) =>
-  typeof tailwindFontSize === 'number' || typeof tailwindFontSize === 'string'
-    ? rem(tailwindFontSize)
-    : rem(tailwindFontSize[0])
+export const fontSize = (fontSizeToken: FontSizeToken) =>
+  typeof fontSizeToken === 'number' || typeof fontSizeToken === 'string'
+    ? rem(fontSizeToken)
+    : rem(fontSizeToken[0])
 
-export const lineHeight = (tailwindFontSize: TailwindFontSize) =>
+export const lineHeight = (fontSizeToken: FontSizeToken) =>
   // eslint-disable-next-line no-nested-ternary
-  typeof tailwindFontSize === 'number' || typeof tailwindFontSize === 'string'
-    ? 1
-    : typeof tailwindFontSize[1]?.lineHeight === 'string'
-      ? rem(tailwindFontSize[1]?.lineHeight)
-      : tailwindFontSize[1]?.lineHeight || 1
+  typeof fontSizeToken === 'number' || typeof fontSizeToken === 'string'
+    ? tokens.lineHeight.default
+    : typeof fontSizeToken[1]?.lineHeight === 'string'
+      ? rem(fontSizeToken[1]?.lineHeight)
+      : fontSizeToken[1]?.lineHeight || 1
 
-export const letterSpacing = (tailwindFontSize: TailwindFontSize) =>
-  typeof tailwindFontSize === 'number' || typeof tailwindFontSize === 'string'
-    ? 'normal'
-    : rem(tailwindFontSize[1]?.letterSpacing) || 'normal'
+export const letterSpacing = (fontSizeToken: FontSizeToken) =>
+  typeof fontSizeToken === 'number' || typeof fontSizeToken === 'string'
+    ? rem(tokens.letterSpacing.default)
+    : rem(fontSizeToken[1]?.letterSpacing) || 'normal'
 
-export const fontSizeStyle = (tailwindFontSize: TailwindFontSize) => ({
-  fontSize: fontSize(tailwindFontSize),
-  lineHeight: lineHeight(tailwindFontSize),
-  letterSpacing: letterSpacing(tailwindFontSize),
+export const fontSizeStyle = (fontSizeToken: FontSizeToken) => ({
+  fontSize: fontSize(fontSizeToken),
+  lineHeight: lineHeight(fontSizeToken),
+  letterSpacing: letterSpacing(fontSizeToken),
 })
 
 export function borderRadiusStyleBySize(size: Size) {
   const styles: Record<Size, CSSObject> = {
     xs: {
-      borderRadius: rem(borderRadius.xs),
+      borderRadius: rem(radius.xs),
     },
     sm: {
-      borderRadius: rem(borderRadius.sm),
+      borderRadius: rem(radius.sm),
     },
     md: {
-      borderRadius: rem(borderRadius.md),
+      borderRadius: rem(radius.md),
     },
     lg: {
-      borderRadius: rem(borderRadius.DEFAULT),
+      borderRadius: rem(radius.md),
     },
   }
   return styles[size]
@@ -149,6 +149,6 @@ export function iconStyleBySize(size: Size) {
 
 export function disabledItemBackgroundStyle({ theme }: any) {
   return `
-    background-color: ${rgba(theme.disabledItemBackground.backdropColor, theme.disabledItemBackground.backdropOpacity)};
+    background-color: ${theme.accessBlocker.default.denied.background};
   `
 }

@@ -1,20 +1,38 @@
 <template>
-  <StDialogRoot
-    v-bind="{
-      ...props,
-      open: dialogOpen,
-      'onUpdate:open': (value: boolean) => (dialogOpen = value),
-    }"
+  <Dialog.Root
+    v-bind="$attrs"
+    v-model:open="dialogOpen"
+    :ids="{ trigger: triggerId }"
+    @focus-outside.prevent
+    @interact-outside="onOverlayShieldInteractOutside"
   >
-    <StDialogTrigger>
+    <ReferenceTrigger>
       <slot name="reference" />
-    </StDialogTrigger>
+    </ReferenceTrigger>
     <Teleport :to="props.portalTarget" defer>
       <PortalTargetProvider :target="portalTarget">
-        <Transition class="transition">
+        <Transition
+          :class="
+            css({
+              transitionProperty:
+                'color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter',
+              transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+              transitionDuration: '150ms',
+            })
+          "
+        >
           <StDialogBackdrop v-if="dialogOpen" />
         </Transition>
-        <Transition class="transition">
+        <Transition
+          :class="
+            css({
+              transitionProperty:
+                'color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter',
+              transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+              transitionDuration: '150ms',
+            })
+          "
+        >
           <StDialogPositioner v-if="dialogOpen">
             <StDialogContentWrapper
               ref="portalTarget"
@@ -22,14 +40,14 @@
             >
               <StDialogContent>
                 <NvCard>
-                  <NvStack spacing="5">
-                    <NvGroup justify="between">
+                  <NvStack :spacing="5">
+                    <NvGroup justify="apart">
                       <StDialogTitle asChild>
                         <NvText type="title">
                           <slot name="title" />
                         </NvText>
                       </StDialogTitle>
-                      <StDialogCloseTrigger>
+                      <StDialogCloseTrigger as-child>
                         <NvButton
                           icon-name="times"
                           size="xs"
@@ -52,10 +70,26 @@
         </Transition>
       </PortalTargetProvider>
     </Teleport>
-  </StDialogRoot>
+  </Dialog.Root>
 </template>
 <script lang="ts" setup>
-import { computed, defineComponent, provide, ref } from 'vue'
+import { css } from '@/styled-system/css'
+import {
+  Comment,
+  Fragment,
+  Text,
+  computed,
+  defineComponent,
+  h,
+  onUpdated,
+  provide,
+  ref,
+  useId,
+  watchPostEffect,
+  type VNode,
+} from 'vue'
+import { getElement } from '@/utils/vue'
+import { Dialog } from '@ark-ui/vue'
 import { props as propsDefinition } from './dialog.shared'
 import NvCard from '@/components/display/Card/NvCard.vue'
 import NvButton from '@/components/forms/Button/NvButton.vue'
@@ -69,27 +103,122 @@ import {
   StDialogContentWrapper,
   StDialogDescription,
   StDialogPositioner,
-  StDialogRoot,
   StDialogTitle,
   StDialogTrigger,
-} from './dialog.styled'
+} from './dialog.panda'
 import { PORTAL_TARGET } from '@/consts'
+import { onOverlayShieldInteractOutside } from '@/utils/overlay-shield'
 
 const PortalTargetProvider = defineComponent({
   name: 'PortalTargetProvider',
   props: {
     target: {
       type: Object,
-      required: true,
+      required: false,
     },
   },
   setup(props, { slots }) {
-    provide(PORTAL_TARGET, props.target)
+    // Both the Panda adapter and Ark expose a component ref before the native node.
+    // Resolve reactively because the provider is mounted before dialog content.
+    provide(
+      PORTAL_TARGET,
+      computed(() => getElement(props.target?.$el) || getElement(props.target)),
+    )
     return () => slots.default?.()
   },
 })
 
+defineOptions({ inheritAttrs: false })
+
 const portalTarget = ref()
+const triggerId = ref(`nv-dialog-${useId()}-trigger`)
+
+function referenceNodes(nodes: VNode[]): VNode[] {
+  return nodes.flatMap((node) => {
+    if (node.type === Fragment) return referenceNodes(node.children as VNode[])
+    if (
+      node.type === Comment ||
+      (node.type === Text && !String(node.children).trim())
+    )
+      return []
+    return [node]
+  })
+}
+
+const ReferenceTrigger = defineComponent({
+  setup(_, { slots }) {
+    const trigger = ref()
+    const needsButtonSemantics = ref(false)
+    const disabled = ref(false)
+    const syncTrigger = () => {
+      const root = getElement(trigger.value?.$el) || getElement(trigger.value)
+      const element =
+        root?.querySelector<HTMLElement>(
+          '[data-scope="dialog"][data-part="trigger"]',
+        ) || root
+      if (element?.id) triggerId.value = element.id
+      needsButtonSemantics.value =
+        !!element &&
+        !element.matches('button, input, select, textarea, a[href], summary')
+      disabled.value =
+        !!element &&
+        (element.hasAttribute('disabled') ||
+          element.getAttribute('aria-disabled') === 'true')
+    }
+    watchPostEffect(syncTrigger)
+    onUpdated(syncTrigger)
+    const onKeydown = (event: KeyboardEvent) => {
+      if (
+        !needsButtonSemantics.value ||
+        disabled.value ||
+        event.defaultPrevented
+      )
+        return
+      // Non-native references translate button activation into Ark's click path.
+      if (event.key === ' ' || event.key === 'Enter') {
+        event.preventDefault()
+        if (event.key === 'Enter' && !event.repeat)
+          (event.currentTarget as HTMLElement).click()
+      }
+    }
+    const onKeyup = (event: KeyboardEvent) => {
+      if (
+        needsButtonSemantics.value &&
+        !disabled.value &&
+        !event.defaultPrevented &&
+        event.key === ' '
+      ) {
+        event.preventDefault()
+        ;(event.currentTarget as HTMLElement).click()
+      }
+    }
+    return () => {
+      const nodes = referenceNodes(slots.default?.() || [])
+      const asChild = nodes.length === 1 && nodes[0].type !== Text
+      return h(
+        StDialogTrigger,
+        {
+          ref: trigger,
+          id: triggerId.value,
+          asChild,
+          key: String(asChild),
+          role: needsButtonSemantics.value ? 'button' : undefined,
+          tabindex: needsButtonSemantics.value
+            ? disabled.value
+              ? -1
+              : 0
+            : undefined,
+          onKeydown,
+          onKeyup,
+          onClickCapture: (event: MouseEvent) => {
+            if (disabled.value) event.preventDefault()
+          },
+        },
+        { default: () => nodes },
+      )
+    }
+  },
+})
 
 const props = defineProps({
   ...propsDefinition,

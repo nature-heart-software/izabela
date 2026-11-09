@@ -8,16 +8,23 @@
         :style="{
           zIndex: 999999999,
         }"
-        class="fixed inset-0 pointer-events-auto cursor-none"
+        :class="
+          css({
+            position: 'fixed',
+            inset: '0',
+            pointerEvents: 'auto',
+            cursor: 'none',
+          })
+        "
         @click="displayOffscreenFocusFix = false"
       />
       <NvBackground />
-      <div class="h-0">
+      <div :class="css({ height: '0' })">
         <div id="router-overlay" ref="routerOverlay"></div>
         <NvMessenger
           :min-width="768"
           :transform="messengerStore.position.transform"
-          class="w-full h-full"
+          :class="css({ width: '100%', height: '100%' })"
         />
       </div>
       <NvDebug v-if="!isGameOverlay && settingsStore.debugMode" />
@@ -38,7 +45,8 @@ body {
 }
 </style>
 <script lang="ts" setup>
-import { ThemeProvider } from 'vue3-styled-components'
+import { css } from '@/styled-system/css'
+import { ThemeProvider } from '@packages/ui'
 import NvMessenger from '@/teams/messenger/components/NvMessenger.vue'
 import { tokens } from '@packages/ui'
 import NvBackground from '@/teams/messenger/components/NvBackground.vue'
@@ -57,7 +65,7 @@ import pkg from '@root/package.json'
 import { useGameOverlayStore } from '@/features/game-overlay/store'
 import { onIPCApplyProfile } from '@/electron/events/renderer.ts'
 import { useProfilesStore } from '@/features/profiles/store.ts'
-import { themes, GlobalStyles, PORTAL_TARGET } from '@packages/ui'
+import { resolveTheme, GlobalStyles, PORTAL_TARGET } from '@packages/ui'
 
 const offscreenFocusFix = ref()
 provide('offscreen-focus-fix', offscreenFocusFix)
@@ -70,7 +78,7 @@ const displayOffscreenFocusFix = ref(isGameOverlay)
 
 const theme = computed(() => ({
   ...tokens,
-  ...themes.get(settingsStore.theme),
+  ...resolveTheme(settingsStore.theme),
 }))
 
 const globalStyles = ref()

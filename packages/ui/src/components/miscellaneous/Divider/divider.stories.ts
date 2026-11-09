@@ -1,3 +1,4 @@
+import { css } from '@/styled-system/css'
 /* eslint-disable import/no-extraneous-dependencies */
 import {
   Direction,
@@ -35,5 +36,5 @@ Default.args = {}
 export const Vertical = Template.bind({})
 Vertical.args = {
   direction: 'vertical',
-  class: 'h-64',
+  class: css({ height: '16rem' }),
 }

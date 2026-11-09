@@ -2,32 +2,58 @@
   <NvCard>
     <NvStack v-loading="downloading">
       <NvGroup align="start" justify="between" noWrap>
-        <NvGroup align="start" class="!flex-1 min-w-0" noWrap>
+        <NvGroup
+          align="start"
+          :class="css({ flex: '1 1 0% !important', minWidth: '0' })"
+          noWrap
+        >
           <NvButton
             :loading="isLoading"
-            class="shrink-0"
+            :class="css({ flexShrink: 0 })"
             icon-name="play"
             size="sm"
             @click="() => play()"
           />
-          <NvStack class="!flex-1 min-h-0">
+          <NvStack :class="css({ flex: '1 1 0% !important', minHeight: '0' })">
             <NvStack>
-              <NvText class="select-text px-3 -mx-3"
+              <NvText
+                :class="
+                  css({
+                    userSelect: 'text',
+                    paddingInline: '3',
+                    marginInline: 'calc(-1 * {spacing.3})',
+                  })
+                "
                 >{{ message.originalMessage || id }}
               </NvText>
               <NvGroup v-if="message.translatedMessage" align="start" noWrap>
                 <NvIcon name="english-to-chinese" size="3" />
-                <NvText class="select-text px-3 -mx-3"
+                <NvText
+                  :class="
+                    css({
+                      userSelect: 'text',
+                      paddingInline: '3',
+                      marginInline: 'calc(-1 * {spacing.3})',
+                    })
+                  "
                   >{{ message.translatedMessage || id }}
                 </NvText>
               </NvGroup>
             </NvStack>
             <NvText type="caption">
-              <NvGroup class="w-full" justify="between" noWrap>
-                <span class="truncate">
+              <NvGroup :class="css({ width: '100%' })" justify="between" noWrap>
+                <span
+                  :class="
+                    css({
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    })
+                  "
+                >
                   {{ engine.name }} - {{ engine.getVoiceName(message.voice) }}
                 </span>
-                <span class="whitespace-nowrap">
+                <span :class="css({ whiteSpace: 'nowrap' })">
                   <UseTimeAgo v-slot="{ timeAgo }" :time="message.createdAt">
                     {{ timeAgo }}
                   </UseTimeAgo>
@@ -37,16 +63,27 @@
           </NvStack>
         </NvGroup>
         <NvContextMenu :options="contextMenuOptions">
-          <NvButton class="shrink-0" icon-name="ellipsis-v" size="sm" />
+          <NvButton
+            :class="css({ flexShrink: 0 })"
+            icon-name="ellipsis-v"
+            size="sm"
+          />
         </NvContextMenu>
       </NvGroup>
-      <NvBarWrapper v-if="isPlaying" class="h-2 relative">
-        <NvBar :style="{ width: `${progress * 100}%` }" class="h-full"></NvBar>
+      <NvBarWrapper
+        v-if="isPlaying"
+        :class="css({ height: '2', position: 'relative' })"
+      >
+        <NvBar
+          :style="{ width: `${progress * 100}%` }"
+          :class="css({ height: '100%' })"
+        ></NvBar>
       </NvBarWrapper>
     </NvStack>
   </NvCard>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import {
   NvButton,
   NvCard,
@@ -119,9 +156,11 @@ const downloadMessageLocally = async () => {
         reader.onload = () => {
           ElectronFilesystem.downloadMessagePrompt(
             completeMessage,
-            `${formatedCreatedAt.value} - ${engine.value?.name} - ${engine.value?.getVoiceName(
-              message.value?.voice,
-            )} - ${message.value?.message}`.replace(/([^a-z0-9\s-]+)/gi, '_'),
+            `${formatedCreatedAt.value} - ${
+              engine.value?.name
+            } - ${engine.value?.getVoiceName(message.value?.voice)} - ${
+              message.value?.message
+            }`.replace(/([^a-z0-9\s-]+)/gi, '_'),
             reader.result as string,
           ).finally(() => {
             downloading.value = false

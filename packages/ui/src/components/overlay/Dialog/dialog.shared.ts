@@ -1,6 +1,5 @@
-import { ExtractPropTypes, PropType } from 'vue'
-import { DialogRootProps } from '@ark-ui/vue'
-import { ComputePositionConfig } from '@floating-ui/vue'
+import { ExtractPropTypes } from 'vue'
+import type { DialogRootProps } from '@ark-ui/vue'
 
 export const props = {
   portalTarget: {

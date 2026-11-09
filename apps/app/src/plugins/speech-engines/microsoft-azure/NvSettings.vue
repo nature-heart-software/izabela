@@ -21,7 +21,7 @@
           </NvStack>
           <NvSwitch
             :modelValue="getProperty('streamAudio')"
-            class="shrink-0"
+            :class="css({ flexShrink: 0 })"
             @update:modelValue="(value) => setProperty('streamAudio', value)"
           />
         </NvGroup>
@@ -44,7 +44,7 @@
           </NvStack>
           <NvSwitch
             :modelValue="getProperty('includeTimestamps')"
-            class="shrink-0"
+            :class="css({ flexShrink: 0 })"
             @update:modelValue="
               (value) => setProperty('includeTimestamps', value)
             "
@@ -97,6 +97,7 @@
   </template>
 </template>
 <script lang="ts" setup>
+import { css } from '@/styled-system/css'
 import {
   NvAccessBlocker,
   NvDivider,
