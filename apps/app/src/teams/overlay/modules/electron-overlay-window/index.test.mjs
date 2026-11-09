@@ -16,7 +16,8 @@ function fixture({ displays = [{ id: 1, bounds: {} }] } = {}) {
     blocks = [],
     commands = []
   let released = true,
-    nextTimer = 0
+    nextTimer = 0,
+    now = 0
   const settings = {
     enableOverlayWindow: true,
     keybindings: { toggleOverlayWindow: [] },
@@ -70,8 +71,8 @@ function fixture({ displays = [{ id: 1, bounds: {} }] } = {}) {
       '@/features/display/utils': displayUtils,
     },
     {
-      setTimeout: (fn) => {
-        timers.set(++nextTimer, fn)
+      setTimeout: (fn, delay) => {
+        timers.set(++nextTimer, { fn, at: now + delay })
         return nextTimer
       },
       clearTimeout: (id) => timers.delete(id),
@@ -121,10 +122,19 @@ function fixture({ displays = [{ id: 1, bounds: {} }] } = {}) {
     hold() {
       released = false
     },
+    pendingCallbacks: () => [...timers.values()].map((timer) => timer.fn),
+    tick(ms) {
+      now += ms
+      const work = [...timers].filter(([, timer]) => timer.at <= now)
+      work.forEach(([id, timer]) => {
+        timers.delete(id)
+        timer.fn()
+      })
+    },
     flush() {
       const work = [...timers.values()]
       timers.clear()
-      work.forEach((fn) => fn())
+      work.forEach((timer) => timer.fn())
     },
   }
 }
@@ -169,10 +179,83 @@ test('closing before the delayed block cancels it and replacement shortcuts work
   f.flush()
   assert.equal(f.blocks.at(-1), 1)
   await f.controller.hide()
+  assert.equal(f.blocks.at(-1), 1)
+  f.flush()
   assert.equal(f.blocks.at(-1), 0)
   assert.equal(f.state.isShown, false)
   replacement.destroy()
   assert.equal(f.keys.size, 0)
+})
+
+test('hiding preserves the input block for the 100 ms submit-key grace period', async () => {
+  const f = fixture(),
+    w = f.makeWindow()
+  f.controller.start(w)
+  await f.controller.show()
+  f.tick(100)
+  assert.equal(f.blocks.at(-1), 1)
+
+  await f.controller.hide()
+  assert.equal(w.visible, false)
+  assert.equal(f.state.isShown, false)
+  assert.equal(f.blocks.at(-1), 1)
+  f.tick(99)
+  assert.equal(f.blocks.at(-1), 1)
+  f.tick(1)
+  assert.equal(f.blocks.at(-1), 0)
+  w.destroy()
+})
+
+test('reopening cancels the old release and rejects a late callback after reblocking', async () => {
+  const f = fixture(),
+    w = f.makeWindow()
+  f.controller.start(w)
+  await f.controller.show()
+  f.tick(100)
+  await f.controller.hide()
+  const [lateRelease] = f.pendingCallbacks()
+  assert.equal(typeof lateRelease, 'function')
+
+  f.tick(50)
+  await f.controller.show()
+  const blocksAfterReopen = f.blocks.length
+  f.tick(50)
+  assert.equal(f.blocks.length, blocksAfterReopen)
+  f.tick(50)
+  assert.equal(f.blocks.at(-1), 1)
+  lateRelease()
+  assert.equal(f.blocks.at(-1), 1)
+  w.destroy()
+})
+
+test('closing during the grace period releases input immediately and cancels the timer', async () => {
+  const f = fixture(),
+    w = f.makeWindow()
+  f.controller.start(w)
+  await f.controller.show()
+  f.tick(100)
+  await f.controller.hide()
+  assert.equal(f.blocks.at(-1), 1)
+
+  w.destroy()
+  assert.equal(f.blocks.at(-1), 0)
+  assert.equal(f.keys.size, 0)
+  const blocksAfterClose = f.blocks.length
+  f.tick(100)
+  assert.equal(f.blocks.length, blocksAfterClose)
+})
+
+test('hiding before the delayed block cannot leave a hidden overlay blocking input', async () => {
+  const f = fixture(),
+    w = f.makeWindow()
+  f.controller.start(w)
+  await f.controller.show()
+  await f.controller.hide()
+  f.tick(100)
+  assert.equal(w.visible, false)
+  assert.equal(f.blocks.includes(1), false)
+  assert.equal(f.blocks.at(-1), 0)
+  w.destroy()
 })
 
 test('recreating the overlay restores saved monitor bounds after display IDs change', async () => {
