@@ -59,7 +59,7 @@ jobs:
           name: package-tests-${{ matrix.os }}
           path: coverage/package-results/*.json
           if-no-files-found: warn
-          retention-days: 14
+          retention-days: 1
       - name: Report UI declaration diagnostics
         if: failure()
         run: node tools/report-ui-type-diagnostics.mjs
@@ -72,4 +72,4 @@ jobs:
             packages/ui/dist/**/*.d.ts
             coverage/ui-types/vue-global-types.d.ts
           if-no-files-found: warn
-          retention-days: 14
+          retention-days: 1
