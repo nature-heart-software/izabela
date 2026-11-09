@@ -263,8 +263,6 @@ for (const [saved, expectedId] of [
   [undefined, 'izabela-light'],
   ['light', 'izabela-light'],
   ['dark', 'izabela-dark'],
-  ['kumo-ink-light', 'kumo-light'],
-  ['kumo-ink-dark', 'kumo-dark'],
   ['removed-theme', generated.defaultThemeId],
   ...generated.themes.map(({ id }) => [id, id]),
 ]) {

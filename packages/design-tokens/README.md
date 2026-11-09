@@ -53,7 +53,7 @@ The arrays above illustrate only the additional configuration field; a real expo
 
 ## Runtime and compatibility
 
-`themeOptions`, `themes`, and `resolveTheme` are derived from the generated inventory. Existing persisted `light`/`dark` preferences resolve to the Izabela modes, and `kumo-ink-light`/`kumo-ink-dark` resolve to `kumo-light`/`kumo-dark`; unknown selections fall back to the authored default semantic mode. Themes switch reactively without requesting an application restart. A `ThemeProvider` owns a scoped CSS-variable boundary, including semantic aliases, so nested providers and portal descendants use their selected theme rather than a root-cached color.
+`themeOptions`, `themes`, and `resolveTheme` are derived from the generated inventory. Existing persisted `light`/`dark` preferences resolve to the Izabela modes; unknown selections fall back to the authored default semantic mode. Themes switch reactively without requesting an application restart. A `ThemeProvider` owns a scoped CSS-variable boundary, including semantic aliases, so nested providers and portal descendants use their selected theme rather than a root-cached color.
 
 Colors with alpha retain the authored alpha value. Semantic shadow-color roles are also exposed in Panda's `shadows` category under the same path, combined with the authored `shadow/offsetY`, `shadow/blur`, and `shadow/spread` geometry.
 
