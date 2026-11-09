@@ -6,7 +6,8 @@ const fs = require('node:fs')
 const path = require('node:path')
 const Module = require('node:module')
 const { createRequire } = Module
-const { spawn, execFileSync } = require('node:child_process')
+const childProcess = require('node:child_process')
+const { spawn, execFileSync } = childProcess
 const { app, BrowserWindow, nativeImage, screen, dialog } = require('electron')
 const config = JSON.parse(fs.readFileSync(process.argv.at(-1), 'utf8'))
 process.argv = [process.argv[0], __filename]
@@ -14,9 +15,31 @@ const requireApp = createRequire(path.join(config.appRoot, 'package.json'))
 const sdk = requireApp('electron-game-overlay')
 // Security configuration is always a controlled boundary in native E2E.
 // The real button/IPC/main warning path runs, but no exclusion can be applied.
-requireApp('@vscode/sudo-prompt').exec = () => {
-  evidence.elevationRequests++
-  throw new Error('Elevation and Defender changes are forbidden in E2E')
+// Production bundles sudo-prompt into its main code rather than shipping a
+// standalone module. Guard the OS shell boundary in both builds; loading a mock
+// from the workspace would not intercept the bundled production implementation.
+for (const method of [
+  'exec',
+  'execSync',
+  'execFile',
+  'execFileSync',
+  'spawn',
+  'spawnSync',
+]) {
+  const original = childProcess[method]
+  childProcess[method] = function (command, ...args) {
+    if (
+      /(?:powershell|pwsh|cscript|wscript|runas)(?:\.exe)?\b/i.test(
+        String(command),
+      )
+    ) {
+      evidence.elevationRequests++
+      throw new Error(
+        'Elevation and security shell commands are forbidden in E2E',
+      )
+    }
+    return original.call(this, command, ...args)
+  }
 }
 dialog.showMessageBox = async () => {
   throw new Error(
@@ -32,11 +55,14 @@ const evidence = {
   sdk: requireApp('electron-game-overlay/package.json').version,
   scaleFactor: config.scaleFactor,
   targetMode: config.targetMode,
+  recovery: !!config.recovery,
   startupBarrier: config.targetMode !== 'fast-folder',
   inputSource: 'Windows SendInput virtual-key down/up pairs',
   pointerClicks: 0,
   realAppBundle: true,
   realRenderer: true,
+  appIsPackaged: app.isPackaged,
+  executable: process.execPath,
   nativeInjectionConfirmed: false,
   checks: [],
   diagnostics: [],
@@ -47,13 +73,15 @@ const evidence = {
 }
 // Override only the app bundle's public SDK imports. Production omits addonDirectory;
 // the E2E setup and launcher both use this owned registry instead of the account's.
-const preloadAddonDirectory = path.join(
-  config.directory,
-  'isolated-addon-registry',
-  // The nightly uses shorter shared-directory filenames. Keep the long-path
-  // regression deliberate instead of depending on its previous cache layout.
-  'long-path-regression-' + 'x'.repeat(64),
-)
+const preloadAddonDirectory =
+  config.addonDirectory ||
+  path.join(
+    config.directory,
+    'isolated-addon-registry',
+    // The nightly uses shorter shared-directory filenames. Keep the long-path
+    // regression deliberate instead of depending on its previous cache layout.
+    'long-path-regression-' + 'x'.repeat(64),
+  )
 const preload = requireApp('electron-game-overlay/preload')
 const loadModule = Module._load
 const applicationBundle = path.join(config.appRoot, 'dist-electron') + path.sep
@@ -70,6 +98,10 @@ Module._load = function (request, parent, isMain) {
             options.addonPreload.applicationId
           return sdk.createReShadeLaunchConfig({
             ...options,
+            // Test profiles isolate application state, while the SDK's sealed
+            // payload store is reused across sequential graphics cells/builds.
+            runsRootDirectory:
+              config.runtimeRunsRoot || options.runsRootDirectory,
             addonPreload: {
               ...options.addonPreload,
               addonDirectory: preloadAddonDirectory,
@@ -92,6 +124,7 @@ Module._load = function (request, parent, isMain) {
             applicationId: result.applicationId,
             registrationId: result.registrationId,
             isolated: true,
+            directory: preloadAddonDirectory,
           }
           return result
         },
@@ -106,6 +139,17 @@ Module._load = function (request, parent, isMain) {
   return loadModule.call(this, request, parent, isMain)
 }
 const failures = []
+const databaseRepository = requireApp('./package.json')
+  .repository.split('/')
+  .slice(-2)
+  .join('/')
+const databaseUrls = new Map(
+  ['allowlist', 'denylist'].map((kind) => [
+    `https://raw.githubusercontent.com/${databaseRepository}/refs/heads/dev/databases/game-overlay-${kind}.json`,
+    kind,
+  ]),
+)
+const controlledSessions = new WeakSet()
 let target,
   managedController,
   overlay,
@@ -117,6 +161,9 @@ let target,
 let targetConnected = false
 let fatalWatcherError
 let targetOperationError
+let failureOwner
+let failurePrefix
+let refusal
 const progress = setInterval(() => {
   fs.writeFileSync(
     path.join(config.directory, 'progress.json'),
@@ -229,6 +276,7 @@ function capture(name) {
       })
       .toPNG(),
   )
+  fs.unlinkSync(filename) // PNG retains the same capture; avoid raw bitmap copies.
   return image
 }
 async function verifyVisible(name, before) {
@@ -336,6 +384,32 @@ process.on('unhandledRejection', (error) =>
   failures.push(String(error?.stack || error)),
 )
 app.on('browser-window-created', (_event, window) => {
+  const browserSession = window.webContents.session
+  if (!controlledSessions.has(browserSession)) {
+    controlledSessions.add(browserSession)
+    browserSession.protocol.handle('https', (request) => {
+      const kind = databaseUrls.get(request.url)
+      if (!kind)
+        return browserSession.fetch(request, {
+          bypassCustomProtocolHandlers: true,
+        })
+      evidence.controlledDatabaseRequests ??= []
+      evidence.controlledDatabaseRequests.push(kind)
+      // Keep real fetch/store/IPC/policy revision handling, with owned test data.
+      // Published database rules must never authorize unrelated workstation apps.
+      return new Response(
+        JSON.stringify(
+          kind === 'allowlist' ? [config.target.replaceAll('\\', '/')] : [],
+        ),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
+        },
+      )
+    })
+  }
   window.webContents.on('render-process-gone', (_e, details) =>
     failures.push(details.reason),
   )
@@ -391,6 +465,11 @@ sdk.OverlayTargetWatcher.prototype.onEvent = function (handler) {
       pid: event.target?.pid,
       mode: event.target?.mode,
       creationTime100ns: event.identity?.creationTime100ns,
+      targetCreationTime100ns: event.target?.identity?.creationTime100ns,
+      failureCode: event.error?.diagnostic?.code,
+      failureStage: event.error?.diagnostic?.stage,
+      retrySafety: event.error?.diagnostic?.retrySafety,
+      scoped: !!(event.target || event.selector),
       error:
         event.type === 'error'
           ? String(event.error?.stack || event.error)
@@ -453,6 +532,14 @@ sdk.ElectronGameOverlay.prototype.createSession = function (...args) {
   evidence.sessionObserved = true
   const result = createSession.apply(this, args)
   session = result
+  for (const method of ['intercept', 'release']) {
+    const original = result.input[method].bind(result.input)
+    result.input[method] = (...parameters) => {
+      evidence.inputRequests ??= []
+      evidence.inputRequests.push({ method, at: Date.now() })
+      return original(...parameters)
+    }
+  }
   const whenReady = result.whenReady.bind(result)
   result.whenReady = () => {
     const ready = whenReady()
@@ -501,7 +588,7 @@ sdk.ElectronGameOverlay.prototype.createSession = function (...args) {
 }
 async function openAndType(key, expected, label) {
   const started = Date.now()
-  drive('shortcut', 13) // Actual configured Ctrl+Enter global shortcut.
+  evidence.shortcutState = drive('shortcut', 13) // Actual configured Ctrl+Enter global shortcut.
   await until(
     () => wrapper.visible && intercepting,
     `${label}: overlay input interception`,
@@ -960,7 +1047,227 @@ async function closeTarget() {
   drive('close')
   await until(() => owned.exitCode !== null, 'owned graphics host exited', 5000)
 }
+async function closeObservedTarget() {
+  const pid = target.pid
+  await closeTarget()
+  await until(
+    () =>
+      evidence.managedEvents.some(
+        (event) =>
+          event.type === 'exited' &&
+          event.pid === pid &&
+          event.creationTime100ns,
+      ),
+    'SDK confirms the exact graphics process exited',
+  )
+}
+async function stopFailureTarget() {
+  if (!failureOwner) return
+  const owned = failureOwner
+  fs.writeFileSync(failurePrefix + '.stop', '')
+  await until(
+    () => owned.exitCode !== null,
+    'retained-handle fixture owner exited',
+    10000,
+  )
+  assert.equal(owned.exitCode, 0)
+  assert.ok(fs.existsSync(failurePrefix + '.exited'))
+  failureOwner = undefined
+}
+async function failOwnedTarget(mode) {
+  const prefix = (failurePrefix = path.join(
+    config.directory,
+    'failure-' + mode,
+  ))
+  const begin = evidence.managedEvents.length
+  failureOwner = spawn(
+    config.recoveryOwner,
+    ['--own', config.failureTarget, prefix, mode],
+    { windowsHide: true, stdio: ['ignore', 'ignore', 'pipe'] },
+  )
+  failureOwner.stderr.pipe(fs.createWriteStream(prefix + '.stderr.log'))
+  await until(
+    () => fs.existsSync(prefix + '.json'),
+    'owned failure target creation',
+  )
+  const identity = JSON.parse(fs.readFileSync(prefix + '.json', 'utf8'))
+  const expectedCode =
+    mode === 'suspended'
+      ? 'target-module-inspection-failed'
+      : 'runtime-initialization-timeout'
+  const failed = await until(
+    () =>
+      evidence.managedEvents
+        .slice(begin)
+        .find((event) => event.type === 'error' && event.pid === identity.pid),
+    'owned target produces the real expected SDK failure',
+    35000,
+  )
+  assert.equal(failed.scoped, true, 'Failure remains scoped to B')
+  assert.equal(failed.failureCode, expectedCode)
+  assert.equal(failed.targetCreationTime100ns, identity.creationTime100ns)
+  assert.equal(
+    failed.retrySafety,
+    mode === 'suspended' ? 'definite-safe' : 'indeterminate',
+  )
+  await stopFailureTarget()
+  await until(
+    () =>
+      evidence.managedEvents
+        .slice(begin)
+        .some(
+          (event) =>
+            event.type === 'exited' &&
+            event.pid === identity.pid &&
+            event.creationTime100ns === identity.creationTime100ns,
+        ),
+    'SDK retires B only after authoritative process-instance exit',
+  )
+  evidence.recoveryFailures ??= []
+  evidence.recoveryFailures.push({
+    mode,
+    ...identity,
+    code: failed.failureCode,
+  })
+}
+async function startAccessRefusal() {
+  const child = spawn(config.refusalOwner, [], {
+    cwd: path.dirname(config.refusalOwner),
+    windowsHide: true,
+    stdio: ['pipe', 'pipe', 'pipe'],
+  })
+  const owned = (refusal = { child, records: [], buffer: '' })
+  child.on('error', (error) => {
+    owned.error = error
+  })
+  child.stdout.on('data', (bytes) => {
+    owned.buffer += bytes.toString()
+    let newline
+    while ((newline = owned.buffer.indexOf('\n')) >= 0) {
+      const line = owned.buffer.slice(0, newline).trim()
+      owned.buffer = owned.buffer.slice(newline + 1)
+      if (line) owned.records.push(JSON.parse(line))
+    }
+  })
+  child.stderr.pipe(
+    fs.createWriteStream(
+      path.join(config.directory, 'access-refusal.stderr.log'),
+    ),
+  )
+  const ready = await until(() => {
+    if (owned.error) throw owned.error
+    return owned.records.find((record) => record.ready)
+  }, 'SDK-owned access refusal fixture ready')
+  assert.equal(ready.kind, 'EGO_OWNED_ACCESS_REFUSAL_V1')
+  assert.equal(ready.readOnlyIdentityVerified, true)
+  assert.equal(ready.fullAccessWindowsError, 5)
+  assert.equal(
+    ready.executablePath.toLowerCase(),
+    config.refusedTarget.toLowerCase(),
+  )
+  owned.identity = ready
+  const failed = await until(
+    () =>
+      evidence.managedEvents.find(
+        (event) => event.type === 'error' && event.pid === ready.pid,
+      ),
+    'refused full-access open remains target-scoped',
+  )
+  assert.equal(failed.targetCreationTime100ns, ready.creationTime100ns)
+  assert.equal(failed.scoped, true)
+  assert.equal(failed.failureCode, 'injector-failed')
+  assert.equal(
+    child.exitCode,
+    null,
+    'Refused B remains alive while fresh A starts',
+  )
+  evidence.recoveryFailures ??= []
+  evidence.recoveryFailures.push({
+    mode: 'access-refusal',
+    pid: ready.pid,
+    creationTime100ns: ready.creationTime100ns,
+    code: failed.failureCode,
+  })
+}
+async function stopAccessRefusal() {
+  if (!refusal) return
+  const owned = refusal
+  owned.child.stdin.end('exit\n')
+  await until(
+    () =>
+      owned.child.exitCode !== null &&
+      owned.records.some((record) => record.exited),
+    'SDK refusal owner authoritative cleanup',
+  )
+  assert.equal(owned.child.exitCode, 0)
+  const exited = owned.records.find((record) => record.exited)
+  assert.ok(exited?.retainedHandle)
+  assert.equal(exited.pid, owned.identity.pid)
+  assert.equal(exited.creationTime100ns, owned.identity.creationTime100ns)
+  await until(
+    () =>
+      evidence.managedEvents.some(
+        (event) =>
+          event.type === 'exited' &&
+          event.pid === exited.pid &&
+          event.creationTime100ns === exited.creationTime100ns,
+      ),
+    'SDK confirms refused target exit',
+  )
+  assert.equal(
+    evidence.managedEvents.filter(
+      (event) => event.type === 'attaching' && event.pid === exited.pid,
+    ).length,
+    1,
+    'No reinjection or repeated attempt into refused live B',
+  )
+  evidence.accessRefusal = { identity: owned.identity, exit: exited }
+  refusal = undefined
+}
+async function verifyMixedRecovery() {
+  for (const mode of ['access-refusal', 'suspended', 'timeout']) {
+    await closeObservedTarget()
+    if (mode === 'access-refusal') await startAccessRefusal()
+    else await failOwnedTarget(mode)
+    await startTarget()
+    const before = capture('recovery-' + mode + '-before')
+    const previous = (await read()).value
+    await openAndType('d', previous + 'd', 'fresh-A-after-' + mode)
+    await until(() => rendering, 'recovered target renders the overlay')
+    await verifyVisible('recovery-' + mode, before)
+    if (mode === 'access-refusal') {
+      await stopAccessRefusal()
+      assert.ok(wrapper.visible && intercepting, 'B exit preserves A input')
+      drive('key', 69)
+      await until(
+        async () => (await read()).value === previous + 'de',
+        'A keeps typing after refused B exits',
+      )
+      drive('key', 8)
+    }
+    drive('key', 8)
+    await until(
+      async () => (await read()).value === previous,
+      'clear recovery key',
+    )
+    drive('key', 27)
+    await until(
+      () => !wrapper.visible && !intercepting,
+      'recovered target releases input',
+    )
+    evidence.checks.push(
+      `fresh A after B ${mode} failure renders and types without a click`,
+    )
+  }
+}
 async function run() {
+  if (config.appExecutable) {
+    assert.equal(app.isPackaged, true, 'Real executable runs in packaged mode')
+    assert.equal(
+      process.execPath.toLowerCase(),
+      config.appExecutable.toLowerCase(),
+    )
+  }
   require(path.join(config.appRoot, 'dist-electron/background.js'))
   await app.whenReady()
   await until(
@@ -982,6 +1289,10 @@ async function run() {
     'real initial database policy snapshots received',
   )
   await startTarget()
+  assert.deepEqual([...new Set(evidence.controlledDatabaseRequests)].sort(), [
+    'allowlist',
+    'denylist',
+  ])
   drive('move', '20,20')
   await wait(100)
   const gameCursor = drive('state').cursor
@@ -996,6 +1307,7 @@ async function run() {
       'Escape hides overlay and releases interception',
     )
     assert.equal((await read()).value, 'a')
+    if (config.recovery) await verifyMixedRecovery()
     if (config.targetMode === 'early') {
       const previousPid = target.pid
       const selection = evidence.managedEvents.findIndex(
@@ -1115,6 +1427,20 @@ async function run() {
   }
   const state = await read()
   assert.ok(
+    !evidence.managedEvents.some((event) => event.type === 'discovery-blocked'),
+    'Future discovery must remain usable throughout the test',
+  )
+  assert.ok(
+    !evidence.managedEvents.some(
+      (event) =>
+        event.type === 'error' &&
+        !evidence.recoveryFailures?.some(
+          (failure) => failure.pid === event.pid,
+        ),
+    ),
+    'Only the explicitly owned failure fixtures may report target errors',
+  )
+  assert.ok(
     evidence.preloadRegistration?.isolated,
     'Preload setup uses the test registry',
   )
@@ -1145,6 +1471,26 @@ async function finish(code) {
   finishing = true
   clearTimeout(deadline)
   clearInterval(progress)
+  if (refusal) {
+    try {
+      refusal.child.stdin.end('exit\n')
+      await Promise.race([
+        new Promise((resolve) => refusal.child.once('exit', resolve)),
+        wait(5000),
+      ])
+      if (refusal.child.exitCode === null) refusal.child.kill()
+    } catch {}
+  }
+  if (failureOwner) {
+    try {
+      fs.writeFileSync(failurePrefix + '.stop', '')
+      await Promise.race([
+        new Promise((resolve) => failureOwner.once('exit', resolve)),
+        wait(5000),
+      ])
+      if (failureOwner.exitCode === null) failureOwner.kill()
+    } catch {}
+  }
   evidence.windows = BrowserWindow.getAllWindows().map((window) => ({
     id: window.id,
     url: window.webContents.getURL(),
@@ -1159,6 +1505,53 @@ async function finish(code) {
     ])
     if (target.exitCode === null) target.kill()
   }
+  if (target) {
+    const identity = evidence.managedEvents.findLast(
+      (event) => event.type === 'attaching' && event.pid === target.pid,
+    )?.targetCreationTime100ns
+    const observed = () =>
+      evidence.managedEvents.some(
+        (event) =>
+          event.type === 'exited' &&
+          event.pid === target.pid &&
+          event.creationTime100ns === identity,
+      )
+    const untilExit = Date.now() + 5000
+    while (identity && !observed() && Date.now() < untilExit) await wait(20)
+    evidence.cleanupTargetExitObserved = !!identity && observed()
+    // Let retirement finish while the app still owns its launcher and guards.
+    // Closing the OS window alone is not the SDK's authoritative exit signal.
+    const inspected = evidence.targetModuleInspections?.findLast(
+      (entry) => entry.pid === target.pid,
+    )
+    if (inspected?.module && evidence.cleanupTargetExitObserved) {
+      const images = [32, 64].map((bits) =>
+        path.join(
+          path.dirname(inspected.module),
+          `electron_game_overlay.addon${bits}`,
+        ),
+      )
+      const untilRetired = Date.now() + 5000
+      while (
+        images.some((file) => fs.existsSync(file)) &&
+        Date.now() < untilRetired
+      )
+        await wait(20)
+      evidence.cleanupPrivateImagesRetired = images.every(
+        (file) => !fs.existsSync(file),
+      )
+    }
+    if (
+      code === 0 &&
+      (!evidence.cleanupTargetExitObserved ||
+        !evidence.cleanupPrivateImagesRetired)
+    ) {
+      code = 1
+      evidence.status = 'failed'
+      evidence.error =
+        'Test cleanup did not observe authoritative target exit and private image retirement'
+    }
+  }
   fs.writeFileSync(
     path.join(config.directory, 'report.json'),
     JSON.stringify(evidence, null, 2) + '\n',
@@ -1170,6 +1563,12 @@ run()
   .then(() => finish(0))
   .catch(async (error) => {
     evidence.error = String(error.stack || error)
+    evidence.finalInputState = {
+      visible: wrapper?.visible,
+      intercepting,
+      rendering,
+      targetConnected,
+    }
     try {
       evidence.dom = await read()
       capture('failure')

@@ -564,6 +564,36 @@ test('scoped attachment errors retain the controller; fatal controller errors te
   f.overlay.quit()
 })
 
+test('another target failure preserves input and permits a fresh target in the same backend', async () => {
+  const f = fixture({ enabled: true })
+  await f.overlay.start()
+  f.window()
+  f.event('connected', 42)
+  f.overlay.startIntercept()
+  const controller = f.controllers[0],
+    session = f.sessions[0]
+  controller.emit({
+    type: 'error',
+    target: { pid: 43 },
+    error: new Error('controlled target refusal'),
+  })
+  assert.equal(f.overlay.isProcessHooked(42), true)
+  assert.equal(f.wrappers[0].visible, true)
+  assert.equal(controller.disposals, 0)
+  assert.equal(session.closed, undefined)
+  f.event('exited', 43)
+  f.event('exited', 42)
+  assert.equal(f.overlay.isProcessHooked(42), false)
+  f.event('connected', 44)
+  f.overlay.startIntercept()
+  assert.equal(f.overlay.isProcessHooked(44), true)
+  assert.equal(f.wrappers[0].visible, true)
+  assert.equal(f.controllers.length, 1)
+  assert.equal(f.sessions.length, 1)
+  assert.equal(controller.disposals, 0)
+  f.overlay.quit()
+})
+
 test('blocked future discovery preserves authorized overlay input and reports no raw errors', async () => {
   const f = fixture({ enabled: true })
   await f.overlay.start()

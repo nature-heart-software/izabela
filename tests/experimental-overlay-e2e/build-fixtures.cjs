@@ -3,6 +3,7 @@ const fs = require('node:fs')
 const path = require('node:path')
 const { createHash } = require('node:crypto')
 const { execFileSync } = require('node:child_process')
+const { createRequire } = require('node:module')
 
 const revision = '1ff4baeb5930bb20d6dff0d8e69ca05c8eb8be98'
 const root = path.resolve(__dirname, '../..')
@@ -108,6 +109,7 @@ function build() {
 function inputSourceHash() {
   return createHash('sha256')
     .update(fs.readFileSync(path.join(__dirname, 'native/input.cpp')))
+    .update(fs.readFileSync(path.join(__dirname, 'native/recovery.cpp')))
     .update(fs.readFileSync(path.join(__dirname, 'native/CMakeLists.txt')))
     .digest('hex')
 }
@@ -138,7 +140,115 @@ function buildInput(manifest) {
   manifest.inputHelperSha256 = createHash('sha256')
     .update(fs.readFileSync(path.join(directory, 'overlay-test-input.exe')))
     .digest('hex')
+  fs.copyFileSync(
+    path.join(helperBuild, 'Release/overlay-test-recovery.exe'),
+    path.join(directory, 'overlay-test-recovery.exe'),
+  )
+  manifest.recoveryHelperSha256 = createHash('sha256')
+    .update(fs.readFileSync(path.join(directory, 'overlay-test-recovery.exe')))
+    .digest('hex')
   manifest.inputSourceSha256 = inputSourceHash()
+  fs.writeFileSync(
+    path.join(directory, 'manifest.json'),
+    JSON.stringify(manifest, null, 2) + '\n',
+  )
+}
+function buildRefusalFixture(manifest) {
+  const requireApp = createRequire(path.join(root, 'apps/app/package.json'))
+  const dependency =
+    requireApp('./package.json').dependencies['electron-game-overlay']
+  assert.ok(dependency.startsWith('file:') && dependency.endsWith('.tgz'))
+  const archive = path.resolve(
+    root,
+    'apps/app',
+    dependency.slice(5).replace(/\.tgz$/, '.source.zip'),
+  )
+  const provenance = JSON.parse(
+    fs.readFileSync(
+      path.join(
+        path.dirname(requireApp.resolve('electron-game-overlay/package.json')),
+        'SDK_PROVENANCE.json',
+      ),
+      'utf8',
+    ),
+  )
+  const hash = (file) =>
+    createHash('sha256').update(fs.readFileSync(file)).digest('hex')
+  assert.equal(
+    hash(archive),
+    provenance.sourceSnapshot.sha256,
+    'SDK fixture source archive provenance',
+  )
+  if (
+    manifest.refusalFixture?.sourceSnapshotSha256 === hash(archive) &&
+    manifest.refusalFixture.files.every(
+      (file) =>
+        fs.existsSync(path.join(directory, file.path)) &&
+        hash(path.join(directory, file.path)) === file.sha256,
+    )
+  )
+    return
+  const upstream = path.join(directory, 'access-refusal-source')
+  fs.mkdirSync(upstream, { recursive: true })
+  const entries = execFileSync('tar', ['-tf', archive], {
+    encoding: 'utf8',
+    windowsHide: true,
+  })
+    .trim()
+    .split(/\r?\n/)
+  for (const name of ['owner.cpp', 'target.cpp']) {
+    const matches = entries.filter(
+      (entry) =>
+        entry ===
+        `libs/electron-game-overlay-runtime/tests/unopened-target-selection/${name}`,
+    )
+    assert.equal(
+      matches.length,
+      1,
+      'Candidate source snapshot contains the owned refusal fixture',
+    )
+    fs.writeFileSync(
+      path.join(upstream, name),
+      execFileSync('tar', ['-xOf', archive, matches[0]], { windowsHide: true }),
+    )
+  }
+  const build = path.join(directory, 'input-build')
+  execute('cmake', [
+    '-S',
+    path.join(__dirname, 'native'),
+    '-B',
+    build,
+    '-G',
+    'Visual Studio 17 2022',
+    '-A',
+    'x64',
+    `-DUPSTREAM_REFUSAL_SOURCE=${upstream}`,
+  ])
+  execute('cmake', [
+    '--build',
+    build,
+    '--config',
+    'Release',
+    '--parallel',
+    '2',
+    '--target',
+    'owned_access_refusal_owner',
+    'owned_access_refused_target',
+  ])
+  manifest.refusalFixture = { sourceSnapshotSha256: hash(archive), files: [] }
+  const binaries = path.join(directory, 'access-refusal')
+  fs.mkdirSync(binaries, { recursive: true })
+  for (const name of [
+    'owned_access_refusal_owner.exe',
+    'owned_access_refused_target.exe',
+  ]) {
+    const target = path.join(binaries, name)
+    fs.copyFileSync(path.join(build, 'Release', name), target)
+    manifest.refusalFixture.files.push({
+      path: path.relative(directory, target).replaceAll('\\', '/'),
+      sha256: hash(target),
+    })
+  }
   fs.writeFileSync(
     path.join(directory, 'manifest.json'),
     JSON.stringify(manifest, null, 2) + '\n',
@@ -148,6 +258,7 @@ if (require.main === module) build()
 module.exports = {
   build,
   buildInput,
+  buildRefusalFixture,
   inputSourceHash,
   cases,
   directory,

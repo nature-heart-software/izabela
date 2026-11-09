@@ -1,8 +1,50 @@
 # Experimental overlay SDK distribution
 
-`vendor/electron-game-overlay-1.0.0-nightly.1.tgz` is the complete, unmodified
-published upstream nightly release. `@packages/electron-game-overlay` remains
-the legacy backend.
+The working tree currently uses the complete, unmodified upstream local test
+candidate `vendor/electron-game-overlay-1.0.1-alpha.2026110902.tgz`.
+`@packages/electron-game-overlay` remains the legacy backend. This candidate is
+not a published release and these integration changes remain local.
+
+- Tarball SHA-256: `7b1802450366171017e26d424b70296817b15ab24c6fad679d75c52da4eb033f`.
+- Source base: `cb5acf47e1793f1b0e5ed5e8ebfa5e7f513afe6c`, branch
+  `codex/attachment-storage-recovery`, with uncommitted upstream changes.
+  The sibling source ZIP, manifest and dirty diff are hash-bound by the packaged
+  `SDK_PROVENANCE.json`; the separate source-provenance JSON is retained too.
+- Native generation: 25, both architectures; add-on build ID
+  `CCE20935ADD44EF6A5A7973014B2E07F`. Packaging verifies all 157 sealed payloads.
+- License: GPL-3.0-only; the complete package, notices and source snapshot remain
+  available. Izabela does not patch SDK files or add injection retries.
+
+The candidate shares verified immutable runtime payloads across attachments,
+retains private configuration/credentials, and safely retires private add-on
+images after proven target exit. It adds failure isolation and process-identity
+recovery fixes and same-handle generation-24 inspection diagnostics. Generation
+25 reports the verified read-only process identity before an injection-access
+open can fail, so the exact refused instance remains reserved while discovery
+continues for other targets. Cancellation retains the selected identity for
+private-image retirement after authoritative exit. A failed
+live attempt with uncertain injection is never blindly retried.
+
+The preceding generation-24 consumer tests exposed discovery stranded after an
+open refusal before V2 selection, and private-image retention after a cancelled
+target's authoritative exit. Both were reproduced and corrected upstream in this
+candidate. The consumer suite covers those cases alongside preflight 299 and
+runtime timeout recovery, immediately typed native input, pixels, cursor shapes,
+scrolling and shutdown retirement. Its retained evidence is indexed in
+`coverage/experimental-overlay/attachment-recovery-validation.json`. Controlled
+acceptance does not establish the cause of every failure on another system.
+
+Current local acceptance passes 94 overlay/package checks, frozen installation,
+workspace and packaged Electron smoke, and 16 native cases covering 24 authenticated
+graphics target lifecycles. This includes the full graphics/architecture/scaling
+matrix, early rearming, no-barrier relaunch, and expanded mixed recovery in both
+workspace and the actual packaged executable. All cases confirm authoritative
+target exit and private-image retirement without accumulating new private images.
+The user authorized scoped injector exclusions on the test machine; no antivirus
+setting is changed by the E2E suite itself. Shared test registry/staging caches
+and lossless PNG-only captures avoid repeated full asset copies.
+
+## Earlier published nightly validation
 
 - Release: [v1.0.0-nightly.1](https://github.com/Wurielle/electron-game-overlay/releases/tag/v1.0.0-nightly.1).
 - Source commit: `cb5acf47e1793f1b0e5ed5e8ebfa5e7f513afe6c`, recorded in the
@@ -15,7 +57,7 @@ the legacy backend.
 - License: GPL-3.0-only. Both architectures, nested dependency notices and
   `SDK_PROVENANCE.json` are retained. No SDK patches or native rebuild are applied.
 
-Nightly consumer validation after merging `dev` passes 92 overlay/package checks,
+The earlier nightly consumer validation after merging `dev` passed 92 overlay/package checks,
 127 app checks, seven backdrop checks, helper type checking, the workspace/app
 builds, frozen installation and the genuine Electron smoke. All 12 native E2E
 cases pass: the full ten-case graphics/scaling/rearming/focus-control matrix and

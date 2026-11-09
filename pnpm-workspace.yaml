@@ -18,8 +18,8 @@ overrides:
   'c12@3.3.4>magicast': '-'
 
 minimumReleaseAgeExclude:
-  # The published nightly release asset is hash-pinned and explicitly selected.
-  - electron-game-overlay@1.0.0-nightly.1
+  # Local upstream candidate: hash/source pinned, unavailable in the registry.
+  - electron-game-overlay@1.0.1-alpha.2026110902
   - gelectron
   - electron@46.0.0-alpha.2
   - '@aws-sdk/client-cognito-identity@3.1157.0'

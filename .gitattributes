@@ -1,2 +1,6 @@
 # Release provenance manifests are hash-pinned; preserve their exact bytes.
 /vendor/electron-game-overlay-*-source-manifest.json -text whitespace=cr-at-eol
+/vendor/electron-game-overlay-*.source-manifest.json -text whitespace=cr-at-eol
+/vendor/electron-game-overlay-*.source-provenance.json -text whitespace=cr-at-eol
+# Preserve hash-pinned upstream patches, including intentional diff context spaces.
+/vendor/electron-game-overlay-*.source-dirty.diff -text -whitespace

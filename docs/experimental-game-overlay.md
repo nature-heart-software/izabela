@@ -109,8 +109,14 @@ prepares the fixed injector paths and returns a one-use confirmation token;
 the renderer supplies no paths. Approval requests an elevated helper; it does not change Izabela's
 administrator-startup setting. No rules are added at startup or after cancellation.
 
-Rules cover `inject.exe` and `inject32.exe` in the bundled SDK runtime and direct
-launch subfolders of Izabela's and the SDK's shared run roots. Shared rules can
+Rules use `inject*.exe` in the bundled SDK runtime and `*\inject*.exe` under
+Izabela's and the SDK's shared run roots. Each run-root basename has a trailing
+wildcard (for example `runs*\*\inject*.exe`) to include adjacent SDK payload-cache
+directories. The filename wildcard covers both
+injector architectures and replacement copies. With pnpm, the SDK package-version
+folder is also wildcarded while the package name and native runtime layout stay
+fixed. Defender folder wildcards span one level; these rules do not use recursive
+globstars or exclude whole directories. Shared rules can
 also match injector copies used by other applications. Paths come from the main
 process and public SDK discovery APIs; the renderer supplies no paths or commands.
 The helper adds missing `ExclusionPath` entries and reads them back before

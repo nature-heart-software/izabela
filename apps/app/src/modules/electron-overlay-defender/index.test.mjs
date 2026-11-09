@@ -24,7 +24,7 @@ function fixture({
   platform = 'win32',
   arch = 'x64',
   failure,
-  stdout = '{"status":"added","count":6}',
+  stdout = '{"status":"added","count":3}',
   deferred = false,
   elevation,
 } = {}) {
@@ -91,13 +91,25 @@ function fixture({
   }
 }
 
-test('plan targets both injector filenames in SDK roots without folder/process exclusions', () => {
+test('plan wildcards injector filenames and launch folders without folder/process exclusions', () => {
   const actual = paths()
-  assert.equal(actual.length, 6)
-  for (const path of actual) assert.match(path, /\\(?:inject|inject32)\.exe$/)
-  assert.equal(actual.filter((p) => p.includes('\\*\\')).length, 4)
-  assert.ok(actual.includes('C:\\SDK\\runtime\\inject.exe'))
-  assert.ok(actual.includes('C:\\User\\Izabela\\runs\\*\\inject32.exe'))
+  assert.equal(actual.length, 3)
+  for (const path of actual) assert.match(path, /\\inject\*\.exe$/)
+  assert.equal(actual.filter((p) => p.includes('\\*\\')).length, 2)
+  assert.ok(actual.includes('C:\\SDK\\runtime\\inject*.exe'))
+  assert.ok(actual.includes('C:\\User\\Izabela\\runs*\\*\\inject*.exe'))
+  assert.ok(
+    actual.includes(
+      'C:\\User\\Temp\\electron-game-overlay\\reshade-runs*\\*\\inject*.exe',
+    ),
+  )
+  assert.deepEqual(actual, [
+    ...plan.injectorExclusionPaths(
+      'C:/SDK/runtime/',
+      'C:/User/Izabela/runs/',
+      'C:/User/Temp/electron-game-overlay/reshade-runs/',
+    ),
+  ])
   assert.equal(
     [
       ...plan.injectorExclusionPaths(
@@ -106,7 +118,42 @@ test('plan targets both injector filenames in SDK roots without folder/process e
         'c:/SAME/runs',
       ),
     ].length,
-    4,
+    2,
+  )
+})
+
+test('SDK source wildcard survives pnpm version changes while retaining the exact package and runtime layout', () => {
+  const source = (version) =>
+    `C:/Izabela/node_modules/.pnpm/electron-game-overlay@${version}/node_modules/electron-game-overlay/dist/runtime/win32-x64/reshade`
+  const first = [
+    ...plan.injectorExclusionPaths(
+      source('file+vendor+rc.12_electron@46'),
+      'C:/Izabela/runs',
+      'C:/Shared/runs',
+    ),
+  ]
+  const upgraded = [
+    ...plan.injectorExclusionPaths(
+      source('file+vendor+nightly.2_electron@46'),
+      'C:/Izabela/runs',
+      'C:/Shared/runs',
+    ),
+  ]
+  assert.deepEqual(first, upgraded)
+  assert.equal(
+    first[0],
+    'C:\\Izabela\\node_modules\\.pnpm\\electron-game-overlay@*\\node_modules\\electron-game-overlay\\dist\\runtime\\win32-x64\\reshade\\inject*.exe',
+  )
+  const installed = [
+    ...plan.injectorExclusionPaths(
+      'C:/Izabela/resources/app.asar.unpacked/node_modules/electron-game-overlay/dist/runtime/win32-x64/reshade',
+      'C:/Izabela/runs',
+      'C:/Shared/runs',
+    ),
+  ]
+  assert.equal(
+    installed[0],
+    'C:\\Izabela\\resources\\app.asar.unpacked\\node_modules\\electron-game-overlay\\dist\\runtime\\win32-x64\\reshade\\inject*.exe',
   )
 })
 

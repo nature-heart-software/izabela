@@ -16,15 +16,27 @@ export function injectorExclusionPaths(
       throw new Error('Unsupported injector directory')
     return normalized
   }
-  const runtime = directory(runtimeDirectory)
+  // pnpm changes this directory when the SDK version or Electron peer changes.
+  // Wildcard only that package's version segment, retaining its native SDK path.
+  const runtime = directory(runtimeDirectory).replace(
+    /(\\node_modules\\\.pnpm\\)electron-game-overlay@[^\\]+(\\node_modules\\electron-game-overlay\\dist\\runtime\\win32-x64\\reshade)\\?$/i,
+    '$1electron-game-overlay@*$2',
+  )
   const runs = [
     directory(applicationRunsDirectory),
     directory(sharedRunsDirectory),
   ]
-  const paths = ['inject.exe', 'inject32.exe'].flatMap((name) => [
-    path.win32.join(runtime, name),
-    ...runs.map((root) => path.win32.join(root, '*', name)),
-  ])
+  // Defender's folder wildcard spans one level, not an arbitrary-depth glob.
+  // Match injector filenames only, including both shipped architectures and
+  // replacement copies in future SDK runs; never exclude the whole run folder.
+  const paths = [
+    path.win32.join(runtime, 'inject*.exe'),
+    // SDK payload caches can be siblings of the run root. Keep that root's
+    // fixed prefix and injector filename while allowing its cache suffix.
+    ...runs.map((root) =>
+      path.win32.join(root.replace(/\\+$/, '') + '*', '*', 'inject*.exe'),
+    ),
+  ]
   return [
     ...new Map(paths.map((value) => [value.toLowerCase(), value])).values(),
   ]

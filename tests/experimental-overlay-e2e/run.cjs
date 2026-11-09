@@ -8,6 +8,7 @@ const {
   directory: fixtures,
   revision,
   buildInput,
+  buildRefusalFixture,
   inputSourceHash,
 } = require('./build-fixtures.cjs')
 const root = path.resolve(__dirname, '../..')
@@ -16,8 +17,10 @@ const argument = (name) =>
     .find((arg) => arg.startsWith(`--${name}=`))
     ?.slice(name.length + 3)
 const appRoot = path.resolve(argument('app-root') || 'apps/app')
+const appExecutable = argument('app-exe') && path.resolve(argument('app-exe'))
 const selected = argument('case') ? [argument('case')] : cases
 const targetMode = argument('target-mode') || 'folder'
+const recovery = process.argv.includes('--recovery')
 const requestedScale =
   argument('scale') === undefined ? undefined : Number(argument('scale'))
 const reportRoot = path.join(
@@ -26,6 +29,55 @@ const reportRoot = path.join(
   new Date().toISOString().replaceAll(':', '-'),
 )
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+const runtimeRunsRoot = path.join(
+  root,
+  'coverage/experimental-overlay/native-runs',
+)
+function runtimeStorage() {
+  const identities = new Set()
+  let files = 0,
+    contentBytes = 0n,
+    allocatedBytes = 0n,
+    privateImages = 0
+  function visit(directory) {
+    if (!fs.existsSync(directory)) return
+    for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+      const filename = path.join(directory, entry.name)
+      assert.equal(
+        entry.isSymbolicLink(),
+        false,
+        'No links to unrelated storage',
+      )
+      if (entry.isDirectory()) {
+        visit(filename)
+        continue
+      }
+      if (!entry.isFile()) continue
+      files++
+      if (
+        /^electron_game_overlay\.addon(?:32|64)$/.test(entry.name) &&
+        directory.startsWith(runtimeRunsRoot + path.sep)
+      )
+        privateImages++
+      const stat = fs.statSync(filename, { bigint: true }),
+        identity = `${stat.dev}:${stat.ino}`
+      if (identities.has(identity)) continue
+      identities.add(identity)
+      contentBytes += stat.size
+      allocatedBytes += stat.blocks * 512n
+    }
+  }
+  visit(runtimeRunsRoot)
+  visit(runtimeRunsRoot + '.payloads-v1')
+  return {
+    files,
+    uniqueFiles: identities.size,
+    contentBytes: String(contentBytes),
+    allocatedBytes: String(allocatedBytes),
+    privateImages,
+    scope: 'unique file identities, excluding filesystem metadata',
+  }
+}
 let child
 function pnpm(args) {
   const options = {
@@ -72,6 +124,7 @@ async function runCase(
   scaleFactor = 1,
   mode = targetMode,
 ) {
+  const storageBefore = runtimeStorage()
   const fixture = manifest.files.find((file) => file.case === name)
   assert.ok(fixture, `Missing compiled fixture: ${name}`)
   const source = path.join(fixtures, fixture.path)
@@ -94,6 +147,32 @@ async function runCase(
   fs.mkdirSync(targetDirectory, { recursive: true })
   fs.mkdirSync(path.join(profile, 'session'), { recursive: true })
   fs.copyFileSync(source, target)
+  let failureTarget, refusedTarget, refusalOwner
+  if (recovery && !negativeControl) {
+    failureTarget = path.join(targetDirectory, 'owned-overlay-failure.exe')
+    fs.copyFileSync(
+      path.join(fixtures, 'overlay-test-recovery.exe'),
+      failureTarget,
+    )
+    const refusalDirectory = path.join(directory, 'access-refusal')
+    fs.mkdirSync(refusalDirectory, { recursive: true })
+    for (const file of manifest.refusalFixture.files) {
+      const source = path.join(fixtures, file.path)
+      assert.equal(
+        createHash('sha256').update(fs.readFileSync(source)).digest('hex'),
+        file.sha256,
+      )
+      fs.copyFileSync(
+        source,
+        path.join(refusalDirectory, path.basename(source)),
+      )
+    }
+    refusedTarget = path.join(
+      refusalDirectory,
+      'owned_access_refused_target.exe',
+    )
+    refusalOwner = path.join(refusalDirectory, 'owned_access_refusal_owner.exe')
+  }
   if (mode !== 'fast-folder')
     fs.writeFileSync(
       path.join(
@@ -111,6 +190,7 @@ async function runCase(
       mode === 'early'
         ? target.replaceAll('\\', '/')
         : targetDirectory.replaceAll('\\', '/') + '/**',
+      ...(refusedTarget ? [refusedTarget.replaceAll('\\', '/')] : []),
     ],
     denylist: [],
     ignorelist: [],
@@ -133,10 +213,22 @@ async function runCase(
     scaleFactor,
     targetMode: mode,
     appRoot,
+    appExecutable,
     directory,
     profile,
     target,
     input: path.join(fixtures, 'overlay-test-input.exe'),
+    recovery: recovery && !negativeControl,
+    failureTarget,
+    refusedTarget,
+    refusalOwner,
+    recoveryOwner: path.join(fixtures, 'overlay-test-recovery.exe'),
+    runtimeRunsRoot,
+    addonDirectory: path.join(
+      root,
+      'coverage/experimental-overlay/isolated-addon-registry',
+      'long-path-regression-' + 'x'.repeat(128),
+    ),
   }
   const configFile = path.join(directory, 'config.json')
   fs.writeFileSync(configFile, JSON.stringify(config, null, 2))
@@ -144,12 +236,18 @@ async function runCase(
   const env = { ...process.env }
   delete env.ELECTRON_RUN_AS_NODE
   child = spawn(
-    require('electron'),
-    [
-      `--force-device-scale-factor=${scaleFactor}`,
-      path.join(__dirname, 'runtime.cjs'),
-      configFile,
-    ],
+    appExecutable || require('electron'),
+    appExecutable
+      ? [
+          '--inspect-brk=127.0.0.1:0',
+          `--force-device-scale-factor=${scaleFactor}`,
+          `--user-data-dir=${profile}`,
+        ]
+      : [
+          `--force-device-scale-factor=${scaleFactor}`,
+          path.join(__dirname, 'runtime.cjs'),
+          configFile,
+        ],
     {
       cwd: path.join(root, 'apps/app'),
       env,
@@ -165,6 +263,12 @@ async function runCase(
   const timer = setTimeout(() => child?.kill(), 165000)
   let code
   try {
+    if (appExecutable)
+      await require('./packaged.cjs').instrumentPackaged(
+        owned,
+        config,
+        configFile,
+      )
     code = await new Promise((resolve, reject) => {
       child.once('error', reject)
       child.once('exit', resolve)
@@ -184,6 +288,18 @@ async function runCase(
     ? JSON.parse(fs.readFileSync(file, 'utf8'))
     : { status: 'failed', error: 'Electron exited without a native E2E report' }
   report.exitCode = code
+  report.runtimeStorageBeforeApp = storageBefore
+  report.runtimeStorageAfterAppExit = runtimeStorage()
+  if (
+    report.status === 'passed' &&
+    report.runtimeStorageAfterAppExit.privateImages >
+      storageBefore.privateImages
+  ) {
+    report.status = 'failed'
+    report.error =
+      'Private images accumulated after owned target exit and app shutdown'
+  }
+  fs.writeFileSync(file, JSON.stringify(report, null, 2) + '\n')
   console.log(
     `${report.status === 'passed' && code === 0 ? 'PASS' : 'FAIL'} ${name}${
       negativeControl ? ' negative-control' : ''
@@ -199,6 +315,16 @@ async function main() {
   )
   for (const name of selected)
     assert.ok(cases.includes(name), `Unknown fixture: ${name}`)
+  if (appExecutable) {
+    assert.ok(fs.existsSync(appExecutable), 'Packaged executable must exist')
+    assert.equal(
+      appRoot.toLowerCase(),
+      path
+        .join(path.dirname(appExecutable), 'resources/app.asar')
+        .toLowerCase(),
+      "--app-root must be the selected executable's own resources/app.asar",
+    )
+  }
   assert.ok(
     ['early', 'folder', 'fast-folder'].includes(targetMode),
     'Supported target modes: early, folder, fast-folder',
@@ -207,6 +333,19 @@ async function main() {
     requestedScale === undefined || [1, 1.25, 1.5].includes(requestedScale),
     'Supported E2E scales: 1, 1.25, 1.5',
   )
+  if (recovery) {
+    assert.deepEqual(selected, ['d3d11-x64'], 'Mixed recovery uses D3D11 x64')
+    assert.equal(
+      targetMode,
+      'folder',
+      'Mixed recovery uses broad native policy',
+    )
+    assert.equal(
+      requestedScale,
+      1,
+      'Mixed recovery requires explicit --scale=1',
+    )
+  }
   await assertFreePort(7070)
   if (!fs.existsSync(path.join(fixtures, 'manifest.json')))
     require('./build-fixtures.cjs').build()
@@ -232,6 +371,7 @@ async function main() {
   )
   assert.equal(manifest.sourceRevision, revision)
   if (manifest.inputSourceSha256 !== inputSourceHash()) buildInput(manifest)
+  if (recovery) buildRefusalFixture(manifest)
   assert.equal(
     createHash('sha256')
       .update(fs.readFileSync(path.join(fixtures, 'overlay-test-input.exe')))
@@ -239,6 +379,16 @@ async function main() {
     manifest.inputHelperSha256,
     'Native input driver checksum',
   )
+  if (recovery)
+    assert.equal(
+      createHash('sha256')
+        .update(
+          fs.readFileSync(path.join(fixtures, 'overlay-test-recovery.exe')),
+        )
+        .digest('hex'),
+      manifest.recoveryHelperSha256,
+      'Owned recovery fixture checksum',
+    )
   fs.mkdirSync(reportRoot, { recursive: true })
   const reports = []
   for (const name of selected)
@@ -279,6 +429,7 @@ async function main() {
       {
         status: passed ? 'passed' : 'failed',
         fixtureSource: revision,
+        runtimeStorage: runtimeStorage(),
         reports,
       },
       null,
