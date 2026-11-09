@@ -42,9 +42,7 @@ describe('Figma-authored primitive tokens', () => {
       generated.semanticTokens,
     )
     expect(theme.colors).toEqual({})
-    expect(generated.themes[0].values).toHaveProperty('Kumo Ink.Light.canvas')
-    expect(generated.paletteTokens.colors).toHaveProperty(
-      'Kumo Ink.Light.canvas',
-    )
+    expect(generated.themes[0].values).toHaveProperty('Kumo.Light.canvas')
+    expect(generated.paletteTokens.colors).toHaveProperty('Kumo.Light.canvas')
   })
 })

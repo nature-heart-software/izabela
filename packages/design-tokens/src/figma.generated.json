@@ -877,7 +877,7 @@
             "e4e7edff": "#e4e7ed"
           }
         },
-        "Kumo Ink": {
+        "Kumo": {
           "Light": {
             "canvas": "#fbfbfb",
             "panel": "#f8f8f8",
@@ -1954,7 +1954,7 @@
             "e4e7edff": "#e4e7ed"
           }
         },
-        "Kumo Ink": {
+        "Kumo": {
           "Light": {
             "canvas": "#fbfbfb",
             "panel": "#f8f8f8",
@@ -2156,8 +2156,8 @@
       }
     },
     {
-      "id": "kumo-ink-light",
-      "label": "Kumo Ink Light",
+      "id": "kumo-light",
+      "label": "Kumo Light",
       "values": {
         "spacing": {
           "1": 2,
@@ -3031,7 +3031,7 @@
             "e4e7edff": "#e4e7ed"
           }
         },
-        "Kumo Ink": {
+        "Kumo": {
           "Light": {
             "canvas": "#fbfbfb",
             "panel": "#f8f8f8",
@@ -3233,8 +3233,8 @@
       }
     },
     {
-      "id": "kumo-ink-dark",
-      "label": "Kumo Ink Dark",
+      "id": "kumo-dark",
+      "label": "Kumo Dark",
       "values": {
         "spacing": {
           "1": 2,
@@ -4108,7 +4108,7 @@
             "e4e7edff": "#e4e7ed"
           }
         },
-        "Kumo Ink": {
+        "Kumo": {
           "Light": {
             "canvas": "#fbfbfb",
             "panel": "#f8f8f8",
@@ -5185,7 +5185,7 @@
             "e4e7edff": "#e4e7ed"
           }
         },
-        "Kumo Ink": {
+        "Kumo": {
           "Light": {
             "canvas": "#fbfbfb",
             "panel": "#f8f8f8",
@@ -6262,7 +6262,7 @@
             "e4e7edff": "#e4e7ed"
           }
         },
-        "Kumo Ink": {
+        "Kumo": {
           "Light": {
             "canvas": "#fbfbfb",
             "panel": "#f8f8f8",
@@ -8312,277 +8312,277 @@
           }
         }
       },
-      "Kumo Ink": {
+      "Kumo": {
         "Light": {
           "canvas": {
-            "value": "var(--nv--kumo--ink--light-canvas)"
+            "value": "var(--nv--kumo--light-canvas)"
           },
           "panel": {
-            "value": "var(--nv--kumo--ink--light-panel)"
+            "value": "var(--nv--kumo--light-panel)"
           },
           "surface": {
-            "value": "var(--nv--kumo--ink--light-surface)"
+            "value": "var(--nv--kumo--light-surface)"
           },
           "control": {
-            "value": "var(--nv--kumo--ink--light-control)"
+            "value": "var(--nv--kumo--light-control)"
           },
           "panelTransparent": {
-            "value": "var(--nv--kumo--ink--light-panel-transparent)"
+            "value": "var(--nv--kumo--light-panel-transparent)"
           },
           "text": {
-            "value": "var(--nv--kumo--ink--light-text)"
+            "value": "var(--nv--kumo--light-text)"
           },
           "secondary": {
-            "value": "var(--nv--kumo--ink--light-secondary)"
+            "value": "var(--nv--kumo--light-secondary)"
           },
           "border": {
-            "value": "var(--nv--kumo--ink--light-border)"
+            "value": "var(--nv--kumo--light-border)"
           },
           "divider": {
-            "value": "var(--nv--kumo--ink--light-divider)"
+            "value": "var(--nv--kumo--light-divider)"
           },
           "accent": {
-            "value": "var(--nv--kumo--ink--light-accent)"
+            "value": "var(--nv--kumo--light-accent)"
           },
           "accentEdge": {
-            "value": "var(--nv--kumo--ink--light-accent-edge)"
+            "value": "var(--nv--kumo--light-accent-edge)"
           },
           "onAccent": {
-            "value": "var(--nv--kumo--ink--light-on-accent)"
+            "value": "var(--nv--kumo--light-on-accent)"
           },
           "selected": {
-            "value": "var(--nv--kumo--ink--light-selected)"
+            "value": "var(--nv--kumo--light-selected)"
           },
           "transparent": {
-            "value": "var(--nv--kumo--ink--light-transparent)"
+            "value": "var(--nv--kumo--light-transparent)"
           },
           "shadow": {
-            "value": "var(--nv--kumo--ink--light-shadow)"
+            "value": "var(--nv--kumo--light-shadow)"
           },
           "inverse": {
-            "value": "var(--nv--kumo--ink--light-inverse)"
+            "value": "var(--nv--kumo--light-inverse)"
           },
           "onInverse": {
-            "value": "var(--nv--kumo--ink--light-on-inverse)"
+            "value": "var(--nv--kumo--light-on-inverse)"
           },
           "buttonHover": {
-            "value": "var(--nv--kumo--ink--light-button-hover)"
+            "value": "var(--nv--kumo--light-button-hover)"
           },
           "buttonPressed": {
-            "value": "var(--nv--kumo--ink--light-button-pressed)"
+            "value": "var(--nv--kumo--light-button-pressed)"
           },
           "inverseHover": {
-            "value": "var(--nv--kumo--ink--light-inverse-hover)"
+            "value": "var(--nv--kumo--light-inverse-hover)"
           },
           "inversePressed": {
-            "value": "var(--nv--kumo--ink--light-inverse-pressed)"
+            "value": "var(--nv--kumo--light-inverse-pressed)"
           },
           "buttonFocus": {
-            "value": "var(--nv--kumo--ink--light-button-focus)"
+            "value": "var(--nv--kumo--light-button-focus)"
           },
           "loadingMask": {
-            "value": "var(--nv--kumo--ink--light-loading-mask)"
+            "value": "var(--nv--kumo--light-loading-mask)"
           },
           "borderHover": {
-            "value": "var(--nv--kumo--ink--light-border-hover)"
+            "value": "var(--nv--kumo--light-border-hover)"
           },
           "disabledText": {
-            "value": "var(--nv--kumo--ink--light-disabled-text)"
+            "value": "var(--nv--kumo--light-disabled-text)"
           },
           "thumbHover": {
-            "value": "var(--nv--kumo--ink--light-thumb-hover)"
+            "value": "var(--nv--kumo--light-thumb-hover)"
           },
           "thumbPressed": {
-            "value": "var(--nv--kumo--ink--light-thumb-pressed)"
+            "value": "var(--nv--kumo--light-thumb-pressed)"
           },
           "shadow05": {
-            "value": "var(--nv--kumo--ink--light-shadow05)"
+            "value": "var(--nv--kumo--light-shadow05)"
           },
           "dialogBackdrop": {
-            "value": "var(--nv--kumo--ink--light-dialog-backdrop)"
+            "value": "var(--nv--kumo--light-dialog-backdrop)"
           },
           "tableCurrent": {
-            "value": "var(--nv--kumo--ink--light-table-current)"
+            "value": "var(--nv--kumo--light-table-current)"
           },
           "tableHover": {
-            "value": "var(--nv--kumo--ink--light-table-hover)"
+            "value": "var(--nv--kumo--light-table-hover)"
           },
           "tableStripe": {
-            "value": "var(--nv--kumo--ink--light-table-stripe)"
+            "value": "var(--nv--kumo--light-table-stripe)"
           },
           "disabledSurface": {
-            "value": "var(--nv--kumo--ink--light-disabled-surface)"
+            "value": "var(--nv--kumo--light-disabled-surface)"
           },
           "disabledBorder": {
-            "value": "var(--nv--kumo--ink--light-disabled-border)"
+            "value": "var(--nv--kumo--light-disabled-border)"
           },
           "disabledChecked": {
-            "value": "var(--nv--kumo--ink--light-disabled-checked)"
+            "value": "var(--nv--kumo--light-disabled-checked)"
           },
           "tooltipDarkSurface": {
-            "value": "var(--nv--kumo--ink--light-tooltip-dark-surface)"
+            "value": "var(--nv--kumo--light-tooltip-dark-surface)"
           },
           "tooltipDarkText": {
-            "value": "var(--nv--kumo--ink--light-tooltip-dark-text)"
+            "value": "var(--nv--kumo--light-tooltip-dark-text)"
           },
           "tooltipLightSurface": {
-            "value": "var(--nv--kumo--ink--light-tooltip-light-surface)"
+            "value": "var(--nv--kumo--light-tooltip-light-surface)"
           },
           "tooltipLightBorder": {
-            "value": "var(--nv--kumo--ink--light-tooltip-light-border)"
+            "value": "var(--nv--kumo--light-tooltip-light-border)"
           },
           "tooltipLightText": {
-            "value": "var(--nv--kumo--ink--light-tooltip-light-text)"
+            "value": "var(--nv--kumo--light-tooltip-light-text)"
           },
           "shadow10": {
-            "value": "var(--nv--kumo--ink--light-shadow10)"
+            "value": "var(--nv--kumo--light-shadow10)"
           },
           "derived": {
             "shadow12": {
-              "value": "var(--nv--kumo--ink--light-derived-shadow12)"
+              "value": "var(--nv--kumo--light-derived-shadow12)"
             },
             "checkedHover": {
-              "value": "var(--nv--kumo--ink--light-derived-checked-hover)"
+              "value": "var(--nv--kumo--light-derived-checked-hover)"
             }
           },
           "cardMask": {
-            "value": "var(--nv--kumo--ink--light-card-mask)"
+            "value": "var(--nv--kumo--light-card-mask)"
           }
         },
         "Dark": {
           "canvas": {
-            "value": "var(--nv--kumo--ink--dark-canvas)"
+            "value": "var(--nv--kumo--dark-canvas)"
           },
           "panel": {
-            "value": "var(--nv--kumo--ink--dark-panel)"
+            "value": "var(--nv--kumo--dark-panel)"
           },
           "surface": {
-            "value": "var(--nv--kumo--ink--dark-surface)"
+            "value": "var(--nv--kumo--dark-surface)"
           },
           "control": {
-            "value": "var(--nv--kumo--ink--dark-control)"
+            "value": "var(--nv--kumo--dark-control)"
           },
           "panelTransparent": {
-            "value": "var(--nv--kumo--ink--dark-panel-transparent)"
+            "value": "var(--nv--kumo--dark-panel-transparent)"
           },
           "text": {
-            "value": "var(--nv--kumo--ink--dark-text)"
+            "value": "var(--nv--kumo--dark-text)"
           },
           "secondary": {
-            "value": "var(--nv--kumo--ink--dark-secondary)"
+            "value": "var(--nv--kumo--dark-secondary)"
           },
           "border": {
-            "value": "var(--nv--kumo--ink--dark-border)"
+            "value": "var(--nv--kumo--dark-border)"
           },
           "divider": {
-            "value": "var(--nv--kumo--ink--dark-divider)"
+            "value": "var(--nv--kumo--dark-divider)"
           },
           "accent": {
-            "value": "var(--nv--kumo--ink--dark-accent)"
+            "value": "var(--nv--kumo--dark-accent)"
           },
           "accentEdge": {
-            "value": "var(--nv--kumo--ink--dark-accent-edge)"
+            "value": "var(--nv--kumo--dark-accent-edge)"
           },
           "onAccent": {
-            "value": "var(--nv--kumo--ink--dark-on-accent)"
+            "value": "var(--nv--kumo--dark-on-accent)"
           },
           "selected": {
-            "value": "var(--nv--kumo--ink--dark-selected)"
+            "value": "var(--nv--kumo--dark-selected)"
           },
           "transparent": {
-            "value": "var(--nv--kumo--ink--dark-transparent)"
+            "value": "var(--nv--kumo--dark-transparent)"
           },
           "shadow": {
-            "value": "var(--nv--kumo--ink--dark-shadow)"
+            "value": "var(--nv--kumo--dark-shadow)"
           },
           "inverse": {
-            "value": "var(--nv--kumo--ink--dark-inverse)"
+            "value": "var(--nv--kumo--dark-inverse)"
           },
           "onInverse": {
-            "value": "var(--nv--kumo--ink--dark-on-inverse)"
+            "value": "var(--nv--kumo--dark-on-inverse)"
           },
           "buttonHover": {
-            "value": "var(--nv--kumo--ink--dark-button-hover)"
+            "value": "var(--nv--kumo--dark-button-hover)"
           },
           "buttonPressed": {
-            "value": "var(--nv--kumo--ink--dark-button-pressed)"
+            "value": "var(--nv--kumo--dark-button-pressed)"
           },
           "inverseHover": {
-            "value": "var(--nv--kumo--ink--dark-inverse-hover)"
+            "value": "var(--nv--kumo--dark-inverse-hover)"
           },
           "inversePressed": {
-            "value": "var(--nv--kumo--ink--dark-inverse-pressed)"
+            "value": "var(--nv--kumo--dark-inverse-pressed)"
           },
           "buttonFocus": {
-            "value": "var(--nv--kumo--ink--dark-button-focus)"
+            "value": "var(--nv--kumo--dark-button-focus)"
           },
           "loadingMask": {
-            "value": "var(--nv--kumo--ink--dark-loading-mask)"
+            "value": "var(--nv--kumo--dark-loading-mask)"
           },
           "borderHover": {
-            "value": "var(--nv--kumo--ink--dark-border-hover)"
+            "value": "var(--nv--kumo--dark-border-hover)"
           },
           "disabledText": {
-            "value": "var(--nv--kumo--ink--dark-disabled-text)"
+            "value": "var(--nv--kumo--dark-disabled-text)"
           },
           "thumbHover": {
-            "value": "var(--nv--kumo--ink--dark-thumb-hover)"
+            "value": "var(--nv--kumo--dark-thumb-hover)"
           },
           "thumbPressed": {
-            "value": "var(--nv--kumo--ink--dark-thumb-pressed)"
+            "value": "var(--nv--kumo--dark-thumb-pressed)"
           },
           "shadow05": {
-            "value": "var(--nv--kumo--ink--dark-shadow05)"
+            "value": "var(--nv--kumo--dark-shadow05)"
           },
           "dialogBackdrop": {
-            "value": "var(--nv--kumo--ink--dark-dialog-backdrop)"
+            "value": "var(--nv--kumo--dark-dialog-backdrop)"
           },
           "tableCurrent": {
-            "value": "var(--nv--kumo--ink--dark-table-current)"
+            "value": "var(--nv--kumo--dark-table-current)"
           },
           "tableHover": {
-            "value": "var(--nv--kumo--ink--dark-table-hover)"
+            "value": "var(--nv--kumo--dark-table-hover)"
           },
           "tableStripe": {
-            "value": "var(--nv--kumo--ink--dark-table-stripe)"
+            "value": "var(--nv--kumo--dark-table-stripe)"
           },
           "disabledSurface": {
-            "value": "var(--nv--kumo--ink--dark-disabled-surface)"
+            "value": "var(--nv--kumo--dark-disabled-surface)"
           },
           "disabledBorder": {
-            "value": "var(--nv--kumo--ink--dark-disabled-border)"
+            "value": "var(--nv--kumo--dark-disabled-border)"
           },
           "disabledChecked": {
-            "value": "var(--nv--kumo--ink--dark-disabled-checked)"
+            "value": "var(--nv--kumo--dark-disabled-checked)"
           },
           "tooltipDarkSurface": {
-            "value": "var(--nv--kumo--ink--dark-tooltip-dark-surface)"
+            "value": "var(--nv--kumo--dark-tooltip-dark-surface)"
           },
           "tooltipDarkText": {
-            "value": "var(--nv--kumo--ink--dark-tooltip-dark-text)"
+            "value": "var(--nv--kumo--dark-tooltip-dark-text)"
           },
           "tooltipLightSurface": {
-            "value": "var(--nv--kumo--ink--dark-tooltip-light-surface)"
+            "value": "var(--nv--kumo--dark-tooltip-light-surface)"
           },
           "tooltipLightBorder": {
-            "value": "var(--nv--kumo--ink--dark-tooltip-light-border)"
+            "value": "var(--nv--kumo--dark-tooltip-light-border)"
           },
           "tooltipLightText": {
-            "value": "var(--nv--kumo--ink--dark-tooltip-light-text)"
+            "value": "var(--nv--kumo--dark-tooltip-light-text)"
           },
           "shadow10": {
-            "value": "var(--nv--kumo--ink--dark-shadow10)"
+            "value": "var(--nv--kumo--dark-shadow10)"
           },
           "derived": {
             "shadow12": {
-              "value": "var(--nv--kumo--ink--dark-derived-shadow12)"
+              "value": "var(--nv--kumo--dark-derived-shadow12)"
             },
             "checkedHover": {
-              "value": "var(--nv--kumo--ink--dark-derived-checked-hover)"
+              "value": "var(--nv--kumo--dark-derived-checked-hover)"
             }
           },
           "cardMask": {
-            "value": "var(--nv--kumo--ink--dark-card-mask)"
+            "value": "var(--nv--kumo--dark-card-mask)"
           }
         }
       },
