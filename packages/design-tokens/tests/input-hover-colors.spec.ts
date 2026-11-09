@@ -3,10 +3,10 @@ import generated from '../src/figma.generated.json'
 
 const controls = ['input', 'textarea', 'number-input', 'select'] as const
 const themes = generated.themes.filter(
-  ({ id }) => id.startsWith('kumo-ink-') || id.startsWith('github-'),
+  ({ id }) => id.startsWith('kumo-') || id.startsWith('github-'),
 )
 
-describe('Kumo Ink and GitHub input hover feedback', () => {
+describe('Kumo and GitHub input hover feedback', () => {
   it.each(
     themes.flatMap(({ id }) => controls.map((control) => ({ id, control }))),
   )(

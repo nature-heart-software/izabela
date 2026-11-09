@@ -13,6 +13,23 @@ const api = registry as typeof registry & {
 }
 
 describe('imported theme registry', () => {
+  it.each(['light', 'dark'])(
+    'preserves saved Kumo Ink %s selections under the Kumo name',
+    (mode) => {
+      const canonical = `kumo-${mode}`
+      expect(api.themeOptions).toContainEqual({
+        value: canonical,
+        label: `Kumo ${mode === 'light' ? 'Light' : 'Dark'}`,
+      })
+      expect(
+        api.themeOptions.some(({ value }) => value === `kumo-ink-${mode}`),
+      ).toBe(false)
+      expect(registry.resolveThemeId(`kumo-ink-${mode}`)).toBe(canonical)
+      expect(api.resolveTheme(`kumo-ink-${mode}`)).toBe(
+        api.themes.get(canonical),
+      )
+    },
+  )
   it.each(['github-light', 'github-dark'])(
     'keeps input borders unchanged on focus in %s',
     (id) => {

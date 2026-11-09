@@ -48,7 +48,15 @@ export const themes = new Map<string, Theme>(
 export function resolveThemeId(id: string): string {
   if (themes.has(id)) return id
   const legacy =
-    id === 'light' ? 'izabela-light' : id === 'dark' ? 'izabela-dark' : id
+    id === 'light'
+      ? 'izabela-light'
+      : id === 'dark'
+      ? 'izabela-dark'
+      : id === 'kumo-ink-light'
+      ? 'kumo-light'
+      : id === 'kumo-ink-dark'
+      ? 'kumo-dark'
+      : id
   return themes.has(legacy) ? legacy : generated.defaultThemeId
 }
 

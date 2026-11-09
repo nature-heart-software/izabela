@@ -85,11 +85,11 @@
           "modeId": "20:1"
         },
         {
-          "name": "Kumo Ink Light",
+          "name": "Kumo Light",
           "modeId": "370:0"
         },
         {
-          "name": "Kumo Ink Dark",
+          "name": "Kumo Dark",
           "modeId": "370:1"
         },
         {
@@ -14384,7 +14384,7 @@
     },
     {
       "id": "VariableID:320:1134",
-      "name": "Kumo Ink/Light/canvas",
+      "name": "Kumo/Light/canvas",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -14424,7 +14424,7 @@
     },
     {
       "id": "VariableID:320:1136",
-      "name": "Kumo Ink/Light/panel",
+      "name": "Kumo/Light/panel",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -14464,7 +14464,7 @@
     },
     {
       "id": "VariableID:320:1138",
-      "name": "Kumo Ink/Light/surface",
+      "name": "Kumo/Light/surface",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -14504,7 +14504,7 @@
     },
     {
       "id": "VariableID:320:1140",
-      "name": "Kumo Ink/Light/control",
+      "name": "Kumo/Light/control",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -14544,7 +14544,7 @@
     },
     {
       "id": "VariableID:320:1142",
-      "name": "Kumo Ink/Light/panelTransparent",
+      "name": "Kumo/Light/panelTransparent",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -14584,7 +14584,7 @@
     },
     {
       "id": "VariableID:320:1144",
-      "name": "Kumo Ink/Light/text",
+      "name": "Kumo/Light/text",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -14624,7 +14624,7 @@
     },
     {
       "id": "VariableID:320:1146",
-      "name": "Kumo Ink/Light/secondary",
+      "name": "Kumo/Light/secondary",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -14664,7 +14664,7 @@
     },
     {
       "id": "VariableID:320:1148",
-      "name": "Kumo Ink/Light/border",
+      "name": "Kumo/Light/border",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -14704,7 +14704,7 @@
     },
     {
       "id": "VariableID:320:1150",
-      "name": "Kumo Ink/Light/divider",
+      "name": "Kumo/Light/divider",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -14744,7 +14744,7 @@
     },
     {
       "id": "VariableID:320:1152",
-      "name": "Kumo Ink/Light/accent",
+      "name": "Kumo/Light/accent",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -14784,7 +14784,7 @@
     },
     {
       "id": "VariableID:320:1154",
-      "name": "Kumo Ink/Light/accentEdge",
+      "name": "Kumo/Light/accentEdge",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -14824,7 +14824,7 @@
     },
     {
       "id": "VariableID:320:1156",
-      "name": "Kumo Ink/Light/onAccent",
+      "name": "Kumo/Light/onAccent",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -14864,7 +14864,7 @@
     },
     {
       "id": "VariableID:320:1158",
-      "name": "Kumo Ink/Light/selected",
+      "name": "Kumo/Light/selected",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -14904,7 +14904,7 @@
     },
     {
       "id": "VariableID:320:1160",
-      "name": "Kumo Ink/Light/transparent",
+      "name": "Kumo/Light/transparent",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -14944,7 +14944,7 @@
     },
     {
       "id": "VariableID:320:1162",
-      "name": "Kumo Ink/Light/shadow",
+      "name": "Kumo/Light/shadow",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -14984,7 +14984,7 @@
     },
     {
       "id": "VariableID:320:1164",
-      "name": "Kumo Ink/Light/inverse",
+      "name": "Kumo/Light/inverse",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -15024,7 +15024,7 @@
     },
     {
       "id": "VariableID:320:1166",
-      "name": "Kumo Ink/Light/onInverse",
+      "name": "Kumo/Light/onInverse",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -15064,7 +15064,7 @@
     },
     {
       "id": "VariableID:320:1169",
-      "name": "Kumo Ink/Light/buttonHover",
+      "name": "Kumo/Light/buttonHover",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -15104,7 +15104,7 @@
     },
     {
       "id": "VariableID:320:1171",
-      "name": "Kumo Ink/Light/buttonPressed",
+      "name": "Kumo/Light/buttonPressed",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -15144,7 +15144,7 @@
     },
     {
       "id": "VariableID:320:1173",
-      "name": "Kumo Ink/Light/inverseHover",
+      "name": "Kumo/Light/inverseHover",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -15184,7 +15184,7 @@
     },
     {
       "id": "VariableID:320:1175",
-      "name": "Kumo Ink/Light/inversePressed",
+      "name": "Kumo/Light/inversePressed",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -15224,7 +15224,7 @@
     },
     {
       "id": "VariableID:320:1177",
-      "name": "Kumo Ink/Light/buttonFocus",
+      "name": "Kumo/Light/buttonFocus",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -15264,7 +15264,7 @@
     },
     {
       "id": "VariableID:320:1179",
-      "name": "Kumo Ink/Light/loadingMask",
+      "name": "Kumo/Light/loadingMask",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -15304,7 +15304,7 @@
     },
     {
       "id": "VariableID:320:1181",
-      "name": "Kumo Ink/Light/borderHover",
+      "name": "Kumo/Light/borderHover",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -15344,7 +15344,7 @@
     },
     {
       "id": "VariableID:320:1183",
-      "name": "Kumo Ink/Light/disabledText",
+      "name": "Kumo/Light/disabledText",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -15384,7 +15384,7 @@
     },
     {
       "id": "VariableID:320:1185",
-      "name": "Kumo Ink/Light/thumbHover",
+      "name": "Kumo/Light/thumbHover",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -15424,7 +15424,7 @@
     },
     {
       "id": "VariableID:320:1187",
-      "name": "Kumo Ink/Light/thumbPressed",
+      "name": "Kumo/Light/thumbPressed",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -15464,7 +15464,7 @@
     },
     {
       "id": "VariableID:320:1189",
-      "name": "Kumo Ink/Light/shadow05",
+      "name": "Kumo/Light/shadow05",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -15504,7 +15504,7 @@
     },
     {
       "id": "VariableID:320:1191",
-      "name": "Kumo Ink/Light/dialogBackdrop",
+      "name": "Kumo/Light/dialogBackdrop",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -15544,7 +15544,7 @@
     },
     {
       "id": "VariableID:320:1193",
-      "name": "Kumo Ink/Light/tableCurrent",
+      "name": "Kumo/Light/tableCurrent",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -15584,7 +15584,7 @@
     },
     {
       "id": "VariableID:320:1195",
-      "name": "Kumo Ink/Light/tableHover",
+      "name": "Kumo/Light/tableHover",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -15624,7 +15624,7 @@
     },
     {
       "id": "VariableID:320:1197",
-      "name": "Kumo Ink/Light/tableStripe",
+      "name": "Kumo/Light/tableStripe",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -15664,7 +15664,7 @@
     },
     {
       "id": "VariableID:320:1199",
-      "name": "Kumo Ink/Light/disabledSurface",
+      "name": "Kumo/Light/disabledSurface",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -15704,7 +15704,7 @@
     },
     {
       "id": "VariableID:320:1201",
-      "name": "Kumo Ink/Light/disabledBorder",
+      "name": "Kumo/Light/disabledBorder",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -15744,7 +15744,7 @@
     },
     {
       "id": "VariableID:320:1203",
-      "name": "Kumo Ink/Light/disabledChecked",
+      "name": "Kumo/Light/disabledChecked",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -15784,7 +15784,7 @@
     },
     {
       "id": "VariableID:320:1205",
-      "name": "Kumo Ink/Light/tooltipDarkSurface",
+      "name": "Kumo/Light/tooltipDarkSurface",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -15824,7 +15824,7 @@
     },
     {
       "id": "VariableID:320:1207",
-      "name": "Kumo Ink/Light/tooltipDarkText",
+      "name": "Kumo/Light/tooltipDarkText",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -15864,7 +15864,7 @@
     },
     {
       "id": "VariableID:320:1209",
-      "name": "Kumo Ink/Light/tooltipLightSurface",
+      "name": "Kumo/Light/tooltipLightSurface",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -15904,7 +15904,7 @@
     },
     {
       "id": "VariableID:320:1211",
-      "name": "Kumo Ink/Light/tooltipLightBorder",
+      "name": "Kumo/Light/tooltipLightBorder",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -15944,7 +15944,7 @@
     },
     {
       "id": "VariableID:320:1213",
-      "name": "Kumo Ink/Light/tooltipLightText",
+      "name": "Kumo/Light/tooltipLightText",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -15984,7 +15984,7 @@
     },
     {
       "id": "VariableID:320:1215",
-      "name": "Kumo Ink/Light/shadow10",
+      "name": "Kumo/Light/shadow10",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -16024,7 +16024,7 @@
     },
     {
       "id": "VariableID:370:1071",
-      "name": "Kumo Ink/Dark/canvas",
+      "name": "Kumo/Dark/canvas",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -16064,7 +16064,7 @@
     },
     {
       "id": "VariableID:370:1073",
-      "name": "Kumo Ink/Dark/panel",
+      "name": "Kumo/Dark/panel",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -16104,7 +16104,7 @@
     },
     {
       "id": "VariableID:370:1075",
-      "name": "Kumo Ink/Dark/surface",
+      "name": "Kumo/Dark/surface",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -16144,7 +16144,7 @@
     },
     {
       "id": "VariableID:370:1077",
-      "name": "Kumo Ink/Dark/control",
+      "name": "Kumo/Dark/control",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -16184,7 +16184,7 @@
     },
     {
       "id": "VariableID:370:1079",
-      "name": "Kumo Ink/Dark/panelTransparent",
+      "name": "Kumo/Dark/panelTransparent",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -16224,7 +16224,7 @@
     },
     {
       "id": "VariableID:370:1081",
-      "name": "Kumo Ink/Dark/text",
+      "name": "Kumo/Dark/text",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -16264,7 +16264,7 @@
     },
     {
       "id": "VariableID:370:1083",
-      "name": "Kumo Ink/Dark/secondary",
+      "name": "Kumo/Dark/secondary",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -16304,7 +16304,7 @@
     },
     {
       "id": "VariableID:370:1085",
-      "name": "Kumo Ink/Dark/border",
+      "name": "Kumo/Dark/border",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -16344,7 +16344,7 @@
     },
     {
       "id": "VariableID:370:1087",
-      "name": "Kumo Ink/Dark/divider",
+      "name": "Kumo/Dark/divider",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -16384,7 +16384,7 @@
     },
     {
       "id": "VariableID:370:1089",
-      "name": "Kumo Ink/Dark/accent",
+      "name": "Kumo/Dark/accent",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -16424,7 +16424,7 @@
     },
     {
       "id": "VariableID:370:1091",
-      "name": "Kumo Ink/Dark/accentEdge",
+      "name": "Kumo/Dark/accentEdge",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -16464,7 +16464,7 @@
     },
     {
       "id": "VariableID:370:1093",
-      "name": "Kumo Ink/Dark/onAccent",
+      "name": "Kumo/Dark/onAccent",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -16504,7 +16504,7 @@
     },
     {
       "id": "VariableID:370:1095",
-      "name": "Kumo Ink/Dark/selected",
+      "name": "Kumo/Dark/selected",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -16544,7 +16544,7 @@
     },
     {
       "id": "VariableID:370:1097",
-      "name": "Kumo Ink/Dark/transparent",
+      "name": "Kumo/Dark/transparent",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -16584,7 +16584,7 @@
     },
     {
       "id": "VariableID:370:1099",
-      "name": "Kumo Ink/Dark/shadow",
+      "name": "Kumo/Dark/shadow",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -16624,7 +16624,7 @@
     },
     {
       "id": "VariableID:370:1101",
-      "name": "Kumo Ink/Dark/inverse",
+      "name": "Kumo/Dark/inverse",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -16664,7 +16664,7 @@
     },
     {
       "id": "VariableID:370:1103",
-      "name": "Kumo Ink/Dark/onInverse",
+      "name": "Kumo/Dark/onInverse",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -16704,7 +16704,7 @@
     },
     {
       "id": "VariableID:370:1105",
-      "name": "Kumo Ink/Dark/buttonHover",
+      "name": "Kumo/Dark/buttonHover",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -16744,7 +16744,7 @@
     },
     {
       "id": "VariableID:370:1107",
-      "name": "Kumo Ink/Dark/buttonPressed",
+      "name": "Kumo/Dark/buttonPressed",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -16784,7 +16784,7 @@
     },
     {
       "id": "VariableID:370:1109",
-      "name": "Kumo Ink/Dark/inverseHover",
+      "name": "Kumo/Dark/inverseHover",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -16824,7 +16824,7 @@
     },
     {
       "id": "VariableID:370:1111",
-      "name": "Kumo Ink/Dark/inversePressed",
+      "name": "Kumo/Dark/inversePressed",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -16864,7 +16864,7 @@
     },
     {
       "id": "VariableID:370:1113",
-      "name": "Kumo Ink/Dark/buttonFocus",
+      "name": "Kumo/Dark/buttonFocus",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -16904,7 +16904,7 @@
     },
     {
       "id": "VariableID:370:1115",
-      "name": "Kumo Ink/Dark/loadingMask",
+      "name": "Kumo/Dark/loadingMask",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -16944,7 +16944,7 @@
     },
     {
       "id": "VariableID:370:1117",
-      "name": "Kumo Ink/Dark/borderHover",
+      "name": "Kumo/Dark/borderHover",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -16984,7 +16984,7 @@
     },
     {
       "id": "VariableID:370:1119",
-      "name": "Kumo Ink/Dark/disabledText",
+      "name": "Kumo/Dark/disabledText",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -17024,7 +17024,7 @@
     },
     {
       "id": "VariableID:370:1121",
-      "name": "Kumo Ink/Dark/thumbHover",
+      "name": "Kumo/Dark/thumbHover",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -17064,7 +17064,7 @@
     },
     {
       "id": "VariableID:370:1123",
-      "name": "Kumo Ink/Dark/thumbPressed",
+      "name": "Kumo/Dark/thumbPressed",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -17104,7 +17104,7 @@
     },
     {
       "id": "VariableID:370:1125",
-      "name": "Kumo Ink/Dark/shadow05",
+      "name": "Kumo/Dark/shadow05",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -17144,7 +17144,7 @@
     },
     {
       "id": "VariableID:370:1127",
-      "name": "Kumo Ink/Dark/dialogBackdrop",
+      "name": "Kumo/Dark/dialogBackdrop",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -17184,7 +17184,7 @@
     },
     {
       "id": "VariableID:370:1129",
-      "name": "Kumo Ink/Dark/tableCurrent",
+      "name": "Kumo/Dark/tableCurrent",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -17224,7 +17224,7 @@
     },
     {
       "id": "VariableID:370:1131",
-      "name": "Kumo Ink/Dark/tableHover",
+      "name": "Kumo/Dark/tableHover",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -17264,7 +17264,7 @@
     },
     {
       "id": "VariableID:370:1133",
-      "name": "Kumo Ink/Dark/tableStripe",
+      "name": "Kumo/Dark/tableStripe",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -17304,7 +17304,7 @@
     },
     {
       "id": "VariableID:370:1135",
-      "name": "Kumo Ink/Dark/disabledSurface",
+      "name": "Kumo/Dark/disabledSurface",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -17344,7 +17344,7 @@
     },
     {
       "id": "VariableID:370:1137",
-      "name": "Kumo Ink/Dark/disabledBorder",
+      "name": "Kumo/Dark/disabledBorder",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -17384,7 +17384,7 @@
     },
     {
       "id": "VariableID:370:1139",
-      "name": "Kumo Ink/Dark/disabledChecked",
+      "name": "Kumo/Dark/disabledChecked",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -17424,7 +17424,7 @@
     },
     {
       "id": "VariableID:370:1141",
-      "name": "Kumo Ink/Dark/tooltipDarkSurface",
+      "name": "Kumo/Dark/tooltipDarkSurface",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -17464,7 +17464,7 @@
     },
     {
       "id": "VariableID:370:1143",
-      "name": "Kumo Ink/Dark/tooltipDarkText",
+      "name": "Kumo/Dark/tooltipDarkText",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -17504,7 +17504,7 @@
     },
     {
       "id": "VariableID:370:1145",
-      "name": "Kumo Ink/Dark/tooltipLightSurface",
+      "name": "Kumo/Dark/tooltipLightSurface",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -17544,7 +17544,7 @@
     },
     {
       "id": "VariableID:370:1147",
-      "name": "Kumo Ink/Dark/tooltipLightBorder",
+      "name": "Kumo/Dark/tooltipLightBorder",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -17584,7 +17584,7 @@
     },
     {
       "id": "VariableID:370:1149",
-      "name": "Kumo Ink/Dark/tooltipLightText",
+      "name": "Kumo/Dark/tooltipLightText",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -17624,7 +17624,7 @@
     },
     {
       "id": "VariableID:370:1151",
-      "name": "Kumo Ink/Dark/shadow10",
+      "name": "Kumo/Dark/shadow10",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -17664,7 +17664,7 @@
     },
     {
       "id": "VariableID:370:1153",
-      "name": "Kumo Ink/Light/derived/shadow12",
+      "name": "Kumo/Light/derived/shadow12",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -17684,7 +17684,7 @@
     },
     {
       "id": "VariableID:370:1154",
-      "name": "Kumo Ink/Dark/derived/shadow12",
+      "name": "Kumo/Dark/derived/shadow12",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -17744,7 +17744,7 @@
     },
     {
       "id": "VariableID:417:1071",
-      "name": "Kumo Ink/Light/cardMask",
+      "name": "Kumo/Light/cardMask",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -17764,7 +17764,7 @@
     },
     {
       "id": "VariableID:417:1072",
-      "name": "Kumo Ink/Dark/cardMask",
+      "name": "Kumo/Dark/cardMask",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -17884,7 +17884,7 @@
     },
     {
       "id": "VariableID:512:1301",
-      "name": "Kumo Ink/Light/derived/checkedHover",
+      "name": "Kumo/Light/derived/checkedHover",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {
@@ -17904,7 +17904,7 @@
     },
     {
       "id": "VariableID:512:1302",
-      "name": "Kumo Ink/Dark/derived/checkedHover",
+      "name": "Kumo/Dark/derived/checkedHover",
       "variableCollectionId": "VariableCollectionId:193:379",
       "resolvedType": "COLOR",
       "valuesByMode": {

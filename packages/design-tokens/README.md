@@ -33,7 +33,7 @@ The importer validates the complete input before writing. Missing mode values, m
 ## Collections and modes
 
 - **Tokens** supplies primitive values with its authored paths: `radius`, `border`, scalar `fontSize`, `lineHeight`, and `letterSpacing`, for example. Panda categories convert dimensions to CSS units without retaining the former token namespaces.
-- **Colors** supplies palette values and independent Light/Dark selections. Palette groups, including `Cloudflare Kumo` and `Kumo Ink`, keep their exact spelling in the imported object. Panda rejects spaces in named token keys, so these groups are exposed as scoped CSS custom properties rather than renamed Panda palette keys. Components consume the exact Figma semantic roles through Panda.
+- **Colors** supplies palette values and independent Light/Dark selections. Palette groups, including `Cloudflare Kumo` and `Kumo`, keep their exact spelling in the imported object. Panda rejects spaces in named token keys, so these groups are exposed as scoped CSS custom properties rather than renamed Panda palette keys. Components consume the exact Figma semantic roles through Panda.
 - **Semantic Tokens** supplies the component/shared roles and the application theme-mode inventory. Every mode automatically appears in settings and the Storybook toolbar. There is no two-theme allowlist or theme-specific value adapter.
 - **Figma** contains design/preview-only helpers and is excluded from production imports.
 
@@ -53,7 +53,7 @@ The arrays above illustrate only the additional configuration field; a real expo
 
 ## Runtime and compatibility
 
-`themeOptions`, `themes`, and `resolveTheme` are derived from the generated inventory. Existing persisted `light`/`dark` preferences resolve to the Izabela modes; unknown selections fall back to the authored default semantic mode. Themes switch reactively without requesting an application restart. A `ThemeProvider` owns a scoped CSS-variable boundary, including semantic aliases, so nested providers and portal descendants use their selected theme rather than a root-cached color.
+`themeOptions`, `themes`, and `resolveTheme` are derived from the generated inventory. Existing persisted `light`/`dark` preferences resolve to the Izabela modes, and `kumo-ink-light`/`kumo-ink-dark` resolve to `kumo-light`/`kumo-dark`; unknown selections fall back to the authored default semantic mode. Themes switch reactively without requesting an application restart. A `ThemeProvider` owns a scoped CSS-variable boundary, including semantic aliases, so nested providers and portal descendants use their selected theme rather than a root-cached color.
 
 Colors with alpha retain the authored alpha value. Semantic shadow-color roles are also exposed in Panda's `shadows` category under the same path, combined with the authored `shadow/offsetY`, `shadow/blur`, and `shadow/spread` geometry.
 
