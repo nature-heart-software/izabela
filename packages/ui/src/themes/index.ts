@@ -51,12 +51,12 @@ export function resolveThemeId(id: string): string {
     id === 'light'
       ? 'izabela-light'
       : id === 'dark'
-      ? 'izabela-dark'
-      : id === 'kumo-ink-light'
-      ? 'kumo-light'
-      : id === 'kumo-ink-dark'
-      ? 'kumo-dark'
-      : id
+        ? 'izabela-dark'
+        : id === 'kumo-ink-light'
+          ? 'kumo-light'
+          : id === 'kumo-ink-dark'
+            ? 'kumo-dark'
+            : id
   return themes.has(legacy) ? legacy : generated.defaultThemeId
 }
 
