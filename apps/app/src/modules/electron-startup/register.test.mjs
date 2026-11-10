@@ -15,20 +15,14 @@ function deferred() {
 function fixture({
   experimental = false,
   elevated = false,
-  relaunchAvailable = true,
-  launchError,
-  launchStatus = 'launched',
-  lockAvailable = true,
+  runAsAdmin = true,
+  launchSucceeds = false,
 } = {}) {
-  const hydrated = deferred()
-  const calls = []
+  const hydrated = deferred(),
+    calls = []
   const settings = {
-    runAsAdmin: true,
+    runAsAdmin,
     launchOnStartup: false,
-    $whenReady: () => Promise.resolve(),
-  }
-  const overlay = {
-    enableExperimentalGameOverlay: experimental,
     $whenReady: () => hydrated.promise,
   }
   const register = loadTypescript(
@@ -36,7 +30,16 @@ function fixture({
     {
       vue: { watch() {} },
       '@/features/settings/store': { useSettingsStore: () => settings },
-      '@/features/game-overlay/store': { useGameOverlayStore: () => overlay },
+      '@/features/game-overlay/store': {
+        useGameOverlayStore: () => ({
+          enableExperimentalGameOverlay: experimental,
+          $whenReady: () => {
+            throw new Error(
+              'Overlay settings must not govern administrator startup',
+            )
+          },
+        }),
+      },
       electron: {
         app: {
           whenReady: () => Promise.resolve(),
@@ -45,7 +48,7 @@ function fixture({
           releaseSingleInstanceLock: () => calls.push('release-lock'),
           requestSingleInstanceLock: () => {
             calls.push('acquire-lock')
-            return lockAvailable
+            return true
           },
           quit: () => calls.push('quit'),
         },
@@ -53,151 +56,96 @@ function fixture({
       child_process: {
         exec(command, callback) {
           calls.push({ command })
-          callback(new Error('Fixture denies elevation'))
+          callback(launchSucceeds ? null : new Error('Fixture denies UAC'))
         },
       },
       '@packages/toolbox': { Deferred: deferred },
       '@/electron/utils.ts': { isRunningAsAdmin: () => elevated },
       'electron-game-overlay': {
-        async inspectOverlayConsumerExecutionContext() {
-          calls.push('context')
-          return {
-            overlaySupported: !elevated,
-            relaunchAvailable,
-            relaunchRefusal: relaunchAvailable ? null : 'shell-unavailable',
-          }
+        inspectOverlayConsumerExecutionContext() {
+          throw new Error('Startup must not change elevation for the SDK')
         },
-        async launchUnelevatedOverlayConsumer() {
-          calls.push('launch')
-          if (launchError) throw launchError
-          return { status: launchStatus }
+        launchUnelevatedOverlayConsumer() {
+          throw new Error('Startup must not force de-elevation')
         },
       },
     },
     {
       process: { platform: 'win32', execPath: 'C:/Izabela/Izabela Next.exe' },
-      console: { log() {}, info() {}, error() {} },
+      console: { log() {}, error() {} },
       __importMetaEnv: { PROD: true },
     },
   ).default
-  return { register, settings, overlay, hydrated, calls }
+  return { register, settings, hydrated, calls }
 }
 
-test('startup waits for overlay hydration before deciding whether to elevate', async () => {
-  const f = fixture()
+for (const experimental of [false, true]) {
+  test(
+    'saved administrator startup is honored with experimental=' + experimental,
+    async () => {
+      const f = fixture({ experimental })
+      f.hydrated.resolve()
+      await f.register()
+      assert.equal(f.settings.runAsAdmin, true)
+      assert.equal(f.calls.length, 2)
+      assert.equal(f.calls[0], 'login')
+      assert.match(f.calls[1].command, /-Verb RunAs/)
+    },
+  )
+
+  test(
+    'already elevated startup stays elevated with experimental=' + experimental,
+    async () => {
+      const f = fixture({ experimental, elevated: true })
+      f.hydrated.resolve()
+      await f.register()
+      assert.equal(f.settings.runAsAdmin, true)
+      assert.deepEqual(f.calls, ['login'])
+    },
+  )
+
+  test(
+    'manual elevated launch is not replaced with experimental=' + experimental,
+    async () => {
+      const f = fixture({ experimental, elevated: true, runAsAdmin: false })
+      f.hydrated.resolve()
+      await f.register()
+      assert.equal(f.settings.runAsAdmin, false)
+      assert.deepEqual(f.calls, ['login'])
+    },
+  )
+}
+
+test('startup waits for the saved preference before requesting elevation', async () => {
+  const f = fixture({ experimental: true, runAsAdmin: false })
   const startup = f.register()
   await Promise.resolve()
   await Promise.resolve()
   assert.deepEqual(f.calls, [])
-  f.overlay.enableExperimentalGameOverlay = true
+  f.settings.runAsAdmin = true
   f.hydrated.resolve()
   await startup
-  assert.equal(f.settings.runAsAdmin, false)
-  assert.deepEqual(f.calls, ['context', 'login'])
-})
-
-test('experimental startup clears a stale administrator preference before services start', async () => {
-  const f = fixture({ experimental: true })
-  f.hydrated.resolve()
-  await f.register()
-  assert.equal(f.settings.runAsAdmin, false)
-  assert.deepEqual(f.calls, ['context', 'login'])
-})
-
-test('legacy startup retains the requested elevation behavior', async () => {
-  const f = fixture()
-  f.hydrated.resolve()
-  await f.register()
   assert.equal(f.settings.runAsAdmin, true)
-  assert.equal(f.calls.length, 2)
-  assert.equal(f.calls[0], 'login')
   assert.match(f.calls[1].command, /-Verb RunAs/)
 })
 
-test('already elevated legacy startup does not request elevation again', async () => {
-  const f = fixture({ elevated: true })
+test('disabled administrator startup remains disabled', async () => {
+  const f = fixture({ experimental: true, runAsAdmin: false })
   f.hydrated.resolve()
   await f.register()
+  assert.equal(f.settings.runAsAdmin, false)
   assert.deepEqual(f.calls, ['login'])
 })
 
-test('elevated experimental startup hands off before starting services', async () => {
-  const f = fixture({ experimental: true, elevated: true })
+test('successful administrator launch quits the old process without resetting the preference', async () => {
+  const f = fixture({ experimental: true, launchSucceeds: true })
   f.hydrated.resolve()
   let continued = false
   void f.register().then(() => {
     continued = true
   })
   await new Promise(setImmediate)
-  assert.equal(f.settings.runAsAdmin, false)
-  assert.deepEqual(f.calls, ['context', 'release-lock', 'launch', 'quit'])
-  assert.equal(continued, false, 'Old elevated process must not start services')
-})
-
-test('failed handoff reacquires the lock and leaves the original app running', async () => {
-  const f = fixture({
-    experimental: true,
-    elevated: true,
-    launchError: new Error('Owned child token verification failed'),
-  })
-  f.hydrated.resolve()
-  await f.register()
-  assert.deepEqual(f.calls, [
-    'context',
-    'release-lock',
-    'launch',
-    'acquire-lock',
-    'login',
-  ])
-})
-
-test('unavailable normal-permission launch never releases the app lock', async () => {
-  const f = fixture({
-    experimental: true,
-    elevated: true,
-    relaunchAvailable: false,
-  })
-  f.hydrated.resolve()
-  await f.register()
-  assert.deepEqual(f.calls, ['context', 'login'])
-})
-
-test('already-normal SDK result reacquires the lock before continuing', async () => {
-  const f = fixture({
-    experimental: true,
-    elevated: true,
-    launchStatus: 'already-unelevated',
-  })
-  f.hydrated.resolve()
-  await f.register()
-  assert.deepEqual(f.calls, [
-    'context',
-    'release-lock',
-    'launch',
-    'acquire-lock',
-    'login',
-  ])
-})
-
-test('a competing instance after failed handoff prevents this process starting services', async () => {
-  const f = fixture({
-    experimental: true,
-    elevated: true,
-    launchError: new Error('Launch failed'),
-    lockAvailable: false,
-  })
-  f.hydrated.resolve()
-  let continued = false
-  void f.register().then(() => {
-    continued = true
-  })
-  await new Promise(setImmediate)
-  assert.deepEqual(f.calls, [
-    'context',
-    'release-lock',
-    'launch',
-    'acquire-lock',
-    'quit',
-  ])
+  assert.equal(f.settings.runAsAdmin, true)
+  assert.equal(f.calls.at(-1), 'quit')
   assert.equal(continued, false)
 })

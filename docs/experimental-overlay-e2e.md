@@ -18,6 +18,10 @@ pnpm test:experimental-overlay:e2e --case=d3d11-x64 --scale=1.25
 pnpm test:experimental-overlay:e2e --case=d3d11-x64 --scale=1 --target-mode=early
 # Real-app recovery after controlled preflight and runtime failures:
 pnpm test:experimental-overlay:e2e --case=d3d11-x64 --scale=1 --target-mode=folder --recovery
+# Explicit administrator trial, from an administrator terminal, using the actual EXE:
+pnpm test:experimental-overlay:e2e --case=d3d11-x64 --scale=1 --target-mode=folder --elevated --app-root=apps/app/dist_electron/win-unpacked/resources/app.asar "--app-exe=apps/app/dist_electron/win-unpacked/Izabela Next.exe"
+# Elevated app with a genuinely normal-permission graphics target:
+pnpm test:experimental-overlay:e2e --case=d3d11-x64 --scale=1 --target-mode=folder --elevated --medium-target --app-root=apps/app/dist_electron/win-unpacked/resources/app.asar "--app-exe=apps/app/dist_electron/win-unpacked/Izabela Next.exe"
 # Slow loader startup, before the graphics barrier can execute:
 pnpm test:experimental-overlay:e2e --case=d3d11-x64 --scale=1 --target-mode=folder --startup-delay-ms=800
 # Fast-start diagnostic: no graphics startup barrier (timing can still fail):
@@ -169,7 +173,10 @@ Reports and screenshots are under `coverage/experimental-overlay/e2e/<run>/`.
 Only lossless PNG captures are retained; raw bitmap intermediates are removed.
 Cleanup waits for the SDK's authoritative target exit and private-image retirement
 before closing the app. Each case reports unique runtime allocation by file
-identity and fails if private add-on images accumulate after its shutdown.
+identity and fails if private add-on images or unlinked EXE/DLL payloads
+accumulate after its shutdown. It compares both private binary count and bytes
+against the pre-launch baseline, so shared hard-link names do not masquerade as
+new disk allocations.
 `Native overlay input` builds fixtures on hosted Windows and runs the
 full matrix on a Windows desktop runner labelled `graphics-overlay`. This manual
 workflow requires that desktop runner; ordinary hosted/headless builds continue
@@ -202,6 +209,26 @@ Reports use the stable `coverage/experimental-overlay/elevated-consumer*.json`
 paths. Running it without elevation fails before creating a replacement.
 
 The regular graphics matrix never requests UAC. This check establishes the real
-elevated-to-medium SDK transition; startup unit tests cover Izabela's lock handoff
-and persistent setting, while packaged graphics cases verify the normal process's
-native token before rendering/input tests.
+elevated-to-medium SDK transition. Startup unit tests require Izabela to honor
+its administrator preference and preserve elevated launches. The graphics harness observes its own normal token
+before rendering/input tests; it does not change production startup privileges.
+
+The separate `--elevated` graphics trial requires a genuinely high-integrity
+packaged app and preserves `runAsAdmin: true`. It must still render and accept
+native input to pass; an SDK refusal is a failure. The owned graphics host is
+created by the elevated app and inherits its token. Generation 26 rejected the
+elevated injector before checking the target token;
+generation 28 passes the actual high/high and high/medium cases using its private
+authorization lane. A successful headless de-elevation check does
+not establish elevated overlay support.
+
+Adding `--medium-target` keeps Izabela elevated and creates only the test fixture
+at medium integrity. The high Node controller explicitly launches a medium Node
+fixture owner through the SDK's optional replacement API; it never replaces the
+application. That owner verifies the pinned graphics bytes, creates only that
+child and retains its process handle for cleanup. The graphics driver queries
+the exact target's real token, session and creation time before attachment checks.
+Reports must show the app at high integrity, the target at medium integrity and
+the unchanged administrator preference. The ordinary administrator trial instead
+verifies a high target. Neither trial treats refusal or process creation as a
+rendering/input pass.

@@ -201,11 +201,11 @@ test('experimental opt-in deselects legacy, marks restart and never requests ele
   assert.match(wrapper.text(), /Enable Experimental Game Overlay/)
 })
 
-test('experimental opt-in disables the legacy administrator startup setting', async (t) => {
+test('experimental opt-in preserves the administrator startup setting', async (t) => {
   const f = fixture(t, { enableGameOverlay: true })
   assert.equal(f.runAsAdmin(), true)
   await f.toggle(1)
-  assert.equal(f.runAsAdmin(), false)
+  assert.equal(f.runAsAdmin(), true)
 })
 
 test('confirmed legacy opt-in deselects experimental and retains the admin requirement', async (t) => {

@@ -1,20 +1,20 @@
 {
   "schemaVersion": 2,
-  "version": "1.0.1-alpha.2026110903",
+  "version": "1.0.1-alpha.2026111002",
   "repository": "https://github.com/Wurielle/electron-game-overlay",
   "baseCommit": "cb5acf47e1793f1b0e5ed5e8ebfa5e7f513afe6c",
   "branch": "codex/attachment-storage-recovery",
   "workingTreeDirty": true,
   "sourceSnapshot": {
     "file": "source-snapshot.zip",
-    "sha256": "f6d43892f2d4bc80843917ba5f0c31426019719943eb0392645931f5f620ff8b"
+    "sha256": "c4a6885588220437453762662b819bcda97ff08cc6162c67e235db2696026c56"
   },
   "sourceManifest": {
     "file": "source-manifest.json",
-    "sha256": "545b907f36c14268d7283cf322f532c39b282351a2a20db02a12c618d70ec1b9"
+    "sha256": "941fba185b235b01e4346728f06167ab6f71595d6e81f41cd81f880971aa1912"
   },
   "dirtyDiff": {
     "file": "source-dirty.diff",
-    "sha256": "78d5699d32f2308951796385e1080e64b88759e80950caf12fd58dda26c83838"
+    "sha256": "d99be6b4b0dbcee962a0e99d9e450a47f243d94d05a89f48c6f11aeb86a5fbd0"
   }
 }

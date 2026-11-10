@@ -115,7 +115,7 @@ app
         'SDK escaped packaged application',
       )
     const metadata = requireApp('electron-game-overlay/package.json')
-    assert.equal(metadata.version, '1.0.1-alpha.2026110903')
+    assert.equal(metadata.version, '1.0.1-alpha.2026111002')
     const expectedElectron = JSON.parse(
       fs.readFileSync(path.resolve('apps/app/package.json'), 'utf8'),
     ).devDependencies.electron

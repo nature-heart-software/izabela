@@ -40,10 +40,18 @@ static bool activate() {
     const bool b = foreground && foreground != current && foreground != target && AttachThreadInput(current, foreground, TRUE);
     ShowWindow(target_window, SW_RESTORE);
     BringWindowToTop(target_window);
-    SetForegroundWindow(target_window);
+    const bool requested = SetForegroundWindow(target_window) != FALSE;
     if (b) AttachThreadInput(current, foreground, FALSE);
     if (a) AttachThreadInput(current, target, FALSE);
-    return GetForegroundWindow() == target_window;
+    const HWND observed = GetForegroundWindow();
+    if (observed != target_window) {
+        DWORD foreground_pid = 0;
+        GetWindowThreadProcessId(observed, &foreground_pid);
+        std::fprintf(stderr, "Fixture activation failed: targetPid=%lu foregroundPid=%lu requested=%d attachedTarget=%d attachedForeground=%d minimized=%d enabled=%d alt=%d control=%d shift=%d\n",
+            target_pid, foreground_pid, requested, a, b, IsIconic(target_window), IsWindowEnabled(target_window),
+            GetAsyncKeyState(VK_MENU) < 0, GetAsyncKeyState(VK_CONTROL) < 0, GetAsyncKeyState(VK_SHIFT) < 0);
+    }
+    return observed == target_window;
 }
 static void add_key(std::vector<INPUT> &inputs, WORD vk, bool up) {
     INPUT input{};
@@ -62,6 +70,34 @@ int wmain(int argc, wchar_t **argv) {
     DWORD size = 32768;
     const bool valid = process && QueryFullProcessImageNameW(process, 0, image, &size) && _wcsicmp(image, expected_image.c_str()) == 0;
     if (!valid) { if (process) CloseHandle(process); std::fprintf(stderr, "Owned fixture identity mismatch\n"); return 3; }
+    if (command == L"token") {
+        HANDLE token = nullptr;
+        TOKEN_ELEVATION elevation{};
+        DWORD length = 0, session = 0;
+        FILETIME creation{}, exit{}, kernel{}, user{};
+        bool ok = OpenProcessToken(process, TOKEN_QUERY, &token) &&
+            GetTokenInformation(token, TokenElevation, &elevation, sizeof(elevation), &length) &&
+            GetTokenInformation(token, TokenSessionId, &session, sizeof(session), &length) &&
+            GetProcessTimes(process, &creation, &exit, &kernel, &user);
+        DWORD needed = 0, integrity = 0;
+        if (ok) {
+            GetTokenInformation(token, TokenIntegrityLevel, nullptr, 0, &needed);
+            std::vector<BYTE> data(needed);
+            ok = needed && GetTokenInformation(token, TokenIntegrityLevel, data.data(), needed, &length);
+            if (ok) {
+                const auto label = reinterpret_cast<TOKEN_MANDATORY_LABEL *>(data.data());
+                ok = IsValidSid(label->Label.Sid) && *GetSidSubAuthorityCount(label->Label.Sid) > 0;
+                if (ok) integrity = *GetSidSubAuthority(label->Label.Sid, *GetSidSubAuthorityCount(label->Label.Sid) - 1);
+            }
+        }
+        const DWORD error = ok ? 0 : GetLastError();
+        if (token) CloseHandle(token);
+        CloseHandle(process);
+        if (!ok) { std::fprintf(stderr, "Owned token query failed: %lu\n", error); return 14; }
+        const auto birth = (static_cast<unsigned long long>(creation.dwHighDateTime) << 32) | creation.dwLowDateTime;
+        std::printf("{\"pid\":%lu,\"elevated\":%s,\"integrityRid\":%lu,\"sessionId\":%lu,\"creationTime100ns\":\"%llu\"}\n", target_pid, elevation.TokenIsElevated ? "true" : "false", integrity, session, birth);
+        return 0;
+    }
     if (command == L"module") {
         std::wstring found;
         DWORD query_error = ERROR_INSUFFICIENT_BUFFER, max_path_length = 0;

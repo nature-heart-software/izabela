@@ -56,7 +56,7 @@ async function main() {
     true,
     'Run this check from an administrator terminal',
   )
-  assert.equal(context.overlaySupported, false)
+  assert.equal(context.overlaySupported, true)
   assert.equal(context.relaunchAvailable, true, context.relaunchRefusal)
   if (fs.existsSync(replacementReport)) {
     const previous = JSON.parse(fs.readFileSync(replacementReport, 'utf8'))

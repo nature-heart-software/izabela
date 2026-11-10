@@ -11,11 +11,7 @@ the other. Existing saved legacy settings do not opt you into the experiment.
 2. In **Settings → Game Overlay**, enable **Experimental Game Overlay**.
 3. Review the shared allowlist/denylist. Only newly created matching processes
    are candidates; an already-running game is not attached retroactively.
-4. Restart Izabela, then launch the supported game. The experiment disables
-   **Run as Administrator** before services start. If Izabela is already
-   elevated, the SDK verifies a same-user desktop shell and launches a fresh
-   normal-permission replacement without requesting UAC. An ordinary restart
-   alone would inherit the old administrator token.
+4. Restart Izabela, then launch the supported game.
 5. Use the existing messenger shortcut to show/type in the game overlay. Escape
    and the existing stop-interception action release input and hide it.
 
@@ -25,13 +21,11 @@ legacy, stop the game, select the existing **Game Overlay** option, and restart
 Izabela before launching it again. The legacy administrator confirmation is
 unchanged.
 
-The SDK verifies the replacement's executable, process identity, user, session
-and token before letting it run. Izabela releases its single-instance lock only
-for that verified handoff and quits the elevated process after confirmed child
-creation. Failed handoffs restore the lock and leave the original app available;
-startup logs retain the failure. A missing eligible desktop shell or executable
-that requires administrator permissions can prevent this relaunch. Elevated
-game targets remain unsupported.
+**Run as Administrator** keeps its saved value and original startup behavior.
+Enabling the experimental overlay does not change that preference or relaunch
+Izabela at a different privilege level. The SDK supports elevated Izabela with
+normal or elevated targets belonging to the same user and interactive session.
+An ordinary non-elevated Izabela cannot attach to an elevated target.
 
 The experiment uses the SDK's public `OverlayTargetWatcher` with
 `createOverlayProcessPolicy`. User and database allow/deny rules are combined
@@ -158,7 +152,7 @@ setting does not switch focus behavior before a restart.
 
 - Windows x64 host, supported Direct3D 9/10/11/12 games; x86/x64 runtime payloads
   are supplied by the SDK.
-- No anti-cheat or elevated game targets. Existing ReShade installations are not
+- No anti-cheat-protected targets. Elevated targets require elevated Izabela under the same user/session. Existing ReShade installations are not
   overwritten. The optional Defender action changes only the disclosed injector
   path exclusions after user approval; it does not disable antivirus protection.
 - Izabela keeps Electron **46.0.0-alpha.2**, an exact prerelease explicitly

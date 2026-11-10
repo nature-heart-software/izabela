@@ -275,7 +275,6 @@ const setGameOverlay = (value: boolean) => {
 }
 
 const setExperimentalGameOverlay = (value: boolean) => {
-  if (value) settingsStore.disableRunAsAdmin()
   gameOverlayStore.$patch({
     enableExperimentalGameOverlay: value,
     ...(value ? { enableGameOverlay: false } : {}),

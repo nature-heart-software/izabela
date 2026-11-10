@@ -1,64 +1,75 @@
 # Experimental overlay SDK distribution
 
 The working tree uses the complete, unmodified upstream local candidate
-`vendor/electron-game-overlay-1.0.1-alpha.2026110903.tgz`.
-`@packages/electron-game-overlay` remains the legacy backend. This candidate is
-not a published SDK release; Izabela pins the archive directly.
+`vendor/electron-game-overlay-1.0.1-alpha.2026111002.tgz`.
+`@packages/electron-game-overlay` remains the legacy backend. This is an
+unpublished SDK candidate pinned directly by Izabela.
 
-- Tarball SHA-256: `a5ed66cbc72d3a45fdbe7584dd7605abd9717d262b08ea09e57606169fade479`.
+- Tarball SHA-256: `34f6e7ccfb71c6309315e6e9cef8fceab9b40763420560e58798a4a420f9aa22`.
 - Source base: `cb5acf47e1793f1b0e5ed5e8ebfa5e7f513afe6c`, branch
   `codex/attachment-storage-recovery`, with uncommitted upstream changes.
-  The sibling source ZIP, manifest and dirty diff are hash-bound by the packaged
+  The sibling source ZIP, manifest and dirty diff match the hash-bound packaged
   `SDK_PROVENANCE.json`; the separate source-provenance JSON is retained too.
-- Native generation: 26, both architectures; add-on build ID
-  `CCE20935ADD44EF6A5A7973014B2E07F`. Packaging verifies all 160 sealed payloads
-  and preserves all 165 package files.
+- Native generation: 28, both architectures; explicit capability
+  `privateElevatedAuthorization: 2`. Add-on build ID:
+  `CCE20935ADD44EF6A5A7973014B2E07F`.
+- Packaging verifies all 160 sealed payloads and preserves all 165 package files.
 - License: GPL-3.0-only. The complete package, notices and source snapshot remain
-  available. Izabela does not patch SDK files or add injection retries.
+  available. Izabela applies no SDK patches or injection retries.
 
-Generation 26 adds a bounded read-only loader-readiness phase on the exact
-retained process handle before normal strict module inspection. A positively
-observed uninitialized loader can initialize within three seconds; a target that
-never initializes reports `target-startup-readiness-failed` without injection.
-Other inspection failures retain their existing strict inspection behavior.
-Native member/elevation refusals now retain precise diagnostic classifications.
+**Run as Administrator** retains its saved preference and original startup
+behavior. Experimental opt-in does not clear the preference or automatically
+relaunch the app at a lower privilege level. Startup regressions enforce this.
+Izabela does not call the SDK optional de-elevation API in production.
 
-Izabela uses `inspectOverlayConsumerExecutionContext()` before starting overlay
-services. An already-elevated consumer can use the SDK's
-`launchUnelevatedOverlayConsumer()` contract to create its own same-user/session
-replacement through a verified normal-permission desktop shell. The SDK verifies
-the child executable and token before resuming it, preserves literal arguments,
-uses a fresh environment and requests no UAC prompt. This does not authorize
-injection into elevated targets. See [startup behavior](experimental-game-overlay.md).
+The SDK now supports an interactive high-integrity consumer with a medium or
+high target under the same user and session. A medium consumer cannot authorize
+a higher-integrity target. Unknown tokens, different users/sessions and system
+contexts fail closed. Native `EGO_TARGET_AUTHORIZATION_V1` telemetry records
+`allowed-private-elevated` for the elevated lane.
 
-The SDK producer passed 639 SDK checks and 26 source-cache checks, with eight
-Windows-inapplicable POSIX skips. Both native architectures passed delayed-loader,
-permanent-timeout, process-exit, diagnostic and owned desktop-parent launch checks.
-The desktop-parent fixture exercises the production launch body from a normal
-caller; it does not establish an actual elevated Izabela round trip.
+High consumers use a private runtime stage with explicit user ownership, a
+protected access list and high integrity. Both native managers verify its file
+identities, single-link code files, expected hashes and security descriptors.
+Only two fixed diagnostics files are medium-writable. The elevated target lane
+does not scan the shared per-user add-on inventory. No privileged shared broker
+or OS security-policy change is required.
 
-Consumer frozen installation and all 103 overlay/package checks pass. All 21
-native cases pass across 29 authenticated graphics lifecycles, including four
-cases through the actual packaged executable. Coverage includes delayed loader
-startup, immediate first-key typing, cursor/scroll, scaling, early rearming,
-no-barrier relaunch and mixed failure recovery. All cases confirm authoritative
-exit and private-image retirement. The separate user-approved headless check also
-passes the actual elevated-to-medium SDK transition, verifying child identity,
-executable hash, session, literal arguments and a fresh environment. This live
-check uses Node; Izabela startup unit tests cover the app lock handoff and setting.
-Exact evidence, including the generation-25 delayed
-startup failure and retained fixture failures, is indexed in
-`coverage/experimental-overlay/attachment-recovery-validation.json`.
+The SDK producer passed 697 checks with eight Windows-inapplicable POSIX skips.
+An actual high-token public `prepare()` call verified both native architectures,
+rejected changed digests and hard-link aliases, preserved the high caller and
+removed its unused stage on disposal. This preparation gate was followed by
+actual packaged Izabela graphics tests; it is not used as their substitute.
 
-The preceding generation-25 candidate fixed discovery stranded after an access
-refusal and private-image retention after a cancelled target's authoritative exit.
-Its consumer validation passed 16 native cases covering 24 authenticated graphics
-lifecycles, including the actual packaged executable, cursor/scroll, scaling,
-no-click typing and mixed A/B/A recovery. Those checks did not cover delayed
-loader initialization or an already-elevated consumer. The generation-26 checks
-extend that coverage. Shared test registry/staging caches and lossless PNG-only
-captures avoid repeated full asset copies. The E2E suite itself changes no
-antivirus setting and launches no user games.
+Frozen installation and all 103 consumer/package checks pass. Actual packaged
+administrator acceptance passes for x64 high targets, x64 medium targets and
+x86 high targets. Each verifies the real app/target tokens, saved administrator
+preference, private native authorization, first-key/no-click input, rendered
+pixels, cursor/scroll, input release and authoritative private-code retirement.
+The full 11-case normal-permission graphics/scaling/rearming matrix passes, as do
+actual packaged normal-permission mixed recovery and delayed-loader pairs.
+Together with the administrator trials, these cover 21 passing native cases and
+25 authenticated graphics lifecycles. All 10 actual packaged cases pass.
+
+An additional administrator mixed-recovery attempt stopped before the
+access-refusal fixture became ready: the unchanged upstream owner exited 13 at
+its forbidden-open/refusal/resume guard. No SDK failure was reached. That
+administrator recovery scenario remains unvalidated; the normal recovery tests
+and administrator graphics acceptance are recorded separately. The harness now
+reports early fixture exits directly instead of waiting for readiness timeout.
+
+Generation 28 also retains bounded loader readiness, startup-timeout diagnostics
+and per-process failure isolation. Earlier failures are preserved: generation 26
+refused elevated injectors; generation 27 failed private diagnostics creation
+with Windows error 1314. An initial generation-28 high preparation gate caught
+files owned by the Administrators group; explicit ownership at creation fixed
+that upstream while retaining the strict verification rule.
+
+Exact reports are indexed under `coverage/experimental-overlay/`.
+Normal tests share verified staging/registration caches and retain PNG captures
+without raw bitmap duplicates. Elevated tests additionally require private code
+copies to retire after authoritative target exit. No user games or antivirus
+settings are changed by these tests.
 
 ## Earlier published nightly validation
 

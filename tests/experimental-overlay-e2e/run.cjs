@@ -21,6 +21,8 @@ const appExecutable = argument('app-exe') && path.resolve(argument('app-exe'))
 const selected = argument('case') ? [argument('case')] : cases
 const targetMode = argument('target-mode') || 'folder'
 const recovery = process.argv.includes('--recovery')
+const elevated = process.argv.includes('--elevated')
+const mediumTarget = process.argv.includes('--medium-target')
 const startupDelayMs = Number(argument('startup-delay-ms') || 0)
 const requestedScale =
   argument('scale') === undefined ? undefined : Number(argument('scale'))
@@ -39,7 +41,9 @@ function runtimeStorage() {
   let files = 0,
     contentBytes = 0n,
     allocatedBytes = 0n,
-    privateImages = 0
+    privateImages = 0,
+    privateCodeFiles = 0,
+    privateCodeBytes = 0n
   function visit(directory) {
     if (!fs.existsSync(directory)) return
     for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
@@ -62,6 +66,14 @@ function runtimeStorage() {
         privateImages++
       const stat = fs.statSync(filename, { bigint: true }),
         identity = `${stat.dev}:${stat.ino}`
+      if (
+        directory.startsWith(runtimeRunsRoot + path.sep) &&
+        /\.(?:exe|dll|addon32|addon64)$/i.test(entry.name) &&
+        stat.nlink === 1n
+      ) {
+        privateCodeFiles++
+        privateCodeBytes += stat.size
+      }
       if (identities.has(identity)) continue
       identities.add(identity)
       contentBytes += stat.size
@@ -76,6 +88,8 @@ function runtimeStorage() {
     contentBytes: String(contentBytes),
     allocatedBytes: String(allocatedBytes),
     privateImages,
+    privateCodeFiles,
+    privateCodeBytes: String(privateCodeBytes),
     scope: 'unique file identities, excluding filesystem metadata',
   }
 }
@@ -199,7 +213,7 @@ async function runCase(
     ignorelist: [],
   })
   writeStore(profile, 'settings', {
-    runAsAdmin: false,
+    runAsAdmin: elevated,
     launchOnStartup: false,
     enableAutoUpdate: false,
     enableSTTTS: false,
@@ -213,6 +227,8 @@ async function runCase(
   const config = {
     case: name,
     negativeControl,
+    elevated,
+    mediumTarget,
     scaleFactor,
     targetMode: mode,
     appRoot,
@@ -221,6 +237,7 @@ async function runCase(
     profile,
     target,
     fixtureSource: source,
+    fixtureSha256: fixture.sha256,
     startupDelayMs: delayMs,
     input: path.join(fixtures, 'overlay-test-input.exe'),
     recovery: recovery && !negativeControl,
@@ -237,6 +254,46 @@ async function runCase(
   }
   const configFile = path.join(directory, 'config.json')
   fs.writeFileSync(configFile, JSON.stringify(config, null, 2))
+  if (mediumTarget) {
+    const { createRequire } = require('node:module')
+    const sdk = createRequire(path.join(root, 'apps/app/package.json'))(
+      'electron-game-overlay',
+    )
+    const context = await sdk.inspectOverlayConsumerExecutionContext()
+    assert.equal(
+      context.elevated,
+      true,
+      'Medium-target trial requires an elevated controller',
+    )
+    const launched = await sdk.launchUnelevatedOverlayConsumer({
+      context,
+      arguments: [path.join(__dirname, 'medium-target.cjs'), configFile],
+    })
+    assert.equal(launched.status, 'launched')
+    const prefix = path.join(directory, 'medium-target')
+    const deadline = Date.now() + 40000
+    while (
+      !fs.existsSync(prefix + '.ready.json') &&
+      !fs.existsSync(prefix + '.error.json') &&
+      Date.now() < deadline
+    )
+      await wait(20)
+    if (!fs.existsSync(prefix + '.ready.json')) {
+      fs.writeFileSync(prefix + '.stop', '')
+      throw new Error('Medium fixture owner did not initialize')
+    }
+    const owner = JSON.parse(fs.readFileSync(prefix + '.ready.json', 'utf8'))
+    assert.equal(owner.ownerPid, launched.replacement.pid)
+    assert.equal(
+      owner.creationTime100ns,
+      launched.replacement.creationTime100ns,
+    )
+    assert.equal(owner.elevated, false)
+    assert.equal(owner.integrityRid, 8192)
+    assert.equal(owner.sessionId, context.sessionId)
+    config.mediumOwnerContext = owner
+    fs.writeFileSync(configFile, JSON.stringify(config, null, 2))
+  }
   await assertFreePort(7070)
   const env = { ...process.env }
   delete env.ELECTRON_RUN_AS_NODE
@@ -280,6 +337,17 @@ async function runCase(
     })
   } finally {
     clearTimeout(timer)
+    if (mediumTarget) {
+      const prefix = path.join(directory, 'medium-target')
+      fs.writeFileSync(prefix + '.stop', '')
+      const deadline = Date.now() + 10000
+      while (!fs.existsSync(prefix + '.exited.json') && Date.now() < deadline)
+        await wait(20)
+      assert.ok(
+        fs.existsSync(prefix + '.exited.json'),
+        'Owned medium fixture owner exited',
+      )
+    }
     owned.stdout.unpipe(stdout)
     owned.stderr.unpipe(stderr)
     owned.stdout.destroy()
@@ -297,12 +365,16 @@ async function runCase(
   report.runtimeStorageAfterAppExit = runtimeStorage()
   if (
     report.status === 'passed' &&
-    report.runtimeStorageAfterAppExit.privateImages >
-      storageBefore.privateImages
+    (report.runtimeStorageAfterAppExit.privateImages >
+      storageBefore.privateImages ||
+      report.runtimeStorageAfterAppExit.privateCodeFiles >
+        storageBefore.privateCodeFiles ||
+      BigInt(report.runtimeStorageAfterAppExit.privateCodeBytes) >
+        BigInt(storageBefore.privateCodeBytes))
   ) {
     report.status = 'failed'
     report.error =
-      'Private images accumulated after owned target exit and app shutdown'
+      'Private overlay binaries accumulated after owned target exit and app shutdown'
   }
   fs.writeFileSync(file, JSON.stringify(report, null, 2) + '\n')
   console.log(
@@ -320,6 +392,33 @@ async function main() {
   )
   for (const name of selected)
     assert.ok(cases.includes(name), `Unknown fixture: ${name}`)
+  if (elevated) {
+    assert.equal(
+      selected.length,
+      1,
+      'Administrator trial uses one pinned graphics fixture',
+    )
+    assert.equal(
+      requestedScale,
+      1,
+      'Administrator trial requires explicit --scale=1',
+    )
+    assert.ok(
+      appExecutable,
+      'Administrator trial must launch the actual packaged executable',
+    )
+  }
+  if (mediumTarget) {
+    assert.deepEqual(
+      selected,
+      ['d3d11-x64'],
+      'Medium owner uses the pinned D3D11 fixture',
+    )
+    assert.equal(elevated, true, 'Medium-target trial requires --elevated')
+    assert.equal(targetMode, 'folder', 'Medium-target trial uses folder policy')
+    assert.equal(recovery, false)
+    assert.equal(startupDelayMs, 0)
+  }
   if (appExecutable) {
     assert.ok(fs.existsSync(appExecutable), 'Packaged executable must exist')
     assert.equal(

@@ -7,6 +7,7 @@ const path = require('node:path')
 const Module = require('node:module')
 const { createRequire } = Module
 const { EventEmitter } = require('node:events')
+const { PassThrough } = require('node:stream')
 const childProcess = require('node:child_process')
 const { spawn, execFileSync } = childProcess
 const { app, BrowserWindow, nativeImage, screen, dialog } = require('electron')
@@ -58,6 +59,8 @@ const evidence = {
   targetMode: config.targetMode,
   startupDelayMs: config.startupDelayMs || 0,
   recovery: !!config.recovery,
+  elevatedTrial: !!config.elevated,
+  mediumTarget: !!config.mediumTarget,
   startupBarrier: config.targetMode !== 'fast-folder',
   inputSource: 'Windows SendInput virtual-key down/up pairs',
   pointerClicks: 0,
@@ -92,18 +95,6 @@ Module._load = function (request, parent, isMain) {
     if (request === 'electron-game-overlay')
       return {
         ...sdk,
-        async inspectOverlayConsumerExecutionContext(options) {
-          const context = await sdk.inspectOverlayConsumerExecutionContext(
-            options,
-          )
-          evidence.consumerExecutionContext = context
-          return context
-        },
-        launchUnelevatedOverlayConsumer() {
-          throw new Error(
-            'Normal-permission graphics cases must not relaunch outside the owned test boundary',
-          )
-        },
         createReShadeLaunchConfig(options) {
           assert.ok(options.addonPreload?.applicationId)
           assert.equal(options.addonPreload.addonDirectory, undefined)
@@ -484,6 +475,7 @@ sdk.OverlayTargetWatcher.prototype.onEvent = function (handler) {
       failureCode: event.error?.diagnostic?.code,
       failureStage: event.error?.diagnostic?.stage,
       windowsErrorCode: event.error?.diagnostic?.windowsErrorCode,
+      injectorEvidence: event.error?.diagnostic?.evidence,
       retrySafety: event.error?.diagnostic?.retrySafety,
       scoped: !!(event.target || event.selector),
       error:
@@ -997,7 +989,45 @@ async function startTarget() {
       ),
       false,
     )
-  if (config.startupDelayMs) {
+  if (config.mediumTarget) {
+    const prefix = path.join(config.directory, 'medium-target')
+    fs.writeFileSync(prefix + '.start', '')
+    await until(() => {
+      if (fs.existsSync(prefix + '.error.json'))
+        throw new Error(fs.readFileSync(prefix + '.error.json', 'utf8'))
+      return fs.existsSync(prefix + '.started.json')
+    }, 'medium owner creates the checksum-pinned graphics target')
+    const identity = JSON.parse(
+      fs.readFileSync(prefix + '.started.json', 'utf8'),
+    )
+    assert.equal(
+      identity.executablePath.toLowerCase(),
+      config.target.toLowerCase(),
+    )
+    const proxy = new EventEmitter()
+    Object.assign(proxy, {
+      pid: identity.pid,
+      exitCode: null,
+      stdout: new PassThrough(),
+      stderr: new PassThrough(),
+      kill: () => fs.writeFileSync(prefix + '.stop', ''),
+    })
+    const observeExit = setInterval(() => {
+      if (!fs.existsSync(prefix + '.exited.json')) return
+      const exited = JSON.parse(
+        fs.readFileSync(prefix + '.exited.json', 'utf8'),
+      )
+      proxy.exitCode = exited.exitCode ?? 1
+      clearInterval(observeExit)
+      proxy.stdout.end()
+      proxy.stderr.end()
+      proxy.emit('exit', proxy.exitCode)
+    }, 25)
+    observeExit.unref()
+    target = proxy
+    evidence.mediumTargetIdentity = identity
+    evidence.mediumOwnerContext = config.mediumOwnerContext
+  } else if (config.startupDelayMs) {
     const prefix = path.join(
       config.directory,
       'delayed-start-' + evidence.targetLaunchReadiness.length,
@@ -1056,6 +1086,21 @@ async function startTarget() {
     })
   }
   evidence.targetPid = target.pid
+  const token = drive('token')
+  assert.equal(token.pid, target.pid)
+  assert.equal(token.elevated, !!config.elevated && !config.mediumTarget)
+  assert.equal(
+    token.integrityRid,
+    config.elevated && !config.mediumTarget ? 12288 : 8192,
+  )
+  assert.equal(token.sessionId, evidence.consumerExecutionContext.sessionId)
+  if (config.mediumTarget)
+    assert.equal(
+      token.creationTime100ns,
+      evidence.mediumTargetIdentity.creationTime100ns,
+    )
+  evidence.targetTokens ??= []
+  evidence.targetTokens.push(token)
   target.stdout.pipe(
     fs.createWriteStream(path.join(config.directory, 'target.stdout.log')),
   )
@@ -1145,7 +1190,46 @@ async function startTarget() {
   const inspection = drive('module')
   assert.equal(inspection.queryError, 0, 'Owned module inspection succeeds')
   assert.ok(inspection.module, 'Owned ReShade module is present')
-  if (config.profile.startsWith(config.directory + path.sep))
+  if (config.elevated) {
+    const prefix = 'EGO_TARGET_AUTHORIZATION_V1 '
+    const log = fs.readFileSync(
+      path.join(path.dirname(inspection.module), 'inject.stdout.log'),
+      'utf8',
+    )
+    const records = log
+      .split(/\r?\n/)
+      .filter((line) => line.startsWith(prefix))
+      .map((line) => JSON.parse(line.slice(prefix.length)))
+    const authorization = records.find((entry) => entry.pid === target.pid)
+    assert.ok(
+      authorization,
+      'Native elevated authorization is observed for the exact target',
+    )
+    assert.equal(authorization.targetHandlePid, target.pid)
+    assert.equal(authorization.phase, 'allowed-private-elevated')
+    assert.equal(authorization.windowsError, 0)
+    assert.equal(authorization.injector.elevated, true)
+    assert.equal(authorization.target.elevated, !config.mediumTarget)
+    evidence.elevatedAuthorizations ??= []
+    evidence.elevatedAuthorizations.push(authorization)
+    evidence.elevatedPrivatePayloads ??= []
+    evidence.elevatedPrivatePayloads.push({
+      pid: target.pid,
+      files: fs
+        .readdirSync(path.dirname(inspection.module), { withFileTypes: true })
+        .filter(
+          (entry) =>
+            entry.isFile() &&
+            /(?:\.exe|\.dll|\.addon32|\.addon64)$/i.test(entry.name),
+        )
+        .map((entry) => path.join(path.dirname(inspection.module), entry.name)),
+    })
+  }
+  // The high lane deliberately avoids the shared long-path registration.
+  if (
+    !config.elevated &&
+    config.profile.startsWith(config.directory + path.sep)
+  )
     assert.ok(
       inspection.maxModulePathLength > 260,
       'Default test profile exercises a loaded module beyond MAX_PATH',
@@ -1254,6 +1338,9 @@ async function startAccessRefusal() {
   child.on('error', (error) => {
     owned.error = error
   })
+  child.once('exit', (code, signal) => {
+    owned.exit = { code, signal }
+  })
   child.stdout.on('data', (bytes) => {
     owned.buffer += bytes.toString()
     let newline
@@ -1270,6 +1357,10 @@ async function startAccessRefusal() {
   )
   const ready = await until(() => {
     if (owned.error) throw owned.error
+    if (owned.exit)
+      throw new Error(
+        `Access-refusal fixture exited before readiness: ${JSON.stringify(owned.exit)}`,
+      )
     return owned.records.find((record) => record.ready)
   }, 'SDK-owned access refusal fixture ready')
   assert.equal(ready.kind, 'EGO_OWNED_ACCESS_REFUSAL_V1')
@@ -1384,18 +1475,31 @@ async function run() {
   }
   require(path.join(config.appRoot, 'dist-electron/background.js'))
   await app.whenReady()
+  evidence.consumerExecutionContext =
+    await sdk.inspectOverlayConsumerExecutionContext()
   await until(
     async () =>
       overlay && wrapper && (await read()).probe && (await read()).value === '',
     'real messenger and public backend readiness',
     90000,
   )
-  assert.equal(
-    evidence.consumerExecutionContext?.overlaySupported,
-    true,
-    'Real startup must verify the native consumer token before starting the overlay',
+  if (!config.elevated)
+    assert.equal(
+      evidence.consumerExecutionContext?.overlaySupported,
+      true,
+      'The normal-permission graphics test must be supported by the SDK',
+    )
+  assert.equal(evidence.consumerExecutionContext.elevated, !!config.elevated)
+  if (config.elevated)
+    assert.equal(evidence.consumerExecutionContext.integrityRid, 12288)
+  evidence.savedRunAsAdmin = await overlay.webContents.executeJavaScript(
+    "document.querySelector('#app').__vue_app__.config.globalProperties.$pinia._s.get('settings').runAsAdmin",
   )
-  assert.equal(evidence.consumerExecutionContext.elevated, false)
+  assert.equal(
+    evidence.savedRunAsAdmin,
+    !!config.elevated,
+    'Izabela must preserve the saved administrator-startup preference',
+  )
   evidence.displayScaleFactor = screen.getPrimaryDisplay().scaleFactor
   assert.equal(evidence.displayScaleFactor, config.scaleFactor)
   // Startup updates still run while the SDK prepares. Only the controlled game
@@ -1667,11 +1771,25 @@ async function finish(code) {
       evidence.cleanupPrivateImagesRetired = images.every(
         (file) => !fs.existsSync(file),
       )
+      if (config.elevated) {
+        const files =
+          evidence.elevatedPrivatePayloads?.flatMap((entry) => entry.files) ||
+          []
+        const deadline = Date.now() + 5000
+        while (
+          files.some((file) => fs.existsSync(file)) &&
+          Date.now() < deadline
+        )
+          await wait(20)
+        evidence.cleanupPrivateCodeRetired =
+          files.length > 0 && files.every((file) => !fs.existsSync(file))
+      }
     }
     if (
       code === 0 &&
       (!evidence.cleanupTargetExitObserved ||
-        !evidence.cleanupPrivateImagesRetired)
+        !evidence.cleanupPrivateImagesRetired ||
+        (config.elevated && !evidence.cleanupPrivateCodeRetired))
     ) {
       code = 1
       evidence.status = 'failed'

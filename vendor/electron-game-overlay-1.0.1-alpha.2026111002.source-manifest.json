@@ -5,8 +5,8 @@
   "files": [
     {
       "path": ".gitattributes",
-      "size": 2000,
-      "sha256": "2849b6ceb154bd0e2d8838b0b97201a65653d149fdb1c55d048e5dff9730c054",
+      "size": 2089,
+      "sha256": "5f375bef4b00c62d33df8ddb248354f96dcc2c232f06efda00d5bb9957e1ac19",
       "untracked": false
     },
     {
@@ -1031,8 +1031,8 @@
     },
     {
       "path": "doc/addon-preloading.md",
-      "size": 8005,
-      "sha256": "75de016b7e7f7523b3ad84b208560fb41a494f3472e8fa5c0de285d1935bd6d4",
+      "size": 8424,
+      "sha256": "fd573d27c4d42e3a253f3d5a12ca371689edf31f940ac7347053d511abe5e3da",
       "untracked": false
     },
     {
@@ -1064,6 +1064,12 @@
       "size": 4522,
       "sha256": "434beac2ccf61596325e5bf9abc571dc497aeee533ceef0d173d5058038144e4",
       "untracked": false
+    },
+    {
+      "path": "doc/elevated-consumers.md",
+      "size": 7919,
+      "sha256": "503c8a0aab71ad2a08faaf6b629b08590993daf21e70f471f3c5b504f9d067d6",
+      "untracked": true
     },
     {
       "path": "doc/evidence/addon-preloading-2026-11-02.json",
@@ -1217,8 +1223,8 @@
     },
     {
       "path": "doc/sdk-api.md",
-      "size": 29261,
-      "sha256": "8b1694ce3259ffbc93d2335b91a018d978c4079abd76661f4c71505a7b3afe66",
+      "size": 29609,
+      "sha256": "7a0f4b08f9c9b8ae7b627c0a2d72f4534aa0047de8156a84c744fb7764191380",
       "untracked": false
     },
     {
@@ -1415,8 +1421,8 @@
     },
     {
       "path": "libs/electron-game-overlay-runtime/CMakeLists.txt",
-      "size": 200477,
-      "sha256": "6178fb576acbf43653c7e291f5f813f75aa514e56e525cb881b6a37bddada9a1",
+      "size": 203287,
+      "sha256": "26aa56e0911d198eb3c12eef482c40119c5ca63e62247a13bf27fdb45ffd2a59",
       "untracked": false
     },
     {
@@ -1445,8 +1451,8 @@
     },
     {
       "path": "libs/electron-game-overlay-runtime/README.md",
-      "size": 60464,
-      "sha256": "b46eece4fad658a9e1112ff01a384ac52570c42b00ba4da77cd6566b48761584",
+      "size": 60524,
+      "sha256": "cedba5dda1d6a9b8796705a7bff77ed4c026d2b8bba213f99a66483d0919b534",
       "untracked": false
     },
     {
@@ -1457,8 +1463,8 @@
     },
     {
       "path": "libs/electron-game-overlay-runtime/patches/README.md",
-      "size": 27756,
-      "sha256": "50c36ec5073938c7f0890bb08fa028d97de849f14f16b514b138ad1f7c5977ba",
+      "size": 28968,
+      "sha256": "7fd4f21a6ef52af474965e33cb5818046c32d202a083c2a3d63da23ebf690c98",
       "untracked": false
     },
     {
@@ -1490,6 +1496,12 @@
       "size": 23517,
       "sha256": "d4fc9a85d26c8458b7d22424402018579477205317e10a38dd0b7e472a448e56",
       "untracked": false
+    },
+    {
+      "path": "libs/electron-game-overlay-runtime/patches/reshade-injector-elevated-private-authorization.patch",
+      "size": 18697,
+      "sha256": "df33e210e32a3994866ecda8f6b0461c113a3f27dec1a79133d4d0af347b9697",
+      "untracked": true
     },
     {
       "path": "libs/electron-game-overlay-runtime/patches/reshade-injector-exact-pid.patch",
@@ -1745,14 +1757,14 @@
     },
     {
       "path": "libs/electron-game-overlay-runtime/scripts/build-reshade-runtime.ps1",
-      "size": 32525,
-      "sha256": "2dd38519287961a46d3baf301c5862248ecefcb6b05c45d12726f0b6e093788e",
+      "size": 33121,
+      "sha256": "c11e0ac758fa5f54c7d94fe1e79257cdae01b17538525fbc4242002c5ae5dc19",
       "untracked": false
     },
     {
       "path": "libs/electron-game-overlay-runtime/scripts/build.ps1",
-      "size": 20539,
-      "sha256": "c9a780948fb4e6ee992fa9ce59461b07a5a7377a72697e51c5fa40422187dda0",
+      "size": 20712,
+      "sha256": "f346985dbcbc901ab0cbea0b8e6df49c1df6b7a923cdb2a5c543e8e5dd72d596",
       "untracked": false
     },
     {
@@ -2638,6 +2650,18 @@
       "untracked": false
     },
     {
+      "path": "libs/electron-game-overlay-runtime/scripts/test-cases/elevated-private-authorization-console.ps1",
+      "size": 1365,
+      "sha256": "09dc3311f911b7c9cf38d5c450d8ff0cac91ed0a964bab2754ed489f35ca3af8",
+      "untracked": true
+    },
+    {
+      "path": "libs/electron-game-overlay-runtime/scripts/test-cases/elevated-public-prepare-console.ps1",
+      "size": 419,
+      "sha256": "56666cd1db71540e7acd44e95373d27d179236d3f2dcb4f29a81711c882f43a4",
+      "untracked": true
+    },
+    {
       "path": "libs/electron-game-overlay-runtime/scripts/test-cases/existing-reshade-installation-preflight.ps1",
       "size": 223,
       "sha256": "1fb6fdd411dbb8e03d9661062cba0e9409d048f58f25e2791402b499146883ce",
@@ -2759,8 +2783,8 @@
     },
     {
       "path": "libs/electron-game-overlay-runtime/scripts/test-cases/member-diagnostics-console.ps1",
-      "size": 1289,
-      "sha256": "98630510cc589813e787ed473297e7f04298b115104fb21455968ea60fdf6112",
+      "size": 1288,
+      "sha256": "9c9c62c4a3a47d03ec24fa06292ffbe5eb47773c84b75dcada536b778b250940",
       "untracked": true
     },
     {
@@ -2819,8 +2843,8 @@
     },
     {
       "path": "libs/electron-game-overlay-runtime/scripts/test-cases/startup-readiness-console.ps1",
-      "size": 1779,
-      "sha256": "9e0b0da98189828f3aaae1af3f43256919f0d2e8c3bfdbbac6a126db96eb1ec7",
+      "size": 1778,
+      "sha256": "9e458d73a7b45ce557888dd7f6e306b28cf1e3172c47442efc5b84d8201d36bd",
       "untracked": true
     },
     {
@@ -2897,8 +2921,8 @@
     },
     {
       "path": "libs/electron-game-overlay-runtime/src/electron_game_overlay_reshade_manager.cpp",
-      "size": 163210,
-      "sha256": "d105c03f015e3baa2330bf8fa68a37f91889f4d60f1ee24f13add23756f26b3e",
+      "size": 183632,
+      "sha256": "0b2d46d9e752c3ce999e5ecf0024c54e95705a0b8d0a101bbac7bb38ff5df347",
       "untracked": false
     },
     {
@@ -3364,6 +3388,30 @@
       "untracked": false
     },
     {
+      "path": "libs/electron-game-overlay-runtime/tests/elevated-private-authorization/CMakeLists.txt",
+      "size": 704,
+      "sha256": "8705a0a545375bacda7eea8678d109fafcbe4dd1b5db69490bfe8007951e6fc9",
+      "untracked": true
+    },
+    {
+      "path": "libs/electron-game-overlay-runtime/tests/elevated-private-authorization/fixture.cpp",
+      "size": 5930,
+      "sha256": "5f2dfc69a7ade6253846699748030db5306983dd30388b226e192f5da1cb7258",
+      "untracked": true
+    },
+    {
+      "path": "libs/electron-game-overlay-runtime/tests/elevated-private-authorization/public-prepare.cjs",
+      "size": 4558,
+      "sha256": "96732eff02856170f5a8e40f10abe032fb8a78daad54fd628c3b70d56fe63274",
+      "untracked": true
+    },
+    {
+      "path": "libs/electron-game-overlay-runtime/tests/elevated-private-authorization/run.cjs",
+      "size": 2852,
+      "sha256": "fbe11351a4686af1ce6b260a7ebb882fb0f0aeb0852b16f3778c78d21d70a343",
+      "untracked": true
+    },
+    {
       "path": "libs/electron-game-overlay-runtime/tests/ini-canonicalization/CMakeLists.txt",
       "size": 1100,
       "sha256": "966499e5427697a464efc8ed7990b3a5c41dad2e7d490cbaf84f1874ba7129bb",
@@ -3479,8 +3527,8 @@
     },
     {
       "path": "libs/electron-game-overlay-runtime/tests/inspection-context-console/consumer-context.cjs",
-      "size": 3423,
-      "sha256": "b5343a43ebdffb89d8c007f0388fc28f811d8fc4d8374a151a900cab484b40c7",
+      "size": 3446,
+      "sha256": "d01ed1f3455ba2954cd2c3339fd9efcdc10552f73b6db39acacf892abab5ad94",
       "untracked": true
     },
     {
@@ -4115,8 +4163,8 @@
     },
     {
       "path": "libs/electron-game-overlay/README.md",
-      "size": 21246,
-      "sha256": "baf516d17fdd435d20a32c1b0c92770fc5e4eb611dd75a097dbf4d9a0760c16a",
+      "size": 21244,
+      "sha256": "a347714ed804425f703d99fd21c9f98e042326ba21f597182e9c452a8f4bd72a",
       "untracked": false
     },
     {
@@ -4157,8 +4205,8 @@
     },
     {
       "path": "libs/electron-game-overlay/scripts/stage-game-overlay-runtime.ps1",
-      "size": 22573,
-      "sha256": "47d4f9c659a44274764f7f64adbbdbc3c4f7a7f361c9f625cbd5356a5117d00d",
+      "size": 22950,
+      "sha256": "672f5e9f99113275e83fbe057b582781c71517a1e54011b4612e442bd83b4f6d",
       "untracked": false
     },
     {
@@ -4283,8 +4331,8 @@
     },
     {
       "path": "libs/electron-game-overlay/src/lib/overlay-broker-protocol.ts",
-      "size": 30435,
-      "sha256": "8c7eeaf3886337fa75f7a2e05bebb4442a27c889b762ca1abef42883f1e5af12",
+      "size": 29502,
+      "sha256": "395081aced3d9a046d1e23a7ef0637b7d7ff5a5be7b211330f3725ff2f0867bd",
       "untracked": false
     },
     {
@@ -4307,8 +4355,8 @@
     },
     {
       "path": "libs/electron-game-overlay/src/lib/overlay-consumer-context.ts",
-      "size": 8313,
-      "sha256": "91465bac2025274f293259f20a481c4a72f0a89ba05f6c0c85ebf599d97f5e01",
+      "size": 12490,
+      "sha256": "d8b273b7c8c4c54b47ec7628ec1359a3cb1b77dd31a6336c06bd92292a895e3d",
       "untracked": true
     },
     {
@@ -4325,8 +4373,8 @@
     },
     {
       "path": "libs/electron-game-overlay/src/lib/overlay-package-manifest.ts",
-      "size": 36424,
-      "sha256": "1158f5862eaf8dc119d9de29dda10753600aa96a44391ad7f1376d9441718a37",
+      "size": 37592,
+      "sha256": "eaa3ebbb66d1e0328cb1bb6c5ca27bdbad5dcc47fe5b09b87d6738d770e6dbce",
       "untracked": false
     },
     {
@@ -4373,14 +4421,14 @@
     },
     {
       "path": "libs/electron-game-overlay/src/lib/reshade-launcher.ts",
-      "size": 239839,
-      "sha256": "f507c3b4d0020cab1d4a66684de55fce6a4f87cc2ec1cdba89e144706e28dc32",
+      "size": 245131,
+      "sha256": "da3dcd94b12bd308e2531121723b2b594d4b9b5b9782d1b3e2c9f6d9ee8babae",
       "untracked": false
     },
     {
       "path": "libs/electron-game-overlay/src/lib/runtime-payload-store.ts",
-      "size": 5652,
-      "sha256": "76a62784a532f5e731e99bbfc4044dde98866480cd5be065cf91224ae9ff9d1c",
+      "size": 6492,
+      "sha256": "5715d321aad9c91a0e991b2596d82df4c3afda1bb88ca409d3c426ca4c0baa03",
       "untracked": true
     },
     {
@@ -4589,8 +4637,8 @@
     },
     {
       "path": "libs/electron-game-overlay/tests/helpers/cooperative-package-fixture.cjs",
-      "size": 11414,
-      "sha256": "b6e8ea7b14fdcff5e09846df2fa150c2ce64e05b45bf9c5a6c58522a1a24cb70",
+      "size": 11692,
+      "sha256": "2232a4b567eba4d50d8e2bc1c0d90032f5850d16d0c82d95d502f5f8fabfda78",
       "untracked": false
     },
     {
@@ -4823,8 +4871,8 @@
     },
     {
       "path": "libs/electron-game-overlay/tests/overlay-consumer-context.test.cjs",
-      "size": 5260,
-      "sha256": "12bb71f01d82bc0f9631779256c618ec9a72e3ba086c7d6182cbd8936a5c0d19",
+      "size": 8770,
+      "sha256": "77e65eae0382fdcdedf30058e6b949d501a748923254085a8fafc9dee9cbd55f",
       "untracked": true
     },
     {
@@ -4835,8 +4883,8 @@
     },
     {
       "path": "libs/electron-game-overlay/tests/overlay-package-manifest.test.cjs",
-      "size": 60035,
-      "sha256": "06dc28136d93c5e773642a5231c0efb964de13ff42a68660774e5e4d99192e0d",
+      "size": 61695,
+      "sha256": "ca21d2f0d6c878a62093e9f0d990b06f586f7f4ac5ceabbb554ecc9ac0d6ee2b",
       "untracked": false
     },
     {
@@ -4985,8 +5033,8 @@
     },
     {
       "path": "libs/electron-game-overlay/tests/reshade-launcher.test.cjs",
-      "size": 294598,
-      "sha256": "ba6d5eb43ef8e09808a335e40095b7c654dc443ceeed7cfd220d0ef3d76bbab5",
+      "size": 303896,
+      "sha256": "993aebdf3ed6956a7f920a8bffb4bf9f01f867e0a9654ad1b6efe163f007ce1e",
       "untracked": false
     },
     {
@@ -5027,14 +5075,14 @@
     },
     {
       "path": "libs/electron-game-overlay/tests/shared-addon-directory-source-cache.test.cjs",
-      "size": 25032,
-      "sha256": "8d569af485683ca8730abb8dc78b52d1982f83e8719f458a0d911095a600d2a1",
+      "size": 26535,
+      "sha256": "bbbe8ab5e89259b64f45fad9c84110a61c8ea22fbbff45402337225f42643057",
       "untracked": false
     },
     {
       "path": "libs/electron-game-overlay/tests/stageguard.test.cjs",
-      "size": 37019,
-      "sha256": "6798d16dae3354f7b07e1556f0fdf143787a617f48409b4f591e4480bd0e2023",
+      "size": 37071,
+      "sha256": "4e3a3f5c53bfc9764502a03a92929a2cacf6a6a29072d9364b1017409fb8cffa",
       "untracked": false
     },
     {
@@ -5227,6 +5275,6 @@
   "deleted": [],
   "dirtyDiff": {
     "file": "source-dirty.diff",
-    "sha256": "78d5699d32f2308951796385e1080e64b88759e80950caf12fd58dda26c83838"
+    "sha256": "d99be6b4b0dbcee962a0e99d9e450a47f243d94d05a89f48c6f11aeb86a5fbd0"
   }
 }
