@@ -1,6 +1,9 @@
-// Owned inert target and retained-handle owner for failure/recovery E2E.
-// This never selects an existing process or executes a user-provided binary.
+// Retained-handle owner for inert and checksum-verified graphics fixtures.
+// This never selects an existing process. Graphics bytes must match the pinned
+// fixture source that the parent verified before invoking this helper.
 #include <Windows.h>
+#include <algorithm>
+#include <chrono>
 #include <filesystem>
 #include <fstream>
 #include <iterator>
@@ -19,15 +22,20 @@ int wmain(int argc, wchar_t **argv) {
         }
         return 10;
     }
-    if (argc != 5 || std::wstring(argv[1]) != L"--own") return 2;
-    const std::wstring mode = argv[4], prefix = argv[3];
-    if (mode != L"suspended" && mode != L"timeout") return 3;
+    const bool graphics = argc == 6 && std::wstring(argv[1]) == L"--graphics";
+    if (!graphics && (argc != 5 || std::wstring(argv[1]) != L"--own")) return 2;
+    const std::wstring mode = graphics ? L"delayed-graphics" : argv[4];
+    const std::wstring prefix = graphics ? argv[4] : argv[3];
+    const DWORD delay = graphics ? wcstoul(argv[5], nullptr, 10) : 0;
+    if (graphics && (delay < 300 || delay > 5000 || std::filesystem::path(argv[2]).filename() != L"d3d11_overlay_test_host.exe")) return 3;
+    if (!graphics && mode != L"suspended" && mode != L"timeout") return 3;
     wchar_t self[32768]{};
     if (!GetModuleFileNameW(nullptr, self, 32768)) return 4;
-    const auto own_bytes = bytes(self);
+    const auto own_bytes = bytes(graphics ? argv[3] : self);
     if (own_bytes.empty() || own_bytes != bytes(argv[2])) return 5;
     const std::wstring stop = prefix + L".stop";
-    std::wstring command = L"\"" + std::wstring(argv[2]) + L"\" --wait \"" + stop + L"\"";
+    std::wstring command = L"\"" + std::wstring(argv[2]) + L"\"";
+    if (!graphics) command += L" --wait \"" + stop + L"\"";
     HANDLE job = CreateJobObjectW(nullptr, nullptr);
     JOBOBJECT_EXTENDED_LIMIT_INFORMATION limits{};
     limits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
@@ -57,15 +65,33 @@ int wmain(int argc, wchar_t **argv) {
         CloseHandle(process.hThread); CloseHandle(process.hProcess); CloseHandle(job);
         return 12;
     }
-    CloseHandle(process.hThread);
+    if (!graphics) CloseHandle(process.hThread);
     const auto timestamp = (static_cast<unsigned long long>(creation.dwHighDateTime) << 32) | creation.dwLowDateTime;
     {
         std::ofstream state(std::filesystem::path(prefix + L".tmp"));
         state << "{\"pid\":" << process.dwProcessId << ",\"creationTime100ns\":\"" << timestamp << "\"}";
     }
     if (!MoveFileExW((prefix + L".tmp").c_str(), (prefix + L".json").c_str(), MOVEFILE_WRITE_THROUGH)) {
+        if (graphics) CloseHandle(process.hThread);
         CloseHandle(process.hProcess); CloseHandle(job);
         return 14;
+    }
+    if (graphics) {
+        const auto started = std::chrono::steady_clock::now();
+        const auto deadline = started + std::chrono::milliseconds(delay);
+        DWORD state = WAIT_TIMEOUT;
+        while (state == WAIT_TIMEOUT && std::chrono::steady_clock::now() < deadline) {
+            const auto remaining = std::chrono::duration_cast<std::chrono::milliseconds>(deadline - std::chrono::steady_clock::now()).count();
+            state = WaitForSingleObject(process.hProcess, static_cast<DWORD>((std::max)(remaining, decltype(remaining)(0)) + 1));
+        }
+        if (state != WAIT_TIMEOUT || GetFileAttributesW(stop.c_str()) != INVALID_FILE_ATTRIBUTES || ResumeThread(process.hThread) == DWORD(-1)) {
+            CloseHandle(process.hThread);
+            CloseHandle(process.hProcess); CloseHandle(job);
+            return 15;
+        }
+        CloseHandle(process.hThread);
+        std::ofstream marker(std::filesystem::path(prefix + L".resumed"));
+        marker << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - started).count();
     }
     bool requested = false;
     for (int i = 0; i < 400 && WaitForSingleObject(process.hProcess, 0) == WAIT_TIMEOUT; ++i) {
@@ -78,5 +104,5 @@ int wmain(int argc, wchar_t **argv) {
     CloseHandle(process.hProcess); CloseHandle(job);
     if (exited) { std::ofstream marker(std::filesystem::path(prefix + L".exited")); marker << timestamp; }
     requested = requested || GetFileAttributesW(stop.c_str()) != INVALID_FILE_ATTRIBUTES;
-    return exited && requested ? 0 : 13;
+    return exited && (graphics || requested) ? 0 : 13;
 }

@@ -1,48 +1,64 @@
 # Experimental overlay SDK distribution
 
-The working tree currently uses the complete, unmodified upstream local test
-candidate `vendor/electron-game-overlay-1.0.1-alpha.2026110902.tgz`.
+The working tree uses the complete, unmodified upstream local candidate
+`vendor/electron-game-overlay-1.0.1-alpha.2026110903.tgz`.
 `@packages/electron-game-overlay` remains the legacy backend. This candidate is
-not a published release and these integration changes remain local.
+not a published SDK release; Izabela pins the archive directly.
 
-- Tarball SHA-256: `7b1802450366171017e26d424b70296817b15ab24c6fad679d75c52da4eb033f`.
+- Tarball SHA-256: `a5ed66cbc72d3a45fdbe7584dd7605abd9717d262b08ea09e57606169fade479`.
 - Source base: `cb5acf47e1793f1b0e5ed5e8ebfa5e7f513afe6c`, branch
   `codex/attachment-storage-recovery`, with uncommitted upstream changes.
   The sibling source ZIP, manifest and dirty diff are hash-bound by the packaged
   `SDK_PROVENANCE.json`; the separate source-provenance JSON is retained too.
-- Native generation: 25, both architectures; add-on build ID
-  `CCE20935ADD44EF6A5A7973014B2E07F`. Packaging verifies all 157 sealed payloads.
-- License: GPL-3.0-only; the complete package, notices and source snapshot remain
+- Native generation: 26, both architectures; add-on build ID
+  `CCE20935ADD44EF6A5A7973014B2E07F`. Packaging verifies all 160 sealed payloads
+  and preserves all 165 package files.
+- License: GPL-3.0-only. The complete package, notices and source snapshot remain
   available. Izabela does not patch SDK files or add injection retries.
 
-The candidate shares verified immutable runtime payloads across attachments,
-retains private configuration/credentials, and safely retires private add-on
-images after proven target exit. It adds failure isolation and process-identity
-recovery fixes and same-handle generation-24 inspection diagnostics. Generation
-25 reports the verified read-only process identity before an injection-access
-open can fail, so the exact refused instance remains reserved while discovery
-continues for other targets. Cancellation retains the selected identity for
-private-image retirement after authoritative exit. A failed
-live attempt with uncertain injection is never blindly retried.
+Generation 26 adds a bounded read-only loader-readiness phase on the exact
+retained process handle before normal strict module inspection. A positively
+observed uninitialized loader can initialize within three seconds; a target that
+never initializes reports `target-startup-readiness-failed` without injection.
+Other inspection failures retain their existing strict inspection behavior.
+Native member/elevation refusals now retain precise diagnostic classifications.
 
-The preceding generation-24 consumer tests exposed discovery stranded after an
-open refusal before V2 selection, and private-image retention after a cancelled
-target's authoritative exit. Both were reproduced and corrected upstream in this
-candidate. The consumer suite covers those cases alongside preflight 299 and
-runtime timeout recovery, immediately typed native input, pixels, cursor shapes,
-scrolling and shutdown retirement. Its retained evidence is indexed in
-`coverage/experimental-overlay/attachment-recovery-validation.json`. Controlled
-acceptance does not establish the cause of every failure on another system.
+Izabela uses `inspectOverlayConsumerExecutionContext()` before starting overlay
+services. An already-elevated consumer can use the SDK's
+`launchUnelevatedOverlayConsumer()` contract to create its own same-user/session
+replacement through a verified normal-permission desktop shell. The SDK verifies
+the child executable and token before resuming it, preserves literal arguments,
+uses a fresh environment and requests no UAC prompt. This does not authorize
+injection into elevated targets. See [startup behavior](experimental-game-overlay.md).
 
-Current local acceptance passes 94 overlay/package checks, frozen installation,
-workspace and packaged Electron smoke, and 16 native cases covering 24 authenticated
-graphics target lifecycles. This includes the full graphics/architecture/scaling
-matrix, early rearming, no-barrier relaunch, and expanded mixed recovery in both
-workspace and the actual packaged executable. All cases confirm authoritative
-target exit and private-image retirement without accumulating new private images.
-The user authorized scoped injector exclusions on the test machine; no antivirus
-setting is changed by the E2E suite itself. Shared test registry/staging caches
-and lossless PNG-only captures avoid repeated full asset copies.
+The SDK producer passed 639 SDK checks and 26 source-cache checks, with eight
+Windows-inapplicable POSIX skips. Both native architectures passed delayed-loader,
+permanent-timeout, process-exit, diagnostic and owned desktop-parent launch checks.
+The desktop-parent fixture exercises the production launch body from a normal
+caller; it does not establish an actual elevated Izabela round trip.
+
+Consumer frozen installation and all 103 overlay/package checks pass. All 21
+native cases pass across 29 authenticated graphics lifecycles, including four
+cases through the actual packaged executable. Coverage includes delayed loader
+startup, immediate first-key typing, cursor/scroll, scaling, early rearming,
+no-barrier relaunch and mixed failure recovery. All cases confirm authoritative
+exit and private-image retirement. The separate user-approved headless check also
+passes the actual elevated-to-medium SDK transition, verifying child identity,
+executable hash, session, literal arguments and a fresh environment. This live
+check uses Node; Izabela startup unit tests cover the app lock handoff and setting.
+Exact evidence, including the generation-25 delayed
+startup failure and retained fixture failures, is indexed in
+`coverage/experimental-overlay/attachment-recovery-validation.json`.
+
+The preceding generation-25 candidate fixed discovery stranded after an access
+refusal and private-image retention after a cancelled target's authoritative exit.
+Its consumer validation passed 16 native cases covering 24 authenticated graphics
+lifecycles, including the actual packaged executable, cursor/scroll, scaling,
+no-click typing and mixed A/B/A recovery. Those checks did not cover delayed
+loader initialization or an already-elevated consumer. The generation-26 checks
+extend that coverage. Shared test registry/staging caches and lossless PNG-only
+captures avoid repeated full asset copies. The E2E suite itself changes no
+antivirus setting and launches no user games.
 
 ## Earlier published nightly validation
 
@@ -174,6 +190,7 @@ unattributed D3D11 GPU hang remain known issues. Passing consumer runs do not
 establish their cause or resolution.
 
 Defender allowances for an older build do not establish coverage or trust for new
-binaries. Tests never modify Defender or request elevation. The existing explicit
+binaries. Graphics tests never modify Defender or request elevation. The separate
+elevated-consumer check requires explicit user approval. The existing explicit
 in-app exclusions flow remains user initiated; preloading does not add exclusions
 or change antivirus protection.

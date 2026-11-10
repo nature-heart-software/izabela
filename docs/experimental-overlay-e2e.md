@@ -18,6 +18,8 @@ pnpm test:experimental-overlay:e2e --case=d3d11-x64 --scale=1.25
 pnpm test:experimental-overlay:e2e --case=d3d11-x64 --scale=1 --target-mode=early
 # Real-app recovery after controlled preflight and runtime failures:
 pnpm test:experimental-overlay:e2e --case=d3d11-x64 --scale=1 --target-mode=folder --recovery
+# Slow loader startup, before the graphics barrier can execute:
+pnpm test:experimental-overlay:e2e --case=d3d11-x64 --scale=1 --target-mode=folder --startup-delay-ms=800
 # Fast-start diagnostic: no graphics startup barrier (timing can still fail):
 pnpm test:experimental-overlay:e2e --case=d3d11-x64 --scale=1 --target-mode=fast-folder
 # Also accepts an already-built packaged app:
@@ -57,10 +59,20 @@ startup timing. The explicit `fast-folder` mode never creates or waits for that
 barrier. Its failures remain failures; one successful sample does not establish
 reliable fast-start attachment.
 
+The delayed-start case creates only its own checksum-verified D3D11 child
+suspended, retains its process and thread handles, and resumes it after the
+requested delay (300–5000 ms). The fixture owner confines the child to a
+kill-on-close job and records its PID, creation time, actual delay and exit.
+The SDK never suspends or resumes a target. This exercises loader readiness
+before the graphics barrier can run; successful attachment must preserve the
+exact process identity and pass the usual first-key, pixel, pointer and scroll
+checks. The default matrix includes an 800 ms delayed-start case.
+
 The explicit `--recovery` case runs the real app and broad folder policy through
 A success, an owned B that permits identity queries but refuses injection access,
 fresh A while B remains live, then B's authoritative exit while A keeps typing.
-It continues through an owned suspended B that fails with preflight error 299, fresh A,
+It continues through an owned suspended B that reaches the bounded startup
+readiness timeout (Windows error 1460) without injection, fresh A,
 an owned inert B that times out during runtime initialization, then fresh A.
 Each recovered A must render and immediately type using the normal shortcut,
 without a click. B's owner retains the process handle it created, verifies that
@@ -123,6 +135,7 @@ Assertions cover:
 
 The default matrix runs all six graphics/architecture pairs at 100% scale, plus
 D3D11 x64 at 125% and 150%, plus D3D11 x64 using the managed early controller.
+It also includes the D3D11 x64 delayed-loader regression at 100% scale.
 Every positive case includes rendering, typing,
 pointer/cursor and scrolling assertions; the negative focus control runs once.
 Installed add-on registration and launch configuration use the real SDK with the
@@ -176,3 +189,19 @@ test runtime before production main starts, then disconnects before graphics
 testing. The report must confirm `appIsPackaged: true` and the exact executable
 path. This exercises the shipped executable and packaged paths while keeping
 profiles, add-on registration and security configuration inside the test boundary.
+
+## Explicit elevated-consumer check
+
+From a Windows administrator terminal, run
+`pnpm test:experimental-overlay:elevation`. This separate headless check requires
+an actually elevated Node caller and uses the installed, unmodified SDK to launch
+only its own executable at normal permissions. It verifies the exact child PID
+and creation identity, executable hash, session, medium token, literal arguments
+and fresh environment. It launches no game and changes no antivirus setting.
+Reports use the stable `coverage/experimental-overlay/elevated-consumer*.json`
+paths. Running it without elevation fails before creating a replacement.
+
+The regular graphics matrix never requests UAC. This check establishes the real
+elevated-to-medium SDK transition; startup unit tests cover Izabela's lock handoff
+and persistent setting, while packaged graphics cases verify the normal process's
+native token before rendering/input tests.

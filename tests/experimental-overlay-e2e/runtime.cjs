@@ -6,6 +6,7 @@ const fs = require('node:fs')
 const path = require('node:path')
 const Module = require('node:module')
 const { createRequire } = Module
+const { EventEmitter } = require('node:events')
 const childProcess = require('node:child_process')
 const { spawn, execFileSync } = childProcess
 const { app, BrowserWindow, nativeImage, screen, dialog } = require('electron')
@@ -55,6 +56,7 @@ const evidence = {
   sdk: requireApp('electron-game-overlay/package.json').version,
   scaleFactor: config.scaleFactor,
   targetMode: config.targetMode,
+  startupDelayMs: config.startupDelayMs || 0,
   recovery: !!config.recovery,
   startupBarrier: config.targetMode !== 'fast-folder',
   inputSource: 'Windows SendInput virtual-key down/up pairs',
@@ -90,6 +92,18 @@ Module._load = function (request, parent, isMain) {
     if (request === 'electron-game-overlay')
       return {
         ...sdk,
+        async inspectOverlayConsumerExecutionContext(options) {
+          const context = await sdk.inspectOverlayConsumerExecutionContext(
+            options,
+          )
+          evidence.consumerExecutionContext = context
+          return context
+        },
+        launchUnelevatedOverlayConsumer() {
+          throw new Error(
+            'Normal-permission graphics cases must not relaunch outside the owned test boundary',
+          )
+        },
         createReShadeLaunchConfig(options) {
           assert.ok(options.addonPreload?.applicationId)
           assert.equal(options.addonPreload.addonDirectory, undefined)
@@ -164,6 +178,7 @@ let targetOperationError
 let failureOwner
 let failurePrefix
 let refusal
+let delayedOwner
 const progress = setInterval(() => {
   fs.writeFileSync(
     path.join(config.directory, 'progress.json'),
@@ -468,6 +483,7 @@ sdk.OverlayTargetWatcher.prototype.onEvent = function (handler) {
       targetCreationTime100ns: event.target?.identity?.creationTime100ns,
       failureCode: event.error?.diagnostic?.code,
       failureStage: event.error?.diagnostic?.stage,
+      windowsErrorCode: event.error?.diagnostic?.windowsErrorCode,
       retrySafety: event.error?.diagnostic?.retrySafety,
       scoped: !!(event.target || event.selector),
       error:
@@ -981,11 +997,64 @@ async function startTarget() {
       ),
       false,
     )
-  target = spawn(config.target, [], {
-    cwd: path.dirname(config.target),
-    windowsHide: false,
-    stdio: ['ignore', 'pipe', 'pipe'],
-  })
+  if (config.startupDelayMs) {
+    const prefix = path.join(
+      config.directory,
+      'delayed-start-' + evidence.targetLaunchReadiness.length,
+    )
+    const owned = (delayedOwner = spawn(
+      config.recoveryOwner,
+      [
+        '--graphics',
+        config.target,
+        config.fixtureSource,
+        prefix,
+        String(config.startupDelayMs),
+      ],
+      {
+        cwd: path.dirname(config.target),
+        windowsHide: true,
+        stdio: ['ignore', 'pipe', 'pipe'],
+      },
+    ))
+    let ownerError
+    owned.once('error', (error) => {
+      ownerError = error
+    })
+    await until(() => {
+      if (ownerError) throw ownerError
+      if (fs.existsSync(prefix + '.json')) return true
+      if (owned.exitCode !== null)
+        throw new Error('Delayed fixture owner exited: ' + owned.exitCode)
+      return false
+    }, 'owned suspended graphics target creation')
+    const identity = JSON.parse(fs.readFileSync(prefix + '.json', 'utf8'))
+    const proxy = new EventEmitter()
+    Object.assign(proxy, {
+      pid: identity.pid,
+      exitCode: null,
+      stdout: owned.stdout,
+      stderr: owned.stderr,
+      kill: () => owned.kill(),
+    })
+    owned.once('exit', (code) => {
+      proxy.exitCode = code ?? 1
+      proxy.emit('exit', code)
+    })
+    target = proxy
+    evidence.delayedStarts ??= []
+    evidence.delayedStarts.push({
+      ...identity,
+      prefix,
+      requestedMs: config.startupDelayMs,
+    })
+  } else {
+    target = spawn(config.target, [], {
+      cwd: path.dirname(config.target),
+      windowsHide: false,
+      stdio: ['ignore', 'pipe', 'pipe'],
+    })
+  }
   evidence.targetPid = target.pid
   target.stdout.pipe(
     fs.createWriteStream(path.join(config.directory, 'target.stdout.log')),
@@ -1029,6 +1098,50 @@ async function startTarget() {
     30000,
   )
   evidence.nativeInjectionConfirmed = true
+  if (config.startupDelayMs) {
+    const delayed = evidence.delayedStarts.at(-1)
+    delayed.resumedAfterMs = Number(
+      fs.readFileSync(delayed.prefix + '.resumed', 'utf8'),
+    )
+    assert.ok(
+      delayed.resumedAfterMs >= config.startupDelayMs,
+      'Only the fixture owner resumes its target after the requested delay',
+    )
+    assert.ok(
+      evidence.managedEvents.some(
+        (event) =>
+          event.type === 'attaching' &&
+          event.pid === delayed.pid &&
+          event.targetCreationTime100ns === delayed.creationTime100ns,
+      ),
+      'SDK attachment uses the exact delayed target incarnation',
+    )
+    const module = drive('module').module
+    assert.ok(module, 'Delayed target has the actual injected module')
+    const nativeLog = fs.readFileSync(
+      path.join(path.dirname(module), 'inject.stdout.log'),
+      'utf8',
+    )
+    const prefix = 'EGO_TARGET_STARTUP_READINESS_V1 '
+    const records = nativeLog
+      .split(/\r?\n/)
+      .filter((line) => line.startsWith(prefix))
+    assert.equal(records.length, 1, 'One native startup readiness observation')
+    const readiness = JSON.parse(records[0].slice(prefix.length))
+    assert.equal(readiness.pid, delayed.pid)
+    assert.equal(
+      readiness.waited,
+      true,
+      'Fixture must exercise the actual SDK wait',
+    )
+    assert.equal(readiness.loaderState, 'initialized')
+    assert.equal(readiness.windowsError, 0)
+    assert.ok(readiness.attempts > 1)
+    delayed.readiness = readiness
+    evidence.checks.push(
+      'SDK waits through delayed loader startup before normal graphics attachment',
+    )
+  }
   const inspection = drive('module')
   assert.equal(inspection.queryError, 0, 'Owned module inspection succeeds')
   assert.ok(inspection.module, 'Owned ReShade module is present')
@@ -1093,7 +1206,7 @@ async function failOwnedTarget(mode) {
   const identity = JSON.parse(fs.readFileSync(prefix + '.json', 'utf8'))
   const expectedCode =
     mode === 'suspended'
-      ? 'target-module-inspection-failed'
+      ? 'target-startup-readiness-failed'
       : 'runtime-initialization-timeout'
   const failed = await until(
     () =>
@@ -1105,6 +1218,7 @@ async function failOwnedTarget(mode) {
   )
   assert.equal(failed.scoped, true, 'Failure remains scoped to B')
   assert.equal(failed.failureCode, expectedCode)
+  if (mode === 'suspended') assert.equal(failed.windowsErrorCode, 1460)
   assert.equal(failed.targetCreationTime100ns, identity.creationTime100ns)
   assert.equal(
     failed.retrySafety,
@@ -1276,6 +1390,12 @@ async function run() {
     'real messenger and public backend readiness',
     90000,
   )
+  assert.equal(
+    evidence.consumerExecutionContext?.overlaySupported,
+    true,
+    'Real startup must verify the native consumer token before starting the overlay',
+  )
+  assert.equal(evidence.consumerExecutionContext.elevated, false)
   evidence.displayScaleFactor = screen.getPrimaryDisplay().scaleFactor
   assert.equal(evidence.displayScaleFactor, config.scaleFactor)
   // Startup updates still run while the SDK prepares. Only the controlled game
@@ -1504,6 +1624,13 @@ async function finish(code) {
       wait(2500),
     ])
     if (target.exitCode === null) target.kill()
+  }
+  if (delayedOwner && delayedOwner.exitCode === null) {
+    delayedOwner.kill()
+    await Promise.race([
+      new Promise((resolve) => delayedOwner.once('exit', resolve)),
+      wait(2000),
+    ])
   }
   if (target) {
     const identity = evidence.managedEvents.findLast(

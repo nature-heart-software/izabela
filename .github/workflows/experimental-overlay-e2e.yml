@@ -25,6 +25,7 @@ jobs:
           path: |
             coverage/experimental-overlay/fixtures/bin
             coverage/experimental-overlay/fixtures/overlay-test-input.exe
+            coverage/experimental-overlay/fixtures/overlay-test-recovery.exe
             coverage/experimental-overlay/fixtures/manifest.json
             coverage/experimental-overlay/fixtures/SDK-fixtures-LICENSE
           if-no-files-found: error

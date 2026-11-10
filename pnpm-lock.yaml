@@ -455,8 +455,8 @@ importers:
         specifier: 1.5.0
         version: 1.5.0
       electron-game-overlay:
-        specifier: file:../../vendor/electron-game-overlay-1.0.1-alpha.2026110902.tgz
-        version: file:vendor/electron-game-overlay-1.0.1-alpha.2026110902.tgz(electron@46.0.0-alpha.2)
+        specifier: file:../../vendor/electron-game-overlay-1.0.1-alpha.2026110903.tgz
+        version: file:vendor/electron-game-overlay-1.0.1-alpha.2026110903.tgz(electron@46.0.0-alpha.2)
       electron-postman:
         specifier: workspace:*
         version: link:../../packages/electron-postman
@@ -6181,9 +6181,9 @@ packages:
   electron-devtools-installer@3.2.1:
     resolution: {integrity: sha512-FaCi+oDCOBTw0gJUsuw5dXW32b2Ekh5jO8lI1NRCQigo3azh2VogsIi0eelMVrP1+LkN/bewyH3Xoo1USjO0eQ==}
 
-  electron-game-overlay@file:vendor/electron-game-overlay-1.0.1-alpha.2026110902.tgz:
-    resolution: {integrity: sha512-JBRmG/R38J02Ey+fonZk2a4EUsYFl4dSmlsV3gyw11HxEnyOa5fzayYoi/K2rB339skephnuAju3IRv3VaU1Rg==, tarball: file:vendor/electron-game-overlay-1.0.1-alpha.2026110902.tgz}
-    version: 1.0.1-alpha.2026110902
+  electron-game-overlay@file:vendor/electron-game-overlay-1.0.1-alpha.2026110903.tgz:
+    resolution: {integrity: sha512-fFe2LO56C1mOtoA4AkX8tQ+phn7RmM3djbxOk6OtwuNT9brqi8YWcWld2SW9hSTZEO9OAlVOcArp1g70SygXLw==, tarball: file:vendor/electron-game-overlay-1.0.1-alpha.2026110903.tgz}
+    version: 1.0.1-alpha.2026110903
     peerDependencies:
       electron: '>=39.1.0 <40 || 46.0.0-alpha.2'
 
@@ -18570,7 +18570,7 @@ snapshots:
       tslib: 2.8.1
       unzip-crx-3: 0.2.0
 
-  electron-game-overlay@file:vendor/electron-game-overlay-1.0.1-alpha.2026110902.tgz(electron@46.0.0-alpha.2):
+  electron-game-overlay@file:vendor/electron-game-overlay-1.0.1-alpha.2026110903.tgz(electron@46.0.0-alpha.2):
     dependencies:
       electron: 46.0.0-alpha.2
       tslib: 2.8.1

@@ -1,21 +1,64 @@
 diff --git a/.gitattributes b/.gitattributes
-index 8fc997cd6f1b2bc83b66eab8d80139ababbc48ac..a0f0bf2202d118e24d37b701e17bf4eb4c32dc44 100644
+index 8fc997cd6f1b2bc83b66eab8d80139ababbc48ac..b12f2a8a47d8f2764588551e7cef02d64d0cd631 100644
 --- a/.gitattributes
 +++ b/.gitattributes
-@@ -9,6 +9,8 @@ libs/electron-game-overlay-runtime/patches/reshade-injector-preload-long-path.pa
+@@ -9,6 +9,10 @@ libs/electron-game-overlay-runtime/patches/reshade-injector-preload-long-path.pa
  libs/electron-game-overlay-runtime/patches/reshade-owned-late-d3d11-adapter-ready-long-path.patch text eol=lf
  libs/electron-game-overlay-runtime/patches/reshade-injector-initial-inspection-recovery.patch text eol=lf
  libs/electron-game-overlay-runtime/patches/reshade-injector-shared-addon-directory.patch text eol=lf
 +libs/electron-game-overlay-runtime/patches/reshade-injector-inspection-context.patch text eol=lf
 +libs/electron-game-overlay-runtime/patches/reshade-injector-selection-before-open.patch text eol=lf
++libs/electron-game-overlay-runtime/patches/reshade-injector-member-diagnostics.patch text eol=lf
++libs/electron-game-overlay-runtime/patches/reshade-injector-startup-readiness.patch text eol=lf
  libs/electron-game-overlay-runtime/patches/reshade-owned-late-d3d11-addon-failure-isolation.patch text eol=lf
  libs/electron-game-overlay-runtime/tests/late-d3d11-adoption/owned-host-prototype/* text eol=lf
  libs/electron-game-overlay-runtime/tests/late-d3d11-adoption/owned-host-prototype/*.patch whitespace=-trailing-space,-space-before-tab
 diff --git a/doc/sdk-api.md b/doc/sdk-api.md
-index 1288650ef4a70a0974eaab8d7aeb7c426b25bed6..6480108472492d0e72c03f02869029cf18cad066 100644
+index 1288650ef4a70a0974eaab8d7aeb7c426b25bed6..1d8e618cac32dcaa5cd6d9c1583261ec326afc8a 100644
 --- a/doc/sdk-api.md
 +++ b/doc/sdk-api.md
-@@ -138,7 +138,7 @@ starts no watcher, broker or injection. Options are:
+@@ -10,6 +10,40 @@ The host is Windows x64 with Electron `>=39.1.0 <40` or the exact tested
+ targets are not supported. The rc.7 tarball is a complete local candidate, not a
+ public npm release.
+ 
++## Consumer elevation and replacement startup
++
++The local generation-26 candidate exports
++`inspectOverlayConsumerExecutionContext(options?)` and
++`launchUnelevatedOverlayConsumer({context, arguments?, config?})` from the root
++SDK entry. Inspect before starting application services, windows, overlay sessions
++or brokers. `context.overlaySupported` reports whether this caller is unelevated
++at medium integrity or lower; `relaunchAvailable` reports whether the native
++helper found a same-user, same-session, unelevated desktop parent. A missing or
++different-user desktop refuses relaunch with `relaunchRefusal`. Elevated game
++targets remain unsupported.
++
++When relaunch is available, first suppress the application's persistent
++administrator-startup setting and release its single-instance lock immediately
++before calling the launch API. Pass the inspected context unchanged. Arguments
++default to `process.argv.slice(1)`, preserving Electron's development app path;
++packaged applications may pass their actual application arguments explicitly.
++The helper binds the current caller's PID, creation time and executable hash,
++creates only that executable with a fresh user environment, and verifies the
++owned child's image, user, session and medium token before starting it. It
++requests no UAC prompt and transfers no elevated handles or overlay credentials.
++
++The result is `{status:'launched', context, replacement:{pid,
++creationTime100ns}}` or `{status:'already-unelevated', context}`. Quit the old
++consumer only for `launched`; let the replacement initialize fresh. Reacquire
++the single-instance lock on an error or `already-unelevated`. A successful
++result proves OS process creation and token verification, not Electron readiness
++or overlay authentication. A lost or malformed response does not authorize a
++blind retry, since an owned replacement may already exist.
++
++The implementation uses Microsoft's documented
++[desktop parent process technique](https://devblogs.microsoft.com/oldnewthing/20190425-00/?p=102443/)
++and a [fresh user environment](https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-createenvironmentblock).
++
+ ## Entry points and tool selection
+ 
+ | Import | Environment | Exports |
+@@ -138,7 +172,7 @@ starts no watcher, broker or injection. Options are:
  | Option | Meaning |
  | --- | --- |
  | `bundledRuntimeDirectory` | Absolute directory of the complete staged native bundle; defaults to the SDK's physical runtime location, including ASAR-unpacked discovery |
@@ -25,13 +68,32 @@ index 1288650ef4a70a0974eaab8d7aeb7c426b25bed6..6480108472492d0e72c03f02869029cf
  `defaultReShadeRuntimeDirectory()` and `defaultReShadeRunsRootDirectory()` return
  locations, not proof of an installed/healthy runtime. Use the config validator
 diff --git a/libs/electron-game-overlay-runtime/CMakeLists.txt b/libs/electron-game-overlay-runtime/CMakeLists.txt
-index da9de0cd6b78f591c541b679f64f8e70a461d4ff..73b169cd088206b6bf1c5655f43e675ba3924a8c 100644
+index da9de0cd6b78f591c541b679f64f8e70a461d4ff..a82571dec6aca312af8bcb2cf6231c3c687bd07c 100644
 --- a/libs/electron-game-overlay-runtime/CMakeLists.txt
 +++ b/libs/electron-game-overlay-runtime/CMakeLists.txt
-@@ -2,6 +2,25 @@ cmake_minimum_required(VERSION 3.24)
+@@ -2,6 +2,44 @@ cmake_minimum_required(VERSION 3.24)
  
  project(electron_game_overlay_runtime LANGUAGES CXX)
  
++set(RESHAPE_STARTUP_READINESS_INJECTOR_CONTENT_SHA256
++    "534882EA54EF994ADBF6BA45F9F7D99EB91D74B0EDA65646736E924B3515E6F8"
++)
++set(RESHAPE_STARTUP_READINESS_PATCH
++    "${CMAKE_CURRENT_SOURCE_DIR}/patches/reshade-injector-startup-readiness.patch"
++)
++set(RESHAPE_STARTUP_READINESS_PATCH_SHA256
++    "29C8D7ACA8919189D484B2E22F83DBD564B00D344E8C860058AFCCEAFC808D9D"
++)
++
++set(RESHAPE_MEMBER_DIAGNOSTICS_INJECTOR_CONTENT_SHA256
++    "243F064C81A96D2140337100ECAF9FFA44BB955127E068D80EA64835005CB517"
++)
++set(RESHAPE_MEMBER_DIAGNOSTICS_PATCH
++    "${CMAKE_CURRENT_SOURCE_DIR}/patches/reshade-injector-member-diagnostics.patch"
++)
++set(RESHAPE_MEMBER_DIAGNOSTICS_PATCH_SHA256
++    "D56162D2EA444DB44E7F21128A5F316E124E11E08EC1B6F3328D769EA4048A57"
++)
 +set(RESHAPE_SELECTION_BEFORE_OPEN_INJECTOR_CONTENT_SHA256
 +    "DA86B38F4E02B00AF0BD89E29AB348EE17D61C6908172B799F782ACA0C953EE9"
 +)
@@ -54,7 +116,7 @@ index da9de0cd6b78f591c541b679f64f8e70a461d4ff..73b169cd088206b6bf1c5655f43e675b
  set(ELECTRON_GAME_OVERLAY_ADDON_BUILD_ID
      "CCE20935ADD44EF6A5A7973014B2E07F"
  )
-@@ -388,6 +407,14 @@ string(REPLACE "source/ego_owned_late_d3d11/owned_late_d3d11.inl=${RESHAPE_ADAPT
+@@ -388,6 +426,22 @@ string(REPLACE "source/ego_owned_late_d3d11/owned_late_d3d11.inl=${RESHAPE_ADAPT
      "source/ego_owned_late_d3d11/owned_late_d3d11.inl=${RESHAPE_FOREIGN_ADDON_ISOLATION_INL_CONTENT_SHA256}"
      RESHAPE_FOREIGN_ADDON_ISOLATION_PATCHED_CONTENT_SHA256
      "${RESHAPE_SHARED_ADDON_DIRECTORY_PATCHED_CONTENT_SHA256}")
@@ -66,19 +128,29 @@ index da9de0cd6b78f591c541b679f64f8e70a461d4ff..73b169cd088206b6bf1c5655f43e675b
 +    "tools/injector.cpp=${RESHAPE_SELECTION_BEFORE_OPEN_INJECTOR_CONTENT_SHA256}"
 +    RESHAPE_SELECTION_BEFORE_OPEN_PATCHED_CONTENT_SHA256
 +    "${RESHAPE_INSPECTION_CONTEXT_PATCHED_CONTENT_SHA256}")
++string(REPLACE "tools/injector.cpp=${RESHAPE_SELECTION_BEFORE_OPEN_INJECTOR_CONTENT_SHA256}"
++    "tools/injector.cpp=${RESHAPE_MEMBER_DIAGNOSTICS_INJECTOR_CONTENT_SHA256}"
++    RESHAPE_MEMBER_DIAGNOSTICS_PATCHED_CONTENT_SHA256
++    "${RESHAPE_SELECTION_BEFORE_OPEN_PATCHED_CONTENT_SHA256}")
++string(REPLACE "tools/injector.cpp=${RESHAPE_MEMBER_DIAGNOSTICS_INJECTOR_CONTENT_SHA256}"
++    "tools/injector.cpp=${RESHAPE_STARTUP_READINESS_INJECTOR_CONTENT_SHA256}"
++    RESHAPE_STARTUP_READINESS_PATCHED_CONTENT_SHA256
++    "${RESHAPE_MEMBER_DIAGNOSTICS_PATCHED_CONTENT_SHA256}")
  set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
      ${RESHAPE_SOURCE_PATCHES}
      "${RESHAPE_RAW_INPUT_NORMALIZATION_PATCH}"
-@@ -424,6 +451,8 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+@@ -424,6 +478,10 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
      "${RESHAPE_ADAPTER_READY_LONG_PATH_PATCH}"
      "${RESHAPE_INITIAL_INSPECTION_RECOVERY_PATCH}"
      "${RESHAPE_SHARED_ADDON_DIRECTORY_PATCH}"
 +    "${RESHAPE_INSPECTION_CONTEXT_PATCH}"
 +    "${RESHAPE_SELECTION_BEFORE_OPEN_PATCH}"
++    "${RESHAPE_MEMBER_DIAGNOSTICS_PATCH}"
++    "${RESHAPE_STARTUP_READINESS_PATCH}"
      "${RESHAPE_FOREIGN_ADDON_ISOLATION_PATCH}"
  )
  
-@@ -999,6 +1028,30 @@ function(ego_prepare_owned_late_source_cache source_dir)
+@@ -999,6 +1057,54 @@ function(ego_prepare_owned_late_source_cache source_dir)
              message(FATAL_ERROR "The foreign add-on isolation patch hash is not the frozen implementation.")
          endif()
      endif()
@@ -98,6 +170,30 @@ index da9de0cd6b78f591c541b679f64f8e70a461d4ff..73b169cd088206b6bf1c5655f43e675b
 +            message(FATAL_ERROR "The selection-before-open patch hash is not the frozen implementation.")
 +        endif()
 +    endif()
++    if(DEFINED RESHAPE_MEMBER_DIAGNOSTICS_PATCH)
++        get_filename_component(member_patch_dir "${RESHAPE_MEMBER_DIAGNOSTICS_PATCH}" DIRECTORY)
++        get_filename_component(member_patch_name "${RESHAPE_MEMBER_DIAGNOSTICS_PATCH}" NAME)
++        ego_read_source_cache_file("${member_patch_dir}" "${member_patch_name}" member_patch_hash ignored_text)
++        if(NOT member_patch_hash STREQUAL RESHAPE_MEMBER_DIAGNOSTICS_PATCH_SHA256)
++            message(FATAL_ERROR "The member-diagnostics patch hash is not the frozen implementation.")
++        endif()
++    endif()
++    if(DEFINED RESHAPE_STARTUP_READINESS_PATCH)
++        get_filename_component(startup_patch_dir "${RESHAPE_STARTUP_READINESS_PATCH}" DIRECTORY)
++        get_filename_component(startup_patch_name "${RESHAPE_STARTUP_READINESS_PATCH}" NAME)
++        ego_read_source_cache_file("${startup_patch_dir}" "${startup_patch_name}" startup_patch_hash ignored_text)
++        if(NOT startup_patch_hash STREQUAL RESHAPE_STARTUP_READINESS_PATCH_SHA256)
++            message(FATAL_ERROR "The startup-readiness patch hash is not the frozen implementation.")
++        endif()
++    endif()
++    if(injector_hash STREQUAL RESHAPE_STARTUP_READINESS_INJECTOR_CONTENT_SHA256)
++        ego_apply_startup_readiness_source_tail("${source_root}" REVERSE)
++        ego_read_source_cache_file("${source_root}" "tools/injector.cpp" injector_hash ignored_text)
++    endif()
++    if(injector_hash STREQUAL RESHAPE_MEMBER_DIAGNOSTICS_INJECTOR_CONTENT_SHA256)
++        ego_apply_member_diagnostics_source_tail("${source_root}" REVERSE)
++        ego_read_source_cache_file("${source_root}" "tools/injector.cpp" injector_hash ignored_text)
++    endif()
 +    if(injector_hash STREQUAL RESHAPE_SELECTION_BEFORE_OPEN_INJECTOR_CONTENT_SHA256)
 +        ego_apply_selection_before_open_source_tail("${source_root}" REVERSE)
 +        ego_read_source_cache_file("${source_root}" "tools/injector.cpp" injector_hash ignored_text)
@@ -109,10 +205,52 @@ index da9de0cd6b78f591c541b679f64f8e70a461d4ff..73b169cd088206b6bf1c5655f43e675b
      # Restore generation 22 in reverse publication order. Each helper proves
      # every source file and Git entry before its one atomic rename. All supplied
      # patch hashes above are checked before the first publication.
-@@ -1562,6 +1615,48 @@ function(ego_apply_shared_addon_directory_source_tail source_dir)
+@@ -1562,6 +1668,90 @@ function(ego_apply_shared_addon_directory_source_tail source_dir)
          "${before_hash}" "${after_hash}" ${apply_direction})
  endfunction()
  
++function(ego_apply_startup_readiness_source_tail source_dir)
++    set(before_hash "${RESHAPE_MEMBER_DIAGNOSTICS_INJECTOR_CONTENT_SHA256}")
++    set(after_hash "${RESHAPE_STARTUP_READINESS_INJECTOR_CONTENT_SHA256}")
++    set(RESHAPE_EXPECTED_PATCHED_CONTENT_SHA256
++        "${RESHAPE_MEMBER_DIAGNOSTICS_PATCHED_CONTENT_SHA256}")
++    set(apply_direction)
++    if(ARGC GREATER 1)
++        if(NOT ARGC EQUAL 2 OR NOT ARGV1 STREQUAL "REVERSE")
++            message(FATAL_ERROR "Unknown startup-readiness patch direction; no source files were changed.")
++        endif()
++        set(before_hash "${RESHAPE_STARTUP_READINESS_INJECTOR_CONTENT_SHA256}")
++        set(after_hash "${RESHAPE_MEMBER_DIAGNOSTICS_INJECTOR_CONTENT_SHA256}")
++        set(RESHAPE_EXPECTED_PATCHED_CONTENT_SHA256
++            "${RESHAPE_STARTUP_READINESS_PATCHED_CONTENT_SHA256}")
++        set(apply_direction REVERSE)
++    endif()
++    ego_apply_terminal_source_file_tail("${source_dir}" "tools/injector.cpp"
++        "${RESHAPE_STARTUP_READINESS_PATCH}" "${RESHAPE_STARTUP_READINESS_PATCH_SHA256}"
++        "${before_hash}" "${after_hash}" ${apply_direction})
++endfunction()
++
++function(ego_apply_member_diagnostics_source_tail source_dir)
++    set(before_hash "${RESHAPE_SELECTION_BEFORE_OPEN_INJECTOR_CONTENT_SHA256}")
++    set(after_hash "${RESHAPE_MEMBER_DIAGNOSTICS_INJECTOR_CONTENT_SHA256}")
++    set(RESHAPE_EXPECTED_PATCHED_CONTENT_SHA256
++        "${RESHAPE_SELECTION_BEFORE_OPEN_PATCHED_CONTENT_SHA256}")
++    set(apply_direction)
++    if(ARGC GREATER 1)
++        if(NOT ARGC EQUAL 2 OR NOT ARGV1 STREQUAL "REVERSE")
++            message(FATAL_ERROR "Unknown member-diagnostics patch direction; no source files were changed.")
++        endif()
++        set(before_hash "${RESHAPE_MEMBER_DIAGNOSTICS_INJECTOR_CONTENT_SHA256}")
++        set(after_hash "${RESHAPE_SELECTION_BEFORE_OPEN_INJECTOR_CONTENT_SHA256}")
++        set(RESHAPE_EXPECTED_PATCHED_CONTENT_SHA256
++            "${RESHAPE_MEMBER_DIAGNOSTICS_PATCHED_CONTENT_SHA256}")
++        set(apply_direction REVERSE)
++    endif()
++    ego_apply_terminal_source_file_tail("${source_dir}" "tools/injector.cpp"
++        "${RESHAPE_MEMBER_DIAGNOSTICS_PATCH}" "${RESHAPE_MEMBER_DIAGNOSTICS_PATCH_SHA256}"
++        "${before_hash}" "${after_hash}" ${apply_direction})
++endfunction()
++
 +function(ego_apply_selection_before_open_source_tail source_dir)
 +    set(before_hash "${RESHAPE_INSPECTION_CONTEXT_INJECTOR_CONTENT_SHA256}")
 +    set(after_hash "${RESHAPE_SELECTION_BEFORE_OPEN_INJECTOR_CONTENT_SHA256}")
@@ -158,7 +296,7 @@ index da9de0cd6b78f591c541b679f64f8e70a461d4ff..73b169cd088206b6bf1c5655f43e675b
  function(ego_apply_foreign_addon_isolation_source_tail source_dir)
      set(before_hash "${RESHAPE_ADAPTER_READY_LONG_PATH_INL_CONTENT_SHA256}")
      set(after_hash "${RESHAPE_FOREIGN_ADDON_ISOLATION_INL_CONTENT_SHA256}")
-@@ -3431,6 +3526,13 @@ set(RESHAPE_EXPECTED_PATCHED_CONTENT_SHA256
+@@ -3431,6 +3621,21 @@ set(RESHAPE_EXPECTED_PATCHED_CONTENT_SHA256
  ego_apply_foreign_addon_isolation_source_tail("${reshade_SOURCE_DIR}")
  set(RESHAPE_EXPECTED_PATCHED_CONTENT_SHA256
      "${RESHAPE_FOREIGN_ADDON_ISOLATION_PATCHED_CONTENT_SHA256}")
@@ -169,14 +307,36 @@ index da9de0cd6b78f591c541b679f64f8e70a461d4ff..73b169cd088206b6bf1c5655f43e675b
 +ego_apply_selection_before_open_source_tail("${reshade_SOURCE_DIR}")
 +set(RESHAPE_EXPECTED_PATCHED_CONTENT_SHA256
 +    "${RESHAPE_SELECTION_BEFORE_OPEN_PATCHED_CONTENT_SHA256}")
++
++ego_apply_member_diagnostics_source_tail("${reshade_SOURCE_DIR}")
++set(RESHAPE_EXPECTED_PATCHED_CONTENT_SHA256
++    "${RESHAPE_MEMBER_DIAGNOSTICS_PATCHED_CONTENT_SHA256}")
++
++ego_apply_startup_readiness_source_tail("${reshade_SOURCE_DIR}")
++set(RESHAPE_EXPECTED_PATCHED_CONTENT_SHA256
++    "${RESHAPE_STARTUP_READINESS_PATCHED_CONTENT_SHA256}")
  
  # Fail configuration unless this FetchContent tree is exactly the pinned
  # ordered patch stack. This runs independently for the regular and
 diff --git a/libs/electron-game-overlay-runtime/README.md b/libs/electron-game-overlay-runtime/README.md
-index 5b1284746eb04afb6aecb181287958432d546b5b..0b9b239312b85da087f3f1c3b81aac69c718a4ed 100644
+index 5b1284746eb04afb6aecb181287958432d546b5b..f470093804aa5e0fc147126f4898feabf730b5ab 100644
 --- a/libs/electron-game-overlay-runtime/README.md
 +++ b/libs/electron-game-overlay-runtime/README.md
-@@ -126,7 +126,23 @@ npx nx build electron-game-overlay-runtime
+@@ -1,5 +1,13 @@
+ # Electron game overlay Windows runtime
+ 
++The local generation-26 candidate adds bounded, identity-bound initial loader
++readiness and precise member authorization diagnostics. Its native manager also
++provides read-only consumer token inspection and guarded same-user medium
++replacement of its own caller executable. These commands do not change ReShade
++transaction ownership or permit injection into elevated targets. See the
++[patch and headless test contracts](patches/README.md#generation-26-diagnostics-and-initial-loader-readiness)
++and [consumer startup API](../../doc/sdk-api.md#consumer-elevation-and-replacement-startup).
++
+ This production Windows package builds x64 and x86 ReShade 6.7.3 full add-on
+ runtimes as the native process-entry, graphics-hook, swap-chain, input, logging,
+ and Dear ImGui layer. It builds architecture-specific injectors, controlled hosts,
+@@ -126,7 +134,23 @@ npx nx build electron-game-overlay-runtime
  
  That target builds the transport dependency, pinned ReShade runtime/injector,
  production add-on, native target-local ReShade add-on manager, and ABI smoke.
@@ -202,10 +362,10 @@ index 5b1284746eb04afb6aecb181287958432d546b5b..0b9b239312b85da087f3f1c3b81aac69
  source and content hashes and declares its runtime generation plus target
  transport range. Composite SDK staging retains the x64 manifest under that name
 diff --git a/libs/electron-game-overlay-runtime/patches/README.md b/libs/electron-game-overlay-runtime/patches/README.md
-index 8f39bb3edef620c7a8f957f8911dbfa13101eb4d..1991de9b0d5e59f5a3b3240cc2e60c68e8e3e538 100644
+index 8f39bb3edef620c7a8f957f8911dbfa13101eb4d..729c13664c1dcca1f7d5752d7fc4920a47a00569 100644
 --- a/libs/electron-game-overlay-runtime/patches/README.md
 +++ b/libs/electron-game-overlay-runtime/patches/README.md
-@@ -315,6 +315,96 @@ environment layout. The Win32 build targets `ReShade32.dll` and
+@@ -315,6 +315,129 @@ environment layout. The Win32 build targets `ReShade32.dll` and
  loader with an ordered code-section end marker because x86 images do not carry
  the x64 unwind metadata used to measure that thunk.
  
@@ -299,11 +459,44 @@ index 8f39bb3edef620c7a8f957f8911dbfa13101eb4d..1991de9b0d5e59f5a3b3240cc2e60c68
 +also documents consumer integration. No graphics, external target or system
 +security configuration is involved in these gates.
 +
++## Generation-26 diagnostics and initial loader readiness
++
++`reshade-injector-member-diagnostics.patch` preserves the authorization policy
++and reports each actor's token-query phase through
++`EGO_PRELOAD_AUTHORIZATION_CONTEXT_V1`. Windows error 5 alone does not identify
++the elevated actor. Structured member failures distinguish preflight from an
++already consumed participant load; the SDK keeps mutation uncertainty terminal.
++
++`reshade-injector-startup-readiness.patch` adds a separate 3000 ms bounded wait
++only after the identity-bound handle positively reports a missing or
++uninitialized loader. It checks liveness on that same handle and never resumes
++or suspends a target, reopens a PID, or retries an uncertain injection. Unknown
++initial state delegates to strict inspection; losing a known pending state
++fails closed. The existing strict module inspection retains its 250 ms budget
++after startup readiness. Readiness neither proves module absence nor authorizes
++injection. Timeout/exit emits `target-startup-readiness-failed` before mutation.
++Successor selection still publishes its own V2 identity independently.
++
++Both tails are frozen, reversible source-cache phases with exact SDK/native
++provenance on x64 and x86. They do not change mapped host/add-on implementation;
++the add-on ID stays `CCE20935ADD44EF6A5A7973014B2E07F`.
++
++Human-facing headless gates have separate launchers:
++`startup-readiness-console.ps1` (owned paused child, 800 ms owner resume,
++unchanged 299 negative control, timeout and exit),
++`member-diagnostics-console.ps1` (real token observations and deterministic
++failure/formatter seams), `consumer-execution-context-console.ps1` (real caller
++binding and fail-closed identity checks), and `consumer-parent-launch-console.ps1`
++(actual medium desktop-parent launch with a test-only early-return seam).
++The latter proves the real process creation, environment and argv path at medium
++integrity; it does not establish an elevated-to-medium consumer round trip.
++None starts graphics, a game or a UAC prompt.
++
  ## `reshade-x86-target-architecture-diagnostic.patch`
  
  Emits the existing strict pre-mutation injector diagnostic with
 diff --git a/libs/electron-game-overlay-runtime/scripts/build-reshade-runtime.ps1 b/libs/electron-game-overlay-runtime/scripts/build-reshade-runtime.ps1
-index 82aa51debc58f51b6c1f42cd9ec7a1b498c44b0c..968c22b36e2d3568295379f9b35d7aaa9d27a7e7 100644
+index 82aa51debc58f51b6c1f42cd9ec7a1b498c44b0c..12a18fff5ddd96c0f451ad6dfe4081d6248cc610 100644
 --- a/libs/electron-game-overlay-runtime/scripts/build-reshade-runtime.ps1
 +++ b/libs/electron-game-overlay-runtime/scripts/build-reshade-runtime.ps1
 @@ -2,7 +2,8 @@
@@ -328,7 +521,7 @@ index 82aa51debc58f51b6c1f42cd9ec7a1b498c44b0c..968c22b36e2d3568295379f9b35d7aaa
  $ReShadeSource = Join-Path $BuildRoot "_deps\reshade-src"
  $ArchitectureConfig = if ($Architecture -eq "x86") {
      [pscustomobject]@{
-@@ -229,6 +235,16 @@ $ExpectedPatchedFiles = @(
+@@ -229,6 +235,24 @@ $ExpectedPatchedFiles = @(
      "source/runtime_gui.cpp"
      "tools/injector.cpp"
  )
@@ -342,39 +535,50 @@ index 82aa51debc58f51b6c1f42cd9ec7a1b498c44b0c..968c22b36e2d3568295379f9b35d7aaa
 +if ($InjectorSelectionBeforeOpenPatchHash -cne "F83053E59EE9443E98D31A4C238B3D19D6B847D1F6F5E238E05B899FFC87E555") {
 +    throw "The injector selection-before-open patch does not match its frozen source."
 +}
++$InjectorMemberDiagnosticsPatch = Join-Path $RuntimeRoot "patches\reshade-injector-member-diagnostics.patch"
++$InjectorMemberDiagnosticsPatchHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $InjectorMemberDiagnosticsPatch).Hash
++if ($InjectorMemberDiagnosticsPatchHash -cne "D56162D2EA444DB44E7F21128A5F316E124E11E08EC1B6F3328D769EA4048A57") {
++    throw "The injector member-diagnostics patch does not match its frozen source."
++}
++$InjectorStartupReadinessPatch = Join-Path $RuntimeRoot "patches\reshade-injector-startup-readiness.patch"
++$InjectorStartupReadinessPatchHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $InjectorStartupReadinessPatch).Hash
++if ($InjectorStartupReadinessPatchHash -cne "29C8D7ACA8919189D484B2E22F83DBD564B00D344E8C860058AFCCEAFC808D9D") { throw "The startup-readiness patch differs from its frozen implementation." }
  $ExpectedPatchedContentSha256 = [ordered]@{
      "ReShade.vcxproj" = "9FC55C36B9B4E55E8FE9D87401CEFE69858B5FA5110023840BEAF2FC5B8D2A9C"
      "include/reshade.hpp" = "CC102FA21D311B85713ED167F0E182A4EECCD40CDF3FBE360AD9F83A0CF40767"
-@@ -248,7 +264,7 @@ $ExpectedPatchedContentSha256 = [ordered]@{
+@@ -248,7 +272,7 @@ $ExpectedPatchedContentSha256 = [ordered]@{
      "source/runtime.cpp" = "96B12143E7A13B607D101AE7FD573C86334DD1BFDEEC2CA21520C74FE0200CD7"
      "source/runtime.hpp" = "1F2CF88559AE52D62DC3A8B236A734093E74864CAC44A069DD54440FBCCE3D11"
      "source/runtime_gui.cpp" = "6B8A8D3ACECE1E9C687062360FABBFAC04397222973A23565B661A7505F3187A"
 -    "tools/injector.cpp" = "B6647995D40C7EF13DD998AF9CFEAD5E5D0A1174E81EEE1121E8AA12C21CB9D1"
-+    "tools/injector.cpp" = "DA86B38F4E02B00AF0BD89E29AB348EE17D61C6908172B799F782ACA0C953EE9"
++    "tools/injector.cpp" = "534882EA54EF994ADBF6BA45F9F7D99EB91D74B0EDA65646736E924B3515E6F8"
  }
  
  function Get-NormalizedTextSha256([string]$Path) {
-@@ -315,8 +331,9 @@ function Test-ReShadePatchedSourceState {
+@@ -315,8 +339,10 @@ function Test-ReShadePatchedSourceState {
      # long-path injector seam, which no longer reverses independently.
      foreach ($Patch in @(
          $OwnedLateD3d11AdapterReadyLongPathPatch
 -        $InjectorInitialInspectionRecoveryPatch
          $InjectorSharedAddonDirectoryPatch
-+        $InjectorInspectionContextPatch
 +        $InjectorSelectionBeforeOpenPatch
++        $InjectorMemberDiagnosticsPatch
++        $InjectorStartupReadinessPatch
          $OwnedLateD3d11ForeignAddonIsolationPatch
      )) {
          if (-not (Test-GitPatchApplied $Patch)) {
-@@ -385,6 +402,8 @@ function Test-RuntimeBuildCache {
+@@ -385,6 +411,10 @@ function Test-RuntimeBuildCache {
              $Stamp.ownedLateD3d11AdapterReadyLongPathPatchSha256 -eq $OwnedLateD3d11AdapterReadyLongPathPatchHash -and
              $Stamp.injectorInitialInspectionRecoveryPatchSha256 -eq $InjectorInitialInspectionRecoveryPatchHash -and
              $Stamp.injectorSharedAddonDirectoryPatchSha256 -eq $InjectorSharedAddonDirectoryPatchHash -and
 +            $Stamp.injectorInspectionContextPatchSha256 -eq $InjectorInspectionContextPatchHash -and
 +            $Stamp.injectorSelectionBeforeOpenPatchSha256 -eq $InjectorSelectionBeforeOpenPatchHash -and
++            $Stamp.injectorMemberDiagnosticsPatchSha256 -eq $InjectorMemberDiagnosticsPatchHash -and
++            $Stamp.injectorStartupReadinessPatchSha256 -eq $InjectorStartupReadinessPatchHash -and
              $Stamp.ownedLateD3d11ForeignAddonIsolationPatchSha256 -eq $OwnedLateD3d11ForeignAddonIsolationPatchHash -and
              ($Stamp.addonPreloadProtocol -is [int] -or $Stamp.addonPreloadProtocol -is [long]) -and
              $Stamp.addonPreloadProtocol -eq 1 -and
-@@ -410,7 +429,19 @@ if ((Test-RuntimeBuildCache) -and -not $Force) {
+@@ -410,7 +440,19 @@ if ((Test-RuntimeBuildCache) -and -not $Force) {
  
  Push-Location $RuntimeRoot
  try {
@@ -395,17 +599,19 @@ index 82aa51debc58f51b6c1f42cd9ec7a1b498c44b0c..968c22b36e2d3568295379f9b35d7aaa
      if ($LASTEXITCODE -ne 0) {
          throw "CMake configure failed with exit code $LASTEXITCODE."
      }
-@@ -537,6 +568,8 @@ $InjectorHash = (Get-FileHash -ErrorAction Stop -Algorithm SHA256 -LiteralPath $
+@@ -537,6 +579,10 @@ $InjectorHash = (Get-FileHash -ErrorAction Stop -Algorithm SHA256 -LiteralPath $
      ownedLateD3d11AdapterReadyLongPathPatchSha256 = $OwnedLateD3d11AdapterReadyLongPathPatchHash
      injectorInitialInspectionRecoveryPatchSha256 = $InjectorInitialInspectionRecoveryPatchHash
      injectorSharedAddonDirectoryPatchSha256 = $InjectorSharedAddonDirectoryPatchHash
 +    injectorInspectionContextPatchSha256 = $InjectorInspectionContextPatchHash
 +    injectorSelectionBeforeOpenPatchSha256 = $InjectorSelectionBeforeOpenPatchHash
++    injectorMemberDiagnosticsPatchSha256 = $InjectorMemberDiagnosticsPatchHash
++    injectorStartupReadinessPatchSha256 = $InjectorStartupReadinessPatchHash
      ownedLateD3d11ForeignAddonIsolationPatchSha256 = $OwnedLateD3d11ForeignAddonIsolationPatchHash
      addonPreloadProtocol = 1
      cooperativeAddonProtocol = 1
 diff --git a/libs/electron-game-overlay-runtime/scripts/build.ps1 b/libs/electron-game-overlay-runtime/scripts/build.ps1
-index fec54cc66c00a1dcd5533bdf3b65f88b5d15f833..8323814289466a7f06dd9cea20c03d34bea87e21 100644
+index fec54cc66c00a1dcd5533bdf3b65f88b5d15f833..2289b94f1691f1ac4277a9a63cdb5c0ead3c1ead 100644
 --- a/libs/electron-game-overlay-runtime/scripts/build.ps1
 +++ b/libs/electron-game-overlay-runtime/scripts/build.ps1
 @@ -2,7 +2,9 @@
@@ -437,11 +643,11 @@ index fec54cc66c00a1dcd5533bdf3b65f88b5d15f833..8323814289466a7f06dd9cea20c03d34
  $ExpectedAddonBuildId = "CCE20935ADD44EF6A5A7973014B2E07F"
  # Bump when the runtime provider or injector implementation changes, never for package semver.
 -$RuntimeGeneration = 23
-+$RuntimeGeneration = 25
++$RuntimeGeneration = 26
  # Protocol-family v1 providers must always retain literal transport v1 in their
  # advertised range; backwards-compatible releases may raise only the maximum.
  $TargetTransportMin = 1
-@@ -178,6 +186,10 @@ $ExpectedPatchProvenance = [ordered]@{
+@@ -178,6 +186,14 @@ $ExpectedPatchProvenance = [ordered]@{
          Join-Path $RuntimeRoot "patches\reshade-injector-initial-inspection-recovery.patch"
      injectorSharedAddonDirectoryPatchSha256 =
          Join-Path $RuntimeRoot "patches\reshade-injector-shared-addon-directory.patch"
@@ -449,10 +655,14 @@ index fec54cc66c00a1dcd5533bdf3b65f88b5d15f833..8323814289466a7f06dd9cea20c03d34
 +        Join-Path $RuntimeRoot "patches\reshade-injector-inspection-context.patch"
 +    injectorSelectionBeforeOpenPatchSha256 =
 +        Join-Path $RuntimeRoot "patches\reshade-injector-selection-before-open.patch"
++    injectorMemberDiagnosticsPatchSha256 =
++        Join-Path $RuntimeRoot "patches\reshade-injector-member-diagnostics.patch"
++    injectorStartupReadinessPatchSha256 =
++        Join-Path $RuntimeRoot "patches\reshade-injector-startup-readiness.patch"
      ownedLateD3d11ForeignAddonIsolationPatchSha256 =
          Join-Path $RuntimeRoot "patches\reshade-owned-late-d3d11-addon-failure-isolation.patch"
      injectorFutureTargetsPatchSha256 = Join-Path $RuntimeRoot "patches\reshade-injector-future-targets.patch"
-@@ -222,11 +234,13 @@ Assert-Sha256Equal `
+@@ -222,11 +238,13 @@ Assert-Sha256Equal `
      -Label "frozen owned late D3D11 foreign add-on isolation patch"
  
  $CMake = Resolve-Executable "cmake.exe"
@@ -468,7 +678,7 @@ index fec54cc66c00a1dcd5533bdf3b65f88b5d15f833..8323814289466a7f06dd9cea20c03d34
  }
  if ($LASTEXITCODE -ne 0) {
      throw "Building the pinned ReShade runtime failed with exit code $LASTEXITCODE."
-@@ -234,7 +248,14 @@ if ($LASTEXITCODE -ne 0) {
+@@ -234,7 +252,14 @@ if ($LASTEXITCODE -ne 0) {
  
  Push-Location $RuntimeRoot
  try {
@@ -484,11 +694,231 @@ index fec54cc66c00a1dcd5533bdf3b65f88b5d15f833..8323814289466a7f06dd9cea20c03d34
      if ($LASTEXITCODE -ne 0) {
          throw "Configuring the production overlay runtime failed with exit code $LASTEXITCODE."
      }
+diff --git a/libs/electron-game-overlay-runtime/src/electron_game_overlay_reshade_manager.cpp b/libs/electron-game-overlay-runtime/src/electron_game_overlay_reshade_manager.cpp
+index 5f88f4b71cbffcdc9f2b6134ce70fceea36a4852..ed855c05683eca5acbf0e79770a580ea5fdf885e 100644
+--- a/libs/electron-game-overlay-runtime/src/electron_game_overlay_reshade_manager.cpp
++++ b/libs/electron-game-overlay-runtime/src/electron_game_overlay_reshade_manager.cpp
+@@ -126,6 +126,10 @@
+ #include <vector>
+ 
+ #pragma comment(lib, "bcrypt.lib")
++#include <TlHelp32.h>
++#include <userenv.h>
++#pragma comment(lib, "userenv.lib")
++#pragma comment(lib, "advapi32.lib")
+ 
+ #ifndef OBJ_DONT_REPARSE
+ #define OBJ_DONT_REPARSE 0x00001000L
+@@ -4636,6 +4640,177 @@ std::string query_process_image(int argc, wchar_t **argv)
+     return result.str();
+ }
+ 
++struct consumer_token_context
++{
++    bool elevated = false;
++    DWORD integrity = 0, session = 0;
++    std::vector<BYTE> sid;
++};
++
++consumer_token_context read_consumer_token(HANDLE process, const char *actor)
++{
++    HANDLE raw = nullptr;
++    if (!OpenProcessToken(process, TOKEN_QUERY, &raw))
++        throw_windows("consumer-token-open-failed", actor, exit_category::io_failure);
++    unique_handle token(raw);
++    auto query = [&](TOKEN_INFORMATION_CLASS kind) {
++        DWORD length = 0;
++        GetTokenInformation(token.get(), kind, nullptr, 0, &length);
++        if (length == 0 || length > 65536)
++            throw_windows("consumer-token-query-failed", actor, exit_category::io_failure);
++        std::vector<BYTE> value(length);
++        if (!GetTokenInformation(token.get(), kind, value.data(), length, &length) || length > value.size())
++            throw_windows("consumer-token-query-failed", actor, exit_category::io_failure);
++        value.resize(length); return value;
++    };
++    auto elevation = query(TokenElevation), integrity = query(TokenIntegrityLevel), user = query(TokenUser), session = query(TokenSessionId);
++    if (elevation.size() != sizeof(TOKEN_ELEVATION) || integrity.size() < sizeof(TOKEN_MANDATORY_LABEL) || user.size() < sizeof(TOKEN_USER) || session.size() != sizeof(DWORD))
++        throw manager_error("consumer-token-size-invalid", actor, exit_category::preserved_state);
++    auto valid_sid = [&](PSID sid, const std::vector<BYTE> &buffer) {
++        const auto address = reinterpret_cast<std::uintptr_t>(sid), begin = reinterpret_cast<std::uintptr_t>(buffer.data());
++        if (address < begin || address > begin + buffer.size() || begin + buffer.size() - address < 8 || !IsValidSid(sid) || GetLengthSid(sid) > begin + buffer.size() - address)
++            throw manager_error("consumer-token-sid-invalid", actor, exit_category::preserved_state);
++    };
++    const auto label = reinterpret_cast<const TOKEN_MANDATORY_LABEL *>(integrity.data());
++    const auto identity = reinterpret_cast<const TOKEN_USER *>(user.data());
++    valid_sid(label->Label.Sid, integrity); valid_sid(identity->User.Sid, user);
++    const UCHAR count = *GetSidSubAuthorityCount(label->Label.Sid);
++    if (!count) throw manager_error("consumer-token-sid-invalid", actor, exit_category::preserved_state);
++    consumer_token_context result;
++    result.elevated = reinterpret_cast<const TOKEN_ELEVATION *>(elevation.data())->TokenIsElevated != 0;
++    result.integrity = *GetSidSubAuthority(label->Label.Sid, count - 1);
++    result.session = *reinterpret_cast<const DWORD *>(session.data());
++    result.sid.resize(GetLengthSid(identity->User.Sid));
++    if (!CopySid(static_cast<DWORD>(result.sid.size()), result.sid.data(), identity->User.Sid))
++        throw_windows("consumer-token-sid-invalid", actor, exit_category::io_failure);
++    return result;
++}
++
++std::uint64_t consumer_birth(HANDLE process)
++{
++    FILETIME birth{}, exited{}, kernel{}, user{};
++    if (!GetProcessTimes(process, &birth, &exited, &kernel, &user))
++        throw_windows("consumer-identity-query-failed", "Unable to read consumer creation identity.", exit_category::io_failure);
++    return (std::uint64_t(birth.dwHighDateTime) << 32) | birth.dwLowDateTime;
++}
++
++std::wstring consumer_image(HANDLE process)
++{
++    std::wstring image(32768, L'\0'); DWORD length = static_cast<DWORD>(image.size());
++    if (!QueryFullProcessImageNameW(process, 0, image.data(), &length) || !length || length >= image.size())
++        throw_windows("consumer-image-query-failed", "Unable to read consumer executable identity.", exit_category::io_failure);
++    image.resize(length); return image;
++}
++
++std::wstring quote_consumer_argument(const std::wstring &value)
++{
++    std::wstring result = L"\""; unsigned slashes = 0;
++    for (wchar_t ch : value) {
++        if (ch == L'\\') { ++slashes; continue; }
++        result.append(ch == L'"' ? slashes * 2 + 1 : slashes, L'\\'); slashes = 0; result += ch;
++    }
++    result.append(slashes * 2, L'\\'); result += L'"'; return result;
++}
++
++std::string consumer_execution_command(int argc, wchar_t **argv, bool launch)
++{
++    if (argc < 3) throw manager_error("invalid-request", "A consumer PID is required.", exit_category::invalid_request);
++    const std::wstring pid_text(argv[2]);
++    if (pid_text.empty() || pid_text[0] == L'0' || pid_text.size() > 10 || pid_text.find_first_not_of(L"0123456789") != std::wstring::npos)
++        throw manager_error("invalid-request", "Invalid consumer PID.", exit_category::invalid_request);
++    const auto numeric_pid = std::stoull(pid_text);
++    if (numeric_pid > MAXDWORD) throw manager_error("invalid-request", "Invalid consumer PID.", exit_category::invalid_request);
++    const DWORD owner_pid = static_cast<DWORD>(numeric_pid);
++    unique_handle snapshot(CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0));
++    PROCESSENTRY32W entry{sizeof(entry)}; DWORD actual_parent = 0;
++    for (BOOL next = Process32FirstW(snapshot.get(), &entry); next; next = Process32NextW(snapshot.get(), &entry))
++        if (entry.th32ProcessID == GetCurrentProcessId()) { actual_parent = entry.th32ParentProcessID; break; }
++    if (actual_parent != owner_pid)
++        throw manager_error("consumer-parent-mismatch", "Only this helper's actual calling process can be relaunched.", exit_category::preserved_state);
++    unique_handle owner(OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, FALSE, owner_pid));
++    if (!owner || WaitForSingleObject(owner.get(), 0) != WAIT_TIMEOUT)
++        throw_windows("consumer-owner-unavailable", "The calling consumer is unavailable.", exit_category::io_failure);
++    const auto birth = consumer_birth(owner.get()); const auto image = consumer_image(owner.get());
++    const auto context = read_consumer_token(owner.get(), "consumer");
++    unique_handle image_guard(CreateFileW(image.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_FLAG_OPEN_REPARSE_POINT, nullptr));
++    if (!image_guard) throw_windows("consumer-image-unavailable", "Unable to pin the consumer executable.", exit_category::io_failure);
++    verify_regular_non_reparse_handle(image_guard.get(), image, "consumer-image-invalid", exit_category::preserved_state, false);
++    const std::string image_hash = hash_handle(image_guard.get(), 512ull * 1024 * 1024, "consumer-image-invalid");
++    const bool supported = !context.elevated && context.integrity <= SECURITY_MANDATORY_MEDIUM_RID;
++    DWORD shell_pid = 0; GetWindowThreadProcessId(GetShellWindow(), &shell_pid);
++    unique_handle shell(shell_pid ? OpenProcess(PROCESS_CREATE_PROCESS | PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, FALSE, shell_pid) : nullptr);
++    std::string refusal = "desktop-shell-unavailable";
++    std::optional<consumer_token_context> shell_context;
++    if (shell && WaitForSingleObject(shell.get(), 0) == WAIT_TIMEOUT) {
++        try {
++            shell_context = read_consumer_token(shell.get(), "desktop-shell");
++            if (context.sid != shell_context->sid) refusal = "desktop-user-mismatch";
++            else if (context.session != shell_context->session) refusal = "desktop-session-mismatch";
++            else if (shell_context->elevated || shell_context->integrity > SECURITY_MANDATORY_MEDIUM_RID) refusal = "desktop-shell-not-medium";
++            else refusal.clear();
++        } catch (const manager_error &) { refusal = "desktop-token-query-failed"; }
++    }
++    if (!launch && argc != 3) throw manager_error("invalid-request", "Unexpected consumer-context arguments.", exit_category::invalid_request);
++    DWORD child_pid = 0; std::uint64_t child_birth = 0;
++    if (launch) {
++        if (argc < 5 || std::wstring(argv[3]) != std::to_wstring(birth) || utf8_from_wide(argv[4]) != image_hash)
++            throw manager_error("consumer-identity-mismatch", "The consumer incarnation or immutable executable changed.", exit_category::preserved_state);
++        if (!supported && !refusal.empty()) throw manager_error("consumer-relaunch-unavailable", refusal, exit_category::preserved_state);
++        std::wstring command = quote_consumer_argument(image);
++        for (int index = 5; index < argc; index += 2) {
++            if (index + 1 >= argc || std::wstring_view(argv[index]) != L"--arg" || index >= 517)
++                throw manager_error("invalid-request", "Invalid consumer launch arguments.", exit_category::invalid_request);
++            command += L" " + quote_consumer_argument(argv[index + 1]);
++        }
++        if (command.size() >= 32767) throw manager_error("invalid-request", "Consumer command line is too long.", exit_category::invalid_request);
++        if (!supported) {
++            HANDLE token_raw = nullptr;
++            // CreateEnvironmentBlock requires QUERY | DUPLICATE for a primary
++            // token. This handle is used only to build a fresh environment.
++            if (!OpenProcessToken(shell.get(), TOKEN_QUERY | TOKEN_DUPLICATE, &token_raw)) throw_windows("consumer-shell-token-unavailable", "Unable to read the desktop token.", exit_category::io_failure);
++            unique_handle shell_token(token_raw); void *environment = nullptr;
++            if (!CreateEnvironmentBlock(&environment, shell_token.get(), FALSE)) throw_windows("consumer-environment-unavailable", "Unable to construct the medium user's environment.", exit_category::io_failure);
++            struct environment_guard { void *value; ~environment_guard(){DestroyEnvironmentBlock(value);} } environment_scope{environment};
++            SIZE_T attribute_bytes = 0; InitializeProcThreadAttributeList(nullptr, 1, 0, &attribute_bytes);
++            std::vector<BYTE> attributes(attribute_bytes); auto list = reinterpret_cast<PPROC_THREAD_ATTRIBUTE_LIST>(attributes.data());
++            if (!InitializeProcThreadAttributeList(list, 1, 0, &attribute_bytes)) throw_windows("consumer-launch-attributes-failed", "Unable to initialize parent attributes.", exit_category::io_failure);
++            struct attributes_guard { PPROC_THREAD_ATTRIBUTE_LIST value; ~attributes_guard(){DeleteProcThreadAttributeList(value);} } attributes_scope{list};
++            HANDLE shell_handle = shell.get();
++            if (!UpdateProcThreadAttribute(list, 0, PROC_THREAD_ATTRIBUTE_PARENT_PROCESS, &shell_handle, sizeof(shell_handle), nullptr, nullptr))
++                throw_windows("consumer-launch-attributes-failed", "Unable to bind the medium desktop parent.", exit_category::io_failure);
++            STARTUPINFOEXW startup{}; startup.StartupInfo.cb = sizeof(startup); startup.lpAttributeList = list;
++            PROCESS_INFORMATION child{}; const auto slash = image.find_last_of(L"\\/"); const auto directory = image.substr(0, slash);
++            // Direct CreateProcess never invokes RunAs or a UAC prompt. A
++            // requireAdministrator executable fails rather than being elevated.
++            // Console consumers must not attach to a console belonging to the
++            // elevated creator. GUI consumers ignore CREATE_NO_WINDOW.
++            if (!CreateProcessW(image.c_str(), command.data(), nullptr, nullptr, FALSE, EXTENDED_STARTUPINFO_PRESENT | CREATE_UNICODE_ENVIRONMENT | CREATE_SUSPENDED | CREATE_NO_WINDOW,
++                    environment, directory.c_str(), &startup.StartupInfo, &child))
++                throw_windows("consumer-launch-failed", "Unable to create an unelevated replacement; no UAC fallback is attempted.", exit_category::io_failure);
++            unique_handle child_process(child.hProcess), child_thread(child.hThread);
++            bool resumed = false;
++            try {
++                const auto verified = read_consumer_token(child_process.get(), "replacement");
++                if (verified.elevated || verified.integrity > SECURITY_MANDATORY_MEDIUM_RID || verified.session != context.session ||
++                    context.sid != verified.sid || _wcsicmp(consumer_image(child_process.get()).c_str(), image.c_str()) != 0)
++                    throw manager_error("consumer-replacement-mismatch", "The replacement did not retain the same user/session/image at medium integrity.", exit_category::preserved_state);
++                child_pid = child.dwProcessId; child_birth = consumer_birth(child_process.get());
++                if (ResumeThread(child_thread.get()) == static_cast<DWORD>(-1)) throw_windows("consumer-resume-failed", "Unable to start the owned replacement.", exit_category::io_failure);
++                resumed = true;
++            } catch (...) { if (!resumed) {TerminateProcess(child_process.get(), 1);WaitForSingleObject(child_process.get(),5000);} throw; }
++        }
++    }
++    std::ostringstream result;
++    result << "{\"schemaVersion\":1,\"kind\":\"electron-game-overlay-consumer-context\",\"ownerPid\":" << owner_pid
++           << ",\"creationTime100ns\":" << json_string(std::to_string(birth)) << ",\"executablePath\":" << json_string(utf8_from_wide(image))
++           << ",\"executableSha256\":" << json_string(image_hash) << ",\"elevated\":" << (context.elevated?"true":"false")
++           << ",\"integrityRid\":" << context.integrity << ",\"sessionId\":" << context.session << ",\"overlaySupported\":" << (supported?"true":"false")
++           << ",\"relaunchAvailable\":" << (refusal.empty()?"true":"false") << ",\"relaunchRefusal\":" << (refusal.empty()?"null":json_string(refusal))
++           << ",\"status\":" << json_string(launch?(supported?"already-unelevated":"launched"):"inspected")
++           << ",\"replacementPid\":" << child_pid << ",\"replacementCreationTime100ns\":" << json_string(std::to_string(child_birth)) << "}\n";
++    return result.str();
++}
++
+ void write_stdout(const std::string &text)
+ {
+     const HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
+@@ -4667,6 +4842,12 @@ int wmain(int argc, wchar_t **argv)
+     std::optional<std::string> operation;
+     try
+     {
++        if (argc >= 2 && (std::wstring_view(argv[1]) == L"--consumer-context" || std::wstring_view(argv[1]) == L"--consumer-relaunch")) {
++            const bool launch = std::wstring_view(argv[1]) == L"--consumer-relaunch";
++            operation = launch ? "consumer-relaunch" : "consumer-context";
++            write_stdout(consumer_execution_command(argc, argv, launch));
++            return static_cast<int>(exit_category::success);
++        }
+         if (argc >= 2 &&
+             std::wstring_view(argv[1]) == L"--query-process-image")
+         {
 diff --git a/libs/electron-game-overlay/README.md b/libs/electron-game-overlay/README.md
-index 8fae665c229555416d7cf4f323bd72bbdda5da61..29d7fb3f8d87e57b25c0eccfed2b0ebd1fd89b99 100644
+index 8fae665c229555416d7cf4f323bd72bbdda5da61..d40d44ea22158c8fc0c27e71521aab7796c0cb49 100644
 --- a/libs/electron-game-overlay/README.md
 +++ b/libs/electron-game-overlay/README.md
-@@ -181,6 +181,128 @@ Current process-policy behavior and fast-start limitations: [rc.6 guide](https:/
+@@ -45,6 +45,13 @@ Use `new ElectronGameOverlay()` with the cooperative candidate. The retained
+ 
+ ## Run the minimal consumer
+ 
++For applications that may start elevated, the local generation-26 candidate
++provides `inspectOverlayConsumerExecutionContext` and
++`launchUnelevatedOverlayConsumer`. Call them before services or overlay startup;
++the [consumer startup contract](../../doc/sdk-api.md#consumer-elevation-and-replacement-startup)
++describes single-instance lock handling, development arguments and verified
++same-user medium replacement. Elevated targets remain unsupported.
++
+ Copy [`examples/basic-overlay`](https://github.com/Wurielle/electron-game-overlay/tree/feat/sdk-release-candidate/examples/basic-overlay)
+ from the matching candidate source checkout into a directory outside that checkout.
+ Its README gives local-tarball installation and verification instructions.
+@@ -181,6 +188,128 @@ Current process-policy behavior and fast-start limitations: [rc.6 guide](https:/
  The basename-glob update fix and discovery readiness contract are documented in [rc.7](https://github.com/Wurielle/electron-game-overlay/blob/feat/sdk-release-candidate/doc/sdk-rc7-discovery-policy.md).
  
  
@@ -618,7 +1048,7 @@ index 8fae665c229555416d7cf4f323bd72bbdda5da61..29d7fb3f8d87e57b25c0eccfed2b0ebd
  
  The [complete SDK API guide](https://github.com/Wurielle/electron-game-overlay/blob/dev/doc/sdk-api.md)
 diff --git a/libs/electron-game-overlay/scripts/stage-game-overlay-runtime.ps1 b/libs/electron-game-overlay/scripts/stage-game-overlay-runtime.ps1
-index 958acd0523b0ed3c7ec2b103e8782bd3c891e8ae..cb56a1daaa129e88ac03e58c660bbd258eb266e1 100644
+index 958acd0523b0ed3c7ec2b103e8782bd3c891e8ae..6503801f491c3052bf90bcf12190f383070a88f6 100644
 --- a/libs/electron-game-overlay/scripts/stage-game-overlay-runtime.ps1
 +++ b/libs/electron-game-overlay/scripts/stage-game-overlay-runtime.ps1
 @@ -79,7 +79,7 @@ $ExpectedReShadeCommit = "4a50d1eddace85734871d91792ff214f13f66c01"
@@ -626,11 +1056,11 @@ index 958acd0523b0ed3c7ec2b103e8782bd3c891e8ae..cb56a1daaa129e88ac03e58c660bbd25
  # Keep these exact mirrors of the runtime build manifest. Protocol-family v1
  # must retain literal target transport v1 as its advertised minimum.
 -$ExpectedRuntimeGeneration = 23
-+$ExpectedRuntimeGeneration = 25
++$ExpectedRuntimeGeneration = 26
  $ExpectedTargetTransportMin = 1
  $ExpectedTargetTransportMax = 1
  $RuntimeSourceRoot = Join-Path $RepoRoot "libs\electron-game-overlay-runtime"
-@@ -151,6 +151,10 @@ $ExpectedPatchProvenance = [ordered]@{
+@@ -151,6 +151,14 @@ $ExpectedPatchProvenance = [ordered]@{
          Join-Path $RuntimeSourceRoot "patches\reshade-injector-initial-inspection-recovery.patch"
      injectorSharedAddonDirectoryPatchSha256 =
          Join-Path $RuntimeSourceRoot "patches\reshade-injector-shared-addon-directory.patch"
@@ -638,11 +1068,15 @@ index 958acd0523b0ed3c7ec2b103e8782bd3c891e8ae..cb56a1daaa129e88ac03e58c660bbd25
 +        Join-Path $RuntimeSourceRoot "patches\reshade-injector-inspection-context.patch"
 +    injectorSelectionBeforeOpenPatchSha256 =
 +        Join-Path $RuntimeSourceRoot "patches\reshade-injector-selection-before-open.patch"
++    injectorMemberDiagnosticsPatchSha256 =
++        Join-Path $RuntimeSourceRoot "patches\reshade-injector-member-diagnostics.patch"
++    injectorStartupReadinessPatchSha256 =
++        Join-Path $RuntimeSourceRoot "patches\reshade-injector-startup-readiness.patch"
      ownedLateD3d11ForeignAddonIsolationPatchSha256 =
          Join-Path $RuntimeSourceRoot "patches\reshade-owned-late-d3d11-addon-failure-isolation.patch"
      injectorFutureTargetsPatchSha256 = Join-Path $RuntimeSourceRoot "patches\reshade-injector-future-targets.patch"
 diff --git a/libs/electron-game-overlay/src/lib/overlay-broker-protocol.ts b/libs/electron-game-overlay/src/lib/overlay-broker-protocol.ts
-index d8375bc125dbe990d0e97c49f85e3167fe97c842..97cd1bc7da3a0248937f004fc012adf05aeaeaf3 100644
+index d8375bc125dbe990d0e97c49f85e3167fe97c842..1efb7c981ba4a5b3cf5523c7642b740fcfd57bde 100644
 --- a/libs/electron-game-overlay/src/lib/overlay-broker-protocol.ts
 +++ b/libs/electron-game-overlay/src/lib/overlay-broker-protocol.ts
 @@ -20,7 +20,7 @@ export const OVERLAY_BROKER_LEGACY_TARGET_TRANSPORT_MAX = 1 as const;
@@ -650,15 +1084,15 @@ index d8375bc125dbe990d0e97c49f85e3167fe97c842..97cd1bc7da3a0248937f004fc012adf0
   * only with the matching staged-artifact manifests, never for package semver.
   */
 -export const OVERLAY_BROKER_RUNTIME_GENERATION = 23 as const;
-+export const OVERLAY_BROKER_RUNTIME_GENERATION = 25 as const;
++export const OVERLAY_BROKER_RUNTIME_GENERATION = 26 as const;
  /** Current target transport spoken by the broker and injected runtime. */
  export const OVERLAY_BROKER_TARGET_TRANSPORT_VERSION = 1 as const;
  /**
 diff --git a/libs/electron-game-overlay/src/lib/overlay-package-manifest.ts b/libs/electron-game-overlay/src/lib/overlay-package-manifest.ts
-index e9711133fb65ed4152ccd5a266839c33a4a67852..777a5039762a400d5eded2679f625efb24159eb5 100644
+index e9711133fb65ed4152ccd5a266839c33a4a67852..11bb50cabf59cc718fa3fed9ace81e5914f165de 100644
 --- a/libs/electron-game-overlay/src/lib/overlay-package-manifest.ts
 +++ b/libs/electron-game-overlay/src/lib/overlay-package-manifest.ts
-@@ -30,6 +30,10 @@ const INJECTOR_SHARED_ADDON_DIRECTORY_PATCH_SHA256 =
+@@ -30,6 +30,14 @@ const INJECTOR_SHARED_ADDON_DIRECTORY_PATCH_SHA256 =
    '54AE1F9ABCE02CBB66481C7C2AB30E4D3E7925CD83F27F31D8551D76DEF85125';
  const OWNED_LATE_D3D11_FOREIGN_ADDON_ISOLATION_PATCH_SHA256 =
    '2A1FF13D7F76258ECF9D5CFB565D68C2522BEE772053A5373A3645823D310F99';
@@ -666,10 +1100,14 @@ index e9711133fb65ed4152ccd5a266839c33a4a67852..777a5039762a400d5eded2679f625efb
 +  '288C2A76AEDBC827BB00117A455FFE87ECB708CA33411449CD56E2BEA190160E';
 +const INJECTOR_SELECTION_BEFORE_OPEN_PATCH_SHA256 =
 +  'F83053E59EE9443E98D31A4C238B3D19D6B847D1F6F5E238E05B899FFC87E555';
++const INJECTOR_MEMBER_DIAGNOSTICS_PATCH_SHA256 =
++  'D56162D2EA444DB44E7F21128A5F316E124E11E08EC1B6F3328D769EA4048A57';
++const INJECTOR_STARTUP_READINESS_PATCH_SHA256 =
++  '29C8D7ACA8919189D484B2E22F83DBD564B00D344E8C860058AFCCEAFC808D9D';
  
  /** @internal */
  export interface OverlayDistributionManifest {
-@@ -262,6 +266,24 @@ function validateNative(dist: string, files: ReadonlySet<string>): void {
+@@ -262,6 +270,38 @@ function validateNative(dist: string, files: ReadonlySet<string>): void {
        (requiresSharedAddonDirectoryPatch && expectedGeneration < 23)) {
      throw new Error('Compiled SDK shared add-on directory patch pin does not match its generation');
    }
@@ -691,10 +1129,24 @@ index e9711133fb65ed4152ccd5a266839c33a4a67852..777a5039762a400d5eded2679f625efb
 +  if ((selectionPins.length === 1) !== (expectedGeneration >= 25)) {
 +    throw new Error('Compiled SDK selection before open patch pin does not match its generation');
 +  }
++  const memberDeclarations = [...validator.matchAll(/\b(?:const|let|var)\s+INJECTOR_MEMBER_DIAGNOSTICS_PATCH_SHA256\b/g)];
++  const memberPins = [...validator.matchAll(/\bconst\s+INJECTOR_MEMBER_DIAGNOSTICS_PATCH_SHA256\s*=\s*['"]([0-9a-fA-F]{64})['"]\s*;/g)];
++  if (memberDeclarations.length !== memberPins.length || memberDeclarations.length > 1 ||
++      (memberPins.length === 1 && memberPins[0][1].toUpperCase() !== INJECTOR_MEMBER_DIAGNOSTICS_PATCH_SHA256)) {
++    throw new Error('Compiled SDK member diagnostics patch pin is malformed or unsupported');
++  }
++  if ((memberPins.length === 1) !== (expectedGeneration >= 26)) {
++    throw new Error('Compiled SDK member diagnostics patch pin does not match its generation');
++  }
++  const startupDeclarations = [...validator.matchAll(/\b(?:const|let|var)\s+INJECTOR_STARTUP_READINESS_PATCH_SHA256\b/g)];
++  const startupPins = [...validator.matchAll(/\bconst\s+INJECTOR_STARTUP_READINESS_PATCH_SHA256\s*=\s*['"]([0-9a-fA-F]{64})['"]\s*;/g)];
++  if (startupDeclarations.length !== startupPins.length || startupDeclarations.length > 1 ||
++      (startupPins.length === 1 && startupPins[0][1].toUpperCase() !== INJECTOR_STARTUP_READINESS_PATCH_SHA256)) throw new Error('Compiled SDK startup readiness patch pin is malformed or unsupported');
++  if ((startupPins.length === 1) !== (expectedGeneration >= 26)) throw new Error('Compiled SDK startup readiness patch pin does not match its generation');
    const foreignAddonIsolationDeclarations = [...validator.matchAll(/\b(?:const|let|var)\s+OWNED_LATE_D3D11_FOREIGN_ADDON_ISOLATION_PATCH_SHA256\b/g)];
    const foreignAddonIsolationPins = [...validator.matchAll(/\bconst\s+OWNED_LATE_D3D11_FOREIGN_ADDON_ISOLATION_PATCH_SHA256\s*=\s*['"]([0-9a-fA-F]{64})['"]\s*;/g)];
    if (foreignAddonIsolationDeclarations.length !== foreignAddonIsolationPins.length || foreignAddonIsolationDeclarations.length > 1) {
-@@ -403,6 +425,22 @@ function validateNative(dist: string, files: ReadonlySet<string>): void {
+@@ -403,6 +443,34 @@ function validateNative(dist: string, files: ReadonlySet<string>): void {
      } else if (reshade.ownedLateD3d11ForeignAddonIsolationPatchSha256 !== undefined) {
        throw new Error('Owned late D3D11 foreign add-on isolation patch provenance requires the sealed SDK implementation pin: ' + bits);
      }
@@ -714,6 +1166,18 @@ index e9711133fb65ed4152ccd5a266839c33a4a67852..777a5039762a400d5eded2679f625efb
 +    } else if (reshade.injectorSelectionBeforeOpenPatchSha256 !== undefined) {
 +      throw new Error('Injector selection before open patch provenance requires runtime generation 25: ' + bits);
 +    }
++    if (expectedGeneration >= 26) {
++      if (typeof reshade.injectorMemberDiagnosticsPatchSha256 !== 'string' ||
++          reshade.injectorMemberDiagnosticsPatchSha256.toUpperCase() !== INJECTOR_MEMBER_DIAGNOSTICS_PATCH_SHA256) {
++        throw new Error('Pinned injector member diagnostics patch provenance mismatch: ' + bits);
++      }
++    } else if (reshade.injectorMemberDiagnosticsPatchSha256 !== undefined) {
++      throw new Error('Injector member diagnostics patch provenance requires runtime generation 26: ' + bits);
++    }
++    if (expectedGeneration >= 26) {
++      if (typeof reshade.injectorStartupReadinessPatchSha256 !== 'string' || reshade.injectorStartupReadinessPatchSha256.toUpperCase() !== INJECTOR_STARTUP_READINESS_PATCH_SHA256)
++        throw new Error('Pinned injector startup readiness patch provenance mismatch: ' + bits);
++    } else if (reshade.injectorStartupReadinessPatchSha256 !== undefined) throw new Error('Injector startup readiness patch provenance requires runtime generation 26: ' + bits);
      verifyHash(native, `ReShade${bits}.dll`, reshade.runtimeSha256);
      verifyHash(native, `inject${suffix}.exe`, reshade.injectorSha256);
    }
@@ -848,7 +1312,7 @@ index 0c3018b3d0a90e490084672424c7ad7c939debe7..7580f39d4f22839b7f484d90614335bc
    }
  
 diff --git a/libs/electron-game-overlay/src/lib/reshade-launcher.ts b/libs/electron-game-overlay/src/lib/reshade-launcher.ts
-index 16d44e3aa781b35edfe343a233596af9e939679b..3dd2e063b6037fd1144ddadc444d0e9a30fe1289 100644
+index 16d44e3aa781b35edfe343a233596af9e939679b..45967e382c39117a3ecda785a4cf554fb6a9ce9e 100644
 --- a/libs/electron-game-overlay/src/lib/reshade-launcher.ts
 +++ b/libs/electron-game-overlay/src/lib/reshade-launcher.ts
 @@ -1,4 +1,5 @@
@@ -902,7 +1366,69 @@ index 16d44e3aa781b35edfe343a233596af9e939679b..3dd2e063b6037fd1144ddadc444d0e9a
  }>;
  
  type ReclaimableRunDirectory = Readonly<{
-@@ -989,7 +991,7 @@ export function defaultReShadeRuntimeDirectory(): string {
+@@ -672,6 +674,16 @@ export type ReShadeDiagnosticCode =
+   | 'target-runtime-reuse-too-late'
+   | 'target-runtime-reuse-raced'
+   | 'target-module-inspection-failed'
++  | 'target-startup-readiness-failed'
++  | 'target-member-payload-invalid'
++  | 'target-preloaded-member-selection-invalid'
++  | 'target-member-host-unavailable'
++  | 'target-member-disabled'
++  | 'target-preloaded-member-invalid'
++  | 'target-first-host-preload-invalid'
++  | 'target-preloaded-member-elevation-rejected'
++  | 'target-host-claim-failed'
++  | 'target-member-host-inspection-failed'
+   | 'existing-runtime-addon-load-failed'
+   | 'injector-start-failed'
+   | 'injector-evidence-write-failed'
+@@ -897,7 +909,15 @@ type InjectorPreflightDiagnostic = Readonly<{
+     | 'target-runtime-incompatible'
+     | 'target-runtime-reuse-too-late'
+     | 'target-runtime-reuse-raced'
+-    | 'target-module-inspection-failed';
++    | 'target-module-inspection-failed'
++    | 'target-startup-readiness-failed'
++    | 'target-member-payload-invalid'
++    | 'target-preloaded-member-selection-invalid'
++    | 'target-member-host-unavailable'
++    | 'target-member-disabled'
++    | 'target-preloaded-member-invalid'
++    | 'target-preloaded-member-elevation-rejected'
++    | 'target-host-claim-failed';
+   pid: number;
+   targetExecutablePath: string;
+   injectionStarted: false;
+@@ -920,7 +940,26 @@ type InjectorExistingRuntimeAddonLoadDiagnostic = Readonly<{
+ }>;
+ 
+ type InjectorDiagnostic =
+-  InjectorPreflightDiagnostic | InjectorExistingRuntimeAddonLoadDiagnostic;
++  InjectorPreflightDiagnostic | InjectorExistingRuntimeAddonLoadDiagnostic | InjectorParticipantAddonLoadDiagnostic;
++
++type InjectorParticipantAddonLoadDiagnostic = Omit<InjectorPreflightDiagnostic, 'stage' | 'code' | 'injectionStarted'> & Readonly<{
++  stage: 'participant-addon-load';
++  injectionStarted: true;
++  code: 'target-member-payload-invalid' | 'target-preloaded-member-selection-invalid' |
++    'target-member-host-unavailable' | 'target-member-disabled' | 'target-preloaded-member-invalid' |
++    'target-first-host-preload-invalid' | 'target-member-host-inspection-failed' | 'target-module-inspection-failed';
++}>;
++
++const memberPreflightCodes = new Set([
++  'target-member-payload-invalid', 'target-preloaded-member-selection-invalid',
++  'target-member-host-unavailable', 'target-member-disabled', 'target-preloaded-member-invalid',
++  'target-preloaded-member-elevation-rejected', 'target-host-claim-failed',
++]);
++const memberPostloadCodes = new Set([
++  'target-member-payload-invalid', 'target-preloaded-member-selection-invalid',
++  'target-member-host-unavailable', 'target-member-disabled', 'target-preloaded-member-invalid',
++  'target-first-host-preload-invalid', 'target-member-host-inspection-failed', 'target-module-inspection-failed',
++]);
+ 
+ type InjectorResult =
+   | Readonly<{
+@@ -989,7 +1028,7 @@ export function defaultReShadeRuntimeDirectory(): string {
      .replace(/([\\/])([^\\/]+\.asar)(?=[\\/])/i, '$1$2.unpacked');
  }
  
@@ -911,7 +1437,7 @@ index 16d44e3aa781b35edfe343a233596af9e939679b..3dd2e063b6037fd1144ddadc444d0e9a
  export function defaultReShadeRunsRootDirectory(): string {
    return path.join(tmpdir(), 'electron-game-overlay', 'reshade-runs');
  }
-@@ -1437,6 +1439,7 @@ export class ReShadeOverlayLauncher {
+@@ -1437,6 +1476,7 @@ export class ReShadeOverlayLauncher {
      number,
      StagedRuntime
    >();
@@ -919,7 +1445,7 @@ index 16d44e3aa781b35edfe343a233596af9e939679b..3dd2e063b6037fd1144ddadc444d0e9a
    private releaseTargetAuthorization: (() => void) | null = null;
    private releaseGlobalTargetAuthorization: (() => void) | null = null;
    private launchGeneration = 0;
-@@ -1528,7 +1531,7 @@ export class ReShadeOverlayLauncher {
+@@ -1528,7 +1568,7 @@ export class ReShadeOverlayLauncher {
  
    /**
     * Applies an external, authoritative process-exit observation to a connected
@@ -928,7 +1454,7 @@ index 16d44e3aa781b35edfe343a233596af9e939679b..3dd2e063b6037fd1144ddadc444d0e9a
     * when a process watcher observes termination before the overlay transport.
     * Returns whether the observation changed launcher or deferred-maintenance
     * state.
-@@ -1537,10 +1540,17 @@ export class ReShadeOverlayLauncher {
+@@ -1537,10 +1577,17 @@ export class ReShadeOverlayLauncher {
      if (!isValidProcessPid(pid)) {
        return false;
      }
@@ -947,7 +1473,7 @@ index 16d44e3aa781b35edfe343a233596af9e939679b..3dd2e063b6037fd1144ddadc444d0e9a
        current.targetLabel === this.attachmentTargetLabel
      ) {
        this.confirmedTargetExitRuntimeByPid.set(pid, current.staged);
-@@ -1553,7 +1563,7 @@ export class ReShadeOverlayLauncher {
+@@ -1553,7 +1600,7 @@ export class ReShadeOverlayLauncher {
      }
      const targetLabel = this.attachmentTargetLabel;
      if (
@@ -956,7 +1482,7 @@ index 16d44e3aa781b35edfe343a233596af9e939679b..3dd2e063b6037fd1144ddadc444d0e9a
        this.attachmentExpectedTargetPid !== pid ||
        targetLabel === null
      ) {
-@@ -1580,7 +1590,7 @@ export class ReShadeOverlayLauncher {
+@@ -1580,7 +1627,7 @@ export class ReShadeOverlayLauncher {
      );
      this.activeAttach?.cancel(error);
      this.invalidateActiveLaunch();
@@ -965,7 +1491,7 @@ index 16d44e3aa781b35edfe343a233596af9e939679b..3dd2e063b6037fd1144ddadc444d0e9a
      this.resetTargetState(targetLabel);
      return true;
    }
-@@ -1891,7 +1901,33 @@ export class ReShadeOverlayLauncher {
+@@ -1891,7 +1938,33 @@ export class ReShadeOverlayLauncher {
        return;
      }
      const requestAtDisposal = this.activeRequest;
@@ -999,7 +1525,7 @@ index 16d44e3aa781b35edfe343a233596af9e939679b..3dd2e063b6037fd1144ddadc444d0e9a
      this.activeAttach?.cancel(
        new Error(
          'the ReShade launcher was disposed before attachment completed',
-@@ -2926,6 +2962,9 @@ export class ReShadeOverlayLauncher {
+@@ -2926,6 +2999,9 @@ export class ReShadeOverlayLauncher {
                  ...staged,
                  expectedCreationTime100ns: created,
                });
@@ -1009,7 +1535,7 @@ index 16d44e3aa781b35edfe343a233596af9e939679b..3dd2e063b6037fd1144ddadc444d0e9a
                this.emitEvent(
                  Object.freeze({
                    type: 'target-selected',
-@@ -3030,21 +3069,12 @@ export class ReShadeOverlayLauncher {
+@@ -3030,21 +3106,12 @@ export class ReShadeOverlayLauncher {
          [X86_ADDON_FILE_NAME, this.config.x86AddonPath],
          [CONFIG_FILE_NAME, this.config.configPath],
        ]);
@@ -1036,7 +1562,36 @@ index 16d44e3aa781b35edfe343a233596af9e939679b..3dd2e063b6037fd1144ddadc444d0e9a
  
        const runtimeProvider = await validateRuntimePackageBuildStamps(
          new Map<string, string>(
-@@ -4139,7 +4169,7 @@ export class ReShadeOverlayLauncher {
+@@ -3533,6 +3600,28 @@ export class ReShadeOverlayLauncher {
+         case 'target-module-inspection-failed':
+           detail = `loaded-module inspection failed for target pid=${diagnostic.pid}${windowsErrorDetail}`;
+           break;
++        case 'target-startup-readiness-failed':
++          detail = `the bounded read-only startup-readiness phase ended for target pid=${diagnostic.pid}${windowsErrorDetail}; no injection was started`;
++          break;
++        case 'target-preloaded-member-elevation-rejected':
++          detail = `preloaded add-on authorization refused for pid=${diagnostic.pid}${windowsErrorDetail}; the injector and target must both be unelevated with at most medium integrity. Token-query failures also refuse attachment; see EGO_PRELOAD_AUTHORIZATION_CONTEXT_V1 in the injector stdout log for the checked actor and phase`;
++          break;
++        case 'target-member-payload-invalid':
++        case 'target-preloaded-member-selection-invalid':
++        case 'target-preloaded-member-invalid':
++        case 'target-first-host-preload-invalid':
++          detail = `the exact overlay member payload or preload selection was refused for pid=${diagnostic.pid} (${diagnostic.code})${windowsErrorDetail}`;
++          break;
++        case 'target-member-disabled':
++          detail = `the target's effective ReShade configuration disables the selected overlay member for pid=${diagnostic.pid}${windowsErrorDetail}; its configuration was preserved`;
++          break;
++        case 'target-member-host-unavailable':
++        case 'target-member-host-inspection-failed':
++          detail = `the overlay member host could not be verified for pid=${diagnostic.pid} (${diagnostic.code})${windowsErrorDetail}`;
++          break;
++        case 'target-host-claim-failed':
++          detail = `the persistent overlay host claim failed for pid=${diagnostic.pid}${windowsErrorDetail}`;
++          break;
+         case 'existing-runtime-addon-load-failed':
+           detail = `the overlay add-on could not be loaded into the existing ReShade runtime for target pid=${diagnostic.pid}${
+             diagnostic.modulePath
+@@ -4139,7 +4228,7 @@ export class ReShadeOverlayLauncher {
          );
        } finally {
          try {
@@ -1045,7 +1600,7 @@ index 16d44e3aa781b35edfe343a233596af9e939679b..3dd2e063b6037fd1144ddadc444d0e9a
            scheduleRunRetentionSweep(pending.staged.runsRootDirectory);
          } catch (error) {
            if (!(await pathIsMissing(pending.staged.runDirectory))) {
-@@ -4208,7 +4238,9 @@ export class ReShadeOverlayLauncher {
+@@ -4208,7 +4297,9 @@ export class ReShadeOverlayLauncher {
          path: target.path,
        }),
      );
@@ -1056,7 +1611,7 @@ index 16d44e3aa781b35edfe343a233596af9e939679b..3dd2e063b6037fd1144ddadc444d0e9a
      this.resetTargetState(target.targetLabel);
    }
  
-@@ -4226,7 +4258,8 @@ export class ReShadeOverlayLauncher {
+@@ -4226,7 +4317,8 @@ export class ReShadeOverlayLauncher {
          launchGeneration,
        )
      ) {
@@ -1066,7 +1621,7 @@ index 16d44e3aa781b35edfe343a233596af9e939679b..3dd2e063b6037fd1144ddadc444d0e9a
      }
      if (
        this.attachmentState === 'blocked' ||
-@@ -4242,6 +4275,7 @@ export class ReShadeOverlayLauncher {
+@@ -4242,6 +4334,7 @@ export class ReShadeOverlayLauncher {
    private retireCurrentRuntime(
      targetLabel: string,
      launchGeneration?: number,
@@ -1074,7 +1629,7 @@ index 16d44e3aa781b35edfe343a233596af9e939679b..3dd2e063b6037fd1144ddadc444d0e9a
    ): void {
      const current = this.currentRuntime;
      if (
-@@ -4254,7 +4288,15 @@ export class ReShadeOverlayLauncher {
+@@ -4254,7 +4347,15 @@ export class ReShadeOverlayLauncher {
      }
      this.currentRuntime = null;
      const { staged } = current;
@@ -1091,7 +1646,7 @@ index 16d44e3aa781b35edfe343a233596af9e939679b..3dd2e063b6037fd1144ddadc444d0e9a
        .then(() => scheduleRunRetentionSweep(staged.runsRootDirectory))
        .catch(async (error) => {
          if (await pathIsMissing(staged.runDirectory)) {
-@@ -4938,16 +4980,6 @@ function sha256(bytes: Uint8Array): string {
+@@ -4938,16 +5039,6 @@ function sha256(bytes: Uint8Array): string {
    return createHash('sha256').update(bytes).digest('hex').toUpperCase();
  }
  
@@ -1108,7 +1663,7 @@ index 16d44e3aa781b35edfe343a233596af9e939679b..3dd2e063b6037fd1144ddadc444d0e9a
  async function removeStagedRuntime(staged: StagedRuntime): Promise<void> {
    assertDirectChild(
      staged.runsRootDirectory,
-@@ -4957,8 +4989,28 @@ async function removeStagedRuntime(staged: StagedRuntime): Promise<void> {
+@@ -4957,8 +5048,28 @@ async function removeStagedRuntime(staged: StagedRuntime): Promise<void> {
    await rm(staged.runDirectory, { recursive: true, force: true });
  }
  
@@ -1138,7 +1693,7 @@ index 16d44e3aa781b35edfe343a233596af9e939679b..3dd2e063b6037fd1144ddadc444d0e9a
  ): Promise<void> {
    await assertCanonicalDirectChildDirectory(
      staged.runsRootDirectory,
-@@ -4982,6 +5034,7 @@ async function markRunDirectoryReclaimable(
+@@ -4982,6 +5093,7 @@ async function markRunDirectoryReclaimable(
      runId: staged.runId,
      directoryName,
      retiredAt: new Date().toISOString(),
@@ -1146,7 +1701,7 @@ index 16d44e3aa781b35edfe343a233596af9e939679b..3dd2e063b6037fd1144ddadc444d0e9a
    });
    const markerPath = path.join(
      staged.runDirectory,
-@@ -5005,6 +5058,90 @@ async function markRunDirectoryReclaimable(
+@@ -5005,6 +5117,90 @@ async function markRunDirectoryReclaimable(
          'the ReShade run reclaimable marker already exists with unexpected contents',
        );
      }
@@ -1237,7 +1792,7 @@ index 16d44e3aa781b35edfe343a233596af9e939679b..3dd2e063b6037fd1144ddadc444d0e9a
    }
  }
  
-@@ -5066,6 +5203,9 @@ async function pruneReclaimableRunDirectories(
+@@ -5066,6 +5262,9 @@ async function pruneReclaimableRunDirectories(
        entry.name,
      );
      if (candidate) {
@@ -1247,7 +1802,7 @@ index 16d44e3aa781b35edfe343a233596af9e939679b..3dd2e063b6037fd1144ddadc444d0e9a
        candidates.push(candidate);
      }
    }
-@@ -5080,8 +5220,9 @@ async function pruneReclaimableRunDirectories(
+@@ -5080,8 +5279,9 @@ async function pruneReclaimableRunDirectories(
    const now = Date.now();
    const directoriesToRemove = candidates.filter(
      (candidate, index) =>
@@ -1259,7 +1814,7 @@ index 16d44e3aa781b35edfe343a233596af9e939679b..3dd2e063b6037fd1144ddadc444d0e9a
    );
  
    for (const candidate of directoriesToRemove) {
-@@ -5240,7 +5381,8 @@ async function readRunReclaimableMarker(
+@@ -5240,7 +5440,8 @@ async function readRunReclaimableMarker(
      value.kind !== RUN_RECLAIMABLE_MARKER_KIND ||
      !isRunId(value.runId) ||
      value.directoryName !== directoryName ||
@@ -1269,7 +1824,7 @@ index 16d44e3aa781b35edfe343a233596af9e939679b..3dd2e063b6037fd1144ddadc444d0e9a
    ) {
      return undefined;
    }
-@@ -5250,6 +5392,7 @@ async function readRunReclaimableMarker(
+@@ -5250,6 +5451,7 @@ async function readRunReclaimableMarker(
      runId: value.runId,
      directoryName: value.directoryName,
      retiredAt: value.retiredAt,
@@ -1277,11 +1832,122 @@ index 16d44e3aa781b35edfe343a233596af9e939679b..3dd2e063b6037fd1144ddadc444d0e9a
    });
  }
  
+@@ -5732,8 +5934,11 @@ function parseInjectorDiagnostic(
+       code === 'target-runtime-incompatible' ||
+       code === 'target-runtime-reuse-too-late' ||
+       code === 'target-runtime-reuse-raced' ||
+-      code === 'target-module-inspection-failed') &&
++      code === 'target-module-inspection-failed' || code === 'target-startup-readiness-failed' ||
++      (typeof code === 'string' && memberPreflightCodes.has(code))) &&
+     candidate.injectionStarted === false;
++  const isParticipantAddonLoadDiagnostic = candidate.stage === 'participant-addon-load' &&
++    typeof code === 'string' && memberPostloadCodes.has(code) && candidate.injectionStarted === true;
+   const isExistingRuntimeAddonLoadDiagnostic =
+     candidate.stage === 'existing-runtime-addon-load' &&
+     code === 'existing-runtime-addon-load-failed' &&
+@@ -5759,7 +5964,7 @@ function parseInjectorDiagnostic(
+     code === 'target-runtime-conflict' ||
+     code === 'target-runtime-incompatible' ||
+     code === 'target-runtime-reuse-too-late' ||
+-    code === 'target-runtime-reuse-raced';
++    code === 'target-runtime-reuse-raced' || code === 'target-member-host-unavailable' || code === 'target-member-disabled';
+   const preflightRequiresWindowsError =
+     code === 'target-process-instance-mismatch' ||
+     code === 'target-process-instance-query-failed' ||
+@@ -5774,18 +5979,19 @@ function parseInjectorDiagnostic(
+     code === 'target-runtime-incompatible' ||
+     code === 'target-runtime-reuse-too-late' ||
+     code === 'target-runtime-reuse-raced' ||
+-    code === 'target-module-inspection-failed';
++    code === 'target-module-inspection-failed' || code === 'target-startup-readiness-failed' ||
++    (typeof code === 'string' && (memberPreflightCodes.has(code) || memberPostloadCodes.has(code)));
+   const preflightRequiresEffectiveSettings =
+     code === 'target-existing-reshade-installation' ||
+     code === 'target-existing-reshade-global-layer' ||
+-    code === 'target-runtime-incompatible';
++    code === 'target-runtime-incompatible' || code === 'target-member-disabled';
+   const hasAnyEffectiveSetting =
+     reshadeBasePath !== undefined ||
+     addonDirectoryPath !== undefined ||
+     electronGameOverlayAddonDisabled !== undefined;
+   if (
+     candidate.schemaVersion !== 1 ||
+-    (!isPreflightDiagnostic && !isExistingRuntimeAddonLoadDiagnostic) ||
++    (!isPreflightDiagnostic && !isExistingRuntimeAddonLoadDiagnostic && !isParticipantAddonLoadDiagnostic) ||
+     !hasExactObjectKeys(candidate, exactKeys) ||
+     !isValidProcessPid(candidate.pid) ||
+     typeof targetExecutablePath !== 'string' ||
+@@ -5807,7 +6013,7 @@ function parseInjectorDiagnostic(
+       (!Number.isSafeInteger(windowsErrorCode) ||
+         (windowsErrorCode as number) <= 0 ||
+         (windowsErrorCode as number) > 0xffffffff)) ||
+-    (isPreflightDiagnostic &&
++    ((isPreflightDiagnostic || isParticipantAddonLoadDiagnostic) &&
+       ((preflightRequiresModule && modulePath === undefined) ||
+         (preflightRequiresWindowsError && windowsErrorCode === undefined) ||
+         (code === 'target-process-instance-mismatch' &&
+@@ -5815,6 +6021,9 @@ function parseInjectorDiagnostic(
+         (code === 'target-session-mismatch' && windowsErrorCode !== 5) ||
+         (code === 'target-architecture-mismatch' &&
+           windowsErrorCode !== WINDOWS_ERROR_IMAGE_MACHINE_TYPE_MISMATCH) ||
++        (code === 'target-member-disabled' && windowsErrorCode !== 1260) ||
++        ((code === 'target-preloaded-member-elevation-rejected' || code === 'target-host-claim-failed' || code === 'target-member-host-inspection-failed' || code === 'target-startup-readiness-failed') && modulePath !== undefined) ||
++        (isParticipantAddonLoadDiagnostic && code === 'target-module-inspection-failed' && modulePath === undefined) ||
+         preflightRequiresEffectiveSettings !== hasAnyEffectiveSetting)) ||
+     (isExistingRuntimeAddonLoadDiagnostic &&
+       (modulePath === undefined ||
+@@ -5827,6 +6036,15 @@ function parseInjectorDiagnostic(
+     });
+   }
+ 
++  if (isParticipantAddonLoadDiagnostic) {
++    return Object.freeze({kind:'valid',diagnostic:Object.freeze({
++      schemaVersion:1,stage:'participant-addon-load',code:code as InjectorParticipantAddonLoadDiagnostic['code'],
++      pid:candidate.pid as number,targetExecutablePath:targetExecutablePath as string,injectionStarted:true,
++      ...(modulePath === undefined ? {} : {modulePath:modulePath as string}),
++      ...(windowsErrorCode === undefined ? {} : {windowsErrorCode:windowsErrorCode as number}),
++      ...(reshadeBasePath === undefined ? {} : {reshadeBasePath:reshadeBasePath as string,addonDirectoryPath:addonDirectoryPath as string,electronGameOverlayAddonDisabled:electronGameOverlayAddonDisabled as boolean}),
++    })});
++  }
+   if (isExistingRuntimeAddonLoadDiagnostic) {
+     return Object.freeze({
+       kind: 'valid',
+@@ -5996,8 +6214,18 @@ function injectorDiagnosticExitMatches(
+       case 'target-session-mismatch':
+       case 'target-session-query-failed':
+       case 'target-module-inspection-failed':
++      case 'target-startup-readiness-failed':
+       case 'target-global-reshade-layer-inspection-failed':
+       case 'existing-runtime-addon-load-failed':
++      case 'target-member-payload-invalid':
++      case 'target-preloaded-member-selection-invalid':
++      case 'target-member-host-unavailable':
++      case 'target-member-disabled':
++      case 'target-preloaded-member-invalid':
++      case 'target-first-host-preload-invalid':
++      case 'target-preloaded-member-elevation-rejected':
++      case 'target-host-claim-failed':
++      case 'target-member-host-inspection-failed':
+         return diagnostic.windowsErrorCode;
+     }
+   })();
+diff --git a/libs/electron-game-overlay/src/lib/sdk.ts b/libs/electron-game-overlay/src/lib/sdk.ts
+index 2c30bb1e2cac8ed696ca5be857f782cc4b2ac4e1..43ed8f5d4a7e730c6bc905583349a3bcd224757e 100644
+--- a/libs/electron-game-overlay/src/lib/sdk.ts
++++ b/libs/electron-game-overlay/src/lib/sdk.ts
+@@ -1,4 +1,7 @@
+ export { ElectronGameOverlay } from './electron-game-overlay.js';
++export { inspectOverlayConsumerExecutionContext, launchUnelevatedOverlayConsumer,
++  type OverlayConsumerExecutionContext, type OverlayConsumerContextOptions,
++  type OverlayConsumerRelaunchOptions, type OverlayConsumerRelaunchResult } from './overlay-consumer-context.js';
+ export {
+   defaultOverlayAddonStorageRoot,
+   registerOverlayAddonInstallation,
 diff --git a/libs/electron-game-overlay/tests/helpers/cooperative-package-fixture.cjs b/libs/electron-game-overlay/tests/helpers/cooperative-package-fixture.cjs
-index 49924b04c8dfea83981ebb068d5fc89132cc2b7e..3d7b15739ed914542b01ad7881ed6b8c3b772129 100644
+index 49924b04c8dfea83981ebb068d5fc89132cc2b7e..c7e70810a9e72abbb9a1e7a1b85b525858fab77d 100644
 --- a/libs/electron-game-overlay/tests/helpers/cooperative-package-fixture.cjs
 +++ b/libs/electron-game-overlay/tests/helpers/cooperative-package-fixture.cjs
-@@ -27,6 +27,10 @@ function writeCooperativeDistribution(dist, {
+@@ -27,6 +27,14 @@ function writeCooperativeDistribution(dist, {
    sharedAddonDirectoryPatch = runtimeGeneration >= 23,
    injectorSharedAddonDirectoryPatchSha256 = '54AE1F9ABCE02CBB66481C7C2AB30E4D3E7925CD83F27F31D8551D76DEF85125',
    foreignAddonIsolationPatch = runtimeGeneration >= 23,
@@ -1289,10 +1955,14 @@ index 49924b04c8dfea83981ebb068d5fc89132cc2b7e..3d7b15739ed914542b01ad7881ed6b8c
 +  injectorInspectionContextPatchSha256 = '288C2A76AEDBC827BB00117A455FFE87ECB708CA33411449CD56E2BEA190160E',
 +  selectionBeforeOpenPatch = runtimeGeneration >= 25,
 +  injectorSelectionBeforeOpenPatchSha256 = 'F83053E59EE9443E98D31A4C238B3D19D6B847D1F6F5E238E05B899FFC87E555',
++  memberDiagnosticsPatch = runtimeGeneration >= 26,
++  injectorMemberDiagnosticsPatchSha256 = 'D56162D2EA444DB44E7F21128A5F316E124E11E08EC1B6F3328D769EA4048A57',
++  startupReadinessPatch = runtimeGeneration >= 26,
++  injectorStartupReadinessPatchSha256 = '29C8D7ACA8919189D484B2E22F83DBD564B00D344E8C860058AFCCEAFC808D9D',
    ownedLateD3d11ForeignAddonIsolationPatchSha256 = '2A1FF13D7F76258ECF9D5CFB565D68C2522BEE772053A5373A3645823D310F99',
  } = {}) {
    dist = path.resolve(dist);
-@@ -74,6 +78,12 @@ function writeCooperativeDistribution(dist, {
+@@ -74,6 +82,18 @@ function writeCooperativeDistribution(dist, {
        : '') +
      (foreignAddonIsolationPatch
        ? `const OWNED_LATE_D3D11_FOREIGN_ADDON_ISOLATION_PATCH_SHA256 = '${ownedLateD3d11ForeignAddonIsolationPatchSha256}';\n`
@@ -1302,23 +1972,31 @@ index 49924b04c8dfea83981ebb068d5fc89132cc2b7e..3d7b15739ed914542b01ad7881ed6b8c
 +      : '') +
 +    (selectionBeforeOpenPatch
 +      ? `const INJECTOR_SELECTION_BEFORE_OPEN_PATCH_SHA256 = '${injectorSelectionBeforeOpenPatchSha256}';\n`
++      : '') +
++    (memberDiagnosticsPatch
++      ? `const INJECTOR_MEMBER_DIAGNOSTICS_PATCH_SHA256 = '${injectorMemberDiagnosticsPatchSha256}';\n`
++      : '') +
++    (startupReadinessPatch
++      ? `const INJECTOR_STARTUP_READINESS_PATCH_SHA256 = '${injectorStartupReadinessPatchSha256}';\n`
        : ''));
    json('node_modules/tslib/package.json', { name: 'tslib', version: '2.8.1', main: 'tslib.js' });
    write('node_modules/tslib/tslib.js', '// controlled dependency, never executed\n');
-@@ -116,6 +126,8 @@ function writeCooperativeDistribution(dist, {
+@@ -116,6 +136,10 @@ function writeCooperativeDistribution(dist, {
          ...(initialInspectionRecoveryPatch ? { injectorInitialInspectionRecoveryPatchSha256 } : {}),
          ...(sharedAddonDirectoryPatch ? { injectorSharedAddonDirectoryPatchSha256 } : {}),
          ...(foreignAddonIsolationPatch ? { ownedLateD3d11ForeignAddonIsolationPatchSha256 } : {}),
 +        ...(inspectionContextPatch ? { injectorInspectionContextPatchSha256 } : {}),
 +        ...(selectionBeforeOpenPatch ? { injectorSelectionBeforeOpenPatchSha256 } : {}),
++        ...(memberDiagnosticsPatch ? { injectorMemberDiagnosticsPatchSha256 } : {}),
++        ...(startupReadinessPatch ? { injectorStartupReadinessPatchSha256 } : {}),
          cooperativeAddonProtocol: 1, injectorProcessInstanceBinding: 1, injectorFutureTargets: 2,
          configuration: 'Release', platform: bits === 64 ? '64-bit' : '32-bit', addonLevel: 2,
          }),
 diff --git a/libs/electron-game-overlay/tests/overlay-package-manifest.test.cjs b/libs/electron-game-overlay/tests/overlay-package-manifest.test.cjs
-index 56511b67ec596408573c5ea7f920790c810d8459..3dc93e4be3aabebe685b807fc821e2c26c9544d9 100644
+index 56511b67ec596408573c5ea7f920790c810d8459..9e39e2469dd27dafc6eeae3dc51e1b7437119bcf 100644
 --- a/libs/electron-game-overlay/tests/overlay-package-manifest.test.cjs
 +++ b/libs/electron-game-overlay/tests/overlay-package-manifest.test.cjs
-@@ -41,6 +41,27 @@ function mutateStamp(f, name, mutate) {
+@@ -41,6 +41,45 @@ function mutateStamp(f, name, mutate) {
    f.payload.seal();
  }
  
@@ -1338,6 +2016,24 @@ index 56511b67ec596408573c5ea7f920790c810d8459..3dc93e4be3aabebe685b807fc821e2c2
 +  assert.throws(() => validateOverlayDistributionSync(missing.dist), /selection before open patch pin does not match/);
 +});
 +
++test('generation-26 startup readiness requires the frozen patch on each architecture and its compiled pin', t => {
++  for (const bits of [64,32]) {
++    const f=fixture(t,{runtimeGeneration:26});validateOverlayDistributionSync(f.dist);
++    mutateStamp(f,`ReShade${bits}.build.json`,stamp=>{delete stamp.injectorStartupReadinessPatchSha256;});
++    assert.throws(()=>validateOverlayDistributionSync(f.dist),/startup readiness patch provenance mismatch/);
++  }
++  const missing=fixture(t,{runtimeGeneration:26,startupReadinessPatch:false});
++  assert.throws(()=>validateOverlayDistributionSync(missing.dist),/startup readiness patch pin does not match/);
++});
++
++test('generation-26 member diagnostics require the frozen native patch and compiled SDK pin', t => {
++  const f = fixture(t, {runtimeGeneration:26});validateOverlayDistributionSync(f.dist);
++  mutateStamp(f,'ReShade32.build.json',stamp=>{delete stamp.injectorMemberDiagnosticsPatchSha256;});
++  assert.throws(()=>validateOverlayDistributionSync(f.dist),/member diagnostics patch provenance mismatch/);
++  const missing=fixture(t,{runtimeGeneration:26,memberDiagnosticsPatch:false});
++  assert.throws(()=>validateOverlayDistributionSync(missing.dist),/member diagnostics patch pin does not match/);
++});
++
 +test('generation-24 metadata cannot promote a validator without its inspection implementation pin', t => {
 +  const f = fixture(t, { runtimeGeneration: 24, inspectionContextPatch: false });
 +  assert.throws(() => validateOverlayDistributionSync(f.dist), /inspection context patch pin does not match/);
@@ -1346,17 +2042,17 @@ index 56511b67ec596408573c5ea7f920790c810d8459..3dc93e4be3aabebe685b807fc821e2c2
  test('direct SDK seal validates both native architectures without executing an SDK or broker', t => {
    const f = fixture(t);
    f.write('index.js', 'throw new Error("Packaging must never execute the supplied SDK");\n');
-@@ -730,7 +751,7 @@ test('payload junctions cannot redirect integrity reads outside the SDK', t => {
+@@ -730,7 +769,7 @@ test('payload junctions cannot redirect integrity reads outside the SDK', t => {
  });
  
  test('actual seal script builds a self-contained SDK manifest on the supported build Node version', t => {
 -  const f = fixture(t);
-+  const f = fixture(t, { runtimeGeneration: 25 });
++  const f = fixture(t, { runtimeGeneration: 26 });
    const scripts = path.join(f.root, 'scripts'); fs.mkdirSync(scripts);
    fs.writeFileSync(path.join(f.root, 'package.json'), JSON.stringify({ name: 'electron-game-overlay', version: '0.1.0-rc.7' }));
    const dependencyOutput = path.join(f.dist, 'node_modules');
 diff --git a/libs/electron-game-overlay/tests/overlay-target-watcher.test.cjs b/libs/electron-game-overlay/tests/overlay-target-watcher.test.cjs
-index 75b1923e4b0fdc8834f15377412f1c015e02e435..0b9f5b9472bb24fee32da0a69d87cfec05a51d02 100644
+index 75b1923e4b0fdc8834f15377412f1c015e02e435..e26f60af1042e4e7f8090a0c09f4d4af290ae18b 100644
 --- a/libs/electron-game-overlay/tests/overlay-target-watcher.test.cjs
 +++ b/libs/electron-game-overlay/tests/overlay-target-watcher.test.cjs
 @@ -71,6 +71,7 @@ function fixture(t, options = {}) {
@@ -1367,7 +2063,7 @@ index 75b1923e4b0fdc8834f15377412f1c015e02e435..0b9f5b9472bb24fee32da0a69d87cfec
        require: (id) =>
          id === './reshade-launcher.js'
            ? {
-@@ -146,6 +147,174 @@ const returned = (l, pid = 42, file = game.executablePath) =>
+@@ -146,6 +147,176 @@ const returned = (l, pid = 42, file = game.executablePath) =>
    });
  const connected = (l, pid = 42, file = game.executablePath) =>
    l.emit({ type: 'target-connected', pid, path: file });
@@ -1416,6 +2112,8 @@ index 75b1923e4b0fdc8834f15377412f1c015e02e435..0b9f5b9472bb24fee32da0a69d87cfec
 +});
 +
 +for (const failure of [
++  { code: 'target-preloaded-member-elevation-rejected', stage: 'target-preflight', retrySafety: 'definite-safe', windowsErrorCode: 5 },
++  { code: 'target-startup-readiness-failed', stage: 'target-preflight', retrySafety: 'definite-safe', windowsErrorCode: 1460 },
 +  { code: 'target-module-inspection-failed', stage: 'target-preflight', retrySafety: 'definite-safe', windowsErrorCode: 299 },
 +  { code: 'injector-failed', stage: 'injector', retrySafety: 'indeterminate' },
 +  { code: 'runtime-initialization-timeout', stage: 'runtime-initialization', retrySafety: 'indeterminate' },
@@ -1542,7 +2240,7 @@ index 75b1923e4b0fdc8834f15377412f1c015e02e435..0b9f5b9472bb24fee32da0a69d87cfec
  test('ready waits for observer baseline and every native watcher, never injection completion', async (t) => {
    const f = fixture(t, { earlyTargets: [game, { processName: 'other.exe' }] });
    await tick();
-@@ -363,8 +532,10 @@ test('mismatched exit and recycled PID results fail closed instead of confirming
+@@ -363,8 +534,10 @@ test('mismatched exit and recycled PID results fail closed instead of confirming
        returned(l);
      }
      assert.equal(l.confirmed.length, 0);
@@ -1578,7 +2276,7 @@ index 2d13179f32af8a8f70f71e84e3f1ccff111d7e9b..f270d5f6cb343e6db8ea515b77c6853a
      if (id === 'node:child_process') return { ...require(id), execFile() { throw new Error('prepare() must never execute an injector'); } };
      return Module.prototype.require.call(loaded, id);
 diff --git a/libs/electron-game-overlay/tests/reshade-launcher.test.cjs b/libs/electron-game-overlay/tests/reshade-launcher.test.cjs
-index 44603308a7276e20d73847f2cec1d3b5317f5a18..28c2b43e8402d401a6c45f7766dde7aaf1c4e6ee 100644
+index 44603308a7276e20d73847f2cec1d3b5317f5a18..09c950f92459a128b8c056251918614dcb22532c 100644
 --- a/libs/electron-game-overlay/tests/reshade-launcher.test.cjs
 +++ b/libs/electron-game-overlay/tests/reshade-launcher.test.cjs
 @@ -4,6 +4,7 @@ const { createHash } = require('node:crypto');
@@ -1844,10 +2542,65 @@ index 44603308a7276e20d73847f2cec1d3b5317f5a18..28c2b43e8402d401a6c45f7766dde7aa
  test('quiescence before any native invocation invalidates delayed attachment without executing a child', async()=>{
    const execution=stubExecFile(),wait=deferred(),harness=createSessionHarness(wait.promise),launcher=new ReShadeOverlayLauncher(createConfig(policyRuntime()));
    try {
-@@ -6759,6 +6959,67 @@ for (const target of [{ pathContains: '\\steamapps\\' }, { processName: 'game.ex
+@@ -6759,6 +6959,122 @@ for (const target of [{ pathContains: '\\steamapps\\' }, { processName: 'game.ex
  }
  
  
++for(const [name,pid] of [['main-9288',9288],['helper-20860',20860]]) test(`supplied ${name} authorization refusal remains a preflight diagnostic without x86 fallback or retry`,async()=>{
++  const execution=stubExecFile(),harness=createSessionHarness(),launcher=new ReShadeOverlayLauncher(createConfig(policyRuntime()));
++  const stdout=readFileSync(path.resolve(__dirname,`../../electron-game-overlay-runtime/tests/member-diagnostics/fixtures/${name}.stdout.txt`),'utf8');
++  try{
++    const request=launcher.attach(harness.session,nativePolicyTarget);
++    const rejected=assert.rejects(request,error=>error.code==='target-preloaded-member-elevation-rejected'&&error.stage==='target-preflight'&&error.retrySafety==='definite-safe'&&error.diagnostic.pid===pid&&error.diagnostic.windowsErrorCode===5);
++    await waitFor(()=>execution.calls.length===1);const call=execution.calls[0];
++    call.emitStdout(stdout);call.callback(Object.assign(new Error('native refusal'),{code:5}),stdout,'');await rejected;
++    assert.equal(execution.calls.length,1);launcher.confirmTargetExited(pid);
++  }finally{launcher.dispose();execution.restore();}
++});
++
++const memberDiagnosticContracts=[
++  ['target-startup-readiness-failed',1460,{}],
++  ['target-member-payload-invalid',2,{}],['target-preloaded-member-selection-invalid',1306,{}],
++  ['target-member-host-unavailable',1460,{modulePath:'C:\\stage\\member.addon64'}],
++  ['target-member-disabled',1260,{modulePath:'C:\\host\\dxgi.dll',reshadeBasePath:'C:\\host',addonDirectoryPath:'C:\\host\\addons',electronGameOverlayAddonDisabled:false}],
++  ['target-preloaded-member-invalid',1306,{}],['target-preloaded-member-elevation-rejected',5,{}],
++  ['target-host-claim-failed',5,{}],['target-first-host-preload-invalid',1306,{}],['target-member-host-inspection-failed',299,{}],
++  ['target-module-inspection-failed',299,{modulePath:'C:\\host\\dxgi.dll'}],
++];
++for(const [code,exitCode,fields] of memberDiagnosticContracts) for(const afterLoad of [false,true]) {
++  if(afterLoad?['target-startup-readiness-failed','target-preloaded-member-elevation-rejected','target-host-claim-failed'].includes(code):['target-first-host-preload-invalid','target-member-host-inspection-failed'].includes(code))continue;
++  test(`member diagnostic ${code} has exact ${afterLoad?'post-load':'preflight'} safety`,async()=>{
++    const execution=stubExecFile(),harness=createSessionHarness(),launcher=new ReShadeOverlayLauncher(createConfig(policyRuntime()));
++    try{
++      const request=launcher.attach(harness.session,nativePolicyTarget);
++      const rejected=assert.rejects(request,error=>error.code===code&&error.retrySafety===(afterLoad?'indeterminate':'definite-safe')&&error.stage===(afterLoad?'runtime-initialization':'target-preflight'));
++      await waitFor(()=>execution.calls.length===1);const call=execution.calls[0];
++      const stdout=injectorDiagnostic({pid:4242,targetExecutablePath:'C:\\steamapps\\game.exe',stage:afterLoad?'participant-addon-load':'target-preflight',code,injectionStarted:afterLoad,windowsErrorCode:exitCode,...fields})+(afterLoad?'':'ReShade injection not started.\n');
++      call.callback(Object.assign(new Error('native member refusal'),{code:exitCode}),stdout,'');await rejected;
++      assert.equal(execution.calls.length,1);
++    }finally{launcher.dispose();execution.restore();}
++  });
++}
++for(const variant of ['unknown-code','postload-not-started','preflight-started','wrong-exit','duplicate','extra-fields','zero-error','bad-settings','wrong-target','postload-elevation'])test(`member diagnostics reject ${variant} evidence`,async()=>{
++  const execution=stubExecFile(),harness=createSessionHarness(),launcher=new ReShadeOverlayLauncher(createConfig(policyRuntime()));
++  try{
++    const record={pid:4242,targetExecutablePath:'C:\\steamapps\\game.exe',stage:'target-preflight',code:'target-preloaded-member-elevation-rejected',injectionStarted:false,windowsErrorCode:5};let exit=5,marker=true;
++    if(variant==='unknown-code')record.code='unknown-member-error';
++    if(variant==='postload-not-started'){record.stage='participant-addon-load';record.code='target-member-payload-invalid';record.injectionStarted=true;}
++    if(variant==='preflight-started')record.injectionStarted=true;
++    if(variant==='wrong-exit')exit=13;
++    if(variant==='extra-fields')record.surprise=true;
++    if(variant==='zero-error')record.windowsErrorCode=0;
++    if(variant==='bad-settings'){record.reshadeBasePath='C:\\unexpected';}
++    if(variant==='wrong-target')record.targetExecutablePath='C:\\other\\unmatched.exe';
++    if(variant==='postload-elevation'){record.stage='participant-addon-load';record.injectionStarted=true;marker=false;}
++    const request=launcher.attach(harness.session,nativePolicyTarget);const rejected=assert.rejects(request,error=>error.code==='injector-result-invalid');
++    await waitFor(()=>execution.calls.length===1);const call=execution.calls[0];
++    let stdout=injectorDiagnostic(record);if(variant==='duplicate')stdout+=stdout;if(marker)stdout+='ReShade injection not started.\n';
++    call.callback(Object.assign(new Error('contradictory member evidence'),{code:exit}),stdout,'');await rejected;assert.equal(execution.calls.length,1);
++  }finally{launcher.dispose();execution.restore();}
++});
++
 +test('native open refusal publishes V2 without a legacy selection and retains that exact instance for exit cleanup', async () => {
 +  const execution=stubExecFile(),harness=createSessionHarness(),launcher=new ReShadeOverlayLauncher(createConfig(policyRuntime()));
 +  const selections=[];launcher.onEvent(event=>{if(event.type==='target-selected')selections.push(event);});
@@ -1913,22 +2666,28 @@ index 44603308a7276e20d73847f2cec1d3b5317f5a18..28c2b43e8402d401a6c45f7766dde7aa
   const execution=stubExecFile(),harness=createSessionHarness(),launcher=new ReShadeOverlayLauncher(createConfig(policyRuntime()));
   try {
 diff --git a/libs/electron-game-overlay/tests/shared-addon-directory-source-cache.test.cjs b/libs/electron-game-overlay/tests/shared-addon-directory-source-cache.test.cjs
-index 30ad805f5ef9efd7169dff75040de5e3a452cc5c..45aedcb38e94d39c4e41563a954a4c2bdc635224 100644
+index 30ad805f5ef9efd7169dff75040de5e3a452cc5c..b3348884efe76d7a7aa6c51bc420348e241873c2 100644
 --- a/libs/electron-game-overlay/tests/shared-addon-directory-source-cache.test.cjs
 +++ b/libs/electron-game-overlay/tests/shared-addon-directory-source-cache.test.cjs
-@@ -57,6 +57,8 @@ const patches = {
+@@ -57,6 +57,10 @@ const patches = {
    RESHAPE_INITIAL_INSPECTION_RECOVERY_PATCH: recoveryPatch,
    RESHAPE_SHARED_ADDON_DIRECTORY_PATCH: sharedDirectoryPatch,
    RESHAPE_FOREIGN_ADDON_ISOLATION_PATCH: foreignIsolationPatch,
 +  RESHAPE_INSPECTION_CONTEXT_PATCH: patch('reshade-injector-inspection-context.patch'),
 +  RESHAPE_SELECTION_BEFORE_OPEN_PATCH: patch('reshade-injector-selection-before-open.patch'),
++  RESHAPE_MEMBER_DIAGNOSTICS_PATCH: patch('reshade-injector-member-diagnostics.patch'),
++  RESHAPE_STARTUP_READINESS_PATCH: patch('reshade-injector-startup-readiness.patch'),
  };
  const unavailable = spawnSync('cmake', ['--version'], { windowsHide: true }).status !== 0 ? 'CMake unavailable' :
    spawnSync('git', ['--version'], { windowsHide: true }).status !== 0 ? 'Git unavailable' : false;
-@@ -137,6 +139,10 @@ function vector(f) { return manifest.entries.map(entry => [entry.path, sourceSha
+@@ -137,6 +141,14 @@ function vector(f) { return manifest.entries.map(entry => [entry.path, sourceSha
  function run(f, action, overrides = {}) {
    assert.ok(tables && helpers && derivedVectors.includes('RESHAPE_FOREIGN_ADDON_ISOLATION_PATCHED_CONTENT_SHA256'));
    const calls = {
++    member: [`ego_apply_member_diagnostics_source_tail(${q(f.source)})`],
++    reverseMember: [`ego_apply_member_diagnostics_source_tail(${q(f.source)} REVERSE)`],
++    startup: [`ego_apply_startup_readiness_source_tail(${q(f.source)})`],
++    reverseStartup: [`ego_apply_startup_readiness_source_tail(${q(f.source)} REVERSE)`],
 +    context: [`ego_apply_inspection_context_source_tail(${q(f.source)})`],
 +    reverseContext: [`ego_apply_inspection_context_source_tail(${q(f.source)} REVERSE)`],
 +    selection: [`ego_apply_selection_before_open_source_tail(${q(f.source)})`],
@@ -1936,7 +2695,7 @@ index 30ad805f5ef9efd7169dff75040de5e3a452cc5c..45aedcb38e94d39c4e41563a954a4c2b
      injector: [`ego_apply_shared_addon_directory_source_tail(${q(f.source)})`],
      host: [`ego_apply_foreign_addon_isolation_source_tail(${q(f.source)})`],
      reverseInjector: [`ego_apply_shared_addon_directory_source_tail(${q(f.source)} REVERSE)`],
-@@ -192,6 +198,43 @@ test('shared directory tails retain every frozen generation-19 through22 impleme
+@@ -192,6 +204,62 @@ test('shared directory tails retain every frozen generation-19 through22 impleme
    assert.doesNotMatch(tables, /SHARED_ADDON_DIRECTORY|FOREIGN_ADDON_ISOLATION/);
  });
  
@@ -1960,6 +2719,25 @@ index 30ad805f5ef9efd7169dff75040de5e3a452cc5c..45aedcb38e94d39c4e41563a954a4c2b
 +  rejected(f, 'prepare'); rejected(f, 'context');
 +});
 +
++test('generation-26 diagnostic and startup tails exactly replay and reverse without changing mapped code', options, t => {
++  const f = fixture(t, 'complete'); accepted(run(f, 'context')); accepted(run(f, 'selection'));
++  const before = snapshot(f.source);
++  accepted(run(f, 'member')); assert.equal(sourceSha(f.injector), pin('RESHAPE_MEMBER_DIAGNOSTICS_INJECTOR_CONTENT_SHA256'));
++  const intermediate = snapshot(f.source);
++  accepted(run(f, 'startup')); assert.equal(sourceSha(f.injector), pin('RESHAPE_STARTUP_READINESS_INJECTOR_CONTENT_SHA256'));
++  const published = snapshot(f.source);
++  const publishedVector = vector(f);
++  assert.deepEqual(published.filter(file => file.path !== 'tools/injector.cpp'), before.filter(file => file.path !== 'tools/injector.cpp'));
++  accepted(run(f, 'startup')); assert.deepEqual(snapshot(f.source), published);
++  accepted(run(f, 'reverseStartup')); assert.deepEqual(snapshot(f.source), intermediate);
++  accepted(run(f, 'reverseMember')); assert.deepEqual(snapshot(f.source), before);
++  accepted(run(f, 'member')); accepted(run(f, 'startup')); accepted(run(f, 'prepare'));
++  accepted(run(f, 'forward')); accepted(run(f, 'context')); accepted(run(f, 'selection')); accepted(run(f, 'member')); accepted(run(f, 'startup'));
++  assert.deepEqual(vector(f), publishedVector);
++  write(f.injector, fs.readFileSync(f.injector, 'utf8') + '\n// unknown edit\n');
++  rejected(f, 'prepare'); rejected(f, 'startup');
++});
++
 +test('generation-25 selection tail reverses before context and preserves every mapped implementation', options, t => {
 +  const f = fixture(t, 'complete'); accepted(run(f, 'context'));
 +  const before = snapshot(f.source);
@@ -1980,15 +2758,43 @@ index 30ad805f5ef9efd7169dff75040de5e3a452cc5c..45aedcb38e94d39c4e41563a954a4c2b
  test('shared directory injector publishes one source file and leaves the generation-22 host byte-identical', options, t => {
    const f = fixture(t), before = snapshot(f.source);
    accepted(run(f, 'injector'));
-@@ -264,6 +307,8 @@ for (const unknown of ['injector', 'host', 'other implementation', 'extra file']
+@@ -264,6 +332,10 @@ for (const unknown of ['injector', 'host', 'other implementation', 'extra file']
  for (const [name, file, action, shape] of [
    ['RESHAPE_SHARED_ADDON_DIRECTORY_PATCH', sharedDirectoryPatch, 'injector', 'base'],
    ['RESHAPE_FOREIGN_ADDON_ISOLATION_PATCH', foreignIsolationPatch, 'host', 'injector'],
 +  ['RESHAPE_INSPECTION_CONTEXT_PATCH', patches.RESHAPE_INSPECTION_CONTEXT_PATCH, 'context', 'complete'],
 +  ['RESHAPE_SELECTION_BEFORE_OPEN_PATCH', patches.RESHAPE_SELECTION_BEFORE_OPEN_PATCH, 'selection', 'complete'],
++  ['RESHAPE_MEMBER_DIAGNOSTICS_PATCH', patches.RESHAPE_MEMBER_DIAGNOSTICS_PATCH, 'member', 'complete'],
++  ['RESHAPE_STARTUP_READINESS_PATCH', patches.RESHAPE_STARTUP_READINESS_PATCH, 'startup', 'complete'],
  ]) test(`changed ${name} fails before its direct publication and before any cache peel`, options, t => {
    const f = fixture(t, shape), changed = path.join(f.directory, 'changed.patch');
    write(changed, fs.readFileSync(file, 'utf8') + '\n# unknown patch edit\n');
+diff --git a/libs/electron-game-overlay/tests/stageguard.test.cjs b/libs/electron-game-overlay/tests/stageguard.test.cjs
+index 0f7b93802fc17cc061d7c66188eab95d5ace6599..f940d3bb99ed120b278848c4571eae408d5b0516 100644
+--- a/libs/electron-game-overlay/tests/stageguard.test.cjs
++++ b/libs/electron-game-overlay/tests/stageguard.test.cjs
+@@ -36,7 +36,7 @@ test('portable source contract: staging mirrors bound cooperative native and pac
+   const produced = producer.match(/\$PackageBuildStamp = \[ordered\]@\{([\s\S]*?)\n\}/)[1];
+   assert.deepEqual([...properties.matchAll(/"(\w+)"/g)].map(m => m[1]).sort(), [...produced.matchAll(/^    (\w+) =/gm)].map(m => m[1]).sort());
+   assert.deepEqual(patches(stage), patches(producer));
+-  assert.equal(patches(stage).length, 37);
++  assert.equal(patches(stage).length, 41);
+   assert.deepEqual(patches(stage).filter(([key]) => key === 'ownedLateD3d11PatchSha256'), [['ownedLateD3d11PatchSha256', 'reshade-owned-late-d3d11.patch']]);
+   assert.deepEqual(patches(stage).filter(([key]) => key === 'injectorFirstHostResultPatchSha256'), [['injectorFirstHostResultPatchSha256', 'reshade-injector-first-host-result.patch']]);
+   assert.deepEqual(patches(stage).filter(([key]) => key === 'injectorAddonPreloadPatchSha256'), [['injectorAddonPreloadPatchSha256', 'reshade-injector-preloaded-addon.patch']]);
+@@ -160,9 +160,9 @@ test('current source cache binds the complete nineteen-file stack and terminal p
+   assert.match(reshadeProducer, /addonPreloadProtocol = 1/);
+   assert.match(producer, /addonPreloadProtocol = 1/);
+   const reverseChecks = reshadeProducer.match(/foreach \(\$Patch in @\(([\s\S]*?)\r?\n    \)\)/)[1];
+-  // The shared-directory tail replaces the old snapshot path hunk, so the
+-  // superseded long-path tail is checked during ordered migration instead.
+-  assert.deepEqual(reverseChecks.match(/\$\w+Patch/g).sort(), ['$OwnedLateD3d11AdapterReadyLongPathPatch', '$InjectorInitialInspectionRecoveryPatch', '$InjectorSharedAddonDirectoryPatch', '$OwnedLateD3d11ForeignAddonIsolationPatch'].sort());
++  // Context/readiness replace the initial-inspection hunk. Superseded seams
++  // are validated by the exact complete vector and ordered migration tests.
++  assert.deepEqual(reverseChecks.match(/\$\w+Patch/g).sort(), ['$OwnedLateD3d11AdapterReadyLongPathPatch', '$InjectorSharedAddonDirectoryPatch', '$OwnedLateD3d11ForeignAddonIsolationPatch', '$InjectorSelectionBeforeOpenPatch', '$InjectorMemberDiagnosticsPatch', '$InjectorStartupReadinessPatch'].sort());
+   assert.ok(reshadeProducer.indexOf('foreach ($Patch in @(') > reshadeProducer.indexOf('foreach ($Entry in $ExpectedPatchedContentSha256.GetEnumerator())'), 'Terminal patch reversal check follows the complete source inventory/hash proof');
+   for (const source of [reshadeProducer, producer, stage]) {
+     assert.ok(source.includes(ownedLatePatchSha256), 'Frozen owned-late production patch is pinned before packaging/cache acceptance');
 diff --git a/libs/electron-game-overlay-runtime/patches/reshade-injector-inspection-context.patch b/libs/electron-game-overlay-runtime/patches/reshade-injector-inspection-context.patch
 new file mode 100644
 index 0000000000000000000000000000000000000000..986ea1d70f68cac5eb29c0bc07743c63a0e867c7
@@ -2110,6 +2916,230 @@ index 0000000000000000000000000000000000000000..986ea1d70f68cac5eb29c0bc07743c63
 + 	{
 + 		print_injection_not_started();
 + 		return ERROR_WRITE_FAULT;
+diff --git a/libs/electron-game-overlay-runtime/patches/reshade-injector-member-diagnostics.patch b/libs/electron-game-overlay-runtime/patches/reshade-injector-member-diagnostics.patch
+new file mode 100644
+index 0000000000000000000000000000000000000000..5509d4221e5e5a42d64147cd2d97b3a842a5f24a
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/patches/reshade-injector-member-diagnostics.patch
+@@ -0,0 +1,218 @@
++diff --git a/tools/injector.cpp b/tools/injector.cpp
++index e7cd83e..fd7759a 100644
++--- a/tools/injector.cpp
+++++ b/tools/injector.cpp
++@@ -3662,11 +3662,14 @@ static bool write_injector_diagnostic(
++ 	const std::wstring &module_path,
++ 	DWORD windows_error,
++ 	const std::wstring &target_executable_path,
++-	const target_effective_reshade_settings *effective_settings = nullptr)
+++	const target_effective_reshade_settings *effective_settings = nullptr,
+++	bool injection_started = false)
++ {
++ 	std::wstring diagnostic =
++ 		L"ELECTRON_GAME_OVERLAY_INJECTOR_DIAGNOSTIC {\"schemaVersion\":1,"
++-		L"\"stage\":\"target-preflight\",\"code\":\"";
+++		L"\"stage\":\"";
+++	diagnostic.append(injection_started ? L"participant-addon-load" : L"target-preflight");
+++	diagnostic.append(L"\",\"code\":\"");
++ 	diagnostic.append(code);
++ 	diagnostic.append(L"\",\"pid\":");
++ 	diagnostic.append(std::to_wstring(pid));
++@@ -3675,7 +3678,7 @@ static bool write_injector_diagnostic(
++ 		diagnostic.append(L",\"targetExecutablePath\":");
++ 		append_json_string(diagnostic, target_executable_path);
++ 	}
++-	diagnostic.append(L",\"injectionStarted\":false");
+++	diagnostic.append(injection_started ? L",\"injectionStarted\":true" : L",\"injectionStarted\":false");
++ 	if (!module_path.empty())
++ 	{
++ 		diagnostic.append(L",\"modulePath\":");
++@@ -4282,35 +4285,72 @@ static bool preloaded_addon_disabled(const target_effective_reshade_settings &se
++ 	return false;
++ }
++ 
++-static DWORD require_unelevated_process(HANDLE process)
+++struct preload_authorization_observation
++ {
++-	scoped_handle token;
++-	if (!OpenProcessToken(process, TOKEN_QUERY, &token))
++-	{
++-		const DWORD error = GetLastError();
++-		return error != ERROR_SUCCESS ? error : ERROR_ACCESS_DENIED;
++-	}
++-	TOKEN_ELEVATION elevation{};
++-	DWORD size = 0;
++-	if (!GetTokenInformation(token, TokenElevation, &elevation, sizeof(elevation), &size))
++-	{
++-		const DWORD error = GetLastError();
++-		return error != ERROR_SUCCESS ? error : ERROR_INVALID_DATA;
++-	}
++-	if (size != sizeof(elevation) || elevation.TokenIsElevated != 0) return ERROR_ACCESS_DENIED;
++-	alignas(TOKEN_MANDATORY_LABEL) BYTE integrity_buffer[SECURITY_MAX_SID_SIZE + sizeof(TOKEN_MANDATORY_LABEL)] = {};
++-	if (!GetTokenInformation(token, TokenIntegrityLevel, integrity_buffer, sizeof(integrity_buffer), &size))
++-	{
++-		const DWORD error = GetLastError();
++-		return error != ERROR_SUCCESS ? error : ERROR_INVALID_DATA;
++-	}
++-	if (size < sizeof(TOKEN_MANDATORY_LABEL)) return ERROR_INVALID_DATA;
++-	const auto label = reinterpret_cast<const TOKEN_MANDATORY_LABEL *>(integrity_buffer);
++-	if (!IsValidSid(label->Label.Sid)) return ERROR_INVALID_SID;
++-	const UCHAR count = *GetSidSubAuthorityCount(label->Label.Sid);
++-	if (count == 0) return ERROR_INVALID_SID;
++-	return *GetSidSubAuthority(label->Label.Sid, count - 1) <= SECURITY_MANDATORY_MEDIUM_RID
++-		? ERROR_SUCCESS : ERROR_ACCESS_DENIED;
+++    const wchar_t *phase = L"not-checked";
+++    DWORD windows_error = ERROR_SUCCESS;
+++    DWORD returned_size = 0;
+++    bool elevation_known = false;
+++    bool elevated = false;
+++    bool integrity_known = false;
+++    DWORD integrity_rid = 0;
+++};
+++
+++static DWORD require_unelevated_process(HANDLE process, preload_authorization_observation *observation = nullptr)
+++{
+++    preload_authorization_observation local;
+++    auto &result = observation != nullptr ? *observation : local;
+++    result = {};
+++    auto finish = [&result](DWORD error, const wchar_t *phase) {
+++        result.phase = phase; result.windows_error = error; return error;
+++    };
+++    scoped_handle token;
+++    if (!OpenProcessToken(process, TOKEN_QUERY, &token)) {
+++        const DWORD error = GetLastError();
+++        return finish(error != ERROR_SUCCESS ? error : ERROR_ACCESS_DENIED, L"token-open-failed");
+++    }
+++    TOKEN_ELEVATION elevation{};
+++    DWORD size = 0;
+++    if (!GetTokenInformation(token, TokenElevation, &elevation, sizeof(elevation), &size)) {
+++        const DWORD error = GetLastError(); result.returned_size = size;
+++        return finish(error != ERROR_SUCCESS ? error : ERROR_INVALID_DATA, L"elevation-query-failed");
+++    }
+++    result.returned_size = size;
+++    if (size != sizeof(elevation)) return finish(ERROR_ACCESS_DENIED, L"elevation-size-invalid");
+++    result.elevation_known = true; result.elevated = elevation.TokenIsElevated != 0;
+++    if (result.elevated) return finish(ERROR_ACCESS_DENIED, L"elevated");
+++    alignas(TOKEN_MANDATORY_LABEL) BYTE integrity_buffer[SECURITY_MAX_SID_SIZE + sizeof(TOKEN_MANDATORY_LABEL)] = {};
+++    if (!GetTokenInformation(token, TokenIntegrityLevel, integrity_buffer, sizeof(integrity_buffer), &size)) {
+++        const DWORD error = GetLastError(); result.returned_size = size;
+++        return finish(error != ERROR_SUCCESS ? error : ERROR_INVALID_DATA, L"integrity-query-failed");
+++    }
+++    result.returned_size = size;
+++    if (size < sizeof(TOKEN_MANDATORY_LABEL)) return finish(ERROR_INVALID_DATA, L"integrity-size-invalid");
+++    const auto label = reinterpret_cast<const TOKEN_MANDATORY_LABEL *>(integrity_buffer);
+++    if (!IsValidSid(label->Label.Sid)) return finish(ERROR_INVALID_SID, L"integrity-sid-invalid");
+++    const UCHAR count = *GetSidSubAuthorityCount(label->Label.Sid);
+++    if (count == 0) return finish(ERROR_INVALID_SID, L"integrity-sid-empty");
+++    result.integrity_known = true; result.integrity_rid = *GetSidSubAuthority(label->Label.Sid, count - 1);
+++    return finish(result.integrity_rid <= SECURITY_MANDATORY_MEDIUM_RID ? ERROR_SUCCESS : ERROR_ACCESS_DENIED,
+++        result.integrity_rid <= SECURITY_MANDATORY_MEDIUM_RID ? L"allowed" : L"integrity-above-medium");
+++}
+++
+++static bool write_preload_authorization_context(DWORD pid, HANDLE process,
+++    const preload_authorization_observation &injector, const preload_authorization_observation &target)
+++{
+++    std::wstring line = L"EGO_PRELOAD_AUTHORIZATION_CONTEXT_V1 {\"pid\":" + std::to_wstring(pid);
+++    line.append(L",\"targetHandlePid\":" + std::to_wstring(GetProcessId(process)));
+++    line.append(L",\"injectorPid\":" + std::to_wstring(GetCurrentProcessId()));
+++    auto append = [&line](const wchar_t *actor, const preload_authorization_observation &value) {
+++        line.append(L",\""); line.append(actor); line.append(L"\":{\"phase\":"); append_json_string(line, value.phase);
+++        line.append(L",\"windowsError\":" + std::to_wstring(value.windows_error));
+++        line.append(L",\"returnedSize\":" + std::to_wstring(value.returned_size));
+++        line.append(L",\"elevated\":"); line.append(value.elevation_known ? value.elevated ? L"true" : L"false" : L"null");
+++        line.append(L",\"integrityRid\":"); line.append(value.integrity_known ? std::to_wstring(value.integrity_rid) : L"null");
+++        line.push_back(L'}');
+++    };
+++    append(L"injector", injector); append(L"target", target); line.push_back(L'}');
+++    return fwprintf(stdout, L"%ls\n", line.c_str()) >= 0 && fflush(stdout) == 0;
++ }
++ 
++ static DWORD hash_immutable_native_file(const std::wstring &path, scoped_handle &guard,
++@@ -5039,7 +5079,7 @@ static DWORD load_participant_only(HANDLE process, DWORD pid, const std::wstring
++ 		error = validate_staged_participant(addon_path, validated_build_id);
++ 	if (error != ERROR_SUCCESS)
++ 	{
++-		write_injector_diagnostic(L"target-member-payload-invalid", pid, addon_path, error, image_path);
+++		write_injector_diagnostic(L"target-member-payload-invalid", pid, addon_path, error, image_path, nullptr, earlier_load_consumed);
++ 		if (!earlier_load_consumed) print_injection_not_started();
++ 		return error;
++ 	}
++@@ -5049,7 +5089,7 @@ static DWORD load_participant_only(HANDLE process, DWORD pid, const std::wstring
++ 			error = ERROR_REVISION_MISMATCH;
++ 		if (error != ERROR_SUCCESS)
++ 		{
++-			write_injector_diagnostic(L"target-preloaded-member-selection-invalid", pid, addon_path, error, image_path);
+++			write_injector_diagnostic(L"target-preloaded-member-selection-invalid", pid, addon_path, error, image_path, nullptr, earlier_load_consumed);
++ 			if (!earlier_load_consumed) print_injection_not_started();
++ 			return error;
++ 		}
++@@ -5108,7 +5148,7 @@ static DWORD load_participant_only(HANDLE process, DWORD pid, const std::wstring
++ 		}
++ 		if (error != ERROR_SUCCESS)
++ 		{
++-			write_injector_diagnostic(L"target-member-host-unavailable", pid, addon_path, error, image_path);
+++			write_injector_diagnostic(L"target-member-host-unavailable", pid, addon_path, error, image_path, nullptr, earlier_load_consumed);
++ 			if (!earlier_load_consumed) print_injection_not_started();
++ 			return error;
++ 		}
++@@ -5126,14 +5166,15 @@ static DWORD load_participant_only(HANDLE process, DWORD pid, const std::wstring
++ 			!inspect_target_effective_reshade_settings(image_path, runtime_path, process,
++ 				environment, configuration, settings, error))
++ 		{
++-			write_injector_diagnostic(L"target-module-inspection-failed", pid, runtime_path, error, image_path);
+++			error = error != ERROR_SUCCESS ? error : ERROR_INVALID_DATA;
+++			write_injector_diagnostic(L"target-module-inspection-failed", pid, runtime_path, error, image_path, nullptr, earlier_load_consumed);
++ 			if (!earlier_load_consumed) print_injection_not_started();
++ 			return error != ERROR_SUCCESS ? error : ERROR_INVALID_DATA;
++ 		}
++ 		if (settings.electron_game_overlay_addon_disabled ||
++ 			(!preloaded_addon_leaf.empty() && preloaded_addon_disabled(settings, preloaded_addon_leaf)))
++ 		{
++-			write_injector_diagnostic(L"target-member-disabled", pid, runtime_path, ERROR_ACCESS_DISABLED_BY_POLICY, image_path, &settings);
+++			write_injector_diagnostic(L"target-member-disabled", pid, runtime_path, ERROR_ACCESS_DISABLED_BY_POLICY, image_path, &settings, earlier_load_consumed);
++ 			if (!earlier_load_consumed) print_injection_not_started();
++ 			return ERROR_ACCESS_DISABLED_BY_POLICY;
++ 		}
++@@ -5147,7 +5188,7 @@ static DWORD load_participant_only(HANDLE process, DWORD pid, const std::wstring
++ 				validated_build_id, staged_hash, selected_path, preload_file_guard);
++ 			if (error != ERROR_SUCCESS)
++ 			{
++-				write_injector_diagnostic(L"target-preloaded-member-invalid", pid, selected_path, error, image_path);
+++				write_injector_diagnostic(L"target-preloaded-member-invalid", pid, selected_path, error, image_path, nullptr, earlier_load_consumed);
++ 				if (!earlier_load_consumed) print_injection_not_started();
++ 				return error;
++ 			}
++@@ -5161,7 +5202,7 @@ static DWORD load_participant_only(HANDLE process, DWORD pid, const std::wstring
++ 				runtime_path, settings, preloaded_addon_leaf, staged_hash, selected_path, snapshot_guard);
++ 			if (error != ERROR_SUCCESS)
++ 			{
++-				write_injector_diagnostic(L"target-first-host-preload-invalid", pid, selected_path, error, image_path);
+++				write_injector_diagnostic(L"target-first-host-preload-invalid", pid, selected_path, error, image_path, nullptr, true);
++ 				return error; // This request's full ReShade initialization is already consumed.
++ 			}
++ 		}
++@@ -5672,10 +5713,12 @@ if (!write_utf8_stdout_line(L"EGO_TARGET_SELECTED\t" + std::to_wstring(pid))) re
++ 	scoped_handle preloaded_staged_guard;
++ 	if (!preloaded_addon_leaf.empty())
++ 	{
++-		DWORD preload_error = require_unelevated_process(GetCurrentProcess());
++-		if (preload_error == ERROR_SUCCESS) preload_error = require_unelevated_process(remote_process);
+++		preload_authorization_observation injector_authorization, target_authorization;
+++		DWORD preload_error = require_unelevated_process(GetCurrentProcess(), &injector_authorization);
+++		if (preload_error == ERROR_SUCCESS) preload_error = require_unelevated_process(remote_process, &target_authorization);
++ 		if (preload_error != ERROR_SUCCESS)
++ 		{
+++			write_preload_authorization_context(pid, remote_process, injector_authorization, target_authorization);
++ 			write_injector_diagnostic(L"target-preloaded-member-elevation-rejected", pid,
++ 				std::wstring(), preload_error, selected_image_path);
++ 			print_injection_not_started();
++@@ -6428,7 +6471,7 @@ if (!write_utf8_stdout_line(L"EGO_TARGET_SELECTED\t" + std::to_wstring(pid))) re
++ 		if (member_error != ERROR_SUCCESS)
++ 		{
++ 			write_injector_diagnostic(L"target-member-host-inspection-failed", pid,
++-				std::wstring(), member_error, selected_image_path);
+++				std::wstring(), member_error, selected_image_path, nullptr, true);
++ 			return member_error;
++ 		}
++ 		if (owned_late.initializer != 0)
 diff --git a/libs/electron-game-overlay-runtime/patches/reshade-injector-selection-before-open.patch b/libs/electron-game-overlay-runtime/patches/reshade-injector-selection-before-open.patch
 new file mode 100644
 index 0000000000000000000000000000000000000000..8636a852a291fe05363518c8c292466ef394a370
@@ -2146,6 +3176,122 @@ index 0000000000000000000000000000000000000000..8636a852a291fe05363518c8c292466e
 + if (!write_utf8_stdout_line(L"EGO_TARGET_SELECTED\t" + std::to_wstring(pid))) return ERROR_WRITE_FAULT;
 + 
 + 	bool session_mismatch = false;
+diff --git a/libs/electron-game-overlay-runtime/patches/reshade-injector-startup-readiness.patch b/libs/electron-game-overlay-runtime/patches/reshade-injector-startup-readiness.patch
+new file mode 100644
+index 0000000000000000000000000000000000000000..bcd4857b3171220167c84e7bb6a83e92d13b0c67
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/patches/reshade-injector-startup-readiness.patch
+@@ -0,0 +1,110 @@
++diff --git a/tools/injector.cpp b/tools/injector.cpp
++index fd7759a..b54d602 100644
++--- a/tools/injector.cpp
+++++ b/tools/injector.cpp
++@@ -3572,6 +3572,88 @@ static void append_json_string(std::wstring &json, const std::wstring &value)
++ 
++ // Diagnostic reads use the exact identity-bound handle. They never reopen by
++ // PID, infer absence of a host, resume a thread or authorize an injection.
+++enum class initial_loader_state { ready, not_created, not_initialized, unavailable };
+++struct initial_loader_readiness_observation
+++{
+++    initial_loader_state state = initial_loader_state::unavailable;
+++    DWORD windows_error = ERROR_SUCCESS;
+++    unsigned attempts = 0;
+++    ULONGLONG elapsed_ms = 0;
+++    bool waited = false;
+++};
+++
+++// Caller has already validated architecture and the retained handle's exact
+++// process incarnation. This reads only that handle; it never resumes a thread.
+++static initial_loader_state inspect_initial_loader(HANDLE process, DWORD &error)
+++{
+++    error = ERROR_SUCCESS;
+++    const HMODULE ntdll = GetModuleHandleW(L"ntdll.dll");
+++    const auto query = reinterpret_cast<decltype(&NtQueryInformationProcess)>(GetProcAddress(ntdll, "NtQueryInformationProcess"));
+++    const auto to_error = reinterpret_cast<decltype(&RtlNtStatusToDosError)>(GetProcAddress(ntdll, "RtlNtStatusToDosError"));
+++    if (query == nullptr) { error = ERROR_PROC_NOT_FOUND; return initial_loader_state::unavailable; }
+++    PROCESS_BASIC_INFORMATION basic{};
+++    const NTSTATUS status = query(process, ProcessBasicInformation, &basic, sizeof(basic), nullptr);
+++    if (status < 0) { error = to_error != nullptr ? to_error(status) : ERROR_GEN_FAILURE; return initial_loader_state::unavailable; }
+++    if (basic.PebBaseAddress == nullptr) { error = ERROR_INVALID_ADDRESS; return initial_loader_state::unavailable; }
+++    uintptr_t loader = 0;
+++    if (!read_remote_bytes(process, reinterpret_cast<uintptr_t>(basic.PebBaseAddress) + offsetof(PEB, Ldr), &loader, sizeof(loader), error))
+++        return initial_loader_state::unavailable;
+++    if (loader == 0) return initial_loader_state::not_created;
+++    BYTE initialized = 0;
+++    if (!read_remote_bytes(process, loader + sizeof(ULONG), &initialized, sizeof(initialized), error))
+++        return initial_loader_state::unavailable;
+++    return initialized != 0 ? initial_loader_state::ready : initial_loader_state::not_initialized;
+++}
+++
+++static DWORD wait_for_initial_loader(HANDLE process, initial_loader_readiness_observation &observation)
+++{
+++    constexpr ULONGLONG readiness_budget_ms = 3000;
+++    constexpr unsigned maximum_attempts = 320;
+++    observation = {};
+++    const ULONGLONG started = GetTickCount64();
+++    auto finish = [&](DWORD error) {
+++        observation.windows_error = error;
+++        observation.elapsed_ms = GetTickCount64() - started;
+++        return error;
+++    };
+++    for (;;) {
+++        const DWORD liveness = WaitForSingleObject(process, 0);
+++        if (liveness == WAIT_OBJECT_0) return finish(ERROR_PROCESS_ABORTED);
+++        if (liveness != WAIT_TIMEOUT) { const DWORD error = GetLastError(); return finish(error != ERROR_SUCCESS ? error : ERROR_GEN_FAILURE); }
+++        DWORD query_error = ERROR_SUCCESS;
+++        ++observation.attempts;
+++        observation.state = inspect_initial_loader(process, query_error);
+++        if (observation.state == initial_loader_state::ready) return finish(ERROR_SUCCESS);
+++        if (observation.state == initial_loader_state::unavailable) {
+++            // No positive startup observation: preserve normal strict module
+++            // inspection and its existing budget. Unknown never means ready.
+++            if (!observation.waited) { observation.windows_error = query_error; observation.elapsed_ms = GetTickCount64() - started; return ERROR_SUCCESS; }
+++            return finish(query_error != ERROR_SUCCESS ? query_error : ERROR_GEN_FAILURE);
+++        }
+++        observation.waited = true;
+++        const ULONGLONG elapsed = GetTickCount64() - started;
+++        if (elapsed >= readiness_budget_ms || observation.attempts >= maximum_attempts) return finish(ERROR_TIMEOUT);
+++        const DWORD remaining = static_cast<DWORD>(readiness_budget_ms - elapsed);
+++        const DWORD wait = WaitForSingleObject(process, (std::min)(DWORD(10), remaining));
+++        if (wait == WAIT_OBJECT_0) return finish(ERROR_PROCESS_ABORTED);
+++        if (wait != WAIT_TIMEOUT) { const DWORD error = GetLastError(); return finish(error != ERROR_SUCCESS ? error : ERROR_GEN_FAILURE); }
+++    }
+++}
+++
+++static bool write_initial_loader_readiness(DWORD pid, const initial_loader_readiness_observation &value)
+++{
+++    const wchar_t *state = value.state == initial_loader_state::ready ? L"initialized" :
+++        value.state == initial_loader_state::not_created ? L"not-created" :
+++        value.state == initial_loader_state::not_initialized ? L"not-initialized" : L"unavailable";
+++    std::wstring line = L"EGO_TARGET_STARTUP_READINESS_V1 {\"pid\":" + std::to_wstring(pid) + L",\"loaderState\":";
+++    append_json_string(line, state);
+++    line.append(L",\"waited\":"); line.append(value.waited ? L"true" : L"false");
+++    line.append(L",\"attempts\":" + std::to_wstring(value.attempts));
+++    line.append(L",\"elapsedMs\":" + std::to_wstring(value.elapsed_ms));
+++    line.append(L",\"windowsError\":" + std::to_wstring(value.windows_error) + L"}");
+++    return fwprintf(stdout, L"%ls\n", line.c_str()) >= 0 && fflush(stdout) == 0;
+++}
+++
++ static bool write_target_inspection_context(HANDLE process, DWORD pid)
++ {
++ 	DWORD architecture_error = ERROR_SUCCESS, loader_error = ERROR_SUCCESS;
++@@ -5771,6 +5853,16 @@ if (!write_utf8_stdout_line(L"EGO_TARGET_SELECTED\t" + std::to_wstring(pid))) re
++ 		return ERROR_IMAGE_MACHINE_TYPE_MISMATCH;
++ 	}
++ 
+++    initial_loader_readiness_observation startup_readiness;
+++    const DWORD startup_error = wait_for_initial_loader(remote_process, startup_readiness);
+++    if (!write_initial_loader_readiness(pid, startup_readiness)) return ERROR_WRITE_FAULT;
+++    if (startup_error != ERROR_SUCCESS) {
+++        write_target_inspection_context(remote_process, pid);
+++        write_injector_diagnostic(L"target-startup-readiness-failed", pid, std::wstring(), startup_error, selected_image_path);
+++        print_injection_not_started();
+++        return startup_error;
+++    }
+++
++ 	scoped_injection_claim injection_claim;
++ 	DWORD claim_error = ERROR_SUCCESS;
++ 	injection_claim_result claim_result = injection_claim_result::failed;
 diff --git a/libs/electron-game-overlay-runtime/scripts/measure-runtime-payload-storage.cjs b/libs/electron-game-overlay-runtime/scripts/measure-runtime-payload-storage.cjs
 new file mode 100644
 index 0000000000000000000000000000000000000000..4b74a13b846a5e44095e52d9f5d57e725e46d8e7
@@ -2445,6 +3591,43 @@ index 0000000000000000000000000000000000000000..78a6cb739455c6370ca124bac6403023
 +    Exit-VisualTestDisplayLease $DisplayLease $Report; Save-Report
 +    Write-Output "Mixed recovery $($Report.status): $ReportPath"
 +}
+diff --git a/libs/electron-game-overlay-runtime/scripts/test-cases/consumer-execution-context-console.ps1 b/libs/electron-game-overlay-runtime/scripts/test-cases/consumer-execution-context-console.ps1
+new file mode 100644
+index 0000000000000000000000000000000000000000..9b0f44519dbe75bb11206203e8e57a6b0ff39f48
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/scripts/test-cases/consumer-execution-context-console.ps1
+@@ -0,0 +1,8 @@
++[CmdletBinding()]
++param([ValidateSet('x64','x86')][string]$Architecture='x64',[string]$Report)
++$ErrorActionPreference='Stop'
++$Repository=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\..\..'))
++$Manager=Join-Path $Repository "build/candidate-gen24-cache/production-$Architecture/RelWithDebInfo/electron_game_overlay_reshade_manager.exe"
++if(-not $Report){$Report=Join-Path $Repository "build/consumer-context-$Architecture-$([Guid]::NewGuid().ToString('N')).json"}
++& node (Join-Path $Repository 'libs/electron-game-overlay-runtime/tests/inspection-context-console/consumer-context.cjs') $Manager ([IO.Path]::GetFullPath($Report))
++if($LASTEXITCODE -ne 0){throw 'Consumer execution context fixture failed'}
+diff --git a/libs/electron-game-overlay-runtime/scripts/test-cases/consumer-parent-launch-console.ps1 b/libs/electron-game-overlay-runtime/scripts/test-cases/consumer-parent-launch-console.ps1
+new file mode 100644
+index 0000000000000000000000000000000000000000..92231923e674aac4f728f0a8f5ce541dfde797be
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/scripts/test-cases/consumer-parent-launch-console.ps1
+@@ -0,0 +1,17 @@
++[CmdletBinding()]
++param([ValidateSet('x64','x86')][string]$Architecture='x64',[string]$Report)
++$ErrorActionPreference='Stop'
++$Repository=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\..\..'))
++$Source=Join-Path $Repository 'libs/electron-game-overlay-runtime/src/electron_game_overlay_reshade_manager.cpp'
++$Hasher=[Security.Cryptography.SHA256]::Create()
++try{$Pin=[BitConverter]::ToString($Hasher.ComputeHash([Text.Encoding]::UTF8.GetBytes([IO.File]::ReadAllText($Source).Replace("`r`n","`n")))).Replace('-','').ToLowerInvariant()}finally{$Hasher.Dispose()}
++$Build=Join-Path $Repository "build/consumer-parent-launch/compile-$Architecture"
++$Platform=if($Architecture -eq 'x86'){'Win32'}else{'x64'}
++& cmake -S (Join-Path $Repository 'libs/electron-game-overlay-runtime/tests/consumer-parent-launch') -B $Build -G 'Visual Studio 17 2022' -A $Platform "-DMANAGER_SOURCE=$($Source.Replace('\','/'))" "-DEXPECTED_SOURCE_SHA=$Pin"
++if($LASTEXITCODE -ne 0){throw 'Consumer parent fixture configure failed'}
++& cmake --build $Build --config Release
++if($LASTEXITCODE -ne 0){throw 'Consumer parent fixture build failed'}
++$Manager=Join-Path $Repository "build/candidate-gen24-cache/production-$Architecture/RelWithDebInfo/electron_game_overlay_reshade_manager.exe"
++if(-not $Report){$Report=Join-Path $Repository "build/consumer-parent-$Architecture-$([Guid]::NewGuid().ToString('N')).json"}
++& node (Join-Path $Repository 'libs/electron-game-overlay-runtime/tests/consumer-parent-launch/fixture.cjs') (Join-Path $Build 'Release/consumer_parent_launch.exe') $Manager ([IO.Path]::GetFullPath($Report))
++if($LASTEXITCODE -ne 0){throw 'Owned medium desktop-parent fixture failed'}
 diff --git a/libs/electron-game-overlay-runtime/scripts/test-cases/d3d11-mixed-watcher-protocol-recovery.ps1 b/libs/electron-game-overlay-runtime/scripts/test-cases/d3d11-mixed-watcher-protocol-recovery.ps1
 new file mode 100644
 index 0000000000000000000000000000000000000000..c0e57ad2717f2f4aff3d1fd5f31eadda626fcf33
@@ -2513,6 +3696,28 @@ index 0000000000000000000000000000000000000000..bd2a7e413077f98593691bb52854411f
 +$IdentityOutput = Join-Path $Root "$Architecture.image-identity.log"
 +& (Join-Path $Build 'Release\private_image_identity.exe') (Join-Path $Build 'Release\private_image_marker.dll') (Join-Path $Root ('owned-image-probe-' + [Guid]::NewGuid().ToString('N'))) | Tee-Object -FilePath $IdentityOutput
 +if ($LASTEXITCODE -ne 0) { throw 'Private image identity gate failed.' }
+diff --git a/libs/electron-game-overlay-runtime/scripts/test-cases/member-diagnostics-console.ps1 b/libs/electron-game-overlay-runtime/scripts/test-cases/member-diagnostics-console.ps1
+new file mode 100644
+index 0000000000000000000000000000000000000000..4bc22fe22286128a238b305043069fa25222e2a5
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/scripts/test-cases/member-diagnostics-console.ps1
+@@ -0,0 +1,16 @@
++[CmdletBinding()]
++param([ValidateSet('x64','x86')][string]$Architecture='x64')
++$ErrorActionPreference='Stop'
++$Repository=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\..\..'))
++$Root=Join-Path $Repository 'build/member-diagnostics-console'
++$Build=Join-Path $Root "compile-$Architecture"
++$Injector=Join-Path $Repository 'build/candidate-gen24-cache/native/_deps/reshade-src/tools/injector.cpp'
++$Text=[IO.File]::ReadAllText((Join-Path $Repository 'libs/electron-game-overlay-runtime/CMakeLists.txt'))
++$Pin=[regex]::Match($Text,'set\(RESHAPE_STARTUP_READINESS_INJECTOR_CONTENT_SHA256\s+"([0-9A-F]+)"').Groups[1].Value.ToLowerInvariant()
++$Platform=if($Architecture -eq 'x86'){'Win32'}else{'x64'}
++& cmake -S (Join-Path $Repository 'libs/electron-game-overlay-runtime/tests/member-diagnostics') -B $Build -G 'Visual Studio 17 2022' -A $Platform "-DINJECTOR_SOURCE=$($Injector.Replace('\','/'))" "-DEXPECTED_SOURCE_SHA=$Pin"
++if($LASTEXITCODE -ne 0){throw 'Member diagnostics configure failed'}
++& cmake --build $Build --config Release
++if($LASTEXITCODE -ne 0){throw 'Member diagnostics build failed'}
++& (Join-Path $Build 'Release/member_diagnostics.exe') | Tee-Object -FilePath (Join-Path $Root "$Architecture.stdout.log")
++if($LASTEXITCODE -ne 0){throw 'Member diagnostics console failed'}
 diff --git a/libs/electron-game-overlay-runtime/scripts/test-cases/owned-target-access-refusal-negative-control.ps1 b/libs/electron-game-overlay-runtime/scripts/test-cases/owned-target-access-refusal-negative-control.ps1
 new file mode 100644
 index 0000000000000000000000000000000000000000..3d16b5b6cbdc47002a331b8827bd04c209540525
@@ -2553,9 +3758,35 @@ index 0000000000000000000000000000000000000000..973a410d9405046e34768cd5a8809c9b
 +$ErrorActionPreference = 'Stop'
 +& node (Join-Path $PSScriptRoot '..\measure-runtime-payload-storage.cjs')
 +if ($LASTEXITCODE -ne 0) { throw 'Runtime payload storage gate failed.' }
+diff --git a/libs/electron-game-overlay-runtime/scripts/test-cases/startup-readiness-console.ps1 b/libs/electron-game-overlay-runtime/scripts/test-cases/startup-readiness-console.ps1
+new file mode 100644
+index 0000000000000000000000000000000000000000..705010bfb97ef687a72226f265bf37d2cd8c4ca6
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/scripts/test-cases/startup-readiness-console.ps1
+@@ -0,0 +1,20 @@
++[CmdletBinding()]
++param([ValidateSet('x64','x86')][string]$Architecture='x64')
++$ErrorActionPreference='Stop'
++$Repository=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\..\..'))
++$Source=Join-Path $Repository 'build/candidate-gen24-cache/native/_deps/reshade-src/tools/injector.cpp'
++$Text=[IO.File]::ReadAllText((Join-Path $Repository 'libs/electron-game-overlay-runtime/CMakeLists.txt'))
++$Pin=[regex]::Match($Text,'set\(RESHAPE_STARTUP_READINESS_INJECTOR_CONTENT_SHA256\s+"([0-9A-F]+)"').Groups[1].Value
++$Hasher=[Security.Cryptography.SHA256]::Create()
++try{$Actual=[BitConverter]::ToString($Hasher.ComputeHash([Text.Encoding]::UTF8.GetBytes([IO.File]::ReadAllText($Source).Replace("`r`n","`n")))).Replace('-','')}finally{$Hasher.Dispose()}
++if($Actual -cne $Pin){throw 'Production source does not match the frozen startup-readiness pin'}
++$Build=Join-Path $Repository "build/startup-readiness-console/compile-$Architecture"
++$Platform=if($Architecture -eq 'x86'){'Win32'}else{'x64'}
++& cmake -S (Join-Path $Repository 'libs/electron-game-overlay-runtime/tests/inspection-context-console') -B $Build -G 'Visual Studio 17 2022' -A $Platform "-DINJECTOR_SOURCE=$($Source.Replace('\','/'))"
++if($LASTEXITCODE -ne 0){throw 'Startup fixture configure failed'}
++& cmake --build $Build --config Release --target startup_readiness startup_readiness_seams
++if($LASTEXITCODE -ne 0){throw 'Startup fixture build failed'}
++& (Join-Path $Build 'Release/startup_readiness.exe') | Tee-Object -FilePath (Join-Path $Repository "build/startup-readiness-console/$Architecture.stdout.log")
++if($LASTEXITCODE -ne 0){throw 'Owned startup-readiness fixture failed'}
++& (Join-Path $Build 'Release/startup_readiness_seams.exe')
++if($LASTEXITCODE -ne 0){throw 'Deterministic startup-readiness fixture failed'}
 diff --git a/libs/electron-game-overlay-runtime/scripts/test-cases/unopened-target-selection-console.ps1 b/libs/electron-game-overlay-runtime/scripts/test-cases/unopened-target-selection-console.ps1
 new file mode 100644
-index 0000000000000000000000000000000000000000..008741d74c319c26f21a44b489588222d988ce16
+index 0000000000000000000000000000000000000000..e2eb42193bdd7a42d4f2ab2330a40143ff29478a
 --- /dev/null
 +++ b/libs/electron-game-overlay-runtime/scripts/test-cases/unopened-target-selection-console.ps1
 @@ -0,0 +1,28 @@
@@ -2567,7 +3798,7 @@ index 0000000000000000000000000000000000000000..008741d74c319c26f21a44b489588222
 +$Build = Join-Path $Root "compile-$Architecture"
 +$Injector = Join-Path $Repository 'build\candidate-gen24-cache\native\_deps\reshade-src\tools\injector.cpp'
 +$Text = [IO.File]::ReadAllText((Join-Path $Repository 'libs\electron-game-overlay-runtime\CMakeLists.txt'))
-+$Pin = [regex]::Match($Text, 'set\(RESHAPE_SELECTION_BEFORE_OPEN_INJECTOR_CONTENT_SHA256\s+"([0-9A-F]+)"').Groups[1].Value.ToLowerInvariant()
++$Pin = [regex]::Match($Text, 'set\(RESHAPE_STARTUP_READINESS_INJECTOR_CONTENT_SHA256\s+"([0-9A-F]+)"').Groups[1].Value.ToLowerInvariant()
 +$Platform = if ($Architecture -eq 'x86') {'Win32'} else {'x64'}
 +& cmake -S (Join-Path $Repository 'libs\electron-game-overlay-runtime\tests\unopened-target-selection') -B $Build -G 'Visual Studio 17 2022' -A $Platform "-DINJECTOR_SOURCE=$($Injector.Replace('\','/'))" "-DEXPECTED_INJECTOR_SHA256=$Pin"
 +if ($LASTEXITCODE -ne 0) {throw 'Owned open-refusal fixture configure failed'}
@@ -2587,12 +3818,78 @@ index 0000000000000000000000000000000000000000..008741d74c319c26f21a44b489588222
 +    if ($After.IndexOf('Failed to open target application process!') -lt 0) {throw 'V2 must precede the full-open refusal'}
 +}
 +Write-Output "Passed ${Architecture}: live denied and owned fast-exit selections publish exact V2 before full-open refusal; no injection or graphics."
+diff --git a/libs/electron-game-overlay-runtime/tests/consumer-parent-launch/CMakeLists.txt b/libs/electron-game-overlay-runtime/tests/consumer-parent-launch/CMakeLists.txt
+new file mode 100644
+index 0000000000000000000000000000000000000000..de55e52434b15410745ea27738f4340f8dd6e763
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/tests/consumer-parent-launch/CMakeLists.txt
+@@ -0,0 +1,30 @@
++cmake_minimum_required(VERSION 3.24)
++project(consumer_parent_launch LANGUAGES CXX)
++# Exercise the actual native launch body from a medium test owner without UAC.
++# The only fixture seam forces the existing already-medium early return off.
++# This is not evidence of an actual elevated caller and is never packaged.
++file(READ "${MANAGER_SOURCE}" source)
++string(REPLACE "\r\n" "\n" source "${source}")
++string(SHA256 actual "${source}")
++if(NOT actual STREQUAL EXPECTED_SOURCE_SHA)
++  message(FATAL_ERROR "Production manager source hash mismatch")
++endif()
++set(seam "const bool supported = !context.elevated && context.integrity <= SECURITY_MANDATORY_MEDIUM_RID;")
++string(FIND "${source}" "${seam}" position)
++if(position LESS 0)
++  message(FATAL_ERROR "Medium early-return seam changed")
++endif()
++string(LENGTH "${seam}" seam_length)
++math(EXPR after_seam "${position}+${seam_length}")
++string(SUBSTRING "${source}" ${after_seam} -1 remainder)
++string(FIND "${remainder}" "${seam}" duplicate)
++if(NOT duplicate EQUAL -1)
++  message(FATAL_ERROR "Ambiguous medium early-return seam")
++endif()
++string(REPLACE "${seam}" "const bool supported = false; // TEST ONLY: exercise real parent launch at medium integrity" source "${source}")
++string(REPLACE "resumed = true;" "resumed = true; const DWORD observed_wait = WaitForSingleObject(child_process.get(), 15000); DWORD observed_exit = STILL_ACTIVE; GetExitCodeProcess(child_process.get(), &observed_exit); fprintf(stderr, \"EGO_OWNED_CHILD_EXIT pid=%lu wait=%lu exit=%lu\\n\", child_pid, observed_wait, observed_exit);" source "${source}")
++file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/fixture.cpp" "${source}")
++add_executable(consumer_parent_launch "${CMAKE_CURRENT_BINARY_DIR}/fixture.cpp")
++target_compile_features(consumer_parent_launch PRIVATE cxx_std_20)
++target_compile_definitions(consumer_parent_launch PRIVATE UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN)
++target_link_libraries(consumer_parent_launch PRIVATE bcrypt advapi32 userenv)
+diff --git a/libs/electron-game-overlay-runtime/tests/consumer-parent-launch/fixture.cjs b/libs/electron-game-overlay-runtime/tests/consumer-parent-launch/fixture.cjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..8a78b588ab0fb4a0f56d0d352f771d66e2b41cb4
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/tests/consumer-parent-launch/fixture.cjs
+@@ -0,0 +1,24 @@
++'use strict';
++const cp=require('node:child_process'),fs=require('node:fs'),assert=require('node:assert/strict'),path=require('node:path');
++const [seamManager,productionManager,report]=process.argv.slice(2).map(p=>path.resolve(p));
++const sdk=require('../../../electron-game-overlay/dist/lib/overlay-consumer-context.js');
++const literals=['with spaces','','quote"here','trailing\\','$(literal)','日本語'];
++function raw(args){const r=cp.spawnSync(seamManager,args,{encoding:'utf8',windowsHide:true});fs.writeFileSync(report+'.native-stdio.json',JSON.stringify({status:r.status,stdout:r.stdout,stderr:r.stderr,error:r.error?.message},null,2));assert.equal(r.status,0,r.stderr||r.stdout||r.error?.message);return JSON.parse(r.stdout);}
++async function main(){
++  const context=await sdk.inspectOverlayConsumerExecutionContext({config:{addonManagerPath:productionManager}});
++  assert.equal(context.overlaySupported,true,'This no-UAC fixture requires an actual medium caller');
++  const childReport=report+'.replacement.json';assert.equal(fs.existsSync(childReport),false,'Use a fresh report path');
++  const ownChild=path.resolve(__dirname,'../inspection-context-console/consumer-context.cjs');
++  process.env.EGO_PARENT_LAUNCH_ENV_SENTINEL='must-not-inherit';
++  const args=[ownChild,productionManager,childReport,'--owned-replacement',...literals];
++  const result=raw(['--consumer-relaunch',String(process.pid),context.creationTime100ns,context.executableSha256,...args.flatMap(a=>['--arg',a])]);
++  fs.writeFileSync(report+'.attempt.json',JSON.stringify({context,result,args},null,2));
++  assert.equal(result.status,'launched');
++  const deadline=Date.now()+10000;while(!fs.existsSync(childReport)&&Date.now()<deadline)await new Promise(r=>setTimeout(r,25));
++  const child=JSON.parse(fs.readFileSync(childReport,'utf8'));assert.equal(child.pid,result.replacementPid);
++  assert.equal(child.context.creationTime100ns,result.replacementCreationTime100ns);assert.equal(child.context.elevated,false);assert.equal(child.context.integrityRid,8192);
++  assert.equal(child.context.sessionId,context.sessionId);assert.equal(child.inheritedSentinel,false);assert.deepEqual(child.args,literals);
++  const output={status:'passed',actualElevatedRelaunch:false,fixtureSeam:'force medium early return off; production launch body unchanged',actualMediumDesktopParentLaunch:true,sourceContext:context,child,environmentNotInherited:true,graphics:false,injection:false,uac:false};
++  fs.writeFileSync(report,JSON.stringify(output,null,2)+'\n');console.log(JSON.stringify(output));
++}
++main().catch(e=>{console.error(e);process.exitCode=1;});
 diff --git a/libs/electron-game-overlay-runtime/tests/inspection-context-console/CMakeLists.txt b/libs/electron-game-overlay-runtime/tests/inspection-context-console/CMakeLists.txt
 new file mode 100644
-index 0000000000000000000000000000000000000000..127bee438bacf5b1b0a067c1d8ca6c3f4065c3e5
+index 0000000000000000000000000000000000000000..0b7779f381ae29ca795c0639cc288fe04c202ade
 --- /dev/null
 +++ b/libs/electron-game-overlay-runtime/tests/inspection-context-console/CMakeLists.txt
-@@ -0,0 +1,15 @@
+@@ -0,0 +1,41 @@
 +cmake_minimum_required(VERSION 3.24)
 +project(initial_module_inspection_console LANGUAGES CXX)
 +set(INJECTOR_SOURCE "" CACHE FILEPATH "Verified reconstructed production source")
@@ -2604,10 +3901,90 @@ index 0000000000000000000000000000000000000000..127bee438bacf5b1b0a067c1d8ca6c3f
 +target_compile_definitions(initial_module_inspection PRIVATE UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN "EGO_INJECTOR_SOURCE=\"${INJECTOR_SOURCE}\"")
 +target_compile_options(initial_module_inspection PRIVATE /W4 /EHsc)
 +target_link_libraries(initial_module_inspection PRIVATE psapi advapi32)
++add_executable(startup_readiness startup-readiness.cpp)
++target_compile_features(startup_readiness PRIVATE cxx_std_17)
++target_compile_definitions(startup_readiness PRIVATE UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN "EGO_INJECTOR_SOURCE=\"${INJECTOR_SOURCE}\"")
++target_link_libraries(startup_readiness PRIVATE psapi advapi32)
++file(READ "${INJECTOR_SOURCE}" readiness_source)
++foreach(part IN ITEMS types wait)
++    if(part STREQUAL "types")
++        set(first "enum class initial_loader_state")
++        set(last "// Caller has already validated architecture")
++    else()
++        set(first "static DWORD wait_for_initial_loader(")
++        set(last "static bool write_initial_loader_readiness(")
++    endif()
++    string(FIND "${readiness_source}" "${first}" start)
++    string(FIND "${readiness_source}" "${last}" end)
++    if(start LESS 0 OR end LESS start)
++        message(FATAL_ERROR "Missing pinned startup readiness seam")
++    endif()
++    math(EXPR length "${end}-${start}")
++    string(SUBSTRING "${readiness_source}" ${start} ${length} body)
++    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/readiness-${part}.hpp" "${body}")
++endforeach()
++add_executable(startup_readiness_seams startup-readiness-seams.cpp)
++target_compile_features(startup_readiness_seams PRIVATE cxx_std_17)
++target_compile_definitions(startup_readiness_seams PRIVATE UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN)
++target_include_directories(startup_readiness_seams PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
 +add_library(private_image_marker SHARED private-image-marker.cpp)
 +add_executable(private_image_identity private-image-identity.cpp)
 +target_compile_features(private_image_identity PRIVATE cxx_std_17)
 +target_compile_definitions(private_image_identity PRIVATE UNICODE _UNICODE)
+diff --git a/libs/electron-game-overlay-runtime/tests/inspection-context-console/consumer-context.cjs b/libs/electron-game-overlay-runtime/tests/inspection-context-console/consumer-context.cjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..b96166d836c4b461374f68b24bcb8496427809c9
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/tests/inspection-context-console/consumer-context.cjs
+@@ -0,0 +1,48 @@
++'use strict';
++// Headless owned Node processes only; no Electron, game, UAC prompt or injection.
++const fs=require('node:fs');
++const path=require('node:path');
++const assert=require('node:assert/strict');
++const cp=require('node:child_process');
++const [manager,report,...args]=process.argv.slice(2);
++if(args[0]==='--owned-replacement')fs.writeFileSync(report+'.bootstrap.json',JSON.stringify({pid:process.pid,args,execPath:process.execPath}));
++const config={addonManagerPath:path.resolve(manager)};
++async function main(){
++  const {inspectOverlayConsumerExecutionContext:inspect,launchUnelevatedOverlayConsumer:launch}=require('../../../electron-game-overlay/dist/lib/overlay-consumer-context.js');
++  if(args[0]==='--owned-replacement'){
++    const context=await inspect({config});
++    fs.writeFileSync(report,JSON.stringify({context,args:args.slice(1),pid:process.pid,inheritedSentinel:process.env.EGO_PARENT_LAUNCH_ENV_SENTINEL!==undefined}));return;
++  }
++  const context=await inspect({config});
++  assert.equal(context.ownerPid,process.pid);assert.ok(context.executableSha256);
++  let checks=1,replacement=null;
++  for(const argv of [
++    ['--consumer-context',String(process.pid+1)],
++    ['--consumer-relaunch',String(process.pid),'1',context.executableSha256],
++    ['--consumer-relaunch',String(process.pid),context.creationTime100ns,'0'.repeat(64)],
++    ['--consumer-relaunch',String(process.pid),context.creationTime100ns,context.executableSha256,'--unrecognized'],
++  ]){
++    const result=cp.spawnSync(config.addonManagerPath,argv,{encoding:'utf8',windowsHide:true});
++    assert.notEqual(result.status,0,result.stdout);assert.equal(result.error,undefined);checks++;
++  }
++  if(context.overlaySupported){
++    const result=await launch({config,context,arguments:[]});assert.equal(result.status,'already-unelevated');assert.equal(result.replacement,undefined);checks++;
++  }else if(context.relaunchAvailable){
++    const childReport=path.resolve(report+'.replacement.json');
++    assert.equal(fs.existsSync(childReport),false,'Use a new report path');
++    const literal=['with spaces','','quote"here','trailing\\','$(literal)','日本語'];
++    const result=await launch({config,context,arguments:[__filename,config.addonManagerPath,childReport,'--owned-replacement',...literal]});
++    assert.equal(result.status,'launched');
++    const deadline=Date.now()+10000;
++    while(!fs.existsSync(childReport)&&Date.now()<deadline)await new Promise(resolve=>setTimeout(resolve,25));
++    replacement=JSON.parse(fs.readFileSync(childReport,'utf8'));
++    assert.equal(replacement.pid,result.replacement.pid);assert.equal(replacement.context.creationTime100ns,result.replacement.creationTime100ns);
++    assert.equal(replacement.context.elevated,false);assert.ok(replacement.context.integrityRid<=8192);assert.equal(replacement.context.sessionId,context.sessionId);
++    assert.deepEqual(replacement.args,literal);checks++;
++  }else{
++    await assert.rejects(launch({config,context,arguments:[]}),/unavailable/);checks++;
++  }
++  const result={status:'passed',checks,context,replacement,actualElevatedRelaunch:replacement!==null,graphics:false,injection:false,uac:false};
++  fs.writeFileSync(report,JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));
++}
++main().catch(error=>{if(args[0]==='--owned-replacement')fs.writeFileSync(report,JSON.stringify({error:error.stack,pid:process.pid}));console.error(error);process.exitCode=1;});
 diff --git a/libs/electron-game-overlay-runtime/tests/inspection-context-console/fixture.cpp b/libs/electron-game-overlay-runtime/tests/inspection-context-console/fixture.cpp
 new file mode 100644
 index 0000000000000000000000000000000000000000..83ce8f76ad701b4cda8db8b8ff84b24bb1dcd64f
@@ -2718,6 +4095,286 @@ index 0000000000000000000000000000000000000000..8eb1e1729e13b16dda0691df7e09a270
 +#include <Windows.h>
 +extern "C" __declspec(dllexport) int ElectronGameOverlayIdentityProbeCounter = 0;
 +BOOL WINAPI DllMain(HINSTANCE, DWORD, LPVOID) { return TRUE; }
+diff --git a/libs/electron-game-overlay-runtime/tests/inspection-context-console/startup-readiness-seams.cpp b/libs/electron-game-overlay-runtime/tests/inspection-context-console/startup-readiness-seams.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..096c15c974bd006726f753f5d9b7379ab952fd7d
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/tests/inspection-context-console/startup-readiness-seams.cpp
+@@ -0,0 +1,38 @@
++#include <Windows.h>
++#include <algorithm>
++#include <vector>
++#include <cstdio>
++#include <stdexcept>
++#include "readiness-types.hpp"
++struct sample {initial_loader_state state;DWORD error=0;};
++static std::vector<sample> samples;
++static unsigned reads=0,waits=0;
++static ULONGLONG clock_ms=0;
++static bool frozen=false,exited=false,exit_after_wait=false,invalid=false;
++static initial_loader_state test_inspect(HANDLE,DWORD &error){const auto &s=samples[(std::min)(reads++,static_cast<unsigned>(samples.size()-1))];error=s.error;return s.state;}
++static ULONGLONG test_clock(){return clock_ms;}
++static DWORD test_wait(HANDLE,DWORD milliseconds){++waits;if(invalid){SetLastError(ERROR_INVALID_HANDLE);return WAIT_FAILED;}if(exited)return WAIT_OBJECT_0;if(milliseconds){if(exit_after_wait)return WAIT_OBJECT_0;if(!frozen)clock_ms+=milliseconds;}return WAIT_TIMEOUT;}
++#define inspect_initial_loader test_inspect
++#define GetTickCount64 test_clock
++#define WaitForSingleObject test_wait
++#include "readiness-wait.hpp"
++#undef inspect_initial_loader
++#undef GetTickCount64
++#undef WaitForSingleObject
++static unsigned assertions=0,cases=0;
++static void require(bool value){++assertions;if(!value)throw std::runtime_error("readiness assertion failed");}
++static initial_loader_readiness_observation run(std::vector<sample> input,DWORD expected){samples=std::move(input);reads=waits=0;clock_ms=0;initial_loader_readiness_observation observation;require(wait_for_initial_loader(reinterpret_cast<HANDLE>(1),observation)==expected);++cases;return observation;}
++int main(){try{
++    using state=initial_loader_state;
++    auto observation=run({{state::ready}},0);require(!observation.waited&&observation.attempts==1&&clock_ms==0);
++    observation=run({{state::unavailable,ERROR_ACCESS_DENIED}},0);require(!observation.waited&&observation.windows_error==ERROR_ACCESS_DENIED&&observation.attempts==1&&clock_ms==0);
++    for(auto pending:{state::not_created,state::not_initialized}){observation=run({{pending},{state::ready}},0);require(observation.waited&&observation.attempts==2&&clock_ms==10);}
++    observation=run({{state::not_created},{state::unavailable,299}},299);require(observation.waited&&observation.attempts==2&&clock_ms==10);
++    observation=run({{state::not_initialized},{state::unavailable,0}},ERROR_GEN_FAILURE);require(observation.waited&&observation.windows_error==ERROR_GEN_FAILURE);
++    observation=run({{state::not_created}},ERROR_TIMEOUT);require(clock_ms==3000&&observation.waited&&observation.attempts<=320);
++    frozen=true;observation=run({{state::not_initialized}},ERROR_TIMEOUT);require(observation.attempts==320&&clock_ms==0);frozen=false;
++    exited=true;observation=run({{state::ready}},ERROR_PROCESS_ABORTED);require(observation.attempts==0&&reads==0);exited=false;
++    exit_after_wait=true;observation=run({{state::not_created}},ERROR_PROCESS_ABORTED);require(observation.attempts==1&&reads==1);exit_after_wait=false;
++    invalid=true;observation=run({{state::ready}},ERROR_INVALID_HANDLE);require(observation.attempts==0&&reads==0);invalid=false;
++    printf("EGO_STARTUP_READINESS_SEAMS_PASSED cases=%u assertions=%u graphics=false injection=false processReopens=0\n",cases,assertions);return 0;
++}catch(const std::exception &error){fprintf(stderr,"%s after %u assertions\n",error.what(),assertions);return 1;}}
+diff --git a/libs/electron-game-overlay-runtime/tests/inspection-context-console/startup-readiness.cpp b/libs/electron-game-overlay-runtime/tests/inspection-context-console/startup-readiness.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..60febfa42ab2601f8fbb5be6210b870d6b728d19
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/tests/inspection-context-console/startup-readiness.cpp
+@@ -0,0 +1,58 @@
++#define wmain production_injector_main
++#include EGO_INJECTOR_SOURCE
++#undef wmain
++#include <thread>
++struct owned_child {
++    scoped_handle process,thread,job;
++    DWORD pid=0;
++    owned_child(){
++        wchar_t image[32768]{};GetModuleFileNameW(nullptr,image,ARRAYSIZE(image));
++        std::wstring command=L"\""+std::wstring(image)+L"\" --owned-child";
++        STARTUPINFOW startup{sizeof(startup)};PROCESS_INFORMATION child{};
++        if(!CreateProcessW(image,command.data(),nullptr,nullptr,FALSE,CREATE_SUSPENDED|CREATE_NO_WINDOW,nullptr,nullptr,&startup,&child))throw 1;
++        process.handle=child.hProcess;thread.handle=child.hThread;pid=child.dwProcessId;
++        job.handle=CreateJobObjectW(nullptr,nullptr);JOBOBJECT_EXTENDED_LIMIT_INFORMATION limits{};limits.BasicLimitInformation.LimitFlags=JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
++        if(!SetInformationJobObject(job,JobObjectExtendedLimitInformation,&limits,sizeof(limits))||!AssignProcessToJobObject(job,process)){TerminateProcess(process,1);throw 2;}
++    }
++    ~owned_child(){if(WaitForSingleObject(process,0)!=WAIT_OBJECT_0){TerminateProcess(process,0);WaitForSingleObject(process,5000);}}
++};
++static DWORD strict_inspection(owned_child &child,initial_module_inspection_observation &observation){
++    bool pinned=false,ready=false,participant=false;HMODULE runtime=nullptr;owned_late_d3d11_host late;
++    return inspect_initial_host_readonly(child.process,child.pid,pinned,runtime,ready,participant,late,observation);
++}
++int wmain(int argc,wchar_t **argv){
++    if(argc==2&&wcscmp(argv[1],L"--owned-child")==0){Sleep(INFINITE);return 0;}
++    try{
++        for(const bool negative_control:{true,false}){
++            owned_child child;std::thread owner([&]{Sleep(800);ResumeThread(child.thread);});
++            initial_module_inspection_observation inspection;DWORD before=0;
++            if(negative_control)before=strict_inspection(child,inspection);
++            initial_loader_readiness_observation readiness;const DWORD error=wait_for_initial_loader(child.process,readiness);
++            const DWORD after=error==ERROR_SUCCESS?strict_inspection(child,inspection):error;owner.join();
++            if((negative_control&&before!=ERROR_PARTIAL_COPY)||error!=ERROR_SUCCESS||after!=ERROR_SUCCESS||!readiness.waited||readiness.state!=initial_loader_state::ready) return 3;
++            write_initial_loader_readiness(child.pid,readiness);
++            printf("EGO_STARTUP_CASE {\"case\":\"owner-resumed-800ms\",\"negativeControl\":%s,\"oldInspectionError\":%lu,\"strictInspectionError\":%lu,\"sameHandle\":true,\"injection\":false}\n",negative_control?"true":"false",before,after);
++        }
++        {
++            owned_child child;initial_loader_readiness_observation observation;
++            const DWORD error=wait_for_initial_loader(child.process,observation);write_initial_loader_readiness(child.pid,observation);
++            if(error!=ERROR_TIMEOUT||!observation.waited||observation.elapsed_ms<3000||observation.elapsed_ms>4500)return 4;
++            printf("EGO_STARTUP_CASE {\"case\":\"forever-suspended\",\"windowsError\":%lu,\"injection\":false}\n",error);
++        }
++        {
++            owned_child child;std::thread owner([&]{Sleep(100);TerminateProcess(child.process,0);});
++            initial_loader_readiness_observation observation;DWORD error=wait_for_initial_loader(child.process,observation);owner.join();
++            if(error!=ERROR_PROCESS_ABORTED||observation.elapsed_ms>1000)return 5;
++            printf("EGO_STARTUP_CASE {\"case\":\"owner-exited\",\"windowsError\":%lu,\"injection\":false}\n",error);
++        }
++        {
++            owned_child child;ResumeThread(child.thread);
++            initial_loader_readiness_observation observation;DWORD error=wait_for_initial_loader(child.process,observation);
++            initial_module_inspection_observation inspection;
++            if(error!=ERROR_SUCCESS||strict_inspection(child,inspection)!=ERROR_SUCCESS)return 6;
++            // An invalid handle exits before any loader query, rather than waiting.
++            if(wait_for_initial_loader(nullptr,observation)==ERROR_SUCCESS||observation.attempts!=0)return 7;
++        }
++        printf("EGO_STARTUP_READINESS_PASSED cases=5 graphics=false injection=false ownerOnlyResume=true\n");return 0;
++    }catch(int error){return 20+error;}
++}
+diff --git a/libs/electron-game-overlay-runtime/tests/member-diagnostics/CMakeLists.txt b/libs/electron-game-overlay-runtime/tests/member-diagnostics/CMakeLists.txt
+new file mode 100644
+index 0000000000000000000000000000000000000000..4a464e92696ef54c67a431b236b1df68d90503c5
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/tests/member-diagnostics/CMakeLists.txt
+@@ -0,0 +1,29 @@
++cmake_minimum_required(VERSION 3.24)
++project(member_diagnostics LANGUAGES CXX)
++set(INJECTOR_SOURCE "" CACHE FILEPATH "Pinned production injector")
++file(READ "${INJECTOR_SOURCE}" source)
++string(REPLACE "\r\n" "\n" source "${source}")
++string(SHA256 source_sha "${source}")
++if(NOT source_sha STREQUAL EXPECTED_SOURCE_SHA)
++  message(FATAL_ERROR "Production source pin mismatch")
++endif()
++function(extract name first last)
++  string(FIND "${source}" "${first}" start)
++  string(FIND "${source}" "${last}" end)
++  if(start LESS 0 OR end LESS start)
++    message(FATAL_ERROR "Missing exact source seam: ${name}")
++  endif()
++  math(EXPR length "${end}-${start}")
++  string(SUBSTRING "${source}" ${start} ${length} body)
++  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${name}.hpp" "${body}")
++endfunction()
++extract(handles "struct scoped_handle" "struct scoped_mapped_view")
++extract(settings "struct target_effective_reshade_settings" "static bool try_resolve_target_environment_directory(")
++extract(json "static void append_json_string(" "// Diagnostic reads use")
++extract(writer "static bool write_injector_diagnostic(" "static bool write_existing_runtime_load_diagnostic(")
++extract(authorization "struct preload_authorization_observation" "static DWORD hash_immutable_native_file(")
++add_executable(member_diagnostics fixture.cpp)
++target_compile_features(member_diagnostics PRIVATE cxx_std_17)
++target_compile_definitions(member_diagnostics PRIVATE UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN)
++target_include_directories(member_diagnostics PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
++target_link_libraries(member_diagnostics PRIVATE advapi32)
+diff --git a/libs/electron-game-overlay-runtime/tests/member-diagnostics/fixture.cpp b/libs/electron-game-overlay-runtime/tests/member-diagnostics/fixture.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..3a1e83a38ea331877e15fb65590c976854831dbf
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/tests/member-diagnostics/fixture.cpp
+@@ -0,0 +1,80 @@
++// Exact production query/formatter functions; no injector entrypoint, DLL load,
++// target VM operation, elevation request, impersonation or graphics is present.
++#include <windows.h>
++#include <string>
++#include <vector>
++#include <cstdio>
++#include "handles.hpp"
++#include "settings.hpp"
++#include "json.hpp"
++#include "writer.hpp"
++enum class mode { actual, allowed, elevated, open_failed, elevation_failed, elevation_size, integrity_failed, integrity_size, integrity_sid, integrity_empty, integrity_high };
++static mode selected_mode = mode::actual;
++static unsigned opens = 0;
++static BOOL WINAPI test_open_token(HANDLE process,DWORD access,PHANDLE token)
++{
++    ++opens;
++    if(selected_mode==mode::open_failed){SetLastError(ERROR_ACCESS_DENIED);return FALSE;}
++    return OpenProcessToken(process,access,token);
++}
++static BOOL WINAPI test_token_information(HANDLE token,TOKEN_INFORMATION_CLASS kind,LPVOID data,DWORD capacity,PDWORD size)
++{
++    if(selected_mode==mode::actual)return GetTokenInformation(token,kind,data,capacity,size);
++    if(kind==TokenElevation){
++        if(selected_mode==mode::elevation_failed){SetLastError(ERROR_ACCESS_DENIED);return FALSE;}
++        *size=selected_mode==mode::elevation_size?1:sizeof(TOKEN_ELEVATION);
++        reinterpret_cast<TOKEN_ELEVATION *>(data)->TokenIsElevated=selected_mode==mode::elevated?1:0;return TRUE;
++    }
++    if(selected_mode==mode::integrity_failed){SetLastError(ERROR_ACCESS_DENIED);return FALSE;}
++    *size=selected_mode==mode::integrity_size?1:sizeof(TOKEN_MANDATORY_LABEL)+SECURITY_MAX_SID_SIZE;
++    auto label=reinterpret_cast<TOKEN_MANDATORY_LABEL *>(data);
++    label->Label.Sid=selected_mode==mode::integrity_sid?nullptr:static_cast<BYTE *>(data)+sizeof(TOKEN_MANDATORY_LABEL);
++    if(label->Label.Sid){SID_IDENTIFIER_AUTHORITY authority=SECURITY_MANDATORY_LABEL_AUTHORITY;InitializeSid(label->Label.Sid,&authority,selected_mode==mode::integrity_empty?0:1);if(selected_mode!=mode::integrity_empty)*GetSidSubAuthority(label->Label.Sid,0)=selected_mode==mode::integrity_high?SECURITY_MANDATORY_HIGH_RID:SECURITY_MANDATORY_MEDIUM_RID;}
++    return TRUE;
++}
++#define OpenProcessToken test_open_token
++#define GetTokenInformation test_token_information
++#include "authorization.hpp"
++#undef OpenProcessToken
++#undef GetTokenInformation
++int wmain(int argc,wchar_t **argv)
++{
++    if(argc==2&&wcscmp(argv[1],L"--owned-child")==0){Sleep(INFINITE);return 0;}
++    wchar_t executable[32768]{};GetModuleFileNameW(nullptr,executable,ARRAYSIZE(executable));
++    STARTUPINFOW startup{sizeof(startup)};PROCESS_INFORMATION child{};std::wstring command=L"\""+std::wstring(executable)+L"\" --owned-child";
++    if(!CreateProcessW(executable,command.data(),nullptr,nullptr,FALSE,CREATE_NO_WINDOW,nullptr,nullptr,&startup,&child))return 1;
++    scoped_handle process(child.hProcess),thread(child.hThread);
++    preload_authorization_observation real_injector,real_target;
++    DWORD real_error=require_unelevated_process(GetCurrentProcess(),&real_injector);
++    if(real_error==ERROR_SUCCESS)real_error=require_unelevated_process(process,&real_target);
++    write_preload_authorization_context(child.dwProcessId,process,real_injector,real_target);
++    wprintf(L"EGO_AUTHORIZATION_REAL_RESULT {\"error\":%lu,\"uacRequested\":false,\"targetTokenChecked\":%s}\n",real_error,wcscmp(real_target.phase,L"not-checked")==0?L"false":L"true");
++    const mode cases[]={mode::allowed,mode::elevated,mode::open_failed,mode::elevation_failed,mode::elevation_size,mode::integrity_failed,mode::integrity_size,mode::integrity_sid,mode::integrity_empty,mode::integrity_high};
++    for(bool target_failure:{false,true})for(mode value:cases){
++        preload_authorization_observation injector,target;opens=0;
++        selected_mode=target_failure?mode::allowed:value;DWORD error=require_unelevated_process(GetCurrentProcess(),&injector);
++        if(error==ERROR_SUCCESS){selected_mode=target_failure?value:mode::allowed;error=require_unelevated_process(process,&target);}
++        if((error==ERROR_SUCCESS)!=(value==mode::allowed))return 2;
++        if(!target_failure&&value!=mode::allowed&&(opens!=1||wcscmp(target.phase,L"not-checked")!=0))return 3;
++        if(target_failure&&opens!=2)return 4;
++        write_preload_authorization_context(child.dwProcessId,process,injector,target);
++    }
++    selected_mode=mode::actual;
++    struct diagnostic_case {const wchar_t *code;DWORD error;bool preflight;bool postload;bool settings;bool module;};
++    const diagnostic_case diagnostic_cases[]={
++      {L"target-member-payload-invalid",2,true,true,false,false},{L"target-preloaded-member-selection-invalid",1306,true,true,false,false},
++      {L"target-member-host-unavailable",1460,true,true,false,true},{L"target-member-disabled",1260,true,true,true,true},
++      {L"target-preloaded-member-invalid",1306,true,true,false,false},{L"target-preloaded-member-elevation-rejected",5,true,false,false,false},
++      {L"target-host-claim-failed",5,true,false,false,false},{L"target-first-host-preload-invalid",1306,false,true,false,false},
++      {L"target-member-host-inspection-failed",299,false,true,false,false},{L"target-module-inspection-failed",299,true,true,false,true}};
++    target_effective_reshade_settings settings;settings.reshade_base_path=L"C:\\owned\\host";settings.addon_directory_path=L"C:\\owned\\host\\addons";
++    unsigned diagnostics=0;
++    for(const auto &test:diagnostic_cases)for(bool after_load:{false,true}){
++        if(after_load?!test.postload:!test.preflight)continue;
++        if(!write_injector_diagnostic(test.code,4242,test.module?L"C:\\owned\\host\\dxgi.dll":L"",test.error,L"C:\\owned\\test.exe",test.settings?&settings:nullptr,after_load))return 5;
++        ++diagnostics;
++    }
++    if(!TerminateProcess(process,0)||WaitForSingleObject(process,5000)!=WAIT_OBJECT_0)return 6;
++    wprintf(L"EGO_MEMBER_DIAGNOSTICS_PASSED {\"authorizationSeamCases\":20,\"diagnosticCases\":%u,\"realQueries\":true,\"graphics\":false,\"injection\":false,\"ownedTargetExited\":true}\n",diagnostics);
++    return 0;
++}
+diff --git a/libs/electron-game-overlay-runtime/tests/member-diagnostics/fixtures/helper-20860.stdout.txt b/libs/electron-game-overlay-runtime/tests/member-diagnostics/fixtures/helper-20860.stdout.txt
+new file mode 100644
+index 0000000000000000000000000000000000000000..02e492276e0330beb7ba11360a2200e1738bdf2c
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/tests/member-diagnostics/fixtures/helper-20860.stdout.txt
+@@ -0,0 +1,7 @@
++EGO_POLICY_BASELINE_V1	134387355370799928
++ReShade path watcher armed.
++Matched executable path: D:\SteamLibrary\steamapps\common\Gun Frog\UnityCrashHandler64.exe
++EGO_TARGET_SELECTED_V2	20860	134387359218644144	D:\SteamLibrary\steamapps\common\Gun Frog\UnityCrashHandler64.exe
++EGO_TARGET_SELECTED	20860
++ELECTRON_GAME_OVERLAY_INJECTOR_DIAGNOSTIC {"schemaVersion":1,"stage":"target-preflight","code":"target-preloaded-member-elevation-rejected","pid":20860,"targetExecutablePath":"D:\\SteamLibrary\\steamapps\\common\\Gun Frog\\UnityCrashHandler64.exe","injectionStarted":false,"windowsErrorCode":5}
++ReShade injection not started.
+diff --git a/libs/electron-game-overlay-runtime/tests/member-diagnostics/fixtures/main-9288.stdout.txt b/libs/electron-game-overlay-runtime/tests/member-diagnostics/fixtures/main-9288.stdout.txt
+new file mode 100644
+index 0000000000000000000000000000000000000000..499ed43c4d84265fa9650d2417dff00f761620e9
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/tests/member-diagnostics/fixtures/main-9288.stdout.txt
+@@ -0,0 +1,7 @@
++EGO_POLICY_BASELINE_V1	134387355370799928
++ReShade path watcher armed.
++Matched executable path: D:\SteamLibrary\steamapps\common\Gun Frog\Gun Frog.exe
++EGO_TARGET_SELECTED_V2	9288	134387359135642586	D:\SteamLibrary\steamapps\common\Gun Frog\Gun Frog.exe
++EGO_TARGET_SELECTED	9288
++ELECTRON_GAME_OVERLAY_INJECTOR_DIAGNOSTIC {"schemaVersion":1,"stage":"target-preflight","code":"target-preloaded-member-elevation-rejected","pid":9288,"targetExecutablePath":"D:\\SteamLibrary\\steamapps\\common\\Gun Frog\\Gun Frog.exe","injectionStarted":false,"windowsErrorCode":5}
++ReShade injection not started.
+diff --git a/libs/electron-game-overlay-runtime/tests/member-diagnostics/native-sdk-contract.cjs b/libs/electron-game-overlay-runtime/tests/member-diagnostics/native-sdk-contract.cjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..3aef10722cdbb8658359a12f1b2dab75f105acf0
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/tests/member-diagnostics/native-sdk-contract.cjs
+@@ -0,0 +1,19 @@
++'use strict';
++// Read real native formatter output through the exact compiled SDK parser.
++// The private export exists in this in-memory test module only.
++const fs=require('node:fs'),path=require('node:path'),Module=require('node:module'),assert=require('node:assert/strict'),crypto=require('node:crypto');
++const root=path.resolve(__dirname,'../../../..');
++const entry=path.join(root,'libs/electron-game-overlay/dist/lib/reshade-launcher.js');
++const source=fs.readFileSync(entry,'utf8');
++assert.match(source,/function parseInjectorDiagnostic\(stdout\)/);
++const fixture=new Module(entry,module);fixture.filename=entry;fixture.paths=Module._nodeModulePaths(path.dirname(entry));
++fixture._compile(source+'\nexports.__nativeTestParser = parseInjectorDiagnostic;\n',entry);
++const records=[];
++for(const architecture of ['x64','x86']){
++  const log=fs.readFileSync(path.join(root,`build/member-diagnostics-console/${architecture}.stdout.log`),'utf8');
++  const lines=log.split(/\r?\n/).filter(line=>line.startsWith('ELECTRON_GAME_OVERLAY_INJECTOR_DIAGNOSTIC '));
++  assert.equal(lines.length,16);
++  for(const line of lines){const parsed=fixture.exports.__nativeTestParser(line);assert.equal(parsed.kind,'valid',JSON.stringify(parsed));records.push({architecture,code:parsed.diagnostic.code,stage:parsed.diagnostic.stage,injectionStarted:parsed.diagnostic.injectionStarted});}
++}
++const report={status:'passed',nativeCases:records.length,sdkParserSha256:crypto.createHash('sha256').update(source).digest('hex'),sdkFileModified:false,graphics:false,injection:false,records};
++fs.writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({status:report.status,nativeCases:records.length}));
 diff --git a/libs/electron-game-overlay-runtime/tests/mixed-watcher-recovery/CMakeLists.txt b/libs/electron-game-overlay-runtime/tests/mixed-watcher-recovery/CMakeLists.txt
 new file mode 100644
 index 0000000000000000000000000000000000000000..bfc05c06c9ede8c8094d1ee0abab34871b241f86
@@ -3079,10 +4736,10 @@ index 0000000000000000000000000000000000000000..491f25c39703b5f8a5033a9f9dd5f639
 +}
 diff --git a/libs/electron-game-overlay-runtime/tests/unopened-target-selection/native-gate.cjs b/libs/electron-game-overlay-runtime/tests/unopened-target-selection/native-gate.cjs
 new file mode 100644
-index 0000000000000000000000000000000000000000..a8be2f7c18d867f0153626cce4639309d721a940
+index 0000000000000000000000000000000000000000..e84a14020f0bdeee59e6e17edd20c33b6d0ab4ce
 --- /dev/null
 +++ b/libs/electron-game-overlay-runtime/tests/unopened-target-selection/native-gate.cjs
-@@ -0,0 +1,59 @@
+@@ -0,0 +1,60 @@
 +'use strict';
 +// Own-process access-refusal gate: real injector, real process DACL, no injection.
 +const fs = require('node:fs'), path = require('node:path'), assert = require('node:assert/strict');
@@ -3092,7 +4749,8 @@ index 0000000000000000000000000000000000000000..a8be2f7c18d867f0153626cce4639309
 +const negativeControl = process.argv[5] === '--negative-control';
 +const sha = file => createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 +const stamp = JSON.parse(fs.readFileSync(path.join(path.dirname(injector),'electron_game_overlay_runtime.build.json'),'utf8').replace(/^\uFEFF/,''));
-+assert.equal(stamp.runtimeGeneration,negativeControl?24:25); assert.equal(sha(injector).toUpperCase(),stamp.injectorSha256.toUpperCase());
++if(negativeControl)assert.equal(stamp.runtimeGeneration,24);else assert.ok(stamp.runtimeGeneration>=25&&stamp.runtimeGeneration<=26);
++assert.equal(sha(injector).toUpperCase(),stamp.injectorSha256.toUpperCase());
 +const ownerFile = path.join(fixtureDirectory,'owned_access_refusal_owner.exe');
 +const targetFile = path.join(fixtureDirectory,'owned_access_refused_target.exe');
 +const policyFile = path.join(fixtureDirectory,`owned-native-policy-${process.pid}.txt`);
@@ -3244,6 +4902,120 @@ index 0000000000000000000000000000000000000000..51296c2f3ffdf57415abe2a5440bf11c
 @@ -0,0 +1,2 @@
 +#include <windows.h>
 +int main() { Sleep(INFINITE); return 0; }
+diff --git a/libs/electron-game-overlay/src/lib/overlay-consumer-context.ts b/libs/electron-game-overlay/src/lib/overlay-consumer-context.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..664f65af8b180f68630b489db3270fad8da60783
+--- /dev/null
++++ b/libs/electron-game-overlay/src/lib/overlay-consumer-context.ts
+@@ -0,0 +1,108 @@
++import { execFile } from 'node:child_process';
++import { win32 as path } from 'node:path';
++import { createReShadeLaunchConfig, type ReShadeLaunchConfig } from './reshade-launcher.js';
++import { isValidProcessCreationTime100ns } from './overlay-process-identity.js';
++
++/** Current caller token and availability of a verified same-user medium desktop parent. */
++export type OverlayConsumerExecutionContext = Readonly<{
++  ownerPid: number;
++  creationTime100ns: string;
++  executablePath: string;
++  executableSha256: string;
++  elevated: boolean;
++  integrityRid: number;
++  sessionId: number;
++  overlaySupported: boolean;
++  relaunchAvailable: boolean;
++  relaunchRefusal: string | null;
++}>;
++/** Uses an already validated runtime configuration, or resolves the bundled native runtime. */
++export type OverlayConsumerContextOptions = Readonly<{ config?: ReShadeLaunchConfig }>;
++/** Own-executable replacement request. Arguments default to process.argv.slice(1), including a development app path. */
++export type OverlayConsumerRelaunchOptions = OverlayConsumerContextOptions & Readonly<{
++  context: OverlayConsumerExecutionContext;
++  arguments?: readonly string[];
++}>;
++/** Confirms kernel process/image/token creation, not Electron app readiness or overlay authentication. */
++export type OverlayConsumerRelaunchResult = Readonly<{
++  status: 'launched' | 'already-unelevated';
++  context: OverlayConsumerExecutionContext;
++  replacement?: Readonly<{ pid: number; creationTime100ns: string }>;
++}>;
++
++const normalize = (value: string) => {
++  const normalized=path.normalize(value), lower=normalized.toLowerCase();
++  return (lower.startsWith('\\\\?\\unc\\')?'\\\\'+normalized.slice(8):lower.startsWith('\\\\?\\')?normalized.slice(4):normalized).toLowerCase();
++};
++const expectedKeys = ['schemaVersion','kind','ownerPid','creationTime100ns','executablePath','executableSha256','elevated','integrityRid','sessionId','overlaySupported','relaunchAvailable','relaunchRefusal','status','replacementPid','replacementCreationTime100ns'];
++function validate(value: unknown): Record<string, unknown> {
++  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Invalid native consumer context');
++  const result = value as Record<string, unknown>;
++  if (Object.keys(result).length !== expectedKeys.length || expectedKeys.some(key => !(key in result)) ||
++      result.schemaVersion !== 1 || result.kind !== 'electron-game-overlay-consumer-context' || result.ownerPid !== process.pid ||
++      !isValidProcessCreationTime100ns(result.creationTime100ns) || typeof result.executablePath !== 'string' ||
++      normalize(result.executablePath) !== normalize(process.execPath) || typeof result.executableSha256 !== 'string' || !/^[A-F0-9]{64}$/u.test(result.executableSha256) ||
++      typeof result.elevated !== 'boolean' || !Number.isSafeInteger(result.integrityRid) || Number(result.integrityRid)<0 || Number(result.integrityRid)>0xffffffff ||
++      !Number.isSafeInteger(result.sessionId) || Number(result.sessionId)<0 || Number(result.sessionId)>0xffffffff ||
++      typeof result.overlaySupported !== 'boolean' || result.overlaySupported !== (!result.elevated && Number(result.integrityRid)<=8192) ||
++      typeof result.relaunchAvailable !== 'boolean' || !(result.relaunchRefusal===null || typeof result.relaunchRefusal==='string') ||
++      result.relaunchAvailable !== (result.relaunchRefusal===null) || !['inspected','launched','already-unelevated'].includes(String(result.status))) {
++    throw new Error('Native consumer context contradicted this caller or its token');
++  }
++  return result;
++}
++function snapshot(result: Record<string, unknown>): OverlayConsumerExecutionContext {
++  const keys = ['ownerPid','creationTime100ns','executablePath','executableSha256','elevated','integrityRid','sessionId','overlaySupported','relaunchAvailable','relaunchRefusal'];
++  return Object.freeze(Object.fromEntries(keys.map(key=>[key,result[key]]))) as OverlayConsumerExecutionContext;
++}
++async function invoke(config: ReShadeLaunchConfig | undefined, arguments_: readonly string[]): Promise<Record<string, unknown>> {
++  const selected = config ?? createReShadeLaunchConfig();
++  return new Promise((resolve,reject)=>{
++    execFile(selected.addonManagerPath,[...arguments_],{encoding:'utf8',shell:false,windowsHide:true,timeout:30000,maxBuffer:65536},(error,stdout,stderr)=>{
++      if(error){reject(new Error(`Native consumer context request failed: ${stdout.trim() || stderr.trim() || error.message}`));return;}
++      try {
++        if(stderr.trim())throw new Error('Unexpected consumer context stderr');
++        const lines=stdout.trim().split(/\r?\n/u);if(lines.length!==1)throw new Error('Expected one native consumer context record');
++        resolve(validate(JSON.parse(lines[0])));
++      } catch(cause){reject(cause);}
++    });
++  });
++}
++
++/** Reads this calling process's real elevation/integrity and a same-user/session desktop relaunch capability. Never changes a token or starts an app. */
++export async function inspectOverlayConsumerExecutionContext(options: OverlayConsumerContextOptions = {}): Promise<OverlayConsumerExecutionContext> {
++  const result=await invoke(options.config,['--consumer-context',String(process.pid)]);
++  if(result.status!=='inspected' || result.replacementPid!==0 || result.replacementCreationTime100ns!=='0')throw new Error('Unexpected launch during consumer context inspection');
++  return snapshot(result);
++}
++
++/**
++ * Creates only this consumer's own executable using a verified same-user/session
++ * medium desktop parent and fresh user environment. It requests no UAC prompt,
++ * never changes game privileges, and verifies the owned child's image/token
++ * before resuming it. No existing user process thread is resumed or suspended.
++ *
++ * Before calling, suppress the application's persistent administrator startup
++ * option and release its single-instance lock. On failure reacquire that lock;
++ * on `launched` the host may quit the old elevated process. Keep app/session
++ * startup in the replacement fresh; do not transfer elevated rendezvous tokens.
++ * A successful result proves process creation, not application readiness.
++ * A lost or invalid native response does not authorize a blind relaunch retry.
++ */
++export async function launchUnelevatedOverlayConsumer(options: OverlayConsumerRelaunchOptions): Promise<OverlayConsumerRelaunchResult> {
++  const context=options.context;
++  if(context.ownerPid!==process.pid || normalize(context.executablePath)!==normalize(process.execPath) ||
++      !isValidProcessCreationTime100ns(context.creationTime100ns) || !/^[A-F0-9]{64}$/u.test(context.executableSha256)) throw new Error('Relaunch context does not identify this consumer');
++  if(!context.overlaySupported && !context.relaunchAvailable)throw new Error(`Unelevated relaunch is unavailable: ${context.relaunchRefusal}`);
++  const args=options.arguments ?? process.argv.slice(1);
++  if(args.length>256 || args.some(arg=>typeof arg!=='string'||arg.includes('\0')) || args.reduce((length,arg)=>length+arg.length,0)>30000)throw new Error('Invalid consumer launch arguments');
++  const result=await invoke(options.config,['--consumer-relaunch',String(process.pid),context.creationTime100ns,context.executableSha256,...args.flatMap(arg=>['--arg',arg])]);
++  if(result.creationTime100ns!==context.creationTime100ns || result.executableSha256!==context.executableSha256 || result.status==='inspected')throw new Error('Consumer identity changed before relaunch');
++  if(result.status==='already-unelevated'){
++    if(!result.overlaySupported || result.replacementPid!==0 || result.replacementCreationTime100ns!=='0')throw new Error('Unexpected already-unelevated result');
++    return Object.freeze({status:'already-unelevated',context:snapshot(result)});
++  }
++  if(result.overlaySupported || !result.relaunchAvailable || !Number.isSafeInteger(result.replacementPid) || Number(result.replacementPid)<=0 || Number(result.replacementPid)>0xffffffff ||
++      result.replacementPid===process.pid || !isValidProcessCreationTime100ns(result.replacementCreationTime100ns))throw new Error('Invalid verified replacement process');
++  return Object.freeze({status:'launched',context:snapshot(result),replacement:Object.freeze({pid:Number(result.replacementPid),creationTime100ns:result.replacementCreationTime100ns as string})});
++}
 diff --git a/libs/electron-game-overlay/src/lib/runtime-payload-store.ts b/libs/electron-game-overlay/src/lib/runtime-payload-store.ts
 new file mode 100644
 index 0000000000000000000000000000000000000000..bf50337ec1ca0133500217ced5b48575112950c2
@@ -3431,3 +5203,71 @@ index 0000000000000000000000000000000000000000..cb6b4d39c612ba46d49e51994b609aca
 +}
 +module.exports = { reconstruct };
 +if (require.main === module) console.log(reconstruct(path.resolve(process.argv[2])));
+diff --git a/libs/electron-game-overlay/tests/overlay-consumer-context.test.cjs b/libs/electron-game-overlay/tests/overlay-consumer-context.test.cjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..5bc481d9f7378cde74b02af7449f43e768a20b1b
+--- /dev/null
++++ b/libs/electron-game-overlay/tests/overlay-consumer-context.test.cjs
+@@ -0,0 +1,62 @@
++'use strict';
++const test=require('node:test');
++const assert=require('node:assert/strict');
++const cp=require('node:child_process');
++const {inspectOverlayConsumerExecutionContext:inspect,launchUnelevatedOverlayConsumer:launch}=require('../dist/lib/overlay-consumer-context.js');
++const config={addonManagerPath:'C:\\verified-runtime\\manager.exe'};
++function record(extra={}) { return {schemaVersion:1,kind:'electron-game-overlay-consumer-context',ownerPid:process.pid,creationTime100ns:'134387369353549747',executablePath:process.execPath,executableSha256:'A'.repeat(64),elevated:true,integrityRid:12288,sessionId:1,overlaySupported:false,relaunchAvailable:true,relaunchRefusal:null,status:'inspected',replacementPid:0,replacementCreationTime100ns:'0',...extra}; }
++function stub(t,responses) {
++  const calls=[],original=cp.execFile;
++  cp.execFile=(file,args,options,callback)=>{
++    calls.push({file,args,options});
++    const response=responses.shift();assert.ok(response,'Unexpected helper invocation');
++    queueMicrotask(()=>callback(response.error??null,response.stdout??JSON.stringify(response.record),response.stderr??''));
++  };
++  t.after(()=>{cp.execFile=original;});return calls;
++}
++test('consumer inspection is read-only, hidden, shell-free, and binds the actual caller',async t=>{
++  const calls=stub(t,[{record:record()}]);const context=await inspect({config});
++  assert.equal(context.elevated,true);assert.equal(Object.isFrozen(context),true);
++  assert.deepEqual(calls[0].args,['--consumer-context',String(process.pid)]);
++  assert.equal(calls[0].options.shell,false);assert.equal(calls[0].options.windowsHide,true);
++  assert.equal(calls.length,1);
++});
++test('elevated consumer launch binds inspected birth and image, preserves literal arguments, and returns verified child identity',async t=>{
++  const calls=stub(t,[{record:record()},{record:record({status:'launched',replacementPid:process.pid+1,replacementCreationTime100ns:'134387369353549748'})}]);
++  const context=await inspect({config});const args=['C:\\dev app\\main.js','','quote"here','trailing\\','$(literal)','--flag'];
++  const result=await launch({config,context,arguments:args});
++  assert.equal(result.status,'launched');assert.equal(result.replacement.pid,process.pid+1);
++  assert.deepEqual(calls[1].args,['--consumer-relaunch',String(process.pid),context.creationTime100ns,context.executableSha256,...args.flatMap(arg=>['--arg',arg])]);
++  assert.equal(Object.isFrozen(result.replacement),true);assert.equal(calls.length,2);
++});
++test('default arguments preserve the development app path; already medium never reports a replacement',async t=>{
++  const medium=record({elevated:false,integrityRid:8192,overlaySupported:true});
++  const calls=stub(t,[{record:medium},{record:{...medium,status:'already-unelevated'}}]);
++  const result=await launch({config,context:await inspect({config})});
++  assert.equal(result.status,'already-unelevated');assert.equal(result.replacement,undefined);
++  assert.deepEqual(calls[1].args.slice(4),process.argv.slice(1).flatMap(arg=>['--arg',arg]));
++});
++for(const [name,extra] of [
++  ['foreign caller',{ownerPid:process.pid+1}],['foreign image',{executablePath:'C:\\other.exe'}],['zero birth',{creationTime100ns:'0'}],
++  ['invalid hash',{executableSha256:'a'.repeat(64)}],['contradictory token',{overlaySupported:true}],
++  ['contradictory capability',{relaunchAvailable:false}],['extra fields',{unexpected:true}],['unexpected launch',{status:'launched',replacementPid:123}],
++])test('consumer inspection rejects '+name,async t=>{stub(t,[{record:record(extra)}]);await assert.rejects(inspect({config}));});
++for(const response of [
++  {stdout:'{}\n{}'}, {record:record(),stderr:'unexpected'}, {stdout:'not JSON'}, {error:Error('native refusal'),stdout:'refused'},
++])test('consumer rejects invalid or failed native output without retry '+JSON.stringify(response),async t=>{
++  const calls=stub(t,[response]);await assert.rejects(inspect({config}));assert.equal(calls.length,1);
++});
++test('unavailable desktop context fails before a launch invocation',async t=>{
++  const calls=stub(t,[{record:record({relaunchAvailable:false,relaunchRefusal:'desktop-user-mismatch'})}]);
++  await assert.rejects(launch({config,context:await inspect({config})}),/unavailable/);assert.equal(calls.length,1);
++});
++for(const extra of [{creationTime100ns:'134387369353549749'},{executableSha256:'B'.repeat(64)},{replacementPid:process.pid},{replacementCreationTime100ns:'0'},{replacementPid:0},{status:'already-unelevated'}])
++  test('replacement contradiction fails without retry '+JSON.stringify(extra),async t=>{
++    const calls=stub(t,[{record:record()},{record:record({status:'launched',replacementPid:process.pid+1,replacementCreationTime100ns:'134387369353549748',...extra})}]);
++    await assert.rejects(launch({config,context:await inspect({config}),arguments:[]}));assert.equal(calls.length,2);
++  });
++test('invalid arguments and foreign contexts never invoke the manager',async t=>{
++  const calls=stub(t,[]);
++  for(const args of [['bad\0argument'],Array(257).fill(''),['x'.repeat(30001)]])await assert.rejects(launch({config,context:record(),arguments:args}));
++  await assert.rejects(launch({config,context:record({ownerPid:process.pid+1}),arguments:[]}));assert.equal(calls.length,0);
++});

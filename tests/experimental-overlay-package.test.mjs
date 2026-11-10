@@ -19,19 +19,19 @@ test('experimental SDK is the pinned complete upstream local candidate, distinct
   )
   assert.equal(
     app.dependencies['electron-game-overlay'],
-    'file:../../vendor/electron-game-overlay-1.0.1-alpha.2026110902.tgz',
+    'file:../../vendor/electron-game-overlay-1.0.1-alpha.2026110903.tgz',
   )
   const bytes = readFileSync(
-    new URL('vendor/electron-game-overlay-1.0.1-alpha.2026110902.tgz', root),
+    new URL('vendor/electron-game-overlay-1.0.1-alpha.2026110903.tgz', root),
   )
   assert.equal(
     createHash('sha256').update(bytes).digest('hex'),
-    '7b1802450366171017e26d424b70296817b15ab24c6fad679d75c52da4eb033f',
+    'a5ed66cbc72d3a45fdbe7584dd7605abd9717d262b08ea09e57606169fade479',
   )
   const consumer = createRequire(new URL('apps/app/package.json', root))
   assert.equal(
     consumer('electron-game-overlay/package.json').version,
-    '1.0.1-alpha.2026110902',
+    '1.0.1-alpha.2026110903',
   )
   const sdkRoot = path.dirname(
     consumer.resolve('electron-game-overlay/package.json'),
@@ -39,7 +39,7 @@ test('experimental SDK is the pinned complete upstream local candidate, distinct
   const provenance = JSON.parse(
     readFileSync(path.join(sdkRoot, 'SDK_PROVENANCE.json'), 'utf8'),
   )
-  assert.equal(provenance.version, '1.0.1-alpha.2026110902')
+  assert.equal(provenance.version, '1.0.1-alpha.2026110903')
   assert.equal(provenance.workingTreeDirty, true)
   for (const [field, suffix] of [
     ['sourceSnapshot', 'source.zip'],
@@ -48,7 +48,7 @@ test('experimental SDK is the pinned complete upstream local candidate, distinct
   ]) {
     const source = readFileSync(
       new URL(
-        `vendor/electron-game-overlay-1.0.1-alpha.2026110902.${suffix}`,
+        `vendor/electron-game-overlay-1.0.1-alpha.2026110903.${suffix}`,
         root,
       ),
     )
@@ -70,7 +70,7 @@ test('experimental SDK is the pinned complete upstream local candidate, distinct
     ['x64', 'x86'],
   )
   for (const native of provenance.native) {
-    assert.equal(native.runtimeGeneration, 25)
+    assert.equal(native.runtimeGeneration, 26)
     assert.equal(native.addonBuildId, 'CCE20935ADD44EF6A5A7973014B2E07F')
   }
 })
@@ -82,7 +82,7 @@ test('local SDK candidate has only its exact-version release-age exception and n
     .map((line) => line.trim())
     .filter((line) => /^- ['"]?electron-game-overlay(?:@|['"]?$)/.test(line))
   assert.deepEqual(exemptions, [
-    '- electron-game-overlay@1.0.1-alpha.2026110902',
+    '- electron-game-overlay@1.0.1-alpha.2026110903',
   ])
   assert.doesNotMatch(config, /^  electron-game-overlay@.*: patches\//m)
   assert.doesNotMatch(config, /^minimumReleaseAge:\s*0\s*$/m)
@@ -103,7 +103,7 @@ test('both native architectures carry the fixed identity and verified artifacts'
       ).replace(/^\uFEFF/, ''),
     )
     assert.equal(stamp.addonBuildId, 'CCE20935ADD44EF6A5A7973014B2E07F')
-    assert.equal(stamp.runtimeGeneration, 25)
+    assert.equal(stamp.runtimeGeneration, 26)
     assert.equal(stamp.injectorFutureTargets, 2)
     assert.equal(stamp.cooperativeAddonProtocol, 1)
     assert.equal(stamp.addonPreloadProtocol, 1)
@@ -174,7 +174,7 @@ test('afterPack preserves every actual SDK file including sealed dependency noti
         (file) =>
           !file.startsWith(path.join('node_modules', '.bin') + path.sep),
       )
-    assert.equal(files.length, 162)
+    assert.equal(files.length, 165)
     assert.deepEqual(
       readdirSync(destination, { recursive: true, withFileTypes: true })
         .filter((entry) => entry.isFile())
@@ -209,10 +209,10 @@ test('afterPack preserves every actual SDK file including sealed dependency noti
         file.path,
       )
     }
-    assert.equal(manifest.files.length, 157)
+    assert.equal(manifest.files.length, 160)
     const { verifyOverlayPackage } = consumer('electron-game-overlay/packaging')
     assert.deepEqual(await verifyOverlayPackage(destination), {
-      sealedPayloads: 157,
+      sealedPayloads: 160,
     })
     // Exercise the physical ASAR-unpacked package's default source discovery.
     // Only the test registry is overridden; no build-account registration occurs.

@@ -21,6 +21,7 @@ const appExecutable = argument('app-exe') && path.resolve(argument('app-exe'))
 const selected = argument('case') ? [argument('case')] : cases
 const targetMode = argument('target-mode') || 'folder'
 const recovery = process.argv.includes('--recovery')
+const startupDelayMs = Number(argument('startup-delay-ms') || 0)
 const requestedScale =
   argument('scale') === undefined ? undefined : Number(argument('scale'))
 const reportRoot = path.join(
@@ -123,6 +124,7 @@ async function runCase(
   manifest,
   scaleFactor = 1,
   mode = targetMode,
+  delayMs = startupDelayMs,
 ) {
   const storageBefore = runtimeStorage()
   const fixture = manifest.files.find((file) => file.case === name)
@@ -138,6 +140,7 @@ async function runCase(
     name +
       (mode === 'early' ? '-early' : '') +
       (mode === 'fast-folder' ? '-fast-folder' : '') +
+      (delayMs ? `-startup-delay-${delayMs}` : '') +
       (scaleFactor === 1 ? '' : `-scale-${scaleFactor}`) +
       (negativeControl ? '-negative-control' : ''),
   )
@@ -217,6 +220,8 @@ async function runCase(
     directory,
     profile,
     target,
+    fixtureSource: source,
+    startupDelayMs: delayMs,
     input: path.join(fixtures, 'overlay-test-input.exe'),
     recovery: recovery && !negativeControl,
     failureTarget,
@@ -346,6 +351,24 @@ async function main() {
       'Mixed recovery requires explicit --scale=1',
     )
   }
+  assert.ok(
+    Number.isInteger(startupDelayMs) &&
+      (startupDelayMs === 0 ||
+        (startupDelayMs >= 300 && startupDelayMs <= 5000)),
+    'Startup delay must be 0 or 300..5000ms',
+  )
+  if (startupDelayMs) {
+    assert.deepEqual(
+      selected,
+      ['d3d11-x64'],
+      'Delayed startup uses the pinned D3D11 x64 fixture',
+    )
+    assert.equal(
+      requestedScale,
+      1,
+      'Delayed startup requires explicit --scale=1',
+    )
+  }
   await assertFreePort(7070)
   if (!fs.existsSync(path.join(fixtures, 'manifest.json')))
     require('./build-fixtures.cjs').build()
@@ -379,16 +402,13 @@ async function main() {
     manifest.inputHelperSha256,
     'Native input driver checksum',
   )
-  if (recovery)
-    assert.equal(
-      createHash('sha256')
-        .update(
-          fs.readFileSync(path.join(fixtures, 'overlay-test-recovery.exe')),
-        )
-        .digest('hex'),
-      manifest.recoveryHelperSha256,
-      'Owned recovery fixture checksum',
-    )
+  assert.equal(
+    createHash('sha256')
+      .update(fs.readFileSync(path.join(fixtures, 'overlay-test-recovery.exe')))
+      .digest('hex'),
+    manifest.recoveryHelperSha256,
+    'Owned recovery and delayed-start fixture checksum',
+  )
   fs.mkdirSync(reportRoot, { recursive: true })
   const reports = []
   for (const name of selected)
@@ -408,6 +428,9 @@ async function main() {
         'early',
       ),
     )
+  }
+  if (!argument('case') && !startupDelayMs) {
+    reports.push(await runCase('d3d11-x64', false, manifest, 1, 'folder', 800))
   }
   // A regression test must detect the original bug, not merely prove that its
   // own input helper can type into an Electron webview.

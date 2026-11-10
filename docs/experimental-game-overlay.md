@@ -1,7 +1,7 @@
 # Experimental Game Overlay
 
-The Experimental backend uses the pinned `electron-game-overlay` **0.1.0-rc.7**
-SDK. It is separate from the existing Game Overlay, which continues to use
+The Experimental backend uses the complete pinned `electron-game-overlay`
+[SDK candidate](experimental-overlay-sdk.md). It is separate from the existing Game Overlay, which continues to use
 `@packages/electron-game-overlay`. Both are off by default; enabling one deselects
 the other. Existing saved legacy settings do not opt you into the experiment.
 
@@ -11,9 +11,11 @@ the other. Existing saved legacy settings do not opt you into the experiment.
 2. In **Settings → Game Overlay**, enable **Experimental Game Overlay**.
 3. Review the shared allowlist/denylist. Only newly created matching processes
    are candidates; an already-running game is not attached retroactively.
-4. Quit Izabela and reopen it normally, then launch the supported game. Enabling
-   the experiment disables **Run as Administrator**; an already-elevated process
-   cannot de-elevate itself through an ordinary restart.
+4. Restart Izabela, then launch the supported game. The experiment disables
+   **Run as Administrator** before services start. If Izabela is already
+   elevated, the SDK verifies a same-user desktop shell and launches a fresh
+   normal-permission replacement without requesting UAC. An ordinary restart
+   alone would inherit the old administrator token.
 5. Use the existing messenger shortcut to show/type in the game overlay. Escape
    and the existing stop-interception action release input and hide it.
 
@@ -22,6 +24,14 @@ from an uncertain Experimental attachment to the legacy injector. To return to
 legacy, stop the game, select the existing **Game Overlay** option, and restart
 Izabela before launching it again. The legacy administrator confirmation is
 unchanged.
+
+The SDK verifies the replacement's executable, process identity, user, session
+and token before letting it run. Izabela releases its single-instance lock only
+for that verified handoff and quits the elevated process after confirmed child
+creation. Failed handoffs restore the lock and leave the original app available;
+startup logs retain the failure. A missing eligible desktop shell or executable
+that requires administrator permissions can prevent this relaunch. Elevated
+game targets remain unsupported.
 
 The experiment uses the SDK's public `OverlayTargetWatcher` with
 `createOverlayProcessPolicy`. User and database allow/deny rules are combined
