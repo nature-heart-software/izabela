@@ -46,19 +46,29 @@ export const ElectronOverlayWindow = () => {
     return window && !window.isDestroyed() ? window : undefined
   }
 
-  const releaseInput = () => {
+  const releaseInput = (delayUnblock = false) => {
     showGeneration++
     cancelPendingShow?.()
     cancelPendingShow = undefined
     clearTimeout(blockInputTimer)
     gkl?.removeListener(toggleOverlayWindowListener)
-    user32Api.BlockInput(0)
+    if (delayUnblock) {
+      const generation = showGeneration
+      // Enter submits on key-down. Preserve the historical 100 ms grace period
+      // so its remaining key events do not leak into the game and open chat.
+      // This is input suppression, not an animation delay; do not remove it.
+      blockInputTimer = setTimeout(() => {
+        if (generation === showGeneration) user32Api.BlockInput(0)
+      }, 100)
+    } else {
+      user32Api.BlockInput(0)
+    }
     waitingToShow = false
   }
 
   const hide = async () => {
-    releaseInput()
     const window = getWindow()
+    releaseInput(!!window)
     window?.hide()
     return !!window
   }

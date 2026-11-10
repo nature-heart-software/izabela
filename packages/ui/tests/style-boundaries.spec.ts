@@ -149,7 +149,7 @@ afterEach(() => {
 })
 
 describe('toggle hover background cascade', () => {
-  it.each(['kumo-ink-light', 'kumo-ink-dark', 'github-light', 'github-dark'])(
+  it.each(['kumo-light', 'kumo-dark', 'github-light', 'github-dark'])(
     'preserves the checked state while showing hover with and without focus in %s',
     (themeId) => {
       const theme = ui.themes.get(themeId)
@@ -238,7 +238,7 @@ describe('toggle hover background cascade', () => {
             )
             expect(background(control)).not.toBe(theme.switch.on.background)
             expect(background(thumb)).toBe(theme.switch.on['thumb-background'])
-            if (themeId.startsWith('kumo-ink-')) {
+            if (themeId.startsWith('kumo-')) {
               expect(
                 Math.abs(
                   brightness(background(control)) -

@@ -33,7 +33,7 @@ The importer validates the complete input before writing. Missing mode values, m
 ## Collections and modes
 
 - **Tokens** supplies primitive values with its authored paths: `radius`, `border`, scalar `fontSize`, `lineHeight`, and `letterSpacing`, for example. Panda categories convert dimensions to CSS units without retaining the former token namespaces.
-- **Colors** supplies palette values and independent Light/Dark selections. Palette groups, including `Cloudflare Kumo` and `Kumo Ink`, keep their exact spelling in the imported object. Panda rejects spaces in named token keys, so these groups are exposed as scoped CSS custom properties rather than renamed Panda palette keys. Components consume the exact Figma semantic roles through Panda.
+- **Colors** supplies palette values and independent Light/Dark selections. Palette groups, including `Cloudflare Kumo` and `Kumo`, keep their exact spelling in the imported object. Panda rejects spaces in named token keys, so these groups are exposed as scoped CSS custom properties rather than renamed Panda palette keys. Components consume the exact Figma semantic roles through Panda.
 - **Semantic Tokens** supplies the component/shared roles and the application theme-mode inventory. Every mode automatically appears in settings and the Storybook toolbar. There is no two-theme allowlist or theme-specific value adapter.
 - **Figma** contains design/preview-only helpers and is excluded from production imports.
 
