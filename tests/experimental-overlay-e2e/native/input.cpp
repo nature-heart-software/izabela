@@ -148,7 +148,12 @@ int wmain(int argc, wchar_t **argv) {
     } else if (command == L"activate") {
         if (!activate()) return 5;
     } else if (command == L"move" || command == L"click" || command == L"wheel") {
-        if (GetForegroundWindow() != target_window) return 6;
+        if (GetForegroundWindow() != target_window) {
+            DWORD foreground_pid = 0;
+            GetWindowThreadProcessId(GetForegroundWindow(), &foreground_pid);
+            std::fprintf(stderr, "Pointer input refused: targetPid=%lu foregroundPid=%lu\n", target_pid, foreground_pid);
+            return 6;
+        }
         std::vector<INPUT> inputs;
         INPUT input{}; input.type = INPUT_MOUSE;
         if (command == L"move") {
@@ -165,7 +170,10 @@ int wmain(int argc, wchar_t **argv) {
             RECT bounds{}; GetClientRect(target_window, &bounds);
             if (!GetCursorInfo(&cursor)) return 8;
             POINT point = cursor.ptScreenPos; ScreenToClient(target_window, &point);
-            if (!PtInRect(&bounds, point)) return 6;
+            if (!PtInRect(&bounds, point)) {
+                std::fprintf(stderr, "Pointer outside fixture: x=%ld y=%ld width=%ld height=%ld\n", point.x, point.y, bounds.right, bounds.bottom);
+                return 6;
+            }
             if (command == L"click") {
                 input.mi.dwFlags = MOUSEEVENTF_LEFTDOWN; inputs.push_back(input);
                 input.mi.dwFlags = MOUSEEVENTF_LEFTUP; inputs.push_back(input);

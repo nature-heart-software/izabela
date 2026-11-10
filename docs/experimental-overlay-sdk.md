@@ -1,75 +1,80 @@
 # Experimental overlay SDK distribution
 
-The working tree uses the complete, unmodified upstream local candidate
-`vendor/electron-game-overlay-1.0.1-alpha.2026111002.tgz`.
-`@packages/electron-game-overlay` remains the legacy backend. This is an
-unpublished SDK candidate pinned directly by Izabela.
+The working tree uses the complete, unmodified upstream local storage candidate
+`vendor/electron-game-overlay-1.0.1-alpha.2026111005.tgz`.
+`@packages/electron-game-overlay` remains the legacy backend.
 
-- Tarball SHA-256: `34f6e7ccfb71c6309315e6e9cef8fceab9b40763420560e58798a4a420f9aa22`.
-- Source base: `cb5acf47e1793f1b0e5ed5e8ebfa5e7f513afe6c`, branch
-  `codex/attachment-storage-recovery`, with uncommitted upstream changes.
-  The sibling source ZIP, manifest and dirty diff match the hash-bound packaged
-  `SDK_PROVENANCE.json`; the separate source-provenance JSON is retained too.
-- Native generation: 28, both architectures; explicit capability
-  `privateElevatedAuthorization: 2`. Add-on build ID:
-  `CCE20935ADD44EF6A5A7973014B2E07F`.
-- Packaging verifies all 160 sealed payloads and preserves all 165 package files.
-- License: GPL-3.0-only. The complete package, notices and source snapshot remain
-  available. Izabela applies no SDK patches or injection retries.
+- Tarball SHA-256: `ecd223b6f26018468a654a96972dc12947741c26218f450198621a60ebe9ab9f`.
+- Source snapshot base: `8f1be4d322529be703a2c4cdc7885ab76d35ce1d`, branch
+  `codex/attachment-storage-recovery`. The snapshot and exact dirty diff include
+  the uncommitted permission-isolation, unused-drain and retirement-order corrections.
+  The sibling ZIP, manifest and diff match the packaged `SDK_PROVENANCE.json`.
+- Native generation remains 28 with `privateElevatedAuthorization: 2`.
+  All thirteen native payload/configuration files match the previous candidate
+  byte for byte. Add-on build ID: `CCE20935ADD44EF6A5A7973014B2E07F`.
+- The complete package has 168 files and 163 sealed payloads. Both architectures,
+  GPL-3.0-only notices and exact source provenance are retained.
+  Izabela applies no SDK patches or injection retries.
 
 **Run as Administrator** retains its saved preference and original startup
-behavior. Experimental opt-in does not clear the preference or automatically
-relaunch the app at a lower privilege level. Startup regressions enforce this.
-Izabela does not call the SDK optional de-elevation API in production.
+behavior. Experimental opt-in does not clear it or relaunch at lower privilege.
+The SDK supports high-integrity consumers and medium/high targets belonging to
+the same user and interactive session. Medium consumers cannot authorize high
+or system targets. Unknown user/session/token facts fail closed.
 
-The SDK now supports an interactive high-integrity consumer with a medium or
-high target under the same user and session. A medium consumer cannot authorize
-a higher-integrity target. Unknown tokens, different users/sessions and system
-contexts fail closed. Native `EGO_TARGET_AUTHORIZATION_V1` telemetry records
-`allowed-private-elevated` for the elevated lane.
+## Runtime storage
 
-High consumers use a private runtime stage with explicit user ownership, a
-protected access list and high integrity. Both native managers verify its file
-identities, single-link code files, expected hashes and security descriptors.
-Only two fixed diagnostics files are medium-writable. The elevated target lane
-does not scan the shared per-user add-on inventory. No privileged shared broker
-or OS security-policy change is required.
+Ordinary preparation uses an immutable, verified `runs.payloads-v2` cache.
+Helpers, runtime DLLs and manifests share file identities; participant add-ons
+and mutable INIs remain private. Preparation/publication leases protect versions
+being created or consumed. The SDK collects obsolete verified versions only when
+unused, retaining at most two unused versions plus every live/uncertain version.
 
-The SDK producer passed 697 checks with eight Windows-inapplicable POSIX skips.
-An actual high-token public `prepare()` call verified both native architectures,
-rejected changed digests and hard-link aliases, preserved the high caller and
-removed its unused stage on disposal. This preparation gate was followed by
-actual packaged Izabela graphics tests; it is not used as their substitute.
+After positive non-execution evidence or authoritative target exit, the SDK
+removes all thirteen payload entries from that run. Completed accessible, recognized runs retain small
+diagnostic bundles, bounded to 16 folders, seven days and 4 MiB total. Individual
+stdout/stderr/ReShade logs retain at most their last 64 KiB.
 
-Frozen installation and all 103 consumer/package checks pass. Actual packaged
-administrator acceptance passes for x64 high targets, x64 medium targets and
-x86 high targets. Each verifies the real app/target tokens, saved administrator
-preference, private native authorization, first-key/no-click input, rendered
-pixels, cursor/scroll, input release and authoritative private-code retirement.
-The full 11-case normal-permission graphics/scaling/rearming matrix passes, as do
-actual packaged normal-permission mixed recovery and delayed-loader pairs.
-Together with the administrator trials, these cover 21 passing native cases and
-25 authenticated graphics lifecycles. All 10 actual packaged cases pass.
+Administrator runs retain their protected, caller-owned, high-integrity,
+single-link payloads while active. They stage directly from verified package
+bytes without creating a redundant medium snapshot. Their payloads are transient
+and disappear after the same lifetime proof; the existing security verifier is
+unchanged. Known policy, ownership, transport and lease files are removed
+before the final payload disappears, including synchronous unused-watcher drains.
+A denied/shared control preserves payloads and exit proof for later maintenance.
+One inaccessible stage no longer aborts cleanup of its eligible peers.
 
-An additional administrator mixed-recovery attempt stopped before the
-access-refusal fixture became ready: the unchanged upstream owner exited 13 at
-its forbidden-open/refusal/resume guard. No SDK failure was reached. That
-administrator recovery scenario remains unvalidated; the normal recovery tests
-and administrator graphics acceptance are recorded separately. The harness now
-reports early fixture exits directly instead of waiting for readiness timeout.
+Izabela invokes the public `pruneReShadeRuntimeStorage()` alongside target
+discovery with at most eight recovery probes per activation. It neither delays
+watcher readiness nor cancels attachment if maintenance fails. The SDK alone
+checks ownership, recorded PID/creation identity and authoritative OS evidence.
+Denied, malformed, timed-out or missing evidence leaves the run intact.
 
-Generation 28 also retains bounded loader readiness, startup-timeout diagnostics
-and per-process failure isolation. Earlier failures are preserved: generation 26
-refused elevated injectors; generation 27 failed private diagnostics creation
-with Windows error 1314. An initial generation-28 high preparation gate caught
-files owned by the Administrators group; explicit ownership at creation fixed
-that upstream while retaining the strict verification rule.
+Legacy `payloads-v1` is preserved because older SDK preparations do not acquire
+collection leases. Old run folders without exact lifetime evidence also remain
+untouched. Age, app restart and socket loss do not authorize deleting a possibly
+mapped runtime. The audited older 88-folder/1.5 GB history is therefore not
+claimed reclaimed by this update. No consumer force-delete is introduced.
 
-Exact reports are indexed under `coverage/experimental-overlay/`.
-Normal tests share verified staging/registration caches and retain PNG captures
-without raw bitmap duplicates. Elevated tests additionally require private code
-copies to retire after authoritative target exit. No user games or antivirus
-settings are changed by these tests.
+## Validation
+
+The producer passed 676 offline checks. Its real-payload storage gate retained
+zero payload entries in completed runs and measured 19,898,368 allocated file
+bytes after 32 retirements, excluding filesystem metadata. The single-retirement
+baseline was 19,836,928 bytes; the bounded increase was diagnostic metadata.
+
+Frozen installation and all 105 consumer/package checks pass. Final candidate acceptance passes four actual packaged E2E cases across seven
+authenticated graphics lifecycles: normal-permission mixed recovery and the
+high-token x86 positive/focus-negative pair. Every completed target stage loses
+all thirteen payload entries, and staging-control counts do not grow. The exact
+fast shutdown that left a policy file in candidate 1004 now passes unchanged.
+Broader preceding-candidate acceptance covers 21 graphics/scaling/lifecycle cases,
+including ten actual packaged cases, with identical native payloads.
+
+An additional high-token access-refusal recovery scenario remains unvalidated:
+the unchanged upstream test fixture exits 13 before readiness. Normal mixed
+recovery and administrator graphics acceptance are separate evidence. HDR color
+investigation remains deferred.
 
 ## Earlier published nightly validation
 

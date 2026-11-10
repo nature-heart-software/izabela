@@ -38,6 +38,7 @@ function fixture({
   platform = 'win32',
   ready,
   managedReady,
+  maintenanceReady,
   storeReady,
   preloadReady,
   failAt,
@@ -202,6 +203,11 @@ function fixture({
   }
   const sdk = {
     createOverlayProcessPolicy,
+    pruneReShadeRuntimeStorage(options) {
+      calls.push(['storage.prune', options])
+      if (failAt === 'maintenance') return Promise.reject(new Error('SECRET'))
+      return maintenanceReady?.promise ?? Promise.resolve({ entries: [] })
+    },
     createReShadeLaunchConfig(options) {
       calls.push(['config', JSON.parse(JSON.stringify(options))])
       if (failAt === 'config') throw new Error('SECRET')
@@ -361,6 +367,29 @@ for (const [name, pathApi] of [
     f.overlay.quit()
   })
 }
+
+test('bounded SDK storage maintenance does not delay target discovery', async () => {
+  const maintenanceReady = deferred()
+  const f = fixture({ enabled: true, maintenanceReady })
+  assert.equal(await f.overlay.start(), true)
+  const maintenance = f.calls.filter((call) => call[0] === 'storage.prune')
+  assert.equal(maintenance.length, 1)
+  assert.equal(maintenance[0][1].config, f.controllers[0].options.config)
+  assert.equal(maintenance[0][1].maxRecoveryProbes, 8)
+  f.overlay.quit()
+  maintenanceReady.resolve()
+  await drain()
+})
+
+test('storage maintenance failure stays sanitized and leaves discovery running', async () => {
+  const f = fixture({ enabled: true, failAt: 'maintenance' })
+  assert.equal(await f.overlay.start(), true)
+  await drain()
+  assert.equal(f.controllers.length, 1)
+  assert.equal(f.controllers[0].disposals, 0)
+  assert.doesNotMatch(JSON.stringify(f.logs), /SECRET/)
+  f.overlay.quit()
+})
 
 test('native policy combines configured rules and freezes snapshots without implicit exclusions', async () => {
   const f = fixture({ enabled: true })

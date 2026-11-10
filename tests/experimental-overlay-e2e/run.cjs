@@ -43,7 +43,8 @@ function runtimeStorage() {
     allocatedBytes = 0n,
     privateImages = 0,
     privateCodeFiles = 0,
-    privateCodeBytes = 0n
+    privateCodeBytes = 0n,
+    stagedControlFiles = 0
   function visit(directory) {
     if (!fs.existsSync(directory)) return
     for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
@@ -68,6 +69,15 @@ function runtimeStorage() {
         identity = `${stat.dev}:${stat.ino}`
       if (
         directory.startsWith(runtimeRunsRoot + path.sep) &&
+        [
+          'ego-process-policy.txt',
+          'electron-game-overlay-owned-runtime-v1.marker',
+          'electron-overlay-transport-v1.json',
+        ].includes(entry.name)
+      )
+        stagedControlFiles++
+      if (
+        directory.startsWith(runtimeRunsRoot + path.sep) &&
         /\.(?:exe|dll|addon32|addon64)$/i.test(entry.name) &&
         stat.nlink === 1n
       ) {
@@ -82,6 +92,7 @@ function runtimeStorage() {
   }
   visit(runtimeRunsRoot)
   visit(runtimeRunsRoot + '.payloads-v1')
+  visit(runtimeRunsRoot + '.payloads-v2')
   return {
     files,
     uniqueFiles: identities.size,
@@ -90,6 +101,7 @@ function runtimeStorage() {
     privateImages,
     privateCodeFiles,
     privateCodeBytes: String(privateCodeBytes),
+    stagedControlFiles,
     scope: 'unique file identities, excluding filesystem metadata',
   }
 }
@@ -370,11 +382,13 @@ async function runCase(
       report.runtimeStorageAfterAppExit.privateCodeFiles >
         storageBefore.privateCodeFiles ||
       BigInt(report.runtimeStorageAfterAppExit.privateCodeBytes) >
-        BigInt(storageBefore.privateCodeBytes))
+        BigInt(storageBefore.privateCodeBytes) ||
+      report.runtimeStorageAfterAppExit.stagedControlFiles >
+        storageBefore.stagedControlFiles)
   ) {
     report.status = 'failed'
     report.error =
-      'Private overlay binaries accumulated after owned target exit and app shutdown'
+      'Private overlay binaries or staging control files accumulated after owned target exit and app shutdown'
   }
   fs.writeFileSync(file, JSON.stringify(report, null, 2) + '\n')
   console.log(

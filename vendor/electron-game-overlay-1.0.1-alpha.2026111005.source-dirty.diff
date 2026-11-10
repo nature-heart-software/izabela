@@ -1,0 +1,561 @@
+diff --git a/doc/runtime-storage.md b/doc/runtime-storage.md
+index d2c59ffc0026411dd5764fdd0ad4bd5505bf3576..26544c60a672e3a88bb1f300c857b8f8de1dcead 100644
+--- a/doc/runtime-storage.md
++++ b/doc/runtime-storage.md
+@@ -67,6 +67,23 @@ bundles are eligible for whole-directory pruning. A foreign entry prevents it.
+ Interrupted diagnostic-only quarantines resume after the same ownership and
+ unmapping evidence is checked again.
+ 
++Each run is maintained independently. A medium caller can read an elevated
++run's exit proof while lacking permission to remove its protected metadata.
++That run is preserved with a per-directory warning and retried by a later
++authorized sweep; it cannot stop compaction or retention of eligible peer runs.
++The count, age and byte bounds apply to accessible, recognized diagnostic
++bundles. Inaccessible stages and foreign entries can remain outside those
++bounds. Maintenance never changes their labels, permissions or ownership.
++The synchronous unused-watcher drain removes its fixed private policy,
++ownership and transport leaves as well as payloads and cache leases, so its
++completed stages become eligible diagnostic bundles without a later API call.
++Both consumed-target retirement and unused-watcher drain remove known control
++files before deleting payloads. Observing all thirteen payload entries gone
++therefore leaves no pending control-file cleanup that early Electron shutdown
++could interrupt. A denied or temporarily shared control preserves the payloads
++and persisted exit proof for a later authorized sweep; it never changes access
++permissions, releases ownership early or treats an incomplete stage as complete.
++
+ These bounds cover completed SDK-owned storage. They do not impose an unsafe
+ expiry on possibly mapped images or unrecognized data.
+ 
+@@ -126,12 +143,12 @@ The storage-only launcher remains
+ It hashes real payload files without executing them and includes a separate Node
+ filesystem restart. Its 2026-11-10 measurement used 19,802,976 payload bytes:
+ 
+-| State | Unique allocated file bytes |
+-| --- | ---: |
+-| One positively unused preparation after retirement | 19,836,928 |
+-| Twelve retired preparations | 19,881,984 |
+-| Separate Node restart and retirement | 19,886,080 |
+-| Thirty-two retirements, with 16 diagnostic folders retained | 19,898,368 |
++| State                                                       | Unique allocated file bytes |
++| ----------------------------------------------------------- | --------------------------: |
++| One positively unused preparation after retirement          |                  19,836,928 |
++| Twelve retired preparations                                 |                  19,881,984 |
++| Separate Node restart and retirement                        |                  19,886,080 |
++| Thirty-two retirements, with 16 diagnostic folders retained |                  19,898,368 |
+ 
+ Allocation is `stat.blocks * 512` counted once per file identity within the gate's
+ owned roots. It excludes filesystem metadata. The small increase is bounded
+diff --git a/libs/electron-game-overlay/src/lib/reshade-launcher.ts b/libs/electron-game-overlay/src/lib/reshade-launcher.ts
+index c5139f4f10c4fcbf746a333db59f9fa551366705..b0a8108d7a2a9821b444be89bc726ddeb9b59a8d 100644
+--- a/libs/electron-game-overlay/src/lib/reshade-launcher.ts
++++ b/libs/electron-game-overlay/src/lib/reshade-launcher.ts
+@@ -1,6 +1,6 @@
+ import { StringDecoder } from 'node:string_decoder';
+-import { stageRuntimePayload, pruneRuntimePayloadCache } from './runtime-payload-store.js';
+-import { compactRuntimeStorageRun, createRuntimeStorageRecord, inspectRuntimeStorageRun, recordRuntimeStorageArtifacts, recordRuntimeStorageAttempt, recoverRuntimeStorageRun, runtimeStorageDiagnosticBytes } from './runtime-stage-storage.js';
++import { stageRuntimePayload, pruneRuntimePayloadCache, RUNTIME_PAYLOAD_LEASE_NAME, RUNTIME_PUBLISHING_LEASE_NAME } from './runtime-payload-store.js';
++import { compactRuntimeStorageRun, createRuntimeStorageRecord, inspectRuntimeStorageRun, recordRuntimeStorageArtifacts, recordRuntimeStorageAttempt, recoverRuntimeStorageRun, runtimeStorageDiagnosticBytes, RUNTIME_STORAGE_TRANSIENT_NAMES } from './runtime-stage-storage.js';
+ import { isValidProcessCreationTime100ns } from './overlay-process-identity.js';
+ import { createPrivateElevatedOverlayStage, inspectOverlayConsumerExecutionContext, verifyPrivateElevatedOverlayStage } from './overlay-consumer-context.js';
+ import {
+@@ -5144,7 +5144,11 @@ export async function pruneReShadeRuntimeStorage(options:Readonly<{config?:ReSha
+     if(probes>=limit)break;
+     if(entry.state!=='exact-target-recorded'&&entry.state!=='prepared-owner-recorded')continue;
+     probes++;
+-    await recoverRuntimeStorageRun(entry.directory,identity=>overlayProcessIncarnationExited(identity,config.addonManagerPath));
++    try {
++      await recoverRuntimeStorageRun(entry.directory,identity=>overlayProcessIncarnationExited(identity,config.addonManagerPath));
++    } catch (error) {
++      warnRuntimeStorageEntry(entry.directory, error);
++    }
+   }
+   const context=config.privateElevatedAuthorization!==undefined?await inspectOverlayConsumerExecutionContext({config}):undefined;
+   await scheduleRunRetentionSweep(before.runsRootDirectory,context?.elevated!==true);
+@@ -5284,6 +5288,17 @@ function retireUnusedDrainedRuntimeSync(staged: StagedRuntime): void {
+   } finally {
+     try { unlinkSync(temporary); } catch (error) { if (!isErrnoException(error, 'ENOENT')) throw error; }
+   }
++  // No control-file tail may follow the final payload deletion, including
++  // when Electron exits immediately after the completed-retirement checkpoint.
++  for (const name of RUNTIME_STORAGE_TRANSIENT_NAMES) {
++    const file = path.join(staged.runDirectory, name);
++    try {
++      const info = lstatSync(file);
++      if (!info.isFile() || info.isSymbolicLink() ||
++          (name !== RUNTIME_PAYLOAD_LEASE_NAME && name !== RUNTIME_PUBLISHING_LEASE_NAME && info.nlink !== 1)) return;
++      unlinkSync(file);
++    } catch (error) { if (!isErrnoException(error, 'ENOENT')) throw error; }
++  }
+   for (const [addon, stamp, hashKey] of PRIVATE_IMAGE_ARTIFACTS) {
+     const file = path.join(staged.runDirectory, addon);
+     try {
+@@ -5299,7 +5314,9 @@ function retireUnusedDrainedRuntimeSync(staged: StagedRuntime): void {
+     for(const name of RUNTIME_ARTIFACTS){
+       if(PRIVATE_IMAGE_ARTIFACTS.some(([image])=>image===name))continue;
+       const file=path.join(staged.runDirectory,name);
+-      try{const info=lstatSync(file);if(info.isFile()&&!info.isSymbolicLink()&&info.size<=MAX_RUNTIME_PACKAGE_BUILD_STAMP_BYTES)unlinkSync(file);}
++      try{const info=lstatSync(file);if(info.isFile()&&!info.isSymbolicLink()&&
++        ((name==='ReShade.ini'||staged.privateElevatedPayload!==undefined)?info.nlink===1:true)&&
++        (name==='ReShade.ini'||info.size<=MAX_RUNTIME_PACKAGE_BUILD_STAMP_BYTES))unlinkSync(file);}
+       catch(error){if(!isErrnoException(error,'ENOENT'))throw error;}
+     }
+   }
+@@ -5370,6 +5387,7 @@ async function pruneReclaimableRunDirectories(
+     if (!entry.isDirectory() || entry.isSymbolicLink()) {
+       continue;
+     }
++    try {
+     // Resume a previously committed diagnostic-only quarantine after a crash.
+     if(/^\.electron-game-overlay-retired-[a-f0-9-]{36}$/u.test(entry.name)){
+       const directory=path.join(runsRootDirectory,entry.name);
+@@ -5389,6 +5407,11 @@ async function pruneReclaimableRunDirectories(
+       if(await runtimeStorageDiagnosticBytes(candidate.runDirectory)===undefined)continue;
+       candidates.push(candidate);
+     }
++    } catch (error) {
++      // A medium caller can inspect the ownership proof but lack write access
++      // to a high stage's metadata. Preserve that entry and maintain its peers.
++      warnRuntimeStorageEntry(path.join(runsRootDirectory, entry.name), error);
++    }
+   }
+ 
+   candidates.sort(
+@@ -5402,10 +5425,14 @@ async function pruneReclaimableRunDirectories(
+   const directoriesToRemove:ReclaimableRunDirectory[]=[];
+   let retainedBytes=0,retainedCount=0;
+   for(const candidate of candidates){
++    try {
+     const bytes=await runtimeStorageDiagnosticBytes(candidate.runDirectory);
+     if(bytes===undefined)continue;
+     if(now-candidate.retiredAtMs>=RUN_RETENTION_MAX_AGE_MS||retainedCount>=RUN_RETENTION_MAX_DIRECTORIES||retainedBytes+bytes>RUN_RETENTION_MAX_BYTES)directoriesToRemove.push(candidate);
+     else{retainedBytes+=bytes;retainedCount++;}
++    } catch (error) {
++      warnRuntimeStorageEntry(candidate.runDirectory, error);
++    }
+   }
+ 
+   for (const candidate of directoriesToRemove) {
+@@ -5472,6 +5499,10 @@ async function pruneReclaimableRunDirectories(
+   }
+ }
+ 
++function warnRuntimeStorageEntry(directory: string, error: unknown): void {
++  console.warn(`Unable to maintain ReShade run directory ${JSON.stringify(directory)}; preserved for a later authorized sweep: ${formatUnknownError(error)}`);
++}
++
+ async function readReclaimableRunDirectory(
+   runsRootDirectory: string,
+   directoryName: string,
+diff --git a/libs/electron-game-overlay/src/lib/runtime-stage-storage.ts b/libs/electron-game-overlay/src/lib/runtime-stage-storage.ts
+index 025fa5f6ce0866693958616a97ba355d237e41ff..972a8a4912ce4d7028efae744dd7becc93abb38e 100644
+--- a/libs/electron-game-overlay/src/lib/runtime-stage-storage.ts
++++ b/libs/electron-game-overlay/src/lib/runtime-stage-storage.ts
+@@ -31,6 +31,14 @@ const diagnostics = [
+   'ReShade.log',
+   '.electron-game-overlay-runtime-startup.json',
+ ];
++/** @internal Fixed stage-owned metadata; leases intentionally alias cache receipts. */
++export const RUNTIME_STORAGE_TRANSIENT_NAMES = Object.freeze([
++  RUNTIME_PAYLOAD_LEASE_NAME,
++  RUNTIME_PUBLISHING_LEASE_NAME,
++  'electron-game-overlay-owned-runtime-v1.marker',
++  'ego-process-policy.txt',
++  'electron-overlay-transport-v1.json',
++]);
+ const imageRules = [
+   ['electron_game_overlay.addon64', 64, 'addonSha256'],
+   ['electron_game_overlay.addon32', 32, 'addonSha256'],
+@@ -371,6 +379,27 @@ export async function compactRuntimeStorageRun(
+ ): Promise<void> {
+   const state = await inspectRuntimeStorageRun(directory);
+   if (!state?.unmapped) return;
++  // Retire controls before the payload checkpoint. Consumers may stop Electron
++  // as soon as all payload entries disappear; no asynchronous control cleanup
++  // may remain after that observation. A denied/shared control keeps this run
++  // incomplete and available for a later authorized sweep, without new proof.
++  for (const name of RUNTIME_STORAGE_TRANSIENT_NAMES) {
++    try {
++      const file = path.join(directory, name),
++        info = await lstat(file);
++      if (
++        !info.isFile() ||
++        info.isSymbolicLink() ||
++        (name !== RUNTIME_PAYLOAD_LEASE_NAME &&
++          name !== RUNTIME_PUBLISHING_LEASE_NAME &&
++          info.nlink !== 1)
++      )
++        return;
++      await unlink(file);
++    } catch (error) {
++      if (!code(error, 'ENOENT')) throw error;
++    }
++  }
+   const privateHigh =
+     (state.storage?.artifacts.length === 13 && !state.storage.payloadId) ||
+     /-[a-f0-9]{32}$/u.test(path.basename(directory));
+@@ -449,21 +478,6 @@ export async function compactRuntimeStorageRun(
+         if (!code(error, 'ENOENT')) throw error;
+       }
+     }
+-    for (const name of [
+-      RUNTIME_PAYLOAD_LEASE_NAME,
+-      RUNTIME_PUBLISHING_LEASE_NAME,
+-      'electron-game-overlay-owned-runtime-v1.marker',
+-      'ego-process-policy.txt',
+-      'electron-overlay-transport-v1.json',
+-    ]) {
+-      try {
+-        const file = path.join(directory, name),
+-          info = await lstat(file);
+-        if (info.isFile() && !info.isSymbolicLink()) await unlink(file);
+-      } catch (error) {
+-        if (!code(error, 'ENOENT')) throw error;
+-      }
+-    }
+     for (const name of await readdir(directory)) {
+       const ownTemporary =
+         name.startsWith(`.storage-${state.runId}-`) ||
+diff --git a/libs/electron-game-overlay/tests/reshade-launcher.test.cjs b/libs/electron-game-overlay/tests/reshade-launcher.test.cjs
+index 87915317726385a87cbb4f3ca1338ee5e4d365d0..f2df4117c246d7dc262a967a7de71b158aa4bb81 100644
+--- a/libs/electron-game-overlay/tests/reshade-launcher.test.cjs
++++ b/libs/electron-game-overlay/tests/reshade-launcher.test.cjs
+@@ -6842,6 +6842,12 @@ for (const outcome of ['complete-unused', 'selected-after-dispose', 'not-drained
+       const request = launcher.attach(harness.session, nativePolicyTarget).catch(() => undefined);
+       await waitFor(() => execution.calls.length === 1);
+       const call = execution.calls[0], image = path.join(call.options.cwd, 'electron_game_overlay.addon64');
++      if (outcome === 'complete-unused') {
++        assert.equal(existsSync(path.join(call.options.cwd, 'ego-process-policy.txt')), true);
++        assert.equal(existsSync(path.join(call.options.cwd, 'electron-game-overlay-owned-runtime-v1.marker')), true);
++        writeFileSync(path.join(call.options.cwd, 'electron-overlay-transport-v1.json'), '{}');
++        writeFileSync(path.join(call.options.cwd, 'ReShade.ini'), Buffer.alloc(256 * 1024, 65));
++      }
+       launcher.dispose();
+       assert.equal(existsSync(image), true, 'Kill alone cannot establish no mapping');
+       call.child.exitCode = 1; call.child.stdout.readableEnded = outcome !== 'not-drained';
+@@ -6850,7 +6856,14 @@ for (const outcome of ['complete-unused', 'selected-after-dispose', 'not-drained
+         : outcome === 'malformed-selection' ? 'EGO_TARGET_SELECTED_V2\tbroken' : '';
+       call.callback(Object.assign(new Error('stopped'), { killed: true, code: 1 }), output, '');
+       await request;
+-      if (outcome === 'complete-unused') await waitFor(() => !existsSync(image));
++      if (outcome === 'complete-unused') {
++        await waitFor(() => !existsSync(image));
++        for (const name of [
++          ...require('../dist/lib/runtime-payload-store.js').RUNTIME_PAYLOAD_NAMES,
++          ...require('../dist/lib/runtime-stage-storage.js').RUNTIME_STORAGE_TRANSIENT_NAMES,
++        ]) assert.equal(existsSync(path.join(call.options.cwd, name)), false, `drained stage retained ${name}`);
++        assert.equal(typeof await require('../dist/lib/runtime-stage-storage.js').runtimeStorageDiagnosticBytes(call.options.cwd), 'number');
++      }
+       else { await tickForQuiescence(); assert.equal(existsSync(image), true); }
+       assert.equal(execution.calls.length, 1);
+     } finally { launcher.dispose(); execution.restore(); }
+diff --git a/libs/electron-game-overlay/tests/runtime-storage.test.cjs b/libs/electron-game-overlay/tests/runtime-storage.test.cjs
+index 7cf628b3463e53bdd3a6f6766c2413ba9d39bf6a..84d01f4b1fac422a7aeca85f87d8e6d1e1c118f5 100644
+--- a/libs/electron-game-overlay/tests/runtime-storage.test.cjs
++++ b/libs/electron-game-overlay/tests/runtime-storage.test.cjs
+@@ -1000,6 +1000,306 @@ test('retired diagnostic data is bounded by stream, directory count and total by
+   );
+ });
+ 
++test('public maintenance isolates inaccessible stages throughout compaction, quarantine and budget scans', async (t) => {
++  for (const phase of ['compact-EPERM', 'quarantine-EACCES', 'budget-EPERM']) {
++    await t.test(phase, async (t) => {
++      const f = fixture(t),
++        now = Date.now(),
++        warnings = [];
++      for (let i = 0; i < 20; i++) {
++        const directory = path.join(
++          f.runs,
++          'medium-' + String(i).padStart(2, '0'),
++        );
++        fs.mkdirSync(directory);
++        const id = marker(directory);
++        unmapped(directory, id, new Date(now - (20 - i) * 1000).toISOString());
++      }
++      const protectedName = phase.startsWith('quarantine')
++        ? '.electron-game-overlay-retired-' + crypto.randomUUID()
++        : '000-protected';
++      const protectedDirectory = path.join(f.runs, protectedName);
++      fs.mkdirSync(protectedDirectory);
++      const id = marker(protectedDirectory);
++      unmapped(protectedDirectory, id, new Date(now).toISOString());
++      await storage.createRuntimeStorageRecord(protectedDirectory, id, null);
++      const protectedLeaf = path.join(
++        protectedDirectory,
++        phase.startsWith('compact')
++          ? 'electron-game-overlay-owned-runtime-v1.marker'
++          : 'inject.stdout.log',
++      );
++      fs.writeFileSync(protectedLeaf, 'protected bytes');
++      const foreign = path.join(f.runs, 'foreign');
++      fs.mkdirSync(foreign);
++      fs.writeFileSync(path.join(foreign, 'data'), 'foreign bytes');
++      const before = fs.statSync(protectedLeaf, { bigint: true });
++      const method = phase.startsWith('compact') ? 'unlink' : 'lstat';
++      const original = fsp[method],
++        originalWarn = console.warn;
++      let denied = 0,
++        stats = 0;
++      fsp[method] = async (file, ...args) => {
++        if (
++          String(file) === protectedLeaf &&
++          (!phase.startsWith('budget') || (!args[0]?.bigint && ++stats >= 2))
++        ) {
++          denied++;
++          throw Object.assign(new Error('inaccessible owned test stage'), {
++            code: phase.includes('EACCES') ? 'EACCES' : 'EPERM',
++            path: String(file),
++          });
++        }
++        return original(file, ...args);
++      };
++      console.warn = (value) => warnings.push(String(value));
++      try {
++        await pruneReShadeRuntimeStorage({
++          config: f.config(),
++          maxRecoveryProbes: 0,
++        });
++        assert.ok(denied > 0, 'the inaccessible entry must be exercised');
++        assert.ok(
++          warnings.some((w) => w.includes(JSON.stringify(protectedDirectory))),
++        );
++        assert.ok(
++          !warnings.some((w) => w.includes('Unable to scan completed')),
++        );
++        assert.equal(
++          fs.readdirSync(f.runs).filter((n) => n.startsWith('medium-')).length,
++          16,
++        );
++        assert.equal(fs.readFileSync(protectedLeaf, 'utf8'), 'protected bytes');
++        const after = fs.statSync(protectedLeaf, { bigint: true });
++        assert.equal(after.ino, before.ino);
++        assert.equal(after.mode, before.mode);
++        assert.equal(after.mtimeNs, before.mtimeNs);
++        assert.equal(
++          fs.readFileSync(path.join(foreign, 'data'), 'utf8'),
++          'foreign bytes',
++        );
++      } finally {
++        fsp[method] = original;
++        console.warn = originalWarn;
++      }
++      // An authorized later sweep can resume the preserved entry.
++      await pruneReShadeRuntimeStorage({
++        config: f.config(),
++        maxRecoveryProbes: 0,
++      });
++      assert.equal(
++        fs.readdirSync(f.runs).filter((n) => n !== 'foreign').length,
++        16,
++      );
++      assert.equal(
++        fs.readFileSync(path.join(foreign, 'data'), 'utf8'),
++        'foreign bytes',
++      );
++    });
++  }
++});
++
++test('a denied recovery proof publication preserves that attempt and still recovers its peer', async (t) => {
++  const f = fixture(t),
++    first = await staged(f, '000-denied'),
++    second = await staged(f, 'later');
++  const identity = { pid: 4242, creationTime100ns: '134387773076910574' };
++  for (const s of [first, second])
++    await storage.recordRuntimeStorageAttempt(s.directory, s.runId, identity);
++  const originalExec = cp.execFile,
++    originalRename = fsp.rename,
++    originalWarn = console.warn;
++  const warnings = [];
++  let probes = 0,
++    denied = 0;
++  cp.execFile = (file, args, options, cb) => {
++    probes++;
++    assert.deepEqual(args, ['--query-process-image', '4242']);
++    queueMicrotask(() =>
++      cb(
++        null,
++        JSON.stringify({
++          schemaVersion: 1,
++          kind: 'electron-game-overlay-process-image',
++          pid: 4242,
++          executablePath: 'C:\\owned\\game.exe',
++          creationTime100ns: '134387773076910575',
++        }),
++        '',
++      ),
++    );
++  };
++  fsp.rename = async (from, to) => {
++    if (
++      to ===
++      path.join(first.directory, '.electron-game-overlay-run-reclaimable.json')
++    ) {
++      denied++;
++      throw Object.assign(new Error('proof publication denied'), {
++        code: 'EPERM',
++      });
++    }
++    return originalRename(from, to);
++  };
++  console.warn = (value) => warnings.push(String(value));
++  try {
++    const report = await pruneReShadeRuntimeStorage({
++      config: f.config(),
++      maxRecoveryProbes: 2,
++    });
++    assert.equal(probes, 2);
++    assert.equal(denied, 1);
++    assert.ok(
++      warnings.some((w) => w.includes(JSON.stringify(first.directory))),
++    );
++    assert.equal(
++      report.entries.find((e) => e.directory === first.directory).state,
++      'exact-target-recorded',
++    );
++    assert.ok(names.every((n) => fs.existsSync(path.join(first.directory, n))));
++    assert.ok(
++      names.every((n) => !fs.existsSync(path.join(second.directory, n))),
++    );
++  } finally {
++    cp.execFile = originalExec;
++    fsp.rename = originalRename;
++    console.warn = originalWarn;
++  }
++});
++
++test('retirement preserves unexpected aliases of private policy and transport metadata', async (t) => {
++  const f = fixture(t),
++    s = await staged(f, 'aliased-metadata');
++  for (const name of [
++    'ego-process-policy.txt',
++    'electron-game-overlay-owned-runtime-v1.marker',
++    'electron-overlay-transport-v1.json',
++  ]) {
++    const external = path.join(f.root, name);
++    fs.writeFileSync(external, 'private metadata alias');
++    fs.linkSync(external, path.join(s.directory, name));
++  }
++  unmapped(s.directory, s.runId);
++  await storage.compactRuntimeStorageRun(s.directory);
++  for (const name of [
++    'ego-process-policy.txt',
++    'electron-game-overlay-owned-runtime-v1.marker',
++    'electron-overlay-transport-v1.json',
++  ]) {
++    assert.equal(fs.statSync(path.join(f.root, name)).nlink, 2);
++    assert.equal(
++      fs.readFileSync(path.join(s.directory, name), 'utf8'),
++      'private metadata alias',
++    );
++  }
++  assert.equal(
++    await storage.runtimeStorageDiagnosticBytes(s.directory),
++    undefined,
++  );
++});
++
++test('immediate filesystem-process exit at the final payload deletion leaves no staging controls', async (t) => {
++  for (const high of [false, true]) {
++    await t.test(
++      high ? 'passive high layout' : 'ordinary snapshot layout',
++      async (t) => {
++        const f = fixture(t),
++          s = await staged(f, 'early-exit', { high });
++        for (const name of storage.RUNTIME_STORAGE_TRANSIENT_NAMES) {
++          const file = path.join(s.directory, name);
++          if (!fs.existsSync(file)) fs.writeFileSync(file, 'owned control');
++        }
++        // A live or indeterminate run cannot enter the cleanup transaction.
++        await storage.compactRuntimeStorageRun(s.directory);
++        assert.ok(names.every((n) => fs.existsSync(path.join(s.directory, n))));
++        assert.ok(
++          storage.RUNTIME_STORAGE_TRANSIENT_NAMES.every((n) =>
++            fs.existsSync(path.join(s.directory, n)),
++          ),
++        );
++        unmapped(s.directory, s.runId);
++        const script = `
++        const fs=require('node:fs'),fsp=require('node:fs/promises'),path=require('node:path');
++        const directory=process.argv[1], names=${JSON.stringify(names)};
++        const original=fsp.unlink;
++        fsp.unlink=async(file)=>{
++          await original(file);
++          if(names.every(n=>!fs.existsSync(path.join(directory,n))))process.exit(0);
++        };
++        require(${JSON.stringify(path.resolve(__dirname, '../dist/lib/runtime-stage-storage.js'))})
++          .compactRuntimeStorageRun(directory).then(()=>process.exit(2),e=>{console.error(e);process.exit(3)});
++      `;
++        const child = cp.spawnSync(
++          process.execPath,
++          ['-e', script, s.directory],
++          { encoding: 'utf8', windowsHide: true, timeout: 10000 },
++        );
++        assert.ifError(child.error);
++        assert.equal(child.status, 0, child.stderr);
++        assert.ok(
++          names.every((n) => !fs.existsSync(path.join(s.directory, n))),
++        );
++        for (const name of storage.RUNTIME_STORAGE_TRANSIENT_NAMES)
++          assert.equal(
++            fs.existsSync(path.join(s.directory, name)),
++            false,
++            `early exit retained ${name}`,
++          );
++        assert.equal(
++          (await storage.inspectRuntimeStorageRun(s.directory)).unmapped,
++          true,
++        );
++        assert.equal(
++          typeof (await storage.runtimeStorageDiagnosticBytes(s.directory)),
++          'number',
++        );
++      },
++    );
++  }
++});
++
++test('a temporarily shared control pauses payload retirement and resumes from persisted proof', async (t) => {
++  const f = fixture(t),
++    s = await staged(f, 'busy-control');
++  const policy = path.join(s.directory, 'ego-process-policy.txt');
++  fs.writeFileSync(policy, 'original policy');
++  unmapped(s.directory, s.runId);
++  const original = fsp.unlink;
++  fsp.unlink = async (file) => {
++    if (file === policy)
++      throw Object.assign(new Error('owned test sharing violation'), {
++        code: 'EBUSY',
++      });
++    return original(file);
++  };
++  try {
++    await assert.rejects(storage.compactRuntimeStorageRun(s.directory), {
++      code: 'EBUSY',
++    });
++    assert.ok(
++      names.every((n) => fs.existsSync(path.join(s.directory, n))),
++      'no payload checkpoint may precede the blocked control',
++    );
++    assert.equal(fs.readFileSync(policy, 'utf8'), 'original policy');
++    assert.equal(
++      (await storage.inspectRuntimeStorageRun(s.directory)).unmapped,
++      true,
++    );
++  } finally {
++    fsp.unlink = original;
++  }
++  await pruneReShadeRuntimeStorage({
++    config: f.config(),
++    maxRecoveryProbes: 0,
++  });
++  assert.ok(names.every((n) => !fs.existsSync(path.join(s.directory, n))));
++  assert.equal(fs.existsSync(policy), false);
++  assert.equal(
++    typeof (await storage.runtimeStorageDiagnosticBytes(s.directory)),
++    'number',
++  );
++});
++
+ test('identical payload bytes share one snapshot regardless of source-map insertion order', async (t) => {
+   const f = fixture(t),
+     first = await staged(f, 'forward'),

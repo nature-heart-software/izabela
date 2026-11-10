@@ -1359,7 +1359,9 @@ async function startAccessRefusal() {
     if (owned.error) throw owned.error
     if (owned.exit)
       throw new Error(
-        `Access-refusal fixture exited before readiness: ${JSON.stringify(owned.exit)}`,
+        `Access-refusal fixture exited before readiness: ${JSON.stringify(
+          owned.exit,
+        )}`,
       )
     return owned.records.find((record) => record.ready)
   }, 'SDK-owned access refusal fixture ready')
@@ -1784,17 +1786,66 @@ async function finish(code) {
         evidence.cleanupPrivateCodeRetired =
           files.length > 0 && files.every((file) => !fs.existsSync(file))
       }
+      const payloadNames = [
+        'inject.exe',
+        'inject32.exe',
+        'electron_game_overlay_reshade_manager.exe',
+        'electron_game_overlay_reshade_manager32.exe',
+        'ReShade64.dll',
+        'ReShade32.dll',
+        'ReShade64.build.json',
+        'ReShade32.build.json',
+        'electron_game_overlay_runtime.build.json',
+        'electron_game_overlay_runtime32.build.json',
+        'electron_game_overlay.addon64',
+        'electron_game_overlay.addon32',
+        'ReShade.ini',
+      ]
+      const stages = [
+        ...new Set(
+          evidence.targetModuleInspections.map((entry) =>
+            path.dirname(entry.module),
+          ),
+        ),
+      ]
+      const ownedStages = stages.every((directory) =>
+        path
+          .resolve(directory)
+          .toLowerCase()
+          .startsWith(
+            path.resolve(config.runtimeRunsRoot).toLowerCase() + path.sep,
+          ),
+      )
+      const remainingPayloads = () =>
+        stages.flatMap((directory) =>
+          payloadNames
+            .map((name) => path.join(directory, name))
+            .filter((file) => fs.existsSync(file)),
+        )
+      const untilCompacted = Date.now() + 5000
+      while (
+        ownedStages &&
+        remainingPayloads().length &&
+        Date.now() < untilCompacted
+      )
+        await wait(20)
+      evidence.retiredPayloadEntries = remainingPayloads()
+      evidence.cleanupRetiredPayloadsEmpty =
+        ownedStages &&
+        stages.length > 0 &&
+        !evidence.retiredPayloadEntries.length
     }
     if (
       code === 0 &&
       (!evidence.cleanupTargetExitObserved ||
         !evidence.cleanupPrivateImagesRetired ||
+        !evidence.cleanupRetiredPayloadsEmpty ||
         (config.elevated && !evidence.cleanupPrivateCodeRetired))
     ) {
       code = 1
       evidence.status = 'failed'
       evidence.error =
-        'Test cleanup did not observe authoritative target exit and private image retirement'
+        'Test cleanup did not observe authoritative target exit and complete payload retirement'
     }
   }
   fs.writeFileSync(

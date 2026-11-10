@@ -145,6 +145,13 @@ class ExperimentalGameOverlay {
           { flush: 'sync' },
         ),
       )
+      // Recover stale stages only through the SDK's exact process-exit proofs.
+      // Maintenance runs alongside discovery so it cannot delay early attachment.
+      void sdk
+        .pruneReShadeRuntimeStorage({ config, maxRecoveryProbes: 8 })
+        .catch((error) => {
+          if (!this.quitting && generation === this.generation) this.warn(error)
+        })
       return (
         (await this.waitFor(targets.ready)) &&
         this.active &&

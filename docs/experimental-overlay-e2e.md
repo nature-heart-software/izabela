@@ -177,6 +177,10 @@ identity and fails if private add-on images or unlinked EXE/DLL payloads
 accumulate after its shutdown. It compares both private binary count and bytes
 against the pre-launch baseline, so shared hard-link names do not masquerade as
 new disk allocations.
+Storage accounting includes both the legacy `payloads-v1` and current
+`payloads-v2` cache using one set of file identities. After exact target exit,
+every inspected stage must also lose all thirteen payload/configuration/manifest
+entries; retaining hard-linked payload names in completed folders fails the test.
 `Native overlay input` builds fixtures on hosted Windows and runs the
 full matrix on a Windows desktop runner labelled `graphics-overlay`. This manual
 workflow requires that desktop runner; ordinary hosted/headless builds continue
