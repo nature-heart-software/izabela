@@ -16,6 +16,7 @@ const cases = [
   'd3d12-x64',
   'd3d9-x86',
   'd3d10-x86',
+  'd3d11-composition-x64',
 ]
 function execute(command, args, cwd = root) {
   execFileSync(command, args, { cwd, windowsHide: true, stdio: 'inherit' })
@@ -63,7 +64,7 @@ function build() {
       `build/electron-game-overlay-runtime${arch === 'x86' ? '-x86' : ''}`,
     )
     const targets = cases
-      .filter((c) => c.endsWith(arch))
+      .filter((c) => c.endsWith(arch) && !c.includes('-composition-'))
       .map((c) => `${c.split('-')[0]}_overlay_test_host`)
     execute(
       'cmake',
@@ -103,6 +104,7 @@ function build() {
     path.join(directory, 'SDK-fixtures-LICENSE'),
   )
   buildInput(manifest)
+  buildCompositionFixture(manifest)
   console.log(`Built controlled graphics fixtures: ${directory}`)
   return directory
 }
@@ -148,6 +150,122 @@ function buildInput(manifest) {
     .update(fs.readFileSync(path.join(directory, 'overlay-test-recovery.exe')))
     .digest('hex')
   manifest.inputSourceSha256 = inputSourceHash()
+  fs.writeFileSync(
+    path.join(directory, 'manifest.json'),
+    JSON.stringify(manifest, null, 2) + '\n',
+  )
+}
+function buildCompositionFixture(manifest) {
+  // The CI fixture job intentionally compiles before installing app dependencies.
+  const dependency = JSON.parse(
+    fs.readFileSync(path.join(root, 'apps/app/package.json'), 'utf8'),
+  ).dependencies['electron-game-overlay']
+  assert.ok(dependency.startsWith('file:') && dependency.endsWith('.tgz'))
+  const prefix = path.resolve(
+    root,
+    'apps/app',
+    dependency.slice(5).replace(/\.tgz$/, ''),
+  )
+  const archive = prefix + '.source.zip'
+  const provenance = JSON.parse(
+    execFileSync(
+      'tar',
+      ['-xOf', prefix + '.tgz', 'package/SDK_PROVENANCE.json'],
+      {
+        encoding: 'utf8',
+        windowsHide: true,
+      },
+    ),
+  )
+  const hash = (bytes) => createHash('sha256').update(bytes).digest('hex')
+  const sourceSnapshotSha256 = hash(fs.readFileSync(archive))
+  assert.equal(
+    sourceSnapshotSha256,
+    provenance.sourceSnapshot.sha256,
+    'Composition fixture source snapshot provenance',
+  )
+  const manifestBytes = fs.readFileSync(prefix + '.source-manifest.json')
+  assert.equal(
+    hash(manifestBytes),
+    provenance.sourceManifest.sha256,
+    'Composition fixture source inventory provenance',
+  )
+  const sourceManifest = JSON.parse(manifestBytes)
+  const caseName = 'd3d11-composition-x64'
+  const targetArguments = [
+    '--composition-swapchain',
+    '--noninteractive-tool-popup',
+  ]
+  const existing = manifest.files.find((file) => file.case === caseName)
+  if (
+    existing?.sourceSnapshotSha256 === sourceSnapshotSha256 &&
+    JSON.stringify(existing.arguments) === JSON.stringify(targetArguments) &&
+    fs.existsSync(path.join(directory, existing.path)) &&
+    hash(fs.readFileSync(path.join(directory, existing.path))) ===
+      existing.sha256
+  )
+    return
+  const upstream = path.join(directory, 'composition-source')
+  fs.mkdirSync(upstream, { recursive: true })
+  const sources = []
+  for (const name of ['d3d11_test_host.cpp', 'input_oracle.hpp']) {
+    const sourcePath = `libs/electron-game-overlay-runtime/src/${name}`
+    const record = sourceManifest.files.find((file) => file.path === sourcePath)
+    assert.ok(record, `SDK source inventory contains ${sourcePath}`)
+    const bytes = execFileSync('tar', ['-xOf', archive, sourcePath], {
+      windowsHide: true,
+    })
+    assert.equal(bytes.length, record.size)
+    assert.equal(hash(bytes), record.sha256)
+    if (name.endsWith('.cpp'))
+      for (const argument of targetArguments)
+        assert.ok(
+          bytes.includes(Buffer.from(argument)),
+          `SDK composition host must support ${argument}`,
+        )
+    fs.writeFileSync(path.join(upstream, name), bytes)
+    sources.push({ path: sourcePath, sha256: record.sha256 })
+  }
+  const build = path.join(directory, 'composition-build')
+  execute('cmake', [
+    '-S',
+    path.join(__dirname, 'native'),
+    '-B',
+    build,
+    '-G',
+    'Visual Studio 17 2022',
+    '-A',
+    'x64',
+    `-DUPSTREAM_COMPOSITION_SOURCE=${upstream}`,
+  ])
+  execute('cmake', [
+    '--build',
+    build,
+    '--config',
+    'Release',
+    '--parallel',
+    '2',
+    '--target',
+    'owned_composition_test_host',
+  ])
+  const relative = 'bin/d3d11-composition-x64/owned_composition_test_host.exe'
+  const destination = path.join(directory, relative)
+  fs.mkdirSync(path.dirname(destination), { recursive: true })
+  fs.copyFileSync(
+    path.join(build, 'Release/owned_composition_test_host.exe'),
+    destination,
+  )
+  const bytes = fs.readFileSync(destination)
+  assert.equal(bytes.readUInt16LE(bytes.readUInt32LE(0x3c) + 4), 0x8664)
+  manifest.files = manifest.files.filter((file) => file.case !== caseName)
+  manifest.files.push({
+    case: caseName,
+    path: relative,
+    sha256: hash(bytes),
+    sourceSnapshotSha256,
+    sources,
+    arguments: targetArguments,
+  })
   fs.writeFileSync(
     path.join(directory, 'manifest.json'),
     JSON.stringify(manifest, null, 2) + '\n',
@@ -259,6 +377,7 @@ module.exports = {
   build,
   buildInput,
   buildRefusalFixture,
+  buildCompositionFixture,
   inputSourceHash,
   cases,
   directory,

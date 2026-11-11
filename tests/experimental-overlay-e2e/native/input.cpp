@@ -5,6 +5,9 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <cstdint>
+#include <limits>
+#include <cerrno>
 
 static DWORD target_pid;
 static HWND target_window;
@@ -62,6 +65,18 @@ static void add_key(std::vector<INPUT> &inputs, WORD vk, bool up) {
 }
 int wmain(int argc, wchar_t **argv) {
     SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+    bool explicit_window = false;
+    if (argc > 4 && wcsncmp(argv[argc - 1], L"--window=", 9) == 0) {
+        const wchar_t *value = argv[argc - 1] + 9;
+        wchar_t *end = nullptr;
+        errno = 0;
+        const auto handle = wcstoull(value, &end, 10);
+        if (*value < L'1' || *value > L'9' || !end || *end || errno ||
+            handle > (std::numeric_limits<std::uintptr_t>::max)()) return 2;
+        target_window = reinterpret_cast<HWND>(static_cast<std::uintptr_t>(handle));
+        explicit_window = true;
+        --argc;
+    }
     if (argc < 4) return 2;
     target_pid = wcstoul(argv[1], nullptr, 10);
     const std::wstring expected_image = argv[2], command = argv[3];
@@ -141,7 +156,14 @@ int wmain(int argc, wchar_t **argv) {
         return 0;
     }
     CloseHandle(process);
-    EnumWindows(find_window, 0);
+    if (explicit_window) {
+        DWORD window_pid = 0;
+        GetWindowThreadProcessId(target_window, &window_pid);
+        if (!IsWindow(target_window) || !IsWindowVisible(target_window) ||
+            window_pid != target_pid || GetAncestor(target_window, GA_ROOT) != target_window) {
+            std::fprintf(stderr, "Explicit fixture window identity mismatch\n"); return 4;
+        }
+    } else EnumWindows(find_window, 0);
     if (!target_window) { std::fprintf(stderr, "Fixture window unavailable\n"); return 4; }
     if (command == L"close") {
         PostMessageW(target_window, WM_CLOSE, 0, 0);

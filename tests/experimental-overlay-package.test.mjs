@@ -19,19 +19,19 @@ test('experimental SDK is the pinned complete upstream local candidate, distinct
   )
   assert.equal(
     app.dependencies['electron-game-overlay'],
-    'file:../../vendor/electron-game-overlay-1.0.1-alpha.2026111005.tgz',
+    'file:../../vendor/electron-game-overlay-1.0.1-alpha.2026111013.tgz',
   )
   const bytes = readFileSync(
-    new URL('vendor/electron-game-overlay-1.0.1-alpha.2026111005.tgz', root),
+    new URL('vendor/electron-game-overlay-1.0.1-alpha.2026111013.tgz', root),
   )
   assert.equal(
     createHash('sha256').update(bytes).digest('hex'),
-    'ecd223b6f26018468a654a96972dc12947741c26218f450198621a60ebe9ab9f',
+    '7e911d9c19b753158b88e7cf69224172c326c534df9e7b9492956ba4205eedd4',
   )
   const consumer = createRequire(new URL('apps/app/package.json', root))
   assert.equal(
     consumer('electron-game-overlay/package.json').version,
-    '1.0.1-alpha.2026111005',
+    '1.0.1-alpha.2026111013',
   )
   const sdkRoot = path.dirname(
     consumer.resolve('electron-game-overlay/package.json'),
@@ -39,7 +39,7 @@ test('experimental SDK is the pinned complete upstream local candidate, distinct
   const provenance = JSON.parse(
     readFileSync(path.join(sdkRoot, 'SDK_PROVENANCE.json'), 'utf8'),
   )
-  assert.equal(provenance.version, '1.0.1-alpha.2026111005')
+  assert.equal(provenance.version, '1.0.1-alpha.2026111013')
   assert.equal(provenance.workingTreeDirty, true)
   for (const [field, suffix] of [
     ['sourceSnapshot', 'source.zip'],
@@ -48,7 +48,7 @@ test('experimental SDK is the pinned complete upstream local candidate, distinct
   ]) {
     const source = readFileSync(
       new URL(
-        `vendor/electron-game-overlay-1.0.1-alpha.2026111005.${suffix}`,
+        `vendor/electron-game-overlay-1.0.1-alpha.2026111013.${suffix}`,
         root,
       ),
     )
@@ -63,14 +63,14 @@ test('experimental SDK is the pinned complete upstream local candidate, distinct
   )
   assert.equal(
     provenance.baseCommit,
-    '8f1be4d322529be703a2c4cdc7885ab76d35ce1d',
+    '38efc4c6998844419f0a6a3fb334be187dd512cf',
   )
   assert.deepEqual(
     provenance.native.map((entry) => entry.architecture).sort(),
     ['x64', 'x86'],
   )
   for (const native of provenance.native) {
-    assert.equal(native.runtimeGeneration, 28)
+    assert.equal(native.runtimeGeneration, 36)
     assert.equal(native.addonBuildId, 'CCE20935ADD44EF6A5A7973014B2E07F')
   }
 })
@@ -82,7 +82,7 @@ test('local SDK candidate has only its exact-version release-age exception and n
     .map((line) => line.trim())
     .filter((line) => /^- ['"]?electron-game-overlay(?:@|['"]?$)/.test(line))
   assert.deepEqual(exemptions, [
-    '- electron-game-overlay@1.0.1-alpha.2026111005',
+    '- electron-game-overlay@1.0.1-alpha.2026111013',
   ])
   assert.doesNotMatch(config, /^  electron-game-overlay@.*: patches\//m)
   assert.doesNotMatch(config, /^minimumReleaseAge:\s*0\s*$/m)
@@ -103,11 +103,53 @@ test('both native architectures carry the fixed identity and verified artifacts'
       ).replace(/^\uFEFF/, ''),
     )
     assert.equal(stamp.addonBuildId, 'CCE20935ADD44EF6A5A7973014B2E07F')
-    assert.equal(stamp.runtimeGeneration, 28)
+    assert.equal(stamp.runtimeGeneration, 36)
     assert.equal(stamp.privateElevatedAuthorization, 2)
     assert.equal(stamp.injectorFutureTargets, 2)
     assert.equal(stamp.cooperativeAddonProtocol, 1)
     assert.equal(stamp.addonPreloadProtocol, 1)
+    const reshadeStamp = JSON.parse(
+      readFileSync(
+        path.join(runtime, `ReShade${bits}.build.json`),
+        'utf8',
+      ).replace(/^\uFEFF/, ''),
+    )
+    assert.equal(
+      reshadeStamp.d3d11SwapchainResourceIdentityPatchSha256,
+      '25DA093F15FAACF74AA16ED0BFFA233B58D10C7FC1BEA15B667C0E9F5F6AAEF2',
+    )
+    assert.equal(
+      reshadeStamp.steamLoadedModuleHookOrderPatchSha256,
+      '560BF8A6DB17643F7FA095F75FDBE0677211FC4354BEB6C869C7D4ECD7DB1241',
+    )
+    assert.equal(
+      reshadeStamp.injectorPrivateStageDiagnosticsPatchSha256,
+      'D73FF95608079571FC6438F8B5E280BB710AD8467F19CA31B664E371929C05F1',
+    )
+    assert.equal(
+      reshadeStamp.compatibilitySnapshotPatchSha256,
+      'C63E22F1768770469C770FB6D4124AE1A293A6D5ACD8402E8EC86F33B1CA1C66',
+    )
+    assert.equal(
+      reshadeStamp.ownedCompositionPolicyPatchSha256,
+      '7AF52928DCAAD1914993D2CC29D99862461F1A46AF2448A82C7F2C42E87E68CF',
+    )
+    assert.equal(
+      reshadeStamp.ownedCompositionBindingDiagnosticsPatchSha256,
+      '0180A6FACEEC7FA89174F4CED311A926DC98D292FB114347813F0E29C6B150DE',
+    )
+    assert.equal(
+      reshadeStamp.ownedCompositionWindowEligibilityPatchSha256,
+      '080DA1FD83FE48CB782FA9268B82A386E75BE081D107F2A5013F06675107B97F',
+    )
+    assert.equal(
+      reshadeStamp.ownedCompositionAuxiliaryLifetimePatchSha256,
+      '3E80D0D05CA9F383D9E5216034E687B93CC858334B2F61514ADE91EF18573E61',
+    )
+    assert.equal(
+      reshadeStamp.ownedDeferredD3d11PatchSha256,
+      '779D9D41768FE61BC5FF3DCF69E2EE11B360DC00B5B58C24E0B1F83552A2D9BB',
+    )
     const assets = {
       addonSha256: `electron_game_overlay.addon${bits}`,
       injectorSha256: `inject${suffix}.exe`,

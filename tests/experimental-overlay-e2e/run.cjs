@@ -9,6 +9,7 @@ const {
   revision,
   buildInput,
   buildRefusalFixture,
+  buildCompositionFixture,
   inputSourceHash,
 } = require('./build-fixtures.cjs')
 const root = path.resolve(__dirname, '../..')
@@ -250,6 +251,13 @@ async function runCase(
     target,
     fixtureSource: source,
     fixtureSha256: fixture.sha256,
+    fixtureProvenance: fixture.sourceSnapshotSha256
+      ? {
+          sourceSnapshotSha256: fixture.sourceSnapshotSha256,
+          sources: fixture.sources,
+        }
+      : { sourceRevision: revision },
+    targetArguments: fixture.arguments || [],
     startupDelayMs: delayMs,
     input: path.join(fixtures, 'overlay-test-input.exe'),
     recovery: recovery && !negativeControl,
@@ -506,6 +514,8 @@ async function main() {
     fs.readFileSync(path.join(fixtures, 'manifest.json'), 'utf8'),
   )
   assert.equal(manifest.sourceRevision, revision)
+  if (selected.includes('d3d11-composition-x64'))
+    buildCompositionFixture(manifest)
   if (manifest.inputSourceSha256 !== inputSourceHash()) buildInput(manifest)
   if (recovery) buildRefusalFixture(manifest)
   assert.equal(

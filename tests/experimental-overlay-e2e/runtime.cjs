@@ -52,6 +52,9 @@ dialog.showMessageBox = async () => {
 const evidence = {
   status: 'failed',
   case: config.case,
+  fixtureSha256: config.fixtureSha256,
+  fixtureProvenance: config.fixtureProvenance,
+  targetArguments: config.targetArguments || [],
   negativeControl: config.negativeControl,
   electron: process.versions.electron,
   sdk: requireApp('electron-game-overlay/package.json').version,
@@ -248,6 +251,9 @@ function drive(command, value) {
         config.target,
         command,
         ...(value === undefined ? [] : [String(value)]),
+        ...(target.inputWindow
+          ? [`--window=${BigInt(target.inputWindow)}`]
+          : []),
       ],
       { windowsHide: true, encoding: 'utf8', timeout: 10000 },
     ),
@@ -1079,7 +1085,7 @@ async function startTarget() {
       requestedMs: config.startupDelayMs,
     })
   } else {
-    target = spawn(config.target, [], {
+    target = spawn(config.target, config.targetArguments || [], {
       cwd: path.dirname(config.target),
       windowsHide: false,
       stdio: ['ignore', 'pipe', 'pipe'],
@@ -1143,6 +1149,58 @@ async function startTarget() {
     30000,
   )
   evidence.nativeInjectionConfirmed = true
+  if (config.case === 'd3d11-composition-x64') {
+    assert.ok(config.targetArguments.includes('--composition-swapchain'))
+    const marker = path.join(
+      path.dirname(config.target),
+      'electron-game-overlay-composition-host.log',
+    )
+    await until(
+      () => fs.existsSync(marker),
+      'real DirectComposition host proof',
+    )
+    const proof = fs.readFileSync(marker, 'utf8')
+    for (const fact of [
+      'EGO_CONTROLLED_COMPOSITION_HOST_V1',
+      'outputWindowNull=true',
+      'getHwndUnsupported=true',
+      'actualDCompositionTarget=true',
+    ])
+      assert.ok(proof.includes(fact), fact)
+    evidence.compositionSwapchain = {
+      outputWindowNull: true,
+      getHwndUnsupported: true,
+      actualDCompositionTarget: true,
+    }
+    assert.ok(config.targetArguments.includes('--noninteractive-tool-popup'))
+    const popup = await until(() => {
+      const proof = readCompositionPopup()
+      return proof?.pid === target.pid && proof
+    }, 'same-process noninteractive popup proof')
+    assert.equal(popup.visible, true)
+    assert.equal(popup.beforeFirstPresent, true)
+    assert.equal(popup.foregroundUnchanged, true)
+    assert.equal(popup.transition, 0)
+    assert.notEqual(popup.mainHwnd, popup.popupHwnd)
+    assert.ok(popup.style & 0x80000000, 'real WS_POPUP window')
+    assert.equal(
+      popup.extendedStyle,
+      0x80088,
+      'actual tooltip style without NOACTIVATE',
+    )
+    evidence.compositionToolPopup = { initial: popup, transitions: [] }
+    target.inputWindow = popup.mainHwnd
+    assert.throws(
+      () =>
+        execFileSync(
+          config.input,
+          [String(target.pid), config.target, 'state', '--window=1'],
+          { windowsHide: true, stdio: 'pipe' },
+        ),
+      (error) => error.status === 4,
+      'An invalid explicit HWND must fail instead of selecting another window',
+    )
+  }
   if (config.startupDelayMs) {
     const delayed = evidence.delayedStarts.at(-1)
     delayed.resumedAfterMs = Number(
@@ -1467,6 +1525,68 @@ async function verifyMixedRecovery() {
     )
   }
 }
+function readCompositionPopup() {
+  try {
+    return JSON.parse(
+      fs.readFileSync(
+        path.join(
+          path.dirname(config.target),
+          'electron-game-overlay-tool-popup-state.json',
+        ),
+        'utf8',
+      ),
+    )
+  } catch (error) {
+    if (error.code === 'ENOENT' || error instanceof SyntaxError) return null
+    throw error
+  }
+}
+async function verifyCompositionPopupTransitions(before) {
+  const surfaceId = surface.surfaceId
+  let transition = 0
+  for (const request of [
+    { command: 'unlayered', visible: true, layered: false },
+    { command: 'layered', visible: true, layered: true },
+    { command: 'hide', visible: false, layered: true },
+    { command: 'show', visible: true, layered: true },
+    { command: 'hide', visible: false, layered: true },
+    { command: 'show', visible: true, layered: true },
+  ]) {
+    fs.writeFileSync(
+      path.join(
+        path.dirname(config.target),
+        `electron-game-overlay-tool-popup-${request.command}.request`,
+      ),
+      '',
+      { flag: 'wx' },
+    )
+    ++transition
+    const proof = await until(() => {
+      const state = readCompositionPopup()
+      return (
+        state?.pid === target.pid &&
+        state.transition === transition &&
+        state.command === request.command &&
+        state.visible === request.visible &&
+        state
+      )
+    }, 'owned host acknowledges popup visibility change')
+    assert.equal(proof.foregroundUnchanged, true)
+    assert.equal(!!(proof.extendedStyle & 0x80000), request.layered)
+    assert.equal(proof.extendedStyle & 0x8000000, 0, 'no NOACTIVATE shortcut')
+    await wait(250)
+    assert.equal(wrapper.visible, true)
+    assert.equal(intercepting, true)
+    assert.equal(rendering, true)
+    assert.equal(surface.surfaceId, surfaceId)
+    assert.equal((await read()).value, 'a')
+    evidence.compositionToolPopup.transitions.push(proof)
+  }
+  await verifyVisible('composition-popup-stable', before)
+  evidence.checks.push(
+    'tooltip visibility and layered-style changes preserve the real scene, surface and input',
+  )
+}
 async function run() {
   if (config.appExecutable) {
     assert.equal(app.isPackaged, true, 'Real executable runs in packaged mode')
@@ -1527,6 +1647,8 @@ async function run() {
   if (!config.negativeControl) {
     await until(() => rendering, 'native overlay scene rendered')
     await verifyVisible('first-show', before)
+    if (config.case === 'd3d11-composition-x64')
+      await verifyCompositionPopupTransitions(before)
     drive('key', 27) // Real Escape -> renderer -> normal stop-interception IPC.
     await until(
       () => !wrapper.visible && !intercepting,

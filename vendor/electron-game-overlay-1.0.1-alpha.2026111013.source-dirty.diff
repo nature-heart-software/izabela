@@ -1,0 +1,1814 @@
+diff --git a/.gitattributes b/.gitattributes
+index fd1119ae677c6c26c73f320953cf2a3072d8862e..5b27b87958a14c31ee8f8f0d7baa8eb33e0e6b4c 100644
+--- a/.gitattributes
++++ b/.gitattributes
+@@ -31,3 +31,5 @@ libs/electron-game-overlay-runtime/patches/reshade-owned-composition-binding-dia
+ libs/electron-game-overlay-runtime/patches/reshade-owned-composition-window-eligibility.patch text eol=lf
+ 
+ libs/electron-game-overlay-runtime/patches/reshade-owned-composition-auxiliary-lifetime.patch text eol=lf
++
++libs/electron-game-overlay-runtime/patches/reshade-owned-deferred-d3d11.patch text eol=lf
+diff --git a/doc/runtime-checkpoint-2026-11-10.md b/doc/runtime-checkpoint-2026-11-10.md
+index 3de011f08179446edaec194d1aca911986a011f4..2dbe25dc342c6147f5cd2fba447c557db4355f77 100644
+--- a/doc/runtime-checkpoint-2026-11-10.md
++++ b/doc/runtime-checkpoint-2026-11-10.md
+@@ -1,7 +1,8 @@
+ # Runtime checkpoint, 2026-11-10
+ 
+ This draft source checkpoint integrates the owned composition corrections
+-through generation 35. It also retains diagnostic fixtures for separate startup
++through generation 36 locally, after the generation-35 draft PR checkpoint. It
++also retains diagnostic fixtures for separate startup
+ and Steam investigations. It is not a release or a claim that every actual-game
+ failure is resolved. Generated artifacts and machine-specific evidence remain
+ outside Git.
+@@ -71,17 +72,48 @@ second device, but the original usable device remains native. This demonstrates
+ the mechanism without attributing the actual PAGER timeout to it.
+ See [the reproduction boundary](delayed-hook-publication-reproduction.md).
+ 
+-An owned deferred-adoption bootstrap is experimental work outside the production
+-patch pipeline. This checkpoint includes only its test observation POD header;
+-no production bootstrap correction, changed loader locking or new sealed
+-package is included. A later Present adoption would not retroactively wrap a
+-missed device or guarantee first-frame observation. Reentrancy, loader liveness,
+-forwarding and negative gates remain required before such a proposal can ship.
+-
+-Actual Overwatch's missing Steam overlay remains unresolved. Owned foreign
+-Present controls validate forwarding, callbacks and GPU readbacks, but do not
+-execute Valve's wrapper or establish rendered Steam frames. Successful Present
+-forwarding and loaded-module diagnostics alone do not prove Steam acceptance.
++Generation 36 integrates the narrow owned deferred-adoption bootstrap into the
++normal production patch pipeline. A validated missing-backend result may queue
++one worker after successful D3D11 publication on the existing LoadLibrary path
++and release of its delayed-path mutex. The worker revalidates stage/readiness.
++The notification path, original try-lock and early returns remain unchanged.
++It introduces no timer, loader wait, retry, reinjection or public ABI change.
++A later Present adoption does not retroactively wrap the missed device or
++guarantee first-frame observation. See [the correction and gates](owned-deferred-d3d11.md).
++
++Both normal production architectures passed 24 deferred-startup cases with
++four immutable 1012 failures retained. The 28-case cohort contains 2,744
++assertions, 78 green hardware readbacks and 80 red runtime-callback readbacks.
++It includes missed original HWND and null-HWND BGRA composition chains,
++automatic proxy controls, DllMain/nested loads, exact forwarding and HRESULTs,
++resize/resume/retirement, and foreign/readiness/queue-error negatives. The
++composition presentation HWND stays outside all monitors without activation;
++no DirectComposition visual or actual game is exercised. The original failed
++window-setup attempt is preserved separately. Notification rendering passes
++with zero deferred work items. These controls are distinct from actual startup,
++application scene/input and mixed-application acceptance still owned by the
++consumer test coordinator. Candidate 1013 binds the local changes to a fresh
++paired source capture; candidate 1012 is not rewritten.
++
++Local offline Overwatch testing observed the Steam performance HUD in both its
++baseline and the authenticated high-to-medium 1012 launch. First-key/native
++glyph acceptance passed in that separate launch. Full Shift+Tab menu acceptance
++is inconclusive because it opened in neither baseline nor injected trial.
++The earlier remote missing-overlay report remains separate. Owned foreign
++Present controls validate forwarding, callbacks and GPU readbacks but do not
++execute Valve's wrapper or establish rendered Steam frames on their own.
++
++A separate normal-integrity Overwatch attempt (PID 4012, creation time
++134388197973881950) failed in the injector before consumer authentication.
++Its retained stdout ends at the injection prefix, stderr is empty, and no
++structured result/startup file was retained. The exact game nevertheless loaded
++ReShade, later registered its add-on and returned successful proxy Present
++downstream to the Steam renderer. Those facts neither authenticate the consumer
++nor identify why the injector exited. No crash/security cause is established;
++generation 36's validated-initializer precondition is not proven in that failed
++lifetime, so this candidate does not claim to fix it. Any repeat must retain
++the injector's numeric exit status/signal alongside exact process identity and
++the existing logs, without reopening possibly consumed ownership.
+ See [the Steam investigation controls](steam-overlay-investigation-controls.md).
+ 
+ The delayed-hook fixture, its documentation and the experimental test header
+diff --git a/libs/electron-game-overlay-runtime/CMakeLists.txt b/libs/electron-game-overlay-runtime/CMakeLists.txt
+index 9bec7616437f4116334dc6e98530ffe422fe3663..6dc456ccb4d8ef221cd59f4ad0fc281bc4ef2576 100644
+--- a/libs/electron-game-overlay-runtime/CMakeLists.txt
++++ b/libs/electron-game-overlay-runtime/CMakeLists.txt
+@@ -2029,6 +2029,9 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/owned-composition-policy.cmake")
+ include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/owned-composition-binding-diagnostics.cmake")
+ include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/owned-composition-window-eligibility.cmake")
+ include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/owned-composition-auxiliary-lifetime.cmake")
++include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/owned-deferred-d3d11.cmake")
++
++ego_owned_deferred_d3d11_tail("${reshade_SOURCE_DIR}" REVERSE)
+ ego_owned_composition_auxiliary_lifetime_tail("${reshade_SOURCE_DIR}" REVERSE)
+ ego_owned_composition_window_eligibility_tail("${reshade_SOURCE_DIR}" REVERSE)
+ ego_owned_composition_binding_diagnostics_tail("${reshade_SOURCE_DIR}" REVERSE)
+@@ -3755,6 +3758,11 @@ string(REPLACE "source/ego_owned_late_d3d11/owned_runtime_policy.hpp=7E0DB28C5BE
+ string(REPLACE "source/ego_owned_late_d3d11/compatibility_snapshot.hpp=2CE32E583C5F2D4F9C55B752675DB530A0B4007F7DB4E6CA0D264E7973DE8D93" "source/ego_owned_late_d3d11/compatibility_snapshot.hpp=EF7E0B8A483D54053E2934E936DE96F8414DEF1B725D0CA131DD2121A5EA7F32" RESHAPE_EXPECTED_PATCHED_CONTENT_SHA256 "${RESHAPE_EXPECTED_PATCHED_CONTENT_SHA256}")
+ string(REPLACE "source/ego_owned_late_d3d11/owned_late_d3d11.inl=F703E65A5BAEBA34FDD24378EC8F37E8A8B02691BCCD97CD72AC596FCBF51B13" "source/ego_owned_late_d3d11/owned_late_d3d11.inl=7D6DCB3C8EA776EE8A4DBFC205CF0B3380AC60F57C86C00868532F2200941595" RESHAPE_EXPECTED_PATCHED_CONTENT_SHA256 "${RESHAPE_EXPECTED_PATCHED_CONTENT_SHA256}")
+ string(REPLACE "source/dxgi/dxgi_swapchain.cpp=34B2775D1F013225ACCA24AAA1C2D08400E8217B46AEC66CC2FAAAAA12AC51EF" "source/dxgi/dxgi_swapchain.cpp=7213F5376BBEF92909910B33BA9B9F771101DA268E2AAAAECD212F1A1CBFDD2E" RESHAPE_EXPECTED_PATCHED_CONTENT_SHA256 "${RESHAPE_EXPECTED_PATCHED_CONTENT_SHA256}")
++ego_owned_deferred_d3d11_tail("${reshade_SOURCE_DIR}" FORWARD)
++string(REPLACE "source/hook_manager.cpp=C62CD60C5AFD66FAFCF6F3E0659C88078685351CB20B9721742953C7D64516BB" "source/hook_manager.cpp=355E78AC03E71D2101585EC8C8C64A458978A17BA6E20F0D218D7E6ED312A49E" RESHAPE_EXPECTED_PATCHED_CONTENT_SHA256 "${RESHAPE_EXPECTED_PATCHED_CONTENT_SHA256}")
++string(REPLACE "source/ego_owned_late_d3d11/owned_late_d3d11.inl=7D6DCB3C8EA776EE8A4DBFC205CF0B3380AC60F57C86C00868532F2200941595" "source/ego_owned_late_d3d11/owned_late_d3d11.inl=2E89DBEED170BD1D5C2247D7373F89D82544CD217951826EE5F953F8B1567080" RESHAPE_EXPECTED_PATCHED_CONTENT_SHA256 "${RESHAPE_EXPECTED_PATCHED_CONTENT_SHA256}")
++string(REPLACE "source/ego_owned_late_d3d11/compatibility_snapshot.hpp=EF7E0B8A483D54053E2934E936DE96F8414DEF1B725D0CA131DD2121A5EA7F32" "source/ego_owned_late_d3d11/compatibility_snapshot.hpp=C0FE868ED8B0FA7FE7688DB19252BE427316DFC1D73C5F4AF5BBD299A8662F50" RESHAPE_EXPECTED_PATCHED_CONTENT_SHA256 "${RESHAPE_EXPECTED_PATCHED_CONTENT_SHA256}")
++string(REPLACE "source/dxgi/dxgi_swapchain.cpp=7213F5376BBEF92909910B33BA9B9F771101DA268E2AAAAECD212F1A1CBFDD2E" "source/dxgi/dxgi_swapchain.cpp=C064C8BBE74B659C423516FB9F7F9A663D5A7A42CCCC6F43354A14AA8F11CC21" RESHAPE_EXPECTED_PATCHED_CONTENT_SHA256 "${RESHAPE_EXPECTED_PATCHED_CONTENT_SHA256}")
+ verify_reshade_patched_source("${reshade_SOURCE_DIR}")
+ 
+ add_library(native_input_gate_addon SHARED
+diff --git a/libs/electron-game-overlay-runtime/patches/README.md b/libs/electron-game-overlay-runtime/patches/README.md
+index ebb6c909149d5c7d77436dc98c97485cbff1c6fc..f9740d7bcd4513121eb5d3139a8331314d3c781c 100644
+--- a/libs/electron-game-overlay-runtime/patches/README.md
++++ b/libs/electron-game-overlay-runtime/patches/README.md
+@@ -582,3 +582,16 @@ production-patch hash, the full-add-on configuration, and runtime/injector
+ hashes before accepting its cache. Raw-input normalization reuses the existing
+ normalized Win32 input path; it changes no published transport C ABI, transport
+ wire schema, or public Node SDK API.
++
++## Owned deferred D3D11, generation 36
++
++`reshade-owned-deferred-d3d11.patch` queues one pinned owned-host worker only
++after successful D3D11 publication on the existing LoadLibrary path and release
++of the delayed-path mutex. Only an already validated missing-backend outcome
++may reopen, and the worker revalidates stage/adapter readiness before using the
++existing raw-adoption path. Existing try-lock, notification, official/foreign,
++target-exit, public ABI and per-app feature boundaries remain unchanged.
++It provides later Present adoption, not retroactive device wrapping or a
++first-frame guarantee. See `doc/owned-deferred-d3d11.md` and the separate
++production, loader, negative and source-cache gate launchers. Actual game
++acceptance remains separate; candidate 1012 stays immutable.
+diff --git a/libs/electron-game-overlay-runtime/scripts/build-reshade-runtime.ps1 b/libs/electron-game-overlay-runtime/scripts/build-reshade-runtime.ps1
+index e04df6ba2d95f5f0a66f53ce004a6151d49f4094..4fc62854e2b6f91b119c46fabdec33bc9000b977 100644
+--- a/libs/electron-game-overlay-runtime/scripts/build-reshade-runtime.ps1
++++ b/libs/electron-game-overlay-runtime/scripts/build-reshade-runtime.ps1
+@@ -235,6 +235,9 @@ if ($CompositionBindingDiagnosticsPatchHash -cne "0180A6FACEEC7FA89174F4CED311A9
+ $WindowEligibilityPatch = Join-Path $RuntimeRoot "patches\reshade-owned-composition-window-eligibility.patch"
+ $WindowEligibilityPatchHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $WindowEligibilityPatch).Hash
+ if ($WindowEligibilityPatchHash -cne "080DA1FD83FE48CB782FA9268B82A386E75BE081D107F2A5013F06675107B97F") { throw "Composition window eligibility patch differs from its pinned implementation." }
++$DeferredD3d11Patch = Join-Path $RuntimeRoot "patches\reshade-owned-deferred-d3d11.patch"
++$DeferredD3d11PatchHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $DeferredD3d11Patch).Hash
++if ($DeferredD3d11PatchHash -cne "779D9D41768FE61BC5FF3DCF69E2EE11B360DC00B5B58C24E0B1F83552A2D9BB") { throw "Owned deferred D3D11 patch differs from its pinned implementation." }
+ $AuxiliaryLifetimePatch = Join-Path $RuntimeRoot "patches\reshade-owned-composition-auxiliary-lifetime.patch"
+ $AuxiliaryLifetimePatchHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $AuxiliaryLifetimePatch).Hash
+ if ($AuxiliaryLifetimePatchHash -cne "3E80D0D05CA9F383D9E5216034E687B93CC858334B2F61514ADE91EF18573E61") { throw "Composition auxiliary lifetime patch differs from its pinned implementation." }
+@@ -291,10 +294,10 @@ $ExpectedPatchedContentSha256 = [ordered]@{
+     "source/ego_owned_late_d3d11/owned_runtime_policy.hpp" = "A06E427C7EA2AE73F3FF90E14C204719FC247B9DE02EB5F84E066B602623F524"
+     "source/dxgi/dxgi_swapchain.hpp" = "C5A155BE0321F30DB18B4FC4578A41BF728414DD0927A789D5C335041922BC55"
+     "source/ini_file.cpp" = "08ACD295DB065D11E5A8388F074CFC6C384D29896E5DA9B20227222D8A61C688"
+-    "source/ego_owned_late_d3d11/compatibility_snapshot.hpp" = "EF7E0B8A483D54053E2934E936DE96F8414DEF1B725D0CA131DD2121A5EA7F32"
++    "source/ego_owned_late_d3d11/compatibility_snapshot.hpp" = "C0FE868ED8B0FA7FE7688DB19252BE427316DFC1D73C5F4AF5BBD299A8662F50"
+     "source/dxgi/dxgi.cpp" = "41A686B186910B4C0FAA1B631356C2D7FD0F4BE772EFB32D7328DAA2DC65B88F"
+-    "source/hook_manager.cpp" = "C62CD60C5AFD66FAFCF6F3E0659C88078685351CB20B9721742953C7D64516BB"
+-    "source/dxgi/dxgi_swapchain.cpp" = "7213F5376BBEF92909910B33BA9B9F771101DA268E2AAAAECD212F1A1CBFDD2E"
++    "source/hook_manager.cpp" = "355E78AC03E71D2101585EC8C8C64A458978A17BA6E20F0D218D7E6ED312A49E"
++    "source/dxgi/dxgi_swapchain.cpp" = "C064C8BBE74B659C423516FB9F7F9A663D5A7A42CCCC6F43354A14AA8F11CC21"
+     "ReShade.vcxproj" = "9FC55C36B9B4E55E8FE9D87401CEFE69858B5FA5110023840BEAF2FC5B8D2A9C"
+     "include/reshade.hpp" = "CC102FA21D311B85713ED167F0E182A4EECCD40CDF3FBE360AD9F83A0CF40767"
+     "include/reshade_api.hpp" = "80E9F0CBC06BF96943DC79CA2D133DB5D8E69D3A4CD516B6D89D675B8B965218"
+@@ -306,7 +309,7 @@ $ExpectedPatchedContentSha256 = [ordered]@{
+     "source/d3d11/d3d11_impl_swapchain.hpp" = "D6010A43C93302C056AF62E1BBE7523E6A8D023DEDFB9D3F50DC689EAA9169B6"
+     "source/ego_owned_late_d3d11/owned_config_file.hpp" = "98D7B1D5D55841FDDD0320378C130D61DFF688EC42C47E6C14BAC7ADDE87C8D8"
+     "source/ego_owned_late_d3d11/owned_late_d3d11.hpp" = "99C928A9D56A8A029F0E02C354C22142A95DCDEE849359B2C31E8077F3C589B6"
+-    "source/ego_owned_late_d3d11/owned_late_d3d11.inl" = "7D6DCB3C8EA776EE8A4DBFC205CF0B3380AC60F57C86C00868532F2200941595"
++    "source/ego_owned_late_d3d11/owned_late_d3d11.inl" = "2E89DBEED170BD1D5C2247D7373F89D82544CD217951826EE5F953F8B1567080"
+     "source/input_frame_consumer.hpp" = "50808217A78ABD97417CA57694A5275895F8F0318AF6172658C087C26D3F8CA0"
+     "source/input.cpp" = "B5778EA4DFD482F1E3E0C8A5337BCCFF351EA2CCF85AD0FDF565669CB9852D72"
+     "source/input.hpp" = "6F9AF2B09AC6FF491AA2BC96A024E3B90F703985FFAD7A96C2BBB862667A4C1E"
+@@ -375,16 +378,15 @@ function Test-ReShadePatchedSourceState {
+             return $false
+         }
+     }
+-    # Check the four independent terminal seams after the exact nineteen-file
+-    # inventory and content proof. The shared-directory tail supersedes the old
+-    # long-path injector seam, which no longer reverses independently.
++    # Check independent terminal seams after the exact file/content proof.
++    # Deferred adoption supersedes the old inl include-context and composition
++    # seams; their bytes remain covered by the complete vector and patch pins.
+     foreach ($Patch in @(
+-        $OwnedLateD3d11AdapterReadyLongPathPatch
+         $InjectorSharedAddonDirectoryPatch
+         $InjectorSelectionBeforeOpenPatch
+         $InjectorStartupReadinessPatch
+         $PrivateStageDiagnosticsPatch
+-        $AuxiliaryLifetimePatch
++        $DeferredD3d11Patch
+         $OwnedLateD3d11ForeignAddonIsolationPatch
+     )) {
+         if (-not (Test-GitPatchApplied $Patch)) {
+@@ -461,6 +463,7 @@ function Test-RuntimeBuildCache {
+             $Stamp.d3d11SwapchainResourceIdentityPatchSha256 -eq $D3d11ResourceIdentityPatchHash -and
+             $Stamp.injectorPrivateStageDiagnosticsPatchSha256 -eq $PrivateStageDiagnosticsPatchHash -and
+             $Stamp.steamLoadedModuleHookOrderPatchSha256 -eq $SteamLoadedModuleHookOrderPatchHash -and
++            $Stamp.ownedDeferredD3d11PatchSha256 -eq $DeferredD3d11PatchHash -and
+             $Stamp.ownedCompositionAuxiliaryLifetimePatchSha256 -eq $AuxiliaryLifetimePatchHash -and
+             $Stamp.ownedCompositionWindowEligibilityPatchSha256 -eq $WindowEligibilityPatchHash -and
+             $Stamp.ownedCompositionBindingDiagnosticsPatchSha256 -eq $CompositionBindingDiagnosticsPatchHash -and
+@@ -636,6 +639,7 @@ $InjectorHash = (Get-FileHash -ErrorAction Stop -Algorithm SHA256 -LiteralPath $
+     injectorStartupReadinessPatchSha256 = $InjectorStartupReadinessPatchHash
+     injectorPrivateStageDiagnosticsPatchSha256 = $PrivateStageDiagnosticsPatchHash
+     steamLoadedModuleHookOrderPatchSha256 = $SteamLoadedModuleHookOrderPatchHash
++    ownedDeferredD3d11PatchSha256 = $DeferredD3d11PatchHash
+     ownedCompositionAuxiliaryLifetimePatchSha256 = $AuxiliaryLifetimePatchHash
+     ownedCompositionWindowEligibilityPatchSha256 = $WindowEligibilityPatchHash
+     ownedCompositionBindingDiagnosticsPatchSha256 = $CompositionBindingDiagnosticsPatchHash
+diff --git a/libs/electron-game-overlay-runtime/scripts/build.ps1 b/libs/electron-game-overlay-runtime/scripts/build.ps1
+index 3ea4ecd291d40daa70500040df394161f4264a75..bd0a82396e483eee285a4c4e456b4605da8b47ba 100644
+--- a/libs/electron-game-overlay-runtime/scripts/build.ps1
++++ b/libs/electron-game-overlay-runtime/scripts/build.ps1
+@@ -110,7 +110,7 @@ $DistributionDirectory = Join-Path `
+ $ExpectedReShadeCommit = "4a50d1eddace85734871d91792ff214f13f66c01"
+ $ExpectedAddonBuildId = "CCE20935ADD44EF6A5A7973014B2E07F"
+ # Bump when the runtime provider or injector implementation changes, never for package semver.
+-$RuntimeGeneration = 35
++$RuntimeGeneration = 36
+ # Protocol-family v1 providers must always retain literal transport v1 in their
+ # advertised range; backwards-compatible releases may raise only the maximum.
+ $TargetTransportMin = 1
+@@ -119,6 +119,7 @@ if ($ExpectedAddonBuildId -cnotmatch '^[0-9A-F]{32}$') {
+     throw "The configured Electron Game Overlay add-on build ID is invalid."
+ }
+ $ExpectedPatchProvenance = [ordered]@{
++    ownedDeferredD3d11PatchSha256 = Join-Path $RuntimeRoot "patches\reshade-owned-deferred-d3d11.patch"
+     ownedCompositionAuxiliaryLifetimePatchSha256 = Join-Path $RuntimeRoot "patches\reshade-owned-composition-auxiliary-lifetime.patch"
+     ownedCompositionWindowEligibilityPatchSha256 = Join-Path $RuntimeRoot "patches\reshade-owned-composition-window-eligibility.patch"
+     ownedCompositionBindingDiagnosticsPatchSha256 = Join-Path $RuntimeRoot "patches\reshade-owned-composition-binding-diagnostics.patch"
+diff --git a/libs/electron-game-overlay-runtime/tests/compatibility-snapshot/run-gate.cjs b/libs/electron-game-overlay-runtime/tests/compatibility-snapshot/run-gate.cjs
+index 039941c386940af46f0b64486a5defcfd72ca164..03199991de5f69bacfb6d2f2ec3d97b317647949 100644
+--- a/libs/electron-game-overlay-runtime/tests/compatibility-snapshot/run-gate.cjs
++++ b/libs/electron-game-overlay-runtime/tests/compatibility-snapshot/run-gate.cjs
+@@ -9,7 +9,7 @@ const section=patch.slice(patch.indexOf('+++ b/source/ego_owned_late_d3d11/compa
+ assert.ok(section.startsWith('+++ b/'));fs.writeFileSync(header,section.split('\n').filter(s=>s.startsWith('+')&&!s.startsWith('+++')).map(s=>s.slice(1)).join('\n')+'\n');
+ const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
+ fs.writeFileSync(header,fs.readFileSync(path.join(cache,'source/ego_owned_late_d3d11/compatibility_snapshot.hpp')));
+-const sourceSha256=sha(fs.readFileSync(header,'utf8').replaceAll('\r\n','\n'));assert.equal(sourceSha256,'ef7e0b8a483d54053e2934e936de96f8414def1b725d0ca131dd2121a5ea7f32');
++const sourceSha256=sha(fs.readFileSync(header,'utf8').replaceAll('\r\n','\n'));assert.equal(sourceSha256,'c0fe868ed8b0fa7fe7688db19252be427316dfc1d73c5f4af5bbd299a8662f50');
+ function run(exe,args){const r=cp.spawnSync(exe,args,{encoding:'utf8',windowsHide:true,timeout:120000,maxBuffer:4*1024*1024});assert.ifError(r.error);assert.equal(r.status,0,r.stdout+'\n'+r.stderr);return r;}
+ run('cmake.exe',['-S',__dirname,'-B',build,'-A',architecture==='x64'?'x64':'Win32','-DSNAPSHOT_HEADER='+header,'-DMINHOOK_SOURCE_DIR='+path.join(cache,'deps/minhook')]);
+ run('cmake.exe',['--build',build,'--config','Release','--parallel','4']);
+@@ -17,7 +17,7 @@ const r=run(path.join(build,'Release/compatibility_snapshot.exe'),[path.join(bui
+ fs.writeFileSync(path.join(base,'snapshot-'+architecture+'.log'),r.stdout);
+ const lines=r.stdout.trim().split(/\r?\n/),records=lines.slice(0,-1).map(s=>{assert.ok(s.startsWith('EGO_COMPATIBILITY_SNAPSHOT_V1 '));return JSON.parse(s.slice(s.indexOf('{')));}),fixture=JSON.parse(lines.at(-1));
+ assert.equal(fixture.status,'passed');assert.equal(records.length,17);assert.equal(fixture.nativeCalls,9);assert.equal(fixture.foreignCalls,9);assert.equal(fixture.referenceCount,1);
+-for(const rec of records){assert.equal(rec.schemaVersion,1);assert.equal(rec.runtimeGeneration,35);assert.ok(rec.pid>0&&rec.tid>0);assert.ok(JSON.stringify(rec).length<1800);assert.ok(!Object.keys(rec).some(k=>/path|token|environmentValue/i.test(k)));}
++for(const rec of records){assert.equal(rec.schemaVersion,1);assert.equal(rec.runtimeGeneration,36);assert.ok(rec.pid>0&&rec.tid>0);assert.ok(JSON.stringify(rec).length<1800);assert.ok(!Object.keys(rec).some(k=>/path|token|environmentValue/i.test(k)));}
+ assert.equal(records.filter(r=>r.kind==='loader').length,1);assert.equal(records.filter(r=>r.kind==='factory-entry'&&r.methodDiscovery).length,1);
+ const registrations=records.filter(r=>r.kind==='native-registration');assert.equal(registrations.length,2);
+ for(const rec of registrations){assert.equal(rec.currentOwner,'other-image');assert.equal(rec.targetOwner,'reshade-host');assert.equal(rec.targetJumpOwner,'other-image');assert.ok(rec.targetJumpHops>0&&rec.targetJumpHops<=2);assert.equal(rec.savedOwner,'private-code');}
+diff --git a/libs/electron-game-overlay-runtime/tests/composition-auxiliary-lifetime/source-cache-gate.cjs b/libs/electron-game-overlay-runtime/tests/composition-auxiliary-lifetime/source-cache-gate.cjs
+index fe8978fe0b538cc54f80dd3c3bb0fc1195db5f5c..654cb305dcd85f4c53ba42e55be2fdd8471beee0 100644
+--- a/libs/electron-game-overlay-runtime/tests/composition-auxiliary-lifetime/source-cache-gate.cjs
++++ b/libs/electron-game-overlay-runtime/tests/composition-auxiliary-lifetime/source-cache-gate.cjs
+@@ -8,7 +8,10 @@ const cmake=read(path.join(runtime,'CMakeLists.txt')),tail=read(path.join(runtim
+ const descriptors=[...tail.matchAll(/"([^"|]+)\|([A-Z0-9]+)\|([A-F0-9]{64})"/g)].map(([,name,before,after])=>({name,before,after}));assert.equal(descriptors.length,4);
+ const producer=read(path.join(runtime,'scripts/build-reshade-runtime.ps1')),table=producer.match(/\$ExpectedPatchedContentSha256 = \[ordered\]@\{([\s\S]*?)\n\}/)[1];
+ const pins=[...table.matchAll(/"([^"]+)" = "([0-9A-F]{64})"/g)].map(([,name,digest])=>({name,digest}));assert.equal(pins.length,26);
+-const post=new Map(pins.map(({name,digest})=>{const bytes=Buffer.from(read(path.join(cache,name)));assert.equal(sha(bytes),digest,name);return [name,bytes];}));
++const deferredTerminal=require('../frozen-source-inputs.cjs').transition(runtime,'owned-deferred-d3d11');
++for(const p of pins){const change=deferredTerminal.files.get(p.name);if(change)p.digest=change.before;}
++const {transition,frozenInputs}=require('../frozen-source-inputs.cjs');
++const post=frozenInputs({pins,cache,scratch:path.join(base,'gen35-text-inputs'),transitions:[]});
+ function run(exe,args,cwd,ok=true){const r=cp.spawnSync(exe,args,{cwd,encoding:'utf8',windowsHide:true,timeout:120000,maxBuffer:4*1024*1024});assert.ifError(r.error);if(ok)assert.equal(r.status,0,r.stdout+'\n'+r.stderr);else assert.notEqual(r.status,0);return r;}
+ const git=(args,cwd=source)=>run('git',['-c','core.autocrlf=false','-c','core.eol=lf',...args],cwd);
+ const owner=path.join(base,'.fixture-owner.json');
+diff --git a/libs/electron-game-overlay-runtime/tests/composition-binding-diagnostics/source-cache-gate.cjs b/libs/electron-game-overlay-runtime/tests/composition-binding-diagnostics/source-cache-gate.cjs
+index 31c38ce4b61e1a342ab456207725260f21d9ca83..c2f9342764d90c56340d276f7acee0d586b7ef31 100644
+--- a/libs/electron-game-overlay-runtime/tests/composition-binding-diagnostics/source-cache-gate.cjs
++++ b/libs/electron-game-overlay-runtime/tests/composition-binding-diagnostics/source-cache-gate.cjs
+@@ -8,6 +8,8 @@ const cmake=read(path.join(runtime,'CMakeLists.txt')),tail=read(path.join(runtim
+ const descriptors=[...tail.matchAll(/"([^"|]+)\|([A-Z0-9]+)\|([A-F0-9]{64})"/g)].map(([,name,before,after])=>({name,before,after}));assert.equal(descriptors.length,5);
+ const producer=read(path.join(runtime,'scripts/build-reshade-runtime.ps1')),table=producer.match(/\$ExpectedPatchedContentSha256 = \[ordered\]@\{([\s\S]*?)\n\}/)[1];
+ const pins=[...table.matchAll(/"([^"]+)" = "([0-9A-F]{64})"/g)].map(([,name,digest])=>({name,digest}));assert.equal(pins.length,26);
++const deferredTerminal=require('../frozen-source-inputs.cjs').transition(runtime,'owned-deferred-d3d11');
++for(const p of pins){const change=deferredTerminal.files.get(p.name);if(change)p.digest=change.before;}
+ const {transition,frozenInputs}=require('../frozen-source-inputs.cjs');
+ const newest=transition(runtime,'owned-composition-auxiliary-lifetime'),successor=transition(runtime,'owned-composition-window-eligibility');
+ for(const p of pins){const latest=newest.files.get(p.name);if(latest)p.digest=latest.before;const change=successor.files.get(p.name);if(change)p.digest=change.before;}
+diff --git a/libs/electron-game-overlay-runtime/tests/composition-window-eligibility/source-cache-gate.cjs b/libs/electron-game-overlay-runtime/tests/composition-window-eligibility/source-cache-gate.cjs
+index 6ad788a286f3fa18969f6834170fea3330b6c1bc..528dd9bc88f9f8ead2e7528783b8ea174ca4c0dc 100644
+--- a/libs/electron-game-overlay-runtime/tests/composition-window-eligibility/source-cache-gate.cjs
++++ b/libs/electron-game-overlay-runtime/tests/composition-window-eligibility/source-cache-gate.cjs
+@@ -8,6 +8,8 @@ const cmake=read(path.join(runtime,'CMakeLists.txt')),tail=read(path.join(runtim
+ const descriptors=[...tail.matchAll(/"([^"|]+)\|([A-Z0-9]+)\|([A-F0-9]{64})"/g)].map(([,name,before,after])=>({name,before,after}));assert.equal(descriptors.length,4);
+ const producer=read(path.join(runtime,'scripts/build-reshade-runtime.ps1')),table=producer.match(/\$ExpectedPatchedContentSha256 = \[ordered\]@\{([\s\S]*?)\n\}/)[1];
+ const pins=[...table.matchAll(/"([^"]+)" = "([0-9A-F]{64})"/g)].map(([,name,digest])=>({name,digest}));assert.equal(pins.length,26);
++const deferredTerminal=require('../frozen-source-inputs.cjs').transition(runtime,'owned-deferred-d3d11');
++for(const p of pins){const change=deferredTerminal.files.get(p.name);if(change)p.digest=change.before;}
+ const {transition,frozenInputs}=require('../frozen-source-inputs.cjs');
+ const successor=transition(runtime,'owned-composition-auxiliary-lifetime');
+ for(const p of pins){const change=successor.files.get(p.name);if(change)p.digest=change.before;}
+diff --git a/libs/electron-game-overlay-runtime/tests/delayed-hook-publication/run-gate.cjs b/libs/electron-game-overlay-runtime/tests/delayed-hook-publication/run-gate.cjs
+index 05be69f3945fd3304e9adce30673ee8872d0d553..80f41ceea62328db7a1ac957ed1d85b66690c73d 100644
+--- a/libs/electron-game-overlay-runtime/tests/delayed-hook-publication/run-gate.cjs
++++ b/libs/electron-game-overlay-runtime/tests/delayed-hook-publication/run-gate.cjs
+@@ -3,8 +3,11 @@ const fs=require('node:fs'),path=require('node:path'),cp=require('node:child_pro
+ const root=path.resolve(__dirname,'../../../..'),arch=process.argv[2]??'x64',mode=process.argv[3]??'all',expectReproduction=process.argv.includes('--expect-reproduction');assert.ok(['x64','x86'].includes(arch));assert.ok(['serialized','contended','all'].includes(mode));
+ const work=path.join(root,'build/overlay-compatibility'),source=path.join(root,'build/candidate-gen24-cache/native/_deps/reshade-src'),build=path.join(work,'delayed-hook-publication-'+arch),stage=path.join(work,'delayed-hook-publication-stage-'+arch),candidate=path.join(root,'build/candidates/composition-auxiliary-lifetime-gen35');
+ const read=p=>fs.readFileSync(p,'utf8').replace(/^\uFEFF/u,'').replaceAll('\r\n','\n'),sha=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex'),contentSha=p=>crypto.createHash('sha256').update(read(p)).digest('hex');
+-const manifest=JSON.parse(read(path.join(candidate,'source-manifest.json'))),producerFile='libs/electron-game-overlay-runtime/scripts/build-reshade-runtime.ps1';assert.equal(sha(path.join(root,producerFile)),manifest.files.find(entry=>entry.path===producerFile).sha256);
+-const producer=read(path.join(root,producerFile)),table=producer.match(/\$ExpectedPatchedContentSha256 = \[ordered\]@\{([\s\S]*?)\n\}/)[1],pins=[...table.matchAll(/"([^"]+)" = "([A-F0-9]{64})"/g)];assert.equal(pins.length,26);for(const [,name,digest]of pins)assert.equal(contentSha(path.join(source,name)).toUpperCase(),digest,name);
++const manifest=JSON.parse(read(path.join(candidate,'source-manifest.json'))),frozen=JSON.parse(read(path.join(__dirname,'frozen-gen35-pins.json')));
++assert.equal(sha(path.join(candidate,'source-snapshot.zip')),frozen.sourceZipSha256);assert.equal(frozen.producerSha256,manifest.files.find(entry=>entry.path===frozen.producerFile).sha256);
++const pins=frozen.pins.map(p=>[null,p.name,p.digest]);assert.equal(pins.length,26);
++const inputs=require('../frozen-source-inputs.cjs').frozenInputs({pins:frozen.pins,cache:source,scratch:path.join(work,'delayed-hook-publication-gen35-inputs-'+arch),transitions:[]});
++for(const [,name,digest]of pins)assert.equal(crypto.createHash('sha256').update(inputs.get(name)).digest('hex').toUpperCase(),digest,name);
+ const seal=JSON.parse(read(path.join(candidate,'sdk-stage/dist/overlay-manifest.json'))),runtimeName=arch==='x64'?'ReShade64.dll':'ReShade32.dll',prefix='runtime/win32-x64/reshade/',input=path.join(candidate,'sdk-stage/dist',prefix,runtimeName),expected=seal.files.find(entry=>entry.path===prefix+runtimeName);assert.ok(expected);assert.equal(sha(input),expected.sha256.toLowerCase());
+ const owner=path.join(stage,'.fixture-owner.json');if(fs.existsSync(stage))assert.equal(JSON.parse(read(owner)).kind,'ego-owned-delayed-hook-publication');else{fs.mkdirSync(path.join(stage,'addons'),{recursive:true});fs.writeFileSync(owner,JSON.stringify({kind:'ego-owned-delayed-hook-publication',architecture:arch}));}
+ const runtime=path.join(stage,runtimeName);if(!fs.existsSync(runtime))fs.linkSync(input,runtime);assert.equal(sha(runtime),expected.sha256.toLowerCase());
+@@ -27,6 +30,6 @@ for(const name of mode==='all'?['serialized','contended']:[mode]){
+  cases.push({name,gateExitCode:result.status,gatePassed:result.status===0,record,nativeEvidence:{file:native,sha256:sha(native),graphicsThreadD3d11Skips:skips,installation:install},stdout:{file:stdout,sha256:sha(stdout)},stderr:{file:stderr,sha256:sha(stderr)}});
+ }
+ assert.equal(sha(input),expected.sha256.toLowerCase());assert.equal(sha(runtime),expected.sha256.toLowerCase());
+-const files=['contract.hpp','adapter.cpp','trigger.cpp','fixture.cpp','CMakeLists.txt','run-gate.cjs'].map(name=>({name,sha256:sha(path.join(__dirname,name))}));
++const files=['contract.hpp','adapter.cpp','trigger.cpp','fixture.cpp','CMakeLists.txt','run-gate.cjs','frozen-gen35-pins.json'].map(name=>({name,sha256:sha(path.join(__dirname,name))}));
+ const report={kind:'ego-owned-production-delayed-hook-publication-reproduction',status:cases.some(item=>!item.gatePassed)?'reproduced-failing-production-device-observation-gate':'serialized-control-passed',architecture:arch,runtimeGeneration:35,runtime:{file:input,sha256:expected.sha256.toLowerCase(),unchanged:true,hardlinks:1,copiesPerCase:0},productionHookManagerSha256:pins.find(item=>item[1]==='source/hook_manager.cpp')[2].toLowerCase(),sourceFiles:files,cases,scope:'Unmodified sealed production ReShade host, its real LoadLibrary lane and delayed-path mutex, real hardware D3D11 device creation and three texture readbacks per process. A single owned Win32 API barrier pauses GetModuleHandleExW only on the designated scan thread with a return address in that host; no private mutex layout, production locking change, fixed delay, retry, target injection, window, user game, Steam code or input. Reproducing this boundary does not prove that it caused the untraced PAGER PID56144 failure.'};
+ const output=path.join(work,'delayed-hook-publication-'+arch+'-'+mode+'-report.json');fs.writeFileSync(output,JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({status:report.status,architecture:arch,cases:cases.length,output}));if(!expectReproduction&&cases.some(item=>!item.gatePassed))process.exitCode=3;
+diff --git a/libs/electron-game-overlay-runtime/tests/frozen-source-inputs.cjs b/libs/electron-game-overlay-runtime/tests/frozen-source-inputs.cjs
+index 416290469053ea91e5a02e3cc293de69ce622738..b4734acff784e8d3dfe18751435ae40663a80c56 100644
+--- a/libs/electron-game-overlay-runtime/tests/frozen-source-inputs.cjs
++++ b/libs/electron-game-overlay-runtime/tests/frozen-source-inputs.cjs
+@@ -5,6 +5,8 @@ const fs=require('node:fs'),path=require('node:path'),cp=require('node:child_pro
+ const read=p=>fs.readFileSync(p,'utf8').replaceAll('\r\n','\n'),sha=b=>crypto.createHash('sha256').update(b).digest('hex').toUpperCase();
+ function transition(runtime,name){const tail=read(path.join(runtime,'cmake',name+'.cmake'));return {patch:path.join(runtime,'patches','reshade-'+name+'.patch'),files:new Map([...tail.matchAll(/"([^"|]+)\|([A-Z0-9]+)\|([A-F0-9]{64})"/g)].map(([,file,before,after])=>[file,{before,after}]))};}
+ function frozenInputs({pins,cache,scratch,transitions}){
++ const terminal=transition(path.resolve(__dirname,'..'),'owned-deferred-d3d11');
++ if(!transitions.some(t=>t.patch===terminal.patch))transitions=[terminal,...transitions];
+  fs.mkdirSync(scratch,{recursive:true});
+  return new Map(pins.map(({name,digest})=>{
+   let bytes=Buffer.from(read(path.join(cache,name)));
+diff --git a/libs/electron-game-overlay-runtime/tests/owned-composition-policy/run-gate.cjs b/libs/electron-game-overlay-runtime/tests/owned-composition-policy/run-gate.cjs
+index e80733c78a0323df669c1b43c9aed14a37f5bb1c..bab06430a828501994c80cc8f207c64a425fa283 100644
+--- a/libs/electron-game-overlay-runtime/tests/owned-composition-policy/run-gate.cjs
++++ b/libs/electron-game-overlay-runtime/tests/owned-composition-policy/run-gate.cjs
+@@ -11,6 +11,8 @@ const eligibility=read(path.join(root,'libs/electron-game-overlay-runtime/cmake/
+ for(const match of eligibility.matchAll(/"([^"|]+)\|([A-Z0-9]+)\|([A-F0-9]{64})"/g)){const existing=pins.find(p=>p[1]===match[1]);if(existing)existing[3]=match[3];}
+ const lifetime=read(path.join(root,'libs/electron-game-overlay-runtime/cmake/owned-composition-auxiliary-lifetime.cmake'));
+ for(const match of lifetime.matchAll(/"([^"|]+)\|([A-Z0-9]+)\|([A-F0-9]{64})"/g)){const existing=pins.find(p=>p[1]===match[1]);if(existing)existing[3]=match[3];}
++const deferred=read(path.join(root,'libs/electron-game-overlay-runtime/cmake/owned-deferred-d3d11.cmake'));
++for(const match of deferred.matchAll(/"([^"|]+)\|([A-Z0-9]+)\|([A-F0-9]{64})"/g)){const existing=pins.find(p=>p[1]===match[1]);if(existing)existing[3]=match[3];}
+ for(const [,name,,after]of pins)assert.equal(sha(read(path.join(source,name))),after,name);
+ const cpp=read(path.join(source,'source/dxgi/dxgi_swapchain.cpp'));
+ const init=cpp.slice(cpp.indexOf('void DXGISwapChain::on_init('),cpp.indexOf('void DXGISwapChain::on_reset('));
+diff --git a/libs/electron-game-overlay-runtime/tests/owned-composition-policy/source-cache-gate.cjs b/libs/electron-game-overlay-runtime/tests/owned-composition-policy/source-cache-gate.cjs
+index 13d15074a75965b2fbe0d9643de64e730bf45d90..13659a1bf4b438d4d1e64072a92aa1d438a47086 100644
+--- a/libs/electron-game-overlay-runtime/tests/owned-composition-policy/source-cache-gate.cjs
++++ b/libs/electron-game-overlay-runtime/tests/owned-composition-policy/source-cache-gate.cjs
+@@ -8,6 +8,8 @@ const cmake=read(path.join(runtime,'CMakeLists.txt')),tail=read(path.join(runtim
+ const descriptors=[...tail.matchAll(/"([^"|]+)\|([A-Z0-9]+)\|([A-F0-9]{64})"/g)].map(([,name,before,after])=>({name,before,after}));assert.equal(descriptors.length,8);
+ const producer=read(path.join(runtime,'scripts/build-reshade-runtime.ps1')),table=producer.match(/\$ExpectedPatchedContentSha256 = \[ordered\]@\{([\s\S]*?)\n\}/)[1];
+ const pins=[...table.matchAll(/"([^"]+)" = "([0-9A-F]{64})"/g)].map(([,name,digest])=>({name,digest}));assert.equal(pins.length,26);
++const deferredTerminal=require('../frozen-source-inputs.cjs').transition(runtime,'owned-deferred-d3d11');
++for(const p of pins){const change=deferredTerminal.files.get(p.name);if(change)p.digest=change.before;}
+ const {transition,frozenInputs}=require('../frozen-source-inputs.cjs');
+ const successor=transition(runtime,'owned-composition-binding-diagnostics');
+ for(const p of pins){const change=successor.files.get(p.name);if(change)p.digest=change.before;}
+diff --git a/libs/electron-game-overlay-runtime/tests/present-forwarding/run-gate.cjs b/libs/electron-game-overlay-runtime/tests/present-forwarding/run-gate.cjs
+index 74a503fff06d0e23a3eeb4ac531de00b48c06481..621854941594d945d37d8a853cb3b08f901a9a57 100644
+--- a/libs/electron-game-overlay-runtime/tests/present-forwarding/run-gate.cjs
++++ b/libs/electron-game-overlay-runtime/tests/present-forwarding/run-gate.cjs
+@@ -3,7 +3,7 @@ const fs=require('node:fs'),path=require('node:path'),cp=require('node:child_pro
+ const root=path.resolve(__dirname,'../../../..'),architecture=process.argv[2]??'x64';assert.ok(['x64','x86'].includes(architecture));
+ const source=path.join(root,'build/candidate-gen24-cache/native/_deps/reshade-src/source/ego_owned_late_d3d11/owned_late_d3d11.inl');
+ const text=fs.readFileSync(source,'utf8').replaceAll('\r\n','\n'),sha=s=>crypto.createHash('sha256').update(s).digest('hex');
+-assert.equal(sha(text),'7d6dcb3c8ea776ee8a4dbfc205cf0b3380ac60f57c86c00868532f2200941595');
++assert.equal(sha(text),'2e89dbeed170bd1d5c2247d7373f89d82544cd217951826ee5f953f8b1567080');
+ function extract(signature){const start=text.indexOf(signature);assert.ok(start>=0);let end=text.indexOf('{',start),depth=0;for(;end<text.length;end++){if(text[end]==='{')depth++;else if(text[end]==='}'&&--depth===0)break;}assert.equal(depth,0);return text.slice(start,end+1)+'\n';}
+ const body=['template <typename Native>\n    HRESULT present(', 'HRESULT STDMETHODCALLTYPE raw_present(', 'HRESULT STDMETHODCALLTYPE raw_present1('].map(extract).join('\n');
+ const base=path.join(root,'build/overlay-compatibility/present-forwarding'),build=path.join(base,architecture),header=path.join(base,'production-present.hpp');fs.mkdirSync(base,{recursive:true});fs.writeFileSync(header,body);
+diff --git a/libs/electron-game-overlay-runtime/tests/steam-hook-order/run-gate.cjs b/libs/electron-game-overlay-runtime/tests/steam-hook-order/run-gate.cjs
+index 6bd7a2ad24c647cc3ec42a029b1130a99cf42751..04b36f26236874d636e3e7cc7bba3954ec574d0b 100644
+--- a/libs/electron-game-overlay-runtime/tests/steam-hook-order/run-gate.cjs
++++ b/libs/electron-game-overlay-runtime/tests/steam-hook-order/run-gate.cjs
+@@ -8,7 +8,7 @@ const architecture=options['--architecture']??'x64';assert.ok(['x64','x86'].incl
+ const bits=architecture==='x64'?64:32,cache=path.join(root,'build/candidate-gen24-cache/native/_deps/reshade-src');
+ const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
+ const sourceHash=sha(fs.readFileSync(path.join(cache,'source/hook_manager.cpp'),'utf8').replaceAll('\r\n','\n'));
+-assert.equal(sourceHash,'c62cd60c5afd66fafcf6f3e0659c88078685351cb20b9721742953c7d64516bb');
++assert.equal(sourceHash,'355e78ac03e71d2101585ec8c8c64a458978a17ba6e20f0d218d7e6ed312a49e');
+ const runtime=path.resolve(options['--runtime']??path.join(root,'libs/electron-game-overlay-runtime/dist',architecture==='x64'?'win32-x64':'win32-ia32',`ReShade${bits}.dll`));
+ const baseline=path.resolve(options['--baseline-runtime']??path.join(root,'build/candidates/d3d11-identity-gen29/sdk-stage/dist/runtime/win32-x64/reshade',`ReShade${bits}.dll`));
+ assert.ok(fs.existsSync(baseline),'Supply a preserved generation-29 baseline runtime');
+@@ -43,7 +43,7 @@ for(const [name,dll,ownedModel,order,expectation,key] of cases){
+   if(!name.startsWith('baseline-')){
+     const snapshots=fs.readFileSync(path.join(directory,'ReShade.log'),'utf8').split(/\r?\n/).filter(s=>s.includes('EGO_COMPATIBILITY_SNAPSHOT_V1 ')).map(s=>JSON.parse(s.slice(s.indexOf('{'))));
+     const loaders=snapshots.filter(s=>s.kind==='loader');assert.equal(loaders.length,1);loaderSnapshot=loaders[0];
+-    assert.equal(loaderSnapshot.runtimeGeneration,35);assert.equal(loaderSnapshot.enabled,true);assert.equal(loaderSnapshot.steamEnvironment,key==='present');
++    assert.equal(loaderSnapshot.runtimeGeneration,36);assert.equal(loaderSnapshot.enabled,true);assert.equal(loaderSnapshot.steamEnvironment,key==='present');
+     const exactRenderer=order==='steam-first'&&ownedModel===model;assert.equal(loaderSnapshot.steamRenderer,exactRenderer);
+     assert.equal(loaderSnapshot.strategy,key==='present'||exactRenderer?'load-library':'notification');
+   }
+diff --git a/libs/electron-game-overlay/scripts/stage-game-overlay-runtime.ps1 b/libs/electron-game-overlay/scripts/stage-game-overlay-runtime.ps1
+index 20c6a173da76dd15d2bdf76efd4cb1ba51f74822..e5e0f8efb3506040fbe2e00a5abb703b40f8aa90 100644
+--- a/libs/electron-game-overlay/scripts/stage-game-overlay-runtime.ps1
++++ b/libs/electron-game-overlay/scripts/stage-game-overlay-runtime.ps1
+@@ -79,11 +79,12 @@ $ExpectedReShadeCommit = "4a50d1eddace85734871d91792ff214f13f66c01"
+ $ExpectedAddonBuildId = "CCE20935ADD44EF6A5A7973014B2E07F"
+ # Keep these exact mirrors of the runtime build manifest. Protocol-family v1
+ # must retain literal target transport v1 as its advertised minimum.
+-$ExpectedRuntimeGeneration = 35
++$ExpectedRuntimeGeneration = 36
+ $ExpectedTargetTransportMin = 1
+ $ExpectedTargetTransportMax = 1
+ $RuntimeSourceRoot = Join-Path $RepoRoot "libs\electron-game-overlay-runtime"
+ $ExpectedPatchProvenance = [ordered]@{
++    ownedDeferredD3d11PatchSha256 = Join-Path $RuntimeSourceRoot "patches\reshade-owned-deferred-d3d11.patch"
+     ownedCompositionAuxiliaryLifetimePatchSha256 = Join-Path $RuntimeSourceRoot "patches\reshade-owned-composition-auxiliary-lifetime.patch"
+     ownedCompositionWindowEligibilityPatchSha256 = Join-Path $RuntimeSourceRoot "patches\reshade-owned-composition-window-eligibility.patch"
+     ownedCompositionBindingDiagnosticsPatchSha256 = Join-Path $RuntimeSourceRoot "patches\reshade-owned-composition-binding-diagnostics.patch"
+diff --git a/libs/electron-game-overlay/src/lib/overlay-broker-protocol.ts b/libs/electron-game-overlay/src/lib/overlay-broker-protocol.ts
+index 574eb0130caad2744e5b6d9c4dfd8bfd9e5e56d8..6fe6f007ca7181937eb50b0bbf6721ec2a8af933 100644
+--- a/libs/electron-game-overlay/src/lib/overlay-broker-protocol.ts
++++ b/libs/electron-game-overlay/src/lib/overlay-broker-protocol.ts
+@@ -20,7 +20,7 @@ export const OVERLAY_BROKER_LEGACY_TARGET_TRANSPORT_MAX = 1 as const;
+  * Monotonic generation of the runtime provider shipped by this SDK. Bump this
+  * only with the matching staged-artifact manifests, never for package semver.
+  */
+-export const OVERLAY_BROKER_RUNTIME_GENERATION = 35 as const;
++export const OVERLAY_BROKER_RUNTIME_GENERATION = 36 as const;
+ /** Current target transport spoken by the broker and injected runtime. */
+ export const OVERLAY_BROKER_TARGET_TRANSPORT_VERSION = 1 as const;
+ /**
+diff --git a/libs/electron-game-overlay/src/lib/overlay-package-manifest.ts b/libs/electron-game-overlay/src/lib/overlay-package-manifest.ts
+index 514ab4906f7aaa14b53b6cd65f36e2e0b4358bd5..6d83e89510902f77c1cc9fe0ca4cbced56047b09 100644
+--- a/libs/electron-game-overlay/src/lib/overlay-package-manifest.ts
++++ b/libs/electron-game-overlay/src/lib/overlay-package-manifest.ts
+@@ -1,3 +1,5 @@
++const OWNED_DEFERRED_D3D11_PATCH_SHA256 =
++  '779D9D41768FE61BC5FF3DCF69E2EE11B360DC00B5B58C24E0B1F83552A2D9BB';
+ const OWNED_COMPOSITION_AUXILIARY_LIFETIME_PATCH_SHA256 =
+   '3E80D0D05CA9F383D9E5216034E687B93CC858334B2F61514ADE91EF18573E61';
+ const OWNED_COMPOSITION_WINDOW_ELIGIBILITY_PATCH_SHA256 =
+@@ -379,6 +381,15 @@ function validateNative(dist: string, files: ReadonlySet<string>): void {
+   if ((ownedCompositionAuxiliaryLifetimePins.length === 1) !== (expectedGeneration >= 35)) {
+     throw new Error('Compiled SDK composition auxiliary lifetime patch pin does not match its generation');
+   }
++  const ownedDeferredD3d11Declarations = [...validator.matchAll(/\b(?:const|let|var)\s+OWNED_DEFERRED_D3D11_PATCH_SHA256\b/g)];
++  const ownedDeferredD3d11Pins = [...validator.matchAll(/\bconst\s+OWNED_DEFERRED_D3D11_PATCH_SHA256\s*=\s*['"]([0-9a-fA-F]{64})['"]\s*;/g)];
++  if (ownedDeferredD3d11Declarations.length !== ownedDeferredD3d11Pins.length || ownedDeferredD3d11Pins.length > 1 ||
++      (ownedDeferredD3d11Pins.length === 1 && ownedDeferredD3d11Pins[0][1].toUpperCase() !== OWNED_DEFERRED_D3D11_PATCH_SHA256)) {
++    throw new Error('Compiled SDK owned deferred D3D11 patch pin is malformed or unsupported');
++  }
++  if ((ownedDeferredD3d11Pins.length === 1) !== (expectedGeneration >= 36)) {
++    throw new Error('Compiled SDK owned deferred D3D11 patch pin does not match its generation');
++  }
+   const privateDiagnosticDeclarations = [...validator.matchAll(/\b(?:const|let|var)\s+PRIVATE_STAGE_DIAGNOSTICS_PATCH_SHA256\b/g)];
+   const privateDiagnosticPins = [...validator.matchAll(/\bconst\s+PRIVATE_STAGE_DIAGNOSTICS_PATCH_SHA256\s*=\s*['"]([0-9a-fA-F]{64})['"]\s*;/g)];
+   if (privateDiagnosticDeclarations.length !== privateDiagnosticPins.length || privateDiagnosticPins.length > 1 ||
+@@ -594,6 +605,14 @@ function validateNative(dist: string, files: ReadonlySet<string>): void {
+     } else if (reshade.ownedCompositionAuxiliaryLifetimePatchSha256 !== undefined) {
+       throw new Error('Composition auxiliary lifetime provenance requires runtime generation 35: ' + bits);
+     }
++    if (expectedGeneration >= 36) {
++      if (typeof reshade.ownedDeferredD3d11PatchSha256 !== 'string' ||
++          reshade.ownedDeferredD3d11PatchSha256.toUpperCase() !== OWNED_DEFERRED_D3D11_PATCH_SHA256) {
++        throw new Error('Pinned owned deferred D3D11 patch provenance mismatch: ' + bits);
++      }
++    } else if (reshade.ownedDeferredD3d11PatchSha256 !== undefined) {
++      throw new Error('Owned deferred D3D11 provenance requires runtime generation 36: ' + bits);
++    }
+     if (expectedGeneration >= 29) {
+       if (typeof reshade.d3d11SwapchainResourceIdentityPatchSha256 !== 'string' ||
+           reshade.d3d11SwapchainResourceIdentityPatchSha256.toUpperCase() !== D3D11_SWAPCHAIN_RESOURCE_IDENTITY_PATCH_SHA256) {
+diff --git a/libs/electron-game-overlay/tests/helpers/cooperative-package-fixture.cjs b/libs/electron-game-overlay/tests/helpers/cooperative-package-fixture.cjs
+index 676c26536f39dd1b00dd71529b8507b44242a24b..25e5e87856f0f6c7b9018caab699de0593f89c43 100644
+--- a/libs/electron-game-overlay/tests/helpers/cooperative-package-fixture.cjs
++++ b/libs/electron-game-overlay/tests/helpers/cooperative-package-fixture.cjs
+@@ -11,6 +11,8 @@ function writeCooperativeDistribution(dist, {
+   addonBuildId = 'CCE20935ADD44EF6A5A7973014B2E07F',
+   runtimeGeneration = 23,
+   resourceIdentityPatch = runtimeGeneration >= 29,
++  ownedDeferredD3d11Patch = runtimeGeneration >= 36,
++  ownedDeferredD3d11PatchSha256 = '779D9D41768FE61BC5FF3DCF69E2EE11B360DC00B5B58C24E0B1F83552A2D9BB',
+   ownedCompositionAuxiliaryLifetimePatch = runtimeGeneration >= 35,
+   ownedCompositionAuxiliaryLifetimePatchSha256 = '3E80D0D05CA9F383D9E5216034E687B93CC858334B2F61514ADE91EF18573E61',
+   ownedCompositionWindowEligibilityPatch = runtimeGeneration >= 34,
+@@ -77,7 +79,7 @@ function writeCooperativeDistribution(dist, {
+   write('lib/module.js', '// controlled compiled SDK module\n');
+   write('lib/reshade-launcher.js', `const OFFICIAL_ADDON_BUILD_ID = '${addonBuildId}';\n`);
+   write('lib/overlay-broker-protocol.js', `exports.OVERLAY_BROKER_RUNTIME_GENERATION = ${runtimeGeneration};\n`);
+-  write('lib/overlay-package-manifest.js', (ownedCompositionAuxiliaryLifetimePatch ? `const OWNED_COMPOSITION_AUXILIARY_LIFETIME_PATCH_SHA256 = '${ownedCompositionAuxiliaryLifetimePatchSha256}';\n` : '') + (ownedCompositionWindowEligibilityPatch ? `const OWNED_COMPOSITION_WINDOW_ELIGIBILITY_PATCH_SHA256 = '${ownedCompositionWindowEligibilityPatchSha256}';\n` : '') + (ownedCompositionBindingDiagnosticsPatch ? `const OWNED_COMPOSITION_BINDING_DIAGNOSTICS_PATCH_SHA256 = '${ownedCompositionBindingDiagnosticsPatchSha256}';\n` : '') + (ownedCompositionPolicyPatch ? `const OWNED_COMPOSITION_POLICY_PATCH_SHA256 = '${ownedCompositionPolicyPatchSha256}';\n` : '') + (compatibilitySnapshotPatch
++  write('lib/overlay-package-manifest.js', (ownedDeferredD3d11Patch ? `const OWNED_DEFERRED_D3D11_PATCH_SHA256 = '${ownedDeferredD3d11PatchSha256}';\n` : '') + (ownedCompositionAuxiliaryLifetimePatch ? `const OWNED_COMPOSITION_AUXILIARY_LIFETIME_PATCH_SHA256 = '${ownedCompositionAuxiliaryLifetimePatchSha256}';\n` : '') + (ownedCompositionWindowEligibilityPatch ? `const OWNED_COMPOSITION_WINDOW_ELIGIBILITY_PATCH_SHA256 = '${ownedCompositionWindowEligibilityPatchSha256}';\n` : '') + (ownedCompositionBindingDiagnosticsPatch ? `const OWNED_COMPOSITION_BINDING_DIAGNOSTICS_PATCH_SHA256 = '${ownedCompositionBindingDiagnosticsPatchSha256}';\n` : '') + (ownedCompositionPolicyPatch ? `const OWNED_COMPOSITION_POLICY_PATCH_SHA256 = '${ownedCompositionPolicyPatchSha256}';\n` : '') + (compatibilitySnapshotPatch
+     ? `const COMPATIBILITY_SNAPSHOT_PATCH_SHA256 = '${compatibilitySnapshotPatchSha256}';\n`
+     : '') + (steamLoadedModulePatch
+     ? `const STEAM_LOADED_MODULE_HOOK_ORDER_PATCH_SHA256 = '${steamLoadedModuleHookOrderPatchSha256}';\n`
+@@ -172,6 +174,7 @@ function writeCooperativeDistribution(dist, {
+         ...(resourceIdentityPatch ? { d3d11SwapchainResourceIdentityPatchSha256 } : {}),
+         ...(privateStageDiagnosticsPatch ? { injectorPrivateStageDiagnosticsPatchSha256 } : {}),
+         ...(steamLoadedModulePatch ? { steamLoadedModuleHookOrderPatchSha256 } : {}),
++        ...(ownedDeferredD3d11Patch ? { ownedDeferredD3d11PatchSha256 } : {}),
+         ...(ownedCompositionAuxiliaryLifetimePatch ? { ownedCompositionAuxiliaryLifetimePatchSha256 } : {}),
+         ...(ownedCompositionWindowEligibilityPatch ? { ownedCompositionWindowEligibilityPatchSha256 } : {}),
+         ...(ownedCompositionBindingDiagnosticsPatch ? { ownedCompositionBindingDiagnosticsPatchSha256 } : {}),
+diff --git a/libs/electron-game-overlay/tests/overlay-package-manifest.test.cjs b/libs/electron-game-overlay/tests/overlay-package-manifest.test.cjs
+index 365d0049ae0a3c089e3df0d208b306cdbadcc79a..95aa0678912a42cee7baf1e38b6ea2a9744a4722 100644
+--- a/libs/electron-game-overlay/tests/overlay-package-manifest.test.cjs
++++ b/libs/electron-game-overlay/tests/overlay-package-manifest.test.cjs
+@@ -41,6 +41,24 @@ function mutateStamp(f, name, mutate) {
+   f.payload.seal();
+ }
+ 
++test('generation-36 binds the owned deferred D3D11 implementation and exact architecture provenance', t => {
++  for (const bits of [64, 32]) {
++    for (const value of [undefined, 'A'.repeat(64), false]) {
++      const f = fixture(t, { runtimeGeneration: 36 });
++      validateOverlayDistributionSync(f.dist);
++      mutateStamp(f, `ReShade${bits}.build.json`, stamp => {
++        if (value === undefined) delete stamp.ownedDeferredD3d11PatchSha256;
++        else stamp.ownedDeferredD3d11PatchSha256 = value;
++      });
++      assert.throws(() => validateOverlayDistributionSync(f.dist), /owned deferred D3D11 patch provenance mismatch/);
++    }
++  }
++  for (const options of [{ ownedDeferredD3d11Patch: false }, { ownedDeferredD3d11PatchSha256: 'A'.repeat(64) }]) {
++    const f = fixture(t, { runtimeGeneration: 36, ...options });
++    assert.throws(() => validateOverlayDistributionSync(f.dist), /owned deferred D3D11 patch pin/);
++  }
++});
++
+ test('generation-35 binds the composition auxiliary lifetime implementation and exact architecture provenance', t => {
+   for (const bits of [64, 32]) {
+     for (const value of [undefined, 'A'.repeat(64), false]) {
+@@ -920,7 +938,7 @@ test('payload junctions cannot redirect integrity reads outside the SDK', t => {
+ });
+ 
+ test('actual seal script builds a self-contained SDK manifest on the supported build Node version', t => {
+-  const f = fixture(t, { runtimeGeneration: 35 });
++  const f = fixture(t, { runtimeGeneration: 36 });
+   const scripts = path.join(f.root, 'scripts'); fs.mkdirSync(scripts);
+   fs.writeFileSync(path.join(f.root, 'package.json'), JSON.stringify({ name: 'electron-game-overlay', version: '0.1.0-rc.7' }));
+   const dependencyOutput = path.join(f.dist, 'node_modules');
+diff --git a/libs/electron-game-overlay/tests/stageguard.test.cjs b/libs/electron-game-overlay/tests/stageguard.test.cjs
+index ee069244b8409216432b4f941653deba32d7c9cc..636f1d912b8378d0178e0bdedced3620c21e8481 100644
+--- a/libs/electron-game-overlay/tests/stageguard.test.cjs
++++ b/libs/electron-game-overlay/tests/stageguard.test.cjs
+@@ -36,7 +36,7 @@ test('portable source contract: staging mirrors bound cooperative native and pac
+   const produced = producer.match(/\$PackageBuildStamp = \[ordered\]@\{([\s\S]*?)\n\}/)[1];
+   assert.deepEqual([...properties.matchAll(/"(\w+)"/g)].map(m => m[1]).sort(), [...produced.matchAll(/^    (\w+) =/gm)].map(m => m[1]).sort());
+   assert.deepEqual(patches(stage), patches(producer));
+-  assert.equal(patches(stage).length, 50);
++  assert.equal(patches(stage).length, 51);
+   assert.deepEqual(patches(stage).filter(([key]) => key === 'd3d11SwapchainResourceIdentityPatchSha256'), [['d3d11SwapchainResourceIdentityPatchSha256', 'reshade-d3d11-swapchain-resource-identity.patch']]);
+   assert.deepEqual(patches(stage).filter(([key]) => key === 'ownedLateD3d11PatchSha256'), [['ownedLateD3d11PatchSha256', 'reshade-owned-late-d3d11.patch']]);
+   assert.deepEqual(patches(stage).filter(([key]) => key === 'injectorFirstHostResultPatchSha256'), [['injectorFirstHostResultPatchSha256', 'reshade-injector-first-host-result.patch']]);
+@@ -163,7 +163,7 @@ test('current source cache binds the complete twenty-six-file stack and terminal
+   const reverseChecks = reshadeProducer.match(/foreach \(\$Patch in @\(([\s\S]*?)\r?\n    \)\)/)[1];
+   // Context/readiness replace the initial-inspection hunk. Superseded seams
+   // are validated by the exact complete vector and ordered migration tests.
+-  assert.deepEqual(reverseChecks.match(/\$\w+Patch/g).sort(), ['$OwnedLateD3d11AdapterReadyLongPathPatch', '$InjectorSharedAddonDirectoryPatch', '$OwnedLateD3d11ForeignAddonIsolationPatch', '$InjectorSelectionBeforeOpenPatch', '$InjectorStartupReadinessPatch', '$PrivateStageDiagnosticsPatch', '$AuxiliaryLifetimePatch'].sort());
++  assert.deepEqual(reverseChecks.match(/\$\w+Patch/g).sort(), ['$InjectorSharedAddonDirectoryPatch', '$OwnedLateD3d11ForeignAddonIsolationPatch', '$InjectorSelectionBeforeOpenPatch', '$InjectorStartupReadinessPatch', '$PrivateStageDiagnosticsPatch', '$DeferredD3d11Patch'].sort());
+   assert.ok(reshadeProducer.indexOf('foreach ($Patch in @(') > reshadeProducer.indexOf('foreach ($Entry in $ExpectedPatchedContentSha256.GetEnumerator())'), 'Terminal patch reversal check follows the complete source inventory/hash proof');
+   for (const source of [reshadeProducer, producer, stage]) {
+     assert.ok(source.includes(ownedLatePatchSha256), 'Frozen owned-late production patch is pinned before packaging/cache acceptance');
+@@ -191,6 +191,7 @@ for (const shell of ['powershell.exe', 'pwsh.exe']) test('actual extracted curre
+     runtimePatchRoot: path.join(root, 'libs/electron-game-overlay-runtime'),
+     sources: [path.join(root, 'libs/electron-game-overlay-runtime/scripts/build.ps1'), path.join(root, 'libs/electron-game-overlay/scripts/stage-game-overlay-runtime.ps1')],
+     requiredPatches: [
++      { key: 'ownedDeferredD3d11PatchSha256', file: path.join(root, 'libs/electron-game-overlay-runtime/patches/reshade-owned-deferred-d3d11.patch'), sha256: '779D9D41768FE61BC5FF3DCF69E2EE11B360DC00B5B58C24E0B1F83552A2D9BB' },
+       { key: 'ownedCompositionAuxiliaryLifetimePatchSha256', file: path.join(root, 'libs/electron-game-overlay-runtime/patches/reshade-owned-composition-auxiliary-lifetime.patch'), sha256: '3E80D0D05CA9F383D9E5216034E687B93CC858334B2F61514ADE91EF18573E61' },
+       { key: 'ownedCompositionWindowEligibilityPatchSha256', file: path.join(root, 'libs/electron-game-overlay-runtime/patches/reshade-owned-composition-window-eligibility.patch'), sha256: '080DA1FD83FE48CB782FA9268B82A386E75BE081D107F2A5013F06675107B97F' },
+       { key: 'ownedCompositionBindingDiagnosticsPatchSha256', file: path.join(root, 'libs/electron-game-overlay-runtime/patches/reshade-owned-composition-binding-diagnostics.patch'), sha256: '0180A6FACEEC7FA89174F4CED311A926DC98D292FB114347813F0E29C6B150DE' },
+@@ -252,7 +253,7 @@ foreach ($SourcePath in $InputData.sources) {
+     if ((Split-Path $SourcePath -Leaf) -eq 'build.ps1') { $RuntimeRoot = $InputData.runtimePatchRoot }
+     else { $RuntimeSourceRoot = $InputData.runtimePatchRoot }
+     . ([scriptblock]::Create($PatchTable.Extent.Text))
+-    if ($ExpectedPatchProvenance.Count -ne 50) { throw 'Production patch path table is incomplete.' }
++    if ($ExpectedPatchProvenance.Count -ne 51) { throw 'Production patch path table is incomplete.' }
+     foreach ($PatchPath in $ExpectedPatchProvenance.Values) {
+         if (-not (Test-Path -LiteralPath $PatchPath -PathType Leaf)) { throw ('Unresolved production patch path: ' + $PatchPath) }
+     }
+diff --git a/doc/owned-deferred-d3d11.md b/doc/owned-deferred-d3d11.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..32651df6bc316f198ade0cb6b3511f6a67a04278
+--- /dev/null
++++ b/doc/owned-deferred-d3d11.md
+@@ -0,0 +1,95 @@
++# Owned deferred D3D11 adoption
++
++Generation 36 addresses the demonstrated missing-backend initialization path.
++The immutable generation-35 fixture shows that delayed-hook contention can let
++a real D3D11 device and swap chain bypass automatic wrapping. Later export-hook
++installation observes subsequent devices but cannot wrap the original device.
++This is a proven owned reproduction, not attribution of the untraced actual
++PAGER startup timeout to this mechanism.
++
++## Narrow correction
++
++An initializer that already validated the exact owned stage and completed
++cooperative adapter registration may remember only its exact
++ERROR_MOD_NOT_FOUND outcome. Other validation, discovery and installation
++failures do not become pending work. No irrelevant graphics backend is loaded.
++
++Only the reproduced LoadLibrary path records successful D3D11 hook publication
++for deferral. After releasing its delayed-path mutex it can queue one native work item. Its
++try-lock, failed-lock early returns and reentrant-load behavior remain intact.
++There is no loader-thread wait, timer, consumer retry, reinjection or second
++ReShade owner. An atomic seen/pending handshake covers publication racing the
++initializer's absent-module result; the queue latch permits one attempt only.
++
++The DLL-notification path neither notes deferred availability nor queues work.
++Its automatic behavior remains unchanged. This avoids introducing cross-module
++queue calls in the [restricted loader-notification callback context](https://learn.microsoft.com/en-us/windows/win32/devnotes/ldrdllnotification).
++A separate notification control requires automatic rendering with zero queued
++workers. This correction does not claim recovery of a notification-path miss.
++
++The pinned owned host's worker reopens only that exact pending state and calls
++the existing raw D3D11 initializer. It revalidates the stage and adapter before
++method discovery or hook activation. A revoked stage or adapter leaves the host
++passive with a queryable failure. Queue failure retains the error and never
++retries or substitutes another worker. Existing authoritative-target-exit and
++per-application implementation ownership rules remain unchanged.
++
++Recovery occurs on a later Present of a supported original swap chain. It does
++not retroactively wrap the missed device, emit its historical automatic device
++callbacks, or guarantee first-frame observation. The existing manual-runtime
++surface/runtime callbacks and rendering path apply. Existing automatic proxies
++continue through their normal path and must not be adopted again.
++
++The patch changes the owned ReShade host and generation labels only. Existing
++foreign/official ReShade installations and mapped feature add-on implementation
++are unchanged. Both native architectures, SDK validation and staging require
++the exact generation-36 patch/source pins. No public ABI or private C++ layout
++is added to a cooperative module boundary.
++
++## Gates and provenance
++
++The unsealed shadow prototype passed 20 positive/negative cases across x64 and
++x86. Two immutable 1012 baseline cases retain exit 3 and gatePassed:false. The
++22-case cohort contains 1,974 assertions, 60 green hardware readbacks and 60 red
++readbacks painted inside actual public runtime callbacks. Its immutable local
++evidence summary SHA-256 is
++`960d8047ffa2ec3d046c1d6b7aef38c72f742c6ab3455d3ff2000ccc5805d787`.
++Original cache sources and reused objects/libraries were verified unchanged.
++
++The production gate separately observes the public QueueUserWorkItem boundary
++with an owned test wrapper. The wrapper calls the opaque native callback once
++and signals a test-owned completion event; no private mutex/layout or test
++runtime export is used. Cases cover held publication and original-chain
++adoption, ordinary automatic proxy behavior, DllMain and nested loads, foreign
++stage, unready adapter, absent backend, queue failure, and stage/readiness
++revocation, plus the notification-path control. A separate contended composition
++case creates a real missed BGRA chain whose GetDesc/GetHwnd have no HWND, then
++requires the manual runtime to bind exactly the nonactivating, visible-style
++window outside all monitors. No DirectComposition visual is attached. Both
++contended paths retain failing immutable 1012 baselines. Actual callback GPU
++rendering, forwarding/flags/HRESULTs, resize,
++resumed rendering and balanced retirement remain mandatory. Each case has a
++dedicated launcher under scripts/test-cases. The final production cohort passed
++24 cases across x64/x86, retaining four failing 1012 baselines: 2,744 assertions,
++78 green readbacks and 80 callback-painted red readbacks. The first composition
++fixture attempt failed its window-setup assertion before adoption; its evidence
++is retained. Explicit SW_SHOWNOACTIVATE setup then passed, preserving foreground
++and offscreen placement. These production fixture results do not establish
++actual-game, application-input or mixed-application acceptance.
++
++## Separate hidden-tooltip observation
++
++The late high-integrity 1012 trace recorded a uniqueness rejection whose first
++candidate's captured style had WS_VISIBLE cleared, followed by resumed binding
++489.6 microseconds later with the same main HWND/thread/token. No matching reset
++record, surface removal or input loss was observed. The reset diagnostic budget
++was not exhausted.
++
++The enumeration checks visibility before its candidate predicate reads style.
++A window hiding between those reads can invalidate remembered full-style
++identity and appear eligible for that scan. This is a plausible visibility
++sampling race. The evidence does not identify which get_hwnd caller observed
++the null result or show that DXGISwapChain::on_present consumed it; that path
++would emit a reset record. Generation 36 does not change this classifier or
++infer an unobserved runtime/surface loss. A visibility recheck would require its
++own deterministic lifetime controls and acceptance.
+diff --git a/libs/electron-game-overlay-runtime/cmake/owned-deferred-d3d11.cmake b/libs/electron-game-overlay-runtime/cmake/owned-deferred-d3d11.cmake
+new file mode 100644
+index 0000000000000000000000000000000000000000..4d8759ef98fad755592ef1f07aef79ed19754a3c
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/cmake/owned-deferred-d3d11.cmake
+@@ -0,0 +1,164 @@
++# Gen36 owned deferred D3D11 tail. Recognized mixed states make each file publication restartable.
++function(ego_deferred_d3d11_state source_dir)
++    set(vector
++        "source/ego_owned_late_d3d11/owned_runtime_policy.hpp=A06E427C7EA2AE73F3FF90E14C204719FC247B9DE02EB5F84E066B602623F524"
++        "source/dxgi/dxgi_swapchain.hpp=C5A155BE0321F30DB18B4FC4578A41BF728414DD0927A789D5C335041922BC55"
++        "source/ini_file.cpp=08ACD295DB065D11E5A8388F074CFC6C384D29896E5DA9B20227222D8A61C688"
++        "source/ego_owned_late_d3d11/compatibility_snapshot.hpp=EF7E0B8A483D54053E2934E936DE96F8414DEF1B725D0CA131DD2121A5EA7F32"
++        "source/dxgi/dxgi.cpp=41A686B186910B4C0FAA1B631356C2D7FD0F4BE772EFB32D7328DAA2DC65B88F"
++        "source/hook_manager.cpp=C62CD60C5AFD66FAFCF6F3E0659C88078685351CB20B9721742953C7D64516BB"
++        "source/dxgi/dxgi_swapchain.cpp=7213F5376BBEF92909910B33BA9B9F771101DA268E2AAAAECD212F1A1CBFDD2E"
++        "ReShade.vcxproj=9FC55C36B9B4E55E8FE9D87401CEFE69858B5FA5110023840BEAF2FC5B8D2A9C"
++        "include/reshade.hpp=CC102FA21D311B85713ED167F0E182A4EECCD40CDF3FBE360AD9F83A0CF40767"
++        "include/reshade_api.hpp=80E9F0CBC06BF96943DC79CA2D133DB5D8E69D3A4CD516B6D89D675B8B965218"
++        "include/reshade_events.hpp=8090912CD69854818C294F7C0F848EBAB7C712AB6D601E6889E62514249EE6A7"
++        "source/addon.cpp=DF69C9E8BE88244B54D92849A183B8A149A74FA959ED49A7109824EF0D8E3D9C"
++        "source/addon_manager.cpp=E6524902A07A0B4E2947B372503679A84CAA0FD1840329E89564559C3160349E"
++        "source/addon_manager.hpp=C1D27EA4C9996F1EAD408FAD0D0DB3AEEAE16A4BEFEB4A0F71EC6C616116989B"
++        "source/d3d11/d3d11_impl_swapchain.cpp=9CC88315C5F2A4DAAA7E4AEAEBBA6584851AE565EC5D250C28BE2AE3B4347DDF"
++        "source/d3d11/d3d11_impl_swapchain.hpp=D6010A43C93302C056AF62E1BBE7523E6A8D023DEDFB9D3F50DC689EAA9169B6"
++        "source/ego_owned_late_d3d11/owned_config_file.hpp=98D7B1D5D55841FDDD0320378C130D61DFF688EC42C47E6C14BAC7ADDE87C8D8"
++        "source/ego_owned_late_d3d11/owned_late_d3d11.hpp=99C928A9D56A8A029F0E02C354C22142A95DCDEE849359B2C31E8077F3C589B6"
++        "source/ego_owned_late_d3d11/owned_late_d3d11.inl=7D6DCB3C8EA776EE8A4DBFC205CF0B3380AC60F57C86C00868532F2200941595"
++        "source/input_frame_consumer.hpp=50808217A78ABD97417CA57694A5275895F8F0318AF6172658C087C26D3F8CA0"
++        "source/input.cpp=B5778EA4DFD482F1E3E0C8A5337BCCFF351EA2CCF85AD0FDF565669CB9852D72"
++        "source/input.hpp=6F9AF2B09AC6FF491AA2BC96A024E3B90F703985FFAD7A96C2BBB862667A4C1E"
++        "source/runtime.cpp=96B12143E7A13B607D101AE7FD573C86334DD1BFDEEC2CA21520C74FE0200CD7"
++        "source/runtime.hpp=1F2CF88559AE52D62DC3A8B236A734093E74864CAC44A069DD54440FBCCE3D11"
++        "source/runtime_gui.cpp=6B8A8D3ACECE1E9C687062360FABBFAC04397222973A23565B661A7505F3187A"
++        "tools/injector.cpp=7A6DC34363FF8EBD78484D8AEE6CE0463F22E90AB35DD1261FC9FBD9B09A3A3E"
++    )
++    set(files)
++    foreach(entry IN LISTS vector)
++        string(REGEX REPLACE "=.*$" "" name "${entry}")
++        list(APPEND files "${name}")
++    endforeach()
++    foreach(descriptor IN LISTS EGO_DEFERRED_D3D11_DESCRIPTORS)
++        string(REPLACE "|" ";" fields "${descriptor}")
++        list(GET fields 0 name)
++        list(GET fields 1 before)
++        list(GET fields 2 after)
++        if(EXISTS "${source_dir}/${name}" OR IS_SYMLINK "${source_dir}/${name}")
++            ego_read_source_cache_file("${source_dir}" "${name}" actual ignored)
++        else()
++            set(actual "ABSENT")
++        endif()
++        if(NOT actual STREQUAL before AND NOT actual STREQUAL after)
++            message(FATAL_ERROR "Unknown owned deferred D3D11 source ${name}; edits were preserved.")
++        endif()
++        if(name IN_LIST files)
++            string(REPLACE "${name}=${before}" "${name}=${actual}" vector "${vector}")
++        elseif(NOT actual STREQUAL "ABSENT")
++            list(APPEND vector "${name}=${actual}")
++            if(actual STREQUAL after)
++                list(APPEND files "${name}")
++            endif()
++        endif()
++    endforeach()
++    set(RESHAPE_EXPECTED_PATCHED_FILES "${files}")
++    set(RESHAPE_EXPECTED_PATCHED_CONTENT_SHA256 "${vector}")
++    ego_assert_source_cache_vector("${source_dir}" ${vector})
++    verify_reshade_patched_source("${source_dir}")
++endfunction()
++
++function(ego_owned_deferred_d3d11_tail source_dir direction)
++    set(EGO_DEFERRED_D3D11_DESCRIPTORS
++        "source/hook_manager.cpp|C62CD60C5AFD66FAFCF6F3E0659C88078685351CB20B9721742953C7D64516BB|355E78AC03E71D2101585EC8C8C64A458978A17BA6E20F0D218D7E6ED312A49E"
++        "source/ego_owned_late_d3d11/owned_late_d3d11.inl|7D6DCB3C8EA776EE8A4DBFC205CF0B3380AC60F57C86C00868532F2200941595|2E89DBEED170BD1D5C2247D7373F89D82544CD217951826EE5F953F8B1567080"
++        "source/ego_owned_late_d3d11/compatibility_snapshot.hpp|EF7E0B8A483D54053E2934E936DE96F8414DEF1B725D0CA131DD2121A5EA7F32|C0FE868ED8B0FA7FE7688DB19252BE427316DFC1D73C5F4AF5BBD299A8662F50"
++        "source/dxgi/dxgi_swapchain.cpp|7213F5376BBEF92909910B33BA9B9F771101DA268E2AAAAECD212F1A1CBFDD2E|C064C8BBE74B659C423516FB9F7F9A663D5A7A42CCCC6F43354A14AA8F11CC21"
++    )
++    set(patch "${CMAKE_CURRENT_SOURCE_DIR}/patches/reshade-owned-deferred-d3d11.patch")
++    ego_read_source_cache_file("${CMAKE_CURRENT_SOURCE_DIR}/patches" "reshade-owned-deferred-d3d11.patch" patch_hash patch_text)
++    if(NOT patch_hash STREQUAL "779D9D41768FE61BC5FF3DCF69E2EE11B360DC00B5B58C24E0B1F83552A2D9BB")
++        message(FATAL_ERROR "The owned deferred D3D11 patch changed; source was preserved.")
++    endif()
++    set(reverse)
++    if(direction STREQUAL "REVERSE")
++        set(active FALSE)
++        foreach(descriptor IN LISTS EGO_DEFERRED_D3D11_DESCRIPTORS)
++            string(REPLACE "|" ";" fields "${descriptor}")
++            list(GET fields 0 name)
++            list(GET fields 1 before)
++            list(GET fields 2 after)
++            if(EXISTS "${source_dir}/${name}" OR IS_SYMLINK "${source_dir}/${name}")
++                ego_read_source_cache_file("${source_dir}" "${name}" actual ignored)
++                if(actual STREQUAL after OR before STREQUAL "ABSENT")
++                    set(active TRUE)
++                endif()
++            endif()
++        endforeach()
++        if(NOT active)
++            return() # Existing historical vector guards remain authoritative.
++        endif()
++        set(reverse "--reverse")
++        list(REVERSE EGO_DEFERRED_D3D11_DESCRIPTORS)
++    elseif(NOT direction STREQUAL "FORWARD")
++        message(FATAL_ERROR "Unknown owned deferred D3D11 direction.")
++    endif()
++    ego_deferred_d3d11_state("${source_dir}")
++    set(scratch "${CMAKE_CURRENT_BINARY_DIR}/ego-owned-deferred-d3d11-stage")
++    file(MAKE_DIRECTORY "${scratch}/candidate")
++    ego_write_lf_source_cache_file("${scratch}/snapshot.patch" "${patch_text}")
++    foreach(descriptor IN LISTS EGO_DEFERRED_D3D11_DESCRIPTORS)
++        string(REPLACE "|" ";" fields "${descriptor}")
++        list(GET fields 0 name)
++        list(GET fields 1 before)
++        list(GET fields 2 after)
++        if(direction STREQUAL "REVERSE")
++            set(desired "${before}")
++        else()
++            set(desired "${after}")
++        endif()
++        if(EXISTS "${source_dir}/${name}")
++            ego_read_source_cache_file("${source_dir}" "${name}" actual source_text)
++            file(SHA256 "${source_dir}/${name}" raw_hash)
++        else()
++            set(actual "ABSENT")
++        endif()
++        if(actual STREQUAL desired)
++            continue()
++        endif()
++        get_filename_component(parent "${scratch}/candidate/${name}" DIRECTORY)
++        file(MAKE_DIRECTORY "${parent}")
++        if(actual STREQUAL "ABSENT")
++            file(REMOVE "${scratch}/candidate/${name}")
++        else()
++            ego_write_lf_source_cache_file("${scratch}/candidate/${name}" "${source_text}")
++        endif()
++        foreach(action IN ITEMS "--check" "--apply")
++            execute_process(COMMAND "${CMAKE_COMMAND}" -E env --unset=GIT_DIR --unset=GIT_WORK_TREE --unset=GIT_INDEX_FILE
++                "GIT_CEILING_DIRECTORIES=${scratch}" "${GIT_EXECUTABLE}" -c core.autocrlf=false -c core.eol=lf
++                apply --whitespace=nowarn ${reverse} "${action}" "--include=${name}" "${scratch}/snapshot.patch"
++                WORKING_DIRECTORY "${scratch}/candidate" COMMAND_ERROR_IS_FATAL ANY)
++        endforeach()
++        if(desired STREQUAL "ABSENT")
++            if(EXISTS "${scratch}/candidate/${name}")
++                message(FATAL_ERROR "The staged diagnostic header was not removed.")
++            endif()
++        else()
++            ego_read_source_cache_file("${scratch}/candidate" "${name}" staged ignored)
++            if(NOT staged STREQUAL desired)
++                message(FATAL_ERROR "The staged owned deferred D3D11 digest differs; source was preserved.")
++            endif()
++        endif()
++        ego_deferred_d3d11_state("${source_dir}")
++        if(NOT actual STREQUAL "ABSENT")
++            file(SHA256 "${source_dir}/${name}" current_raw_hash)
++            if(NOT current_raw_hash STREQUAL raw_hash)
++                message(FATAL_ERROR "Source changed during diagnostic staging; edits were preserved.")
++            endif()
++        elseif(EXISTS "${source_dir}/${name}" OR IS_SYMLINK "${source_dir}/${name}")
++            message(FATAL_ERROR "Source appeared during diagnostic staging; edits were preserved.")
++        endif()
++        if(desired STREQUAL "ABSENT")
++            file(REMOVE "${source_dir}/${name}")
++        else()
++            file(RENAME "${scratch}/candidate/${name}" "${source_dir}/${name}" RESULT result)
++            if(NOT result STREQUAL "0")
++                message(FATAL_ERROR "Cannot publish verified diagnostic source: ${result}")
++            endif()
++        endif()
++        ego_deferred_d3d11_state("${source_dir}")
++    endforeach()
++endfunction()
+diff --git a/libs/electron-game-overlay-runtime/patches/reshade-owned-deferred-d3d11.patch b/libs/electron-game-overlay-runtime/patches/reshade-owned-deferred-d3d11.patch
+new file mode 100644
+index 0000000000000000000000000000000000000000..47dee0f78ddb95a2bedec0a3b2a0ff214412abc6
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/patches/reshade-owned-deferred-d3d11.patch
+@@ -0,0 +1,208 @@
++diff --git a/source/hook_manager.cpp b/source/hook_manager.cpp
++--- a/source/hook_manager.cpp
+++++ b/source/hook_manager.cpp
++@@ -310,6 +310,11 @@ static T call_unchecked(T replacement)
++ 	return reinterpret_cast<T>(find_internal(nullptr, reinterpret_cast<reshade::hook::address>(replacement)).call());
++ }
++ 
+++#if defined(RESHADE_OWNED_LATE_D3D11)
+++void ego_owned_deferred_d3d11_note(HMODULE module) noexcept;
+++void ego_owned_deferred_d3d11_kick() noexcept;
+++#endif
+++
++ static void install_delayed_hooks(const std::filesystem::path &loaded_path, bool check_all = false)
++ {
++ 	if (s_is_loading_export_module)
++@@ -331,12 +336,16 @@ static void install_delayed_hooks(const std::filesystem::path &loaded_path, bool
++ 
++ 		return delayed_handle;
++ 	};
++-	const auto install_delayed_hook_path = [&loaded_path](const std::filesystem::path &path, HMODULE delayed_handle) {
+++	const auto install_delayed_hook_path = [&loaded_path, check_all](const std::filesystem::path &path, HMODULE delayed_handle) {
++ 		reshade::log::message(reshade::log::level::info, "Installing delayed hooks for '%s' (Just loaded via LoadLibrary('%s')) ...", path.u8string().c_str(), loaded_path.u8string().c_str());
++ 
++ 		install_internal(delayed_handle, g_module_handle, hook_method::function_hook);
++ 		if (!reshade::hook::apply_queued_actions())
++ 			reshade::log::message(reshade::log::level::error, "Failed to install hooks for '%s'!", path.u8string().c_str());
+++		#if defined(RESHADE_OWNED_LATE_D3D11)
+++		else if (check_all && _wcsicmp(path.filename().c_str(), L"d3d11.dll") == 0)
+++			ego_owned_deferred_d3d11_note(delayed_handle);
+++		#endif
++ 	};
++ 
++ 	if (const auto it = std::find_if(s_delayed_hook_paths.begin(), s_delayed_hook_paths.end(),
++@@ -373,6 +382,12 @@ static void install_delayed_hooks(const std::filesystem::path &loaded_path, bool
++ 
++ 		s_delayed_hook_paths.erase(remove, s_delayed_hook_paths.end());
++ 	}
+++	#if defined(RESHADE_OWNED_LATE_D3D11)
+++	// The original try-lock and early-return behavior is unchanged. Native
+++	// owned work may only be queued after this scan releases its own mutex.
+++	if (lock.owns_lock()) lock.unlock();
+++	if (check_all) ego_owned_deferred_d3d11_kick();
+++	#endif
++ }
++ 
++ struct UNICODE_STRING
++diff --git a/source/ego_owned_late_d3d11/owned_late_d3d11.inl b/source/ego_owned_late_d3d11/owned_late_d3d11.inl
++--- a/source/ego_owned_late_d3d11/owned_late_d3d11.inl
+++++ b/source/ego_owned_late_d3d11/owned_late_d3d11.inl
++@@ -25,6 +25,8 @@
++ #include <string>
++ #include <vector>
++ 
+++void ego_owned_deferred_d3d11_note(HMODULE module) noexcept;
+++void ego_owned_deferred_d3d11_kick() noexcept;
++ extern thread_local bool g_in_dxgi_runtime;
++ extern "C" const unsigned int ElectronGameOverlayReShadeHostAbi;
++ extern "C" volatile LONG ElectronGameOverlayReShadeAddonGate;
++@@ -37,6 +39,9 @@ namespace ego_owned_late_d3d11
++     constexpr char marker_contents[] = "ELECTRON_GAME_OVERLAY_OWNED_RUNTIME_STAGE_V1\n";
++     constexpr LONG addon_gate_registered = 2, addon_gate_closed = 3;
++ 
+++    // Missing-backend deferral belongs to this pinned owned host only.
+++    std::atomic<HMODULE> deferred_module { nullptr };
+++    std::atomic<bool> deferred_pending { false }, deferred_queued { false };
++     std::mutex install_mutex;
++     std::mutex registry_mutex;
++     std::atomic<std::uint32_t> status { 0 }, last_error { ERROR_SUCCESS }, last_hresult { S_OK };
++@@ -175,7 +180,7 @@ namespace ego_owned_late_d3d11
++             FILETIME utc {};GetSystemTimePreciseAsFileTime(&utc);
++             const auto ticks=(std::uint64_t(utc.dwHighDateTime)<<32)|utc.dwLowDateTime;
++             reshade::log::message(reshade::log::level::info,
++-                "EGO_OWNED_COMPOSITION_BINDING_V1 {\"schemaVersion\":1,\"runtimeGeneration\":35,\"pid\":%lu,\"tid\":%lu,\"utcTime100ns\":\"%llu\",\"reason\":\"%s\",\"bindingId\":\"%p\",\"bound\":\"%p\",\"firstCandidate\":\"%p\",\"firstCandidateOwner\":\"%p\",\"candidate\":\"%p\",\"candidateOwner\":\"%p\",\"expectedThread\":%lu,\"candidateThread\":%lu,\"boundThread\":%lu,\"boundPid\":%lu,\"eligibleCount\":%u,\"enumerationComplete\":%s,\"boundVisible\":%s,\"boundRoot\":%s,\"expectedToken\":\"%p\",\"observedToken\":\"%p\",\"firstCandidateStyle\":%llu,\"firstCandidateExtendedStyle\":%llu,\"candidateStyle\":%llu,\"candidateExtendedStyle\":%llu,\"windowsError\":%lu}",
+++                "EGO_OWNED_COMPOSITION_BINDING_V1 {\"schemaVersion\":1,\"runtimeGeneration\":36,\"pid\":%lu,\"tid\":%lu,\"utcTime100ns\":\"%llu\",\"reason\":\"%s\",\"bindingId\":\"%p\",\"bound\":\"%p\",\"firstCandidate\":\"%p\",\"firstCandidateOwner\":\"%p\",\"candidate\":\"%p\",\"candidateOwner\":\"%p\",\"expectedThread\":%lu,\"candidateThread\":%lu,\"boundThread\":%lu,\"boundPid\":%lu,\"eligibleCount\":%u,\"enumerationComplete\":%s,\"boundVisible\":%s,\"boundRoot\":%s,\"expectedToken\":\"%p\",\"observedToken\":\"%p\",\"firstCandidateStyle\":%llu,\"firstCandidateExtendedStyle\":%llu,\"candidateStyle\":%llu,\"candidateExtendedStyle\":%llu,\"windowsError\":%lu}",
++                 GetCurrentProcessId(),GetCurrentThreadId(),static_cast<unsigned long long>(ticks),reason,r.binding,r.bound,r.first_candidate,r.first_candidate_owner,r.candidate,r.candidate_owner,r.expected_thread,r.candidate_thread,r.bound_thread,r.bound_pid,r.eligible_count,r.enumeration_complete?"true":"false",r.bound_visible?"true":"false",r.bound_root?"true":"false",r.expected_token,r.observed_token,static_cast<unsigned long long>(r.first_candidate_style),static_cast<unsigned long long>(r.first_candidate_extended_style),static_cast<unsigned long long>(r.candidate_style),static_cast<unsigned long long>(r.candidate_extended_style),r.error);
++         } catch (...) {} // A failed diagnostic never changes the binding decision.
++     }
++@@ -882,6 +887,11 @@ extern "C" __declspec(dllexport) DWORD WINAPI ElectronGameOverlayInitializeOwned
++         {
++             last_error.store(error);
++             status.store(4, std::memory_order_release);
+++            if (error == ERROR_MOD_NOT_FOUND)
+++            {
+++                deferred_pending.store(true, std::memory_order_release);
+++                ego_owned_deferred_d3d11_kick();
+++            }
++             return ERROR_SUCCESS;
++         }
++         status.store(1, std::memory_order_release);
++@@ -943,3 +953,60 @@ extern "C" __declspec(dllexport) DWORD WINAPI ElectronGameOverlayQueryOwnedLateD
++     *result = snapshot;
++     return ERROR_SUCCESS;
++ }
+++
+++namespace ego_owned_late_d3d11
+++{
+++    DWORD WINAPI deferred_worker(void *) noexcept
+++    {
+++        DWORD result = ERROR_INVALID_STATE;
+++        try
+++        {
+++            bool eligible = false;
+++            {
+++                const std::lock_guard<std::mutex> lock(install_mutex);
+++                // Only a validated owned-stage initializer's exact missing-
+++                // module outcome may reopen. Unsupported discovery and other
+++                // failures stay terminal, as do foreign/unready hosts.
+++                if (deferred_pending.load() && status.load() == 4 && last_error.load() == ERROR_MOD_NOT_FOUND)
+++                {
+++                    deferred_pending.store(false);
+++                    status.store(0, std::memory_order_release);
+++                    eligible = true;
+++                }
+++            }
+++            if (eligible) result = ElectronGameOverlayInitializeOwnedLateD3D11V1(nullptr);
+++        }
+++        catch (...) { result = ERROR_UNHANDLED_EXCEPTION; }
+++        if (result != ERROR_SUCCESS)
+++        {
+++            const std::lock_guard<std::mutex> lock(install_mutex);
+++            if (status.load() == 0)
+++            {
+++                last_error.store(result);
+++                status.store(3, std::memory_order_release);
+++            }
+++        }
+++        return 0;
+++    }
+++}
+++void ego_owned_deferred_d3d11_note(HMODULE module) noexcept
+++{
+++    if (ego_owned_runtime_policy::active.load(std::memory_order_acquire))
+++        ego_owned_late_d3d11::deferred_module.store(module, std::memory_order_release);
+++}
+++void ego_owned_deferred_d3d11_kick() noexcept
+++{
+++    using namespace ego_owned_late_d3d11;
+++    const ego_owned_runtime_policy::error_scope preserve;
+++    if (!ego_owned_runtime_policy::active.load(std::memory_order_acquire) ||
+++        !deferred_pending.load(std::memory_order_acquire) || deferred_module.load(std::memory_order_acquire) == nullptr)
+++        return;
+++    bool expected = false;
+++    if (!deferred_queued.compare_exchange_strong(expected, true)) return;
+++    if (!QueueUserWorkItem(&deferred_worker, nullptr, WT_EXECUTELONGFUNCTION))
+++    {
+++        const DWORD error = GetLastError();
+++        last_error.store(error ? error : ERROR_GEN_FAILURE);
+++        // Queue failure is terminal: never retry or substitute another worker.
+++    }
+++}
++diff --git a/source/ego_owned_late_d3d11/compatibility_snapshot.hpp b/source/ego_owned_late_d3d11/compatibility_snapshot.hpp
++--- a/source/ego_owned_late_d3d11/compatibility_snapshot.hpp
+++++ b/source/ego_owned_late_d3d11/compatibility_snapshot.hpp
++@@ -73,7 +73,7 @@ namespace ego_compatibility_snapshot {
++         error_scope preserve;
++         if (!once(1u)) return;
++         try { reshade::log::message(reshade::log::level::info,
++-            "EGO_COMPATIBILITY_SNAPSHOT_V1 {\"schemaVersion\":1,\"runtimeGeneration\":35,\"kind\":\"loader\",\"pid\":%lu,\"tid\":%lu,\"strategy\":\"%s\",\"enabled\":%s,\"steamEnvironment\":%s,\"steamRenderer\":%s}",
+++            "EGO_COMPATIBILITY_SNAPSHOT_V1 {\"schemaVersion\":1,\"runtimeGeneration\":36,\"kind\":\"loader\",\"pid\":%lu,\"tid\":%lu,\"strategy\":\"%s\",\"enabled\":%s,\"steamEnvironment\":%s,\"steamRenderer\":%s}",
++             GetCurrentProcessId(), GetCurrentThreadId(), use_load_library ? "load-library" : "notification", enabled ? "true" : "false", inputs.environment ? "true" : "false", inputs.renderer ? "true" : "false"); } catch (...) {}
++     }
++     inline unsigned factory_begin(unsigned flags, bool internal) noexcept {
++@@ -81,7 +81,7 @@ namespace ego_compatibility_snapshot {
++         const unsigned ticket = discovery_depth != 0 ? 2u : internal ? 4u : 8u;
++         if (!once(ticket)) return 0;
++         try { reshade::log::message(reshade::log::level::info,
++-            "EGO_COMPATIBILITY_SNAPSHOT_V1 {\"schemaVersion\":1,\"runtimeGeneration\":35,\"kind\":\"factory-entry\",\"pid\":%lu,\"tid\":%lu,\"ticket\":%u,\"flags\":%u,\"methodDiscovery\":%s,\"dxgiInternal\":%s}",
+++            "EGO_COMPATIBILITY_SNAPSHOT_V1 {\"schemaVersion\":1,\"runtimeGeneration\":36,\"kind\":\"factory-entry\",\"pid\":%lu,\"tid\":%lu,\"ticket\":%u,\"flags\":%u,\"methodDiscovery\":%s,\"dxgiInternal\":%s}",
++             GetCurrentProcessId(), GetCurrentThreadId(), ticket, flags, discovery_depth != 0 ? "true" : "false", internal ? "true" : "false"); } catch (...) {}
++         return ticket;
++     }
++@@ -89,7 +89,7 @@ namespace ego_compatibility_snapshot {
++         error_scope preserve;
++         if (ticket == 0) return;
++         try { reshade::log::message(reshade::log::level::info,
++-            "EGO_COMPATIBILITY_SNAPSHOT_V1 {\"schemaVersion\":1,\"runtimeGeneration\":35,\"kind\":\"factory-return\",\"pid\":%lu,\"tid\":%lu,\"ticket\":%u,\"hresult\":%u,\"original\":\"%p\",\"returned\":\"%p\",\"originalCreateSwapChain\":\"%p\",\"originalOwner\":\"%s\",\"returnedCreateSwapChain\":\"%p\",\"returnedOwner\":\"%s\"}",
+++            "EGO_COMPATIBILITY_SNAPSHOT_V1 {\"schemaVersion\":1,\"runtimeGeneration\":36,\"kind\":\"factory-return\",\"pid\":%lu,\"tid\":%lu,\"ticket\":%u,\"hresult\":%u,\"original\":\"%p\",\"returned\":\"%p\",\"originalCreateSwapChain\":\"%p\",\"originalOwner\":\"%s\",\"returnedCreateSwapChain\":\"%p\",\"returnedOwner\":\"%s\"}",
++             GetCurrentProcessId(), GetCurrentThreadId(), ticket, static_cast<unsigned>(result), original, returned, original_entry, owner(original_entry), returned_entry, owner(returned_entry)); } catch (...) {}
++     }
++     inline bool claim_present(bool proxy, bool extended, unsigned flags) noexcept {
++@@ -102,13 +102,13 @@ namespace ego_compatibility_snapshot {
++         error_scope preserve;
++         const auto current_jump = observe_entry_jump(current), target_jump = observe_entry_jump(target), saved_jump = observe_entry_jump(saved);
++         try { reshade::log::message(reshade::log::level::info,
++-            "EGO_COMPATIBILITY_SNAPSHOT_V1 {\"schemaVersion\":1,\"runtimeGeneration\":35,\"kind\":\"%s\",\"pid\":%lu,\"tid\":%lu,\"role\":\"%s\",\"method\":\"%s\",\"instance\":\"%p\",\"downstreamInstance\":\"%p\",\"device\":\"%p\",\"current\":\"%p\",\"currentOwner\":\"%s\",\"currentJumpOwner\":\"%s\",\"currentJumpHops\":%u,\"target\":\"%p\",\"targetOwner\":\"%s\",\"targetJumpOwner\":\"%s\",\"targetJumpHops\":%u,\"saved\":\"%p\",\"savedOwner\":\"%s\",\"savedJumpOwner\":\"%s\",\"savedJumpHops\":%u,\"dxgiInternal\":%s}",
+++            "EGO_COMPATIBILITY_SNAPSHOT_V1 {\"schemaVersion\":1,\"runtimeGeneration\":36,\"kind\":\"%s\",\"pid\":%lu,\"tid\":%lu,\"role\":\"%s\",\"method\":\"%s\",\"instance\":\"%p\",\"downstreamInstance\":\"%p\",\"device\":\"%p\",\"current\":\"%p\",\"currentOwner\":\"%s\",\"currentJumpOwner\":\"%s\",\"currentJumpHops\":%u,\"target\":\"%p\",\"targetOwner\":\"%s\",\"targetJumpOwner\":\"%s\",\"targetJumpHops\":%u,\"saved\":\"%p\",\"savedOwner\":\"%s\",\"savedJumpOwner\":\"%s\",\"savedJumpHops\":%u,\"dxgiInternal\":%s}",
++             kind, GetCurrentProcessId(), GetCurrentThreadId(), role, method, instance, downstream, device, current, owner(current), current_jump.owner, current_jump.hops, target, owner(target), target_jump.owner, target_jump.hops, saved, owner(saved), saved_jump.owner, saved_jump.hops, internal ? "true" : "false"); } catch (...) {}
++     }
++     inline void present_end(bool proxy, bool extended, HRESULT result) noexcept {
++         error_scope preserve;
++         try { reshade::log::message(reshade::log::level::info,
++-            "EGO_COMPATIBILITY_SNAPSHOT_V1 {\"schemaVersion\":1,\"runtimeGeneration\":35,\"kind\":\"present-return\",\"pid\":%lu,\"tid\":%lu,\"role\":\"%s\",\"method\":\"%s\",\"hresult\":%u}",
+++            "EGO_COMPATIBILITY_SNAPSHOT_V1 {\"schemaVersion\":1,\"runtimeGeneration\":36,\"kind\":\"present-return\",\"pid\":%lu,\"tid\":%lu,\"role\":\"%s\",\"method\":\"%s\",\"hresult\":%u}",
++             GetCurrentProcessId(), GetCurrentThreadId(), proxy ? "proxy" : "raw", extended ? "Present1" : "Present", static_cast<unsigned>(result)); } catch (...) {}
++     }
++ }
++diff --git a/source/dxgi/dxgi_swapchain.cpp b/source/dxgi/dxgi_swapchain.cpp
++--- a/source/dxgi/dxgi_swapchain.cpp
+++++ b/source/dxgi/dxgi_swapchain.cpp
++@@ -978,7 +978,7 @@ void DXGISwapChain::on_reset([[maybe_unused]] bool resize, const char *reason)
++                 FILETIME utc {};GetSystemTimePreciseAsFileTime(&utc);
++                 const auto ticks=(std::uint64_t(utc.dwHighDateTime)<<32)|utc.dwLowDateTime;
++                 reshade::log::message(reshade::log::level::info,
++-                    "EGO_OWNED_RUNTIME_RESET_V1 {\"schemaVersion\":1,\"runtimeGeneration\":35,\"pid\":%lu,\"tid\":%lu,\"utcTime100ns\":\"%llu\",\"reason\":\"%s\",\"proxy\":\"%p\",\"native\":\"%p\",\"implementation\":\"%p\",\"resize\":%s,\"composition\":%s}",
+++                    "EGO_OWNED_RUNTIME_RESET_V1 {\"schemaVersion\":1,\"runtimeGeneration\":36,\"pid\":%lu,\"tid\":%lu,\"utcTime100ns\":\"%llu\",\"reason\":\"%s\",\"proxy\":\"%p\",\"native\":\"%p\",\"implementation\":\"%p\",\"resize\":%s,\"composition\":%s}",
++                     GetCurrentProcessId(),GetCurrentThreadId(),static_cast<unsigned long long>(ticks),reason,static_cast<const void *>(this),static_cast<const void *>(_orig),static_cast<const void *>(_impl),resize?"true":"false",_owned_composition?"true":"false");
++             } catch (...) {} // Logging failure never changes reset or forwarding.
++         }
+diff --git a/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-contended-composition.ps1 b/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-contended-composition.ps1
+new file mode 100644
+index 0000000000000000000000000000000000000000..2d3142e9ab5c5ae788451692f9076e3b3129e34b
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-contended-composition.ps1
+@@ -0,0 +1,3 @@
++$ErrorActionPreference="Stop"
++& node (Join-Path $PSScriptRoot "..\..\tests\owned-deferred-bootstrap\run-gate.cjs") x64 contended-composition
++if($LASTEXITCODE -ne 0){throw "Owned deferred D3D11 contended composition gate failed."}
+diff --git a/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-contended.ps1 b/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-contended.ps1
+new file mode 100644
+index 0000000000000000000000000000000000000000..31e418495383156ff527505b41d5a597aeac00ab
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-contended.ps1
+@@ -0,0 +1,3 @@
++$ErrorActionPreference="Stop"
++& node (Join-Path $PSScriptRoot "..\..\tests\owned-deferred-bootstrap\run-gate.cjs") x64 contended
++if($LASTEXITCODE -ne 0){throw "Owned deferred D3D11 contended gate failed."}
+diff --git a/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-dllmain.ps1 b/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-dllmain.ps1
+new file mode 100644
+index 0000000000000000000000000000000000000000..f22a7be8fe8546f015e514fb08df5547fd135e62
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-dllmain.ps1
+@@ -0,0 +1,3 @@
++$ErrorActionPreference="Stop"
++& node (Join-Path $PSScriptRoot "..\..\tests\owned-deferred-bootstrap\run-gate.cjs") x64 dllmain
++if($LASTEXITCODE -ne 0){throw "Owned deferred D3D11 dllmain gate failed."}
+diff --git a/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-foreign.ps1 b/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-foreign.ps1
+new file mode 100644
+index 0000000000000000000000000000000000000000..bb1919789456f9163262017f74f24fe1fca57854
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-foreign.ps1
+@@ -0,0 +1,3 @@
++$ErrorActionPreference="Stop"
++& node (Join-Path $PSScriptRoot "..\..\tests\owned-deferred-bootstrap\run-gate.cjs") x64 foreign
++if($LASTEXITCODE -ne 0){throw "Owned deferred D3D11 foreign gate failed."}
+diff --git a/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-nested.ps1 b/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-nested.ps1
+new file mode 100644
+index 0000000000000000000000000000000000000000..8693dc68ea50fb88b15966ea0fab60281000ce26
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-nested.ps1
+@@ -0,0 +1,3 @@
++$ErrorActionPreference="Stop"
++& node (Join-Path $PSScriptRoot "..\..\tests\owned-deferred-bootstrap\run-gate.cjs") x64 nested
++if($LASTEXITCODE -ne 0){throw "Owned deferred D3D11 nested gate failed."}
+diff --git a/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-no-backend.ps1 b/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-no-backend.ps1
+new file mode 100644
+index 0000000000000000000000000000000000000000..ea590893a423a4c7c9e3ce09aaa3640f68117506
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-no-backend.ps1
+@@ -0,0 +1,3 @@
++$ErrorActionPreference="Stop"
++& node (Join-Path $PSScriptRoot "..\..\tests\owned-deferred-bootstrap\run-gate.cjs") x64 no-backend
++if($LASTEXITCODE -ne 0){throw "Owned deferred D3D11 no-backend gate failed."}
+diff --git a/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-notification-control.ps1 b/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-notification-control.ps1
+new file mode 100644
+index 0000000000000000000000000000000000000000..a833519d38389070138f77f31692791b0f56d55d
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-notification-control.ps1
+@@ -0,0 +1,3 @@
++$ErrorActionPreference="Stop"
++& node (Join-Path $PSScriptRoot "..\..\tests\owned-deferred-bootstrap\run-gate.cjs") x64 notification-control
++if($LASTEXITCODE -ne 0){throw "Owned deferred D3D11 notification control failed."}
+diff --git a/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-queue-failure.ps1 b/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-queue-failure.ps1
+new file mode 100644
+index 0000000000000000000000000000000000000000..61e375036b4ca45f11b7a6ce1cd39fbeec58dc63
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-queue-failure.ps1
+@@ -0,0 +1,3 @@
++$ErrorActionPreference="Stop"
++& node (Join-Path $PSScriptRoot "..\..\tests\owned-deferred-bootstrap\run-gate.cjs") x64 queue-failure
++if($LASTEXITCODE -ne 0){throw "Owned deferred D3D11 queue-failure gate failed."}
+diff --git a/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-revoked-ready.ps1 b/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-revoked-ready.ps1
+new file mode 100644
+index 0000000000000000000000000000000000000000..3d51df9e0ea0052a8b28a2678df1c197431d0f4a
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-revoked-ready.ps1
+@@ -0,0 +1,3 @@
++$ErrorActionPreference="Stop"
++& node (Join-Path $PSScriptRoot "..\..\tests\owned-deferred-bootstrap\run-gate.cjs") x64 revoked-ready
++if($LASTEXITCODE -ne 0){throw "Owned deferred D3D11 revoked-ready gate failed."}
+diff --git a/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-revoked-stage.ps1 b/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-revoked-stage.ps1
+new file mode 100644
+index 0000000000000000000000000000000000000000..552232d064b147e1abec84b5835af37108196e8c
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-revoked-stage.ps1
+@@ -0,0 +1,3 @@
++$ErrorActionPreference="Stop"
++& node (Join-Path $PSScriptRoot "..\..\tests\owned-deferred-bootstrap\run-gate.cjs") x64 revoked-stage
++if($LASTEXITCODE -ne 0){throw "Owned deferred D3D11 revoked-stage gate failed."}
+diff --git a/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-serialized.ps1 b/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-serialized.ps1
+new file mode 100644
+index 0000000000000000000000000000000000000000..b0ec48d09a761cb9f3b0efe2df3c5bd7ce8297f9
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-serialized.ps1
+@@ -0,0 +1,3 @@
++$ErrorActionPreference="Stop"
++& node (Join-Path $PSScriptRoot "..\..\tests\owned-deferred-bootstrap\run-gate.cjs") x64 serialized
++if($LASTEXITCODE -ne 0){throw "Owned deferred D3D11 serialized gate failed."}
+diff --git a/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-source-cache.ps1 b/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-source-cache.ps1
+new file mode 100644
+index 0000000000000000000000000000000000000000..ac57ef7492829a4b10d82407e53c982903effdd4
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-source-cache.ps1
+@@ -0,0 +1,3 @@
++$ErrorActionPreference="Stop"
++& node (Join-Path $PSScriptRoot "..\..\tests\owned-deferred-bootstrap\source-cache-gate.cjs")
++if($LASTEXITCODE -ne 0){throw "Owned deferred D3D11 source-cache gate failed."}
+diff --git a/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-unready.ps1 b/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-unready.ps1
+new file mode 100644
+index 0000000000000000000000000000000000000000..3864754f87a613165c8d6e3962266445c4c1e616
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/scripts/test-cases/owned-deferred-d3d11-unready.ps1
+@@ -0,0 +1,3 @@
++$ErrorActionPreference="Stop"
++& node (Join-Path $PSScriptRoot "..\..\tests\owned-deferred-bootstrap\run-gate.cjs") x64 unready
++if($LASTEXITCODE -ne 0){throw "Owned deferred D3D11 unready gate failed."}
+diff --git a/libs/electron-game-overlay-runtime/tests/delayed-hook-publication/frozen-gen35-pins.json b/libs/electron-game-overlay-runtime/tests/delayed-hook-publication/frozen-gen35-pins.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..9a4d4ce95909c2c4fc68ec109013c4f9fc8c1c7f
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/tests/delayed-hook-publication/frozen-gen35-pins.json
+@@ -0,0 +1,113 @@
++{
++  "kind": "immutable-gen35-reproduction-source-pins",
++  "runtimeGeneration": 35,
++  "producerFile": "libs/electron-game-overlay-runtime/scripts/build-reshade-runtime.ps1",
++  "producerSha256": "19f61546a38d489b05ea6437b3f5db2fcef59302a45a57c5e2f4d8732835dd36",
++  "sourceZipSha256": "b279e64a6c9772fac54930ed0b4e1719d964374ac7bb76c1e9fc353684a3a59f",
++  "pins": [
++    {
++      "name": "source/ego_owned_late_d3d11/owned_runtime_policy.hpp",
++      "digest": "A06E427C7EA2AE73F3FF90E14C204719FC247B9DE02EB5F84E066B602623F524"
++    },
++    {
++      "name": "source/dxgi/dxgi_swapchain.hpp",
++      "digest": "C5A155BE0321F30DB18B4FC4578A41BF728414DD0927A789D5C335041922BC55"
++    },
++    {
++      "name": "source/ini_file.cpp",
++      "digest": "08ACD295DB065D11E5A8388F074CFC6C384D29896E5DA9B20227222D8A61C688"
++    },
++    {
++      "name": "source/ego_owned_late_d3d11/compatibility_snapshot.hpp",
++      "digest": "EF7E0B8A483D54053E2934E936DE96F8414DEF1B725D0CA131DD2121A5EA7F32"
++    },
++    {
++      "name": "source/dxgi/dxgi.cpp",
++      "digest": "41A686B186910B4C0FAA1B631356C2D7FD0F4BE772EFB32D7328DAA2DC65B88F"
++    },
++    {
++      "name": "source/hook_manager.cpp",
++      "digest": "C62CD60C5AFD66FAFCF6F3E0659C88078685351CB20B9721742953C7D64516BB"
++    },
++    {
++      "name": "source/dxgi/dxgi_swapchain.cpp",
++      "digest": "7213F5376BBEF92909910B33BA9B9F771101DA268E2AAAAECD212F1A1CBFDD2E"
++    },
++    {
++      "name": "ReShade.vcxproj",
++      "digest": "9FC55C36B9B4E55E8FE9D87401CEFE69858B5FA5110023840BEAF2FC5B8D2A9C"
++    },
++    {
++      "name": "include/reshade.hpp",
++      "digest": "CC102FA21D311B85713ED167F0E182A4EECCD40CDF3FBE360AD9F83A0CF40767"
++    },
++    {
++      "name": "include/reshade_api.hpp",
++      "digest": "80E9F0CBC06BF96943DC79CA2D133DB5D8E69D3A4CD516B6D89D675B8B965218"
++    },
++    {
++      "name": "include/reshade_events.hpp",
++      "digest": "8090912CD69854818C294F7C0F848EBAB7C712AB6D601E6889E62514249EE6A7"
++    },
++    {
++      "name": "source/addon.cpp",
++      "digest": "DF69C9E8BE88244B54D92849A183B8A149A74FA959ED49A7109824EF0D8E3D9C"
++    },
++    {
++      "name": "source/addon_manager.cpp",
++      "digest": "E6524902A07A0B4E2947B372503679A84CAA0FD1840329E89564559C3160349E"
++    },
++    {
++      "name": "source/addon_manager.hpp",
++      "digest": "C1D27EA4C9996F1EAD408FAD0D0DB3AEEAE16A4BEFEB4A0F71EC6C616116989B"
++    },
++    {
++      "name": "source/d3d11/d3d11_impl_swapchain.cpp",
++      "digest": "9CC88315C5F2A4DAAA7E4AEAEBBA6584851AE565EC5D250C28BE2AE3B4347DDF"
++    },
++    {
++      "name": "source/d3d11/d3d11_impl_swapchain.hpp",
++      "digest": "D6010A43C93302C056AF62E1BBE7523E6A8D023DEDFB9D3F50DC689EAA9169B6"
++    },
++    {
++      "name": "source/ego_owned_late_d3d11/owned_config_file.hpp",
++      "digest": "98D7B1D5D55841FDDD0320378C130D61DFF688EC42C47E6C14BAC7ADDE87C8D8"
++    },
++    {
++      "name": "source/ego_owned_late_d3d11/owned_late_d3d11.hpp",
++      "digest": "99C928A9D56A8A029F0E02C354C22142A95DCDEE849359B2C31E8077F3C589B6"
++    },
++    {
++      "name": "source/ego_owned_late_d3d11/owned_late_d3d11.inl",
++      "digest": "7D6DCB3C8EA776EE8A4DBFC205CF0B3380AC60F57C86C00868532F2200941595"
++    },
++    {
++      "name": "source/input_frame_consumer.hpp",
++      "digest": "50808217A78ABD97417CA57694A5275895F8F0318AF6172658C087C26D3F8CA0"
++    },
++    {
++      "name": "source/input.cpp",
++      "digest": "B5778EA4DFD482F1E3E0C8A5337BCCFF351EA2CCF85AD0FDF565669CB9852D72"
++    },
++    {
++      "name": "source/input.hpp",
++      "digest": "6F9AF2B09AC6FF491AA2BC96A024E3B90F703985FFAD7A96C2BBB862667A4C1E"
++    },
++    {
++      "name": "source/runtime.cpp",
++      "digest": "96B12143E7A13B607D101AE7FD573C86334DD1BFDEEC2CA21520C74FE0200CD7"
++    },
++    {
++      "name": "source/runtime.hpp",
++      "digest": "1F2CF88559AE52D62DC3A8B236A734093E74864CAC44A069DD54440FBCCE3D11"
++    },
++    {
++      "name": "source/runtime_gui.cpp",
++      "digest": "6B8A8D3ACECE1E9C687062360FABBFAC04397222973A23565B661A7505F3187A"
++    },
++    {
++      "name": "tools/injector.cpp",
++      "digest": "7A6DC34363FF8EBD78484D8AEE6CE0463F22E90AB35DD1261FC9FBD9B09A3A3E"
++    }
++  ]
++}
+diff --git a/libs/electron-game-overlay-runtime/tests/owned-deferred-bootstrap/CMakeLists.txt b/libs/electron-game-overlay-runtime/tests/owned-deferred-bootstrap/CMakeLists.txt
+new file mode 100644
+index 0000000000000000000000000000000000000000..dae2fd113c23aba1abc2a6f38333b68272bcd5fb
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/tests/owned-deferred-bootstrap/CMakeLists.txt
+@@ -0,0 +1,21 @@
++cmake_minimum_required(VERSION 3.24)
++project(owned_deferred_bootstrap LANGUAGES C CXX)
++if(NOT WIN32 OR NOT MSVC OR NOT EXISTS "${RESHAPE_SOURCE}/deps/minhook/src/hook.c")
++  message(FATAL_ERROR "Supply the pinned Windows ReShade source cache.")
++endif()
++set(mh "${RESHAPE_SOURCE}/deps/minhook")
++add_library(callback_counter SHARED adapter.cpp)
++target_include_directories(callback_counter PRIVATE "${RESHAPE_SOURCE}/include")
++add_library(nested_loader SHARED loader.cpp)
++add_library(dllmain_loader SHARED loader.cpp)
++target_compile_definitions(dllmain_loader PRIVATE LOAD_IN_DLLMAIN=1)
++add_executable(owned_deferred_bootstrap fixture.cpp "${mh}/src/hook.c" "${mh}/src/buffer.c" "${mh}/src/trampoline.c" "${mh}/src/hde/hde32.c" "${mh}/src/hde/hde64.c")
++target_include_directories(owned_deferred_bootstrap PRIVATE "${mh}/include" "${RESHAPE_SOURCE}/source/ego_owned_late_d3d11")
++target_link_libraries(owned_deferred_bootstrap PRIVATE user32)
++foreach(target callback_counter nested_loader dllmain_loader owned_deferred_bootstrap)
++  target_compile_features(${target} PRIVATE cxx_std_17)
++  target_compile_definitions(${target} PRIVATE UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN)
++  target_compile_options(${target} PRIVATE /W4 /EHsc /permissive-)
++  target_link_options(${target} PRIVATE /INCREMENTAL:NO)
++endforeach()
++# No d3d11/dxgi imports: backend loading must occur after the absent initializer.
+diff --git a/libs/electron-game-overlay-runtime/tests/owned-deferred-bootstrap/README.md b/libs/electron-game-overlay-runtime/tests/owned-deferred-bootstrap/README.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..c0dfc9fa6835ea6ff5938869b0e11d137cdb4a32
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/tests/owned-deferred-bootstrap/README.md
+@@ -0,0 +1,48 @@
++# Owned deferred D3D11 gate
++
++`node run-gate.cjs x64 all` (or x86) runs the normal production host against the
++immutable 1012 missed-adoption baseline. It creates real hardware devices with
++hidden HWND swap chains or a null-HWND composition chain and a visible-style
++presentation window verified outside all monitors. The latter is shown with
++SW_SHOWNOACTIVATE; foreground and offscreen placement are checked. It does not
++attach a DirectComposition visual, launch games, activate a window or
++send input. Individual launchers select each production case; parameterized
++execution is internal automation.
++
++The contended case holds the actual production delayed-scan mutex at one owned
++GetModuleHandleExW API barrier. The first original device/chain succeeds while
++the mutex is held. After publication the production host must adopt that same
++chain on a later Present. The baseline returns 3/gatePassed:false. Passing the
++orchestrator's expected-baseline assertion never relabels it as runtime success.
++
++The contended-composition case exercises the same missed-first-device boundary
++with a real BGRA composition chain. GetDesc/GetHwnd confirm its absent native
++HWND. The runtime callback must resolve exactly the offscreen presentation HWND,
++paint/read the original backbuffer, resume after resize, and retire normally.
++Both contended cases retain failing 1012 baselines on each architecture.
++
++A second owned API observer wraps QueueUserWorkItem only for calls originating
++in the loaded host. It forwards the opaque callback/argument once and signals a
++test-owned event after callback completion. It checks owner, flags, thread
++separation and one queue attempt. Queue-failure injection returns an actual
++failed API result. No production test exports or private layouts are required.
++
++Callback counters use fixed size/version POD. A registered reshade_present
++callback paints the actual D3D11 backbuffer red and performs a native GPU
++readback. Separate green readbacks prove the original chain remains usable.
++Present/Present1 flags, exactly-once forwarding, a forced downstream error,
++resize/resume and final lifetime retirement are checked. Automatic proxy
++controls must not be manually adopted. Foreign, unready, no-backend, queue-error
++and revoked stage/readiness cases remain inactive.
++
++The notification control clears SteamOverlayGameId only in its own fixture
++process, requires no Steam renderer image, and checks that the notification
++lane keeps automatic runtime rendering with zero deferred work items.
++
++`run-prototype.cjs` explicitly selects the unsealed experimental shadow DLL,
++whose fixed POD observation exports are test instrumentation only. Prototype
++evidence version 2 was sealed before subsequent production-gate changes.
++`source-cache-gate.cjs` exercises the exact normal CMake tail's reverse/replay,
++partial publication, idempotence, unknown-source, extra-file and altered-patch
++refusal in an isolated synthetic Git fixture. That is distinct from runtime,
++production package, actual-game, Steam and physical-key acceptance.
+diff --git a/libs/electron-game-overlay-runtime/tests/owned-deferred-bootstrap/adapter.cpp b/libs/electron-game-overlay-runtime/tests/owned-deferred-bootstrap/adapter.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..8462a449c254bf9ee31714d41a662389850ede6f
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/tests/owned-deferred-bootstrap/adapter.cpp
+@@ -0,0 +1,57 @@
++#include "contract.hpp"
++#include <reshade.hpp>
++#include <atomic>
++#include <d3d11.h>
++#include <wrl/client.h>
++extern "C" __declspec(dllexport) const unsigned int ElectronGameOverlayReShadeAddonAbi = 1;
++extern "C" __declspec(dllexport) volatile LONG ElectronGameOverlayCooperativeAdapterReadyV1 = 0;
++static std::atomic<std::uint64_t> devices{0}, destroyed_devices{0}, chains{0}, destroyed_chains{0}, runtimes{0}, destroyed_runtimes{0}, presents{0}, runtime_presents{0};
++static std::atomic<std::uint64_t> red_readbacks{0},gpu_errors{0};
++static std::atomic<std::uint64_t> runtime_hwnd{0};
++static void device_init(reshade::api::device *) { ++devices; }
++static void device_destroy(reshade::api::device *) { ++destroyed_devices; }
++static void chain_init(reshade::api::swapchain *, bool) { ++chains; }
++static void chain_destroy(reshade::api::swapchain *, bool) { ++destroyed_chains; }
++static void runtime_init(reshade::api::effect_runtime *runtime) { ++runtimes;runtime_hwnd=reinterpret_cast<std::uintptr_t>(runtime->get_hwnd()); }
++static void runtime_destroy(reshade::api::effect_runtime *) { ++destroyed_runtimes; }
++static void runtime_present(reshade::api::effect_runtime *runtime) {
++    ++runtime_presents;
++    // Actual callback rendering/readback, independent of the fixture's green
++    // baseline. D3D11 public resource handles carry the native resource pointer.
++    using Microsoft::WRL::ComPtr;
++    auto *texture=reinterpret_cast<ID3D11Texture2D *>(runtime->get_current_back_buffer().handle);
++    if(!texture){++gpu_errors;return;}
++    ComPtr<ID3D11Device> device;ComPtr<ID3D11DeviceContext> context;ComPtr<ID3D11RenderTargetView> view;ComPtr<ID3D11Texture2D> staging;
++    texture->GetDevice(&device);device->GetImmediateContext(&context);
++    if(FAILED(device->CreateRenderTargetView(texture,nullptr,&view))){++gpu_errors;return;}
++    const float red[4]{1,0,0,1};context->ClearRenderTargetView(view.Get(),red);
++    D3D11_TEXTURE2D_DESC desc{};texture->GetDesc(&desc);desc.Usage=D3D11_USAGE_STAGING;desc.BindFlags=0;desc.CPUAccessFlags=D3D11_CPU_ACCESS_READ;desc.MiscFlags=0;
++    if(FAILED(device->CreateTexture2D(&desc,nullptr,&staging))){++gpu_errors;return;}
++    context->CopyResource(staging.Get(),texture);D3D11_MAPPED_SUBRESOURCE mapped{};
++    if(FAILED(context->Map(staging.Get(),0,D3D11_MAP_READ,0,&mapped))){++gpu_errors;return;}
++    const BYTE *pixel=static_cast<const BYTE *>(mapped.pData);const bool bgra=desc.Format==DXGI_FORMAT_B8G8R8A8_UNORM||desc.Format==DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;const bool valid=pixel[bgra?2:0]==255&&pixel[1]==0&&pixel[bgra?0:2]==0&&pixel[3]==255;context->Unmap(staging.Get(),0);
++    if(valid)++red_readbacks;else ++gpu_errors;
++}
++static void present(reshade::api::command_queue *, reshade::api::swapchain *, const reshade::api::rect *, const reshade::api::rect *, std::uint32_t, const reshade::api::rect *) { ++presents; }
++extern "C" __declspec(dllexport) DWORD WINAPI QueryCallbacksV1(callback_counts_v1 *out) {
++    if (!out || out->struct_size != sizeof(*out) || out->version != 1) return ERROR_REVISION_MISMATCH;
++    out->devices=devices.load();out->destroyed_devices=destroyed_devices.load();out->chains=chains.load();out->destroyed_chains=destroyed_chains.load();out->runtimes=runtimes.load();out->destroyed_runtimes=destroyed_runtimes.load();out->presents=presents.load();out->runtime_presents=runtime_presents.load();out->red_readbacks=red_readbacks.load();out->gpu_errors=gpu_errors.load();out->runtime_hwnd=runtime_hwnd.load();return ERROR_SUCCESS;
++}
++BOOL WINAPI DllMain(HMODULE module, DWORD reason, LPVOID) {
++    if (reason == DLL_PROCESS_ATTACH) {
++        if (!reshade::register_addon(module)) return FALSE;
++        reshade::register_event<reshade::addon_event::init_device>(device_init);
++        reshade::register_event<reshade::addon_event::destroy_device>(device_destroy);
++        reshade::register_event<reshade::addon_event::init_swapchain>(chain_init);
++        reshade::register_event<reshade::addon_event::destroy_swapchain>(chain_destroy);
++        reshade::register_event<reshade::addon_event::init_effect_runtime>(runtime_init);
++        reshade::register_event<reshade::addon_event::destroy_effect_runtime>(runtime_destroy);
++        reshade::register_event<reshade::addon_event::reshade_present>(runtime_present);
++        reshade::register_event<reshade::addon_event::present>(present);
++        InterlockedExchange(&ElectronGameOverlayCooperativeAdapterReadyV1, 1);
++    }
++    return TRUE;
++}
++#if defined(_M_IX86)
++#pragma comment(linker,"/EXPORT:QueryCallbacksV1=_QueryCallbacksV1@4")
++#endif
+diff --git a/libs/electron-game-overlay-runtime/tests/owned-deferred-bootstrap/contract.hpp b/libs/electron-game-overlay-runtime/tests/owned-deferred-bootstrap/contract.hpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..392eea81dbf2cc64cfd821674d1c3167ec551405
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/tests/owned-deferred-bootstrap/contract.hpp
+@@ -0,0 +1,12 @@
++#pragma once
++#include <Windows.h>
++#include <cstdint>
++struct callback_counts_v1 {
++    std::uint32_t struct_size = sizeof(callback_counts_v1), version = 1;
++    std::uint64_t devices = 0, destroyed_devices = 0, chains = 0, destroyed_chains = 0;
++    std::uint64_t runtimes = 0, destroyed_runtimes = 0, presents = 0, runtime_presents = 0;
++    std::uint64_t red_readbacks = 0, gpu_errors = 0;
++    std::uint64_t runtime_hwnd = 0;
++};
++static_assert(sizeof(callback_counts_v1) == 96);
++using query_callbacks_fn = DWORD (WINAPI *)(callback_counts_v1 *);
+diff --git a/libs/electron-game-overlay-runtime/tests/owned-deferred-bootstrap/fixture.cpp b/libs/electron-game-overlay-runtime/tests/owned-deferred-bootstrap/fixture.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..f5c9373b5bdeee45e6227defc254538b801696e8
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/tests/owned-deferred-bootstrap/fixture.cpp
+@@ -0,0 +1,229 @@
++// Real hardware with hidden or verified-offscreen HWNDs; no game or input.
++#include "contract.hpp"
++#include "probe_contract.hpp"
++#define RESHADE_OWNED_LATE_D3D11_ABI_ONLY
++#include "owned_late_d3d11.hpp"
++#include <d3d11.h>
++#include <dxgi1_6.h>
++#include <wrl/client.h>
++#include <MinHook.h>
++#include <intrin.h>
++#include <atomic>
++#include <thread>
++#include <string>
++#include <cstdio>
++#include <stdexcept>
++using Microsoft::WRL::ComPtr;
++static unsigned checks=0, green_readbacks=0;
++static void require(bool ok,const char *text) { ++checks;if(!ok)throw std::runtime_error(text); }
++static void hr(HRESULT value,const char *text) { if(FAILED(value))std::fprintf(stderr,"%s hr=%08lx\n",text,value);require(SUCCEEDED(value),text); }
++template<class T>static T symbol(HMODULE module,const char *name) { const auto fn=reinterpret_cast<T>(GetProcAddress(module,name));require(fn!=nullptr,name);return fn; }
++static HMODULE owner(void *address) { MEMORY_BASIC_INFORMATION info{};return VirtualQuery(address,&info,sizeof(info))?static_cast<HMODULE>(info.AllocationBase):nullptr; }
++static void wait(HANDLE event,const char *text) { require(WaitForSingleObject(event,10000)==WAIT_OBJECT_0,text); }
++struct loader_guard {
++    HANDLE entered=CreateEventW(nullptr,TRUE,FALSE,nullptr),release=CreateEventW(nullptr,TRUE,FALSE,nullptr),done=CreateEventW(nullptr,TRUE,FALSE,nullptr);
++    std::thread thread;
++    ~loader_guard(){SetEvent(release);if(thread.joinable())thread.join();for(auto event:{entered,release,done})if(event)CloseHandle(event);}
++};
++static loader_guard *sync_state=nullptr;
++static HMODULE host=nullptr;
++using stats_fn=DWORD(WINAPI *)(ego_owned_late_d3d11_stats_v1 *);
++static stats_fn captured_query_stats=nullptr;
++static HANDLE captured_completion=nullptr;
++static std::atomic<DWORD> captured_queues{0},captured_workers{0},captured_queue_thread{0},captured_worker_thread{0},captured_error{0},captured_result{ERROR_IO_PENDING};
++static std::atomic<bool> fail_captured_queue{false};
++static std::atomic<bool> captured_contract_ok{true};
++static LPTHREAD_START_ROUTINE captured_callback=nullptr;
++static void *captured_parameter=nullptr;
++using queue_work_fn=BOOL(WINAPI *)(LPTHREAD_START_ROUTINE,PVOID,ULONG);
++static queue_work_fn real_queue_work=nullptr;
++static DWORD WINAPI observed_work(void *) {
++    ++captured_workers;captured_worker_thread=GetCurrentThreadId();
++    captured_result=captured_callback(captured_parameter);SetEvent(captured_completion);return captured_result.load();
++}
++static BOOL WINAPI observe_queue(LPTHREAD_START_ROUTINE callback,PVOID parameter,ULONG flags) {
++    if(owner(_ReturnAddress())!=host)return real_queue_work(callback,parameter,flags);
++    const DWORD count=++captured_queues;captured_queue_thread=GetCurrentThreadId();
++    if(owner(reinterpret_cast<void *>(callback))!=host||parameter!=nullptr||flags!=WT_EXECUTELONGFUNCTION)captured_contract_ok=false;
++    if(fail_captured_queue){captured_error=ERROR_NOT_ENOUGH_MEMORY;captured_result=ERROR_NOT_ENOUGH_MEMORY;SetEvent(captured_completion);SetLastError(ERROR_NOT_ENOUGH_MEMORY);return FALSE;}
++    if(count!=1)return real_queue_work(callback,parameter,flags);
++    captured_callback=callback;captured_parameter=parameter;
++    const BOOL result=real_queue_work(&observed_work,nullptr,flags);
++    if(!result){const DWORD error=GetLastError();captured_error=error;SetEvent(captured_completion);SetLastError(error);}
++    return result;
++}
++static DWORD WINAPI observed_probe(deferred_probe_v1 *out) {
++    ego_owned_late_d3d11_stats_v1 current{};current.struct_size=sizeof(current);current.abi_version=1;
++    const DWORD result=captured_query_stats(&current);if(result)return result;
++    out->pending=current.status==4&&current.last_win32_error==ERROR_MOD_NOT_FOUND;out->queued=captured_queues.load()!=0;out->queue_calls=captured_queues;out->worker_calls=captured_workers;out->queue_thread=captured_queue_thread;out->worker_thread=captured_worker_thread;out->queue_error=captured_error;
++    // Production exposes status/error, not its private worker return value.
++    out->result=current.status==3?current.last_win32_error:captured_result.load();out->host_status=current.status;out->reserved=captured_contract_ok?0:1;return ERROR_SUCCESS;
++}
++static std::atomic<DWORD> scan_thread{0};
++static std::atomic<bool> armed{false},claimed{false},barrier_timeout{false};
++using query_module_fn=BOOL(WINAPI *)(DWORD,LPCWSTR,HMODULE *);
++static query_module_fn real_query=nullptr;
++static BOOL WINAPI query_module(DWORD flags,LPCWSTR name,HMODULE *out) {
++    if(armed.load()&&GetCurrentThreadId()==scan_thread.load()&&name&&
++       (flags&(GET_MODULE_HANDLE_EX_FLAG_PIN|GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS))==GET_MODULE_HANDLE_EX_FLAG_PIN&&owner(_ReturnAddress())==host){
++        bool expected=false;if(claimed.compare_exchange_strong(expected,true)){
++            SetEvent(sync_state->entered);if(WaitForSingleObject(sync_state->release,10000)!=WAIT_OBJECT_0)barrier_timeout=true;
++        }
++    }
++    return real_query(flags,name,out);
++}
++static IDXGISwapChain *tracked=nullptr;
++static unsigned native_presents=0,native_present1s=0,native_resizes=0;
++static UINT last_sync=0,last_flags=0;
++static HRESULT last_native=S_OK;
++static bool force_error=false;
++using present_fn=HRESULT(STDMETHODCALLTYPE *)(IDXGISwapChain *,UINT,UINT);
++using present1_fn=HRESULT(STDMETHODCALLTYPE *)(IDXGISwapChain1 *,UINT,UINT,const DXGI_PRESENT_PARAMETERS *);
++using resize_fn=HRESULT(STDMETHODCALLTYPE *)(IDXGISwapChain *,UINT,UINT,UINT,DXGI_FORMAT,UINT);
++static present_fn real_present=nullptr;static present1_fn real_present1=nullptr;static resize_fn real_resize=nullptr;
++static HRESULT STDMETHODCALLTYPE observe_present(IDXGISwapChain *chain,UINT sync,UINT flags) {
++    const HRESULT result=real_present(chain,sync,flags);if(chain==tracked){++native_presents;last_sync=sync;last_flags=flags;last_native=force_error?DXGI_ERROR_WAS_STILL_DRAWING:result;return last_native;}return result;
++}
++static HRESULT STDMETHODCALLTYPE observe_present1(IDXGISwapChain1 *chain,UINT sync,UINT flags,const DXGI_PRESENT_PARAMETERS *params) {
++    const HRESULT result=real_present1(chain,sync,flags,params);if(chain==tracked){++native_present1s;last_sync=sync;last_flags=flags;last_native=force_error?DXGI_ERROR_WAS_STILL_DRAWING:result;return last_native;}return result;
++}
++static HRESULT STDMETHODCALLTYPE observe_resize(IDXGISwapChain *chain,UINT count,UINT width,UINT height,DXGI_FORMAT format,UINT flags) {
++    const HRESULT result=real_resize(chain,count,width,height,format,flags);if(chain==tracked){++native_resizes;last_native=result;}return result;
++}
++static void install_observers(IDXGISwapChain1 *chain) {
++    tracked=chain;auto **methods=*reinterpret_cast<void ***>(chain);
++    require(MH_CreateHook(methods[8],reinterpret_cast<void *>(&observe_present),reinterpret_cast<void **>(&real_present))==MH_OK,"native Present observer");
++    require(MH_CreateHook(methods[22],reinterpret_cast<void *>(&observe_present1),reinterpret_cast<void **>(&real_present1))==MH_OK,"native Present1 observer");
++    require(MH_CreateHook(methods[13],reinterpret_cast<void *>(&observe_resize),reinterpret_cast<void **>(&real_resize))==MH_OK,"native Resize observer");
++    require(MH_EnableHook(MH_ALL_HOOKS)==MH_OK,"enable owned observers");
++}
++static void green(ID3D11Device *device,ID3D11DeviceContext *context,IDXGISwapChain *chain) {
++    ComPtr<ID3D11Texture2D> texture,staging;ComPtr<ID3D11RenderTargetView> view;
++    hr(chain->GetBuffer(0,IID_PPV_ARGS(&texture)),"real original backbuffer");
++    hr(device->CreateRenderTargetView(texture.Get(),nullptr,&view),"real render target");
++    const float color[4]{0,1,0,1};context->ClearRenderTargetView(view.Get(),color);
++    D3D11_TEXTURE2D_DESC desc{};texture->GetDesc(&desc);desc.Usage=D3D11_USAGE_STAGING;desc.BindFlags=0;desc.CPUAccessFlags=D3D11_CPU_ACCESS_READ;desc.MiscFlags=0;
++    hr(device->CreateTexture2D(&desc,nullptr,&staging),"real staging buffer");context->CopyResource(staging.Get(),texture.Get());
++    D3D11_MAPPED_SUBRESOURCE mapped{};hr(context->Map(staging.Get(),0,D3D11_MAP_READ,0,&mapped),"GPU readback");
++    const BYTE *pixel=static_cast<const BYTE *>(mapped.pData);const bool valid=pixel[0]==0&&pixel[1]==255&&pixel[2]==0&&pixel[3]==255;context->Unmap(staging.Get(),0);require(valid,"green GPU pixel");++green_readbacks;
++}
++static ego_owned_late_d3d11_stats_v1 stats(stats_fn query) { ego_owned_late_d3d11_stats_v1 value{};value.struct_size=sizeof(value);value.abi_version=1;require(query(&value)==0,"production stats");return value; }
++static callback_counts_v1 callbacks(query_callbacks_fn query) { callback_counts_v1 value;require(query(&value)==0,"public callback counts");return value; }
++static deferred_probe_v1 probe(query_deferred_probe_fn query) { deferred_probe_v1 value;if(query)require(query(&value)==0,"prototype observation");return value; }
++int wmain(int argc,wchar_t **argv)try {
++    require(argc==8,"HOST ADAPTER INERT-TRIGGER NESTED-LOADER STAGE CASE baseline|prototype|production");const std::wstring mode=argv[6];const bool production=std::wcscmp(argv[7],L"production")==0;
++    const bool composition=mode==L"contended-composition",serialized=mode==L"serialized",contended=mode==L"contended"||composition,queue_failure=mode==L"queue-failure",foreign=mode==L"foreign",unready=mode==L"unready",no_backend=mode==L"no-backend",dllmain=mode==L"dllmain",nested=mode==L"nested",revoked=mode==L"revoked-ready",revoked_stage=mode==L"revoked-stage",notification=mode==L"notification-control";
++    require(serialized||contended||queue_failure||foreign||unready||no_backend||dllmain||nested||revoked||revoked_stage||notification,"known assessment mode");
++    require(!GetModuleHandleW(L"d3d11.dll")&&!GetModuleHandleW(L"dxgi.dll"),"graphics absent before host");
++    require(SetEnvironmentVariableW(L"SteamOverlayGameId",L"1")!=FALSE,"owned production LoadLibrary lane");
++    if(notification){require(SetEnvironmentVariableW(L"SteamOverlayGameId",nullptr)!=FALSE,"notification control clears only its own child environment");require(!GetModuleHandleW(L"GameOverlayRenderer64.dll")&&!GetModuleHandleW(L"GameOverlayRenderer.dll"),"notification control has no Steam renderer module");}
++    require(SetEnvironmentVariableW(L"RESHADE_BASE_PATH_OVERRIDE",argv[5])!=FALSE,"owned fixture stage");
++    host=LoadLibraryW(argv[1]);require(host!=nullptr,"host loaded");
++    auto gate=symbol<volatile LONG *>(host,"ElectronGameOverlayReShadeAddonGate");require(InterlockedCompareExchange(gate,1,0)==0,"registration gate");
++    const HMODULE counter=LoadLibraryW(argv[2]);require(counter!=nullptr,"public callback adapter loaded");
++    auto ready=symbol<volatile LONG *>(counter,"ElectronGameOverlayCooperativeAdapterReadyV1");
++    if(unready)InterlockedExchange(ready,0);require(InterlockedCompareExchange(gate,2,1)==1,"adapter published");
++    const auto query=symbol<query_callbacks_fn>(counter,"QueryCallbacksV1");
++    const auto initialize=symbol<DWORD(WINAPI *)(const ego_owned_late_d3d11_initialize_v1 *)>(host,"ElectronGameOverlayInitializeOwnedLateD3D11V1");
++    const auto query_stats=symbol<stats_fn>(host,"ElectronGameOverlayQueryOwnedLateD3D11V1");
++    auto query_probe=reinterpret_cast<query_deferred_probe_fn>(GetProcAddress(host,"EgoReproQueryDeferredBootstrapV1"));
++    require(MH_Initialize()==MH_OK,"owned hooks initialized");
++    HANDLE complete=nullptr;
++    if(production){
++        require(query_probe==nullptr,"production DLL excludes prototype exports");captured_query_stats=query_stats;query_probe=&observed_probe;
++        complete=captured_completion=CreateEventW(nullptr,TRUE,FALSE,nullptr);require(complete!=nullptr,"test-owned completion event");
++        require(MH_CreateHook(reinterpret_cast<void *>(&QueueUserWorkItem),reinterpret_cast<void *>(&observe_queue),reinterpret_cast<void **>(&real_queue_work))==MH_OK,"owned public work-queue observation");
++        require(MH_EnableHook(reinterpret_cast<void *>(&QueueUserWorkItem))==MH_OK,"work-queue observation enabled");
++        fail_captured_queue=queue_failure;
++    }else{
++        if(query_probe)require(symbol<acquire_deferred_completion_fn>(host,"EgoReproAcquireDeferredCompletionV1")(&complete)==0,"caller-owned completion handle");
++        if(queue_failure)symbol<force_deferred_queue_failure_fn>(host,"EgoReproForceDeferredQueueFailureV1")(TRUE);
++    }
++    const DWORD initial_result=initialize(nullptr);const auto initial=stats(query_stats);const auto initial_probe=probe(query_probe);
++    require(foreign?initial_result!=0:unready?initial_result==ERROR_NOT_READY:initial_result==0,"owned validation boundary");
++    require(foreign||unready?initial.status==0:initial.status==4&&initial.last_win32_error==ERROR_MOD_NOT_FOUND,"exact initial missing-module state");
++    require(!GetModuleHandleW(L"d3d11.dll"),"initializer did not load irrelevant backend");
++    if(query_probe)require(initial_probe.queue_calls==0&&initial_probe.worker_calls==0&&initial_probe.pending==(!foreign&&!unready),"pending only for validated owned absence");
++    if(no_backend){require(LoadLibraryW(argv[3])!=nullptr,"unrelated library load");const auto final=probe(query_probe);require(!GetModuleHandleW(L"d3d11.dll")&&final.queue_calls==0&&final.worker_calls==0,"no backend means no worker");require(MH_DisableHook(MH_ALL_HOOKS)==MH_OK&&MH_Uninitialize()==MH_OK,"fixture observation retired");std::printf("{\"case\":\"no-backend\",\"status\":\"passed\",\"gatePassed\":true,\"assertions\":%u,\"queueCalls\":0,\"workerCalls\":0,\"onscreen\":false,\"input\":false,\"actualGame\":false}\n",checks);if(complete)CloseHandle(complete);return 0;}
++    // Shared storage precedes guard so it remains alive while its thread joins.
++    std::string scan_error;loader_guard state;sync_state=&state;
++    require(state.entered&&state.release&&state.done,"fixture synchronization events");
++    const bool held=contended||queue_failure||revoked||revoked_stage;
++    if(held){
++        require(MH_CreateHook(reinterpret_cast<void *>(&GetModuleHandleExW),reinterpret_cast<void *>(&query_module),reinterpret_cast<void **>(&real_query))==MH_OK,"scan barrier hook");
++        require(MH_EnableHook(reinterpret_cast<void *>(&GetModuleHandleExW))==MH_OK,"scan barrier enabled");
++        state.thread=std::thread([&]{scan_thread=GetCurrentThreadId();armed=true;if(!LoadLibraryW(argv[3]))scan_error="inert trigger load failed";SetEvent(state.done);});
++        const HANDLE events[]{state.entered,state.done};require(WaitForMultipleObjects(2,events,FALSE,10000)==WAIT_OBJECT_0,"real scan barrier entered");
++    }
++    if(revoked)InterlockedExchange(ready,0);
++    if(revoked_stage)require(DeleteFileW((std::wstring(argv[5])+L"\\electron-game-overlay-owned-runtime-v1.marker").c_str())!=FALSE,"remove only fixture-owned marker before worker validation");
++    if(dllmain||nested){
++        const HMODULE loader=LoadLibraryW(argv[4]);require(loader!=nullptr,"owned nested loader returned without deadlock");
++        if(nested)require(symbol<DWORD(WINAPI *)()>(loader,"LoadBackendV1")()==0,"nested ordinary DLL load returned");
++    }
++    wchar_t system[MAX_PATH]{};require(GetSystemDirectoryW(system,MAX_PATH)!=0,"system backend path");
++    const HMODULE d3d=LoadLibraryW((std::wstring(system)+L"\\d3d11.dll").c_str());require(d3d!=nullptr,"real backend load returned");
++    const auto create=symbol<PFN_D3D11_CREATE_DEVICE_AND_SWAP_CHAIN>(d3d,"D3D11CreateDeviceAndSwapChain");
++    const HWND foreground=GetForegroundWindow();RECT virtual_screen{GetSystemMetrics(SM_XVIRTUALSCREEN),GetSystemMetrics(SM_YVIRTUALSCREEN),0,0};virtual_screen.right=virtual_screen.left+GetSystemMetrics(SM_CXVIRTUALSCREEN);virtual_screen.bottom=virtual_screen.top+GetSystemMetrics(SM_CYVIRTUALSCREEN);RECT placement{-32000,-32000,-31872,-31872},intersection{};require(!IntersectRect(&intersection,&placement,&virtual_screen),"offscreen placement outside every monitor before any visible style");
++    HWND window=CreateWindowExW(WS_EX_NOACTIVATE|WS_EX_TOOLWINDOW,L"STATIC",L"Owned deferred original chain",composition?WS_POPUP|WS_CAPTION:WS_POPUP,-32000,-32000,128,128,nullptr,nullptr,GetModuleHandleW(nullptr),nullptr);
++    require(window!=nullptr,"offscreen HWND created");
++    if(composition)ShowWindow(window,SW_SHOWNOACTIVATE);
++    require((IsWindowVisible(window)!=FALSE)==composition,"offscreen HWND has expected visibility");
++    require(GetForegroundWindow()==foreground,"offscreen HWND preserves foreground");
++    DXGI_SWAP_CHAIN_DESC desc{};desc.BufferDesc.Width=desc.BufferDesc.Height=64;desc.BufferDesc.Format=DXGI_FORMAT_R8G8B8A8_UNORM;desc.SampleDesc.Count=1;desc.BufferUsage=DXGI_USAGE_RENDER_TARGET_OUTPUT;desc.BufferCount=2;desc.OutputWindow=window;desc.Windowed=TRUE;desc.SwapEffect=DXGI_SWAP_EFFECT_DISCARD;
++    ComPtr<ID3D11Device> device;ComPtr<ID3D11DeviceContext> context;ComPtr<IDXGISwapChain> base;ComPtr<IDXGISwapChain1> chain;
++    if(composition){
++        const auto create_device=symbol<PFN_D3D11_CREATE_DEVICE>(d3d,"D3D11CreateDevice");hr(create_device(nullptr,D3D_DRIVER_TYPE_HARDWARE,nullptr,D3D11_CREATE_DEVICE_BGRA_SUPPORT,nullptr,0,D3D11_SDK_VERSION,&device,nullptr,&context),"real missed BGRA hardware device");
++        const HMODULE dxgi=GetModuleHandleW(L"dxgi.dll");require(dxgi!=nullptr,"actual device loaded DXGI");using factory_fn=HRESULT(WINAPI *)(UINT,REFIID,void **);const auto create_factory=symbol<factory_fn>(dxgi,"CreateDXGIFactory2");ComPtr<IDXGIFactory2> factory;hr(create_factory(0,IID_PPV_ARGS(&factory)),"real missed native factory");
++        DXGI_SWAP_CHAIN_DESC1 composition_desc{};composition_desc.Width=composition_desc.Height=64;composition_desc.Format=DXGI_FORMAT_B8G8R8A8_UNORM;composition_desc.SampleDesc.Count=1;composition_desc.BufferUsage=DXGI_USAGE_RENDER_TARGET_OUTPUT;composition_desc.BufferCount=2;composition_desc.SwapEffect=DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;composition_desc.AlphaMode=DXGI_ALPHA_MODE_IGNORE;
++        hr(factory->CreateSwapChainForComposition(device.Get(),&composition_desc,nullptr,&chain),"original composition chain");hr(chain.As(&base),"composition base interface");DXGI_SWAP_CHAIN_DESC observed{};hr(chain->GetDesc(&observed),"composition descriptor");HWND native_window=nullptr;require(observed.OutputWindow==nullptr&&FAILED(chain->GetHwnd(&native_window)),"actual null-HWND composition path");desc.BufferDesc.Format=DXGI_FORMAT_B8G8R8A8_UNORM;
++    }else{hr(create(nullptr,D3D_DRIVER_TYPE_HARDWARE,nullptr,0,nullptr,0,D3D11_SDK_VERSION,&desc,&base,&device,nullptr,&context),"real hardware device and chain");hr(base.As(&chain),"original chain1");}
++    const bool first_proxy=owner((*reinterpret_cast<void ***>(device.Get()))[3])==host;
++    if(held)require(!first_proxy&&callbacks(query).devices==0,"first real device missed by automatic hooks");
++    else require(first_proxy,"ordinary automatic device control remains wrapped");
++    green(device.Get(),context.Get(),chain.Get());hr(chain->Present(0,DXGI_PRESENT_TEST),"first native test Present");
++    // Observers are on original methods; proxy controls exercise their downstream.
++    static constexpr GUID unwrapped={0x7f2c9a11,0x3b4e,0x4d6a,{0x81,0x2f,0x5e,0x9c,0xd3,0x7a,0x1b,0x42}};
++    ComPtr<IDXGISwapChain1> original=chain;if(first_proxy){original.Reset();hr(chain->QueryInterface(unwrapped,&original),"original chain observation");}
++    install_observers(original.Get());
++    if(held){require(WaitForSingleObject(state.done,0)==WAIT_TIMEOUT,"publication held through first usable chain");SetEvent(state.release);wait(state.done,"scan returned after publication");state.thread.join();armed=false;require(scan_error.empty()&&!barrier_timeout,"scan liveness");}
++    const bool inactive=foreign||unready||queue_failure||revoked||revoked_stage||notification;
++    if(query_probe&&!foreign&&!unready&&!notification){wait(complete,"deferred work completed outside loader thread");const auto p=probe(query_probe);require(p.queue_calls==1&&p.queued==1,"one queue attempt");require(p.worker_calls==(queue_failure?0u:1u),"one worker or explicit queue failure");if(!queue_failure)require(p.worker_thread!=p.queue_thread,"worker not loader caller");if(queue_failure)require(p.queue_error==ERROR_NOT_ENOUGH_MEMORY,"queue failure terminal");if(revoked)require(p.result==ERROR_NOT_READY,"worker revalidates adapter readiness");if(revoked_stage)require(p.result==ERROR_ACCESS_DENIED,"worker revalidates exact owned stage marker");}
++    else if(query_probe)require(probe(query_probe).queue_calls==0,"foreign and unready never queued");
++    const auto before=stats(query_stats);const auto cb_before=callbacks(query);
++    if(production)require(probe(query_probe).reserved==0,"owned callback, opaque parameter and queue flags preserved");
++    if(query_probe&&!inactive)require(before.status==2,"deferred raw methods active");
++    if(query_probe&&(revoked||revoked_stage))require(before.status==3&&before.last_win32_error==(revoked?ERROR_NOT_READY:ERROR_ACCESS_DENIED),"asynchronous validation failure remains passive and queryable");
++    unsigned calls=0;
++    for(unsigned i=0;i<5;++i){
++        const bool extended=i%2!=0;const UINT flags=i==0?DXGI_PRESENT_TEST:i==4?DXGI_PRESENT_DO_NOT_WAIT:0;
++        const unsigned observed=native_presents+native_present1s;force_error=i==4;
++        DXGI_PRESENT_PARAMETERS parameters{};const HRESULT result=extended?chain->Present1(0,flags,&parameters):chain->Present(0,flags);++calls;
++        require(native_presents+native_present1s==observed+1,"exactly one original Present forwarding");require(last_sync==0&&last_flags==flags,"sync and flags preserved");require(result==last_native,"downstream HRESULT preserved");if(force_error)require(result==DXGI_ERROR_WAS_STILL_DRAWING,"forced error preserved");force_error=false;
++    }
++    auto after=stats(query_stats);auto cb_after=callbacks(query);const bool adopted=after.adoption_successes==1;
++    const bool recovered=query_probe&&!inactive;
++    if(held&&recovered){require(adopted&&after.adoption_attempts==1,"original missed chain adopted once");require(cb_after.runtimes==1&&cb_after.chains==1&&cb_after.runtime_presents-cb_before.runtime_presents==4,"actual runtime surface and reshade_present callbacks");require(cb_after.presents==0,"manual public runtime path does not invent automatic device Present callbacks");require(owner((*reinterpret_cast<void ***>(device.Get()))[3])!=host,"original device remains native");}
++    if(composition&&recovered)require(cb_after.runtime_hwnd==reinterpret_cast<std::uintptr_t>(window),"raw composition runtime resolves the exact offscreen presentation HWND");
++    if(!held&&recovered)require(after.adoption_successes==0&&after.adoption_attempts==0&&cb_after.runtimes==1,"automatic proxy not adopted twice");
++    if(recovered)require(cb_after.red_readbacks-cb_before.red_readbacks==4&&cb_after.gpu_errors==0,"registered runtime callback actually paints and reads red GPU pixels");
++    if(inactive)require(after.adoption_successes==0&&after.adoption_attempts==0,"negative case never manually adopted");
++    if(notification)require(after.status==4&&after.present_calls==0&&cb_after.runtime_presents==4&&cb_after.red_readbacks==4&&cb_after.gpu_errors==0,"notification lane keeps automatic rendering without deferred work");
++    require(after.quarantines==0&&after.render_failures==0,"no raw quarantine or rendering failure");
++    green(device.Get(),context.Get(),chain.Get());context->ClearState();context->Flush();
++    hr(chain->ResizeBuffers(2,80,80,desc.BufferDesc.Format,0),"real resize after deferred adoption");require(native_resizes==1,"one original ResizeBuffers forwarding");
++    green(device.Get(),context.Get(),chain.Get());const auto post_resize=stats(query_stats);if(held&&recovered)require(post_resize.resize_calls==1&&post_resize.resize_successes==1,"raw resize succeeds");
++    const auto before_resume=callbacks(query);const auto forwarded_before_resume=native_presents+native_present1s;DXGI_PRESENT_PARAMETERS resumed_parameters{};
++    const HRESULT resumed=chain->Present1(0,0,&resumed_parameters);require(resumed==last_native&&native_presents+native_present1s==forwarded_before_resume+1,"resized original chain forwards once");
++    if(recovered){const auto resumed_cb=callbacks(query);require(resumed_cb.runtime_presents==before_resume.runtime_presents+1&&resumed_cb.red_readbacks==before_resume.red_readbacks+1&&resumed_cb.gpu_errors==0,"resized runtime resumes actual red GPU callback");}
++    require(LoadLibraryW(argv[3])!=nullptr,"later unrelated scan");if(query_probe)require(probe(query_probe).queue_calls==(!foreign&&!unready&&!notification?1u:0u),"no later queue retry");
++    RECT final_rect{};require(GetWindowRect(window,&final_rect)&&!IntersectRect(&intersection,&final_rect,&virtual_screen)&&(IsWindowVisible(window)!=FALSE)==composition&&GetForegroundWindow()==foreground,"HWND stays offscreen with original visibility and foreground preserved");
++    // Release actual chains before removing downstream observers.
++    tracked=nullptr;original.Reset();chain.Reset();base.Reset();context.Reset();device.Reset();DestroyWindow(window);
++    const auto final=stats(query_stats);const auto final_cb=callbacks(query);if(held&&recovered)require(final.retirements==1&&final_cb.destroyed_runtimes==final_cb.runtimes,"adopted lifetime retired once and resized runtimes balanced");
++    require(MH_DisableHook(MH_ALL_HOOKS)==MH_OK&&MH_Uninitialize()==MH_OK,"fixture hooks retired");if(complete)CloseHandle(complete);
++    const bool missing_gate=contended&&!query_probe;
++    const auto final_probe=probe(query_probe);
++    std::printf("{\"case\":\"%ls\",\"status\":\"%s\",\"gatePassed\":%s,\"assertions\":%u,\"firstDeviceProxy\":%s,\"adoptedOriginalChain\":%s,\"hostStatus\":%u,\"rawPresentCalls\":%llu,\"nativePresents\":%u,\"nativePresent1s\":%u,\"nativeResizes\":%u,\"gpuGreenReadbacks\":%u,\"runtimeCallbacks\":%llu,\"automaticPresentCallbacks\":%llu,\"runtimePresentCallbacks\":%llu,\"callbackRedReadbacks\":%llu,\"retirements\":%llu,\"queueCalls\":%u,\"workerCalls\":%u,\"queueThread\":%u,\"workerThread\":%u,\"queueError\":%u,\"workerResult\":%u,\"onscreen\":false,\"input\":false,\"actualGame\":false}\n",mode.c_str(),missing_gate?"baseline-late-adoption-missing":"passed",missing_gate?"false":"true",checks,first_proxy?"true":"false",adopted?"true":"false",after.status,static_cast<unsigned long long>(final.present_calls),native_presents,native_present1s,native_resizes,green_readbacks,static_cast<unsigned long long>(final_cb.runtimes),static_cast<unsigned long long>(final_cb.presents),static_cast<unsigned long long>(final_cb.runtime_presents),static_cast<unsigned long long>(final_cb.red_readbacks),static_cast<unsigned long long>(final.retirements),final_probe.queue_calls,final_probe.worker_calls,final_probe.queue_thread,final_probe.worker_thread,final_probe.queue_error,final_probe.result);
++    return missing_gate?3:0;
++}catch(const std::exception &error){std::fprintf(stderr,"%s after %u assertions; Win32=%lu\n",error.what(),checks,GetLastError());return 1;}
+diff --git a/libs/electron-game-overlay-runtime/tests/owned-deferred-bootstrap/loader.cpp b/libs/electron-game-overlay-runtime/tests/owned-deferred-bootstrap/loader.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..67fab407888925f67ca6074fe1dd2cf935dedb5d
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/tests/owned-deferred-bootstrap/loader.cpp
+@@ -0,0 +1,22 @@
++// Controlled nested load only. Never create a device or wait inside DllMain.
++#include <Windows.h>
++#include <cwchar>
++static DWORD load_backend() {
++    wchar_t system[MAX_PATH]{}, path[MAX_PATH]{};
++    const UINT size=GetSystemDirectoryW(system,MAX_PATH);
++    if (!size || size>=MAX_PATH) return ERROR_INSUFFICIENT_BUFFER;
++    if (swprintf_s(path,L"%s\\d3d11.dll",system)<0) return ERROR_INSUFFICIENT_BUFFER;
++    return LoadLibraryW(path) ? ERROR_SUCCESS : GetLastError();
++}
++extern "C" __declspec(dllexport) DWORD WINAPI LoadBackendV1() { return load_backend(); }
++BOOL WINAPI DllMain(HMODULE, DWORD reason, LPVOID) {
++#if defined(LOAD_IN_DLLMAIN)
++    if (reason==DLL_PROCESS_ATTACH) return load_backend()==ERROR_SUCCESS;
++#else
++    (void)reason;
++#endif
++    return TRUE;
++}
++#if defined(_M_IX86)
++#pragma comment(linker,"/EXPORT:LoadBackendV1=_LoadBackendV1@0")
++#endif
+diff --git a/libs/electron-game-overlay-runtime/tests/owned-deferred-bootstrap/run-gate.cjs b/libs/electron-game-overlay-runtime/tests/owned-deferred-bootstrap/run-gate.cjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..8e74b91d6118b457a5eba7d4ece016729b1cb331
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/tests/owned-deferred-bootstrap/run-gate.cjs
+@@ -0,0 +1,34 @@
++'use strict';
++// Offscreen production gate with an immutable missed-adoption baseline.
++const fs=require('node:fs'),path=require('node:path'),cp=require('node:child_process'),crypto=require('node:crypto'),assert=require('node:assert/strict');
++const root=path.resolve(__dirname,'../../../..'),arch=process.argv[2]??'x64',requested=process.argv[3]??'all';assert.ok(['x64','x86'].includes(arch));
++const work=path.join(root,'build/overlay-compatibility'),source=path.join(root,'build/candidate-gen24-cache/native/_deps/reshade-src'),proto=path.join(work,'owned-deferred-d3d11-prototype');
++const runtimeKind=process.argv[4]??'production';assert.ok(['production','prototype'].includes(runtimeKind));
++const build=path.join(work,'owned-deferred-bootstrap-'+arch),runtimeName=arch==='x64'?'ReShade64.dll':'ReShade32.dll';
++const hash=file=>crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
++function run(exe,args,timeout=120000){const value=cp.spawnSync(exe,args,{windowsHide:true,encoding:'utf8',timeout,maxBuffer:4*1024*1024});assert.ifError(value.error);assert.equal(value.status,0,value.stdout+'\n'+value.stderr);return value;}
++const configuration=run('cmake.exe',['-S',__dirname,'-B',build,'-A',arch==='x64'?'x64':'Win32','-DRESHAPE_SOURCE='+source]);
++const compilation=run('cmake.exe',['--build',build,'--config','Release','--parallel','4']);fs.writeFileSync(path.join(work,'owned-deferred-bootstrap-'+arch+'-build.log'),configuration.stdout+compilation.stdout+compilation.stderr);
++const binary=path.join(build,'Release'),reports=[];
++const modes=['contended','contended-composition','serialized','dllmain','nested','foreign','unready','no-backend','queue-failure','revoked-ready','revoked-stage','notification-control'];
++assert.ok(requested==='all'||requested==='baseline'||modes.includes(requested));
++const baseline=path.join(root,'build/candidates/composition-auxiliary-lifetime-gen35/sdk-stage/dist/runtime/win32-x64/reshade',runtimeName);
++for(const kind of requested==='all'?['baseline',runtimeKind]:[requested==='baseline'?'baseline':runtimeKind]){
++ const input=kind==='baseline'?baseline:kind==='prototype'?path.join(proto,'bin',arch==='x64'?'x64':'Win32',runtimeName):path.join(root,'libs/electron-game-overlay-runtime/dist',arch==='x64'?'win32-x64':'win32-ia32',runtimeName);
++ if(kind==='production'){const stamp=JSON.parse(fs.readFileSync(path.join(path.dirname(input),runtimeName.replace('.dll','.build.json')),'utf8').replace(/^\uFEFF/,''));assert.equal(stamp.ownedDeferredD3d11PatchSha256,'779D9D41768FE61BC5FF3DCF69E2EE11B360DC00B5B58C24E0B1F83552A2D9BB');}
++ const stage=path.join(work,'owned-deferred-bootstrap-stage-'+arch+'-'+kind),owner=path.join(stage,'.fixture-owner.json');
++ if(fs.existsSync(stage))assert.equal(JSON.parse(fs.readFileSync(owner)).kind,'owned-deferred-bootstrap');else{fs.mkdirSync(path.join(stage,'addons'),{recursive:true});fs.writeFileSync(owner,JSON.stringify({kind:'owned-deferred-bootstrap',arch}));}
++ const runtime=path.join(stage,runtimeName);if(fs.existsSync(runtime)&&hash(runtime)!==hash(input))fs.unlinkSync(runtime);if(!fs.existsSync(runtime))fs.linkSync(input,runtime);assert.equal(hash(runtime),hash(input));
++ const marker=path.join(stage,'electron-game-overlay-owned-runtime-v1.marker');
++ for(const mode of kind==='baseline'?['contended','contended-composition']:requested==='all'?modes.filter(item=>kind!=='prototype'||item!=='notification-control'):[requested]){
++  fs.writeFileSync(marker,'ELECTRON_GAME_OVERLAY_OWNED_RUNTIME_STAGE_V1\n');if(mode==='foreign')fs.unlinkSync(marker);
++  fs.writeFileSync(path.join(stage,'.electron-game-overlay-run.json'),JSON.stringify({kind:'owned-deferred-bootstrap'}));
++  fs.writeFileSync(path.join(stage,'ReShade.ini'),'[ADDON]\nAddonPath='+path.join(stage,'addons')+'\n[OVERLAY]\nTutorialProgress=4\nShowClock=0\nShowFPS=0\n[GENERAL]\nNoDebugInfo=1\nPerformanceMode=1\n');
++  const result=cp.spawnSync(path.join(binary,'owned_deferred_bootstrap.exe'),[runtime,path.join(binary,'callback_counter.dll'),path.join(binary,'nested_loader.dll'),path.join(binary,mode==='dllmain'?'dllmain_loader.dll':'nested_loader.dll'),stage,mode,kind],{windowsHide:true,encoding:'utf8',timeout:45000,maxBuffer:4*1024*1024});
++  const prefix=path.join(work,'owned-deferred-bootstrap-'+arch+'-'+kind+'-'+mode);fs.writeFileSync(prefix+'.stdout.log',result.stdout??'');fs.writeFileSync(prefix+'.stderr.log',result.stderr??'');if(fs.existsSync(path.join(stage,'ReShade.log')))fs.copyFileSync(path.join(stage,'ReShade.log'),prefix+'.ReShade.log');
++  assert.ifError(result.error);assert.equal(result.status,kind==='baseline'?3:0,kind+' '+mode+'\n'+result.stdout+'\n'+result.stderr);
++  const record=JSON.parse(result.stdout.trim());reports.push({kind,mode,exitCode:result.status,runtimeSha256:hash(runtime),record});console.log(JSON.stringify({kind,mode,...record}));
++ }
++ assert.equal(hash(runtime),hash(input));
++}
++fs.writeFileSync(path.join(work,'owned-deferred-bootstrap-'+arch+'-'+runtimeKind+'-'+requested+'-report.json'),JSON.stringify({kind:'owned-deferred-bootstrap-native-assessment',architecture:arch,cases:reports,productionSourceMutated:false,productionPackage:false},null,2)+'\n');
+diff --git a/libs/electron-game-overlay-runtime/tests/owned-deferred-bootstrap/run-prototype.cjs b/libs/electron-game-overlay-runtime/tests/owned-deferred-bootstrap/run-prototype.cjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..a0da4da1b5454d276bd7942d71a823ae3c230c6a
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/tests/owned-deferred-bootstrap/run-prototype.cjs
+@@ -0,0 +1,3 @@
++'use strict';
++// Experimental shadow DLL only; never a staged SDK runtime.
++process.argv[4]='prototype';require('./run-gate.cjs');
+diff --git a/libs/electron-game-overlay-runtime/tests/owned-deferred-bootstrap/source-cache-gate.cjs b/libs/electron-game-overlay-runtime/tests/owned-deferred-bootstrap/source-cache-gate.cjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..bb03829701d02f46b356ac0f45f0f7197adc6390
+--- /dev/null
++++ b/libs/electron-game-overlay-runtime/tests/owned-deferred-bootstrap/source-cache-gate.cjs
+@@ -0,0 +1,44 @@
++'use strict';
++// Source text and isolated synthetic Git/CMake-P only; no runtime or graphics execute.
++const fs=require('node:fs'),path=require('node:path'),cp=require('node:child_process'),crypto=require('node:crypto'),assert=require('node:assert/strict');
++const root=path.resolve(__dirname,'../../../..'),runtime=path.join(root,'libs/electron-game-overlay-runtime'),cache=path.join(root,'build/candidate-gen24-cache/native/_deps/reshade-src');
++const base=path.join(root,'build/overlay-compatibility/deferred-d3d11-source-cache-fixture'),source=path.join(base,'source'),binary=path.join(base,'binary');
++const sha=b=>crypto.createHash('sha256').update(b).digest('hex').toUpperCase(),read=p=>fs.readFileSync(p,'utf8').replaceAll('\r\n','\n');
++const cmake=read(path.join(runtime,'CMakeLists.txt')),tail=read(path.join(runtime,'cmake/owned-deferred-d3d11.cmake'));
++const descriptors=[...tail.matchAll(/"([^"|]+)\|([A-Z0-9]+)\|([A-F0-9]{64})"/g)].map(([,name,before,after])=>({name,before,after}));assert.equal(descriptors.length,4);
++const producer=read(path.join(runtime,'scripts/build-reshade-runtime.ps1')),table=producer.match(/\$ExpectedPatchedContentSha256 = \[ordered\]@\{([\s\S]*?)\n\}/)[1];
++const pins=[...table.matchAll(/"([^"]+)" = "([0-9A-F]{64})"/g)].map(([,name,digest])=>({name,digest}));assert.equal(pins.length,26);
++const post=new Map(pins.map(({name,digest})=>{const bytes=Buffer.from(read(path.join(cache,name)));assert.equal(sha(bytes),digest,name);return [name,bytes];}));
++function run(exe,args,cwd,ok=true){const r=cp.spawnSync(exe,args,{cwd,encoding:'utf8',windowsHide:true,timeout:120000,maxBuffer:4*1024*1024});assert.ifError(r.error);if(ok)assert.equal(r.status,0,r.stdout+'\n'+r.stderr);else assert.notEqual(r.status,0);return r;}
++const git=(args,cwd=source)=>run('git',['-c','core.autocrlf=false','-c','core.eol=lf',...args],cwd);
++const owner=path.join(base,'.fixture-owner.json');
++if(fs.existsSync(base))assert.equal(JSON.parse(read(owner)).kind,'ego-deferred-d3d11-source-cache-fixture');
++else{fs.mkdirSync(source,{recursive:true});fs.mkdirSync(binary);fs.writeFileSync(owner,JSON.stringify({kind:'ego-deferred-d3d11-source-cache-fixture'}));
++ git(['init','--quiet']);git(['config','core.autocrlf','false']);
++ for(const {name} of pins){const r=cp.spawnSync('git',['-c','safe.directory='+cache,'-C',cache,'show','HEAD:'+name],{windowsHide:true,maxBuffer:4*1024*1024});if(r.status!==0)continue;const file=path.join(source,name);fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,r.stdout);}
++ git(['add','--all']);git(['-c','user.name=Owned source fixture','-c','user.email=fixture@invalid','commit','--quiet','-m','test: frozen pristine source text fixture']);
++}
++const fixtureCommit=git(['rev-parse','HEAD']).stdout.trim();
++const helpers=cmake.match(/# BEGIN EGO_SOURCE_CACHE_MIGRATION_HELPERS\n([\s\S]*?)# END EGO_SOURCE_CACHE_MIGRATION_HELPERS/)[1];
++const extract=name=>cmake.match(new RegExp('^function\\('+name+'[^\\n]*\\)\\n[\\s\\S]*?^endfunction\\(\\)','m'))[0];
++const gitExe=run('where.exe',['git'],root).stdout.trim().split(/\r?\n/)[0],q=s=>'[==['+s.replaceAll('\\','/')+']==]';
++function apply(direction,expect=true,sourceRoot=runtime){const script=path.join(base,'guard.cmake');fs.writeFileSync(script,[
++ 'cmake_minimum_required(VERSION 3.24)',`set(CMAKE_CURRENT_SOURCE_DIR ${q(sourceRoot)})`,`set(CMAKE_CURRENT_BINARY_DIR ${q(binary)})`,`set(GIT_EXECUTABLE ${q(gitExe)})`,`set(RESHAPE_PINNED_COMMIT "${fixtureCommit}")`,
++ extract('verify_reshade_pinned_commit'),extract('verify_reshade_patched_source'),helpers,tail,`ego_owned_deferred_d3d11_tail(${q(source)} ${direction})`,
++].join('\n'));return run('cmake.exe',['-P',script],base,expect);}
++function writeState(state){for(const {name} of pins){const file=path.join(source,name);if(state.has(name)){fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,state.get(name));}else if(fs.existsSync(file))fs.unlinkSync(file);}}
++function state(){return new Map(pins.filter(({name})=>fs.existsSync(path.join(source,name))).map(({name})=>[name,fs.readFileSync(path.join(source,name))]));}
++function equal(a,b){assert.deepEqual([...a].map(([p,b])=>[p,sha(b)]).sort(),[...b].map(([p,b])=>[p,sha(b)]).sort());}
++let cases=0;writeState(post);apply('REVERSE');const before=state();
++for(const d of descriptors)assert.equal(before.has(d.name)?sha(before.get(d.name)):'ABSENT',d.before,d.name);
++apply('FORWARD');equal(state(),post);++cases;
++for(let published=0;published<descriptors.length;published++){
++ const mixed=new Map(before);for(const d of descriptors.slice(0,published))mixed.set(d.name,post.get(d.name));writeState(mixed);
++ apply('FORWARD');equal(state(),post);apply('FORWARD');equal(state(),post);apply('REVERSE');equal(state(),before);++cases;
++}
++writeState(post);fs.appendFileSync(path.join(source,descriptors[0].name),'\n// unknown owned probe\n');let frozen=state();apply('FORWARD',false);equal(state(),frozen);++cases;
++writeState(post);const extra=path.join(source,'unknown-owned-probe.txt');fs.writeFileSync(extra,'preserve');frozen=state();apply('REVERSE',false);equal(state(),frozen);assert.equal(read(extra),'preserve');fs.unlinkSync(extra);++cases;
++const shadow=path.join(base,'altered-runtime');fs.mkdirSync(path.join(shadow,'patches'),{recursive:true});fs.writeFileSync(path.join(shadow,'patches/reshade-owned-deferred-d3d11.patch'),read(path.join(runtime,'patches/reshade-owned-deferred-d3d11.patch'))+'\n# changed owned patch probe\n');frozen=state();apply('FORWARD',false,shadow);equal(state(),frozen);++cases;
++writeState(post);
++const report={kind:'ego-owned-deferred-d3d11-source-cache-native-text-gate',status:'passed',cases,sourceFiles:26,syntheticGitFixture:true,sourceSha256:sha(tail).toLowerCase(),scope:'Actual production CMake helpers over exact26-file text vector in one reusable isolated synthetic Git repository. Checks reverse/replay, all four partial publication boundaries, idempotence, unknown edits, extra files and altered patch rejection without mutation. No compiler, runtime, graphics, injection or game acceptance.'};
++const output=path.join(root,'build/overlay-compatibility/deferred-d3d11-source-cache-report.json');fs.writeFileSync(output,JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({...report,output}));
