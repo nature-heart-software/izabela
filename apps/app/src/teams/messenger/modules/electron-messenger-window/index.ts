@@ -76,8 +76,10 @@ export const ElectronMessengerWindow = () => {
   const focus = (context: 'mouse' | 'keyboard', native = false) =>
     new Promise((_, reject) => {
       const foregroundWindowPid = WinControl?.getForeground()?.getPid()
-      const isProcessHooked = gameOverlay.isProcessHooked(foregroundWindowPid)
-      if (isProcessHooked && !gameOverlay.intercepting) {
+      if (
+        !gameOverlay.intercepting &&
+        gameOverlay.canOpenInGameOverlay(foregroundWindowPid)
+      ) {
         gameOverlay.startIntercept()
         return
       }
@@ -230,13 +232,18 @@ export const ElectronMessengerWindow = () => {
   const toggleWindow = throttle(
     (context: 'mouse' | 'keyboard', native = false) => {
       const foregroundWindowPid = WinControl?.getForeground()?.getPid()
-      const isProcessHooked = gameOverlay.isProcessHooked(foregroundWindowPid)
-      if (isProcessHooked && !gameOverlay.intercepting) {
-        gameOverlay.startIntercept()
+      if (
+        gameOverlay.intercepting &&
+        gameOverlay.isProcessHooked(foregroundWindowPid)
+      ) {
+        gameOverlay.stopIntercept()
         return
       }
-      if (isProcessHooked && gameOverlay.intercepting) {
-        gameOverlay.stopIntercept()
+      if (
+        !gameOverlay.intercepting &&
+        gameOverlay.canOpenInGameOverlay(foregroundWindowPid)
+      ) {
+        gameOverlay.startIntercept()
         return
       }
       const window = getWindow()

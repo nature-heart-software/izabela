@@ -23,6 +23,11 @@ import type {
   OverlayDiagnostic,
 } from 'electron-game-overlay'
 
+// The native runtime can publish once per second while a target is rendering.
+const MIN_FPS_INTERVAL_MS = 500
+const MAX_FPS_INTERVAL_MS = 2000
+const REQUIRED_FPS_SAMPLES = 3
+
 type WindowEntry = {
   window: Electron.BrowserWindow
   owned: boolean
@@ -43,6 +48,7 @@ class ExperimentalGameOverlay {
   private warnings = 0
   private active = false
   private connected = new Set<number>()
+  private fpsSamples = new Map<number, { lastAt: number; count: number }>()
   private requested = false
   private surfaces = new Set<number>()
   private windows = new Map<string, WindowEntry>()
@@ -208,6 +214,7 @@ class ExperimentalGameOverlay {
       event.type === 'exited' ||
       event.type === 'transport-lost'
     ) {
+      this.fpsSamples.delete(event.target.pid)
       if (event.type !== 'transport-lost')
         this.surfaces.delete(event.target.pid)
       if (this.connected.delete(event.target.pid)) this.stopIntercept()
@@ -218,8 +225,10 @@ class ExperimentalGameOverlay {
         )
     } else if (event.type === 'error') {
       this.warn(event.error)
-      if (event.target && this.connected.delete(event.target.pid))
-        this.stopIntercept()
+      if (event.target) {
+        this.fpsSamples.delete(event.target.pid)
+        if (this.connected.delete(event.target.pid)) this.stopIntercept()
+      }
       // Target/selector errors retain uncertain SDK reservations. An unscoped
       // controller error stops this application backend, without a retry.
       if (!event.target && !event.selector) this.stopResources()
@@ -291,6 +300,7 @@ class ExperimentalGameOverlay {
       ...(['targetDisconnected', 'targetTransportLost'] as const).map((event) =>
         session.on(event, ({ pid }) => {
           if (!current()) return
+          this.fpsSamples.delete(pid)
           if (this.connected.delete(pid)) this.stopIntercept()
         }),
       ),
@@ -312,7 +322,23 @@ class ExperimentalGameOverlay {
       session.on('targetSurfaceRemoved', ({ pid }) => {
         if (!current()) return
         this.surfaces.delete(pid)
+        this.fpsSamples.delete(pid)
         if (this.connected.has(pid)) this.stopIntercept()
+      }),
+      session.on('fps', ({ pid, fps }) => {
+        if (!current() || !Number.isFinite(fps) || fps <= 0) return
+        if (import.meta.env.DEV) console.info('FPS', { pid, fps })
+        const now = performance.now()
+        const previous = this.fpsSamples.get(pid)
+        const gap = previous ? now - previous.lastAt : Infinity
+        if (gap < MIN_FPS_INTERVAL_MS) return
+        this.fpsSamples.set(pid, {
+          lastAt: now,
+          count:
+            previous && gap <= MAX_FPS_INTERVAL_MS
+              ? Math.min(previous.count + 1, REQUIRED_FPS_SAMPLES)
+              : 1,
+        })
       }),
     )
   }
@@ -451,6 +477,18 @@ class ExperimentalGameOverlay {
     return this.active && this.connected.has(pid) && !!this.renderer()
   }
 
+  public canOpenInGameOverlay(pid: number) {
+    const samples = this.fpsSamples.get(pid)
+    return (
+      this.active &&
+      this.connected.has(pid) &&
+      !!this.renderer()?.wrapper &&
+      !!samples &&
+      samples.count >= REQUIRED_FPS_SAMPLES &&
+      performance.now() - samples.lastAt <= MAX_FPS_INTERVAL_MS
+    )
+  }
+
   public startIntercept() {
     const entry = this.renderer()
     if (
@@ -516,6 +554,7 @@ class ExperimentalGameOverlay {
     })
     this.windows.clear()
     this.connected.clear()
+    this.fpsSamples.clear()
     this.attempt(() => this.targets?.dispose())
     this.targets = undefined
     this.attempt(() => this.session?.close())

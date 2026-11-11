@@ -4,7 +4,7 @@ import { EventEmitter } from 'node:events'
 import { fileURLToPath } from 'node:url'
 import loadTypescript from '../../../../../../../tests/load-typescript.cjs'
 
-function fixture() {
+function fixture(gameOverlay = {}) {
   const window = new EventEmitter()
   let visible = false
   let destroyed = false
@@ -85,7 +85,11 @@ function fixture() {
         },
       },
       '@/utils/electron-window': { getNativeWindowHandleInt: () => 1 },
-      '@/electron/game-overlay-backend': { isProcessHooked: () => false },
+      '@/electron/game-overlay-backend': {
+        isProcessHooked: () => false,
+        canOpenInGameOverlay: () => false,
+        ...gameOverlay,
+      },
       forcefocus: {
         focusWindow: () => {
           nativeFocuses++
@@ -127,6 +131,39 @@ function fixture() {
     },
   }
 }
+
+test('shortcut opens desktop Izabela for an attached process without sustained FPS', async () => {
+  const f = fixture({ isProcessHooked: () => true })
+  await f.start()
+  f.controller.toggleWindow('keyboard')
+  assert.equal(f.visible(), true)
+})
+
+test('shortcut opens the in-game overlay when the foreground process is eligible', async () => {
+  let opens = 0
+  const f = fixture({
+    isProcessHooked: () => true,
+    canOpenInGameOverlay: (pid) => pid === 42,
+    startIntercept: () => opens++,
+  })
+  await f.start()
+  f.controller.toggleWindow('keyboard')
+  assert.equal(opens, 1)
+  assert.equal(f.visible(), false)
+})
+
+test('shortcut still closes an open in-game overlay after FPS goes stale', async () => {
+  let closes = 0
+  const f = fixture({
+    isProcessHooked: () => true,
+    intercepting: true,
+    stopIntercept: () => closes++,
+  })
+  await f.start()
+  f.controller.toggleWindow('keyboard')
+  assert.equal(closes, 1)
+  assert.equal(f.visible(), false)
+})
 
 test('quick Escape/send cannot let delayed native focus steal focus after hiding', async () => {
   const f = fixture()

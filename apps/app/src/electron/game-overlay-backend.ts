@@ -87,6 +87,12 @@ const gameOverlay = {
   isProcessHooked(pid: number) {
     return gameOverlay.enabled && !!selected?.isProcessHooked(pid)
   },
+  canOpenInGameOverlay(pid: number) {
+    if (!gameOverlay.enabled) return false
+    return selected === experimental
+      ? experimental.canOpenInGameOverlay(pid)
+      : !!selected?.isProcessHooked(pid)
+  },
   startIntercept() {
     if (gameOverlay.enabled) selected?.startIntercept()
   },

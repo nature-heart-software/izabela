@@ -44,6 +44,7 @@ function fixture({
   failAt,
   pathApi = path,
 } = {}) {
+  let time = 0
   const calls = [],
     controllers = [],
     sessions = [],
@@ -272,6 +273,7 @@ function fixture({
     {
       require: boundary,
       process: { platform },
+      performance: { now: () => time },
       queueMicrotask,
       console: {
         warn: (...args) => logs.push(args),
@@ -312,6 +314,9 @@ function fixture({
     logs,
     ipcMain,
     unrelated,
+    advance: (milliseconds) => {
+      time += milliseconds
+    },
     event,
     BrowserWindow,
     window,
@@ -489,6 +494,51 @@ test('only managed authentication enables input and surface-before-connection or
   assert.equal(wrapper.destroyed, true)
   assert.deepEqual(f.ipcMain.listeners('start'), [f.unrelated])
   assert.equal(f.ipcMain.listenerCount('stop'), 0)
+})
+
+test('shortcut eligibility requires repeated recent FPS from the same connected process', async () => {
+  const f = fixture({ enabled: true })
+  await f.overlay.start()
+  f.window()
+  f.event()
+  const sample = (fps = 60, pid = 42) => f.sessions[0].emit('fps', { pid, fps })
+  const eligible = () => f.overlay.canOpenInGameOverlay(42)
+
+  assert.equal(f.overlay.isProcessHooked(42), true)
+  assert.equal(eligible(), false)
+  sample(45)
+  f.advance(100)
+  sample(45)
+  f.advance(1969)
+  sample(0.955)
+  f.advance(31165)
+  sample(0.301)
+  assert.equal(eligible(), false)
+
+  f.advance(1000)
+  sample(60, 99)
+  sample()
+  assert.equal(eligible(), false)
+  f.advance(1000)
+  sample()
+  assert.equal(eligible(), true)
+  assert.equal(f.overlay.canOpenInGameOverlay(99), false)
+
+  f.advance(2001)
+  assert.equal(eligible(), false)
+  sample()
+  f.advance(1000)
+  sample(NaN)
+  assert.equal(eligible(), false)
+  sample()
+  f.advance(1000)
+  sample()
+  assert.equal(eligible(), true)
+
+  f.event('transport-lost')
+  f.event()
+  assert.equal(eligible(), false)
+  f.overlay.quit()
 })
 
 test('renderer readiness and late window attachment replay authenticated surface dimensions', async () => {

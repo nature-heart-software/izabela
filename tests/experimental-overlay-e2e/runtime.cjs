@@ -166,6 +166,13 @@ let target,
   surface,
   intercepting = false,
   rendering = false
+const targetFps = []
+let withholdFps =
+  config.case === 'd3d11-x64' &&
+  config.targetMode === 'folder' &&
+  config.scaleFactor === 1 &&
+  !config.negativeControl &&
+  !config.elevated
 let targetConnected = false
 let fatalWatcherError
 let targetOperationError
@@ -567,6 +574,18 @@ sdk.ElectronGameOverlay.prototype.createSession = function (...args) {
     )
     return ready
   }
+  const on = result.on.bind(result)
+  on('fps', ({ pid, fps }) => {
+    if (pid !== target?.pid || !Number.isFinite(fps) || fps <= 0) return
+    targetFps.push({ fps, at: performance.now(), withheld: withholdFps })
+    if (targetFps.length > 3) targetFps.shift()
+  })
+  result.on = (event, handler) =>
+    event === 'fps'
+      ? on(event, (payload) => {
+          if (!withholdFps) handler(payload)
+        })
+      : on(event, handler)
   result.on('targetConnected', (event) => {
     if (event.pid === target?.pid) targetConnected = true
   })
@@ -600,7 +619,47 @@ sdk.ElectronGameOverlay.prototype.createSession = function (...args) {
   }
   return result
 }
+async function verifyDesktopFallback() {
+  await until(() => targetFps.length > 0, 'native FPS emitted but withheld')
+  const desktop = BrowserWindow.getAllWindows().find(
+    (window) =>
+      window.webContents.getURL().includes('/teams/messenger/index.html') &&
+      window !== overlay,
+  )
+  assert.ok(desktop, 'real desktop messenger window')
+  drive('shortcut', 13)
+  await until(
+    () => desktop.isVisible(),
+    'desktop messenger opens without FPS cadence',
+  )
+  assert.equal(wrapper.visible, false)
+  assert.equal(intercepting, false)
+  assert.equal(
+    evidence.inputRequests?.some(({ method }) => method === 'intercept') ??
+      false,
+    false,
+  )
+  desktop.close()
+  await until(() => !desktop.isVisible(), 'desktop messenger hides')
+  drive('activate')
+  withholdFps = false
+  evidence.checks.push(
+    'native shortcut opens desktop while FPS events are withheld from the attached target',
+  )
+}
+
 async function openAndType(key, expected, label) {
+  await until(
+    () =>
+      targetFps.length === 3 &&
+      targetFps.every(({ at, withheld }, index) => {
+        const gap = index ? at - targetFps[index - 1].at : 1000
+        return !withheld && gap >= 500 && gap <= 2000
+      }) &&
+      performance.now() - targetFps.at(-1).at <= 2000,
+    'three regular native FPS samples for the foreground target',
+  )
+  evidence.fpsSamples = targetFps.map((sample) => ({ ...sample }))
   const started = Date.now()
   evidence.shortcutState = drive('shortcut', 13) // Actual configured Ctrl+Enter global shortcut.
   await until(
@@ -972,6 +1031,7 @@ async function startTarget() {
     updatesSettled: evidence.policyUpdates.length,
     eventsObserved: evidence.managedEvents.length,
   })
+  targetFps.length = 0
   targetConnected = false
   targetOperationError = undefined
   surface = undefined
@@ -1635,6 +1695,7 @@ async function run() {
     'real initial database policy snapshots received',
   )
   await startTarget()
+  if (withholdFps) await verifyDesktopFallback()
   assert.deepEqual([...new Set(evidence.controlledDatabaseRequests)].sort(), [
     'allowlist',
     'denylist',
