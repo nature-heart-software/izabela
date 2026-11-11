@@ -104,6 +104,23 @@ Find guides and API documentation on the [Wiki](https://github.com/nature-heart-
 ## Troubleshooting
 
 <details>
+<summary>Steam's overlay does not appear with the experimental game overlay and RivaTuner</summary>
+
+RivaTuner Statistics Server's default hooking method can conflict with Steam's
+overlay when Izabela's experimental game overlay is enabled. This was observed
+in Overwatch: Steam's startup notification and `Shift` + `Tab` panel did not appear.
+
+1. Close the game.
+2. In RivaTuner Statistics Server, select the affected game's application profile.
+3. Enable **Use Microsoft Detours API hooking** under **Injection properties**.
+4. Start the game again.
+
+Alternatively, close RivaTuner before starting the game. Changing the injection
+delay is not required for this workaround.
+
+</details>
+
+<details>
 <summary>YouTube videos turn black when Izabela opens (Windows / Chrome)</summary>
 
 Chrome's [native window occlusion detection](https://chromium.googlesource.com/chromium/src/+/main/docs/windows_native_window_occlusion_tracking.md)
