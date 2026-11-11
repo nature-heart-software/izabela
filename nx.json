@@ -49,5 +49,8 @@
     }
   },
   "useInferencePlugins": false,
-  "nxCloudId": "6af19a53ca671e20d84ef2b0"
+  "nxCloudId": "6af19a53ca671e20d84ef2b0",
+  "affected": {
+    "legacy": true
+  }
 }

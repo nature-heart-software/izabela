@@ -33,3 +33,5 @@ lerna-debug.log
 .nx/polygraph
 .nx/self-healing
 /coverage/
+
+.nx/migrate-runs
