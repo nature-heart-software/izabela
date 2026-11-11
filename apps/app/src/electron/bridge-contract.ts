@@ -99,6 +99,7 @@ export const bridgeContract: BridgeMethods<AppBridgeModules> = {
   ElectronResources: {
     prepareOverlayInjectorDefenderExclusions: true,
     addOverlayInjectorDefenderExclusions: true,
+    getRunningOverlayPrograms: true,
     isVirtualAudioCableInstalled: true,
     installVirtualAudioCable: true,
     uninstallVirtualAudioCable: true,

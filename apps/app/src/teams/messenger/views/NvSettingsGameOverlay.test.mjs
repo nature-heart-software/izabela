@@ -105,6 +105,7 @@ function fixture(t, saved = {}, decision = 'confirm') {
     new URL('./NvSettingsGameOverlay.vue', import.meta.url),
     {
       pinia: piniaModule,
+      './NvOverlayProcessPicker.vue': layout,
       '@packages/ui': {
         ...Object.fromEntries(
           [
@@ -364,4 +365,192 @@ test('Defender invocation errors remain visible without leaking native details',
     /could not be configured/,
   )
   assert.doesNotMatch(f.wrapper.text(), /secret native error/)
+})
+
+test('process picker searches, reloads and edits only matching program rules', async (t) => {
+  const blender = { name: 'Blender', executable: 'Blender.exe' }
+  const frog = { name: 'Frog Game', executable: 'Gun Frog.exe' }
+  const notepad = { name: 'Notepad', executable: 'Notepad.exe' }
+  const paint = { name: 'Paint', executable: 'Paint.exe' }
+  let processes = [blender, frog, notepad]
+  let loads = 0
+  let fail = false
+  let finishInitialLoad
+  const initialLoad = new Promise((resolve) => {
+    finishInitialLoad = resolve
+  })
+  const originalResources = window.ElectronResources
+  window.ElectronResources = {
+    async getRunningOverlayPrograms() {
+      loads++
+      if (loads === 1) await initialLoad
+      if (fail) throw new Error('Process listing unavailable')
+      return processes
+    },
+  }
+  t.after(() => {
+    window.ElectronResources = originalResources
+  })
+
+  const loadingDirective = loadTypescript(
+    fileURLToPath(
+      new URL('../../../../../../packages/ui/src/loading.ts', import.meta.url),
+    ),
+    {
+      '@/styled-system/css': { cva: () => () => 'loading-test-class' },
+      '@/utils/loading-spinner': {
+        createLoadingSpinner: () =>
+          document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
+      },
+    },
+    {
+      document,
+      getComputedStyle: (element) => window.getComputedStyle(element),
+    },
+  ).loadingDirective
+
+  const picker = compile(
+    new URL('./NvOverlayProcessPicker.vue', import.meta.url),
+    {
+      '@packages/ui': {
+        loadingDirective,
+        NvButton: {
+          render() {
+            return vue.h('button', this.$slots.default?.())
+          },
+        },
+        NvGroup: layout,
+        NvStack: layout,
+        NvDialog: {
+          props: ['open'],
+          emits: ['update:open'],
+          render() {
+            return vue.h('div', [
+              vue.h(
+                'div',
+                { onClick: () => this.$emit('update:open', true) },
+                this.$slots.reference?.(),
+              ),
+              this.open
+                ? vue.h('section', { role: 'dialog' }, [
+                    this.$slots.title?.(),
+                    this.$slots.footer?.(),
+                  ])
+                : null,
+            ])
+          },
+        },
+        NvInput: {
+          props: ['modelValue', 'size'],
+          emits: ['update:modelValue'],
+          render() {
+            return vue.h('input', {
+              value: this.modelValue,
+              onInput: (event) =>
+                this.$emit('update:modelValue', event.target.value),
+            })
+          },
+        },
+        NvTableColumn: layout,
+        NvTable: {
+          props: ['data', 'emptyText'],
+          render() {
+            const action = this.$slots.default()[1].children.default
+            return vue.h(
+              'div',
+              this.data.length
+                ? this.data.map((row) =>
+                    vue.h('div', [row.name, action({ row })]),
+                  )
+                : this.emptyText,
+            )
+          },
+        },
+      },
+    },
+  )
+
+  const allowlist = vue.ref(['**/BLENDER.exe', 'D:/Games/Gun Frog.exe'])
+  const denylist = vue.ref(['**/Notepad.exe'])
+  const wrapper = mount({
+    setup: () => () =>
+      vue.h('div', [
+        vue.h(picker, {
+          listName: 'Allowlist',
+          modelValue: allowlist.value,
+          'onUpdate:modelValue': (value) => {
+            allowlist.value = value
+          },
+        }),
+        vue.h(picker, {
+          listName: 'Denylist',
+          modelValue: denylist.value,
+          'onUpdate:modelValue': (value) => {
+            denylist.value = value
+          },
+        }),
+      ]),
+  })
+  t.after(() => wrapper.unmount())
+
+  await wrapper
+    .get('[aria-label="Browse processes for Allowlist"]')
+    .trigger('click')
+  const allow = wrapper.get('[role="dialog"]')
+  assert.ok(
+    allow.get('[role="status"][aria-label="Loading processes"] svg').exists(),
+  )
+  assert.doesNotMatch(allow.text(), /Loading processes/)
+  finishInitialLoad()
+  await flushPromises()
+  assert.equal(allow.find('[aria-label="Loading processes"]').exists(), false)
+  await allow.get('input').setValue(' GUN FROG.EXE ')
+  assert.equal(allow.find('[aria-label="Add Notepad"]').exists(), false)
+  await allow.get('[aria-label="Add Frog Game"]').trigger('click')
+  assert.deepEqual(
+    [...allowlist.value],
+    ['**/Gun Frog.exe', '**/BLENDER.exe', 'D:/Games/Gun Frog.exe'],
+  )
+  await allow.get('[aria-label="Remove Frog Game"]').trigger('click')
+  assert.deepEqual(
+    [...allowlist.value],
+    ['**/BLENDER.exe', 'D:/Games/Gun Frog.exe'],
+  )
+  await allow.get('input').setValue('blender')
+  await allow.get('[aria-label="Remove Blender"]').trigger('click')
+  assert.deepEqual([...allowlist.value], ['D:/Games/Gun Frog.exe'])
+
+  await allow.get('input').setValue('paint')
+  assert.match(allow.text(), /No matching processes/)
+  const clear = allow
+    .findAll('button')
+    .find((button) => button.text() === 'Clear')
+  await clear.trigger('click')
+  assert.equal(allow.get('input').element.value, '')
+  assert.ok(allow.find('[aria-label="Add Frog Game"]').exists())
+  await allow.get('input').setValue('paint')
+  processes = [paint]
+  const reload = allow
+    .findAll('button')
+    .find((button) => button.text() === 'Reload')
+  await reload.trigger('click')
+  await flushPromises()
+  assert.ok(allow.find('[aria-label="Add Paint"]').exists())
+  fail = true
+  await reload.trigger('click')
+  await flushPromises()
+  assert.match(allow.text(), /Could not load running processes/)
+
+  fail = false
+  processes = [notepad, paint]
+  await wrapper
+    .get('[aria-label="Browse processes for Denylist"]')
+    .trigger('click')
+  await flushPromises()
+  const deny = wrapper.findAll('[role="dialog"]')[1]
+  await deny.get('[aria-label="Remove Notepad"]').trigger('click')
+  await deny.get('[aria-label="Add Paint"]').trigger('click')
+  assert.deepEqual([...denylist.value], ['**/Paint.exe'])
+  assert.deepEqual([...allowlist.value], ['D:/Games/Gun Frog.exe'])
+  assert.equal(loads, 4)
 })

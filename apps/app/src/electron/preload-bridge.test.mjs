@@ -131,7 +131,39 @@ function mainFixture() {
     '@google-cloud/speech': {},
     '@google-cloud/translate': {},
     'electron-postman': {},
-    systeminformation: {},
+    'node:child_process': {
+      execFile(executable, _args, _options, callback) {
+        assert.match(executable, /powershell\.exe$/i)
+        return {
+          stdin: {
+            on() {},
+            end(encoded) {
+              assert.deepEqual(
+                JSON.parse(Buffer.from(encoded, 'base64').toString()),
+                ['C:\\Apps\\Blender.exe'],
+              )
+              callback(
+                null,
+                JSON.stringify([
+                  { file: 'C:\\Apps\\Blender.exe', description: 'Blender' },
+                ]),
+              )
+            },
+          },
+        }
+      },
+    },
+    systeminformation: {
+      processes: async () => ({
+        list: [
+          { name: 'System' },
+          { name: 'Gun Frog.exe', command: 'private command line' },
+          { name: 'gun frog.EXE' },
+          { name: 'Blender.exe', path: 'C:\\Apps\\Blender.exe' },
+          { name: 'Test[Build].exe' },
+        ],
+      }),
+    },
     '@vscode/sudo-prompt': {},
     clipboardy: {},
     'node-abi': {},
@@ -158,7 +190,10 @@ function mainFixture() {
           implementations.set(
             id,
             loadTypescript(source(`../${id.slice(2)}/index.ts`), boundaries, {
-              process,
+              process:
+                id === '@/modules/electron-resources'
+                  ? { arch: process.arch, env: { SystemRoot: 'C:\\Windows' } }
+                  : process,
             }),
           )
         }
@@ -245,6 +280,13 @@ test('preload proxies reach real main implementations through the Electron bound
       .get('ElectronTranslation')
       .translate('unchanged', { to: 'fr' }),
     'unchanged',
+  )
+  assert.deepEqual(
+    await preload.exposed.get('ElectronResources').getRunningOverlayPrograms(),
+    [
+      { name: 'Blender', executable: 'Blender.exe' },
+      { name: 'Gun Frog', executable: 'Gun Frog.exe' },
+    ],
   )
   const error = new Error('Controlled screen failure')
   main.electron.screen.getAllDisplays = () => {

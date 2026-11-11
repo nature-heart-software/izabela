@@ -104,11 +104,15 @@
                 <NvStack spacing="5">
                   <NvText type="label">Allowlist</NvText>
                   <NvDivider direction="horizontal" />
-                  <div>
+                  <NvGroup spacing="4">
                     <NvButton size="sm" @click="addToAllowlist('')"
                       >Add path
                     </NvButton>
-                  </div>
+                    <NvOverlayProcessPicker
+                      v-model="allowlist"
+                      list-name="Allowlist"
+                    />
+                  </NvGroup>
                   <NvDivider v-if="allowlist.length" direction="horizontal" />
                   <template v-for="(path, i) in allowlist" :key="i">
                     <NvGroup :class="css({ width: '100%' })" grow>
@@ -141,11 +145,15 @@
                 <NvStack spacing="5">
                   <NvText type="label">Denylist</NvText>
                   <NvDivider direction="horizontal" />
-                  <div>
+                  <NvGroup spacing="4">
                     <NvButton size="sm" @click="addToDenylist('')"
                       >Add path
                     </NvButton>
-                  </div>
+                    <NvOverlayProcessPicker
+                      v-model="denylist"
+                      list-name="Denylist"
+                    />
+                  </NvGroup>
                   <NvDivider v-if="denylist.length" direction="horizontal" />
                   <template v-for="(path, i) in denylist" :key="i">
                     <NvGroup :class="css({ width: '100%' })" grow>
@@ -193,6 +201,7 @@ import { computed, ref, watch } from 'vue'
 import { useSettingsStore } from '@/features/settings/store'
 import { useConfirmAdmin } from '@/hooks/use-confirm-admin.ts'
 import { useMessengerStateStore } from '@/teams/messenger/store'
+import NvOverlayProcessPicker from './NvOverlayProcessPicker.vue'
 
 const gameOverlayStore = useGameOverlayStore()
 const databasesStore = useDatabasesStore()
