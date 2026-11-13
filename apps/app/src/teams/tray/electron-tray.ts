@@ -16,10 +16,7 @@ const createTray = (): Promise<Tray> =>
       return Menu.buildFromTemplate([
         {
           label: 'Restart',
-          click: () => {
-            app.relaunch()
-            app.exit()
-          },
+          click: electronMessengerWindow.restart,
         },
         {
           label: 'Settings',

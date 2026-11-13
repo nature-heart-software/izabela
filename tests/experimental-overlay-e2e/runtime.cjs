@@ -91,6 +91,16 @@ const preloadAddonDirectory =
     'long-path-regression-' + 'x'.repeat(64),
   )
 const preload = requireApp('electron-game-overlay/preload')
+const launcherResults = new Map()
+const onLauncherEvent = sdk.ReShadeOverlayLauncher.prototype.onEvent
+sdk.ReShadeOverlayLauncher.prototype.onEvent = function (handler) {
+  return onLauncherEvent.call(this, (event) => {
+    if (event.type === 'injector-returned') {
+      launcherResults.set(event.result.injectorTargetPid, event.result)
+    }
+    handler(event)
+  })
+}
 const loadModule = Module._load
 const applicationBundle = path.join(config.appRoot, 'dist-electron') + path.sep
 Module._load = function (request, parent, isMain) {
@@ -106,6 +116,7 @@ Module._load = function (request, parent, isMain) {
             options.addonPreload.applicationId
           return sdk.createReShadeLaunchConfig({
             ...options,
+            ...(!config.verifyCacheStorage && { logging: true }),
             // Test profiles isolate application state, while the SDK's sealed
             // payload store is reused across sequential graphics cells/builds.
             runsRootDirectory:
@@ -648,7 +659,7 @@ async function verifyDesktopFallback() {
   )
 }
 
-async function openAndType(key, expected, label) {
+async function waitForTargetFps() {
   await until(
     () =>
       targetFps.length === 3 &&
@@ -660,6 +671,10 @@ async function openAndType(key, expected, label) {
     'three regular native FPS samples for the foreground target',
   )
   evidence.fpsSamples = targetFps.map((sample) => ({ ...sample }))
+}
+
+async function openAndType(key, expected, label) {
+  await waitForTargetFps()
   const started = Date.now()
   evidence.shortcutState = drive('shortcut', 13) // Actual configured Ctrl+Enter global shortcut.
   await until(
@@ -946,6 +961,7 @@ async function revokePolicy(before) {
     )
     await startTarget()
     assert.notEqual(target.pid, previousPid)
+    await waitForTargetFps()
     const baseline = capture('folder-relaunch-before')
     drive('shortcut', 13)
     await until(
@@ -1025,6 +1041,25 @@ async function startTarget() {
     )
     return ready >= 0 && ready > blocked
   }, 'current managed discovery ready after latest policy update')
+  if (config.verifyCacheStorage) {
+    const storage = await sdk.inspectReShadeRuntimeStorage({
+      runsRootDirectory: config.runtimeRunsRoot,
+    })
+    assert.equal(
+      fs.existsSync(config.runtimeRunsRoot),
+      false,
+      'Watcher arm must not create run storage',
+    )
+    const entries = fs.readdirSync(storage.sdkVersionCacheDirectory, {
+      withFileTypes: true,
+    })
+    assert.equal(entries.length, 1, 'Exactly one SDK version is cached')
+    assert.ok(entries[0].isDirectory(), 'The cached SDK version is a directory')
+    evidence.sdkVersionCacheDirectory = path.join(
+      storage.sdkVersionCacheDirectory,
+      entries[0].name,
+    )
+  }
   evidence.targetLaunchReadiness ??= []
   evidence.targetLaunchReadiness.push({
     at: Date.now(),
@@ -1178,15 +1213,7 @@ async function startTarget() {
       () => {
         const inspection = drive('module')
         evidence.moduleInspection = inspection
-        const module = inspection.module
-        if (!module) return false
-        const log = path.join(path.dirname(module), 'inject.stdout.log')
-        return (
-          fs.existsSync(log) &&
-          fs
-            .readFileSync(log, 'utf8')
-            .includes('ELECTRON_GAME_OVERLAY_INJECTOR_RESULT')
-        )
+        return !!inspection.module && launcherResults.has(target.pid)
       },
       'completed injection before releasing controlled graphics barrier',
       45000,
@@ -1282,7 +1309,8 @@ async function startTarget() {
     const module = drive('module').module
     assert.ok(module, 'Delayed target has the actual injected module')
     const nativeLog = fs.readFileSync(
-      path.join(path.dirname(module), 'inject.stdout.log'),
+      launcherResults.get(delayed.pid)?.injectorStdoutPath ??
+        path.join(path.dirname(module), 'inject.stdout.log'),
       'utf8',
     )
     const prefix = 'EGO_TARGET_STARTUP_READINESS_V1 '
@@ -1308,10 +1336,23 @@ async function startTarget() {
   const inspection = drive('module')
   assert.equal(inspection.queryError, 0, 'Owned module inspection succeeds')
   assert.ok(inspection.module, 'Owned ReShade module is present')
+  if (config.verifyCacheStorage) {
+    assert.equal(
+      fs.existsSync(config.runtimeRunsRoot),
+      false,
+      'Attachment must not create run storage',
+    )
+    assert.equal(
+      path.dirname(inspection.module).toLowerCase(),
+      evidence.sdkVersionCacheDirectory.toLowerCase(),
+      'Target must load the shared SDK version binaries',
+    )
+  }
   if (config.elevated) {
     const prefix = 'EGO_TARGET_AUTHORIZATION_V1 '
     const log = fs.readFileSync(
-      path.join(path.dirname(inspection.module), 'inject.stdout.log'),
+      launcherResults.get(target.pid)?.injectorStdoutPath ??
+        path.join(path.dirname(inspection.module), 'inject.stdout.log'),
       'utf8',
     )
     const records = log
@@ -1655,6 +1696,11 @@ async function run() {
       config.appExecutable.toLowerCase(),
     )
   }
+  if (config.verifyCacheStorage) {
+    evidence.clearedCacheVersions = await sdk.clearOldReShadeRuntimeCache({
+      runsRootDirectory: config.runtimeRunsRoot,
+    })
+  }
   require(path.join(config.appRoot, 'dist-electron/background.js'))
   await app.whenReady()
   evidence.consumerExecutionContext =
@@ -1940,7 +1986,12 @@ async function finish(code) {
     const inspected = evidence.targetModuleInspections?.findLast(
       (entry) => entry.pid === target.pid,
     )
-    if (inspected?.module && evidence.cleanupTargetExitObserved) {
+    const usesCache = !!launcherResults.get(target.pid)?.runtimeCacheDirectory
+    if (
+      inspected?.module &&
+      evidence.cleanupTargetExitObserved &&
+      !usesCache
+    ) {
       const images = [32, 64].map((bits) =>
         path.join(
           path.dirname(inspected.module),
@@ -2021,9 +2072,10 @@ async function finish(code) {
     if (
       code === 0 &&
       (!evidence.cleanupTargetExitObserved ||
-        !evidence.cleanupPrivateImagesRetired ||
-        !evidence.cleanupRetiredPayloadsEmpty ||
-        (config.elevated && !evidence.cleanupPrivateCodeRetired))
+        (!usesCache &&
+          (!evidence.cleanupPrivateImagesRetired ||
+            !evidence.cleanupRetiredPayloadsEmpty ||
+            (config.elevated && !evidence.cleanupPrivateCodeRetired))))
     ) {
       code = 1
       evidence.status = 'failed'

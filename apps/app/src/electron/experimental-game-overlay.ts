@@ -44,6 +44,7 @@ class ExperimentalGameOverlay {
   private owner?: ElectronGameOverlay
   private session?: OverlaySession
   private targets?: OverlayTargetWatcher
+  private retiringTargets = new Set<Promise<void>>()
   private sdk?: typeof import('electron-game-overlay')
   private warnings = 0
   private active = false
@@ -530,12 +531,16 @@ class ExperimentalGameOverlay {
     })
   }
 
-  public quit() {
-    if (this.quitting) return
-    this.quitting = true
-    this.stopSettings?.()
-    this.stopSettings = undefined
-    this.stopResources()
+  public quit(): Promise<void> | undefined {
+    if (!this.quitting) {
+      this.quitting = true
+      this.stopSettings?.()
+      this.stopSettings = undefined
+      this.stopResources()
+    }
+    if (this.retiringTargets.size) {
+      return Promise.allSettled(this.retiringTargets).then(() => undefined)
+    }
   }
 
   private stopResources() {
@@ -555,8 +560,20 @@ class ExperimentalGameOverlay {
     this.windows.clear()
     this.connected.clear()
     this.fpsSamples.clear()
-    this.attempt(() => this.targets?.dispose())
+    const targets = this.targets
     this.targets = undefined
+    this.attempt(() => {
+      if (!targets) return
+      const cleanup = targets.disposeAsync()
+      this.retiringTargets.add(cleanup)
+      void cleanup.then(
+        () => this.retiringTargets.delete(cleanup),
+        (error) => {
+          this.retiringTargets.delete(cleanup)
+          this.warn(error)
+        },
+      )
+    })
     this.attempt(() => this.session?.close())
     this.session = undefined
     this.attempt(() => this.owner?.dispose())

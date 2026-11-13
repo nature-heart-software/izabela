@@ -360,7 +360,7 @@ export const ElectronMessengerWindow = () => {
 
   const restart = () => {
     app.relaunch()
-    app.exit()
+    app.quit()
   }
 
   return {

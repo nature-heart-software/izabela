@@ -201,6 +201,9 @@ function fixture({
       this.readiness.reject(new Error('Disposed'))
       calls.push('targets.dispose')
     }
+    async disposeAsync() {
+      this.dispose()
+    }
   }
   const sdk = {
     createOverlayProcessPolicy,
@@ -876,4 +879,27 @@ test('disabled/non-Windows startup never loads the SDK', async () => {
     assert.equal(f.calls.length, 0)
     f.overlay.quit()
   }
+})
+
+test('quit waits for watcher cleanup already started by disabling the overlay', async () => {
+  const f = fixture({ enabled: true })
+  await f.overlay.start()
+  const cleanup = deferred()
+  const targets = f.controllers[0]
+  targets.disposeAsync = () => {
+    targets.dispose()
+    return cleanup.promise
+  }
+
+  f.store.enableExperimentalGameOverlay = false
+  assert.equal(targets.disposals, 1)
+  let finished = false
+  const quitting = f.overlay.quit().then(() => {
+    finished = true
+  })
+  await drain()
+  assert.equal(finished, false)
+  cleanup.resolve()
+  await quitting
+  assert.equal(finished, true)
 })

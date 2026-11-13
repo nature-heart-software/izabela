@@ -19,19 +19,19 @@ test('experimental SDK is the pinned complete upstream local candidate, distinct
   )
   assert.equal(
     app.dependencies['electron-game-overlay'],
-    'file:../../vendor/electron-game-overlay-1.0.1-alpha.2026111013.tgz',
+    'file:../../vendor/electron-game-overlay-1.0.1-alpha.2026111205.tgz',
   )
   const bytes = readFileSync(
-    new URL('vendor/electron-game-overlay-1.0.1-alpha.2026111013.tgz', root),
+    new URL('vendor/electron-game-overlay-1.0.1-alpha.2026111205.tgz', root),
   )
   assert.equal(
     createHash('sha256').update(bytes).digest('hex'),
-    '7e911d9c19b753158b88e7cf69224172c326c534df9e7b9492956ba4205eedd4',
+    'f8ba0269098aa6ce3b5d728bcfced6e9009906c0e52fce0d826918d77b15b1a8',
   )
   const consumer = createRequire(new URL('apps/app/package.json', root))
   assert.equal(
     consumer('electron-game-overlay/package.json').version,
-    '1.0.1-alpha.2026111013',
+    '1.0.1-alpha.2026111205',
   )
   const sdkRoot = path.dirname(
     consumer.resolve('electron-game-overlay/package.json'),
@@ -39,8 +39,8 @@ test('experimental SDK is the pinned complete upstream local candidate, distinct
   const provenance = JSON.parse(
     readFileSync(path.join(sdkRoot, 'SDK_PROVENANCE.json'), 'utf8'),
   )
-  assert.equal(provenance.version, '1.0.1-alpha.2026111013')
-  assert.equal(provenance.workingTreeDirty, true)
+  assert.equal(provenance.version, '1.0.1-alpha.2026111205')
+  assert.equal(provenance.workingTreeDirty, false)
   for (const [field, suffix] of [
     ['sourceSnapshot', 'source.zip'],
     ['sourceManifest', 'source-manifest.json'],
@@ -48,7 +48,7 @@ test('experimental SDK is the pinned complete upstream local candidate, distinct
   ]) {
     const source = readFileSync(
       new URL(
-        `vendor/electron-game-overlay-1.0.1-alpha.2026111013.${suffix}`,
+        `vendor/electron-game-overlay-1.0.1-alpha.2026111205.${suffix}`,
         root,
       ),
     )
@@ -63,15 +63,15 @@ test('experimental SDK is the pinned complete upstream local candidate, distinct
   )
   assert.equal(
     provenance.baseCommit,
-    '38efc4c6998844419f0a6a3fb334be187dd512cf',
+    'd88c0bcf8fc784642c2c85ad91321b186265ddb9',
   )
   assert.deepEqual(
     provenance.native.map((entry) => entry.architecture).sort(),
     ['x64', 'x86'],
   )
   for (const native of provenance.native) {
-    assert.equal(native.runtimeGeneration, 36)
-    assert.equal(native.addonBuildId, 'CCE20935ADD44EF6A5A7973014B2E07F')
+    assert.equal(native.runtimeGeneration, 45)
+    assert.equal(native.addonBuildId, '3A0626A7F5C84324A83A20F4D9D0B8B1')
   }
 })
 
@@ -82,7 +82,7 @@ test('local SDK candidate has only its exact-version release-age exception and n
     .map((line) => line.trim())
     .filter((line) => /^- ['"]?electron-game-overlay(?:@|['"]?$)/.test(line))
   assert.deepEqual(exemptions, [
-    '- electron-game-overlay@1.0.1-alpha.2026111013',
+    '- electron-game-overlay@1.0.1-alpha.2026111205',
   ])
   assert.doesNotMatch(config, /^  electron-game-overlay@.*: patches\//m)
   assert.doesNotMatch(config, /^minimumReleaseAge:\s*0\s*$/m)
@@ -102,8 +102,12 @@ test('both native architectures carry the fixed identity and verified artifacts'
         'utf8',
       ).replace(/^\uFEFF/, ''),
     )
-    assert.equal(stamp.addonBuildId, 'CCE20935ADD44EF6A5A7973014B2E07F')
-    assert.equal(stamp.runtimeGeneration, 36)
+    assert.equal(stamp.addonBuildId, '3A0626A7F5C84324A83A20F4D9D0B8B1')
+    assert.equal(stamp.runtimeGeneration, 45)
+    assert.equal(stamp.injectorCacheBootstrap, 1)
+    assert.equal(stamp.elevatedCacheBootstrap, 1)
+    assert.equal(stamp.cachePreloadBootstrap, 1)
+    assert.equal(stamp.cacheOfficialBootstrap, 1)
     assert.equal(stamp.privateElevatedAuthorization, 2)
     assert.equal(stamp.injectorFutureTargets, 2)
     assert.equal(stamp.cooperativeAddonProtocol, 1)
@@ -217,7 +221,7 @@ test('afterPack preserves every actual SDK file including sealed dependency noti
         (file) =>
           !file.startsWith(path.join('node_modules', '.bin') + path.sep),
       )
-    assert.equal(files.length, 168)
+    assert.equal(files.length, 170)
     assert.deepEqual(
       readdirSync(destination, { recursive: true, withFileTypes: true })
         .filter((entry) => entry.isFile())
@@ -252,10 +256,10 @@ test('afterPack preserves every actual SDK file including sealed dependency noti
         file.path,
       )
     }
-    assert.equal(manifest.files.length, 163)
+    assert.equal(manifest.files.length, 165)
     const { verifyOverlayPackage } = consumer('electron-game-overlay/packaging')
     assert.deepEqual(await verifyOverlayPackage(destination), {
-      sealedPayloads: 163,
+      sealedPayloads: 165,
     })
     // Exercise the physical ASAR-unpacked package's default source discovery.
     // Only the test registry is overridden; no build-account registration occurs.

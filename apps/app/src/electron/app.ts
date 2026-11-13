@@ -33,6 +33,7 @@ import electronOverlayWindow from '@/teams/overlay/modules/electron-overlay-wind
 const App = () => {
   const isDevelopment = import.meta.env.DEV
   let quitting = false
+  let overlayShutdown: Promise<void> | undefined
   let gameOverlayWindow: BrowserWindow | undefined
   let gameOverlayWindowTask: Promise<void> | undefined
   let stopGameOverlayWindowWatch: WatchStopHandle | undefined
@@ -193,12 +194,13 @@ const App = () => {
     stopOverlayWindowWatch?.()
     void electronOverlayWindow.hide()
     gkl?.kill()
-    gameOverlay.quit()
+    const cleanup = gameOverlay.quit()
     /* fixes app.quit(): https://stackoverflow.com/a/75369483 */
     ElectronWindowManager.getInstances().forEach(({ window }) => {
       window.removeAllListeners()
     })
     stopMouse()
+    return cleanup
   }
 
   function addEventListeners() {
@@ -256,32 +258,31 @@ const App = () => {
       if (BrowserWindow.getAllWindows().length === 0) createWindows()
     })
 
-    const handleQuit = (quitApp = false) => {
-      onQuit()
-      if (quitApp) {
-        app.quit()
-      }
-    }
-
     process.on('message', (data) => {
       if (process.platform === 'win32' && data === 'graceful-exit') {
-        handleQuit(true)
+        app.quit()
       }
     })
     ;['SIGINT', 'SIGTERM', 'SIGQUIT'].forEach((signal) => {
-      process.on(signal, () => {
-        handleQuit(true)
-      })
+      process.on(signal, () => app.quit())
     })
 
-    app.on('before-quit', () => {
-      handleQuit()
+    app.on('before-quit', (event) => {
+      if (!quitting) {
+        const cleanup = onQuit()
+        if (cleanup) {
+          // The SDK bounds this wait and leaves live or uncertain runs intact.
+          overlayShutdown = cleanup.finally(() => {
+            overlayShutdown = undefined
+            app.quit()
+          })
+        }
+      }
+      if (overlayShutdown) event.preventDefault()
     })
 
     app.on('window-all-closed', () => {
-      if (process.platform !== 'darwin') {
-        handleQuit(true)
-      }
+      if (process.platform !== 'darwin') app.quit()
     })
 
     app.on('web-contents-created', (_, webContents) => {

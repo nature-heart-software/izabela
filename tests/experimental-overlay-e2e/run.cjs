@@ -20,7 +20,9 @@ const argument = (name) =>
 const appRoot = path.resolve(argument('app-root') || 'apps/app')
 const appExecutable = argument('app-exe') && path.resolve(argument('app-exe'))
 const selected = argument('case') ? [argument('case')] : cases
-const targetMode = argument('target-mode') || 'folder'
+const verifyCacheStorage = process.argv.includes('--verify-cache-storage')
+const targetMode =
+  argument('target-mode') || (verifyCacheStorage ? 'fast-folder' : 'folder')
 const recovery = process.argv.includes('--recovery')
 const elevated = process.argv.includes('--elevated')
 const mediumTarget = process.argv.includes('--medium-target')
@@ -35,8 +37,17 @@ const reportRoot = path.join(
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 const runtimeRunsRoot = path.join(
   root,
-  'coverage/experimental-overlay/native-runs',
+  'coverage/experimental-overlay',
+  verifyCacheStorage ? 'cache-contract-runs' : 'native-runs',
 )
+function runtimeRunDirectories() {
+  if (!fs.existsSync(runtimeRunsRoot)) return []
+  return fs
+    .readdirSync(runtimeRunsRoot, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort()
+}
 function runtimeStorage() {
   const identities = new Set()
   let files = 0,
@@ -154,6 +165,7 @@ async function runCase(
   delayMs = startupDelayMs,
 ) {
   const storageBefore = runtimeStorage()
+  const directoriesBefore = new Set(runtimeRunDirectories())
   const fixture = manifest.files.find((file) => file.case === name)
   assert.ok(fixture, `Missing compiled fixture: ${name}`)
   const source = path.join(fixtures, fixture.path)
@@ -266,6 +278,7 @@ async function runCase(
     refusalOwner,
     recoveryOwner: path.join(fixtures, 'overlay-test-recovery.exe'),
     runtimeRunsRoot,
+    verifyCacheStorage,
     addonDirectory: path.join(
       root,
       'coverage/experimental-overlay/isolated-addon-registry',
@@ -383,6 +396,42 @@ async function runCase(
   report.exitCode = code
   report.runtimeStorageBeforeApp = storageBefore
   report.runtimeStorageAfterAppExit = runtimeStorage()
+  if (verifyCacheStorage && fs.existsSync(runtimeRunsRoot)) {
+    report.status = 'failed'
+    report.error ||= 'Logging is off but SDK run storage exists after app shutdown'
+  }
+  if (verifyCacheStorage && report.status === 'passed') {
+    const directory = report.sdkVersionCacheDirectory
+    report.cacheFiles = fs
+      .readdirSync(directory)
+      .sort()
+      .map((name) => {
+        const stat = fs.statSync(path.join(directory, name), { bigint: true })
+        assert.ok(stat.isFile(), `Expected an ordinary cache file: ${name}`)
+        return {
+          name,
+          identity: `${stat.dev}:${stat.ino}`,
+          bytes: String(stat.size),
+          modifiedAt: String(stat.mtimeNs),
+        }
+      })
+  }
+  // Comparing names prevents old-folder pruning from hiding newly retained runs.
+  report.newRetiredRunDirectories = runtimeRunDirectories().filter(
+    (name) =>
+      !directoriesBefore.has(name) &&
+      fs.existsSync(
+        path.join(
+          runtimeRunsRoot,
+          name,
+          '.electron-game-overlay-run-reclaimable.json',
+        ),
+      ),
+  )
+  if (report.status === 'passed' && report.newRetiredRunDirectories.length) {
+    report.status = 'failed'
+    report.error = 'New retired overlay run folders remained after app shutdown'
+  }
   if (
     report.status === 'passed' &&
     (report.runtimeStorageAfterAppExit.privateImages >
@@ -414,6 +463,22 @@ async function main() {
   )
   for (const name of selected)
     assert.ok(cases.includes(name), `Unknown fixture: ${name}`)
+  if (verifyCacheStorage) {
+    assert.ok(appExecutable, 'Cache storage check requires a packaged app')
+    assert.equal(selected.length, 1, 'Cache storage check uses one target')
+    assert.ok(
+      ['d3d11-x64', 'd3d9-x86'].includes(selected[0]),
+      'Cache storage check uses a pinned graphics fixture',
+    )
+    assert.ok(['folder', 'fast-folder'].includes(targetMode))
+    assert.equal(requestedScale, 1)
+    assert.ok(!elevated && !recovery && !startupDelayMs)
+    assert.equal(
+      fs.existsSync(runtimeRunsRoot),
+      false,
+      'Run storage must be absent before the cache check',
+    )
+  }
   if (elevated) {
     assert.equal(
       selected.length,
@@ -541,7 +606,7 @@ async function main() {
     for (const scale of [1.25, 1.5])
       reports.push(await runCase(scaleCase, false, manifest, scale))
   }
-  if (!argument('target-mode')) {
+  if (!argument('target-mode') && !verifyCacheStorage) {
     reports.push(
       await runCase(
         selected.includes('d3d11-x64') ? 'd3d11-x64' : selected[0],
@@ -566,6 +631,16 @@ async function main() {
         requestedScale ?? 1,
       ),
     )
+  if (
+    verifyCacheStorage &&
+    reports.every((report) => report.status === 'passed')
+  ) {
+    assert.deepEqual(
+      reports[1].cacheFiles,
+      reports[0].cacheFiles,
+      'A restarted Izabela instance must reuse the same unmodified cache files',
+    )
+  }
   const passed = reports.every(
     (report) => report.status === 'passed' && report.exitCode === 0,
   )

@@ -12,6 +12,7 @@ function fixture(gameOverlay = {}) {
   let paintRequests = 0
   let mouse
   const timers = []
+  const lifecycle = []
   const store = { $patch() {} }
   const settings = {
     $whenReady: () => Promise.resolve(),
@@ -61,6 +62,10 @@ function fixture(gameOverlay = {}) {
         },
       },
       electron: {
+        app: {
+          relaunch: () => lifecycle.push('relaunch'),
+          quit: () => lifecycle.push('quit'),
+        },
         screen: {
           screenToDipPoint: (point) => point,
           getDisplayNearestPoint: () => ({ scaleFactor: 1 }),
@@ -107,6 +112,7 @@ function fixture(gameOverlay = {}) {
   const controller = ElectronMessengerWindow()
   return {
     controller,
+    lifecycle,
     start: async () => {
       controller.start(window)
       await Promise.resolve()
@@ -210,4 +216,10 @@ test('an explicit show reopens the window after hide completes', async () => {
   assert.equal(f.paintRequests(), 0)
   await f.controller.show()
   assert.equal(f.visible(), true)
+})
+
+test('restart schedules relaunch and uses the normal Electron quit lifecycle', () => {
+  const { controller, lifecycle } = fixture()
+  controller.restart()
+  assert.deepEqual(lifecycle, ['relaunch', 'quit'])
 })

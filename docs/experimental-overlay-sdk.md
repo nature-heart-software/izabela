@@ -316,6 +316,23 @@ or system targets. Unknown user/session/token facts fail closed.
 
 ## Runtime storage
 
+With SDK 1205, Izabela's owned ReShade runtime loads from a cache keyed by SDK
+version. A normal launch uses the cached binaries without creating a run folder.
+The SDK defaults file logging to off. An app can set `logging: true` in
+`createReShadeLaunchConfig()` to write injector and ReShade logs to a separate
+folder under its configured `runsRootDirectory`.
+
+Call `clearOldReShadeRuntimeCache({ runsRootDirectory })` with the same root used
+for launching to remove unused binary caches older than the running SDK. The
+SDK keeps active, current, and newer versions. Administrator launches use a
+protected cache. A version used at both privilege levels can have an ordinary
+copy and a protected copy. Clearing the protected cache requires running the
+call as administrator. Supported official ReShade hosts use the cache for the
+startup wait and attachment. Installing or repairing the managed add-on still
+writes to the ReShade installation and can require a target restart.
+
+### Legacy staging
+
 Ordinary preparation uses an immutable, verified `runs.payloads-v2` cache.
 Helpers, runtime DLLs and manifests share file identities; participant add-ons
 and mutable INIs remain private. Preparation/publication leases protect versions

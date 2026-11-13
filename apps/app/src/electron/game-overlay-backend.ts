@@ -58,7 +58,7 @@ const gameOverlay = {
   },
   quit() {
     quitting = true
-    selected?.quit()
+    return selected?.quit()
   },
   isReady() {
     return choose().isReady()
