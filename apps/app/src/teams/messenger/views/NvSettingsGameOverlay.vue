@@ -172,6 +172,14 @@
                       />
                     </NvGroup>
                   </template>
+                  <template
+                    v-for="(path, i) in gameOverlayDenylistData"
+                    :key="`database-deny-${i}`"
+                  >
+                    <NvGroup :class="css({ width: '100%' })" grow>
+                      <NvInput :modelValue="path" readonly />
+                    </NvGroup>
+                  </template>
                 </NvStack>
               </NvCard>
             </template>
@@ -217,6 +225,9 @@ const { allowlist, denylist } = storeToRefs(gameOverlayStore)
 const { data } = storeToRefs(databasesStore)
 const gameOverlayAllowlistData = computed(
   () => data.value['game-overlay-allowlist'] || [],
+)
+const gameOverlayDenylistData = computed(
+  () => data.value['game-overlay-denylist'] || [],
 )
 
 const confirmAdmin = useConfirmAdmin()

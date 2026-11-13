@@ -80,6 +80,9 @@ const { useMessengerStateStore } = loadTypescript(
 function fixture(t, saved = {}, decision = 'confirm') {
   const pinia = createPinia()
   const store = useGameOverlayStore(pinia)
+  const database = defineStore('databases', () => ({ data: vue.ref({}) }))(
+    pinia,
+  )
   store.$patch(saved)
   const messenger = useMessengerStateStore(pinia)
   const calls = { admin: 0, confirmation: 0, closed: 0 }
@@ -135,8 +138,7 @@ function fixture(t, saved = {}, decision = 'confirm') {
       },
       '@/features/game-overlay/store': { useGameOverlayStore: () => store },
       '@/features/databases/store': {
-        useDatabasesStore: () =>
-          defineStore('databases', () => ({ data: vue.ref({}) }))(pinia),
+        useDatabasesStore: () => database,
       },
       '@/store/use-confirm-store.ts': {},
       '@/features/settings/store': {
@@ -164,6 +166,7 @@ function fixture(t, saved = {}, decision = 'confirm') {
     window.ElectronResources = originalResources
     wrapper.unmount()
     store.$dispose()
+    database.$dispose()
     messenger.$dispose()
   })
   async function toggle(index, value) {
@@ -177,6 +180,7 @@ function fixture(t, saved = {}, decision = 'confirm') {
   return {
     wrapper,
     store,
+    database,
     messenger,
     calls,
     toggle,
@@ -188,6 +192,25 @@ function fixture(t, saved = {}, decision = 'confirm') {
     },
   }
 }
+
+test('downloaded deny rules appear as read-only rows without changing local rules', async (t) => {
+  const localRule = '**/local-test.exe'
+  const publishedRule = '**/published-test.exe'
+  const { wrapper, store, database } = fixture(t, {
+    enableExperimentalGameOverlay: true,
+    denylist: [localRule],
+  })
+  database.data['game-overlay-denylist'] = [publishedRule]
+  await vue.nextTick()
+
+  const denylist = wrapper
+    .findAllComponents(layout)
+    .find((component) => component.text() === 'DenylistAdd path')
+  assert.ok(denylist)
+  assert.equal(denylist.get(`[modelvalue="${publishedRule}"]`).attributes('readonly'), '')
+  assert.equal(denylist.get(`[modelvalue="${localRule}"]`).attributes('readonly'), undefined)
+  assert.deepEqual(store.denylist, [localRule])
+})
 
 test('experimental opt-in deselects legacy, marks restart and never requests elevation', async (t) => {
   const { wrapper, store, messenger, calls, toggle } = fixture(t, {
