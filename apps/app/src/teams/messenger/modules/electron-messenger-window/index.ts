@@ -204,6 +204,13 @@ export const ElectronMessengerWindow = () => {
     const window = getWindow()
     if (window) {
       if (!window.isDestroyed() && window.isVisible()) {
+        const mouseDisplay = screen.getDisplayNearestPoint(
+          screen.screenToDipPoint({ x: initialMouseX, y: initialMouseY }),
+        )
+        const windowDisplay = screen.getDisplayMatching(window.getBounds())
+        // Global mouse movement on another monitor must not steal keyboard focus.
+        if (mouseDisplay.id !== windowDisplay.id) return
+
         if (isPosWithinHitbox(initialMouseX, initialMouseY)) {
           focus('mouse')
         } else {
