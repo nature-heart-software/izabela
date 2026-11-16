@@ -2,6 +2,7 @@ import { autoUpdater } from 'electron-updater'
 import { createNotification } from '@/utils/electron-notification'
 import { app } from 'electron'
 import { useSettingsStore } from '@/features/settings/store'
+import { registerUpdateRestart } from './restart'
 
 export default () =>
   app.whenReady().then(() => {
@@ -17,12 +18,7 @@ export default () =>
       const currentChannel =
         app.getVersion().match(/-(alpha|beta|rc)(?:[.-]|$)/)?.[1] || 'latest'
       autoUpdater.allowDowngrade = channel !== currentChannel
-      autoUpdater.once('update-downloaded', () => {
-        app.once('before-quit', () => {
-          // Silent install-on-quit does not relaunch unless explicitly requested.
-          autoUpdater.quitAndInstall(true, true)
-        })
-      })
+      registerUpdateRestart()
       const notification = createNotification({
         title: `${app.name} update available`,
         body: `A new update has been downloaded and will install on exit.`,

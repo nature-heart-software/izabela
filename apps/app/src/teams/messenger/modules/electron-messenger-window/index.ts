@@ -2,7 +2,7 @@ import ElectronWindowManager from '@/modules/electron-window-manager'
 import { startMouse, stopMouse } from '@/modules/node-mouse'
 import throttle from 'lodash/throttle'
 import { Hitbox } from '@/modules/vue-hitboxes/types'
-import { app, BrowserWindow, screen, shell } from 'electron'
+import { BrowserWindow, screen, shell } from 'electron'
 
 import { useMessengerWindowStore } from '@/teams/messenger/store'
 import { useSettingsStore } from '@/features/settings/store'
@@ -15,6 +15,7 @@ import { focusWindow } from 'forcefocus'
 import koffi from 'koffi'
 import { dialogsMap } from '@/modules/electron-dialog'
 import { findDisplay } from '@/features/display/utils'
+import { restartApp } from '@/modules/electron-updater/restart'
 
 export const ElectronMessengerWindow = () => {
   /* use isFocused as source of truth instead of window.isFocused() as in some instances
@@ -29,7 +30,8 @@ export const ElectronMessengerWindow = () => {
   let hitboxesStore: ReturnType<typeof useHitboxesStore> | undefined
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
   let messengerWindowStore:
-    ReturnType<typeof useMessengerWindowStore> | undefined
+    | ReturnType<typeof useMessengerWindowStore>
+    | undefined
   const ready = Deferred<BrowserWindow>()
   const isReady = () => ready.promise
   let foregroundWindow: string | number | null = null
@@ -357,10 +359,7 @@ export const ElectronMessengerWindow = () => {
     addEventListeners()
   })
 
-  const restart = () => {
-    app.relaunch()
-    app.exit()
-  }
+  const restart = restartApp
 
   return {
     openDevTools,

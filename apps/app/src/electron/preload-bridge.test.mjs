@@ -98,6 +98,13 @@ function mainFixture() {
     '@/utils/electron-notification.ts': {},
     '@/utils/electron-notification': {},
     '@/modules/node-mouse': {},
+    'electron-updater': {},
+    get '@/modules/electron-updater/restart'() {
+      return loadTypescript(
+        source('../modules/electron-updater/restart.ts'),
+        boundaries,
+      )
+    },
     '@/teams/messenger/store': {},
     '@/features/settings/store': {},
     '@/features/speech/store': {},
