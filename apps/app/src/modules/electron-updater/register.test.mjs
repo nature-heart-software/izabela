@@ -4,28 +4,62 @@ import { tmpdir } from 'node:os'
 import { join, isAbsolute } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import test from 'node:test'
+import { EventEmitter } from 'node:events'
+import { createRequire } from 'node:module'
 import ts from 'typescript'
 import { build } from 'vite'
 import loadTypescript from '../../../../../tests/load-typescript.cjs'
 
 const appRoot = new URL('../../', import.meta.url)
+const require = createRequire(import.meta.url)
+// Initialize the public entry first to preserve the updater's circular imports.
+require('electron-updater')
+const { BaseUpdater } = loadTypescript(
+  require.resolve('electron-updater/out/BaseUpdater'),
+  {
+    './AppUpdater': require('electron-updater/out/AppUpdater'),
+    electron: { autoUpdater: new EventEmitter() },
+  },
+  { setImmediate },
+)
 
 async function registerUpdater(disabled, enabled = true) {
   const checks = []
-  const updater = {
-    checkForUpdatesAndNotify: async (...args) => checks.push(args),
+  const installs = []
+  const app = Object.assign(new EventEmitter(), {
+    whenReady: () => Promise.resolve(),
+    getVersion: () => '6.6.6',
+    name: 'Izabela',
+    quit() {
+      app.emit('before-quit')
+      app.emit('quit', {}, 0)
+    },
+  })
+  // Keep the updater's real quit/install logic; control only Electron and I/O.
+  const updater = new BaseUpdater(null, {
+    version: app.getVersion(),
+    onQuit: (callback) => app.on('quit', (_, code) => callback(code)),
+    quit: () => app.quit(),
+  })
+  updater.logger = null
+  updater.checkForUpdatesAndNotify = async (...args) => checks.push(args)
+  updater.doInstall = (options) => {
+    installs.push(options)
+    return true
+  }
+  const downloadUpdate = () => {
+    updater.downloadedUpdateHelper = {
+      file: 'downloaded-update.exe',
+      downloadedFileInfo: {},
+    }
+    updater.emit('update-downloaded', {})
+    updater.addQuitHandler()
   }
   const register = loadTypescript(
     fileURLToPath(new URL('./register.ts', import.meta.url)),
     {
       'electron-updater': { autoUpdater: updater },
-      electron: {
-        app: {
-          whenReady: () => Promise.resolve(),
-          getVersion: () => '6.6.6',
-          name: 'Izabela',
-        },
-      },
+      electron: { app },
       '@/features/settings/store': {
         useSettingsStore: () => ({
           $whenReady: () => Promise.resolve(),
@@ -41,13 +75,44 @@ async function registerUpdater(disabled, enabled = true) {
     },
   ).default
   await register()
-  return { checks, updater }
+  return { checks, updater, app, installs, downloadUpdate }
 }
 
+test('a downloaded update waits for exit then installs silently with relaunch requested', async () => {
+  const { app, updater, installs, downloadUpdate } = await registerUpdater(
+    undefined,
+  )
+  downloadUpdate()
+  updater.emit('update-downloaded', {})
+  assert.equal(app.listenerCount('before-quit'), 1)
+  assert.equal(installs.length, 0, 'downloading must not interrupt the app')
+  app.quit()
+  await new Promise(setImmediate)
+  assert.equal(installs.length, 1, 'the update must install only once')
+  assert.equal(installs[0].isSilent, true)
+  assert.equal(installs[0].isForceRunAfter, true)
+})
+
+test('quitting without a downloaded update does not install or relaunch', async () => {
+  const { app, installs } = await registerUpdater(undefined)
+  assert.equal(app.listenerCount('before-quit'), 0)
+  app.quit()
+  await new Promise(setImmediate)
+  assert.deepEqual(installs, [])
+})
+
+test('disabled automatic updates do not register installation hooks', async () => {
+  const { app, updater } = await registerUpdater(undefined, false)
+  assert.equal(updater.listenerCount('update-downloaded'), 0)
+  assert.equal(app.listenerCount('before-quit'), 0)
+})
+
 test('artifact builds never initialize update checks even when saved settings enable updates', async () => {
-  const { checks, updater } = await registerUpdater('true')
+  const { checks, updater, app } = await registerUpdater('true')
   assert.equal(checks.length, 0)
-  assert.equal(updater.channel, undefined)
+  assert.equal(updater.channel, null)
+  assert.equal(updater.listenerCount('update-downloaded'), 0)
+  assert.equal(app.listenerCount('before-quit'), 0)
 })
 
 test('ordinary builds retain automatic updates and respect the saved preference', async () => {
