@@ -10,7 +10,7 @@ const displayUtils = loadTypescript(
   ),
 )
 
-function fixture({ displays = [{ id: 1, bounds: {} }] } = {}) {
+function fixture({ displays = [{ id: 1, bounds: {} }], canBlock = true } = {}) {
   const keys = new Set(),
     timers = new Map(),
     blocks = [],
@@ -18,6 +18,22 @@ function fixture({ displays = [{ id: 1, bounds: {} }] } = {}) {
   let released = true,
     nextTimer = 0,
     now = 0
+  const input = { foreground: 1n, desktopActive: true, desktopReadable: true }
+  const native = {
+    BlockInput(value) {
+      blocks.push(value)
+      return value === 0 || canBlock ? 1 : 0
+    },
+    GetForegroundWindow: () => input.foreground,
+    GetThreadDesktop: () => 1,
+    GetCurrentThreadId: () => 1,
+    GetUserObjectInformationW(_desktop, index, result) {
+      assert.equal(index, 6)
+      if (!input.desktopReadable) return 0
+      result.writeInt32LE(Number(input.desktopActive))
+      return 1
+    },
+  }
   const settings = {
     enableOverlayWindow: true,
     keybindings: { toggleOverlayWindow: [] },
@@ -67,7 +83,12 @@ function fixture({ displays = [{ id: 1, bounds: {} }] } = {}) {
         hide: async () => true,
       },
       '@/teams/overlay/store': { useOverlayWindowStore: () => state },
-      koffi: { load: () => ({ func: () => (value) => blocks.push(value) }) },
+      koffi: {
+        address: (handle) => handle,
+        load: () => ({
+          func: (signature) => native[signature.match(/(\w+)\(/)[1]],
+        }),
+      },
       '@/features/display/utils': displayUtils,
     },
     {
@@ -111,6 +132,7 @@ function fixture({ displays = [{ id: 1, bounds: {} }] } = {}) {
     controller,
     settings,
     state,
+    input,
     keys,
     blocks,
     makeWindow,
@@ -131,6 +153,9 @@ function fixture({ displays = [{ id: 1, bounds: {} }] } = {}) {
         timer.fn()
       })
     },
+    keyDown(name) {
+      ;[...keys].forEach((fn) => fn({ name, state: 'DOWN' }, {}))
+    },
     flush() {
       const work = [...timers.values()]
       timers.clear()
@@ -138,6 +163,130 @@ function fixture({ displays = [{ id: 1, bounds: {} }] } = {}) {
     },
   }
 }
+
+test('a quiet hook releases input after 12 seconds without submitting or destroying the overlay', async () => {
+  const f = fixture(),
+    w = f.makeWindow()
+  f.controller.start(w)
+  await f.controller.show()
+  f.tick(100)
+  f.tick(11_999)
+  assert.deepEqual(f.blocks, [0, 1])
+  assert.equal(w.visible, true)
+  f.tick(1)
+  assert.deepEqual(f.blocks, [0, 1, 0])
+  assert.equal(w.visible, false)
+  assert.equal(w.isDestroyed(), false)
+  assert.deepEqual(f.commands, [])
+  assert.equal(await f.controller.show(), true)
+  f.tick(100)
+  assert.equal(f.blocks.at(-1), 1)
+  w.destroy()
+})
+
+test('typing resets the inactivity deadline', async () => {
+  const f = fixture(),
+    w = f.makeWindow()
+  f.controller.start(w)
+  await f.controller.show()
+  f.tick(100)
+  f.tick(11_000)
+  f.keyDown('SPACE')
+  f.tick(11_999)
+  assert.deepEqual(f.blocks, [0, 1])
+  f.tick(1)
+  assert.deepEqual(f.blocks, [0, 1, 0])
+  assert.deepEqual(f.commands, ['spaceLetter'])
+  w.destroy()
+})
+
+test('an input desktop switch while capture is pending prevents the block', async () => {
+  const f = fixture(),
+    w = f.makeWindow()
+  f.controller.start(w)
+  await f.controller.show()
+  f.input.desktopActive = false
+  f.tick(100)
+  assert.equal(f.blocks.includes(1), false)
+  assert.equal(w.visible, false)
+  w.destroy()
+})
+
+test('a foreground change while the shortcut is held cancels the show', async () => {
+  const f = fixture(),
+    w = f.makeWindow()
+  f.controller.start(w)
+  f.hold()
+  const showing = f.controller.show()
+  f.input.foreground = 2n
+  f.release()
+  assert.equal(await showing, false)
+  f.tick(100)
+  assert.equal(w.visible, false)
+  assert.equal(f.blocks.includes(1), false)
+  w.destroy()
+})
+
+for (const [description, change] of [
+  ['the foreground changes on the same desktop', { foreground: 2n }],
+  ['the desktop stops receiving input', { desktopActive: false }],
+  ['the desktop query fails', { desktopReadable: false }],
+]) {
+  test(`input is released without a key event when ${description}`, async () => {
+    const f = fixture(),
+      w = f.makeWindow()
+    f.controller.start(w)
+    await f.controller.show()
+    f.tick(100)
+    Object.assign(f.input, change)
+    f.tick(100)
+    assert.deepEqual(f.blocks, [0, 1, 0])
+    assert.equal(w.visible, false)
+    assert.deepEqual(f.commands, [])
+    w.destroy()
+  })
+}
+
+test('an input event after foreground changes is not sent to the overlay', async () => {
+  const f = fixture(),
+    w = f.makeWindow()
+  f.controller.start(w)
+  await f.controller.show()
+  f.tick(100)
+  f.input.foreground = 2n
+  f.keyDown('RETURN')
+  assert.deepEqual(f.blocks, [0, 1, 0])
+  assert.equal(w.visible, false)
+  assert.deepEqual(f.commands, [])
+  w.destroy()
+})
+
+test('a failed native block leaves normal dismissal available without an inactivity deadline', async () => {
+  const f = fixture({ canBlock: false }),
+    w = f.makeWindow()
+  f.controller.start(w)
+  await f.controller.show()
+  f.tick(100)
+  f.tick(12_000)
+  assert.equal(w.visible, true)
+  f.keyDown('ESCAPE')
+  assert.equal(w.visible, false)
+  w.destroy()
+})
+
+test('delivered Escape hides and releases capture', async () => {
+  const f = fixture(),
+    w = f.makeWindow()
+  f.controller.start(w)
+  await f.controller.show()
+  f.tick(100)
+  f.keyDown('ESCAPE')
+  assert.equal(w.visible, false)
+  f.tick(100)
+  assert.deepEqual(f.blocks, [0, 1, 0])
+  assert.deepEqual(f.commands, [])
+  w.destroy()
+})
 
 test('absent overlay controls never fall back to the messenger or block input', async () => {
   const f = fixture()
