@@ -16,10 +16,7 @@ const createTray = (): Promise<Tray> =>
       return Menu.buildFromTemplate([
         {
           label: 'Restart',
-          click: () => {
-            app.relaunch()
-            app.exit()
-          },
+          click: electronMessengerWindow.restart,
         },
         {
           label: 'Settings',
@@ -27,7 +24,9 @@ const createTray = (): Promise<Tray> =>
             {
               label: 'Display',
               submenu: allDisplays.map(({ id, bounds }) => ({
-                label: `${(id === primaryDisplay.id && '(Primary) ') || ''}${id}`,
+                label: `${
+                  (id === primaryDisplay.id && '(Primary) ') || ''
+                }${id}`,
                 type: 'radio',
                 checked:
                   settingsStore.display !== null

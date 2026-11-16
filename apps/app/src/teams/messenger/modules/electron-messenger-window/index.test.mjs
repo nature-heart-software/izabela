@@ -26,6 +26,7 @@ function fixture({
   let destroyed = false
   let nativeFocuses = 0
   let paintRequests = 0
+  let restarts = 0
   let mouse
   const timers = []
   const store = { $patch() {} }
@@ -123,6 +124,11 @@ function fixture({
       koffi: { load: () => ({ func: () => () => 2 }) },
       '@/modules/electron-dialog': { dialogsMap: new Map() },
       '@/features/display/utils': { findDisplay: () => undefined },
+      '@/modules/electron-updater/restart': {
+        restartApp: () => {
+          restarts++
+        },
+      },
       'win-control': {
         Window: { getForeground: () => ({ getPid: () => 42 }) },
       },
@@ -132,6 +138,7 @@ function fixture({
   const controller = ElectronMessengerWindow()
   return {
     controller,
+    restarts: () => restarts,
     start: async () => {
       controller.start(window)
       await Promise.resolve()
@@ -160,6 +167,12 @@ function fixture({
     },
   }
 }
+
+test('the messenger Restart action delegates to the update-aware restart policy', () => {
+  const f = fixture()
+  f.controller.restart()
+  assert.equal(f.restarts(), 1)
+})
 
 test('quick Escape/send cannot let delayed native focus steal focus after hiding', async () => {
   const f = fixture()
