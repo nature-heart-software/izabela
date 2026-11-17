@@ -171,6 +171,7 @@
                           css({
                             position: 'absolute',
                             inset: '0',
+                            overflowX: 'hidden',
                             overflowY: 'auto',
                           })
                         "
