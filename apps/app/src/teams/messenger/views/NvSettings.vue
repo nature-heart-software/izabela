@@ -65,6 +65,7 @@
             "
           >
             <NvPanelNavigation
+              ref="panelNavigation"
               :sidebar="sidebar"
               :content="content"
               @close="$emit('close')"
@@ -106,7 +107,10 @@
                           <NvButton
                             as="a"
                             :href="href"
-                            @click="navigate"
+                            @click="
+                              (event) =>
+                                panelNavigation?.activatePage(event, navigate)
+                            "
                             :selected="currentRoute.name === entry.to?.name"
                             :aria-label="
                               entry.to?.name === 'settings-support'
@@ -208,6 +212,7 @@ import NvPortalTarget from '@/teams/messenger/components/NvPortalTarget.vue'
 import { computed, ref } from 'vue'
 
 const settings = ref()
+const panelNavigation = ref<InstanceType<typeof NvPanelNavigation>>()
 const sidebar = ref<HTMLElement>()
 const content = ref<HTMLElement>()
 const settingsStore = useSettingsStore()

@@ -49,7 +49,12 @@
   </Popover.RootProvider>
 </template>
 <script lang="ts" setup>
-import { onMounted, useId } from 'vue'
+import { nextTick, onMounted, useId } from 'vue'
+import {
+  isNavigationFailure,
+  NavigationFailureType,
+  type NavigationFailure,
+} from 'vue-router'
 import { useEventListener } from '@vueuse/core'
 import { Popover, usePopover } from '@ark-ui/vue'
 import { NvButton, NvCard, NvStack, NvText, NvTooltip } from '@packages/ui'
@@ -104,9 +109,28 @@ function onCloseTab(event: KeyboardEvent) {
   popover.value.setOpen(true)
 }
 
+async function activatePage(
+  event: MouseEvent,
+  navigate: (event?: MouseEvent) => Promise<void | NavigationFailure>,
+) {
+  const failure = await navigate(event)
+  if (
+    event.detail !== 0 ||
+    !event.defaultPrevented ||
+    (failure && !isNavigationFailure(failure, NavigationFailureType.duplicated))
+  )
+    return
+  await nextTick()
+  focusArea(props.content)
+}
+
+defineExpose({ activatePage })
+
 function focusArea(area?: HTMLElement, preferCurrent = false) {
   if (!area) return
-  const candidates = getTabStops(area)
+  const candidates = getTabStops(area).filter(
+    (element) => !element.closest('.v-leave-active'),
+  )
   const contentSelector = area === props.content && props.contentFocusSelector
   const contentTarget = contentSelector
     ? candidates.filter((element) => element.matches(contentSelector)).at(-1)

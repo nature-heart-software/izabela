@@ -195,19 +195,20 @@ async function panel(
   return { wrapper, router, close, openChooser }
 }
 
+const MessageList = {
+  render: () =>
+    Vue.h('div', [
+      Vue.h('button', {}, 'Add shortcut'),
+      Vue.h('button', { 'data-message-play': '' }, 'Play first'),
+      Vue.h('button', {}, 'First message options'),
+      Vue.h('button', { 'data-message-play': '' }, 'Play last'),
+      Vue.h('button', {}, 'Last message options'),
+    ]),
+}
+
 it.each(['history', 'shortcuts'])(
   'enters Message %s at the last Play button from the chooser and sidebar Tab',
   async (page) => {
-    const MessageList = {
-      render: () =>
-        Vue.h('div', [
-          Vue.h('button', {}, 'Add shortcut'),
-          Vue.h('button', { 'data-message-play': '' }, 'Play first'),
-          Vue.h('button', {}, 'First message options'),
-          Vue.h('button', { 'data-message-play': '' }, 'Play last'),
-          Vue.h('button', {}, 'Last message options'),
-        ]),
-    }
     const { router, openChooser } = await panel('messages', false, MessageList)
     await router.push('/messages/' + page)
     await settle()
@@ -249,6 +250,34 @@ it.each(['history', 'shortcuts'])(
     links[links.length - 1].dispatchEvent(lastTab)
     await settle()
     expect(lastTab.defaultPrevented).toBe(true)
+    expect(document.activeElement).toBe(
+      document.querySelectorAll('[data-message-play]')[1],
+    )
+  },
+)
+
+it.each(['history', 'shortcuts'])(
+  'focuses the last Play button after keyboard navigation to Message %s',
+  async (page) => {
+    const { wrapper, router } = await panel('messages', false, MessageList)
+    await router.push(
+      '/messages/' + (page === 'history' ? 'shortcuts' : 'history'),
+    )
+    await settle()
+    const link = wrapper.get<HTMLAnchorElement>(
+      'a[href="/messages/' + page + '"]',
+    )
+    link.element.focus()
+    link.element.click()
+    await settle()
+    expect(router.currentRoute.value.name).toBe('messages-' + page)
+    expect(document.activeElement).toBe(
+      document.querySelectorAll('[data-message-play]')[1],
+    )
+
+    link.element.focus()
+    link.element.click()
+    await settle()
     expect(document.activeElement).toBe(
       document.querySelectorAll('[data-message-play]')[1],
     )
@@ -359,7 +388,7 @@ it.each(['settings', 'messages'] as const)(
   },
 )
 
-it('keeps sidebar focus and content state when changing the Settings tab', async () => {
+it('keeps sidebar focus and content state when clicking a Settings tab with the pointer', async () => {
   const { wrapper, router, close, openChooser } = await panel('settings')
   await openChooser()
   document.querySelector<HTMLButtonElement>('[role="dialog"] button')!.click()
@@ -368,11 +397,36 @@ it('keeps sidebar focus and content state when changing the Settings tab', async
     'a[href="/settings/general"]',
   ).element
   general.focus()
-  general.click()
+  general.dispatchEvent(
+    new MouseEvent('click', { detail: 1, bubbles: true, cancelable: true }),
+  )
   await settle()
   expect(router.currentRoute.value.name).toBe('settings-general')
   expect(document.activeElement).toBe(general)
   expect(document.activeElement).not.toBe(close)
+})
+
+it('focuses page content after keyboard activation of a Settings navigation item', async () => {
+  const { wrapper, router } = await panel('settings')
+  const general = wrapper.get<HTMLAnchorElement>('a[href="/settings/general"]')
+  general.element.focus()
+  general.element.click()
+  await settle()
+  expect(router.currentRoute.value.name).toBe('settings-general')
+  expect(document.activeElement).toBe(
+    wrapper.get('[data-content-first]').element,
+  )
+})
+
+it('retains navigation focus when keyboard navigation is cancelled', async () => {
+  const { wrapper, router } = await panel('settings')
+  router.beforeEach(() => false)
+  const general = wrapper.get<HTMLAnchorElement>('a[href="/settings/general"]')
+  general.element.focus()
+  general.element.click()
+  await settle()
+  expect(router.currentRoute.value.name).toBe('settings-game-overlay')
+  expect(document.activeElement).toBe(general.element)
 })
 
 it.each(['select', 'popover'])(
