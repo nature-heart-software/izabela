@@ -144,6 +144,40 @@ describe('overlay interaction boundaries', () => {
     },
   )
 
+  it('reveals the Close button when a scrolled dialog loops focus from its last field', async () => {
+    const wrapper = render(ui.NvDialog, {
+      slots: {
+        reference: () => h('button', 'Profile settings'),
+        title: 'Profile settings',
+        footer: () => h('input', { id: 'dialog-last-field' }),
+      },
+    })
+    wrapper.get('button').element.click()
+    await vi.waitFor(() =>
+      expect(document.activeElement?.getAttribute('data-part')).toBe(
+        'close-trigger',
+      ),
+    )
+    const close = document.activeElement as HTMLElement
+    expect(close.getAttribute('aria-label')).toBe('Close')
+    await vi.waitFor(() =>
+      expect(
+        document.getElementById(close.getAttribute('aria-describedby') || '')
+          ?.textContent,
+      ).toContain('Close'),
+    )
+    const content = close.closest('[role="dialog"]') as HTMLElement
+    content.scrollTop = 500
+    vi.spyOn(close, 'getBoundingClientRect').mockReturnValue(
+      new DOMRect(0, -200, 16, 16),
+    )
+    const last = document.getElementById('dialog-last-field')!
+    last.focus()
+    await key(last, 'Tab')
+    expect(document.activeElement).toBe(close)
+    expect(content.scrollTop).toBeLessThan(500)
+  })
+
   it('focuses the first enabled control on popover open and restores its trigger on Escape', async () => {
     const wrapper = render(ui.NvPopover, {
       slots: {
