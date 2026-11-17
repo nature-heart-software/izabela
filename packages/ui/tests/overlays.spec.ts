@@ -1093,7 +1093,13 @@ describe('overlay interaction boundaries', () => {
     )
   })
 
-  it.each(['Escape', 'keyboard selection', 'option click', 'outside click'])(
+  it.each([
+    'Escape',
+    'keyboard selection',
+    'option click',
+    'trigger click',
+    'outside click',
+  ])(
     'restores a focused Select tooltip after %s unless dismissed outside',
     async (method) => {
       const value = ref('a')
@@ -1133,12 +1139,17 @@ describe('overlay interaction boundaries', () => {
           new MouseEvent('mousedown', { bubbles: true, cancelable: true }),
         )
         option.click()
-      } else if (method === 'outside click') {
+      } else if (method === 'trigger click' || method === 'outside click') {
         const shield = document.querySelector<HTMLElement>(
           '[data-nv-overlay-shield]',
         )!
         shield.dispatchEvent(
-          new MouseEvent('pointerdown', { bubbles: true, cancelable: true }),
+          new MouseEvent('pointerdown', {
+            bubbles: true,
+            cancelable: true,
+            clientX: method === 'trigger click' ? 150 : 400,
+            clientY: 50,
+          }),
         )
         shield.click()
       } else await key(input, 'Escape')

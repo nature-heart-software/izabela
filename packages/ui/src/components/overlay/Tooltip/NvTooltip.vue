@@ -269,6 +269,25 @@ function onOutsidePointer(event: PointerEvent) {
 
   const path = event.composedPath()
   if (reference && path.includes(reference)) return
+  // A popup's shield covers its own reference as well. Clicking the control
+  // again closes the popup, but should still restore its focused tooltip.
+  if (
+    expanded.value &&
+    event.target instanceof Element &&
+    event.target.matches('[data-nv-overlay-shield]')
+  ) {
+    const bounds = document
+      .getElementById(triggerId.value)
+      ?.getBoundingClientRect()
+    if (
+      bounds &&
+      event.clientX >= bounds.left &&
+      event.clientX < bounds.right &&
+      event.clientY >= bounds.top &&
+      event.clientY < bounds.bottom
+    )
+      return
+  }
   const contentId = tooltipApi.value.getContentProps().id
   const content = contentId ? document.getElementById(contentId) : null
   if (content && path.includes(content)) return
