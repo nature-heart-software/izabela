@@ -26,7 +26,7 @@
         data-v-step="messenger-text-input-submit"
         icon-name="message"
         size="lg"
-        @click="playMessage()"
+        @click="onSendClick"
       />
     </NvGroup>
   </NvCard>
@@ -75,6 +75,11 @@ const playMessage = () => {
     emitIPCSay(inputValue.value)
     inputValue.value = ''
   }
+}
+
+const onSendClick = () => {
+  playMessage()
+  inputRef.value?.focus()
 }
 
 const onInputFocus = () => {
