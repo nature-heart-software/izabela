@@ -16,8 +16,12 @@ import {
 import keymap from '@packages/native-keymap'
 import electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
 import { useOverlayWindowStore } from '@/teams/overlay/store'
+import { Buffer } from 'node:buffer'
 import koffi from 'koffi'
 import { findDisplay } from '@/features/display/utils'
+
+const INPUT_CONTEXT_CHECK_MS = 100
+const INPUT_INACTIVITY_MS = 12_000
 
 export const ElectronOverlayWindow = () => {
   let waitingToShow = false
@@ -31,12 +35,47 @@ export const ElectronOverlayWindow = () => {
   }
   let cancelPendingShow: (() => void) | undefined
   let blockInputTimer: ReturnType<typeof setTimeout> | undefined
+  let inputContextTimer: ReturnType<typeof setTimeout> | undefined
+  let inactivityTimer: ReturnType<typeof setTimeout> | undefined
+  let inputForeground: bigint | null = null
+  let inputBlocked = false
   let showGeneration = 0
 
   const user32 = koffi.load('user32.dll')
 
   const user32Api = {
-    BlockInput: user32.func('int BlockInput(int fBlockIt)'),
+    BlockInput: user32.func('int __stdcall BlockInput(int fBlockIt)'),
+    GetForegroundWindow: user32.func('void * __stdcall GetForegroundWindow()'),
+    GetThreadDesktop: user32.func(
+      'void * __stdcall GetThreadDesktop(uint32_t threadId)',
+    ),
+    GetUserObjectInformation: user32.func(
+      'int __stdcall GetUserObjectInformationW(void *object, int index, void *data, uint32_t size, void *needed)',
+    ),
+  }
+  const getCurrentThreadId = koffi
+    .load('kernel32.dll')
+    .func('uint32_t __stdcall GetCurrentThreadId()')
+  const receivesInput = Buffer.alloc(4)
+  const bytesNeeded = Buffer.alloc(4)
+  const getInputForeground = () => {
+    const desktop = user32Api.GetThreadDesktop(getCurrentThreadId())
+    const UOI_IO = 6
+    if (
+      !desktop ||
+      !user32Api.GetUserObjectInformation(
+        desktop,
+        UOI_IO,
+        receivesInput,
+        receivesInput.length,
+        bytesNeeded,
+      ) ||
+      !receivesInput.readInt32LE()
+    ) {
+      return null
+    }
+    const foreground = user32Api.GetForegroundWindow()
+    return foreground ? koffi.address(foreground) : null
   }
 
   const getWindow = () => {
@@ -51,6 +90,10 @@ export const ElectronOverlayWindow = () => {
     cancelPendingShow?.()
     cancelPendingShow = undefined
     clearTimeout(blockInputTimer)
+    clearTimeout(inputContextTimer)
+    clearTimeout(inactivityTimer)
+    inputForeground = null
+    inputBlocked = false
     gkl?.removeListener(toggleOverlayWindowListener)
     if (delayUnblock) {
       const generation = showGeneration
@@ -73,10 +116,42 @@ export const ElectronOverlayWindow = () => {
     return !!window
   }
 
+  const dismissAndRelease = (window: BrowserWindow) => {
+    // Release on the thread that acquired the block. Hiding keeps the renderer
+    // and its draft alive without running the submit command.
+    releaseInput()
+    window.hide()
+  }
+
+  const checkInputContext = (window: BrowserWindow) => {
+    // Secure desktop switches change UOI_IO. A prompt on the normal desktop
+    // can take the foreground while this non-focusing overlay stays visible.
+    if (
+      inputForeground !== null &&
+      inputForeground === getInputForeground() &&
+      settingsStore?.enableOverlayWindow &&
+      window.isVisible()
+    ) {
+      return true
+    }
+    dismissAndRelease(window)
+    return false
+  }
+
+  const armInactivityRelease = (window: BrowserWindow) => {
+    clearTimeout(inactivityTimer)
+    const generation = showGeneration
+    inactivityTimer = setTimeout(() => {
+      if (generation === showGeneration) dismissAndRelease(window)
+    }, INPUT_INACTIVITY_MS)
+  }
+
   const show = async () => {
     const window = getWindow()
-    if (!window || !settingsStore?.enableOverlayWindow) return false
+    if (!window || !settingsStore?.enableOverlayWindow || !gkl) return false
     releaseInput()
+    const foreground = getInputForeground()
+    if (foreground === null) return false
     const generation = showGeneration
     waitingToShow = true
     const released = await new Promise<boolean>((resolve) => {
@@ -104,17 +179,27 @@ export const ElectronOverlayWindow = () => {
       !settingsStore.enableOverlayWindow
     )
       return false
-    gkl?.addListener(toggleOverlayWindowListener)
-    window.showInactive()
     waitingToShow = false
+    if (foreground !== getInputForeground()) return false
+    inputForeground = foreground
+    gkl.addListener(toggleOverlayWindowListener)
+    window.showInactive()
     blockInputTimer = setTimeout(() => {
-      if (
-        generation === showGeneration &&
-        window === getWindow() &&
-        window.isVisible() &&
-        settingsStore?.enableOverlayWindow
-      )
-        user32Api.BlockInput(1)
+      if (generation !== showGeneration || window !== getWindow()) return
+      if (!checkInputContext(window)) return
+      inputBlocked = Boolean(user32Api.BlockInput(1))
+      if (inputBlocked) armInactivityRelease(window)
+
+      const watchInputContext = () => {
+        if (generation !== showGeneration || window !== getWindow()) return
+        if (checkInputContext(window)) {
+          inputContextTimer = setTimeout(
+            watchInputContext,
+            INPUT_CONTEXT_CHECK_MS,
+          )
+        }
+      }
+      inputContextTimer = setTimeout(watchInputContext, INPUT_CONTEXT_CHECK_MS)
     }, 100)
     return true
   }
@@ -127,7 +212,6 @@ export const ElectronOverlayWindow = () => {
       if (window.isVisible()) {
         hide()
       } else if (!waitingToShow) {
-        waitingToShow = true
         show()
       }
     }
@@ -177,10 +261,14 @@ export const ElectronOverlayWindow = () => {
     const window = getWindow()
     const onKey: IGlobalKeyListener = (e, down) => {
       if (
+        window &&
+        window === getWindow() &&
         settingsStore &&
         !keybindingTriggered(settingsStore.keybindings.toggleOverlayWindow) &&
-        window?.isVisible()
+        window.isVisible() &&
+        checkInputContext(window)
       ) {
+        if (inputBlocked && e.state === 'DOWN') armInactivityRelease(window)
         if (
           e.state === 'DOWN' &&
           !((down['LEFT CTRL'] && !down['RIGHT ALT']) || down['RIGHT CTRL']) &&
@@ -272,6 +360,8 @@ export const ElectronOverlayWindow = () => {
         overlayWindowStore.$patch({ isShown: true })
       })
       window.on('hide', () => {
+        if (registeredWindow === window && inputForeground !== null)
+          releaseInput()
         if (!overlayWindowStore) return
         overlayWindowStore.$patch({ isShown: false })
       })

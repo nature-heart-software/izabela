@@ -143,6 +143,16 @@ watch(
 )
 
 watch(
+  () => messengerWindowStore.isShown,
+  (isShown) => {
+    if (isShown) return
+    const active = document.activeElement
+    if (active instanceof HTMLElement) active.blur()
+  },
+  { flush: 'sync' },
+)
+
+watch(
   () => messengerWindowStore.isFocused,
   () => {
     if (messengerWindowStore.isFocused) {

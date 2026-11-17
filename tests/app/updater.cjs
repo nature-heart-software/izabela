@@ -22,6 +22,40 @@ async function until(fn, label, timeout = 90000) {
   }
   throw Error('Timed out: ' + label)
 }
+async function checkRelaunchedSpeech(socket) {
+  await until(() => socket.connected, 'automatically relaunched application')
+  const text = 'Automatic update completed.'
+  let messageId
+  let ended = false
+  let failed = false
+  socket.on('message:load', (message) => {
+    if (message.originalMessage === text) messageId ??= message.id
+  })
+  socket.on('message:error', (message) => {
+    if (messageId && message.id === messageId) failed = true
+  })
+  socket.on('message:end', (message) => {
+    if (messageId && message.id === messageId) ended = true
+  })
+  // Socket.IO starts before the speech renderer can receive a request.
+  await until(
+    () => {
+      if (messageId) return true
+      if (socket.connected) socket.emit('say', text)
+      return false
+    },
+    'relaunched speech worker to accept a request',
+    30000,
+  )
+  await until(
+    () => {
+      assert.ok(!failed, 'Updated speech playback failed')
+      return ended
+    },
+    'updated speech playback to finish',
+    30000,
+  )
+}
 async function command(file, args) {
   const child = spawn(file, args, { windowsHide: true, stdio: 'inherit' })
   const timer = setTimeout(() => stop(child), 180000)
@@ -202,6 +236,7 @@ async function run() {
         debuggerClient = null
         await until(() => child.exitCode !== null, 'old application exits')
         await until(() => {
+          if (!fs.existsSync(executable)) return false
           try {
             const version = execFileSync(
               'powershell',
@@ -214,6 +249,7 @@ async function run() {
                 env: { ...process.env, IZABELA_UPDATE_EXE: executable },
                 windowsHide: true,
                 encoding: 'utf8',
+                stdio: 'pipe',
               },
             ).trim()
             return (
@@ -229,18 +265,7 @@ async function run() {
           transports: ['websocket'],
         })
         try {
-          await until(
-            () => socket.connected,
-            'automatically relaunched application',
-          )
-          const ended = once(socket, 'message:end')
-          socket.emit('say', 'Automatic update completed.')
-          await Promise.race([
-            ended,
-            sleep(30000).then(() => {
-              throw Error('Updated speech did not finish')
-            }),
-          ])
+          await checkRelaunchedSpeech(socket)
         } finally {
           socket.disconnect()
         }

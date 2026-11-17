@@ -2,7 +2,7 @@ import ElectronWindowManager from '@/modules/electron-window-manager'
 import { startMouse, stopMouse } from '@/modules/node-mouse'
 import throttle from 'lodash/throttle'
 import { Hitbox } from '@/modules/vue-hitboxes/types'
-import { app, BrowserWindow, screen, shell } from 'electron'
+import { BrowserWindow, screen, shell } from 'electron'
 
 import { useMessengerWindowStore } from '@/teams/messenger/store'
 import { useSettingsStore } from '@/features/settings/store'
@@ -15,6 +15,7 @@ import { focusWindow } from 'forcefocus'
 import koffi from 'koffi'
 import { dialogsMap } from '@/modules/electron-dialog'
 import { findDisplay } from '@/features/display/utils'
+import { restartApp } from '@/modules/electron-updater/restart'
 
 export const ElectronMessengerWindow = () => {
   /* use isFocused as source of truth instead of window.isFocused() as in some instances
@@ -204,6 +205,13 @@ export const ElectronMessengerWindow = () => {
     const window = getWindow()
     if (window) {
       if (!window.isDestroyed() && window.isVisible()) {
+        const mouseDisplay = screen.getDisplayNearestPoint(
+          screen.screenToDipPoint({ x: initialMouseX, y: initialMouseY }),
+        )
+        const windowDisplay = screen.getDisplayMatching(window.getBounds())
+        // Global mouse movement on another monitor must not steal keyboard focus.
+        if (mouseDisplay.id !== windowDisplay.id) return
+
         if (isPosWithinHitbox(initialMouseX, initialMouseY)) {
           focus('mouse')
         } else {
@@ -350,10 +358,7 @@ export const ElectronMessengerWindow = () => {
     addEventListeners()
   })
 
-  const restart = () => {
-    app.relaunch()
-    app.exit()
-  }
+  const restart = restartApp
 
   return {
     openDevTools,

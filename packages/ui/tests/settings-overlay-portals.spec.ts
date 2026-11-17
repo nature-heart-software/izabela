@@ -350,12 +350,18 @@ it.each(['select', 'popover'])(
     wrappers.push(wrapper)
     ;(document.getElementById('open-settings') as HTMLElement).click()
     await settle()
+    // The panel focuses Close on mount, before Ark activates its modal trap
+    // after two animation frames and runs the deferred initial-focus timer.
+    // Finish that lifecycle before directing focus to the nested control.
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setTimeout(resolve, 0))
+      })
+    })
     await vi.waitFor(() =>
-      expect(
-        document.activeElement?.closest(
-          '[data-scope="popover"][data-part="content"]',
-        ),
-      ).not.toBeNull(),
+      expect(document.activeElement).toBe(
+        document.querySelector('[data-messenger-panel-close]'),
+      ),
     )
     const pane = document.querySelector('.route-scroll-area')!
     const trigger = document.getElementById(
