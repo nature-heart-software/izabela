@@ -4,6 +4,7 @@ import { mount, flushPromises, type VueWrapper } from '@vue/test-utils'
 import * as Vue from 'vue'
 import * as Router from 'vue-router'
 import * as Ark from '@ark-ui/vue'
+import { useEventListener } from '@vueuse/core'
 import { parse, compileScript } from '@vue/compiler-sfc'
 import ts from 'typescript'
 import { readFileSync } from 'node:fs'
@@ -24,6 +25,7 @@ const imports: Record<string, unknown> = {
   vue: Vue,
   'vue-router': Router,
   '@ark-ui/vue': Ark,
+  '@vueuse/core': { useEventListener },
   '@packages/ui': ui,
   '@/utils/focus': { getTabStops },
   '@/styled-system/css': {
@@ -111,7 +113,11 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-async function panel(kind: 'settings' | 'messages', emptyContent = false) {
+async function panel(
+  kind: 'settings' | 'messages',
+  emptyContent = false,
+  pageContent?: Vue.Component,
+) {
   const names =
     kind === 'settings'
       ? [
@@ -128,7 +134,7 @@ async function panel(kind: 'settings' | 'messages', emptyContent = false) {
           'support',
         ]
       : ['history', 'shortcuts']
-  const Page = {
+  const Page = pageContent ?? {
     render: () =>
       emptyContent
         ? Vue.h('p', 'No messages')
@@ -188,6 +194,66 @@ async function panel(kind: 'settings' | 'messages', emptyContent = false) {
   }
   return { wrapper, router, close, openChooser }
 }
+
+it.each(['history', 'shortcuts'])(
+  'enters Message %s at the last Play button from the chooser and sidebar Tab',
+  async (page) => {
+    const MessageList = {
+      render: () =>
+        Vue.h('div', [
+          Vue.h('button', {}, 'Add shortcut'),
+          Vue.h('button', { 'data-message-play': '' }, 'Play first'),
+          Vue.h('button', {}, 'First message options'),
+          Vue.h('button', { 'data-message-play': '' }, 'Play last'),
+          Vue.h('button', {}, 'Last message options'),
+        ]),
+    }
+    const { router, openChooser } = await panel('messages', false, MessageList)
+    await router.push('/messages/' + page)
+    await settle()
+    await openChooser()
+    document
+      .querySelectorAll<HTMLButtonElement>('[role="dialog"] button')[1]
+      .click()
+    await settle()
+    expect(document.activeElement).toBe(
+      document.querySelectorAll('[data-message-play]')[1],
+    )
+    const links = document.querySelectorAll<HTMLElement>(
+      '[aria-label="Message sections"] a',
+    )
+    links[0].focus()
+    const firstTab = new KeyboardEvent('keydown', {
+      key: 'Tab',
+      bubbles: true,
+      cancelable: true,
+    })
+    links[0].dispatchEvent(firstTab)
+    expect(firstTab.defaultPrevented).toBe(false)
+
+    links[links.length - 1].focus()
+    const reverseTab = new KeyboardEvent('keydown', {
+      key: 'Tab',
+      shiftKey: true,
+      bubbles: true,
+      cancelable: true,
+    })
+    links[links.length - 1].dispatchEvent(reverseTab)
+    expect(reverseTab.defaultPrevented).toBe(false)
+
+    const lastTab = new KeyboardEvent('keydown', {
+      key: 'Tab',
+      bubbles: true,
+      cancelable: true,
+    })
+    links[links.length - 1].dispatchEvent(lastTab)
+    await settle()
+    expect(lastTab.defaultPrevented).toBe(true)
+    expect(document.activeElement).toBe(
+      document.querySelectorAll('[data-message-play]')[1],
+    )
+  },
+)
 
 it('updates the Settings support heart when the theme changes in place', async () => {
   settingsStore.theme = 'kumo-light'

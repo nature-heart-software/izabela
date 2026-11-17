@@ -50,6 +50,7 @@
 </template>
 <script lang="ts" setup>
 import { onMounted, useId } from 'vue'
+import { useEventListener } from '@vueuse/core'
 import { Popover, usePopover } from '@ark-ui/vue'
 import { NvButton, NvCard, NvStack, NvText, NvTooltip } from '@packages/ui'
 import { css } from '@/styled-system/css'
@@ -58,6 +59,7 @@ import { getTabStops } from '@/utils/focus'
 const props = defineProps<{
   sidebar?: HTMLElement
   content?: HTMLElement
+  contentFocusSelector?: string
 }>()
 defineEmits<{ close: [] }>()
 const closeId = `panel-close-${useId()}`
@@ -74,6 +76,28 @@ const popover = usePopover({
 // Messages while the outer messenger popup is already open.
 onMounted(() => closeButton()?.focus({ preventScroll: true }))
 
+useEventListener(
+  () => props.sidebar,
+  'keydown',
+  (event) => {
+    if (
+      event.key !== 'Tab' ||
+      event.shiftKey ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.defaultPrevented ||
+      !props.sidebar ||
+      !props.content ||
+      !props.contentFocusSelector
+    )
+      return
+    if (document.activeElement !== getTabStops(props.sidebar).at(-1)) return
+    event.preventDefault()
+    focusArea(props.content)
+  },
+)
+
 function onCloseTab(event: KeyboardEvent) {
   if (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey) return
   event.preventDefault()
@@ -83,11 +107,16 @@ function onCloseTab(event: KeyboardEvent) {
 function focusArea(area?: HTMLElement, preferCurrent = false) {
   if (!area) return
   const candidates = getTabStops(area)
+  const contentSelector = area === props.content && props.contentFocusSelector
+  const contentTarget = contentSelector
+    ? candidates.filter((element) => element.matches(contentSelector)).at(-1)
+    : undefined
   const target =
     (preferCurrent &&
       candidates.find(
         (element) => element.getAttribute('aria-current') === 'page',
       )) ||
+    contentTarget ||
     candidates[0] ||
     area
   target.focus()

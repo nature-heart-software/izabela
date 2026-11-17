@@ -44,6 +44,7 @@
           <NvPanelNavigation
             :sidebar="sidebar"
             :content="content"
+            content-focus-selector="[data-message-play]"
             @close="$emit('close')"
           />
         </div>
