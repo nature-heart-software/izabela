@@ -536,6 +536,43 @@ describe('overlay interaction boundaries', () => {
     },
   )
 
+  it.each(['native', 'shared'])(
+    'keeps a %s button tooltip visible through pointerdown and click',
+    async (kind) => {
+      const clicked = vi.fn()
+      const wrapper = render(ui.NvTooltip, {
+        props: { tippyOptions: { delay: 0, duration: 0 } },
+        slots: {
+          reference: () =>
+            h(
+              kind === 'shared' ? ui.NvButton : 'button',
+              { onClick: clicked },
+              () => 'Apply',
+            ),
+          default: 'Apply profile',
+        },
+      })
+      const trigger = wrapper.get('button')
+      const button = trigger.element as HTMLButtonElement
+      button.focus()
+      await trigger.trigger('pointermove', { pointerType: 'mouse' })
+      await settle()
+      const tooltip = document.querySelector('[role="tooltip"]')
+      expect(tooltip).not.toBeNull()
+
+      await trigger.trigger('pointerdown', { pointerType: 'mouse' })
+      await settle()
+      expect(document.querySelector('[role="tooltip"]')).toBe(tooltip)
+      button.click()
+      await settle()
+      expect(clicked).toHaveBeenCalledOnce()
+      expect(document.querySelector('[role="tooltip"]')).toBe(tooltip)
+      await key(trigger.element, 'Escape')
+      expect(document.querySelector('[role="tooltip"]')).toBeNull()
+      expect(document.activeElement).toBe(trigger.element)
+    },
+  )
+
   it('dismisses a shared-button tooltip after the pointer leaves its trigger', async () => {
     const wrapper = render(ui.NvTooltip, {
       props: { tippyOptions: { delay: [0, 0] } },

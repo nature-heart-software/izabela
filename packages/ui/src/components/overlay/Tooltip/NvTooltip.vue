@@ -196,6 +196,8 @@ const tooltipApi = useTooltip(
     ids: computed(() => ({ trigger: triggerId.value })),
     openDelay,
     closeDelay,
+    closeOnClick: false,
+    closeOnPointerDown: false,
     positioning,
     interactive: computed(() => props.tippyOptions.interactive ?? false),
   }),
