@@ -19,6 +19,7 @@ execFileSync(process.execPath, [resolve(here, 'build-client.mjs')], {
 const clientPath = '../../../coverage/ui-client/test-client.js'
 const ui = await import(/* @vite-ignore */ clientPath)
 const empty = { render: () => null }
+const settingsStore = Vue.reactive({ theme: 'dark' })
 const imports: Record<string, unknown> = {
   vue: Vue,
   'vue-router': Router,
@@ -36,7 +37,7 @@ const imports: Record<string, unknown> = {
   '@/teams/messenger/store': {
     useMessengerStateStore: () => ({ markForRestart: false }),
   },
-  '@/features/settings/store': { useSettingsStore: () => ({ theme: 'dark' }) },
+  '@/features/settings/store': { useSettingsStore: () => settingsStore },
   '@/teams/messenger/components/NvMarkForRestartMessage.vue': empty,
   '@/consts.ts': { isGameOverlay: false },
   '@/features/app/queries.ts': { useGetAppInfoQuery() {} },
@@ -82,6 +83,7 @@ async function settle() {
   await flushPromises()
 }
 beforeEach(() => {
+  settingsStore.theme = 'dark'
   const rect = new DOMRect(0, 0, 300, 100)
   vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(rect)
   vi.spyOn(HTMLElement.prototype, 'getClientRects').mockReturnValue([
@@ -186,6 +188,19 @@ async function panel(kind: 'settings' | 'messages', emptyContent = false) {
   }
   return { wrapper, router, close, openChooser }
 }
+
+it('updates the Settings support heart when the theme changes in place', async () => {
+  settingsStore.theme = 'kumo-light'
+  const { wrapper } = await panel('settings')
+  const support = wrapper.get('a[aria-label="Support"]')
+  expect(support.text()).toBe('🖤')
+
+  settingsStore.theme = 'github-dark'
+  await Vue.nextTick()
+  const updated = wrapper.get('a[aria-label="Support"]')
+  expect(updated.element).toBe(support.element)
+  expect(updated.text()).toBe('🤍')
+})
 
 it.each(['settings', 'messages'] as const)(
   '%s starts at Close and offers tabs/content on the next Tab',

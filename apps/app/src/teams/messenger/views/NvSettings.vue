@@ -108,6 +108,11 @@
                             :href="href"
                             @click="navigate"
                             :selected="currentRoute.name === entry.to?.name"
+                            :aria-label="
+                              entry.to?.name === 'settings-support'
+                                ? entry.name
+                                : undefined
+                            "
                             :aria-current="
                               currentRoute.name === entry.to?.name
                                 ? 'page'
@@ -116,7 +121,11 @@
                             :class="css({ width: '100%' })"
                             size="sm"
                             type="ghost-alt"
-                            >{{ entry.name }}
+                            >{{
+                              entry.to?.name === 'settings-support'
+                                ? supportHeart
+                                : entry.name
+                            }}
                           </NvButton>
                         </router-link>
                       </template>
@@ -184,7 +193,7 @@
 </template>
 <script lang="ts" setup>
 import { css } from '@/styled-system/css'
-import { NvButton, NvCard, NvStack, NvText } from '@packages/ui'
+import { NvButton, NvCard, NvStack, NvText, resolveTheme } from '@packages/ui'
 import NvPanelNavigation from '@/teams/messenger/components/NvPanelNavigation.vue'
 import NvStoreDialog from '@/teams/messenger/components/NvStoreDialog.vue'
 import { useRoute } from 'vue-router'
@@ -195,12 +204,15 @@ import NvMarkForRestartMessage from '@/teams/messenger/components/NvMarkForResta
 import { isGameOverlay } from '@/consts.ts'
 import { useGetAppInfoQuery } from '@/features/app/queries.ts'
 import NvPortalTarget from '@/teams/messenger/components/NvPortalTarget.vue'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 const settings = ref()
 const sidebar = ref<HTMLElement>()
 const content = ref<HTMLElement>()
 const settingsStore = useSettingsStore()
+const supportHeart = computed(
+  () => resolveTheme(settingsStore.theme).settings.support.heart,
+)
 const navigation = [
   {
     name: 'Application',
@@ -256,7 +268,7 @@ const navigation = [
         to: { name: 'settings-about' },
       },
       {
-        name: settingsStore.theme === 'light' ? '🖤' : '🤍',
+        name: 'Support',
         to: { name: 'settings-support' },
       },
     ],
