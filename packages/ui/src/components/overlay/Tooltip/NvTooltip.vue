@@ -251,13 +251,25 @@ function deactivate(event: Event, dismissFocus = true) {
   // The click-through Electron window can miss pointerleave when it loses focus.
   // Reset hover as well as visibility so the next pointer entry can reopen normally.
   tooltipApi.value.getTriggerProps().onPointerleave?.(event as PointerEvent)
-  tooltipApi.value.setOpen(false)
+  // Keep Ark's close delay on mouse movement so interactive content can be reached.
+  if (event.type !== 'pointermove') tooltipApi.value.setOpen(false)
 }
-function onOutsidePointerDown(event: PointerEvent) {
-  const path = event.composedPath()
+function onOutsidePointer(event: PointerEvent) {
   const reference = getElement(tooltip.value)
+  if (
+    event.type === 'pointermove' &&
+    (event.pointerType !== 'mouse' ||
+      !open.value ||
+      expanded.value ||
+      !reference?.contains(document.activeElement))
+  )
+    return
+
+  const path = event.composedPath()
+  if (reference && path.includes(reference)) return
   const contentId = tooltipApi.value.getContentProps().id
   const content = contentId ? document.getElementById(contentId) : null
+  if (content && path.includes(content)) return
   // Select options live in a portal. Choosing one is an interaction with the
   // reference's popup, rather than an outside dismissal of its tooltip.
   const controlledPopups = reference
@@ -269,19 +281,19 @@ function onOutsidePointerDown(event: PointerEvent) {
           .map((id) => document.getElementById(id)),
       )
     : []
-  if (
-    (reference && path.includes(reference)) ||
-    (content && path.includes(content)) ||
-    controlledPopups.some((popup) => popup && path.includes(popup))
-  )
-    return
-  // An outside click can leave the trigger focused. Dismiss independently of
-  // blur, without consuming the click or interfering with interactive content.
+  if (controlledPopups.some((popup) => popup && path.includes(popup))) return
+  // Outside pointer interactions can leave the trigger focused.
   deactivate(event)
 }
-useEventListener(document, 'pointerdown', onOutsidePointerDown, {
+useEventListener(document, 'pointerdown', onOutsidePointer, {
   capture: true,
 })
+useEventListener(
+  () => (open.value && !expanded.value ? document : undefined),
+  'pointermove',
+  onOutsidePointer,
+  { capture: true, passive: true },
+)
 watch(expanded, (expanded) => {
   if (expanded) {
     focusDismissed = false

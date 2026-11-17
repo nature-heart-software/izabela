@@ -574,6 +574,47 @@ describe('overlay interaction boundaries', () => {
     },
   )
 
+  it('dismisses a focused tooltip when the mouse is already outside and moves', async () => {
+    const outside = document.createElement('button')
+    document.body.append(outside)
+    const moveOutside = (pointerType: string) => {
+      outside.dispatchEvent(
+        new PointerEvent('pointermove', { bubbles: true, pointerType }),
+      )
+    }
+    const wrapper = render(ui.NvTooltip, {
+      props: { tippyOptions: { delay: 0, duration: 0 } },
+      slots: {
+        reference: () => h('button', 'Help'),
+        default: 'Helpful details',
+      },
+    })
+    const trigger = wrapper.get('button').element as HTMLButtonElement
+    moveOutside('mouse')
+    await key(outside, 'Tab')
+    trigger.focus()
+    await settle()
+    expect(document.querySelector('[role="tooltip"]')).not.toBeNull()
+
+    moveOutside('touch')
+    await settle()
+    expect(document.querySelector('[role="tooltip"]')).not.toBeNull()
+
+    moveOutside('mouse')
+    await settle()
+    expect(document.querySelector('[role="tooltip"]')).toBeNull()
+    expect(document.activeElement).toBe(trigger)
+
+    outside.focus()
+    await key(outside, 'Tab', true)
+    trigger.focus()
+    await settle()
+    expect(document.querySelector('[role="tooltip"]')).not.toBeNull()
+    await key(trigger, 'Escape')
+    expect(document.querySelector('[role="tooltip"]')).toBeNull()
+    expect(document.activeElement).toBe(trigger)
+  })
+
   it('cancels a pending tooltip when the pointer leaves before its open delay', async () => {
     const wrapper = render(ui.NvTooltip, {
       props: { tippyOptions: { delay: [100, 0] } },
