@@ -6,6 +6,7 @@ const { recoveryCases, runRecovery } = require('./recovery-journeys.cjs')
 const { resilienceCases, runResilience } = require('./resilience-journeys.cjs')
 const { edgeCases, runEdges } = require('./edge-journeys.cjs')
 const { memoryCases, runMemory } = require('./memory-journey.cjs')
+const { checkProfileTooltipScroll } = require('./profile-tooltip-scroll.cjs')
 
 // These names are also the runner's required-result contract.
 const journeyCases = [
@@ -654,6 +655,7 @@ async function runJourneys(context) {
           ),
         'new profile in UI',
       )
+      await checkProfileTooltipScroll({ messenger, evaluate, key })
       await type('Renamed profile', 'input[placeholder="Profile name"]')
       await sleep(350)
       // Change the selected engine through shared settings while leaving the
