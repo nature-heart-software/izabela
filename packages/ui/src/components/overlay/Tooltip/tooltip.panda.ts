@@ -6,6 +6,10 @@ import { props } from './tooltip.shared'
 export const StTooltip = pandaComponent('div', props, cva({ base: {} }))
 export const tooltipPositioner = cva({
   base: {
+    // Zag writes inline coordinates after measuring. Until then, use its
+    // offscreen start position instead of inheriting a parent popup's offset.
+    '--x': '0px',
+    '--y': '-100vh',
     zIndex: '9999 !important',
     animationName: 'nv-tooltip-in',
     animationDuration: 'var(--nv-tooltip-enter-duration, 300ms)',

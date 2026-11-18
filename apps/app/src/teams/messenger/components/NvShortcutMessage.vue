@@ -8,6 +8,7 @@
           noWrap
         >
           <NvButton
+            data-message-play
             :loading="isLoading"
             :class="css({ flexShrink: 0 })"
             icon-name="play"

@@ -144,6 +144,91 @@ describe('overlay interaction boundaries', () => {
     },
   )
 
+  it.each([false, true])(
+    'keeps the Close tooltip inside a dialog initially open=%s through reopening',
+    async (initiallyOpen) => {
+      const open = ref(initiallyOpen)
+      const wrapper = render({
+        render: () =>
+          h(
+            ui.NvDialog,
+            {
+              open: open.value,
+              'onUpdate:open': (value: boolean) => (open.value = value),
+            },
+            {
+              reference: () => h('button', 'Open dialog'),
+              title: () => 'Tooltip portal',
+              footer: () => h('input', { 'aria-label': 'Dialog input' }),
+            },
+          ),
+      })
+      await settle()
+      const trigger = wrapper.get('button').element as HTMLButtonElement
+      if (!initiallyOpen) {
+        trigger.click()
+        await settle()
+      }
+      for (let cycle = 0; cycle < 2; cycle++) {
+        const dialog = document.querySelector<HTMLElement>('[role="dialog"]')!
+        expect(dialog).not.toBeNull()
+        const close = dialog.querySelector<HTMLButtonElement>(
+          'button[aria-label="Close"]',
+        )!
+        close.focus()
+        await vi.waitFor(() => {
+          const tooltip = document.querySelector('[role="tooltip"]')
+          expect(tooltip?.textContent).toBe('Close')
+          expect(dialog.contains(tooltip)).toBe(true)
+          expect(document.activeElement).toBe(close)
+        })
+        close.click()
+        await settle()
+        expect(open.value).toBe(false)
+        expect(document.querySelector('[role="dialog"]')).toBeNull()
+        expect(document.querySelector('[role="tooltip"]')).toBeNull()
+        if (cycle === 0) {
+          trigger.click()
+          await settle()
+        }
+      }
+    },
+  )
+
+  it('reveals the Close button when a scrolled dialog loops focus from its last field', async () => {
+    const wrapper = render(ui.NvDialog, {
+      slots: {
+        reference: () => h('button', 'Profile settings'),
+        title: 'Profile settings',
+        footer: () => h('input', { id: 'dialog-last-field' }),
+      },
+    })
+    wrapper.get('button').element.click()
+    await vi.waitFor(() =>
+      expect(document.activeElement?.getAttribute('data-part')).toBe(
+        'close-trigger',
+      ),
+    )
+    const close = document.activeElement as HTMLElement
+    expect(close.getAttribute('aria-label')).toBe('Close')
+    await vi.waitFor(() =>
+      expect(
+        document.getElementById(close.getAttribute('aria-describedby') || '')
+          ?.textContent,
+      ).toContain('Close'),
+    )
+    const content = close.closest('[role="dialog"]') as HTMLElement
+    content.scrollTop = 500
+    vi.spyOn(close, 'getBoundingClientRect').mockReturnValue(
+      new DOMRect(0, -200, 16, 16),
+    )
+    const last = document.getElementById('dialog-last-field')!
+    last.focus()
+    await key(last, 'Tab')
+    expect(document.activeElement).toBe(close)
+    expect(content.scrollTop).toBeLessThan(500)
+  })
+
   it('focuses the first enabled control on popover open and restores its trigger on Escape', async () => {
     const wrapper = render(ui.NvPopover, {
       slots: {
@@ -502,6 +587,43 @@ describe('overlay interaction boundaries', () => {
     },
   )
 
+  it.each(['native', 'shared'])(
+    'keeps a %s button tooltip visible through pointerdown and click',
+    async (kind) => {
+      const clicked = vi.fn()
+      const wrapper = render(ui.NvTooltip, {
+        props: { tippyOptions: { delay: 0, duration: 0 } },
+        slots: {
+          reference: () =>
+            h(
+              kind === 'shared' ? ui.NvButton : 'button',
+              { onClick: clicked },
+              () => 'Apply',
+            ),
+          default: 'Apply profile',
+        },
+      })
+      const trigger = wrapper.get('button')
+      const button = trigger.element as HTMLButtonElement
+      button.focus()
+      await trigger.trigger('pointermove', { pointerType: 'mouse' })
+      await settle()
+      const tooltip = document.querySelector('[role="tooltip"]')
+      expect(tooltip).not.toBeNull()
+
+      await trigger.trigger('pointerdown', { pointerType: 'mouse' })
+      await settle()
+      expect(document.querySelector('[role="tooltip"]')).toBe(tooltip)
+      button.click()
+      await settle()
+      expect(clicked).toHaveBeenCalledOnce()
+      expect(document.querySelector('[role="tooltip"]')).toBe(tooltip)
+      await key(trigger.element, 'Escape')
+      expect(document.querySelector('[role="tooltip"]')).toBeNull()
+      expect(document.activeElement).toBe(trigger.element)
+    },
+  )
+
   it('dismisses a shared-button tooltip after the pointer leaves its trigger', async () => {
     const wrapper = render(ui.NvTooltip, {
       props: { tippyOptions: { delay: [0, 0] } },
@@ -573,6 +695,47 @@ describe('overlay interaction boundaries', () => {
       )
     },
   )
+
+  it('dismisses a focused tooltip when the mouse is already outside and moves', async () => {
+    const outside = document.createElement('button')
+    document.body.append(outside)
+    const moveOutside = (pointerType: string) => {
+      outside.dispatchEvent(
+        new PointerEvent('pointermove', { bubbles: true, pointerType }),
+      )
+    }
+    const wrapper = render(ui.NvTooltip, {
+      props: { tippyOptions: { delay: 0, duration: 0 } },
+      slots: {
+        reference: () => h('button', 'Help'),
+        default: 'Helpful details',
+      },
+    })
+    const trigger = wrapper.get('button').element as HTMLButtonElement
+    moveOutside('mouse')
+    await key(outside, 'Tab')
+    trigger.focus()
+    await settle()
+    expect(document.querySelector('[role="tooltip"]')).not.toBeNull()
+
+    moveOutside('touch')
+    await settle()
+    expect(document.querySelector('[role="tooltip"]')).not.toBeNull()
+
+    moveOutside('mouse')
+    await settle()
+    expect(document.querySelector('[role="tooltip"]')).toBeNull()
+    expect(document.activeElement).toBe(trigger)
+
+    outside.focus()
+    await key(outside, 'Tab', true)
+    trigger.focus()
+    await settle()
+    expect(document.querySelector('[role="tooltip"]')).not.toBeNull()
+    await key(trigger, 'Escape')
+    expect(document.querySelector('[role="tooltip"]')).toBeNull()
+    expect(document.activeElement).toBe(trigger)
+  })
 
   it('cancels a pending tooltip when the pointer leaves before its open delay', async () => {
     const wrapper = render(ui.NvTooltip, {
@@ -981,7 +1144,13 @@ describe('overlay interaction boundaries', () => {
     )
   })
 
-  it.each(['Escape', 'keyboard selection', 'option click', 'outside click'])(
+  it.each([
+    'Escape',
+    'keyboard selection',
+    'option click',
+    'trigger click',
+    'outside click',
+  ])(
     'restores a focused Select tooltip after %s unless dismissed outside',
     async (method) => {
       const value = ref('a')
@@ -1021,12 +1190,17 @@ describe('overlay interaction boundaries', () => {
           new MouseEvent('mousedown', { bubbles: true, cancelable: true }),
         )
         option.click()
-      } else if (method === 'outside click') {
+      } else if (method === 'trigger click' || method === 'outside click') {
         const shield = document.querySelector<HTMLElement>(
           '[data-nv-overlay-shield]',
         )!
         shield.dispatchEvent(
-          new MouseEvent('pointerdown', { bubbles: true, cancelable: true }),
+          new MouseEvent('pointerdown', {
+            bubbles: true,
+            cancelable: true,
+            clientX: method === 'trigger click' ? 150 : 400,
+            clientY: 50,
+          }),
         )
         shield.click()
       } else await key(input, 'Escape')

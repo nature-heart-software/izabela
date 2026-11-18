@@ -772,6 +772,11 @@
             "border": "#ff0000"
           }
         },
+        "settings": {
+          "support": {
+            "heart": "🖤"
+          }
+        },
         "Cloudflare Kumo": {
           "color": {
             "kumo-base": "#ffffff",
@@ -1847,6 +1852,11 @@
         "debug": {
           "hitbox": {
             "border": "#ff0000"
+          }
+        },
+        "settings": {
+          "support": {
+            "heart": "🤍"
           }
         },
         "Cloudflare Kumo": {
@@ -2926,6 +2936,11 @@
             "border": "#ff0000"
           }
         },
+        "settings": {
+          "support": {
+            "heart": "🖤"
+          }
+        },
         "Cloudflare Kumo": {
           "color": {
             "kumo-base": "#ffffff",
@@ -4001,6 +4016,11 @@
         "debug": {
           "hitbox": {
             "border": "#ff0000"
+          }
+        },
+        "settings": {
+          "support": {
+            "heart": "🤍"
           }
         },
         "Cloudflare Kumo": {
@@ -5080,6 +5100,11 @@
             "border": "#ff0000"
           }
         },
+        "settings": {
+          "support": {
+            "heart": "🖤"
+          }
+        },
         "Cloudflare Kumo": {
           "color": {
             "kumo-base": "#ffffff",
@@ -6155,6 +6180,11 @@
         "debug": {
           "hitbox": {
             "border": "#ff0000"
+          }
+        },
+        "settings": {
+          "support": {
+            "heart": "🤍"
           }
         },
         "Cloudflare Kumo": {

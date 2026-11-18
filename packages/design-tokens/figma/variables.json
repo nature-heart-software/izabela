@@ -454,7 +454,8 @@
         "VariableID:501:1281",
         "VariableID:501:1282",
         "VariableID:501:1283",
-        "VariableID:501:1284"
+        "VariableID:501:1284",
+        "VariableID:540:11236"
       ]
     },
     {
@@ -12560,6 +12561,20 @@
           "type": "VARIABLE_ALIAS",
           "id": "VariableID:42:1598"
         }
+      }
+    },
+    {
+      "id": "VariableID:540:11236",
+      "name": "settings/support/heart",
+      "variableCollectionId": "VariableCollectionId:5:3",
+      "resolvedType": "STRING",
+      "valuesByMode": {
+        "5:1": "🖤",
+        "20:1": "🤍",
+        "370:0": "🖤",
+        "370:1": "🤍",
+        "370:2": "🖤",
+        "370:3": "🤍"
       }
     },
     {

@@ -13,7 +13,7 @@
       >
         <slot name="reference" />
       </ReferenceTrigger>
-      <Teleport :to="portalTarget" defer>
+      <Teleport v-if="portalTarget" :to="portalTarget" defer>
         <StTooltipPositioner
           v-if="open && !expanded"
           :style="{
@@ -154,8 +154,12 @@ useMutationObserver(tooltip, syncTrigger, {
   attributeFilter: ['aria-expanded'],
 })
 const injectedPortalTarget = inject(PORTAL_TARGET)
+// A local portal can mount after its tooltip. Wait for that owner instead of
+// mounting into body and moving a deferred Teleport before it has initialized.
 const portalTarget = computed(
-  () => getElement(injectedPortalTarget) || document.body,
+  () =>
+    getElement(injectedPortalTarget) ||
+    (injectedPortalTarget ? null : document.body),
 )
 const openDelay = computed(() =>
   Array.isArray(props.tippyOptions.delay)
@@ -196,6 +200,8 @@ const tooltipApi = useTooltip(
     ids: computed(() => ({ trigger: triggerId.value })),
     openDelay,
     closeDelay,
+    closeOnClick: false,
+    closeOnPointerDown: false,
     positioning,
     interactive: computed(() => props.tippyOptions.interactive ?? false),
   }),
@@ -251,13 +257,44 @@ function deactivate(event: Event, dismissFocus = true) {
   // The click-through Electron window can miss pointerleave when it loses focus.
   // Reset hover as well as visibility so the next pointer entry can reopen normally.
   tooltipApi.value.getTriggerProps().onPointerleave?.(event as PointerEvent)
-  tooltipApi.value.setOpen(false)
+  // Keep Ark's close delay on mouse movement so interactive content can be reached.
+  if (event.type !== 'pointermove') tooltipApi.value.setOpen(false)
 }
-function onOutsidePointerDown(event: PointerEvent) {
-  const path = event.composedPath()
+function onOutsidePointer(event: PointerEvent) {
   const reference = getElement(tooltip.value)
+  if (
+    event.type === 'pointermove' &&
+    (event.pointerType !== 'mouse' ||
+      !open.value ||
+      expanded.value ||
+      !reference?.contains(document.activeElement))
+  )
+    return
+
+  const path = event.composedPath()
+  if (reference && path.includes(reference)) return
+  // A popup's shield covers its own reference as well. Clicking the control
+  // again closes the popup, but should still restore its focused tooltip.
+  if (
+    expanded.value &&
+    event.target instanceof Element &&
+    event.target.matches('[data-nv-overlay-shield]')
+  ) {
+    const bounds = document
+      .getElementById(triggerId.value)
+      ?.getBoundingClientRect()
+    if (
+      bounds &&
+      event.clientX >= bounds.left &&
+      event.clientX < bounds.right &&
+      event.clientY >= bounds.top &&
+      event.clientY < bounds.bottom
+    )
+      return
+  }
   const contentId = tooltipApi.value.getContentProps().id
   const content = contentId ? document.getElementById(contentId) : null
+  if (content && path.includes(content)) return
   // Select options live in a portal. Choosing one is an interaction with the
   // reference's popup, rather than an outside dismissal of its tooltip.
   const controlledPopups = reference
@@ -269,19 +306,19 @@ function onOutsidePointerDown(event: PointerEvent) {
           .map((id) => document.getElementById(id)),
       )
     : []
-  if (
-    (reference && path.includes(reference)) ||
-    (content && path.includes(content)) ||
-    controlledPopups.some((popup) => popup && path.includes(popup))
-  )
-    return
-  // An outside click can leave the trigger focused. Dismiss independently of
-  // blur, without consuming the click or interfering with interactive content.
+  if (controlledPopups.some((popup) => popup && path.includes(popup))) return
+  // Outside pointer interactions can leave the trigger focused.
   deactivate(event)
 }
-useEventListener(document, 'pointerdown', onOutsidePointerDown, {
+useEventListener(document, 'pointerdown', onOutsidePointer, {
   capture: true,
 })
+useEventListener(
+  () => (open.value && !expanded.value ? document : undefined),
+  'pointermove',
+  onOutsidePointer,
+  { capture: true, passive: true },
+)
 watch(expanded, (expanded) => {
   if (expanded) {
     focusDismissed = false

@@ -4,6 +4,7 @@ import { mount, flushPromises, type VueWrapper } from '@vue/test-utils'
 import * as Vue from 'vue'
 import * as Router from 'vue-router'
 import * as Ark from '@ark-ui/vue'
+import { useEventListener } from '@vueuse/core'
 import { parse, compileScript } from '@vue/compiler-sfc'
 import ts from 'typescript'
 import { readFileSync } from 'node:fs'
@@ -19,10 +20,12 @@ execFileSync(process.execPath, [resolve(here, 'build-client.mjs')], {
 const clientPath = '../../../coverage/ui-client/test-client.js'
 const ui = await import(/* @vite-ignore */ clientPath)
 const empty = { render: () => null }
+const settingsStore = Vue.reactive({ theme: 'dark' })
 const imports: Record<string, unknown> = {
   vue: Vue,
   'vue-router': Router,
   '@ark-ui/vue': Ark,
+  '@vueuse/core': { useEventListener },
   '@packages/ui': ui,
   '@/utils/focus': { getTabStops },
   '@/styled-system/css': {
@@ -36,7 +39,7 @@ const imports: Record<string, unknown> = {
   '@/teams/messenger/store': {
     useMessengerStateStore: () => ({ markForRestart: false }),
   },
-  '@/features/settings/store': { useSettingsStore: () => ({ theme: 'dark' }) },
+  '@/features/settings/store': { useSettingsStore: () => settingsStore },
   '@/teams/messenger/components/NvMarkForRestartMessage.vue': empty,
   '@/consts.ts': { isGameOverlay: false },
   '@/features/app/queries.ts': { useGetAppInfoQuery() {} },
@@ -82,6 +85,7 @@ async function settle() {
   await flushPromises()
 }
 beforeEach(() => {
+  settingsStore.theme = 'dark'
   const rect = new DOMRect(0, 0, 300, 100)
   vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(rect)
   vi.spyOn(HTMLElement.prototype, 'getClientRects').mockReturnValue([
@@ -109,7 +113,11 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-async function panel(kind: 'settings' | 'messages', emptyContent = false) {
+async function panel(
+  kind: 'settings' | 'messages',
+  emptyContent = false,
+  pageContent?: Vue.Component,
+) {
   const names =
     kind === 'settings'
       ? [
@@ -126,7 +134,7 @@ async function panel(kind: 'settings' | 'messages', emptyContent = false) {
           'support',
         ]
       : ['history', 'shortcuts']
-  const Page = {
+  const Page = pageContent ?? {
     render: () =>
       emptyContent
         ? Vue.h('p', 'No messages')
@@ -186,6 +194,108 @@ async function panel(kind: 'settings' | 'messages', emptyContent = false) {
   }
   return { wrapper, router, close, openChooser }
 }
+
+const MessageList = {
+  render: () =>
+    Vue.h('div', [
+      Vue.h('button', {}, 'Add shortcut'),
+      Vue.h('button', { 'data-message-play': '' }, 'Play first'),
+      Vue.h('button', {}, 'First message options'),
+      Vue.h('button', { 'data-message-play': '' }, 'Play last'),
+      Vue.h('button', {}, 'Last message options'),
+    ]),
+}
+
+it.each(['history', 'shortcuts'])(
+  'enters Message %s at the last Play button from the chooser and sidebar Tab',
+  async (page) => {
+    const { router, openChooser } = await panel('messages', false, MessageList)
+    await router.push('/messages/' + page)
+    await settle()
+    await openChooser()
+    document
+      .querySelectorAll<HTMLButtonElement>('[role="dialog"] button')[1]
+      .click()
+    await settle()
+    expect(document.activeElement).toBe(
+      document.querySelectorAll('[data-message-play]')[1],
+    )
+    const links = document.querySelectorAll<HTMLElement>(
+      '[aria-label="Message sections"] a',
+    )
+    links[0].focus()
+    const firstTab = new KeyboardEvent('keydown', {
+      key: 'Tab',
+      bubbles: true,
+      cancelable: true,
+    })
+    links[0].dispatchEvent(firstTab)
+    expect(firstTab.defaultPrevented).toBe(false)
+
+    links[links.length - 1].focus()
+    const reverseTab = new KeyboardEvent('keydown', {
+      key: 'Tab',
+      shiftKey: true,
+      bubbles: true,
+      cancelable: true,
+    })
+    links[links.length - 1].dispatchEvent(reverseTab)
+    expect(reverseTab.defaultPrevented).toBe(false)
+
+    const lastTab = new KeyboardEvent('keydown', {
+      key: 'Tab',
+      bubbles: true,
+      cancelable: true,
+    })
+    links[links.length - 1].dispatchEvent(lastTab)
+    await settle()
+    expect(lastTab.defaultPrevented).toBe(true)
+    expect(document.activeElement).toBe(
+      document.querySelectorAll('[data-message-play]')[1],
+    )
+  },
+)
+
+it.each(['history', 'shortcuts'])(
+  'focuses the last Play button after keyboard navigation to Message %s',
+  async (page) => {
+    const { wrapper, router } = await panel('messages', false, MessageList)
+    await router.push(
+      '/messages/' + (page === 'history' ? 'shortcuts' : 'history'),
+    )
+    await settle()
+    const link = wrapper.get<HTMLAnchorElement>(
+      'a[href="/messages/' + page + '"]',
+    )
+    link.element.focus()
+    link.element.click()
+    await settle()
+    expect(router.currentRoute.value.name).toBe('messages-' + page)
+    expect(document.activeElement).toBe(
+      document.querySelectorAll('[data-message-play]')[1],
+    )
+
+    link.element.focus()
+    link.element.click()
+    await settle()
+    expect(document.activeElement).toBe(
+      document.querySelectorAll('[data-message-play]')[1],
+    )
+  },
+)
+
+it('updates the Settings support heart when the theme changes in place', async () => {
+  settingsStore.theme = 'kumo-light'
+  const { wrapper } = await panel('settings')
+  const support = wrapper.get('a[aria-label="Support"]')
+  expect(support.text()).toBe('🖤')
+
+  settingsStore.theme = 'github-dark'
+  await Vue.nextTick()
+  const updated = wrapper.get('a[aria-label="Support"]')
+  expect(updated.element).toBe(support.element)
+  expect(updated.text()).toBe('🤍')
+})
 
 it.each(['settings', 'messages'] as const)(
   '%s starts at Close and offers tabs/content on the next Tab',
@@ -278,7 +388,7 @@ it.each(['settings', 'messages'] as const)(
   },
 )
 
-it('keeps sidebar focus and content state when changing the Settings tab', async () => {
+it('keeps sidebar focus and content state when clicking a Settings tab with the pointer', async () => {
   const { wrapper, router, close, openChooser } = await panel('settings')
   await openChooser()
   document.querySelector<HTMLButtonElement>('[role="dialog"] button')!.click()
@@ -287,11 +397,36 @@ it('keeps sidebar focus and content state when changing the Settings tab', async
     'a[href="/settings/general"]',
   ).element
   general.focus()
-  general.click()
+  general.dispatchEvent(
+    new MouseEvent('click', { detail: 1, bubbles: true, cancelable: true }),
+  )
   await settle()
   expect(router.currentRoute.value.name).toBe('settings-general')
   expect(document.activeElement).toBe(general)
   expect(document.activeElement).not.toBe(close)
+})
+
+it('focuses page content after keyboard activation of a Settings navigation item', async () => {
+  const { wrapper, router } = await panel('settings')
+  const general = wrapper.get<HTMLAnchorElement>('a[href="/settings/general"]')
+  general.element.focus()
+  general.element.click()
+  await settle()
+  expect(router.currentRoute.value.name).toBe('settings-general')
+  expect(document.activeElement).toBe(
+    wrapper.get('[data-content-first]').element,
+  )
+})
+
+it('retains navigation focus when keyboard navigation is cancelled', async () => {
+  const { wrapper, router } = await panel('settings')
+  router.beforeEach(() => false)
+  const general = wrapper.get<HTMLAnchorElement>('a[href="/settings/general"]')
+  general.element.focus()
+  general.element.click()
+  await settle()
+  expect(router.currentRoute.value.name).toBe('settings-game-overlay')
+  expect(document.activeElement).toBe(general.element)
 })
 
 it.each(['select', 'popover'])(

@@ -37,6 +37,7 @@
             <StDialogContentWrapper
               ref="portalTarget"
               @mousedown.self="closeDialog"
+              @focusin="revealFocusedControl"
             >
               <StDialogContent>
                 <NvCard>
@@ -48,12 +49,18 @@
                         </NvText>
                       </StDialogTitle>
                       <StDialogCloseTrigger as-child>
-                        <NvButton
-                          icon-name="times"
-                          size="xs"
-                          squared
-                          type="plain"
-                        />
+                        <NvTooltip>
+                          <NvText>Close</NvText>
+                          <template #reference>
+                            <NvButton
+                              aria-label="Close"
+                              icon-name="times"
+                              size="xs"
+                              squared
+                              type="plain"
+                            />
+                          </template>
+                        </NvTooltip>
                       </StDialogCloseTrigger>
                     </NvGroup>
                     <StDialogDescription v-if="$slots.description">
@@ -96,6 +103,7 @@ import NvButton from '@/components/forms/Button/NvButton.vue'
 import NvGroup from '@/components/miscellaneous/Group/NvGroup.vue'
 import NvStack from '@/components/miscellaneous/Stack/NvStack.vue'
 import NvText from '@/components/typography/Text/NvText.vue'
+import NvTooltip from '@/components/overlay/Tooltip/NvTooltip.vue'
 import {
   StDialogBackdrop,
   StDialogCloseTrigger,
@@ -245,5 +253,25 @@ const closeDialog = (event: MouseEvent) => {
   if (event.target === event.currentTarget) {
     dialogOpen.value = false
   }
+}
+
+function revealFocusedControl(event: FocusEvent) {
+  const target = event.target
+  const content = event.currentTarget as HTMLElement
+  if (
+    !(target instanceof HTMLElement) ||
+    target.closest('[role="dialog"]') !== content
+  )
+    return
+  const bounds = target.getBoundingClientRect()
+  const viewport = content.getBoundingClientRect()
+  // Ark wraps focus with preventScroll. Reveal the control within this dialog
+  // without scrolling the surrounding panel or any ancestor popups.
+  if (bounds.top < viewport.top || bounds.bottom > viewport.bottom)
+    content.scrollTop +=
+      bounds.top - viewport.top - (viewport.height - bounds.height) / 2
+  if (bounds.left < viewport.left || bounds.right > viewport.right)
+    content.scrollLeft +=
+      bounds.left - viewport.left - (viewport.width - bounds.width) / 2
 }
 </script>

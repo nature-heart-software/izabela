@@ -42,8 +42,10 @@
           "
         >
           <NvPanelNavigation
+            ref="panelNavigation"
             :sidebar="sidebar"
             :content="content"
+            content-focus-selector="[data-message-play]"
             @close="$emit('close')"
           />
         </div>
@@ -79,7 +81,10 @@
                         <NvButton
                           as="a"
                           :href="href"
-                          @click="navigate"
+                          @click="
+                            (event) =>
+                              panelNavigation?.activatePage(event, navigate)
+                          "
                           :selected="currentRoute.name === entry.to?.name"
                           :aria-current="
                             currentRoute.name === entry.to?.name
@@ -160,6 +165,7 @@ import { useRoute } from 'vue-router'
 import NvPortalTarget from '@/teams/messenger/components/NvPortalTarget.vue'
 
 const sidebar = ref<HTMLElement>()
+const panelNavigation = ref<InstanceType<typeof NvPanelNavigation>>()
 const content = ref<HTMLElement>()
 const navigation = [
   {
