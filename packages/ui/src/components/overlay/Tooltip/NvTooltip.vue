@@ -13,7 +13,7 @@
       >
         <slot name="reference" />
       </ReferenceTrigger>
-      <Teleport :to="portalTarget" defer>
+      <Teleport v-if="portalTarget" :to="portalTarget" defer>
         <StTooltipPositioner
           v-if="open && !expanded"
           :style="{
@@ -154,8 +154,12 @@ useMutationObserver(tooltip, syncTrigger, {
   attributeFilter: ['aria-expanded'],
 })
 const injectedPortalTarget = inject(PORTAL_TARGET)
+// A local portal can mount after its tooltip. Wait for that owner instead of
+// mounting into body and moving a deferred Teleport before it has initialized.
 const portalTarget = computed(
-  () => getElement(injectedPortalTarget) || document.body,
+  () =>
+    getElement(injectedPortalTarget) ||
+    (injectedPortalTarget ? null : document.body),
 )
 const openDelay = computed(() =>
   Array.isArray(props.tippyOptions.delay)
