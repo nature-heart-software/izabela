@@ -144,6 +144,57 @@ describe('overlay interaction boundaries', () => {
     },
   )
 
+  it.each([false, true])(
+    'keeps the Close tooltip inside a dialog initially open=%s through reopening',
+    async (initiallyOpen) => {
+      const open = ref(initiallyOpen)
+      const wrapper = render({
+        render: () =>
+          h(
+            ui.NvDialog,
+            {
+              open: open.value,
+              'onUpdate:open': (value: boolean) => (open.value = value),
+            },
+            {
+              reference: () => h('button', 'Open dialog'),
+              title: () => 'Tooltip portal',
+              footer: () => h('input', { 'aria-label': 'Dialog input' }),
+            },
+          ),
+      })
+      await settle()
+      const trigger = wrapper.get('button').element as HTMLButtonElement
+      if (!initiallyOpen) {
+        trigger.click()
+        await settle()
+      }
+      for (let cycle = 0; cycle < 2; cycle++) {
+        const dialog = document.querySelector<HTMLElement>('[role="dialog"]')!
+        expect(dialog).not.toBeNull()
+        const close = dialog.querySelector<HTMLButtonElement>(
+          'button[aria-label="Close"]',
+        )!
+        close.focus()
+        await vi.waitFor(() => {
+          const tooltip = document.querySelector('[role="tooltip"]')
+          expect(tooltip?.textContent).toBe('Close')
+          expect(dialog.contains(tooltip)).toBe(true)
+          expect(document.activeElement).toBe(close)
+        })
+        close.click()
+        await settle()
+        expect(open.value).toBe(false)
+        expect(document.querySelector('[role="dialog"]')).toBeNull()
+        expect(document.querySelector('[role="tooltip"]')).toBeNull()
+        if (cycle === 0) {
+          trigger.click()
+          await settle()
+        }
+      }
+    },
+  )
+
   it('reveals the Close button when a scrolled dialog loops focus from its last field', async () => {
     const wrapper = render(ui.NvDialog, {
       slots: {

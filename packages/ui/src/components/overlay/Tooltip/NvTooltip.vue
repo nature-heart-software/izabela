@@ -13,7 +13,9 @@
       >
         <slot name="reference" />
       </ReferenceTrigger>
-      <Teleport :to="portalTarget" defer>
+      <!-- The resolved target already exists. Mount anchors before a parent
+           dialog's content ref can retarget this portal during the same flush. -->
+      <Teleport :to="portalTarget">
         <StTooltipPositioner
           v-if="open && !expanded"
           :style="{
