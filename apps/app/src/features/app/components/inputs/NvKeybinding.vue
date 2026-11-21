@@ -1,23 +1,27 @@
 <template>
-  <template v-if="isListeningToKeys">
-    <NvButton
-      ref="target"
-      :class="css({ pointerEvents: 'none' })"
-      title="Press Esc to cancel. Hold to remove"
-      v-bind="$attrs"
-      >Listening...
-    </NvButton>
-  </template>
-  <template v-else>
-    <NvButton v-bind="$attrs" @click="isListeningToKeys = true">{{
-      readableKeybinding
-    }}</NvButton>
-  </template>
+  <NvButton
+    ref="target"
+    :class="isListeningToKeys ? css({ pointerEvents: 'none' }) : undefined"
+    :title="
+      isListeningToKeys ? 'Press Esc to cancel. Hold to remove' : undefined
+    "
+    v-bind="$attrs"
+    @click="isListeningToKeys = true"
+    >{{ isListeningToKeys ? 'Listening...' : readableKeybinding }}
+  </NvButton>
 </template>
 <script lang="ts" setup>
 import { css } from '@/styled-system/css'
 import { NvButton } from '@packages/ui'
-import { computed, PropType, Ref, ref, shallowRef, watch } from 'vue'
+import {
+  computed,
+  onBeforeUnmount,
+  PropType,
+  Ref,
+  ref,
+  shallowRef,
+  watch,
+} from 'vue'
 import { useEventListener, onClickOutside } from '@vueuse/core'
 import { Key } from '@/types/keybinds'
 
@@ -64,37 +68,58 @@ onClickOutside(target, () => {
   }
 })
 
-useEventListener(document, 'keydown', (e) => {
-  if (isListeningToKeys.value) {
-    if (e.code === 'Escape' && !escTimeout.value) {
-      escTimeout.value = setTimeout(() => {
-        listenedKeys.value = {}
-        if (escTimeout.value) clearTimeout(escTimeout.value)
-        escTimeout.value = null
+useEventListener(
+  document,
+  'keydown',
+  (e) => {
+    if (isListeningToKeys.value) {
+      e.preventDefault()
+      e.stopPropagation()
+      // Enter activates the button on keydown, before its keyup arrives.
+      // Ignore repeats from that activation until the user releases the key.
+      if (e.repeat && !listenedKeys.value[e.code]) return
+      if (e.code === 'Escape' && !escTimeout.value) {
+        escTimeout.value = setTimeout(() => {
+          listenedKeys.value = {}
+          if (escTimeout.value) clearTimeout(escTimeout.value)
+          escTimeout.value = null
+          isListeningToKeys.value = false
+        }, 500)
+      }
+      if (e.code === 'AltRight' && listenedKeys.value.ControlLeft) {
+        delete listenedKeys.value.ControlLeft
+      }
+      listenedKeys.value[e.code] = e
+      if (Object.keys(listenedKeys.value).length === 3) {
         isListeningToKeys.value = false
-      }, 500)
+      }
     }
-    if (e.code === 'AltRight' && listenedKeys.value.ControlLeft) {
-      delete listenedKeys.value.ControlLeft
-    }
-    listenedKeys.value[e.code] = e
-    if (Object.keys(listenedKeys.value).length === 3) {
+  },
+  { capture: true },
+)
+
+useEventListener(
+  document,
+  'keyup',
+  (e) => {
+    if (isListeningToKeys.value && listenedKeys.value[e.code]) {
+      e.preventDefault()
+      e.stopPropagation()
+      if (e.code === 'Escape' && escTimeout.value) {
+        cancelled.value = true
+      }
       isListeningToKeys.value = false
     }
-  }
-})
-
-useEventListener(document, 'keyup', (e) => {
-  if (isListeningToKeys.value) {
-    if (e.code === 'Escape' && escTimeout.value) {
-      cancelled.value = true
+    if (escTimeout.value) {
+      clearTimeout(escTimeout.value)
+      escTimeout.value = null
     }
-    isListeningToKeys.value = false
-  }
-  if (escTimeout.value) {
-    clearTimeout(escTimeout.value)
-    escTimeout.value = null
-  }
+  },
+  { capture: true },
+)
+
+onBeforeUnmount(() => {
+  if (escTimeout.value) clearTimeout(escTimeout.value)
 })
 
 const keybinding: Ref<Key[]> = computed(() =>
