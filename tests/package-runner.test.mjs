@@ -45,6 +45,10 @@ function runFixture(packages, selections = []) {
       const pkg = JSON.parse(readFileSync(join(process.argv[3], 'package.json'), 'utf8'))
       const output = process.argv.find(arg => arg.startsWith('--outputFile=')).slice('--outputFile='.length)
       appendFileSync('invocations.jsonl', JSON.stringify({ name: pkg.name, id: process.env.UI_TEST_RUN_ID }) + '\\n')
+      if (pkg.fixtureNoReport) {
+        if (process.argv.includes('--reporter=default')) console.log('fixture progress before missing JSON')
+        process.exit(2)
+      }
       writeFileSync(output, pkg.fixtureMalformed ? 'incomplete-json' : JSON.stringify({ testResults: [{ assertionResults: pkg.fixtureAssertions }] }))
     `,
     )
@@ -58,6 +62,7 @@ function runFixture(packages, selections = []) {
           name: pkg.name,
           fixtureAssertions: pkg.assertions,
           fixtureMalformed: pkg.malformed,
+          fixtureNoReport: pkg.noReport,
           fixtureTypeExit: pkg.typeExit,
           scripts:
             pkg.typeExit === undefined ? {} : { 'test:types': 'fixture' },
@@ -96,7 +101,15 @@ function runFixture(packages, selections = []) {
     writeFileSync(
       join(directory, 'fixture-runner.mjs'),
       `
-      import { writeFileSync } from 'node:fs'
+      import { appendFileSync, writeFileSync } from 'node:fs'
+      import childProcess from 'node:child_process'
+      import { syncBuiltinESMExports } from 'node:module'
+      const spawnSync = childProcess.spawnSync
+      childProcess.spawnSync = (command, args, options) => {
+        appendFileSync('spawns.jsonl', JSON.stringify({ command, args, cwd: options.cwd, stdio: options.stdio, timeout: options.timeout }) + '\\n')
+        return spawnSync(command, args, options)
+      }
+      syncBuiltinESMExports()
       const before = process.env.UI_TEST_RUN_ID
       await import('./tools/test-packages.mjs')
       writeFileSync('parent-environment.json', JSON.stringify({ before, after: process.env.UI_TEST_RUN_ID }))
@@ -137,9 +150,16 @@ function runFixture(packages, selections = []) {
       ]),
     )
     return {
+      directory,
       exitCode: run.status,
       summary,
       reports,
+      spawns: existsSync(join(directory, 'spawns.jsonl'))
+        ? readFileSync(join(directory, 'spawns.jsonl'), 'utf8')
+            .trim()
+            .split('\n')
+            .map((line) => JSON.parse(line))
+        : [],
       invocations: existsSync(join(directory, 'invocations.jsonl'))
         ? readFileSync(join(directory, 'invocations.jsonl'), 'utf8')
             .trim()
@@ -159,6 +179,81 @@ function runFixture(packages, selections = []) {
 }
 
 const passed = { fullName: 'fixture ordinary contract', status: 'passed' }
+
+test('package runner adds console diagnostics without changing JSON, selection or child budgets', () => {
+  const result = runFixture(
+    [
+      { name: 'a-selected', assertions: [passed], typeExit: 0 },
+      { name: 'b-unselected', assertions: [passed] },
+    ],
+    ['a-selected'],
+  )
+  assert.equal(result.exitCode, 0, result.output)
+  assert.equal(result.summary.expectedPackages, 1)
+  assert.equal(result.summary.results[0].typecheck, 'passed')
+  assert.equal(result.reports['a-selected'], true)
+  assert.equal(result.reports['b-unselected'], false)
+  assert.deepEqual(result.spawns, [
+    {
+      command: process.execPath,
+      args: [
+        join(result.directory, 'node_modules/vitest/vitest.mjs'),
+        'run',
+        join('packages', 'a-selected'),
+        '--reporter=default',
+        '--reporter=json',
+        `--outputFile=${join(
+          result.directory,
+          'coverage/package-results/packages-a-selected.json',
+        )}`,
+      ],
+      cwd: result.directory,
+      stdio: 'inherit',
+      timeout: 180000,
+    },
+    {
+      command: process.execPath,
+      args: [
+        join(result.directory, 'fixture-package-manager.mjs'),
+        '--dir',
+        join('packages', 'a-selected'),
+        'run',
+        'test:types',
+      ],
+      cwd: result.directory,
+      stdio: 'inherit',
+      timeout: 180000,
+    },
+  ])
+})
+
+test('package runner preserves console progress when a failed child leaves no JSON', () => {
+  const result = runFixture([
+    {
+      name: 'a-no-report',
+      noReport: true,
+      seedReport: true,
+      assertions: [passed],
+      typeExit: 0,
+    },
+    { name: 'b-covered', assertions: [passed] },
+  ])
+  assert.equal(result.exitCode, 1, result.output)
+  assert.match(result.output, /fixture progress before missing JSON/)
+  assert.equal(result.reports['a-no-report'], false)
+  assert.deepEqual(
+    result.summary.results.map(({ status, tests, exitCode, typecheck }) => ({
+      status,
+      tests,
+      exitCode,
+      typecheck,
+    })),
+    [
+      { status: 'failed', tests: 0, exitCode: 2, typecheck: 'passed' },
+      { status: 'passed', tests: 1, exitCode: 0, typecheck: 'not-configured' },
+    ],
+  )
+})
 
 test('package runner gives every Vitest invocation a fresh UUID without changing its inherited environment', () => {
   const original = process.env.UI_TEST_RUN_ID
