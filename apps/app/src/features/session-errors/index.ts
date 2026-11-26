@@ -66,8 +66,8 @@ export default {
         input?.category === 'connection'
           ? 'connection'
           : input?.category === 'subscription'
-          ? 'subscription'
-          : 'other',
+            ? 'subscription'
+            : 'other',
       operation: ['speech', 'speech-recognition', 'translation'].includes(
         input?.operation,
       )

@@ -36,8 +36,8 @@ export default ({ useRecording }: any) => {
               event.errorCode === sdk.CancellationErrorCode.ConnectionFailure
                 ? 'ERR_NETWORK'
                 : event.errorCode === sdk.CancellationErrorCode.ServiceTimeout
-                ? 'ETIMEDOUT'
-                : event.errorCode,
+                  ? 'ETIMEDOUT'
+                  : event.errorCode,
           })
         else turn.finish()
       }

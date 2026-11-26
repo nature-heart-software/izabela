@@ -34,8 +34,7 @@ export default ({ useRecording }: any) => {
       if (lifecycle.stopped) return
       const audio = new PassThrough()
       let stream:
-        | ReturnType<typeof speechToText.recognizeUsingWebSocket>
-        | undefined
+        ReturnType<typeof speechToText.recognizeUsingWebSocket> | undefined
       const turn = lifecycle.create({
         useRecording,
         onChunk: (chunk) => audio.write(chunk),

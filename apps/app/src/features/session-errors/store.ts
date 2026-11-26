@@ -2,10 +2,7 @@ import { defineStore } from 'pinia'
 
 export type ErrorCategory = 'connection' | 'subscription' | 'other'
 export type ErrorOperation =
-  | 'speech'
-  | 'speech-recognition'
-  | 'translation'
-  | 'provider'
+  'speech' | 'speech-recognition' | 'translation' | 'provider'
 export interface SessionError {
   id: string
   createdAt: string
