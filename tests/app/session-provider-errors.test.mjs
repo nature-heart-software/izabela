@@ -78,6 +78,9 @@ for (const provider of [
   test(`${provider}: rejected translation preserves source text and reports session error`, async () => {
     const errors = []
     let engine
+    const { ENGINE_ID, ENGINE_NAME } = loadTypescript(
+      source(`plugins/translation-engines/${provider}/shared.ts`),
+    )
     loadTypescript(
       source(`plugins/translation-engines/${provider}/register.ts`),
       {
@@ -89,8 +92,8 @@ for (const provider of [
           },
         },
         './shared.ts': {
-          ENGINE_ID: provider,
-          ENGINE_NAME: provider,
+          ENGINE_ID,
+          ENGINE_NAME,
           electronModuleName: 'Provider',
         },
         './store.ts': { store: { getProperty: () => 'fixture' } },
@@ -107,7 +110,7 @@ for (const provider of [
     assert.equal(errors.length, 1)
     assert.equal(errors[0][0], failure)
     assert.equal(errors[0][1], 'translation')
-    assert.equal(errors[0][2], provider)
+    assert.equal(errors[0][2], ENGINE_ID)
   })
 }
 
@@ -121,6 +124,9 @@ for (const provider of [
   test(`${provider}: main-process translation reports status before Electron can strip it`, async () => {
     const errors = []
     let translate
+    const { ENGINE_ID } = loadTypescript(
+      source(`plugins/translation-engines/${provider}/shared.ts`),
+    )
     const mocks = {
       '@/features/session-errors/report': reporter(errors),
       '@packages/electron-bridger': {
@@ -130,7 +136,7 @@ for (const provider of [
           },
         },
       },
-      './shared.ts': { electronModuleName: 'Provider' },
+      './shared.ts': { ENGINE_ID, electronModuleName: 'Provider' },
       openai: class {
         chat = { completions: { create: fail } }
       },
@@ -180,6 +186,6 @@ for (const provider of [
     assert.equal(result, 'original text')
     assert.equal(errors.length, 1)
     assert.equal(errors[0][0], failure)
-    assert.equal(errors[0][2], provider)
+    assert.equal(errors[0][2], ENGINE_ID)
   })
 }

@@ -1,4 +1,4 @@
-import sessionErrors from './index'
+import sessionErrors, { normalizeProviderId } from './index'
 import type { ErrorCategory, ErrorOperation } from './store'
 
 const connectionCodes = new Set([
@@ -73,7 +73,7 @@ export function reportProviderError(
 ) {
   const category = classifyProviderError(error)
   if (!category) return
-  const entry = { category, operation, provider }
+  const entry = { category, operation, provider: normalizeProviderId(provider) }
   if (typeof window !== 'undefined') {
     void Promise.resolve(window.ElectronSessionErrors.report(entry)).catch(
       () => {},

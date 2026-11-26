@@ -4,13 +4,14 @@ import speech from '@google-cloud/speech'
 import { createRecognitionLifecycle } from '../../../modules/speech-recognition-engine-manager/lifecycle'
 import { store } from './store.ts'
 import engine from './register.node.ts'
+import { ENGINE_ID } from './shared.ts'
 
 export default ({ useRecording, sampleRateHertz }: any) => {
   if (!engine.hasCredentials()) return
   const settingsStore = useSettingsStore()
   const client = new speech.v1p1beta1.SpeechClient()
   const lifecycle = createRecognitionLifecycle(60000, (error) =>
-    reportProviderError(error, 'speech-recognition', 'google-cloud'),
+    reportProviderError(error, 'speech-recognition', ENGINE_ID),
   )
   return {
     startStream() {

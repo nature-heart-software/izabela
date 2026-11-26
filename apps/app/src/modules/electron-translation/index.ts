@@ -1,5 +1,6 @@
 import { v2 } from '@google-cloud/translate'
 import { reportProviderError } from '@/features/session-errors/report'
+import { ENGINE_ID } from '../../plugins/translation-engines/google-cloud/shared'
 
 export const ElectronTranslation = () => ({
   async translate(
@@ -16,7 +17,7 @@ export const ElectronTranslation = () => ({
       const [translations] = await translate.translate(text, options)
       return translations
     } catch (error) {
-      reportProviderError(error, 'translation', 'google-cloud')
+      reportProviderError(error, 'translation', ENGINE_ID)
       return text
     }
   },

@@ -21,8 +21,8 @@
           <NvText>{{ titles[error.category] }}</NvText>
           <NvText
             >{{ operations[error.operation]
-            }}<template v-if="error.provider">
-              · {{ error.provider }}</template
+            }}<template v-if="getProviderName(error)">
+              · {{ getProviderName(error) }}</template
             ></NvText
           >
           <NvText
@@ -46,6 +46,7 @@ import { ref } from 'vue'
 import { NvButton, NvPopover, NvText } from '@packages/ui'
 import { vstack } from '@/styled-system/patterns'
 import { useSessionErrorsStore } from './store'
+import { getProviderName } from './provider-name'
 const store = useSessionErrorsStore()
 const titles = {
   connection: 'Connection error',

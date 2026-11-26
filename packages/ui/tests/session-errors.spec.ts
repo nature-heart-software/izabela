@@ -19,6 +19,28 @@ execFileSync(
 )
 const ui = await import(/* @vite-ignore */ uiPath)
 const require = createRequire(import.meta.url)
+const loadTypescript = require('../../../tests/load-typescript.cjs')
+const managerMocks = {
+  '@/modules/engine-manager': loadTypescript(
+    resolve('apps/app/src/modules/engine-manager/index.ts'),
+  ),
+  '@/features/dictionary/store': {
+    useDictionaryStore: () => ({ translateText: (text: string) => text }),
+  },
+}
+const speechManager = loadTypescript(
+  resolve('apps/app/src/modules/speech-engine-manager/index.ts'),
+  managerMocks,
+).default
+const recognitionManager = loadTypescript(
+  resolve('apps/app/src/modules/speech-recognition-engine-manager/index.ts'),
+  managerMocks,
+).default
+const translationManager = loadTypescript(
+  resolve('apps/app/src/modules/translation-engine-manager/index.ts'),
+  managerMocks,
+).default
+const futureEngineId = '@acme/voice-v2'
 const wrappers: VueWrapper[] = []
 const errors = Vue.reactive({
   entries: [] as any[],
@@ -30,6 +52,25 @@ const errors = Vue.reactive({
   $whenReady: async () => {},
 })
 const settings = Vue.reactive({ debugMode: false })
+const sessionErrors = loadTypescript(
+  resolve('apps/app/src/features/session-errors/index.ts'),
+  {
+    '@/features/session-errors/store': { useSessionErrorsStore: () => errors },
+  },
+)
+const { reportProviderError } = loadTypescript(
+  resolve('apps/app/src/features/session-errors/report.ts'),
+  { './index': { __esModule: true, ...sessionErrors } },
+  {
+    window: {
+      ElectronSessionErrors: {
+        report(entry: object) {
+          sessionErrors.default.report(JSON.parse(JSON.stringify(entry)))
+        },
+      },
+    },
+  },
+)
 const bridgeWindow = window as unknown as Window & {
   ElectronSessionErrors: {
     read?: () => Promise<{
@@ -73,6 +114,18 @@ const imports: Record<string, any> = {
   },
   '@/features/settings/store': { useSettingsStore: () => settings },
   '@/features/session-errors/store': { useSessionErrorsStore: () => errors },
+  '@/modules/speech-engine-manager': {
+    __esModule: true,
+    default: speechManager,
+  },
+  '@/modules/speech-recognition-engine-manager': {
+    __esModule: true,
+    default: recognitionManager,
+  },
+  '@/modules/translation-engine-manager': {
+    __esModule: true,
+    default: translationManager,
+  },
   './store': { useSessionErrorsStore: () => errors },
   '@/modules/vue-hitboxes': { hitboxClass: 'hitbox' },
   '@/utils/focus': { getTabStops: () => [] },
@@ -115,6 +168,11 @@ function compile(file: string): Vue.Component {
   new Function('require', 'module', 'exports', code)(
     (id: string) => {
       if (Object.hasOwn(imports, id)) return imports[id]
+      if (id === './provider-name')
+        return loadTypescript(
+          resolve('apps/app/src/features/session-errors/provider-name.ts'),
+          imports,
+        )
       if (id.endsWith('NvErrorHistory.vue'))
         return {
           __esModule: true,
@@ -134,6 +192,18 @@ function compile(file: string): Vue.Component {
   return module.exports.default
 }
 beforeEach(() => {
+  speechManager.registerEngine({
+    id: futureEngineId,
+    name: 'Future Voice Plugin',
+  })
+  recognitionManager.registerEngine(futureEngineId, {
+    id: futureEngineId,
+    name: 'Future Recognition Plugin',
+  })
+  translationManager.registerEngine(futureEngineId, {
+    id: futureEngineId,
+    name: 'Future Translation Plugin',
+  })
   trackerStarts = 0
   trackerStops = 0
   vi.stubGlobal(
@@ -192,19 +262,25 @@ it('shows new session errors as dismissible Ark toasts without stealing editor f
   const editor = document.createElement('input')
   document.body.append(editor)
   editor.focus()
-  errors.entries = [
-    {
-      id: '2',
-      category: 'connection',
-      operation: 'speech',
-      createdAt: '2026-01-01T12:00:00Z',
-    },
-  ]
+  reportProviderError(
+    Object.assign(Error('PRIVATE_ERROR_MESSAGE'), {
+      code: 'ECONNRESET',
+      headers: { Authorization: 'PRIVATE_HEADER' },
+      config: { data: 'PRIVATE_REQUEST_BODY' },
+    }),
+    'speech',
+    futureEngineId,
+  )
   await flushPromises()
   expect(
     document.querySelector('[data-scope="toast"][data-part="root"]'),
   ).not.toBeNull()
   expect(document.body.textContent).toContain('Connection error')
+  expect(document.body.textContent).toContain('Speech · Future Voice Plugin')
+  expect(document.body.textContent).not.toContain(futureEngineId)
+  expect(document.body.textContent).not.toMatch(/PRIVATE_|Authorization/)
+  expect(document.body.textContent).not.toContain('Future Recognition Plugin')
+  expect(document.body.textContent).not.toContain('Future Translation Plugin')
   expect(document.activeElement).toBe(editor)
   const dismiss = document.querySelector<HTMLButtonElement>(
     '[aria-label="Dismiss notification"]',
@@ -240,11 +316,19 @@ it('shows the newest error even when three notifications are already visible and
         id: String(id),
         category: 'other',
         operation: 'speech',
+        provider: [
+          'unregistered-plugin',
+          'https://private.example/token',
+          'private credential',
+          futureEngineId,
+        ][id - 1],
         createdAt: '2026-01-01T12:00:00Z',
       },
     ]
     await flushPromises()
   }
+  expect(document.body.textContent).not.toMatch(/unregistered-plugin|private/)
+  expect(document.body.textContent).toContain('Future Voice Plugin')
   expect(document.getElementById('toast:session-error-4')).not.toBeNull()
   expect(document.getElementById('toast:session-error-1')).toBeNull()
   expect(errors.entries.length).toBe(4)
@@ -327,15 +411,34 @@ it('restores main-process session history on renderer reload without replaying t
 
 it('opens error history with safe categories and clears entries without removing the session action', async () => {
   errors.hasOccurred = true
-  errors.entries = [
-    {
-      id: '1',
-      category: 'subscription',
+  const entries = [
+    ...['speech', 'speech-recognition', 'translation', 'provider'].map(
+      (operation, index) => ({
+        id: String(index),
+        category: 'subscription',
+        operation,
+        provider: futureEngineId,
+        createdAt: '2026-01-01T12:00:00Z',
+      }),
+    ),
+    ...[
+      'unregistered-plugin',
+      'https://private.example/token',
+      'private credential',
+    ].map((provider, index) => ({
+      id: `unknown-${index}`,
+      category: 'other',
       operation: 'translation',
-      provider: 'openai',
+      provider,
       createdAt: '2026-01-01T12:00:00Z',
-    },
+    })),
   ]
+  for (const entry of entries)
+    reportProviderError(
+      { status: entry.category === 'subscription' ? 402 : 403 },
+      entry.operation,
+      entry.provider,
+    )
   bridgeWindow.ElectronSessionErrors = {
     clear: vi.fn(async () => {
       errors.entries = []
@@ -346,6 +449,29 @@ it('opens error history with safe categories and clears entries without removing
   await flushPromises()
   expect(document.body.textContent).toContain('Subscription error')
   expect(document.body.textContent).toContain('Translation')
+  const rows = [
+    ...document.querySelectorAll('[aria-label="Session errors"] li'),
+  ].map((row) => row.textContent)
+  expect(
+    rows.filter((row) => row?.includes('Future Translation Plugin')),
+  ).toHaveLength(1)
+  expect(
+    rows.filter((row) => row?.includes('Future Recognition Plugin')),
+  ).toHaveLength(1)
+  expect(
+    rows.filter((row) => row?.includes('Future Voice Plugin')),
+  ).toHaveLength(1)
+  expect(rows.find((row) => row?.includes('Speech recognition'))).toContain(
+    'Future Recognition Plugin',
+  )
+  expect(rows.find((row) => row?.includes('Translation ·'))).toContain(
+    'Future Translation Plugin',
+  )
+  expect(rows.find((row) => row?.includes('Speech ·'))).toContain(
+    'Future Voice Plugin',
+  )
+  expect(document.body.textContent).not.toContain(futureEngineId)
+  expect(document.body.textContent).not.toMatch(/unregistered-plugin|private/)
   const clear = [...document.querySelectorAll('button')].find((b) =>
     b.textContent?.includes('Clear errors'),
   )

@@ -2,6 +2,7 @@ import { useSettingsStore } from '@/features/settings/store'
 import sdk from 'microsoft-cognitiveservices-speech-sdk'
 import { createRecognitionLifecycle } from '../../../modules/speech-recognition-engine-manager/lifecycle'
 import engine from './register.node.ts'
+import { ENGINE_ID } from './shared.ts'
 import { reportProviderError } from '@/features/session-errors/report'
 
 export default ({ useRecording }: any) => {
@@ -11,7 +12,7 @@ export default ({ useRecording }: any) => {
   const speechConfig = sdk.SpeechConfig.fromSubscription(apiKey, region)
   speechConfig.speechRecognitionLanguage = settingsStore.speechInputLanguage
   const lifecycle = createRecognitionLifecycle(60000, (error) =>
-    reportProviderError(error, 'speech-recognition', 'microsoft-azure'),
+    reportProviderError(error, 'speech-recognition', ENGINE_ID),
   )
   return {
     startStream() {

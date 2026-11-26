@@ -8,6 +8,7 @@ import {
 import { PassThrough } from 'stream'
 import { createRecognitionLifecycle } from '../../../modules/speech-recognition-engine-manager/lifecycle'
 import engine from './register.node.ts'
+import { ENGINE_ID } from './shared.ts'
 import { reportProviderError } from '@/features/session-errors/report'
 
 const getCredentials = async () => {
@@ -19,7 +20,7 @@ export default ({ useRecording }: any) => {
   const { region } = engine.getCredentials()
   const settingsStore = useSettingsStore()
   const lifecycle = createRecognitionLifecycle(60000, (error) =>
-    reportProviderError(error, 'speech-recognition', 'amazon-transcribe'),
+    reportProviderError(error, 'speech-recognition', ENGINE_ID),
   )
   let credentials: Awaited<ReturnType<typeof getCredentials>> | undefined
   let refreshing: Promise<typeof credentials> | undefined
@@ -32,7 +33,7 @@ export default ({ useRecording }: any) => {
       })
       .catch((error) => {
         if (!lifecycle.stopped)
-          reportProviderError(error, 'speech-recognition', 'amazon-transcribe')
+          reportProviderError(error, 'speech-recognition', ENGINE_ID)
         console.error('Unable to refresh transcription credentials', error)
         return undefined
       })

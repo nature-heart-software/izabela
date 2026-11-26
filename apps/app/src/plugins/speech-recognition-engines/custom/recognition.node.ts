@@ -1,6 +1,7 @@
 import { useSettingsStore } from '@/features/settings/store'
 import io from 'socket.io-client'
 import engine from './register.node.ts'
+import { ENGINE_ID } from './shared.ts'
 import { reportProviderError } from '@/features/session-errors/report'
 
 export default ({ recorder, useRecording }: any) => {
@@ -11,7 +12,7 @@ export default ({ recorder, useRecording }: any) => {
   )
   let disposed = false
   socket.on('connect_error', (error) => {
-    if (!disposed) reportProviderError(error, 'speech-recognition', 'custom')
+    if (!disposed) reportProviderError(error, 'speech-recognition', ENGINE_ID)
   })
 
   return {

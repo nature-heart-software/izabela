@@ -245,7 +245,14 @@ test('OpenAI established socket errors report one connection failure and allow t
   assert.equal(f.reports.length, 1)
   assert.equal(f.reports[0].category, 'connection')
   assert.equal(f.reports[0].operation, 'speech-recognition')
-  assert.equal(f.reports[0].provider, 'openai')
+  assert.equal(
+    f.reports[0].provider,
+    loadTypescript(
+      fileURLToPath(
+        new URL('plugins/speech-recognition-engines/openai/shared.ts', base),
+      ),
+    ).ENGINE_ID,
+  )
   assert.deepEqual(f.transcripts, [''])
   await f.engine.startStream()
   f.sockets[1].emit(
@@ -408,7 +415,17 @@ for (const name of ['ConnectionFailure', 'ServiceTimeout']) {
     assert.equal(reports.length, 1)
     assert.equal(classifyProviderError(reports[0][0]), 'connection')
     assert.equal(reports[0][1], 'speech-recognition')
-    assert.equal(reports[0][2], 'microsoft-azure')
+    assert.equal(
+      reports[0][2],
+      loadTypescript(
+        fileURLToPath(
+          new URL(
+            'plugins/speech-recognition-engines/microsoft-azure/shared.ts',
+            base,
+          ),
+        ),
+      ).ENGINE_ID,
+    )
     assert.deepEqual(Object.keys(reports[0][0]), ['code'])
     assert.equal(
       classifyProviderError({ code: event.errorCode }),

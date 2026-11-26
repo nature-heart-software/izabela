@@ -3,57 +3,12 @@ import {
   type SessionError,
 } from '@/features/session-errors/store'
 
-// Only built-in provider identities may become visible labels; custom endpoints are never displayed.
-const providers = new Map<string, string>([
-  ...[
-    'openai',
-    'openai-tts',
-    'openai-translation',
-    'openai-speech-recognition',
-  ].map((id): [string, string] => [id, 'OpenAI']),
-  ...[
-    'google-cloud',
-    'gctts',
-    'google-cloud-translation',
-    'google-cloud-speech-recognition',
-  ].map((id): [string, string] => [id, 'Google Cloud']),
-  ...['google-translate', 'google-translate-translation'].map(
-    (id): [string, string] => [id, 'Google Translate'],
-  ),
-  ...[
-    'microsoft-azure',
-    'matts',
-    'microsoft-azure-translation',
-    'microsoft-azure-speech-recognition',
-  ].map((id): [string, string] => [id, 'Microsoft Azure']),
-  ...['amazon-polly', 'aptts'].map((id): [string, string] => [
-    id,
-    'Amazon Polly',
-  ]),
-  ...['amazon-transcribe', 'amazon-transcribe-recognition'].map(
-    (id): [string, string] => [id, 'Amazon Transcribe'],
-  ),
-  ...['amazon-translation', 'amazon-translate-translation'].map(
-    (id): [string, string] => [id, 'Amazon Translate'],
-  ),
-  ...['ibm-watson', 'iwtts', 'ibm-watson-speech-recognition'].map(
-    (id): [string, string] => [id, 'IBM Watson'],
-  ),
-  ...['elevenlabs', '11labstts', 'elevenlabs-speech-recognition'].map(
-    (id): [string, string] => [id, 'ElevenLabs'],
-  ),
-  ...[
-    'custom',
-    'customtts',
-    'custom-translation',
-    'custom-speech-recognition',
-  ].map((id): [string, string] => [id, 'Custom']),
-  ['izabelatts', 'Izabela'],
-  ['saytts', 'System speech'],
-  ['animalesetts', 'Animalese'],
-  ['samtts', 'SAM'],
-  ['external-audio', 'Audio'],
-])
+// Main need not load renderer plugins. Bound opaque IDs without restricting the registry's alphabet.
+export function normalizeProviderId(value: unknown): string | undefined {
+  return typeof value === 'string' && value.length > 0 && value.length <= 128
+    ? value
+    : undefined
+}
 
 export default {
   report(input: Pick<SessionError, 'category' | 'operation' | 'provider'>) {
@@ -73,9 +28,7 @@ export default {
       )
         ? input.operation
         : 'provider',
-      ...(providers.has(input?.provider || '')
-        ? { provider: providers.get(input.provider!) }
-        : {}),
+      provider: normalizeProviderId(input?.provider),
     }
     store.$patch({
       entries: [...store.entries, entry],

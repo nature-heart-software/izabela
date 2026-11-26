@@ -233,6 +233,14 @@ function fixture(provider, options = {}) {
   }
   let engine
   const f = {
+    engineId: loadTypescript(
+      fileURLToPath(
+        new URL(
+          `plugins/speech-recognition-engines/${provider}/shared.ts`,
+          root,
+        ),
+      ),
+    ).ENGINE_ID,
     reportedErrors,
     streams,
     turns,
@@ -364,7 +372,7 @@ test('Google reports a failed recognition turn once and preserves its provider s
     assert.equal(f.reportedErrors.length, 1)
     assert.equal(f.reportedErrors[0][0], error)
     assert.equal(f.reportedErrors[0][1], 'speech-recognition')
-    assert.equal(f.reportedErrors[0][2], 'google-cloud')
+    assert.equal(f.reportedErrors[0][2], f.engineId)
   } finally {
     await f.dispose()
   }
@@ -449,6 +457,8 @@ for (const provider of providers) {
           1,
           'provider failure must reach session history',
         )
+        assert.equal(f.reportedErrors[0][1], 'speech-recognition')
+        assert.equal(f.reportedErrors[0][2], f.engineId)
         await f.begin()
         if (provider === 'elevenlabs') {
           f.end()

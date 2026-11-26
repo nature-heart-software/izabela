@@ -15,12 +15,13 @@ function fixture() {
   const mocks = {
     '@/features/session-errors/store': { useSessionErrorsStore: () => store },
   }
-  const main = load('./index.ts', mocks).default
+  const mainModule = load('./index.ts', mocks)
+  const main = mainModule.default
   const report = load('./report.ts', {
     ...mocks,
-    './index': { __esModule: true, default: main },
+    './index': { __esModule: true, ...mainModule },
   }).reportProviderError
-  return { main, report, store }
+  return { main, mainModule, report, store }
 }
 
 test('classifies structured provider failures without exposing raw data or treating arbitrary forbidden responses as subscriptions', async () => {
@@ -55,14 +56,23 @@ test('intentional cancellation does not create session errors', async () => {
   assert.equal(f.store.entries.length, 0)
 })
 
-test('known engine identifiers have safe provider labels while arbitrary provider strings are discarded', async () => {
+test('main retains bounded opaque engine IDs without requiring renderer plugin registrations', async () => {
   const f = fixture()
-  await f.report({ status: 402 }, 'speech', 'openai-tts')
-  assert.equal(f.store.entries[0].provider, 'OpenAI')
-  await f.report({ status: 403 }, 'translation', 'custom-translation')
-  assert.equal(f.store.entries[1].provider, 'Custom')
-  await f.report({}, 'provider', 'private credential value')
-  assert.equal(f.store.entries[2].provider, undefined)
+  for (const id of [
+    'future-plugin-v7',
+    'acme.voice.v2',
+    '@acme/voice-v2',
+    'acme:voice:v2',
+    '声のプラグイン v2',
+    'x'.repeat(128),
+  ]) {
+    await f.report({ status: 402 }, 'speech', id)
+    assert.equal(f.store.entries.at(-1).provider, id)
+  }
+  for (const id of ['x'.repeat(129), '', null, { secret: 'credential' }]) {
+    f.main.report({ category: 'other', operation: 'provider', provider: id })
+    assert.equal(f.store.entries.at(-1).provider, undefined)
+  }
 })
 
 test('renderer reports carry only normalized metadata through the IPC boundary', async () => {
@@ -70,7 +80,7 @@ test('renderer reports carry only normalized metadata through the IPC boundary',
   const sent = []
   const { reportProviderError } = load(
     './report.ts',
-    { './index': { __esModule: true, default: f.main } },
+    { './index': { __esModule: true, ...f.mainModule } },
     {
       window: {
         ElectronSessionErrors: {
@@ -95,8 +105,95 @@ test('renderer reports carry only normalized metadata through the IPC boundary',
     JSON.stringify(sent),
     /private|request body|Authorization/,
   )
-  reportProviderError({ status: 403 }, 'speech', 'openai')
+  reportProviderError({ status: 403 }, 'speech', 'openai-tts')
   assert.equal(f.store.entries[1].category, 'other')
+  assert.equal(sent[1].provider, 'openai-tts')
+  for (const id of ['x'.repeat(129), '', null, { secret: 'credential' }]) {
+    reportProviderError({}, 'speech', id)
+    assert.equal(sent.at(-1).provider, undefined)
+  }
+})
+
+test('registered opaque plugin IDs survive reporting IPC and main history into operation-owned names', () => {
+  const f = fixture()
+  const managerMocks = {
+    '@/modules/engine-manager': load('../../modules/engine-manager/index.ts'),
+    '@/features/dictionary/store': {
+      useDictionaryStore: () => ({ translateText: (text) => text }),
+    },
+  }
+  const managers = Object.fromEntries(
+    ['speech', 'speech-recognition', 'translation'].map((operation) => [
+      operation,
+      load(`../../modules/${operation}-engine-manager/index.ts`, managerMocks)
+        .default,
+    ]),
+  )
+  const { getProviderName } = load(
+    './provider-name.ts',
+    Object.fromEntries(
+      Object.entries(managers).map(([operation, manager]) => [
+        `@/modules/${operation}-engine-manager`,
+        { __esModule: true, default: manager },
+      ]),
+    ),
+  )
+  const sent = []
+  const { reportProviderError } = load(
+    './report.ts',
+    { './index': { __esModule: true, ...f.mainModule } },
+    {
+      window: {
+        ElectronSessionErrors: {
+          report(value) {
+            const payload = JSON.parse(JSON.stringify(value))
+            sent.push(payload)
+            f.main.report(payload)
+          },
+        },
+      },
+    },
+  )
+  const error = Object.assign(Error('PRIVATE_ERROR_MESSAGE'), {
+    status: 402,
+    headers: { Authorization: 'PRIVATE_HEADER' },
+    config: { data: 'PRIVATE_REQUEST_BODY' },
+  })
+  for (const id of [
+    'future-plugin-v7',
+    'acme.voice.v2',
+    '@acme/voice-v2',
+    'acme:voice:v2',
+    '声のプラグイン v2',
+    'x'.repeat(128),
+  ]) {
+    for (const [operation, manager] of Object.entries(managers)) {
+      const engine = { id, name: `Registered ${operation} Plugin` }
+      if (operation === 'speech') manager.registerEngine(engine)
+      else manager.registerEngine(id, engine)
+      assert.equal(getProviderName({ provider: id, operation }), engine.name)
+      reportProviderError(error, operation, id)
+      assert.equal(sent.at(-1).provider, id)
+      const entry = f.main.read().entries.at(-1)
+      assert.equal(entry.provider, id)
+      assert.equal(entry.category, 'subscription')
+      assert.equal(getProviderName(entry), engine.name)
+    }
+  }
+  for (const provider of [
+    'unregistered-plugin',
+    'https://private.example/token',
+    'private credential',
+  ]) {
+    for (const operation of Object.keys(managers)) {
+      reportProviderError(error, operation, provider)
+      assert.equal(getProviderName(f.main.read().entries.at(-1)), undefined)
+    }
+  }
+  assert.doesNotMatch(
+    JSON.stringify({ sent, state: f.main.read() }),
+    /PRIVATE_ERROR_MESSAGE|PRIVATE_HEADER|PRIVATE_REQUEST_BODY|Authorization|headers|config/,
+  )
 })
 
 test('a reported provider failure becomes safe session history and clear retains session occurrence', async () => {

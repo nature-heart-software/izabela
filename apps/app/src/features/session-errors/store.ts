@@ -8,6 +8,7 @@ export interface SessionError {
   createdAt: string
   category: ErrorCategory
   operation: ErrorOperation
+  /** Opaque engine ID; visible names come only from the operation's plugin manager. */
   provider?: string
 }
 

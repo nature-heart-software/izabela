@@ -4,6 +4,7 @@ import { SpeechModel } from 'ibm-watson/speech-to-text/v1-generated'
 import { useSettingsStore } from '@/features/settings/store'
 import { createRecognitionLifecycle } from '../../../modules/speech-recognition-engine-manager/lifecycle'
 import engine from './register.node.ts'
+import { ENGINE_ID } from './shared.ts'
 import { PassThrough } from 'stream'
 import { reportProviderError } from '@/features/session-errors/report'
 
@@ -12,7 +13,7 @@ export default ({ useRecording }: any) => {
   const { apiKey, url } = engine.getCredentials()
   const settingsStore = useSettingsStore()
   const lifecycle = createRecognitionLifecycle(60000, (error) =>
-    reportProviderError(error, 'speech-recognition', 'ibm-watson'),
+    reportProviderError(error, 'speech-recognition', ENGINE_ID),
   )
   const speechToText = new SpeechToTextV1({
     authenticator: new IamAuthenticator({ apikey: apiKey }),
@@ -25,7 +26,7 @@ export default ({ useRecording }: any) => {
     })
     .catch((error) => {
       if (!lifecycle.stopped)
-        reportProviderError(error, 'speech-recognition', 'ibm-watson')
+        reportProviderError(error, 'speech-recognition', ENGINE_ID)
       console.error('Unable to list recognition models', error)
       return []
     })

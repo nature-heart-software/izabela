@@ -122,6 +122,15 @@ test('browser-recognition provider failures reach session history', async () => 
     })
     assert.equal(f.reportedErrors.length, 1)
     assert.equal(f.reportedErrors[0][1], 'speech-recognition')
+    const { ENGINE_ID } = loadTypescript(
+      fileURLToPath(
+        new URL(
+          '../../../../plugins/speech-recognition-engines/google-cloud/shared.ts',
+          import.meta.url,
+        ),
+      ),
+    )
+    assert.equal(f.reportedErrors[0][2], ENGINE_ID)
   } finally {
     f.dispose()
   }

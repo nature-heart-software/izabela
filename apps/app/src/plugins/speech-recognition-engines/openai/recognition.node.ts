@@ -5,7 +5,7 @@ import { useSettingsStore } from '@/features/settings/store'
 import { WebSocketSessionManager } from '@/teams/speech-worker/modules/electron-native-speech-recognition/websocket-session-manager.ts'
 import { store } from './store.ts'
 import engine from './register.node.ts'
-import { getTranscriptionOptions } from './shared.ts'
+import { ENGINE_ID, getTranscriptionOptions } from './shared.ts'
 import { reportProviderError } from '@/features/session-errors/report'
 
 export default ({ useRecording }: any) => {
@@ -13,12 +13,12 @@ export default ({ useRecording }: any) => {
   const { apiKey } = engine.getCredentials()
   const settingsStore = useSettingsStore()
   const lifecycle = createRecognitionLifecycle(60000, (error) =>
-    reportProviderError(error, 'speech-recognition', 'openai'),
+    reportProviderError(error, 'speech-recognition', ENGINE_ID),
   )
   let pendingTurn = Promise.resolve()
   const manager = new WebSocketSessionManager({
     onError: (error) =>
-      reportProviderError(error, 'speech-recognition', 'openai'),
+      reportProviderError(error, 'speech-recognition', ENGINE_ID),
     sessionMaxAge: 30 * 60 * 1000,
     async factory() {
       const ws = new WebSocket(

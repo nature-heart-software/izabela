@@ -1,6 +1,6 @@
 import { bridge } from '@packages/electron-bridger'
 import { reportProviderError } from '@/features/session-errors/report'
-import { electronModuleName } from './shared.ts'
+import { electronModuleName, ENGINE_ID } from './shared.ts'
 import OpenAI from 'openai'
 
 bridge.register([
@@ -39,7 +39,7 @@ bridge.register([
 
           return response.choices[0].message.content?.trim() || text
         } catch (e) {
-          reportProviderError(e, 'translation', 'openai')
+          reportProviderError(e, 'translation', ENGINE_ID)
           return text
         }
       },

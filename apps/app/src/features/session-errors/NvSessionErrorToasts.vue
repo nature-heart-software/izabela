@@ -73,6 +73,7 @@ import { css } from '@/styled-system/css'
 import { box, hstack, vstack } from '@/styled-system/patterns'
 import { hitboxClass } from '@/modules/vue-hitboxes'
 import { useSessionErrorsStore } from './store'
+import { getProviderName } from './provider-name'
 const props = defineProps<{ anchor?: HTMLElement }>()
 const portal = inject<Ref<HTMLElement | undefined>>('router-overlay')
 const store = useSessionErrorsStore()
@@ -157,12 +158,13 @@ watch(
           activeToasts.delete(oldest.id)
         }
       }
+      const providerName = getProviderName(error)
       toaster.create({
         id: `session-error-${error.id}`,
         type: 'error',
         title: titles[error.category],
         description: `${operations[error.operation]}${
-          error.provider ? ` · ${error.provider}` : ''
+          providerName ? ` · ${providerName}` : ''
         }: ${descriptions[error.category]}`,
         duration: 8000,
         onStatusChange({ status }) {

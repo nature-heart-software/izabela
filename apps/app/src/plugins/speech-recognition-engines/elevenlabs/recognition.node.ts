@@ -8,6 +8,7 @@ import { createReadStream, mkdirSync, unlink, writeFileSync } from 'fs'
 import { v4 as uuid } from 'uuid'
 import { promisify } from 'util'
 import engine from './register.node.ts'
+import { ENGINE_ID } from './shared.ts'
 import { reportProviderError } from '@/features/session-errors/report'
 
 const unlinkAsync = promisify(unlink)
@@ -42,7 +43,7 @@ export default ({ useRecording }: any) => {
   const { apiKey } = engine.getCredentials()
   const client = new ElevenLabsClient({ apiKey })
   const lifecycle = createRecognitionLifecycle(60000, (error) =>
-    reportProviderError(error, 'speech-recognition', 'elevenlabs'),
+    reportProviderError(error, 'speech-recognition', ENGINE_ID),
   )
   return {
     startStream() {

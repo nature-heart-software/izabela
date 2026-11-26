@@ -21,6 +21,7 @@ import { getTopLeftWindow } from '@/electron/utils'
 import { findDisplay } from '@/features/display/utils'
 import speechRecognitionEngineManager from '@/modules/speech-recognition-engine-manager'
 import { reportProviderError } from '@/features/session-errors/report'
+import { ENGINE_ID } from '../../../../plugins/speech-recognition-engines/google-cloud/shared'
 
 export const ElectronSpeechWindow = () => {
   let registeredWindow: BrowserWindow | null = null
@@ -85,7 +86,7 @@ export const ElectronSpeechWindow = () => {
         onListeningError()
       }
     } catch (e: unknown) {
-      reportProviderError(e, 'speech-recognition', 'google-cloud')
+      reportProviderError(e, 'speech-recognition', ENGINE_ID)
       onListeningError()
     }
   }

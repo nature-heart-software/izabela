@@ -34,6 +34,12 @@ test('custom recognition reports connection failures and disconnects silently on
     Object.assign(Error('controlled disconnect'), { code: 'ECONNRESET' }),
   )
   assert.equal(errors.length, 1)
+  assert.equal(errors[0][1], 'speech-recognition')
+  assert.equal(
+    errors[0][2],
+    loadTypescript(fileURLToPath(new URL('./shared.ts', import.meta.url)))
+      .ENGINE_ID,
+  )
   engine.cleanup()
   socket.emit('connect_error', Error('late after cleanup'))
   assert.equal(errors.length, 1)

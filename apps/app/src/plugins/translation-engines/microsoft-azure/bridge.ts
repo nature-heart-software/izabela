@@ -1,6 +1,6 @@
 import { bridge } from '@packages/electron-bridger'
 import { reportProviderError } from '@/features/session-errors/report'
-import { electronModuleName } from './shared.ts'
+import { electronModuleName, ENGINE_ID } from './shared.ts'
 import TextTranslationClient, {
   isUnexpected,
 } from '@azure-rest/ai-translation-text'
@@ -41,7 +41,7 @@ bridge.register([
           const translations = translateResponse.body.value
           return translations[0]?.translations[0]?.text
         } catch (e) {
-          reportProviderError(e, 'translation', 'microsoft-azure')
+          reportProviderError(e, 'translation', ENGINE_ID)
           return text
         }
       },
