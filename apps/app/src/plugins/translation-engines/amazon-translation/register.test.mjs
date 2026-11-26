@@ -10,6 +10,7 @@ function engine({ values = {}, env = {} } = {}) {
     ...loadTypescript(
       fileURLToPath(new URL('./register.ts', import.meta.url)),
       {
+        '@/features/session-errors/report': { reportProviderError() {} },
         '@/modules/translation-engine-manager': {
           registerEngine: (_, engine) => engine,
         },

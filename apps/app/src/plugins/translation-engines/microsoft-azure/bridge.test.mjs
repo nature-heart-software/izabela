@@ -9,6 +9,7 @@ function translationBridge({ response, error, sdk } = {}) {
   const clients = []
   let translate
   loadTypescript(fileURLToPath(new URL('./bridge.ts', import.meta.url)), {
+    '@/features/session-errors/report': { reportProviderError() {} },
     '@packages/electron-bridger': {
       bridge: {
         register(entries) {

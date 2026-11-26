@@ -69,7 +69,7 @@ test('application preload exposes IPC without importing main-only implementation
   assert.doesNotThrow(() => {
     fixture = preloadFixture()
   })
-  assert.equal(fixture.exposed.size, 10)
+  assert.equal(fixture.exposed.size, 11)
   assert.ok(fixture.exposed.has('ElectronSpeechWorkerWindow'))
   assert.equal(fixture.imports.includes('@/electron/bridge'), false)
 })
@@ -108,6 +108,10 @@ function mainFixture() {
     '@/teams/messenger/store': {},
     '@/features/settings/store': {},
     '@/features/speech/store': {},
+    '@/features/session-errors/store': {
+      useSessionErrorsStore: () => ({ entries: [], revision: 0 }),
+    },
+    '@/features/session-errors/report': { reportProviderError() {} },
     '@/modules/vue-hitboxes/hitboxes.store': {},
     '@/utils/electron-window': {},
     '@/electron/game-overlay.ts': {},
@@ -138,6 +142,7 @@ function mainFixture() {
   // are controlled. Never substitute a hand-maintained list of implementation keys.
   const implementations = new Map()
   const paths = [
+    '@/features/session-errors',
     '@/modules/electron-dialog',
     '@/modules/electron-filesystem',
     '@/teams/messenger/modules/electron-messenger-window',
@@ -187,6 +192,14 @@ function assertParity(preload, main) {
   )
 }
 
+test('preload exposes session error history without loading provider code', () => {
+  const fixture = preloadFixture()
+  assert.deepEqual(
+    Object.keys(fixture.exposed.get('ElectronSessionErrors') || {}).sort(),
+    ['clear', 'read', 'report'],
+  )
+})
+
 test('every preload method forwards its exact channel, arguments and result', async () => {
   const fixture = preloadFixture()
   for (const [name, methods] of fixture.exposed) {
@@ -207,7 +220,7 @@ test('every preload method forwards its exact channel, arguments and result', as
 
 test('actual main registrations exactly match the preload contract', (t) => {
   const main = mainFixture()
-  assert.equal(main.implementations.size, 10)
+  assert.equal(main.implementations.size, 11)
   assertParity(preloadFixture(), main)
   t.diagnostic(
     `${main.handlers.size} IPC methods across ${main.implementations.size} real modules`,

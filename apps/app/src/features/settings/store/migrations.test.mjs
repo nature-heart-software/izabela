@@ -7,6 +7,7 @@ function loadStartup(settings, whenReady) {
   const empty = () => ({})
   const manager = { getEngines: () => [] }
   const mocks = {
+    '@/features/session-errors/store': { useSessionErrorsStore: empty },
     '@/features/speech/store': {
       useSpeechStore: empty,
       useSpeechRecognitionStore: empty,

@@ -1,3 +1,4 @@
+import type sessionErrors from '@/features/session-errors'
 import type electronDialog from '@/modules/electron-dialog'
 import type electronFilesystem from '@/modules/electron-filesystem'
 import type electronMessengerWindow from '@/teams/messenger/modules/electron-messenger-window'
@@ -10,6 +11,7 @@ import type electronSi from '@/modules/electron-si'
 import type electronTranslation from '@/modules/electron-translation'
 
 export interface AppBridgeModules {
+  ElectronSessionErrors: typeof sessionErrors
   ElectronDialog: typeof electronDialog
   ElectronFilesystem: typeof electronFilesystem
   ElectronMessengerWindow: typeof electronMessengerWindow
@@ -36,6 +38,7 @@ export type BridgeMethods<Modules> = {
 
 // Required function keys make additions/removals in main fail type checking here.
 export const bridgeContract: BridgeMethods<AppBridgeModules> = {
+  ElectronSessionErrors: { report: true, read: true, clear: true },
   ElectronDialog: {
     showOpenDialog: true,
     showSaveDialog: true,

@@ -1,3 +1,4 @@
+import sessionErrors from '@/features/session-errors'
 import { bridge } from '@packages/electron-bridger'
 import electronDialog from '@/modules/electron-dialog'
 import electronFilesystem from '@/modules/electron-filesystem'
@@ -12,6 +13,7 @@ import electronTranslation from '@/modules/electron-translation'
 import type { AppBridgeModules } from './bridge-contract'
 
 const bridgeImplementations: AppBridgeModules = {
+  ElectronSessionErrors: sessionErrors,
   ElectronDialog: electronDialog,
   ElectronFilesystem: electronFilesystem,
   ElectronMessengerWindow: electronMessengerWindow,

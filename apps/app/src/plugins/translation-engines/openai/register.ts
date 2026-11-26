@@ -1,4 +1,5 @@
 import translationEngineManager from '@/modules/translation-engine-manager'
+import { reportProviderError } from '@/features/session-errors/report'
 import { electronModuleName, ENGINE_ID, ENGINE_NAME } from './shared.ts'
 import { store } from './store.ts'
 import { defineAsyncComponent } from 'vue'
@@ -42,6 +43,7 @@ export const engine = translationEngineManager.registerEngine(ENGINE_ID, {
         credentials,
       })
     } catch (e) {
+      reportProviderError(e, 'translation', ENGINE_ID)
       return text
     }
   },

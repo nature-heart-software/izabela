@@ -82,7 +82,14 @@ for (const pkg of selected) {
   )
   const run = spawnSync(
     process.execPath,
-    [vitest, 'run', pkg.directory, '--reporter=json', `--outputFile=${report}`],
+    [
+      vitest,
+      'run',
+      pkg.directory,
+      '--reporter=default',
+      '--reporter=json',
+      `--outputFile=${report}`,
+    ],
     {
       cwd: root,
       env: { ...process.env, UI_TEST_RUN_ID: randomUUID() },

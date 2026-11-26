@@ -5,15 +5,20 @@ import { useSettingsStore } from '@/features/settings/store'
 import { WebSocketSessionManager } from '@/teams/speech-worker/modules/electron-native-speech-recognition/websocket-session-manager.ts'
 import { store } from './store.ts'
 import engine from './register.node.ts'
-import { getTranscriptionOptions } from './shared.ts'
+import { ENGINE_ID, getTranscriptionOptions } from './shared.ts'
+import { reportProviderError } from '@/features/session-errors/report'
 
 export default ({ useRecording }: any) => {
   if (!engine.hasCredentials()) return
   const { apiKey } = engine.getCredentials()
   const settingsStore = useSettingsStore()
-  const lifecycle = createRecognitionLifecycle()
+  const lifecycle = createRecognitionLifecycle(60000, (error) =>
+    reportProviderError(error, 'speech-recognition', ENGINE_ID),
+  )
   let pendingTurn = Promise.resolve()
   const manager = new WebSocketSessionManager({
+    onError: (error) =>
+      reportProviderError(error, 'speech-recognition', ENGINE_ID),
     sessionMaxAge: 30 * 60 * 1000,
     async factory() {
       const ws = new WebSocket(
@@ -52,6 +57,7 @@ export default ({ useRecording }: any) => {
     async startStream() {
       if (lifecycle.stopped) return
       let ws: WebSocket | undefined
+      let session: Awaited<ReturnType<typeof manager.getSession>> = null
       let ended = false
       let inputEnded = false
       let buffered: Buffer[] = []
@@ -85,7 +91,7 @@ export default ({ useRecording }: any) => {
           ended = true
           buffered = []
           ws?.off('close', onClose)
-          ws?.off('error', onClose)
+          ws?.off('error', onError)
           ws?.off('message', onMessage)
           if (reason === 'timeout' || reason === 'cleanup') ws?.close()
           else if (ws?.readyState === WebSocket.OPEN)
@@ -103,28 +109,42 @@ export default ({ useRecording }: any) => {
             turn.finish(msg.transcript || '')
           if (msg.type === 'error') {
             console.error('OpenAI transcription failed', msg.error?.message)
-            turn.finish('', 'error')
+            turn.fail(msg.error)
           }
-        } catch {
-          turn.finish('', 'error')
+        } catch (error) {
+          turn.fail(error)
         }
       }
-      function onClose() {
-        turn.finish()
+      function onError(error: unknown) {
+        // Transport errors belong to the active turn, not successful completion.
+        if (session?.closing) turn.finish()
+        else turn.fail({ code: 'ERR_NETWORK', cause: error })
+      }
+      function onClose(code: number) {
+        // Manager-owned teardown stays silent even if its close handshake fails.
+        if (
+          !session?.closing &&
+          code !== undefined &&
+          code !== 1000 &&
+          code !== 1005
+        )
+          turn.fail({ code: 'ERR_NETWORK' })
+        else turn.finish()
       }
       turn.start()
       // Each session has one input buffer. Buffer subsequent turns locally until
       // the previous final result has been consumed and its input cleared.
       await previousTurn
       if (turn.ended) return
-      ws = (await manager.getSession())?.socket
+      session = await manager.getSession()
+      ws = session?.socket
       if (turn.ended) return
       if (!ws) {
         turn.finish()
         return
       }
       ws.on('close', onClose)
-      ws.on('error', onClose)
+      ws.on('error', onError)
       ws.on('message', onMessage)
       buffered.forEach(sendChunk)
       buffered = []

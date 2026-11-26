@@ -56,6 +56,7 @@ for (const provider of [
             entries.forEach(([key, factory]) => registered.set(key, factory())),
         },
       },
+      '@/features/session-errors/report': { reportProviderError() {} },
       '@aws-sdk/client-translate': {},
       '@aws-sdk/credential-providers': {},
       '@azure-rest/ai-translation-text': {},

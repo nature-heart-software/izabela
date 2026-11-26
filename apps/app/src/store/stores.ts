@@ -19,8 +19,10 @@ import SpeechRecognitionEngineManager from '@/modules/speech-recognition-engine-
 import SpeechEngineManager from '@/modules/speech-engine-manager'
 import TranslationEngineManager from '@/modules/translation-engine-manager'
 import { storesStates } from '@/store/index.ts'
+import { useSessionErrorsStore } from '@/features/session-errors/store'
 
 const hooks = {
+  useSessionErrorsStore,
   useSpeechStore,
   useHitboxesStore,
   useConfirmStore,

@@ -1,5 +1,6 @@
 import { bridge } from '@packages/electron-bridger'
-import { electronModuleName } from './shared.ts'
+import { reportProviderError } from '@/features/session-errors/report'
+import { electronModuleName, ENGINE_ID } from './shared.ts'
 import {
   TranslateClient,
   TranslateTextCommand,
@@ -40,6 +41,7 @@ bridge.register([
           const response = await client.send(command)
           return response.TranslatedText
         } catch (e) {
+          reportProviderError(e, 'translation', ENGINE_ID)
           console.error('Amazon Translate failed', e)
           return text
         } finally {
