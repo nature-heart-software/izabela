@@ -6,6 +6,7 @@ import test from 'node:test'
 import loadTypescript from '../load-typescript.cjs'
 const appRoot = new URL('../../apps/app/src/', import.meta.url)
 function registration(kind, provider, mocks, globals = {}) {
+  mocks['@/features/session-errors/report'] = { reportProviderError() {} }
   const filename = fileURLToPath(
     new URL(`plugins/${kind}/${provider}/register.ts`, appRoot),
   )

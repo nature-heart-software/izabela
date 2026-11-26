@@ -2,6 +2,7 @@ import { useSettingsStore } from '@/features/settings/store'
 import sdk from 'microsoft-cognitiveservices-speech-sdk'
 import { createRecognitionLifecycle } from '../../../modules/speech-recognition-engine-manager/lifecycle'
 import engine from './register.node.ts'
+import { reportProviderError } from '@/features/session-errors/report'
 
 export default ({ useRecording }: any) => {
   if (!engine.hasCredentials()) return
@@ -9,7 +10,9 @@ export default ({ useRecording }: any) => {
   const settingsStore = useSettingsStore()
   const speechConfig = sdk.SpeechConfig.fromSubscription(apiKey, region)
   speechConfig.speechRecognitionLanguage = settingsStore.speechInputLanguage
-  const lifecycle = createRecognitionLifecycle()
+  const lifecycle = createRecognitionLifecycle(60000, (error) =>
+    reportProviderError(error, 'speech-recognition', 'microsoft-azure'),
+  )
   return {
     startStream() {
       if (lifecycle.stopped) return
@@ -25,7 +28,19 @@ export default ({ useRecording }: any) => {
           audioConfig.close()
         },
       })
-      recognizer.canceled = () => turn.finish('', 'error')
+      recognizer.canceled = (_, event) => {
+        if (event.reason === sdk.CancellationReason.Error)
+          turn.fail({
+            // Azure's numeric codes are SDK-local, not shared transport codes.
+            code:
+              event.errorCode === sdk.CancellationErrorCode.ConnectionFailure
+                ? 'ERR_NETWORK'
+                : event.errorCode === sdk.CancellationErrorCode.ServiceTimeout
+                ? 'ETIMEDOUT'
+                : event.errorCode,
+          })
+        else turn.finish()
+      }
       recognizer.recognizeOnceAsync(
         (result) => {
           turn.finish(
@@ -34,7 +49,7 @@ export default ({ useRecording }: any) => {
               : '',
           )
         },
-        () => turn.finish('', 'error'),
+        (error) => turn.fail(error),
       )
       turn.start()
     },

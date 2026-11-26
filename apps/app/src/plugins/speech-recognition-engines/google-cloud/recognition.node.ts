@@ -1,3 +1,4 @@
+import { reportProviderError } from '@/features/session-errors/report'
 import { useSettingsStore } from '@/features/settings/store'
 import speech from '@google-cloud/speech'
 import { createRecognitionLifecycle } from '../../../modules/speech-recognition-engine-manager/lifecycle'
@@ -8,7 +9,9 @@ export default ({ useRecording, sampleRateHertz }: any) => {
   if (!engine.hasCredentials()) return
   const settingsStore = useSettingsStore()
   const client = new speech.v1p1beta1.SpeechClient()
-  const lifecycle = createRecognitionLifecycle()
+  const lifecycle = createRecognitionLifecycle(60000, (error) =>
+    reportProviderError(error, 'speech-recognition', 'google-cloud'),
+  )
   return {
     startStream() {
       if (lifecycle.stopped) return
@@ -38,7 +41,7 @@ export default ({ useRecording, sampleRateHertz }: any) => {
         if (result?.isFinal)
           turn.finish(result.alternatives?.[0]?.transcript || '')
       })
-      stream.on('error', () => turn.finish('', 'error'))
+      stream.on('error', (error: unknown) => turn.fail(error))
       stream.on('end', () => turn.finish())
       stream.on('close', () => turn.finish())
       turn.start()

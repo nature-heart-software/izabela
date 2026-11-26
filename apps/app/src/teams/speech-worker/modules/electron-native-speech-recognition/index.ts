@@ -10,6 +10,7 @@ import { v4 as uuid } from 'uuid'
 import { Deferred } from '@packages/toolbox'
 import { ipcMain } from 'electron-postman'
 import speechRecognitionEngineManager from '@/modules/speech-recognition-engine-manager'
+import { reportProviderError } from '@/features/session-errors/report'
 
 export default () => {
   console.log('Starting native speech recognition...')
@@ -156,9 +157,15 @@ export default () => {
           .then(() => {
             if (!disposed) return speechRecognitionEngine?.startStream?.()
           })
-          .catch((error) =>
-            console.error('Unable to start speech recognition', error),
-          )
+          .catch((error) => {
+            if (!disposed)
+              reportProviderError(
+                error,
+                'speech-recognition',
+                selectedEngine?.id,
+              )
+            console.error('Unable to start speech recognition', error)
+          })
       } else {
         speechRecognitionEngine?.stopStream?.()
         // console.log(Array.from(pendingMessages.values()).map((m) => m.id))

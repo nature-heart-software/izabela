@@ -38,7 +38,9 @@ export const api = (type?: 'remote' | 'local') => {
 
 function throwIfError(response: Response) {
   if (!response.ok) {
-    throw new Error(`HTTP error! Status: ${response.status}`)
+    throw Object.assign(new Error(`HTTP error! Status: ${response.status}`), {
+      status: response.status,
+    })
   }
   return response
 }

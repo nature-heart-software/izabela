@@ -7,6 +7,7 @@
   >
     <NvGroup :spacing="2" justify="between">
       <NvGroup :spacing="2" noWrap>
+        <NvErrorHistory v-if="sessionErrors.hasOccurred" />
         <template v-if="settingsStore.debugMode">
           <NvTooltip>
             <NvText>Reload page</NvText>
@@ -42,6 +43,8 @@
 import { css } from '@/styled-system/css'
 import { NvButton, NvCard, NvGroup, NvText, NvTooltip } from '@packages/ui'
 import { useSettingsStore } from '@/features/settings/store'
+import NvErrorHistory from '@/features/session-errors/NvErrorHistory.vue'
+import { useSessionErrorsStore } from '@/features/session-errors/store'
 import { useMessengerStateStore } from '@/teams/messenger/store'
 import NvMarkForRestartMessage from '@/teams/messenger/components/NvMarkForRestartMessage.vue'
 import { isGameOverlay } from '@/consts.ts'
@@ -50,6 +53,7 @@ import { ref } from 'vue'
 import { useEventListener } from '@vueuse/core'
 
 const dragging = ref(false)
+const sessionErrors = useSessionErrorsStore()
 useEventListener('mouseup', () => {
   dragging.value = false
 })

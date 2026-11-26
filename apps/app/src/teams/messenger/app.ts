@@ -9,9 +9,14 @@ import VueJsTour from '@globalhive/vuejs-tour'
 import '@/styles/tour.css'
 import './styles'
 import { loadStores } from '@/store/stores.ts'
+import {
+  sessionErrorReporting,
+  sessionQueryOptions,
+} from '@/features/session-errors/plugin'
 
 const vueQueryPluginOptions: VueQueryPluginOptions = {
   queryClientConfig: {
+    ...sessionQueryOptions().queryClientConfig,
     defaultOptions: {
       queries: {
         refetchOnWindowFocus: false,
@@ -23,6 +28,7 @@ const vueQueryPluginOptions: VueQueryPluginOptions = {
 const app = createApp(App)
   .use(router)
   .use(pinia)
+  .use(sessionErrorReporting)
   .use(VueQueryPlugin, vueQueryPluginOptions)
   .use(NvLoading)
   .use(VueJsTour)

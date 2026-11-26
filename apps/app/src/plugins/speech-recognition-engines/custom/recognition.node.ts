@@ -1,6 +1,7 @@
 import { useSettingsStore } from '@/features/settings/store'
 import io from 'socket.io-client'
 import engine from './register.node.ts'
+import { reportProviderError } from '@/features/session-errors/report'
 
 export default ({ recorder, useRecording }: any) => {
   if (!engine.hasCredentials()) return
@@ -8,6 +9,10 @@ export default ({ recorder, useRecording }: any) => {
   const socket = io(
     `ws://localhost:${import.meta.env.VITE_SERVER_WS_PORT || 7071}`,
   )
+  let disposed = false
+  socket.on('connect_error', (error) => {
+    if (!disposed) reportProviderError(error, 'speech-recognition', 'custom')
+  })
 
   return {
     startStream() {
@@ -34,6 +39,7 @@ export default ({ recorder, useRecording }: any) => {
     },
     stopStream() {},
     cleanup() {
+      disposed = true
       socket.disconnect()
     },
   }

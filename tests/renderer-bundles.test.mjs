@@ -102,6 +102,7 @@ function loadRegistration({ category, provider, filename }) {
   const mocks = {
     vue,
     '@/services': {},
+    '@/features/session-errors/report': { reportProviderError() {} },
     '@/modules/speech-engine-manager': { registerEngine },
     '@/modules/speech-recognition-engine-manager': { registerEngine },
     '@/modules/translation-engine-manager': { registerEngine },

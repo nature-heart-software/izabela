@@ -5,12 +5,15 @@ import { useSettingsStore } from '@/features/settings/store'
 import { createRecognitionLifecycle } from '../../../modules/speech-recognition-engine-manager/lifecycle'
 import engine from './register.node.ts'
 import { PassThrough } from 'stream'
+import { reportProviderError } from '@/features/session-errors/report'
 
 export default ({ useRecording }: any) => {
   if (!engine.hasCredentials()) return
   const { apiKey, url } = engine.getCredentials()
   const settingsStore = useSettingsStore()
-  const lifecycle = createRecognitionLifecycle()
+  const lifecycle = createRecognitionLifecycle(60000, (error) =>
+    reportProviderError(error, 'speech-recognition', 'ibm-watson'),
+  )
   const speechToText = new SpeechToTextV1({
     authenticator: new IamAuthenticator({ apikey: apiKey }),
     serviceUrl: url,
@@ -21,6 +24,8 @@ export default ({ useRecording }: any) => {
       return response.result.models
     })
     .catch((error) => {
+      if (!lifecycle.stopped)
+        reportProviderError(error, 'speech-recognition', 'ibm-watson')
       console.error('Unable to list recognition models', error)
       return []
     })
@@ -57,13 +62,13 @@ export default ({ useRecording }: any) => {
           if (result?.final)
             turn.finish(result.alternatives?.[0]?.transcript || '')
         })
-        stream.on('error', () => turn.finish('', 'error'))
+        stream.on('error', (error) => turn.fail(error))
         stream.on('close', () => turn.finish())
         stream.on('end', () => turn.finish())
         audio.on('data', (chunk) => stream?.write(chunk))
         audio.on('end', () => stream?.end())
-      } catch {
-        turn.finish('', 'error')
+      } catch (error) {
+        turn.fail(error)
       }
     },
     stopStream() {},

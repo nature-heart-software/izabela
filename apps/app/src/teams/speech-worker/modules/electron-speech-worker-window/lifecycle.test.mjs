@@ -7,6 +7,7 @@ import loadTypescript from '../../../../../../../tests/load-typescript.cjs'
 const flush = () => new Promise((resolve) => setImmediate(resolve))
 async function fixture() {
   const keyboard = []
+  const reportedErrors = []
   const power = new EventEmitter(),
     scope = vue.effectScope()
   const settings = vue.reactive({
@@ -26,7 +27,18 @@ async function fixture() {
     fileURLToPath(new URL('./index.ts', import.meta.url)),
     {
       vue,
-      '@google-cloud/speech': {},
+      '@/features/session-errors/report': {
+        reportProviderError: (...args) => reportedErrors.push(args),
+      },
+      '@google-cloud/speech': {
+        SpeechClient: class {
+          async longRunningRecognize() {
+            throw Object.assign(Error('controlled provider rejection'), {
+              status: 402,
+            })
+          }
+        },
+      },
       electron: {
         powerMonitor: power,
         screen: {
@@ -35,7 +47,9 @@ async function fixture() {
         },
       },
       'electron-postman': {},
-      '@/utils/electron-notification': {},
+      '@/utils/electron-notification': {
+        createNotification: () => ({ show() {} }),
+      },
       '@/features/speech/store': { useSpeechRecognitionStore: () => speech },
       '@/features/settings/store': { useSettingsStore: () => settings },
       '@/modules/electron-keybinding/utils': {
@@ -86,6 +100,7 @@ async function fixture() {
     speech,
     controller,
     contents,
+    reportedErrors,
     press: () => keyboard.forEach((fn) => fn({ state: 'DOWN' })),
     active: () => started - stopped,
     counts: () => [started, stopped],
@@ -96,6 +111,21 @@ async function fixture() {
     },
   }
 }
+
+test('browser-recognition provider failures reach session history', async () => {
+  const f = await fixture()
+  try {
+    await f.controller.transcribeAudio({
+      content: 'controlled audio',
+      encoding: 'LINEAR16',
+      sampleRate: 16000,
+    })
+    assert.equal(f.reportedErrors.length, 1)
+    assert.equal(f.reportedErrors[0][1], 'speech-recognition')
+  } finally {
+    f.dispose()
+  }
+})
 
 test('renderer crash stops capture and clears held recording until the replacement renderer loads', async () => {
   const f = await fixture()

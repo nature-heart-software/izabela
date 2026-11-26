@@ -1,5 +1,8 @@
 /** Owns a recognition turn until a result, failure, timeout, or engine teardown. */
-export function createRecognitionLifecycle(resultTimeout = 60000) {
+export function createRecognitionLifecycle(
+  resultTimeout = 60000,
+  onError?: (error: unknown) => void,
+) {
   const active = new Set<() => void>()
   let stopped = false
   return {
@@ -29,22 +32,30 @@ export function createRecognitionLifecycle(resultTimeout = 60000) {
           if (ended) return
           try {
             onChunk(chunk)
-          } catch {
-            finish('', 'error')
+          } catch (error) {
+            fail(error)
           }
         },
         onEnded() {
           if (ended || inputEnded) return
           inputEnded = true
-          timer = setTimeout(() => finish('', 'timeout'), resultTimeout)
+          timer = setTimeout(
+            () => fail({ code: 'ETIMEDOUT' }, 'timeout'),
+            resultTimeout,
+          )
           try {
-            Promise.resolve(onEnded?.()).catch(() => finish('', 'error'))
-          } catch {
-            finish('', 'error')
+            Promise.resolve(onEnded?.()).catch((error) => fail(error))
+          } catch (error) {
+            fail(error)
           }
         },
       })
       const cancel = () => finish('', 'cleanup')
+      function fail(error: unknown, reason = 'error') {
+        if (ended) return
+        finish('', reason)
+        onError?.(error)
+      }
       function finish(text = '', reason = 'complete') {
         if (ended) return
         ended = true
@@ -61,6 +72,7 @@ export function createRecognitionLifecycle(resultTimeout = 60000) {
       active.add(cancel)
       return {
         finish,
+        fail,
         done,
         get ended() {
           return ended

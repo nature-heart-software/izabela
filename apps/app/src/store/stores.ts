@@ -19,8 +19,10 @@ import SpeechRecognitionEngineManager from '@/modules/speech-recognition-engine-
 import SpeechEngineManager from '@/modules/speech-engine-manager'
 import TranslationEngineManager from '@/modules/translation-engine-manager'
 import { storesStates } from '@/store/index.ts'
+import { useSessionErrorsStore } from '@/features/session-errors/store'
 
 const hooks = {
+  useSessionErrorsStore,
   useSpeechStore,
   useHitboxesStore,
   useConfirmStore,
@@ -37,7 +39,7 @@ const hooks = {
 
 export const stores = new Map<
   keyof typeof hooks,
-  (typeof hooks)[keyof typeof hooks]
+  typeof hooks[keyof typeof hooks]
 >()
 Object.entries(hooks).forEach(([key, value]) =>
   stores.set(key as keyof typeof hooks, value),

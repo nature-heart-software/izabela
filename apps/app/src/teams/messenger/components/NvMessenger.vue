@@ -97,6 +97,7 @@
       target="#moveable"
       @drag="onDrag"
     />
+    <NvSessionErrorToasts :anchor="messenger?.$el" />
   </div>
 </template>
 <script lang="ts" setup>
@@ -134,6 +135,7 @@ import throttle from 'lodash/throttle'
 import { isGameOverlay } from '@/consts.ts'
 import { Popover, usePopover } from '@ark-ui/vue'
 import { getTabStops } from '@/utils/focus'
+import NvSessionErrorToasts from '@/features/session-errors/NvSessionErrorToasts.vue'
 
 const routerOverlay = inject<Ref<HTMLElement | undefined>>('router-overlay')
 // import gsap from 'gsap'

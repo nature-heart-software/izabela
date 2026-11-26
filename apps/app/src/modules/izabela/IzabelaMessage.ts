@@ -11,6 +11,7 @@ import {
 } from '@/features/messages/store'
 import { IzabelaMessageEvent, IzabelaMessagePayload } from './types'
 import hash from 'object-hash'
+import { reportProviderError } from '@/features/session-errors/report'
 
 type DownloadResponse = Blob | Response
 
@@ -339,11 +340,16 @@ export default (messagePayload: IzabelaMessagePayload) => {
   }
 
   async function downloadAudioAndBlobify(): Promise<Blob> {
-    return downloadAudio().then((res) => {
-      if (!('body' in res)) return res
-      const clonedResponse = res.clone()
-      return clonedResponse.blob()
-    })
+    return downloadAudio()
+      .then((res) => {
+        if (!('body' in res)) return res
+        const clonedResponse = res.clone()
+        return clonedResponse.blob()
+      })
+      .catch((error) => {
+        onError(error)
+        throw error
+      })
   }
 
   async function loadAudio(res: DownloadResponse, audioEls = audioElements) {
@@ -410,6 +416,7 @@ export default (messagePayload: IzabelaMessagePayload) => {
   function onError(e: unknown) {
     if (finished) return
     finished = true
+    reportProviderError(e, 'speech', engineName)
     releaseAudio()
     if (playingMessageStore.id === id)
       playingMessageStore.$patch({ id: null, isPlaying: false, progress: 0 })

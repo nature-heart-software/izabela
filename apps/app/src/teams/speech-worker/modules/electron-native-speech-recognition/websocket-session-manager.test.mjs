@@ -84,6 +84,30 @@ test('failed initial connection can retry and simultaneous callers share one con
   }
 })
 
+test('background connection rejection reports once but stopping a pending connection is silent', async () => {
+  const errors = []
+  const failure = Object.assign(Error('controlled offline'), {
+    code: 'ECONNRESET',
+  })
+  const f = fixture(
+    async () => {
+      throw failure
+    },
+    { onError: (error) => errors.push(error) },
+  )
+  await f.manager.ready
+  assert.equal(errors.length, 1)
+  assert.equal(errors[0], failure)
+  f.manager.stop()
+  const g = fixture(async () => new Socket(), {
+    onError: (error) => errors.push(error),
+  })
+  await flush()
+  g.manager.stop()
+  await g.manager.ready
+  assert.equal(errors.length, 1)
+})
+
 test('closed sockets are replaced, including factories returning an already open socket', async () => {
   const sockets = []
   const f = fixture(async () => {

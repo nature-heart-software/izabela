@@ -150,26 +150,26 @@ const downloadMessageLocally = async () => {
       excludeFromHistory: true,
       disableAutoplay: true,
     })
-    IzabelaMessage(completeMessage)
-      .downloadAudioAndBlobify()
-      .then((data) => {
-        const reader = new FileReader()
-        reader.onload = () => {
-          ElectronFilesystem.downloadMessagePrompt(
-            completeMessage,
-            `${formatedCreatedAt.value} - ${
-              engine.value?.name
-            } - ${engine.value?.getVoiceName(message.value?.voice)} - ${
-              message.value?.message
-            }`.replace(/([^a-z0-9\s-]+)/gi, '_'),
-            reader.result as string,
-          ).finally(() => {
-            downloading.value = false
-          })
-        }
-        reader.readAsDataURL(data)
-      })
+    const data = await IzabelaMessage(completeMessage).downloadAudioAndBlobify()
+    const audio = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(reader.result as string)
+      reader.onerror = () => reject(reader.error)
+      reader.onabort = () => reject(new DOMException('Aborted', 'AbortError'))
+      reader.readAsDataURL(data)
+    })
+    await ElectronFilesystem.downloadMessagePrompt(
+      completeMessage,
+      `${formatedCreatedAt.value} - ${
+        engine.value?.name
+      } - ${engine.value?.getVoiceName(message.value?.voice)} - ${
+        message.value?.message
+      }`.replace(/([^a-z0-9\s-]+)/gi, '_'),
+      audio,
+    )
   } catch (error) {
+    // Synthesis reports its own failure; own the rejection to avoid a second toast.
+  } finally {
     downloading.value = false
   }
 }

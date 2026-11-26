@@ -9,7 +9,8 @@ const flush = () => new Promise((resolve) => setImmediate(resolve))
 function fixture({ held = false, fail = false } = {}) {
   const stream = new PassThrough(),
     sent = [],
-    recordings = []
+    recordings = [],
+    reportedErrors = []
   const state = vue.reactive({ recording: held })
   let stopped = 0,
     cleaned = 0,
@@ -18,6 +19,9 @@ function fixture({ held = false, fail = false } = {}) {
     fileURLToPath(new URL('./index.ts', import.meta.url)),
     {
       vue,
+      '@/features/session-errors/report': {
+        reportProviderError: (...args) => reportedErrors.push(args),
+      },
       '@/features/settings/store': {
         useSettingsStore: () => ({
           speechRecognitionStrategy: 'ptr',
@@ -68,6 +72,7 @@ function fixture({ held = false, fail = false } = {}) {
   return {
     stream,
     sent,
+    reportedErrors,
     recordings,
     state,
     context: () => context,
@@ -143,6 +148,7 @@ test('an asynchronous provider startup failure stays handled and a later recordi
   const f = fixture({ held: true, fail: true })
   try {
     await flush()
+    assert.equal(f.reportedErrors.length, 1)
     f.state.recording = false
     await vue.nextTick()
     f.recover()

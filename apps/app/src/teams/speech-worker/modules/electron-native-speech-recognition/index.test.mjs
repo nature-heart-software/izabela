@@ -29,6 +29,7 @@ for (const sampleRate of [undefined, 24000])
       fileURLToPath(new URL('./index.ts', import.meta.url)),
       {
         vue,
+        '@/features/session-errors/report': { reportProviderError() {} },
         '@/features/settings/store': { useSettingsStore: () => settings },
         '@/features/speech/store': {
           useSpeechRecognitionStore: () => recognition,

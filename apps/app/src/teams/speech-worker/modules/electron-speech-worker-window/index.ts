@@ -20,6 +20,7 @@ import { windowHeight, windowWidth } from '@/teams/speech-worker/electron/const'
 import { getTopLeftWindow } from '@/electron/utils'
 import { findDisplay } from '@/features/display/utils'
 import speechRecognitionEngineManager from '@/modules/speech-recognition-engine-manager'
+import { reportProviderError } from '@/features/session-errors/report'
 
 export const ElectronSpeechWindow = () => {
   let registeredWindow: BrowserWindow | null = null
@@ -27,7 +28,8 @@ export const ElectronSpeechWindow = () => {
   const isReady = () => ready.promise
   let settingsStore: ReturnType<typeof useSettingsStore> | undefined
   let speechRecognitionStore:
-    ReturnType<typeof useSpeechRecognitionStore> | undefined
+    | ReturnType<typeof useSpeechRecognitionStore>
+    | undefined
   let deferredRecording: ReturnType<typeof Deferred> | null = null
   let suspended = false
   let rendererAvailable = true
@@ -84,6 +86,7 @@ export const ElectronSpeechWindow = () => {
         onListeningError()
       }
     } catch (e: unknown) {
+      reportProviderError(e, 'speech-recognition', 'google-cloud')
       onListeningError()
     }
   }

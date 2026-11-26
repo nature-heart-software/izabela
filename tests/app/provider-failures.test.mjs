@@ -14,7 +14,8 @@ function fixture(provider, options = {}) {
     clients = [],
     timers = new Map(),
     logs = [],
-    uploads = []
+    uploads = [],
+    reportedErrors = []
   const directory = mkdtempSync(path.join(os.tmpdir(), 'izabela-provider-'))
   let timerId = 0,
     credentialFailure = false,
@@ -83,6 +84,9 @@ function fixture(provider, options = {}) {
     }),
   }
   const mocks = {
+    '@/features/session-errors/report': {
+      reportProviderError: (...args) => reportedErrors.push(args),
+    },
     '@/features/settings/store': {
       useSettingsStore: () => ({
         speechInputLanguage: options.language || 'en-US',
@@ -229,6 +233,7 @@ function fixture(provider, options = {}) {
   }
   let engine
   const f = {
+    reportedErrors,
     streams,
     turns,
     clients,
@@ -260,7 +265,7 @@ function fixture(provider, options = {}) {
           Buffer.from(
             JSON.stringify({
               type: 'error',
-              error: { message: error.message },
+              error: { message: error.message, code: error.code },
             }),
           ),
         )
@@ -347,6 +352,23 @@ function fixture(provider, options = {}) {
   }
   return f
 }
+test('Google reports a failed recognition turn once and preserves its provider status', async () => {
+  const f = fixture('google-cloud')
+  f.create()
+  try {
+    await f.begin()
+    const error = Object.assign(Error('controlled failure'), { code: 14 })
+    f.fail(error)
+    f.fail(error)
+    await flush()
+    assert.equal(f.reportedErrors.length, 1)
+    assert.equal(f.reportedErrors[0][0], error)
+    assert.equal(f.reportedErrors[0][1], 'speech-recognition')
+    assert.equal(f.reportedErrors[0][2], 'google-cloud')
+  } finally {
+    await f.dispose()
+  }
+})
 const providers = [
   'google-cloud',
   'ibm-watson',
@@ -422,6 +444,11 @@ for (const provider of providers) {
         f.fail(Object.assign(Error('controlled provider failure'), { code }))
         await flush()
         assert.deepEqual(f.turns[0].results, [''])
+        assert.equal(
+          f.reportedErrors.length,
+          1,
+          'provider failure must reach session history',
+        )
         await f.begin()
         if (provider === 'elevenlabs') {
           f.end()
@@ -445,6 +472,11 @@ for (const provider of providers) {
       }
       f.cleanup()
       assert.deepEqual(f.turns[0].results, [''])
+      assert.equal(
+        f.reportedErrors.length,
+        0,
+        'cleanup is not a provider error',
+      )
       assert.equal(f.turns[0].pumping, false)
       if (provider !== 'elevenlabs') f.success('late result')
       else f.success('late result')
@@ -471,6 +503,7 @@ for (const provider of providers) {
       f.expire()
       await flush()
       assert.deepEqual(f.turns[0].results, [''])
+      assert.equal(f.reportedErrors.length, 1, 'timeouts must be visible')
       await f.begin()
       if (provider === 'elevenlabs') {
         f.end()
@@ -510,6 +543,10 @@ test('Amazon credential acquisition failure is handled and a later turn retries'
     await f.begin()
     await flush()
     assert.deepEqual(f.turns[0].results, [''])
+    assert.ok(
+      f.reportedErrors.length > 0,
+      'credential failures must be visible',
+    )
     f.setCredentialFailure(false)
     await f.begin()
     f.success()
@@ -545,6 +582,7 @@ test('IBM model catalog failure does not escape as an unhandled rejection', asyn
     f.success()
     await flush()
     assert.deepEqual(f.turns[0].results, ['recovered speech'])
+    assert.equal(f.reportedErrors.length, 1, 'catalog failures must be visible')
   } finally {
     await f.dispose()
   }

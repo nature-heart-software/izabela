@@ -3,6 +3,7 @@ import { WebSocket } from 'ws'
 interface WebSocketSession {
   socket: WebSocket
   createdAt: number
+  closing: boolean
 }
 
 export class WebSocketSessionManager {
@@ -15,20 +16,24 @@ export class WebSocketSessionManager {
   private readonly factory: () => Promise<WebSocket>
   private readonly sessionMaxAge: number
   private readonly connectionTimeout: number
+  private readonly onError?: (error: unknown) => void
   public readonly ready: Promise<WebSocketSession | null>
 
   constructor({
     factory,
     sessionMaxAge = 30 * 60 * 1000,
     connectionTimeout = 15000,
+    onError,
   }: {
     factory: () => Promise<WebSocket>
     sessionMaxAge?: number
     connectionTimeout?: number
+    onError?: (error: unknown) => void
   }) {
     this.factory = factory
     this.sessionMaxAge = sessionMaxAge
     this.connectionTimeout = connectionTimeout
+    this.onError = onError
     this.ready = this.refresh('primary')
     this.timers.push(
       setInterval(() => {
@@ -77,15 +82,21 @@ export class WebSocketSessionManager {
     const request = this.createWebSocketSession()
       .then((session) => {
         if (this.stopped) {
+          session.closing = true
           session.socket.close()
           return null
         }
         const previous = this[slot]
         this[slot] = session
-        previous?.socket.close()
+        if (previous) {
+          // Mark ownership before close: its handshake can emit error/1006.
+          previous.closing = true
+          previous.socket.close()
+        }
         return session
       })
       .catch((error) => {
+        if (!this.stopped) this.onError?.(error)
         if (!this.stopped)
           console.error('Unable to establish transcription session', error)
         return null
@@ -112,7 +123,8 @@ export class WebSocketSessionManager {
         if (error) {
           socket?.close()
           reject(error)
-        } else resolve({ socket: socket!, createdAt: Date.now() })
+        } else
+          resolve({ socket: socket!, createdAt: Date.now(), closing: false })
       }
       const onOpen = () => finish()
       const onClose = () =>
@@ -154,8 +166,11 @@ export class WebSocketSessionManager {
     this.timers.forEach((timer) => clearTimeout(timer))
     this.timers = []
     this.cancelPending.forEach((cancel) => cancel())
-    this.primary?.socket.close()
-    this.secondary?.socket.close()
+    for (const session of [this.primary, this.secondary]) {
+      if (!session) continue
+      session.closing = true
+      session.socket.close()
+    }
     this.primary = this.secondary = null
   }
 }

@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url'
 import test from 'node:test'
 import loadTypescript from '../../../../tests/load-typescript.cjs'
 
-function loadServices(hasUniversalApiCredentials = true) {
+function loadServices(hasUniversalApiCredentials = true, status = 200) {
   const calls = []
   const services = loadTypescript(
     fileURLToPath(new URL('./index.ts', import.meta.url)),
@@ -26,12 +26,22 @@ function loadServices(hasUniversalApiCredentials = true) {
       __importMetaEnv: { VITE_SERVER_PORT: '7070' },
       fetch: async (url, options) => {
         calls.push({ url: new URL(url), options })
-        return new Response('audio')
+        return new Response('audio', { status })
       },
     },
   )
   return { ...services, calls }
 }
+
+test('HTTP failures retain the status needed to distinguish payment from arbitrary forbidden responses', async () => {
+  for (const status of [401, 402, 403, 429, 503]) {
+    const { fetchApi } = loadServices(true, status)
+    await assert.rejects(
+      fetchApi('remote', '/tts/openai/synthesize-speech'),
+      (error) => error.status === status,
+    )
+  }
+})
 
 test('remote synthesis forwards an explicit region in the gateway query', async () => {
   const { fetchApi, calls } = loadServices()

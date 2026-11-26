@@ -1,4 +1,5 @@
 import { v2 } from '@google-cloud/translate'
+import { reportProviderError } from '@/features/session-errors/report'
 
 export const ElectronTranslation = () => ({
   async translate(
@@ -15,6 +16,7 @@ export const ElectronTranslation = () => ({
       const [translations] = await translate.translate(text, options)
       return translations
     } catch (error) {
+      reportProviderError(error, 'translation', 'google-cloud')
       return text
     }
   },

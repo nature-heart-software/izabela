@@ -8,6 +8,7 @@ import { createReadStream, mkdirSync, unlink, writeFileSync } from 'fs'
 import { v4 as uuid } from 'uuid'
 import { promisify } from 'util'
 import engine from './register.node.ts'
+import { reportProviderError } from '@/features/session-errors/report'
 
 const unlinkAsync = promisify(unlink)
 
@@ -40,7 +41,9 @@ export default ({ useRecording }: any) => {
   if (!engine.hasCredentials()) return
   const { apiKey } = engine.getCredentials()
   const client = new ElevenLabsClient({ apiKey })
-  const lifecycle = createRecognitionLifecycle()
+  const lifecycle = createRecognitionLifecycle(60000, (error) =>
+    reportProviderError(error, 'speech-recognition', 'elevenlabs'),
+  )
   return {
     startStream() {
       if (lifecycle.stopped) return
@@ -68,7 +71,7 @@ export default ({ useRecording }: any) => {
           mkdirSync(path.dirname(wavPath), { recursive: true })
           writeFileSync(wavPath, wavBuffer)
           file = createReadStream(wavPath)
-          file.on('error', () => turn.finish('', 'error'))
+          file.on('error', (error) => turn.fail(error))
           const response = await client.speechToText.convert(
             { file, modelId: 'scribe_v1', tagAudioEvents: false },
             { abortSignal: controller.signal },
